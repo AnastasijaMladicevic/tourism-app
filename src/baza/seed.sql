@@ -33942,3 +33942,332 @@ INSERT INTO "Images" ("Url", "AltText", "IsMain", "LocalityId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", l."Id", NOW()
 FROM source s
 JOIN "Localities" l ON l."Name" = s."LocalityName";
+
+-- 16.2 SPAIN EXPANSION - OBJECTS, REVIEWS, ACTIVITIES
+WITH source("Name", "Description", "Address", "PhoneNumber", "Price", "ObjectTypeName", "LocalityName", "DestinationName", "CreatorEmail", "ManagerEmail", "Profile", "Lng", "Lat") AS (
+    VALUES
+    ('Hotel Mirador Alicante', 'Moderan gradski hotel blizu obale, pogodan za goste koji žele kombinaciju centra i mora.', 'Explanada Alicante, Alicante', '+34965000001', 165.00, 'Hotel', 'Explanada Alicante', 'Alicante', 'carmen.creator@spirego.com', 'manager.alicante@spirego.com', 'lodging', -0.4824, 38.3448),
+    ('Arrocería Costa Blanca', 'Restoran sa fokusom na pirinač, ribu i opušten ručak uz mediteranski ritam grada.', 'Explanada Alicante, Alicante', '+34965000002', 34.00, 'Restoran', 'Explanada Alicante', 'Alicante', 'carmen.creator@spirego.com', 'manager.alicante@spirego.com', 'food', -0.4820, 38.3446),
+    ('Galerija Santa Barbara', 'Manja galerija sa izložbama lokalnih autora i lepim pogledom na gradski deo ispod tvrđave.', 'Castillo Santa Barbara, Alicante', '+34965000003', 8.00, 'Galerija', 'Castillo Santa Barbara Alicante', 'Alicante', 'carmen.creator@spirego.com', 'manager.alicante@spirego.com', 'culture', -0.4787, 38.3490),
+    ('Plaza Mar Alicante', 'Tržni centar sa modom, kozmetikom i svakodnevnim shopping sadržajima blizu centra grada.', 'Explanada Alicante, Alicante', '+34965000004', 0.00, 'Trzni Centar', 'Explanada Alicante', 'Alicante', 'carmen.creator@spirego.com', 'manager.alicante@spirego.com', 'shopping', -0.4816, 38.3450),
+    ('Hospital Costa Alicante', 'Veća bolnica za hitne i redovne preglede, praktično smeštena za gradske i turističke potrebe.', 'Explanada Alicante, Alicante', '+34965000005', 0.00, 'Bolnica', 'Explanada Alicante', 'Alicante', 'carmen.creator@spirego.com', 'manager.alicante@spirego.com', 'health', -0.4830, 38.3455),
+    ('Repsol Postiguet Alicante', 'Pumpa u blizini plaže sa prodavnicom i sadržajima korisnim za kraće gradske vožnje.', 'Playa del Postiguet, Alicante', '+34965000006', 0.00, 'Benzinska Pumpa', 'Playa del Postiguet', 'Alicante', 'carmen.creator@spirego.com', 'manager.alicante@spirego.com', 'fuel', -0.4768, 38.3471),
+    ('Boutique Suveniri Explanada', 'Suvenirnica sa lokalnim detaljima, keramikom i manjim poklon programom za putnike.', 'Explanada Alicante, Alicante', '+34965000007', 0.00, 'Suvenirnica', 'Explanada Alicante', 'Alicante', 'carmen.creator@spirego.com', 'manager.alicante@spirego.com', 'shopping', -0.4815, 38.3442),
+    ('Klinika Vista Med Alicante', 'Privatna klinika sa pregledima, dijagnostikom i brzim prijemom za lakše zdravstvene potrebe.', 'Explanada Alicante, Alicante', '+34965000008', 0.00, 'Klinika', 'Explanada Alicante', 'Alicante', 'carmen.creator@spirego.com', 'manager.alicante@spirego.com', 'health', -0.4827, 38.3457),
+    ('Cepsa Castillo Alicante', 'Pumpa na prilazu tvrđavi korisna za vozila koja obilaze širi gradski pojas.', 'Castillo Santa Barbara Alicante, Alicante', '+34965000009', 0.00, 'Benzinska Pumpa', 'Castillo Santa Barbara Alicante', 'Alicante', 'carmen.creator@spirego.com', 'manager.alicante@spirego.com', 'fuel', -0.4792, 38.3486),
+
+    ('Pansion La Concha Residence', 'Mirniji smeštaj nekoliko minuta od obale, praktičan za goste koji žele pešački obilazak grada.', 'La Concha San Sebastian, San Sebastian', '+34943000001', 148.00, 'Pansion', 'La Concha San Sebastian', 'San Sebastian', 'carmen.creator@spirego.com', 'manager.sansebastian@spirego.com', 'lodging', -1.9885, 43.3208),
+    ('Pintxos Parte Vieja', 'Živ restoran sa baskijskim zalogajima i večernjom atmosferom u starom delu grada.', 'Parte Vieja San Sebastian, San Sebastian', '+34943000002', 31.00, 'Restoran', 'Parte Vieja San Sebastian', 'San Sebastian', 'carmen.creator@spirego.com', 'manager.sansebastian@spirego.com', 'food', -1.9844, 43.3227),
+    ('Galerija Atlantik Donostia', 'Savremena galerija sa manjim izložbama i fokusom na lokalnu kreativnu scenu.', 'Parte Vieja San Sebastian, San Sebastian', '+34943000003', 7.00, 'Galerija', 'Parte Vieja San Sebastian', 'San Sebastian', 'carmen.creator@spirego.com', 'manager.sansebastian@spirego.com', 'culture', -1.9841, 43.3229),
+    ('Mercado Kursaal San Sebastian', 'Gradska tržnica sa hranom, delikatesima i dosta lokalnih proizvoda za kraću kupovinu.', 'Parte Vieja San Sebastian, San Sebastian', '+34943000004', 0.00, 'Trznica', 'Parte Vieja San Sebastian', 'San Sebastian', 'carmen.creator@spirego.com', 'manager.sansebastian@spirego.com', 'shopping', -1.9838, 43.3224),
+    ('Hospital Donostia Center', 'Bolnički objekat sa hitnim prijemom i osnovnim specijalističkim uslugama za gradski i turistički deo.', 'La Concha San Sebastian, San Sebastian', '+34943000005', 0.00, 'Bolnica', 'La Concha San Sebastian', 'San Sebastian', 'carmen.creator@spirego.com', 'manager.sansebastian@spirego.com', 'health', -1.9878, 43.3210),
+    ('Repsol La Concha', 'Pumpa uz glavne gradske prilaze sa brzom uslugom i manjom prodavnicom za putnike.', 'La Concha San Sebastian, San Sebastian', '+34943000006', 0.00, 'Benzinska Pumpa', 'La Concha San Sebastian', 'San Sebastian', 'carmen.creator@spirego.com', 'manager.sansebastian@spirego.com', 'fuel', -1.9894, 43.3205),
+    ('Suveniri Parte Vieja', 'Mala prodavnica sa poklonima, gastronomskim sitnicama i stvarima vezanim za baskijsku kulturu.', 'Parte Vieja San Sebastian, San Sebastian', '+34943000007', 0.00, 'Suvenirnica', 'Parte Vieja San Sebastian', 'San Sebastian', 'carmen.creator@spirego.com', 'manager.sansebastian@spirego.com', 'shopping', -1.9848, 43.3221),
+    ('Poliklinika Zurriola San Sebastian', 'Poliklinika sa pregledima i analizama, pogodna za brže zdravstvene potrebe tokom boravka u gradu.', 'La Concha San Sebastian, San Sebastian', '+34943000008', 0.00, 'Poliklinika', 'La Concha San Sebastian', 'San Sebastian', 'carmen.creator@spirego.com', 'manager.sansebastian@spirego.com', 'health', -1.9869, 43.3216),
+    ('Cepsa Igueldo Drive', 'Benzinska pumpa na prilazu višim tačkama grada i obalnim rutama prema vidikovcu.', 'Monte Igueldo, San Sebastian', '+34943000009', 0.00, 'Benzinska Pumpa', 'Monte Igueldo', 'San Sebastian', 'carmen.creator@spirego.com', 'manager.sansebastian@spirego.com', 'fuel', -2.0319, 43.3185),
+
+    ('Apartmani Onyar Rooms', 'Apartmanski smeštaj uz reku, pogodan za duži boravak i mirnije večeri u Đironi.', 'Onyar Riverside Girona, Girona', '+34972000001', 122.00, 'Apartman', 'Onyar Riverside Girona', 'Girona', 'carmen.creator@spirego.com', 'manager.girona@spirego.com', 'lodging', 2.8247, 41.9846),
+    ('Restoran Barri Vell Girona', 'Restoran u starom gradu sa lokalnim jelima i prijatnim ambijentom za ručak posle obilaska.', 'Barri Vell Girona, Girona', '+34972000002', 29.00, 'Restoran', 'Barri Vell Girona', 'Girona', 'carmen.creator@spirego.com', 'manager.girona@spirego.com', 'food', 2.8262, 41.9861),
+    ('Muzej Mostova Girona', 'Muzejski prostor posvećen istoriji grada, rekama i mostovima koji su oblikovali identitet Đirone.', 'Onyar Riverside Girona, Girona', '+34972000003', 6.00, 'Muzej', 'Onyar Riverside Girona', 'Girona', 'carmen.creator@spirego.com', 'manager.girona@spirego.com', 'culture', 2.8246, 41.9841),
+    ('Girona Market Hall', 'Natkrivena tržnica sa lokalnim proizvodima, sirom, maslinama i ponudom za svakodnevnu kupovinu.', 'Barri Vell Girona, Girona', '+34972000004', 0.00, 'Trznica', 'Barri Vell Girona', 'Girona', 'carmen.creator@spirego.com', 'manager.girona@spirego.com', 'shopping', 2.8256, 41.9855),
+    ('Hospital Girona Nord', 'Bolnički objekat sa prijemom i dijagnostičkim uslugama za širi gradski prostor Đirone.', 'Girona Cathedral Quarter, Girona', '+34972000005', 0.00, 'Bolnica', 'Girona Cathedral Quarter', 'Girona', 'carmen.creator@spirego.com', 'manager.girona@spirego.com', 'health', 2.8255, 41.9875),
+    ('Repsol Girona Riverside', 'Pumpa korisna za gradske vožnje i dalje rute prema obali i unutrašnjosti Katalonije.', 'Onyar Riverside Girona, Girona', '+34972000006', 0.00, 'Benzinska Pumpa', 'Onyar Riverside Girona', 'Girona', 'carmen.creator@spirego.com', 'manager.girona@spirego.com', 'fuel', 2.8239, 41.9844),
+    ('Suvenirnica Katedrala Girona', 'Prodavnica sa poklonima, ilustracijama grada i manjim ručno rađenim predmetima.', 'Girona Cathedral Quarter, Girona', '+34972000007', 0.00, 'Suvenirnica', 'Girona Cathedral Quarter', 'Girona', 'carmen.creator@spirego.com', 'manager.girona@spirego.com', 'shopping', 2.8258, 41.9868),
+
+    ('Hotel La Caleta Cadiz', 'Hotel blizu obale i šetališta, praktičan za goste koji žele atlantsku atmosferu i pešački obilazak.', 'La Caleta Cadiz, Cadiz', '+34956000001', 138.00, 'Hotel', 'La Caleta Cadiz', 'Cadiz', 'carmen.creator@spirego.com', 'manager.cadiz@spirego.com', 'lodging', -6.2992, 36.5312),
+    ('Taverna Campo del Sur', 'Restoran sa morskim jelima i kasnijim večerama uz obalni deo starog Kadiza.', 'Paseo Campo del Sur, Cadiz', '+34956000002', 33.00, 'Restoran', 'Paseo Campo del Sur', 'Cadiz', 'carmen.creator@spirego.com', 'manager.cadiz@spirego.com', 'food', -6.2968, 36.5276),
+    ('Muzej Atlantika Cadiz', 'Kulturni prostor sa fokusom na obalu, luku i istorijski značaj grada kroz vekove.', 'Old Town Cadiz, Cadiz', '+34956000003', 7.00, 'Muzej', 'Old Town Cadiz', 'Cadiz', 'carmen.creator@spirego.com', 'manager.cadiz@spirego.com', 'culture', -6.2944, 36.5290),
+    ('Mercado del Puerto Cadiz', 'Tržnica sa ribom, svežim namirnicama i lokalnim proizvodima tipičnim za andaluzijsku obalu.', 'Old Town Cadiz, Cadiz', '+34956000004', 0.00, 'Trznica', 'Old Town Cadiz', 'Cadiz', 'carmen.creator@spirego.com', 'manager.cadiz@spirego.com', 'shopping', -6.2940, 36.5295),
+    ('Hospital Bahia Cadiz', 'Bolnica za hitne i redovne preglede, korisna i lokalnim stanovnicima i sezonskim posetiocima.', 'Old Town Cadiz, Cadiz', '+34956000005', 0.00, 'Bolnica', 'Old Town Cadiz', 'Cadiz', 'carmen.creator@spirego.com', 'manager.cadiz@spirego.com', 'health', -6.2935, 36.5288),
+    ('Cepsa La Caleta Cadiz', 'Pumpa u blizini obale sa brzim pristupom i manjom ponudom za putnike.', 'La Caleta Cadiz, Cadiz', '+34956000006', 0.00, 'Benzinska Pumpa', 'La Caleta Cadiz', 'Cadiz', 'carmen.creator@spirego.com', 'manager.cadiz@spirego.com', 'fuel', -6.2989, 36.5314),
+    ('Suvenirnica Stari Kadiz', 'Prodavnica sa razglednicama, keramikom i manjim suvenirima inspirisanim gradom i obalom.', 'Old Town Cadiz, Cadiz', '+34956000007', 0.00, 'Suvenirnica', 'Old Town Cadiz', 'Cadiz', 'carmen.creator@spirego.com', 'manager.cadiz@spirego.com', 'shopping', -6.2942, 36.5298),
+
+    ('Hotel Belluga Murcia', 'Centralni gradski hotel za posetioce koji žele da sve glavne tačke Mursije obiđu peške.', 'Plaza Belluga Murcia, Murcia', '+34968000001', 129.00, 'Hotel', 'Plaza Belluga Murcia', 'Murcia', 'carmen.creator@spirego.com', 'manager.murcia@spirego.com', 'lodging', -1.1288, 37.9839),
+    ('Segura Tapas Murcia', 'Restoran sa tapas jelima i opuštenim ritmom za kasniji ručak ili večeru u centru grada.', 'Murcia Old Town, Murcia', '+34968000002', 27.00, 'Restoran', 'Murcia Old Town', 'Murcia', 'carmen.creator@spirego.com', 'manager.murcia@spirego.com', 'food', -1.1298, 37.9860),
+    ('Murcia Wellness Patio', 'Wellness centar za kraći spa predah, masaže i mirniji tempo tokom toplijih gradskih dana.', 'Rio Segura Murcia, Murcia', '+34968000003', 24.00, 'Wellness centar', 'Rio Segura Murcia', 'Murcia', 'carmen.creator@spirego.com', 'manager.murcia@spirego.com', 'wellness', -1.1292, 37.9850),
+    ('Centro Comercial Murcia Luz', 'Tržni centar sa modom, svakodnevnim kupovinama i zatvorenim prostorom za topliji deo godine.', 'Plaza Belluga Murcia, Murcia', '+34968000004', 0.00, 'Trzni Centar', 'Plaza Belluga Murcia', 'Murcia', 'carmen.creator@spirego.com', 'manager.murcia@spirego.com', 'shopping', -1.1282, 37.9843),
+    ('Hospital Segura Murcia', 'Bolnički objekat sa stalnim prijemom i osnovnim specijalističkim uslugama za gradski deo.', 'Murcia Old Town, Murcia', '+34968000005', 0.00, 'Bolnica', 'Murcia Old Town', 'Murcia', 'carmen.creator@spirego.com', 'manager.murcia@spirego.com', 'health', -1.1304, 37.9858),
+    ('Repsol Murcia Centro', 'Pumpa u centralnoj zoni grada, praktična za kraća zaustavljanja i svakodnevne gradske vožnje.', 'Rio Segura Murcia, Murcia', '+34968000006', 0.00, 'Benzinska Pumpa', 'Rio Segura Murcia', 'Murcia', 'carmen.creator@spirego.com', 'manager.murcia@spirego.com', 'fuel', -1.1289, 37.9848),
+    ('Suvenirnica Plaza Belluga', 'Suvenirnica sa manjim poklonima, slatkišima i predmetima inspirisanim Mursijom.', 'Plaza Belluga Murcia, Murcia', '+34968000007', 0.00, 'Suvenirnica', 'Plaza Belluga Murcia', 'Murcia', 'carmen.creator@spirego.com', 'manager.murcia@spirego.com', 'shopping', -1.1284, 37.9836),
+
+    ('Pansion Sardinero Plaza', 'Pansion uz obalu za goste koji žele jednostavan smeštaj i lagan pristup plaži i centru.', 'El Sardinero Santander, Santander', '+34942000001', 119.00, 'Pansion', 'El Sardinero Santander', 'Santander', 'carmen.creator@spirego.com', 'manager.santander@spirego.com', 'lodging', -3.7842, 43.4762),
+    ('Restaurante Botin Norte', 'Restoran severnjačke kuhinje sa ribom, predjelima i pogledom ka obalnom delu Santandera.', 'Centro Botin Santander, Santander', '+34942000002', 35.00, 'Restoran', 'Centro Botin Santander', 'Santander', 'carmen.creator@spirego.com', 'manager.santander@spirego.com', 'food', -3.7977, 43.4635),
+    ('Galerija Costa Cantabrica', 'Galerijski prostor sa povremenim postavkama i manjim kulturnim programom uz vodeni deo grada.', 'Centro Botin Santander, Santander', '+34942000003', 6.00, 'Galerija', 'Centro Botin Santander', 'Santander', 'carmen.creator@spirego.com', 'manager.santander@spirego.com', 'culture', -3.7981, 43.4641),
+    ('Mercado Sardinero Santander', 'Tržnica sa lokalnim namirnicama, sirevima i svakodnevnim shopping sadržajem za gradski deo.', 'El Sardinero Santander, Santander', '+34942000004', 0.00, 'Trznica', 'El Sardinero Santander', 'Santander', 'carmen.creator@spirego.com', 'manager.santander@spirego.com', 'shopping', -3.7837, 43.4769),
+    ('Hospital Cantabrico Santander', 'Bolnica sa hitnim i redovnim prijemom, lako dostupna iz obalnog i centralnog dela grada.', 'Centro Botin Santander, Santander', '+34942000005', 0.00, 'Bolnica', 'Centro Botin Santander', 'Santander', 'carmen.creator@spirego.com', 'manager.santander@spirego.com', 'health', -3.7974, 43.4638),
+    ('Repsol Sardinero Santander', 'Benzinska pumpa uz glavne saobraćajnice prema plažama i gradskom jezgru.', 'El Sardinero Santander, Santander', '+34942000006', 0.00, 'Benzinska Pumpa', 'El Sardinero Santander', 'Santander', 'carmen.creator@spirego.com', 'manager.santander@spirego.com', 'fuel', -3.7848, 43.4758),
+    ('Suveniri Magdalena', 'Prodavnica sa sitnim poklonima i turističkim detaljima inspirisanim severnom obalom.', 'Peninsula Magdalena, Santander', '+34942000007', 0.00, 'Suvenirnica', 'Peninsula Magdalena', 'Santander', 'carmen.creator@spirego.com', 'manager.santander@spirego.com', 'shopping', -3.7564, 43.4691),
+
+    ('Resort Costa Adeje Blue', 'Veći hotel na jugu ostrva sa bazenima, dobrim pristupom plažama i sadržajima za odmor.', 'Costa Adeje Tenerife, Tenerife', '+34922000001', 189.00, 'Hotel', 'Costa Adeje Tenerife', 'Tenerife', 'carmen.creator@spirego.com', 'manager.tenerife@spirego.com', 'lodging', -16.7322, 28.0913),
+    ('Restaurante Volcán y Mar', 'Restoran koji kombinuje ribu, lokalne sastojke i opušteniju večernju atmosferu uz more.', 'Costa Adeje Tenerife, Tenerife', '+34922000002', 37.00, 'Restoran', 'Costa Adeje Tenerife', 'Tenerife', 'carmen.creator@spirego.com', 'manager.tenerife@spirego.com', 'food', -16.7328, 28.0907),
+    ('Teide Outdoor Spa', 'Spa centar sa pogledima i tretmanima namenjenim gostima koji žele mirniji predah između aktivnosti.', 'Teide Viewpoint Tenerife, Tenerife', '+34922000003', 29.00, 'Spa Centar', 'Teide Viewpoint Tenerife', 'Tenerife', 'carmen.creator@spirego.com', 'manager.tenerife@spirego.com', 'wellness', -16.6390, 28.2720),
+    ('Centro Comercial Adeje Sun', 'Tržni centar sa modom, sportskom opremom i svakodnevnim kupovinama u turističkoj zoni.', 'Costa Adeje Tenerife, Tenerife', '+34922000004', 0.00, 'Trzni Centar', 'Costa Adeje Tenerife', 'Tenerife', 'carmen.creator@spirego.com', 'manager.tenerife@spirego.com', 'shopping', -16.7316, 28.0916),
+    ('Hospital Tenerife Sur', 'Veća bolnica sa prijemom i pregledima korisna za južni deo ostrva i turistička naselja.', 'Santa Cruz Tenerife Center, Tenerife', '+34922000005', 0.00, 'Bolnica', 'Santa Cruz Tenerife Center', 'Tenerife', 'carmen.creator@spirego.com', 'manager.tenerife@spirego.com', 'health', -16.2512, 28.4631),
+    ('Cepsa Costa Adeje', 'Benzinska pumpa u blizini glavnih turističkih zona sa dodatnom prodavnicom i parkingom.', 'Costa Adeje Tenerife, Tenerife', '+34922000006', 0.00, 'Benzinska Pumpa', 'Costa Adeje Tenerife', 'Tenerife', 'carmen.creator@spirego.com', 'manager.tenerife@spirego.com', 'fuel', -16.7337, 28.0903),
+    ('Surf Shop Tenerife', 'Prodavnica sa opremom, suvenirima i manjim izborom stvari za vodene aktivnosti na ostrvu.', 'Costa Adeje Tenerife, Tenerife', '+34922000007', 0.00, 'Suvenirnica', 'Costa Adeje Tenerife', 'Tenerife', 'carmen.creator@spirego.com', 'manager.tenerife@spirego.com', 'shopping', -16.7310, 28.0911),
+
+    ('Hotel Obradoiro Suites', 'Centralni hotel za goste koji žele da većinu istorijskog jezgra Santijaga obiđu bez prevoza.', 'Obradoiro Santiago, Santiago de Compostela', '+34981000001', 144.00, 'Hotel', 'Obradoiro Santiago', 'Santiago de Compostela', 'carmen.creator@spirego.com', 'manager.santiago@spirego.com', 'lodging', -8.5442, 42.8801),
+    ('Casa Gallega Santiago', 'Restoran sa galisijskim jelima i sporijim ritmom večere u blizini starog jezgra.', 'Old Town Santiago, Santiago de Compostela', '+34981000002', 30.00, 'Restoran', 'Old Town Santiago', 'Santiago de Compostela', 'carmen.creator@spirego.com', 'manager.santiago@spirego.com', 'food', -8.5424, 42.8788),
+    ('Muzej Hodočasnika Santiago', 'Muzejski prostor posvećen istoriji puta i kulturi koja je oblikovala identitet grada.', 'Old Town Santiago, Santiago de Compostela', '+34981000003', 6.00, 'Muzej', 'Old Town Santiago', 'Santiago de Compostela', 'carmen.creator@spirego.com', 'manager.santiago@spirego.com', 'culture', -8.5430, 42.8794),
+    ('Mercado Compostela Central', 'Gradska tržnica sa lokalnim proizvodima, sirom, ribom i ponudom za svakodnevnu kupovinu.', 'Old Town Santiago, Santiago de Compostela', '+34981000004', 0.00, 'Trznica', 'Old Town Santiago', 'Santiago de Compostela', 'carmen.creator@spirego.com', 'manager.santiago@spirego.com', 'shopping', -8.5421, 42.8791),
+    ('Hospital Santiago Centro', 'Bolnički objekat sa hitnim prijemom i pregledima za gradske i putničke potrebe.', 'Obradoiro Santiago, Santiago de Compostela', '+34981000005', 0.00, 'Bolnica', 'Obradoiro Santiago', 'Santiago de Compostela', 'carmen.creator@spirego.com', 'manager.santiago@spirego.com', 'health', -8.5449, 42.8798),
+    ('Repsol Alameda Santiago', 'Pumpa uz gradski pristup sa osnovnom ponudom i brzim zaustavljanjem pre izlaska iz centra.', 'Alameda Santiago, Santiago de Compostela', '+34981000006', 0.00, 'Benzinska Pumpa', 'Alameda Santiago', 'Santiago de Compostela', 'carmen.creator@spirego.com', 'manager.santiago@spirego.com', 'fuel', -8.5472, 42.8769)
+),
+ranked_source AS (
+    SELECT s.*, ROW_NUMBER() OVER (ORDER BY s."DestinationName", s."Name") AS rn
+    FROM source s
+),
+ins_objects AS (
+    INSERT INTO "Objects"
+    ("Name", "Description", "Address", "PhoneNumber", "Website", "MenuUrl", "CuisineType", "WorkingHours", "Price", "Amenities", "Geolocation", "AverageRating", "ReviewCount",
+     "Status", "IsActive", "ObjectTypeId", "LocalityId", "DestinationId", "CreatedByUserId", "ApprovedByUserId", "ApprovedAt", "CreatedAt", "UpdatedAt")
+    SELECT
+        s."Name",
+        s."Description",
+        s."Address",
+        s."PhoneNumber",
+        NULL,
+        NULL,
+        CASE WHEN s."Profile" = 'food' THEN 'Lokalna i mediteranska' ELSE NULL END,
+        CASE
+            WHEN s."Profile" = 'lodging' THEN '{"pon":"00:00-24:00"}'
+            WHEN s."Profile" = 'food' THEN '{"pon":"12:00-23:00"}'
+            WHEN s."Profile" = 'shopping' THEN '{"pon":"10:00-22:00"}'
+            WHEN s."Profile" = 'health' THEN '{"pon":"00:00-24:00"}'
+            WHEN s."Profile" = 'fuel' THEN '{"pon":"00:00-24:00"}'
+            WHEN s."Profile" = 'culture' THEN '{"pon":"10:00-20:00"}'
+            WHEN s."Profile" = 'wellness' THEN '{"pon":"09:00-22:00"}'
+            ELSE NULL
+        END,
+        s."Price",
+        CASE
+            WHEN s."Profile" = 'lodging' THEN ARRAY['WiFi', 'Prijem', 'Doručak']
+            WHEN s."Profile" = 'food' THEN ARRAY['Rezervacije', 'Terasa', 'Lokalna kuhinja']
+            WHEN s."Profile" = 'shopping' THEN ARRAY['Kupovina', 'Parking']
+            WHEN s."Profile" = 'health' THEN ARRAY['Prijem', 'Dostupno osoblje']
+            WHEN s."Profile" = 'fuel' THEN ARRAY['Prodavnica', 'Parking']
+            WHEN s."Profile" = 'culture' THEN ARRAY['Ulaznice', 'Vođenja']
+            WHEN s."Profile" = 'wellness' THEN ARRAY['Spa', 'Rezervacije']
+            ELSE NULL
+        END,
+        ST_SetSRID(ST_MakePoint(s."Lng", s."Lat"), 4326),
+        0,
+        0,
+        'Approved',
+        true,
+        ot."Id",
+        l."Id",
+        d."Id",
+        cu."Id",
+        mu."Id",
+        NOW(),
+        NOW(),
+        NOW()
+    FROM ranked_source s
+    JOIN "ObjectTypes" ot ON ot."Name" = s."ObjectTypeName"
+    JOIN "Localities" l ON l."Name" = s."LocalityName"
+    JOIN "Destinations" d ON d."Name" = s."DestinationName"
+    JOIN "Users" cu ON cu."Email" = s."CreatorEmail"
+    JOIN "Users" mu ON mu."Email" = s."ManagerEmail"
+    RETURNING "Id", "Name"
+),
+ins_object_images AS (
+    INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
+    SELECT
+        CASE
+            WHEN s."Profile" = 'lodging' THEN 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1400&q=80'
+            WHEN s."Profile" = 'food' THEN 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1400&q=80'
+            WHEN s."Profile" = 'shopping' THEN 'https://images.unsplash.com/photo-1481437156560-3205f6a55735?auto=format&fit=crop&w=1400&q=80'
+            WHEN s."Profile" = 'health' THEN 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1400&q=80'
+            WHEN s."Profile" = 'fuel' THEN 'https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=1400&q=80'
+            WHEN s."Profile" = 'culture' THEN 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1400&q=80'
+            WHEN s."Profile" = 'wellness' THEN 'https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&w=1400&q=80'
+            ELSE 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1400&q=80'
+        END,
+        s."Name",
+        true,
+        o."Id",
+        NOW()
+    FROM ranked_source s
+    JOIN "Objects" o ON o."Name" = s."Name"
+),
+ins_reviews_one AS (
+    INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "CreatedAt")
+    SELECT
+        u."Id",
+        o."Id",
+        CASE s."Profile"
+            WHEN 'lodging' THEN (ARRAY[5,4,4,3,5])[1 + (s.rn % 5)]
+            WHEN 'food' THEN (ARRAY[5,4,3,5,4])[1 + (s.rn % 5)]
+            WHEN 'culture' THEN (ARRAY[4,5,3,4,5])[1 + (s.rn % 5)]
+            WHEN 'shopping' THEN (ARRAY[4,3,5,4,2])[1 + (s.rn % 5)]
+            WHEN 'health' THEN (ARRAY[5,4,4,3,5])[1 + (s.rn % 5)]
+            WHEN 'fuel' THEN (ARRAY[4,3,5,2,4])[1 + (s.rn % 5)]
+            WHEN 'wellness' THEN (ARRAY[5,4,4,5,3])[1 + (s.rn % 5)]
+            ELSE 4
+        END,
+        CASE s."Profile"
+            WHEN 'lodging' THEN s."Name" || ' je imao dobru lokaciju i uredan prostor, pa je boravak protekao bez komplikacija.'
+            WHEN 'food' THEN 'U objektu ' || s."Name" || ' smo dobili ukusna jela i prijatnu uslugu, bez osećaja žurbe.'
+            WHEN 'culture' THEN s."Name" || ' je prijatno mesto za kraći obilazak i ostavio je bolji utisak nego što sam očekivao.'
+            WHEN 'shopping' THEN s."Name" || ' ima dobar izbor i pregledan raspored, pa je kupovina prošla lakše nego što sam očekivao.'
+            WHEN 'health' THEN 'Osoblje u objektu ' || s."Name" || ' bilo je ljubazno i organizacija je delovala jasno od prijema do izlaska.'
+            WHEN 'fuel' THEN 'Na pumpi ' || s."Name" || ' je sve bilo čisto, a usluga brza i korektna.'
+            WHEN 'wellness' THEN 'U objektu ' || s."Name" || ' je atmosfera bila mirna, a tretmani i prostor dovoljno uredni za opušten predah.'
+            ELSE s."Name" || ' je ostavio korektan utisak.'
+        END,
+        NOW()
+    FROM ranked_source s
+    JOIN "Objects" o ON o."Name" = s."Name"
+    JOIN "Users" u ON u."Email" = CASE
+        WHEN s.rn % 3 = 1 THEN 'alejandro.tourist@spirego.com'
+        WHEN s.rn % 3 = 2 THEN 'isabel.tourist@spirego.com'
+        ELSE 'miguel.tourist@spirego.com'
+    END
+),
+ins_reviews_two AS (
+    INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "CreatedAt")
+    SELECT
+        u."Id",
+        o."Id",
+        CASE s."Profile"
+            WHEN 'lodging' THEN (ARRAY[4,3,5,4,2])[1 + (s.rn % 5)]
+            WHEN 'food' THEN (ARRAY[4,3,5,2,4])[1 + (s.rn % 5)]
+            WHEN 'culture' THEN (ARRAY[3,4,2,5,4])[1 + (s.rn % 5)]
+            WHEN 'shopping' THEN (ARRAY[3,4,2,5,4])[1 + (s.rn % 5)]
+            WHEN 'health' THEN (ARRAY[4,3,5,2,4])[1 + (s.rn % 5)]
+            WHEN 'fuel' THEN (ARRAY[3,2,4,4,5])[1 + (s.rn % 5)]
+            WHEN 'wellness' THEN (ARRAY[4,3,5,4,2])[1 + (s.rn % 5)]
+            ELSE 3
+        END,
+        CASE s."Profile"
+            WHEN 'lodging' THEN 'Boravak u objektu ' || s."Name" || ' bio je korektan, ali su se videle i sitnice oko buke ili prostora.'
+            WHEN 'food' THEN 'Hrana u objektu ' || s."Name" || ' je bila dobra, ali je ritam usluge varirao kada je bilo više gostiju.'
+            WHEN 'culture' THEN s."Name" || ' je zanimljiv, ali bi postavka i signalizacija mogli da budu jasnije organizovani.'
+            WHEN 'shopping' THEN 'Ponuda u objektu ' || s."Name" || ' je solidna, ali je u pojedinim terminima bilo više gužve nego što prija.'
+            WHEN 'health' THEN 'U objektu ' || s."Name" || ' je sve išlo korektno, mada je čekanje u jačem terminu bilo primetno.'
+            WHEN 'fuel' THEN 'Pumpa ' || s."Name" || ' radi posao, ali je u špicu znalo da bude malo sporije nego što sam očekivao.'
+            WHEN 'wellness' THEN 'Objekat ' || s."Name" || ' je prijatan, ali bi pojedini delovi usluge mogli da budu ujednačeniji.'
+            ELSE s."Name" || ' je ostavio mešovit utisak.'
+        END,
+        NOW()
+    FROM ranked_source s
+    JOIN "Objects" o ON o."Name" = s."Name"
+    JOIN "Users" u ON u."Email" = CASE
+        WHEN s.rn % 3 = 1 THEN 'isabel.tourist@spirego.com'
+        WHEN s.rn % 3 = 2 THEN 'miguel.tourist@spirego.com'
+        ELSE 'alejandro.tourist@spirego.com'
+    END
+)
+SELECT 1;
+
+WITH source("Name", "Description", "Lng", "Lat", "Price", "DurationMinutes", "ActivityTypeName", "LocalityName", "DestinationName", "ObjectName", "CreatorEmail", "Profile") AS (
+    VALUES
+    ('Jutarnje plivanje Postiguet', 'Lagano jutarnje kupanje na gradskoj plaži uz dovoljno prostora za opušten početak dana.', -0.4772, 38.3472, 0.00, 90, 'Plivanje', 'Playa del Postiguet', 'Alicante', NULL, 'carmen.creator@spirego.com', 'water'),
+    ('Šetnja do tvrđave Santa Barbara', 'Pešačka ruta sa usponom do tvrđave i završetkom na panoramskoj tački iznad grada.', -0.4789, 38.3488, 0.00, 120, 'Pešačenje', 'Castillo Santa Barbara Alicante', 'Alicante', NULL, 'carmen.creator@spirego.com', 'walk'),
+    ('Degustacija pirinčanih ukusa Alicantea', 'Kulinarsko iskustvo uz lokalne specijalitete i sporiji ručak na obali.', -0.4821, 38.3447, 34.00, 100, 'Degustacija hrane', 'Explanada Alicante', 'Alicante', 'Arrocería Costa Blanca', 'carmen.creator@spirego.com', 'food'),
+    ('Kupovina na Explanadi Alicante', 'Lagani shopping obilazak uz fokus na lokalne poklone i gradske prodavnice.', -0.4817, 38.3445, 0.00, 80, 'Kupovina', 'Explanada Alicante', 'Alicante', 'Plaza Mar Alicante', 'carmen.creator@spirego.com', 'shopping'),
+
+    ('Kupanje u zalivu La Concha', 'Plivanje i boravak na najpoznatijoj gradskoj plaži uz lep pogled na zaliv.', -1.9889, 43.3211, 0.00, 90, 'Plivanje', 'La Concha San Sebastian', 'San Sebastian', NULL, 'carmen.creator@spirego.com', 'water'),
+    ('Pintxos veče u Parte Vieji', 'Večernji gastronomski obilazak uz baskijske zalogaje i kraća zadržavanja u starom gradu.', -1.9845, 43.3225, 29.00, 110, 'Degustacija hrane', 'Parte Vieja San Sebastian', 'San Sebastian', 'Pintxos Parte Vieja', 'carmen.creator@spirego.com', 'food'),
+    ('Fotografisanje sa Monte Iguelda', 'Kraći obilazak vidikovca sa dovoljno vremena za panoramske fotografije i pogled na zaliv.', -2.0326, 43.3186, 0.00, 75, 'Fotografisanje', 'Monte Igueldo', 'San Sebastian', NULL, 'carmen.creator@spirego.com', 'view'),
+    ('Biciklistički krug uz obalu Donostije', 'Vožnja bicikla kroz obalni deo grada sa laganim tempom i kratkim foto pauzama.', -1.9877, 43.3209, 18.00, 95, 'Biciklizam', 'La Concha San Sebastian', 'San Sebastian', NULL, 'carmen.creator@spirego.com', 'bike'),
+
+    ('Foto tura kroz Barri Vell', 'Fotografska šetnja kroz srednjovekovne ulice i stepenice istorijskog jezgra Đirone.', 2.8260, 41.9860, 0.00, 90, 'Fotografisanje', 'Barri Vell Girona', 'Girona', NULL, 'carmen.creator@spirego.com', 'view'),
+    ('Razgledanje katedrale i starih ulica', 'Lagani obilazak ključnih tačaka starog grada sa fokusom na detalje i istoriju.', 2.8258, 41.9868, 0.00, 100, 'Razgledanje', 'Girona Cathedral Quarter', 'Girona', NULL, 'carmen.creator@spirego.com', 'walk'),
+    ('Kupovina lokalnih proizvoda u Đironi', 'Obilazak gradske tržnice sa lokalnim sirom, suhomesnatim proizvodima i slatkišima.', 2.8255, 41.9854, 0.00, 70, 'Kupovina', 'Barri Vell Girona', 'Girona', 'Girona Market Hall', 'carmen.creator@spirego.com', 'shopping'),
+    ('Večernja šetnja uz Onjar', 'Kraća pešačka ruta uz reku i šarene fasade sa mirnijim ritmom predveče.', 2.8247, 41.9842, 0.00, 80, 'Pešačenje', 'Onyar Riverside Girona', 'Girona', NULL, 'carmen.creator@spirego.com', 'walk'),
+
+    ('Plivanje na La Caleti', 'Opusteno plivanje i boravak na gradskoj plaži uz atlantski vetar i otvoren horizont.', -6.2991, 36.5315, 0.00, 95, 'Plivanje', 'La Caleta Cadiz', 'Cadiz', NULL, 'carmen.creator@spirego.com', 'water'),
+    ('Vožnja čamcem uz zidine Kadiza', 'Kratka vožnja čamcem sa pogledom na obalu, tvrđave i gradske zidine.', -6.2971, 36.5282, 24.00, 70, 'Vožnja čamcem', 'Paseo Campo del Sur', 'Cadiz', NULL, 'carmen.creator@spirego.com', 'boat'),
+    ('Degustacija morskih zalogaja Kadiza', 'Degustacioni obrok sa morskim plodovima i lokalnim ukusima atlantske obale.', -6.2965, 36.5278, 31.00, 100, 'Degustacija hrane', 'Paseo Campo del Sur', 'Cadiz', 'Taverna Campo del Sur', 'carmen.creator@spirego.com', 'food'),
+    ('Noćni provod uz obalu Kadiza', 'Večernji izlazak u življem delu obale uz muziku i duže zadržavanje na otvorenom.', -6.2963, 36.5275, 12.00, 140, 'Noćni provod', 'Paseo Campo del Sur', 'Cadiz', 'Taverna Campo del Sur', 'carmen.creator@spirego.com', 'night'),
+
+    ('Joga uz Seguru', 'Mirnija jutarnja joga sesija u šetačkoj zoni uz reku i gradsko zelenilo.', -1.1291, 37.9850, 12.00, 60, 'Joga', 'Rio Segura Murcia', 'Murcia', NULL, 'carmen.creator@spirego.com', 'wellness'),
+    ('Kupovina u centru Mursije', 'Shopping ruta kroz centralni trg i zatvoreniji trgovački prostor sa više kategorija radnji.', -1.1284, 37.9841, 0.00, 80, 'Kupovina', 'Plaza Belluga Murcia', 'Murcia', 'Centro Comercial Murcia Luz', 'carmen.creator@spirego.com', 'shopping'),
+    ('Razgledanje trga Beljuga', 'Kraći gradski obilazak sa fokusom na katedralu, trg i najbliže istorijske detalje.', -1.1287, 37.9838, 0.00, 75, 'Razgledanje', 'Plaza Belluga Murcia', 'Murcia', NULL, 'carmen.creator@spirego.com', 'walk'),
+    ('Spa popodne u Mursiji', 'Wellness predah sa masažama i mirnijim sadržajem posle obilaska grada.', -1.1290, 37.9849, 26.00, 95, 'Spa i wellness', 'Rio Segura Murcia', 'Murcia', 'Murcia Wellness Patio', 'carmen.creator@spirego.com', 'wellness'),
+
+    ('Plivanje na El Sardineru', 'Kupanje i opuštanje na široj plaži uz dovoljno prostora i duže šetnje po obali.', -3.7838, 43.4766, 0.00, 100, 'Plivanje', 'El Sardinero Santander', 'Santander', NULL, 'carmen.creator@spirego.com', 'water'),
+    ('Kajak uz obalu Santandera', 'Vožnja kajakom uz obalu sa pogledom na plaže i gradski vodeni front.', -3.7845, 43.4759, 21.00, 80, 'Kajak', 'El Sardinero Santander', 'Santander', NULL, 'carmen.creator@spirego.com', 'boat'),
+    ('Fotografisanje sa Magdalenom', 'Lagani obilazak poluostrva sa fokusom na panorame i prirodne kadrove.', -3.7566, 43.4692, 0.00, 70, 'Fotografisanje', 'Peninsula Magdalena', 'Santander', NULL, 'carmen.creator@spirego.com', 'view'),
+    ('Degustacija severnjačke kuhinje Santandera', 'Ručak sa morskim ukusima i lokalnim stilom serviranja u obalnom delu grada.', -3.7975, 43.4637, 35.00, 100, 'Poseta Restoranu', 'Centro Botin Santander', 'Santander', 'Restaurante Botin Norte', 'carmen.creator@spirego.com', 'food'),
+
+    ('Ronjenje uz Costa Adeje', 'Ronjenje u toplijem priobalju sa fokusom na lakše podvodne tačke za rekreativce.', -16.7329, 28.0908, 42.00, 90, 'Ronjenje', 'Costa Adeje Tenerife', 'Tenerife', NULL, 'carmen.creator@spirego.com', 'water'),
+    ('Paraglajding iznad juga Tenerifa', 'Letačko iskustvo sa pogledima na obalu, litice i južni deo ostrva.', -16.6402, 28.2715, 95.00, 60, 'Paraglajding', 'Teide Viewpoint Tenerife', 'Tenerife', NULL, 'carmen.creator@spirego.com', 'adventure'),
+    ('Planinarenje ka Teide vidikovcu', 'Ruta sa laganim usponom i vulkanskim pejzažom kao glavnim doživljajem dana.', -16.6393, 28.2723, 18.00, 150, 'Planinarenje', 'Teide Viewpoint Tenerife', 'Tenerife', NULL, 'carmen.creator@spirego.com', 'walk'),
+    ('Noćni provod Costa Adeje', 'Večernji izlazak u turističkoj zoni sa muzikom, barovima i živom atmosferom.', -16.7321, 28.0910, 16.00, 150, 'Noćni provod', 'Costa Adeje Tenerife', 'Tenerife', 'Restaurante Volcán y Mar', 'carmen.creator@spirego.com', 'night'),
+
+    ('Razgledanje istorijskog jezgra Santijaga', 'Pešački obilazak kamenih trgova, prolaza i glavnih tačaka istorijskog centra.', -8.5436, 42.8795, 0.00, 95, 'Razgledanje', 'Old Town Santiago', 'Santiago de Compostela', NULL, 'carmen.creator@spirego.com', 'walk'),
+    ('Degustacija galisijske kuhinje', 'Kulinarsko iskustvo sa lokalnim jelima i sporijim tempom večere u starom delu grada.', -8.5425, 42.8789, 30.00, 100, 'Degustacija hrane', 'Old Town Santiago', 'Santiago de Compostela', 'Casa Gallega Santiago', 'carmen.creator@spirego.com', 'food'),
+    ('Kupovina na pijaci Kompostele', 'Kraći obilazak gradske pijace sa fokusom na lokalne proizvode i male proizvođače.', -8.5422, 42.8790, 0.00, 75, 'Kupovina', 'Old Town Santiago', 'Santiago de Compostela', 'Mercado Compostela Central', 'carmen.creator@spirego.com', 'shopping'),
+    ('Jutarnja šetnja kroz Alamedu', 'Mirnija pešačka ruta kroz zeleni deo grada sa pogledima prema starom jezgru.', -8.5474, 42.8769, 0.00, 70, 'Pešačenje', 'Alameda Santiago', 'Santiago de Compostela', NULL, 'carmen.creator@spirego.com', 'walk')
+),
+ranked_source AS (
+    SELECT s.*, ROW_NUMBER() OVER (ORDER BY s."DestinationName", s."Name") AS rn
+    FROM source s
+),
+ins_activities AS (
+    INSERT INTO "Activities"
+    ("Name", "Description", "Geolocation", "Price", "DurationMinutes", "IsActive", "ActivityTypeId", "LocalityId", "DestinationId", "ObjectId", "Status", "CreatedByUserId", "ApprovedByUserId", "ApprovedAt", "CreatedAt", "UpdatedAt")
+    SELECT
+        s."Name",
+        s."Description",
+        ST_SetSRID(ST_MakePoint(s."Lng", s."Lat"), 4326),
+        s."Price",
+        s."DurationMinutes",
+        true,
+        at."Id",
+        l."Id",
+        d."Id",
+        o."Id",
+        1,
+        cu."Id",
+        mu."Id",
+        NOW(),
+        NOW(),
+        NOW()
+    FROM ranked_source s
+    JOIN "ActivityTypes" at ON
+        translate(replace(lower(at."Name"), 'đ', 'dj'), 'šžčć', 'szcc')
+        =
+        translate(replace(lower(s."ActivityTypeName"), 'đ', 'dj'), 'šžčć', 'szcc')
+    JOIN "Localities" l ON l."Name" = s."LocalityName"
+    JOIN "Destinations" d ON d."Name" = s."DestinationName"
+    JOIN "Users" cu ON cu."Email" = s."CreatorEmail"
+    JOIN "Users" mu ON mu."Email" = CASE s."DestinationName"
+        WHEN 'Alicante' THEN 'manager.alicante@spirego.com'
+        WHEN 'San Sebastian' THEN 'manager.sansebastian@spirego.com'
+        WHEN 'Girona' THEN 'manager.girona@spirego.com'
+        WHEN 'Cadiz' THEN 'manager.cadiz@spirego.com'
+        WHEN 'Murcia' THEN 'manager.murcia@spirego.com'
+        WHEN 'Santander' THEN 'manager.santander@spirego.com'
+        WHEN 'Tenerife' THEN 'manager.tenerife@spirego.com'
+        ELSE 'manager.santiago@spirego.com'
+    END
+    LEFT JOIN "Objects" o ON o."Name" = s."ObjectName"
+    RETURNING "Id", "Name"
+),
+ins_activity_images AS (
+    INSERT INTO "Images" ("Url", "AltText", "IsMain", "ActivityId", "CreatedAt")
+    SELECT
+        CASE
+            WHEN s."Profile" = 'water' THEN 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1400&q=80'
+            WHEN s."Profile" = 'food' THEN 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1400&q=80'
+            WHEN s."Profile" = 'shopping' THEN 'https://images.unsplash.com/photo-1481437156560-3205f6a55735?auto=format&fit=crop&w=1400&q=80'
+            WHEN s."Profile" = 'view' THEN 'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1400&q=80'
+            WHEN s."Profile" = 'bike' THEN 'https://images.unsplash.com/photo-1507035895480-2b3156c31fc8?auto=format&fit=crop&w=1400&q=80'
+            WHEN s."Profile" = 'boat' THEN 'https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1400&q=80'
+            WHEN s."Profile" = 'night' THEN 'https://images.unsplash.com/photo-1571266028243-d220c9c3c7d8?auto=format&fit=crop&w=1400&q=80'
+            WHEN s."Profile" = 'wellness' THEN 'https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&w=1400&q=80'
+            WHEN s."Profile" = 'adventure' THEN 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1400&q=80'
+            ELSE 'https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1400&q=80'
+        END,
+        s."Name",
+        true,
+        a."Id",
+        NOW()
+    FROM ranked_source s
+    JOIN "Activities" a ON a."Name" = s."Name"
+)
+SELECT 1;
