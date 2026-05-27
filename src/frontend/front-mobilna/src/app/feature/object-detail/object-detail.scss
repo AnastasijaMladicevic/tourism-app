@@ -1774,7 +1774,7 @@ textarea {
 
   .location-image::after {
     background: rgba(7, 19, 25, 0.88);
-    color: var(--text-dark);
+    color: #ffffff !important;
   }
 
   textarea {
@@ -2091,4 +2091,11 @@ textarea {
 
 .bar {
   background: var(--border);
+}
+
+[data-theme='dark'] .location-image::after,
+.dark .location-image::after,
+.dark-theme .location-image::after {
+  background: rgba(7, 19, 25, 0.88) !important;
+  color: #ffffff !important;
 }

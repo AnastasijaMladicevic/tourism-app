@@ -55,9 +55,9 @@
 
           <p class="location-bold">{{ object.localityName }}, {{ object.destinationName }}</p>
           <p class="venue"><mat-icon>location_on</mat-icon> {{ object.address || ('common.notAvailable' | translate) }}</p>
-          @if (object.cuisineType) {
+          <!--@if (object.cuisineType) {
             <p class="cuisine"><mat-icon>restaurant</mat-icon>{{object.cuisineType}}</p>
-          }
+        }-->
         </div>
         <div class="card">
           <h2>{{ 'object.amenities' | translate }}</h2>

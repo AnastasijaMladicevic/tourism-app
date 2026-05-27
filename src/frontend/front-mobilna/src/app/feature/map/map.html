@@ -21,21 +21,23 @@
 
     @if (showSuggestions && searchResults.length > 0) {
       <div class="suggestions">
-        @for (result of searchResults; track result.id + ':' + (result.lat ?? 0) + ':' + (result.lng ?? 0)) {
-          <div class="suggestion-item" (mousedown)="selectSuggestion(result)">
-            <div class="suggestion-item__image">
-              @if (result.image) {
-                <img [src]="result.image" [alt]="result.name" loading="lazy" decoding="async" />
-              } @else {
-                <mat-icon>{{ result.icon }}</mat-icon>
-              }
+        <div class="suggestions__scroll">
+          @for (result of searchResults; track result.id + ':' + (result.lat ?? 0) + ':' + (result.lng ?? 0)) {
+            <div class="suggestion-item" (mousedown)="selectSuggestion(result)">
+              <div class="suggestion-item__image">
+                @if (result.image) {
+                  <img [src]="result.image" [alt]="result.name" loading="lazy" decoding="async" />
+                } @else {
+                  <mat-icon>{{ result.icon }}</mat-icon>
+                }
+              </div>
+              <div class="suggestion-item__body">
+                <span class="suggestion-item__name">{{ result.name }}</span>
+                <span class="suggestion-item__meta">{{ formatSearchResultMeta(result) }}</span>
+              </div>
             </div>
-            <div class="suggestion-item__body">
-              <span class="suggestion-item__name">{{ result.name }}</span>
-              <span class="suggestion-item__meta">{{ formatSearchResultMeta(result) }}</span>
-            </div>
-          </div>
-        }
+          }
+        </div>
       </div>
     }
   </div>
@@ -475,6 +477,11 @@
                 {{ getItemLocation() }}
               }
             </p>
+            <!--@if (getItemTypeLabel()) {
+              <div class="bottom-card__meta-group">
+                <span class="bottom-card__type-chip">{{ getItemTypeLabel() }}</span>
+              </div>
+            }-->
           </div>
           @if (selectedItem.averageRating > 0) {
             <div class="bottom-card__rating">
