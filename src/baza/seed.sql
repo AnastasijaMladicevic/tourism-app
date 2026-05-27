@@ -34227,101 +34227,6 @@ SELECT
 FROM source s
 JOIN "Events" e ON e."Name" = s."EventName";
 
--- 16.6 DODATNI DOGAĐAJI ZA NOVE DESTINACIJE U ITALIJI
-INSERT INTO "Events"
-("Name", "Description", "Geolocation", "StartDate", "EndDate", "Price", "MaxVisitors", "IsActive", "Status", "EventTypeId", "LocalityId", "DestinationId", "ObjectId", "CreatedByUserId", "ApprovedByUserId", "ApprovedAt", "CreatedAt", "UpdatedAt")
-VALUES
-('Bari veče fokače', 'Večernji gradski događaj sa degustacijama, muzikom i okupljanjem u starom jezgru Barija.',
- ST_SetSRID(ST_MakePoint(16.8734, 41.1280), 4326), '2026-10-11 18:30', '2026-10-11 23:00', 6.00, 900, true, 'Approved',
- 16,
- 160,
- 68,
- NULL,
- (SELECT "Id" FROM "Users" WHERE "Email" = 'lorenzo.creator@spirego.com'),
- NULL,
- NOW(), NOW(), NOW()),
-
-('Palermo noć pijaca', 'Festival večernjih ukusa i gradskih pijaca sa muzikom, svetlom i kasnijim šetnjama kroz Palermo.',
- ST_SetSRID(ST_MakePoint(13.3687, 38.1128), 4326), '2026-10-18 19:00', '2026-10-18 23:30', 7.00, 1100, true, 'Approved',
- 5,
- 164,
- 69,
- NULL,
- (SELECT "Id" FROM "Users" WHERE "Email" = 'lorenzo.creator@spirego.com'),
- NULL,
- NOW(), NOW(), NOW()),
-
-('Trieste morske priče', 'Kulturno okupljanje uz more sa razgovorima, manjim nastupima i pričama o luci i gradu.',
- ST_SetSRID(ST_MakePoint(13.7683, 45.6500), 4326), '2026-10-24 18:00', '2026-10-24 22:00', 5.00, 650, true, 'Approved',
- 8,
- 166,
- 70,
- NULL,
- (SELECT "Id" FROM "Users" WHERE "Email" = 'lorenzo.creator@spirego.com'),
- NULL,
- NOW(), NOW(), NOW()),
-
-('Matera svetla u kamenu', 'Večernja izložba svetla i fotografije kroz kamene četvrti Matere sa mirnijim kulturnim ritmom.',
- ST_SetSRID(ST_MakePoint(16.6078, 40.6676), 4326), '2026-10-31 18:30', '2026-11-02 22:00', 9.00, 780, true, 'Approved',
- 6,
- 169,
- 71,
- NULL,
- (SELECT "Id" FROM "Users" WHERE "Email" = 'lorenzo.creator@spirego.com'),
- NULL,
- NOW(), NOW(), NOW()),
-
-('Sorrento veče limuna', 'Proslava obale sa muzikom, desertima i večernjim programom u centru Sorenta.',
- ST_SetSRID(ST_MakePoint(14.3754, 40.6266), 4326), '2026-11-07 19:00', '2026-11-07 23:30', 8.00, 860, true, 'Approved',
- 16,
- 173,
- 72,
- NULL,
- (SELECT "Id" FROM "Users" WHERE "Email" = 'lorenzo.creator@spirego.com'),
- NULL,
- NOW(), NOW(), NOW()),
-
-('Stand-up pod baroknim svetlima Lečea', 'Stand-up veče sa domaćim komičarima i laganim večernjim izlaskom u centru Lečea.',
- ST_SetSRID(ST_MakePoint(18.1718, 40.3527), 4326), '2026-11-14 20:30', '2026-11-14 22:00', 11.00, 240, true, 'Approved',
- 17,
- 175,
- 73,
- NULL,
- (SELECT "Id" FROM "Users" WHERE "Email" = 'lorenzo.creator@spirego.com'),
- NULL,
- NOW(), NOW(), NOW()),
-
-('Parma gurmanski susret', 'Sajam ukusa sa sirevima, pršutom i malim proizvođačima u centru Parme.',
- ST_SetSRID(ST_MakePoint(10.3284, 44.8010), 4326), '2026-11-21 11:00', '2026-11-22 20:00', 0.00, 980, true, 'Approved',
- 9,
- 178,
- 74,
- NULL,
- (SELECT "Id" FROM "Users" WHERE "Email" = 'lorenzo.creator@spirego.com'),
- NULL,
- NOW(), NOW(), NOW()),
-
-('Regata zaliva Sardinije', 'Sportski događaj na vodi sa posmatračkim zonama i programom uz obalu Sardinije.',
- ST_SetSRID(ST_MakePoint(9.5335, 41.1364), 4326), '2026-11-29 10:00', '2026-11-29 18:00', 10.00, 1200, true, 'Approved',
- 10,
- 181,
- 75,
- NULL,
- (SELECT "Id" FROM "Users" WHERE "Email" = 'lorenzo.creator@spirego.com'),
- NULL,
- NOW(), NOW(), NOW());
-
-INSERT INTO "Images" ("Url", "AltText", "IsMain", "EventId", "CreatedAt")
-VALUES
-('https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&w=1400&q=80', 'Bari veče fokače', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Bari veče fokače'), NOW()),
-('https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1400&q=80', 'Palermo noć pijaca', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Palermo noć pijaca'), NOW()),
-('https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1400&q=80', 'Trieste morske priče', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Trieste morske priče'), NOW()),
-('https://images.unsplash.com/photo-1545987796-200677ee1011?auto=format&fit=crop&w=1400&q=80', 'Matera svetla u kamenu', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Matera svetla u kamenu'), NOW()),
-('https://images.unsplash.com/photo-1571266028243-d220c9c3c7d8?auto=format&fit=crop&w=1400&q=80', 'Sorrento veče limuna', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Sorrento veče limuna'), NOW()),
-('https://images.unsplash.com/photo-1527224857830-43a7acc85260?auto=format&fit=crop&w=1400&q=80', 'Stand-up pod baroknim svetlima Lečea', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Stand-up pod baroknim svetlima Lečea'), NOW()),
-('https://images.unsplash.com/photo-1528698827591-e19ccd7bc23d?auto=format&fit=crop&w=1400&q=80', 'Parma gurmanski susret', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Parma gurmanski susret'), NOW()),
-('https://images.unsplash.com/photo-1519861531473-9200262188bf?auto=format&fit=crop&w=1400&q=80', 'Regata zaliva Sardinije', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Regata zaliva Sardinije'), NOW());
-
 -- ============================================
 -- 16.3 ITALY EXPANSION - USERS, DESTINATIONS, LOCALITIES
 -- ============================================
@@ -34613,6 +34518,71 @@ INSERT INTO "Images" ("Url", "AltText", "IsMain", "LocalityId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", l."Id", NOW()
 FROM source s
 JOIN "Localities" l ON l."Name" = s."LocalityName";
+
+-- 16.6 DODATNI DOGAĐAJI ZA NOVE DESTINACIJE U ITALIJI
+WITH source("Name", "Description", "Lng", "Lat", "StartDate", "EndDate", "Price", "MaxVisitors", "EventTypeName", "LocalityName", "DestinationName", "ObjectName", "CreatorEmail", "ManagerEmail") AS (
+    VALUES
+    ('Bari veče fokače', 'Večernji gradski događaj sa degustacijama, muzikom i okupljanjem u starom jezgru Barija.', 16.8734, 41.1280, '2026-10-11 18:30'::timestamp, '2026-10-11 23:00'::timestamp, 6.00, 900, 'Proslava', 'Bari Vecchia', 'Bari', NULL, 'lorenzo.creator@spirego.com', 'manager.bari@spirego.com'),
+    ('Palermo noć pijaca', 'Festival večernjih ukusa i gradskih pijaca sa muzikom, svetlom i kasnijim šetnjama kroz Palermo.', 13.3687, 38.1128, '2026-10-18 19:00'::timestamp, '2026-10-18 23:30'::timestamp, 7.00, 1100, 'Festival', 'Mercato Ballaro Palermo', 'Palermo', NULL, 'lorenzo.creator@spirego.com', 'manager.palermo@spirego.com'),
+    ('Trieste morske priče', 'Kulturno okupljanje uz more sa razgovorima, manjim nastupima i pričama o luci i gradu.', 13.7683, 45.6500, '2026-10-24 18:00'::timestamp, '2026-10-24 22:00'::timestamp, 5.00, 650, 'Okupljanje', 'Piazza Unita Trieste', 'Trieste', NULL, 'lorenzo.creator@spirego.com', 'manager.trieste@spirego.com'),
+    ('Matera svetla u kamenu', 'Večernja izložba svetla i fotografije kroz kamene četvrti Matere sa mirnijim kulturnim ritmom.', 16.6078, 40.6676, '2026-10-31 18:30'::timestamp, '2026-11-02 22:00'::timestamp, 9.00, 780, 'Izložba', 'Sassi di Matera', 'Matera', NULL, 'lorenzo.creator@spirego.com', 'manager.matera@spirego.com'),
+    ('Sorrento veče limuna', 'Proslava obale sa muzikom, desertima i večernjim programom u centru Sorenta.', 14.3754, 40.6266, '2026-11-07 19:00'::timestamp, '2026-11-07 23:30'::timestamp, 8.00, 860, 'Proslava', 'Corso Italia Sorrento', 'Sorrento', NULL, 'lorenzo.creator@spirego.com', 'manager.sorrento@spirego.com'),
+    ('Stand-up pod baroknim svetlima Lečea', 'Stand-up veče sa domaćim komičarima i laganim večernjim izlaskom u centru Lečea.', 18.1718, 40.3527, '2026-11-14 20:30'::timestamp, '2026-11-14 22:00'::timestamp, 11.00, 240, 'Stand-up', 'Piazza Sant''Oronzo Lecce', 'Lecce', NULL, 'lorenzo.creator@spirego.com', 'manager.lecce@spirego.com'),
+    ('Parma gurmanski susret', 'Sajam ukusa sa sirevima, pršutom i malim proizvođačima u centru Parme.', 10.3284, 44.8010, '2026-11-21 11:00'::timestamp, '2026-11-22 20:00'::timestamp, 0.00, 980, 'Sajam', 'Piazza Duomo Parma', 'Parma', NULL, 'lorenzo.creator@spirego.com', 'manager.parma@spirego.com'),
+    ('Regata zaliva Sardinije', 'Sportski događaj na vodi sa posmatračkim zonama i programom uz obalu Sardinije.', 9.5335, 41.1364, '2026-11-29 10:00'::timestamp, '2026-11-29 18:00'::timestamp, 10.00, 1200, 'Sportski događaj', 'Costa Smeralda Sardinija', 'Sardinija', NULL, 'lorenzo.creator@spirego.com', 'manager.sardinia@spirego.com')
+)
+INSERT INTO "Events"
+("Name", "Description", "Geolocation", "StartDate", "EndDate", "Price", "MaxVisitors", "IsActive", "Status", "EventTypeId", "LocalityId", "DestinationId", "ObjectId", "CreatedByUserId", "ApprovedByUserId", "ApprovedAt", "CreatedAt", "UpdatedAt")
+SELECT
+    s."Name",
+    s."Description",
+    ST_SetSRID(ST_MakePoint(s."Lng", s."Lat"), 4326),
+    s."StartDate",
+    s."EndDate",
+    s."Price",
+    s."MaxVisitors",
+    true,
+    'Approved',
+    et."Id",
+    l."Id",
+    d."Id",
+    o."Id",
+    cu."Id",
+    mu."Id",
+    NOW(),
+    NOW(),
+    NOW()
+FROM source s
+JOIN "EventTypes" et ON
+    translate(replace(lower(et."Name"), 'đ', 'dj'), 'šžčć', 'szcc')
+    =
+    translate(replace(lower(s."EventTypeName"), 'đ', 'dj'), 'šžčć', 'szcc')
+JOIN "Localities" l ON l."Name" = s."LocalityName"
+JOIN "Destinations" d ON d."Name" = s."DestinationName"
+JOIN "Users" cu ON cu."Email" = s."CreatorEmail"
+JOIN "Users" mu ON mu."Email" = s."ManagerEmail"
+LEFT JOIN "Objects" o ON o."Name" = s."ObjectName";
+
+WITH source("Url", "AltText", "IsMain", "EventName") AS (
+    VALUES
+    ('https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&w=1400&q=80', 'Bari veče fokače', true, 'Bari veče fokače'),
+    ('https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1400&q=80', 'Palermo noć pijaca', true, 'Palermo noć pijaca'),
+    ('https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1400&q=80', 'Trieste morske priče', true, 'Trieste morske priče'),
+    ('https://images.unsplash.com/photo-1545987796-200677ee1011?auto=format&fit=crop&w=1400&q=80', 'Matera svetla u kamenu', true, 'Matera svetla u kamenu'),
+    ('https://images.unsplash.com/photo-1571266028243-d220c9c3c7d8?auto=format&fit=crop&w=1400&q=80', 'Sorrento veče limuna', true, 'Sorrento veče limuna'),
+    ('https://images.unsplash.com/photo-1527224857830-43a7acc85260?auto=format&fit=crop&w=1400&q=80', 'Stand-up pod baroknim svetlima Lečea', true, 'Stand-up pod baroknim svetlima Lečea'),
+    ('https://images.unsplash.com/photo-1528698827591-e19ccd7bc23d?auto=format&fit=crop&w=1400&q=80', 'Parma gurmanski susret', true, 'Parma gurmanski susret'),
+    ('https://images.unsplash.com/photo-1519861531473-9200262188bf?auto=format&fit=crop&w=1400&q=80', 'Regata zaliva Sardinije', true, 'Regata zaliva Sardinije')
+)
+INSERT INTO "Images" ("Url", "AltText", "IsMain", "EventId", "CreatedAt")
+SELECT
+    s."Url",
+    s."AltText",
+    s."IsMain",
+    e."Id",
+    NOW()
+FROM source s
+JOIN "Events" e ON e."Name" = s."EventName";
 
 WITH source("Name", "Description", "Lng", "Lat", "Price", "DurationMinutes", "ActivityTypeName", "LocalityName", "DestinationName", "ObjectName", "CreatorEmail", "Profile") AS (
     VALUES

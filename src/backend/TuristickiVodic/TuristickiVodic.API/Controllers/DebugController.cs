@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using TuristickiVodic.Core.Models;
 using TuristickiVodic.Core.DTO;
+using TuristickiVodic.Core.Models;
 using TuristickiVodic.Infrastructure.Data;
 using TuristickiVodic.Services.Services;
 
@@ -137,89 +137,6 @@ namespace TuristickiVodic.API.Controllers
                 ResultsCount = results.Count,
                 Results = results
             });
-        }
-
-        [HttpGet("events-raw")]
-        public async Task<IActionResult> EventsRaw([FromQuery] string? destination = null, [FromQuery] string? search = null)
-        {
-            var query = _context.Events
-                .Include(e => e.Images)
-                .Include(e => e.Destination)
-                .Include(e => e.Locality)
-                .AsNoTracking()
-                .AsQueryable();
-
-            if (!string.IsNullOrWhiteSpace(destination))
-            {
-                var normalizedDestination = destination.Trim().ToLower();
-                query = query.Where(e =>
-                    (e.Destination != null && e.Destination.Name.ToLower().Contains(normalizedDestination)) ||
-                    (e.Destination == null && e.Locality != null && e.Locality.Destination != null && e.Locality.Destination.Name.ToLower().Contains(normalizedDestination)));
-            }
-
-            if (!string.IsNullOrWhiteSpace(search))
-            {
-                var normalizedSearch = search.Trim().ToLower();
-                query = query.Where(e => e.Name.ToLower().Contains(normalizedSearch));
-            }
-
-            var items = await query
-                .OrderBy(e => e.Name)
-                .Select(e => new
-                {
-                    e.Id,
-                    e.Name,
-                    Destination = e.Destination != null ? e.Destination.Name : null,
-                    Locality = e.Locality != null ? e.Locality.Name : null,
-                    Status = e.Status.ToString(),
-                    e.IsActive,
-                    ImageCount = e.Images.Count,
-                    HasMainImage = e.Images.Any(i => i.IsMain)
-                })
-                .ToListAsync();
-
-            return Ok(items);
-        }
-
-        [HttpGet("italy-event-seed-check")]
-        public async Task<IActionResult> ItalyEventSeedCheck()
-        {
-            var source = new[]
-            {
-                new { Name = "Bari veče fokače", EventTypeName = "Proslava", LocalityName = "Bari Vecchia", DestinationName = "Bari", CreatorEmail = "lorenzo.creator@spirego.com", ManagerEmail = "manager.bari@spirego.com" },
-                new { Name = "Palermo noć pijaca", EventTypeName = "Festival", LocalityName = "Mercato Ballaro Palermo", DestinationName = "Palermo", CreatorEmail = "lorenzo.creator@spirego.com", ManagerEmail = "manager.palermo@spirego.com" },
-                new { Name = "Trieste morske priče", EventTypeName = "Okupljanje", LocalityName = "Piazza Unita Trieste", DestinationName = "Trieste", CreatorEmail = "lorenzo.creator@spirego.com", ManagerEmail = "manager.trieste@spirego.com" },
-                new { Name = "Matera svetla u kamenu", EventTypeName = "Izlozba", LocalityName = "Sassi di Matera", DestinationName = "Matera", CreatorEmail = "lorenzo.creator@spirego.com", ManagerEmail = "manager.matera@spirego.com" },
-                new { Name = "Sorrento veče limuna", EventTypeName = "Proslava", LocalityName = "Corso Italia Sorrento", DestinationName = "Sorrento", CreatorEmail = "lorenzo.creator@spirego.com", ManagerEmail = "manager.sorrento@spirego.com" },
-                new { Name = "Stand-up pod baroknim svetlima Lečea", EventTypeName = "Stand-up", LocalityName = "Piazza Sant'Oronzo Lecce", DestinationName = "Lecce", CreatorEmail = "lorenzo.creator@spirego.com", ManagerEmail = "manager.lecce@spirego.com" },
-                new { Name = "Parma gurmanski susret", EventTypeName = "Sajam", LocalityName = "Piazza Duomo Parma", DestinationName = "Parma", CreatorEmail = "lorenzo.creator@spirego.com", ManagerEmail = "manager.parma@spirego.com" },
-                new { Name = "Regata zaliva Sardinije", EventTypeName = "Sportski dogadjaj", LocalityName = "Costa Smeralda Sardinija", DestinationName = "Sardinija", CreatorEmail = "lorenzo.creator@spirego.com", ManagerEmail = "manager.sardinia@spirego.com" }
-            };
-
-            static string Normalize(string value) =>
-                value.Trim().ToLowerInvariant()
-                    .Replace('đ', 'd')
-                    .Replace('š', 's')
-                    .Replace('ž', 'z')
-                    .Replace('č', 'c')
-                    .Replace('ć', 'c');
-
-            var eventTypes = await _context.EventTypes.AsNoTracking().ToListAsync();
-            var localities = await _context.Localities.AsNoTracking().ToListAsync();
-            var destinations = await _context.Destinations.AsNoTracking().ToListAsync();
-            var users = await _context.Users.AsNoTracking().ToListAsync();
-
-            var result = source.Select(item => new
-            {
-                item.Name,
-                HasType = eventTypes.Any(et => Normalize(et.Name) == Normalize(item.EventTypeName)),
-                HasLocality = localities.Any(l => l.Name == item.LocalityName),
-                HasDestination = destinations.Any(d => d.Name == item.DestinationName),
-                HasCreator = users.Any(u => u.Email == item.CreatorEmail),
-                HasManager = users.Any(u => u.Email == item.ManagerEmail)
-            });
-
-            return Ok(result);
         }
     }
 }
