@@ -34090,7 +34090,7 @@ ins_object_images AS (
         o."Id",
         NOW()
     FROM ranked_source s
-    JOIN "Objects" o ON o."Name" = s."Name"
+    JOIN ins_objects o ON o."Name" = s."Name"
 ),
 ins_reviews_one AS (
     INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "CreatedAt")
@@ -34119,7 +34119,7 @@ ins_reviews_one AS (
         END,
         NOW()
     FROM ranked_source s
-    JOIN "Objects" o ON o."Name" = s."Name"
+    JOIN ins_objects o ON o."Name" = s."Name"
     JOIN "Users" u ON u."Email" = CASE
         WHEN s.rn % 3 = 1 THEN 'alejandro.tourist@spirego.com'
         WHEN s.rn % 3 = 2 THEN 'isabel.tourist@spirego.com'
@@ -34153,7 +34153,7 @@ ins_reviews_two AS (
         END,
         NOW()
     FROM ranked_source s
-    JOIN "Objects" o ON o."Name" = s."Name"
+    JOIN ins_objects o ON o."Name" = s."Name"
     JOIN "Users" u ON u."Email" = CASE
         WHEN s.rn % 3 = 1 THEN 'isabel.tourist@spirego.com'
         WHEN s.rn % 3 = 2 THEN 'miguel.tourist@spirego.com'
@@ -34161,6 +34161,166 @@ ins_reviews_two AS (
     END
 )
 SELECT 1;
+
+-- 16.5 DODATNI DOGAĐAJI ZA NOVE DESTINACIJE U ŠPANIJI
+WITH source("Name", "Description", "Lng", "Lat", "StartDate", "EndDate", "Price", "MaxVisitors", "EventTypeName", "LocalityName", "DestinationName", "ObjectName", "CreatorEmail", "ManagerEmail") AS (
+    VALUES
+    ('Alicante Mediteranski vikend', 'Festival na Explanadi sa muzikom, hranom, večernjom šetnjom i opuštenim ritmom obale.', -0.4819, 38.3447, '2026-10-10 18:00'::timestamp, '2026-10-11 23:00'::timestamp, 8.00, 1400, 'Festival', 'Explanada Alicante', 'Alicante', NULL, 'carmen.creator@spirego.com', 'manager.alicante@spirego.com'),
+    ('Noć pintxosa u San Sebastianu', 'Večernje okupljanje uz pintxose, kraće nastupe i živu atmosferu starog jezgra.', -1.9843, 43.3226, '2026-10-16 19:00'::timestamp, '2026-10-16 23:30'::timestamp, 9.00, 750, 'Okupljanje', 'Parte Vieja San Sebastian', 'San Sebastian', NULL, 'carmen.creator@spirego.com', 'manager.sansebastian@spirego.com'),
+    ('Dani starih zidina Girone', 'Kulturni program sa manjim izložbama, vođenim turama i večernjim sadržajem među kamenim ulicama Girone.', 2.8259, 41.9860, '2026-10-22 17:30'::timestamp, '2026-10-24 22:00'::timestamp, 7.00, 900, 'Izlozba', 'Barri Vell Girona', 'Girona', NULL, 'carmen.creator@spirego.com', 'manager.girona@spirego.com'),
+    ('Kadiz obalski sportski dan', 'Sportski događaj uz obalu sa rekreativnim turnirom, gledalištem i programom za posetioce.', -6.2971, 36.5278, '2026-10-30 11:00'::timestamp, '2026-10-30 19:00'::timestamp, 4.00, 1200, 'Sportski dogadjaj', 'Paseo Campo del Sur', 'Cadiz', NULL, 'carmen.creator@spirego.com', 'manager.cadiz@spirego.com'),
+    ('Murcia gastro forum', 'Konferencija o lokalnoj gastronomiji, gradskim tržištima i novim turističkim formatima juga Španije.', -1.1286, 37.9838, '2026-11-05 09:30'::timestamp, '2026-11-05 16:30'::timestamp, 22.00, 320, 'Konferencija', 'Plaza Belluga Murcia', 'Murcia', NULL, 'carmen.creator@spirego.com', 'manager.murcia@spirego.com'),
+    ('Sajam severnih ukusa Santandera', 'Sajam lokalne hrane, manjih proizvođača i obalskih specijaliteta u centralnom delu Santandera.', -3.7978, 43.4636, '2026-11-12 10:00'::timestamp, '2026-11-13 20:00'::timestamp, 0.00, 1100, 'Sajam', 'Centro Botin Santander', 'Santander', NULL, 'carmen.creator@spirego.com', 'manager.santander@spirego.com'),
+    ('Tenerife noć vulkana i ritma', 'Večernji događaj sa DJ setovima, svetlosnim efektima i toplom ostrvskom atmosferom na jugu Tenerifa.', -16.7324, 28.0909, '2026-11-20 21:00'::timestamp, '2026-11-21 02:30'::timestamp, 14.00, 950, 'DJ vece', 'Costa Adeje Tenerife', 'Tenerife', NULL, 'carmen.creator@spirego.com', 'manager.tenerife@spirego.com'),
+    ('Veče hodočasnika u Santjagu', 'Gradska proslava sa muzikom, pričama sa ruta i večernjim druženjem u istorijskom centru Santjaga.', -8.5434, 42.8794, '2026-11-28 18:30'::timestamp, '2026-11-28 23:00'::timestamp, 5.00, 850, 'Proslava', 'Old Town Santiago', 'Santiago de Compostela', NULL, 'carmen.creator@spirego.com', 'manager.santiago@spirego.com')
+)
+INSERT INTO "Events"
+("Name", "Description", "Geolocation", "StartDate", "EndDate", "Price", "MaxVisitors", "IsActive", "Status", "EventTypeId", "LocalityId", "DestinationId", "ObjectId", "CreatedByUserId", "ApprovedByUserId", "ApprovedAt", "CreatedAt", "UpdatedAt")
+SELECT
+    s."Name",
+    s."Description",
+    ST_SetSRID(ST_MakePoint(s."Lng", s."Lat"), 4326),
+    s."StartDate",
+    s."EndDate",
+    s."Price",
+    s."MaxVisitors",
+    true,
+    'Approved',
+    et."Id",
+    l."Id",
+    d."Id",
+    o."Id",
+    cu."Id",
+    mu."Id",
+    NOW(),
+    NOW(),
+    NOW()
+FROM source s
+JOIN "EventTypes" et ON
+    translate(replace(lower(et."Name"), 'đ', 'dj'), 'šžčć', 'szcc')
+    =
+    translate(replace(lower(s."EventTypeName"), 'đ', 'dj'), 'šžčć', 'szcc')
+JOIN "Localities" l ON l."Name" = s."LocalityName"
+JOIN "Destinations" d ON d."Name" = s."DestinationName"
+JOIN "Users" cu ON cu."Email" = s."CreatorEmail"
+JOIN "Users" mu ON mu."Email" = s."ManagerEmail"
+LEFT JOIN "Objects" o ON o."Name" = s."ObjectName";
+
+WITH source("Url", "AltText", "IsMain", "EventName") AS (
+    VALUES
+    ('https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1400&q=80', 'Alicante Mediteranski vikend', true, 'Alicante Mediteranski vikend'),
+    ('https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1400&q=80', 'Noć pintxosa u San Sebastianu', true, 'Noć pintxosa u San Sebastianu'),
+    ('https://images.unsplash.com/photo-1545987796-200677ee1011?auto=format&fit=crop&w=1400&q=80', 'Dani starih zidina Girone', true, 'Dani starih zidina Girone'),
+    ('https://images.unsplash.com/photo-1519861531473-9200262188bf?auto=format&fit=crop&w=1400&q=80', 'Kadiz obalski sportski dan', true, 'Kadiz obalski sportski dan'),
+    ('https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&w=1400&q=80', 'Murcia gastro forum', true, 'Murcia gastro forum'),
+    ('https://images.unsplash.com/photo-1528698827591-e19ccd7bc23d?auto=format&fit=crop&w=1400&q=80', 'Sajam severnih ukusa Santandera', true, 'Sajam severnih ukusa Santandera'),
+    ('https://images.unsplash.com/photo-1571266028243-d220c9c3c7d8?auto=format&fit=crop&w=1400&q=80', 'Tenerife noć vulkana i ritma', true, 'Tenerife noć vulkana i ritma'),
+    ('https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&w=1400&q=80', 'Veče hodočasnika u Santjagu', true, 'Veče hodočasnika u Santjagu')
+)
+INSERT INTO "Images" ("Url", "AltText", "IsMain", "EventId", "CreatedAt")
+SELECT
+    s."Url",
+    s."AltText",
+    s."IsMain",
+    e."Id",
+    NOW()
+FROM source s
+JOIN "Events" e ON e."Name" = s."EventName";
+
+-- 16.6 DODATNI DOGAĐAJI ZA NOVE DESTINACIJE U ITALIJI
+INSERT INTO "Events"
+("Name", "Description", "Geolocation", "StartDate", "EndDate", "Price", "MaxVisitors", "IsActive", "Status", "EventTypeId", "LocalityId", "DestinationId", "ObjectId", "CreatedByUserId", "ApprovedByUserId", "ApprovedAt", "CreatedAt", "UpdatedAt")
+VALUES
+('Bari veče fokače', 'Večernji gradski događaj sa degustacijama, muzikom i okupljanjem u starom jezgru Barija.',
+ ST_SetSRID(ST_MakePoint(16.8734, 41.1280), 4326), '2026-10-11 18:30', '2026-10-11 23:00', 6.00, 900, true, 'Approved',
+ 16,
+ 160,
+ 68,
+ NULL,
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'lorenzo.creator@spirego.com'),
+ NULL,
+ NOW(), NOW(), NOW()),
+
+('Palermo noć pijaca', 'Festival večernjih ukusa i gradskih pijaca sa muzikom, svetlom i kasnijim šetnjama kroz Palermo.',
+ ST_SetSRID(ST_MakePoint(13.3687, 38.1128), 4326), '2026-10-18 19:00', '2026-10-18 23:30', 7.00, 1100, true, 'Approved',
+ 5,
+ 164,
+ 69,
+ NULL,
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'lorenzo.creator@spirego.com'),
+ NULL,
+ NOW(), NOW(), NOW()),
+
+('Trieste morske priče', 'Kulturno okupljanje uz more sa razgovorima, manjim nastupima i pričama o luci i gradu.',
+ ST_SetSRID(ST_MakePoint(13.7683, 45.6500), 4326), '2026-10-24 18:00', '2026-10-24 22:00', 5.00, 650, true, 'Approved',
+ 8,
+ 166,
+ 70,
+ NULL,
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'lorenzo.creator@spirego.com'),
+ NULL,
+ NOW(), NOW(), NOW()),
+
+('Matera svetla u kamenu', 'Večernja izložba svetla i fotografije kroz kamene četvrti Matere sa mirnijim kulturnim ritmom.',
+ ST_SetSRID(ST_MakePoint(16.6078, 40.6676), 4326), '2026-10-31 18:30', '2026-11-02 22:00', 9.00, 780, true, 'Approved',
+ 6,
+ 169,
+ 71,
+ NULL,
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'lorenzo.creator@spirego.com'),
+ NULL,
+ NOW(), NOW(), NOW()),
+
+('Sorrento veče limuna', 'Proslava obale sa muzikom, desertima i večernjim programom u centru Sorenta.',
+ ST_SetSRID(ST_MakePoint(14.3754, 40.6266), 4326), '2026-11-07 19:00', '2026-11-07 23:30', 8.00, 860, true, 'Approved',
+ 16,
+ 173,
+ 72,
+ NULL,
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'lorenzo.creator@spirego.com'),
+ NULL,
+ NOW(), NOW(), NOW()),
+
+('Stand-up pod baroknim svetlima Lečea', 'Stand-up veče sa domaćim komičarima i laganim večernjim izlaskom u centru Lečea.',
+ ST_SetSRID(ST_MakePoint(18.1718, 40.3527), 4326), '2026-11-14 20:30', '2026-11-14 22:00', 11.00, 240, true, 'Approved',
+ 17,
+ 175,
+ 73,
+ NULL,
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'lorenzo.creator@spirego.com'),
+ NULL,
+ NOW(), NOW(), NOW()),
+
+('Parma gurmanski susret', 'Sajam ukusa sa sirevima, pršutom i malim proizvođačima u centru Parme.',
+ ST_SetSRID(ST_MakePoint(10.3284, 44.8010), 4326), '2026-11-21 11:00', '2026-11-22 20:00', 0.00, 980, true, 'Approved',
+ 9,
+ 178,
+ 74,
+ NULL,
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'lorenzo.creator@spirego.com'),
+ NULL,
+ NOW(), NOW(), NOW()),
+
+('Regata zaliva Sardinije', 'Sportski događaj na vodi sa posmatračkim zonama i programom uz obalu Sardinije.',
+ ST_SetSRID(ST_MakePoint(9.5335, 41.1364), 4326), '2026-11-29 10:00', '2026-11-29 18:00', 10.00, 1200, true, 'Approved',
+ 10,
+ 181,
+ 75,
+ NULL,
+ (SELECT "Id" FROM "Users" WHERE "Email" = 'lorenzo.creator@spirego.com'),
+ NULL,
+ NOW(), NOW(), NOW());
+
+INSERT INTO "Images" ("Url", "AltText", "IsMain", "EventId", "CreatedAt")
+VALUES
+('https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&w=1400&q=80', 'Bari veče fokače', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Bari veče fokače'), NOW()),
+('https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1400&q=80', 'Palermo noć pijaca', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Palermo noć pijaca'), NOW()),
+('https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1400&q=80', 'Trieste morske priče', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Trieste morske priče'), NOW()),
+('https://images.unsplash.com/photo-1545987796-200677ee1011?auto=format&fit=crop&w=1400&q=80', 'Matera svetla u kamenu', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Matera svetla u kamenu'), NOW()),
+('https://images.unsplash.com/photo-1571266028243-d220c9c3c7d8?auto=format&fit=crop&w=1400&q=80', 'Sorrento veče limuna', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Sorrento veče limuna'), NOW()),
+('https://images.unsplash.com/photo-1527224857830-43a7acc85260?auto=format&fit=crop&w=1400&q=80', 'Stand-up pod baroknim svetlima Lečea', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Stand-up pod baroknim svetlima Lečea'), NOW()),
+('https://images.unsplash.com/photo-1528698827591-e19ccd7bc23d?auto=format&fit=crop&w=1400&q=80', 'Parma gurmanski susret', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Parma gurmanski susret'), NOW()),
+('https://images.unsplash.com/photo-1519861531473-9200262188bf?auto=format&fit=crop&w=1400&q=80', 'Regata zaliva Sardinije', true, (SELECT "Id" FROM "Events" WHERE "Name" = 'Regata zaliva Sardinije'), NOW());
 
 -- ============================================
 -- 16.3 ITALY EXPANSION - USERS, DESTINATIONS, LOCALITIES
@@ -34561,7 +34721,7 @@ ins_activity_images AS (
         a."Id",
         NOW()
     FROM ranked_source s
-    JOIN "Activities" a ON a."Name" = s."Name"
+    JOIN ins_activities a ON a."Name" = s."Name"
 )
 SELECT 1;
 
@@ -34713,7 +34873,7 @@ ins_object_images AS (
         o."Id",
         NOW()
     FROM ranked_source s
-    JOIN "Objects" o ON o."Name" = s."Name"
+    JOIN ins_objects o ON o."Name" = s."Name"
 ),
 ins_reviews_one AS (
     INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "CreatedAt")
@@ -34742,7 +34902,7 @@ ins_reviews_one AS (
         END,
         NOW()
     FROM ranked_source s
-    JOIN "Objects" o ON o."Name" = s."Name"
+    JOIN ins_objects o ON o."Name" = s."Name"
     JOIN "Users" u ON u."Email" = CASE
         WHEN s.rn % 3 = 1 THEN 'chiara.italy.tourist@spirego.com'
         WHEN s.rn % 3 = 2 THEN 'marco.italy.tourist@spirego.com'
@@ -34776,7 +34936,7 @@ ins_reviews_two AS (
         END,
         NOW()
     FROM ranked_source s
-    JOIN "Objects" o ON o."Name" = s."Name"
+    JOIN ins_objects o ON o."Name" = s."Name"
     JOIN "Users" u ON u."Email" = CASE
         WHEN s.rn % 3 = 1 THEN 'marco.italy.tourist@spirego.com'
         WHEN s.rn % 3 = 2 THEN 'bianca.italy.tourist@spirego.com'
@@ -34892,6 +35052,6 @@ ins_activity_images AS (
         a."Id",
         NOW()
     FROM ranked_source s
-    JOIN "Activities" a ON a."Name" = s."Name"
+    JOIN ins_activities a ON a."Name" = s."Name"
 )
 SELECT 1;
