@@ -34072,26 +34072,6 @@ ins_objects AS (
     JOIN "Users" mu ON mu."Email" = s."ManagerEmail"
     RETURNING "Id", "Name"
 ),
-ins_object_images AS (
-    INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
-    SELECT
-        CASE
-            WHEN s."Profile" = 'lodging' THEN 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1400&q=80'
-            WHEN s."Profile" = 'food' THEN 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1400&q=80'
-            WHEN s."Profile" = 'shopping' THEN 'https://images.unsplash.com/photo-1481437156560-3205f6a55735?auto=format&fit=crop&w=1400&q=80'
-            WHEN s."Profile" = 'health' THEN 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1400&q=80'
-            WHEN s."Profile" = 'fuel' THEN 'https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=1400&q=80'
-            WHEN s."Profile" = 'culture' THEN 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1400&q=80'
-            WHEN s."Profile" = 'wellness' THEN 'https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&w=1400&q=80'
-            ELSE 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1400&q=80'
-        END,
-        s."Name",
-        true,
-        o."Id",
-        NOW()
-    FROM ranked_source s
-    JOIN ins_objects o ON o."Name" = s."Name"
-),
 ins_reviews_one AS (
     INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "CreatedAt")
     SELECT
@@ -34161,6 +34141,68 @@ ins_reviews_two AS (
     END
 )
 SELECT 1;
+
+INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
+VALUES
+('https://loremflickr.com/1920/1080/hotel,alicante,stay?lock=101', 'Hotel Mirador Alicante', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Mirador Alicante'), NOW()),
+('https://loremflickr.com/1920/1080/food,alicante,restaurant?lock=102', 'Arrocería Costa Blanca', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Arrocería Costa Blanca'), NOW()),
+('https://loremflickr.com/1920/1080/art-gallery,alicante,interior?lock=103', 'Galerija Santa Barbara', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Santa Barbara'), NOW()),
+('https://loremflickr.com/1920/1080/shopping-mall,alicante,interior?lock=104', 'Plaza Mar Alicante', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Plaza Mar Alicante'), NOW()),
+('https://loremflickr.com/1920/1080/hospital,alicante,medical?lock=105', 'Hospital Costa Alicante', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Costa Alicante'), NOW()),
+('https://loremflickr.com/1920/1080/gas-station,alicante,roadtrip?lock=106', 'Repsol Postiguet Alicante', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol Postiguet Alicante'), NOW()),
+('https://loremflickr.com/1920/1080/souvenir-shop,alicante,store?lock=107', 'Boutique Suveniri Explanada', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Boutique Suveniri Explanada'), NOW()),
+('https://loremflickr.com/1920/1080/clinic,alicante,medical?lock=108', 'Klinika Vista Med Alicante', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Klinika Vista Med Alicante'), NOW()),
+('https://loremflickr.com/1920/1080/gas-station,alicante,roadtrip?lock=109', 'Cepsa Castillo Alicante', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Cepsa Castillo Alicante'), NOW()),
+('https://loremflickr.com/1920/1080/guesthouse,san-sebastian,travel?lock=110', 'Pansion La Concha Residence', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pansion La Concha Residence'), NOW()),
+('https://loremflickr.com/1920/1080/food,san-sebastian,restaurant?lock=111', 'Pintxos Parte Vieja', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pintxos Parte Vieja'), NOW()),
+('https://loremflickr.com/1920/1080/art-gallery,san-sebastian,interior?lock=112', 'Galerija Atlantik Donostia', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Atlantik Donostia'), NOW()),
+('https://loremflickr.com/1920/1080/market,san-sebastian,shopping?lock=113', 'Mercado Kursaal San Sebastian', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercado Kursaal San Sebastian'), NOW()),
+('https://loremflickr.com/1920/1080/hospital,san-sebastian,medical?lock=114', 'Hospital Donostia Center', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Donostia Center'), NOW()),
+('https://loremflickr.com/1920/1080/gas-station,san-sebastian,roadtrip?lock=115', 'Repsol La Concha', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol La Concha'), NOW()),
+('https://loremflickr.com/1920/1080/souvenir-shop,san-sebastian,store?lock=116', 'Suveniri Parte Vieja', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suveniri Parte Vieja'), NOW()),
+('https://loremflickr.com/1920/1080/clinic,san-sebastian,medical?lock=117', 'Poliklinika Zurriola San Sebastian', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Poliklinika Zurriola San Sebastian'), NOW()),
+('https://loremflickr.com/1920/1080/gas-station,san-sebastian,roadtrip?lock=118', 'Cepsa Igueldo Drive', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Cepsa Igueldo Drive'), NOW()),
+('https://loremflickr.com/1920/1080/hotel,girona,apartment?lock=119', 'Apartmani Onyar Rooms', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartmani Onyar Rooms'), NOW()),
+('https://loremflickr.com/1920/1080/restaurant,girona,dining?lock=120', 'Restoran Barri Vell Girona', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Barri Vell Girona'), NOW()),
+('https://loremflickr.com/1920/1080/museum,girona,exhibition?lock=121', 'Muzej Mostova Girona', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Mostova Girona'), NOW()),
+('https://loremflickr.com/1920/1080/market,girona,shopping?lock=122', 'Girona Market Hall', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Girona Market Hall'), NOW()),
+('https://loremflickr.com/1920/1080/hospital,girona,medical?lock=123', 'Hospital Girona Nord', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Girona Nord'), NOW()),
+('https://loremflickr.com/1920/1080/gas-station,girona,roadtrip?lock=124', 'Repsol Girona Riverside', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol Girona Riverside'), NOW()),
+('https://loremflickr.com/1920/1080/souvenir-shop,girona,store?lock=125', 'Suvenirnica Katedrala Girona', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Katedrala Girona'), NOW()),
+('https://loremflickr.com/1920/1080/hotel,cadiz,stay?lock=126', 'Hotel La Caleta Cadiz', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel La Caleta Cadiz'), NOW()),
+('https://loremflickr.com/1920/1080/restaurant,cadiz,dining?lock=127', 'Taverna Campo del Sur', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Taverna Campo del Sur'), NOW()),
+('https://loremflickr.com/1920/1080/museum,cadiz,exhibition?lock=128', 'Muzej Atlantika Cadiz', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Atlantika Cadiz'), NOW()),
+('https://loremflickr.com/1920/1080/market,cadiz,shopping?lock=129', 'Mercado del Puerto Cadiz', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercado del Puerto Cadiz'), NOW()),
+('https://loremflickr.com/1920/1080/hospital,cadiz,medical?lock=130', 'Hospital Bahia Cadiz', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Bahia Cadiz'), NOW()),
+('https://loremflickr.com/1920/1080/gas-station,cadiz,roadtrip?lock=131', 'Cepsa La Caleta Cadiz', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Cepsa La Caleta Cadiz'), NOW()),
+('https://loremflickr.com/1920/1080/souvenir-shop,cadiz,store?lock=132', 'Suvenirnica Stari Kadiz', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Stari Kadiz'), NOW()),
+('https://loremflickr.com/1920/1080/hotel,murcia,stay?lock=133', 'Hotel Belluga Murcia', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Belluga Murcia'), NOW()),
+('https://loremflickr.com/1920/1080/food,murcia,restaurant?lock=134', 'Segura Tapas Murcia', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Segura Tapas Murcia'), NOW()),
+('https://loremflickr.com/1920/1080/spa,murcia,wellness?lock=135', 'Murcia Wellness Patio', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Murcia Wellness Patio'), NOW()),
+('https://loremflickr.com/1920/1080/shopping-mall,murcia,interior?lock=136', 'Centro Comercial Murcia Luz', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Centro Comercial Murcia Luz'), NOW()),
+('https://loremflickr.com/1920/1080/hospital,murcia,medical?lock=137', 'Hospital Segura Murcia', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Segura Murcia'), NOW()),
+('https://loremflickr.com/1920/1080/gas-station,murcia,roadtrip?lock=138', 'Repsol Murcia Centro', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol Murcia Centro'), NOW()),
+('https://loremflickr.com/1920/1080/souvenir-shop,murcia,store?lock=139', 'Suvenirnica Plaza Belluga', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Plaza Belluga'), NOW()),
+('https://loremflickr.com/1920/1080/guesthouse,santander,travel?lock=140', 'Pansion Sardinero Plaza', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pansion Sardinero Plaza'), NOW()),
+('https://loremflickr.com/1920/1080/food,santander,restaurant?lock=141', 'Restaurante Botin Norte', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restaurante Botin Norte'), NOW()),
+('https://loremflickr.com/1920/1080/art-gallery,santander,interior?lock=142', 'Galerija Costa Cantabrica', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Costa Cantabrica'), NOW()),
+('https://loremflickr.com/1920/1080/market,santander,shopping?lock=143', 'Mercado Sardinero Santander', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercado Sardinero Santander'), NOW()),
+('https://loremflickr.com/1920/1080/hospital,santander,medical?lock=144', 'Hospital Cantabrico Santander', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Cantabrico Santander'), NOW()),
+('https://loremflickr.com/1920/1080/gas-station,santander,roadtrip?lock=145', 'Repsol Sardinero Santander', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol Sardinero Santander'), NOW()),
+('https://loremflickr.com/1920/1080/souvenir-shop,santander,store?lock=146', 'Suveniri Magdalena', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suveniri Magdalena'), NOW()),
+('https://loremflickr.com/1920/1080/resort,tenerife,pool?lock=147', 'Resort Costa Adeje Blue', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Resort Costa Adeje Blue'), NOW()),
+('https://loremflickr.com/1920/1080/food,tenerife,restaurant?lock=148', 'Restaurante Volcán y Mar', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restaurante Volcán y Mar'), NOW()),
+('https://loremflickr.com/1920/1080/spa,tenerife,wellness?lock=149', 'Teide Outdoor Spa', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Teide Outdoor Spa'), NOW()),
+('https://loremflickr.com/1920/1080/shopping-mall,tenerife,interior?lock=150', 'Centro Comercial Adeje Sun', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Centro Comercial Adeje Sun'), NOW()),
+('https://loremflickr.com/1920/1080/hospital,tenerife,medical?lock=151', 'Hospital Tenerife Sur', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Tenerife Sur'), NOW()),
+('https://loremflickr.com/1920/1080/gas-station,tenerife,roadtrip?lock=152', 'Cepsa Costa Adeje', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Cepsa Costa Adeje'), NOW()),
+('https://loremflickr.com/1920/1080/souvenir-shop,tenerife,store?lock=153', 'Surf Shop Tenerife', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Surf Shop Tenerife'), NOW()),
+('https://loremflickr.com/1920/1080/hotel,santiago-de-compostela,stay?lock=154', 'Hotel Obradoiro Suites', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Obradoiro Suites'), NOW()),
+('https://loremflickr.com/1920/1080/food,santiago-de-compostela,restaurant?lock=155', 'Casa Gallega Santiago', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Casa Gallega Santiago'), NOW()),
+('https://loremflickr.com/1920/1080/museum,santiago-de-compostela,exhibition?lock=156', 'Muzej Hodočasnika Santiago', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Hodočasnika Santiago'), NOW()),
+('https://loremflickr.com/1920/1080/market,santiago-de-compostela,shopping?lock=157', 'Mercado Compostela Central', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercado Compostela Central'), NOW()),
+('https://loremflickr.com/1920/1080/hospital,santiago-de-compostela,medical?lock=158', 'Hospital Santiago Centro', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Santiago Centro'), NOW()),
+('https://loremflickr.com/1920/1080/gas-station,santiago-de-compostela,roadtrip?lock=159', 'Repsol Alameda Santiago', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol Alameda Santiago'), NOW());
 
 -- 16.5 DODATNI DOGAĐAJI ZA NOVE DESTINACIJE U ŠPANIJI
 WITH source("Name", "Description", "Lng", "Lat", "StartDate", "EndDate", "Price", "MaxVisitors", "EventTypeName", "LocalityName", "DestinationName", "ObjectName", "CreatorEmail", "ManagerEmail") AS (
@@ -34670,31 +34712,43 @@ ins_activities AS (
     END
     LEFT JOIN "Objects" o ON o."Name" = s."ObjectName"
     RETURNING "Id", "Name"
-),
-ins_activity_images AS (
-    INSERT INTO "Images" ("Url", "AltText", "IsMain", "ActivityId", "CreatedAt")
-    SELECT
-        CASE
-            WHEN s."Profile" = 'water' THEN 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1400&q=80'
-            WHEN s."Profile" = 'food' THEN 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1400&q=80'
-            WHEN s."Profile" = 'shopping' THEN 'https://images.unsplash.com/photo-1481437156560-3205f6a55735?auto=format&fit=crop&w=1400&q=80'
-            WHEN s."Profile" = 'view' THEN 'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1400&q=80'
-            WHEN s."Profile" = 'bike' THEN 'https://images.unsplash.com/photo-1507035895480-2b3156c31fc8?auto=format&fit=crop&w=1400&q=80'
-            WHEN s."Profile" = 'boat' THEN 'https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1400&q=80'
-            WHEN s."Profile" = 'night' THEN 'https://images.unsplash.com/photo-1571266028243-d220c9c3c7d8?auto=format&fit=crop&w=1400&q=80'
-            WHEN s."Profile" = 'wellness' THEN 'https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&w=1400&q=80'
-            WHEN s."Profile" = 'adventure' THEN 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1400&q=80'
-            ELSE 'https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1400&q=80'
-        END,
-        s."Name",
-        true,
-        a."Id",
-        NOW()
-    FROM ranked_source s
-    JOIN ins_activities a ON a."Name" = s."Name"
 )
 SELECT 1;
 
+INSERT INTO "Images" ("Url", "AltText", "IsMain", "ActivityId", "CreatedAt")
+VALUES
+('https://loremflickr.com/1920/1080/swimming,alicante,beach?lock=301', 'Jutarnje plivanje Postiguet', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Jutarnje plivanje Postiguet'), NOW()),
+('https://loremflickr.com/1920/1080/walking-tour,alicante,old-town?lock=302', 'Šetnja do tvrđave Santa Barbara', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Šetnja do tvrđave Santa Barbara'), NOW()),
+('https://loremflickr.com/1920/1080/food-tasting,alicante,restaurant?lock=303', 'Degustacija pirinčanih ukusa Alicantea', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija pirinčanih ukusa Alicantea'), NOW()),
+('https://loremflickr.com/1920/1080/shopping,alicante,market?lock=304', 'Kupovina na Explanadi Alicante', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Kupovina na Explanadi Alicante'), NOW()),
+('https://loremflickr.com/1920/1080/swimming,san-sebastian,beach?lock=305', 'Kupanje u zalivu La Concha', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Kupanje u zalivu La Concha'), NOW()),
+('https://loremflickr.com/1920/1080/food-tasting,san-sebastian,restaurant?lock=306', 'Pintxos veče u Parte Vieji', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Pintxos veče u Parte Vieji'), NOW()),
+('https://loremflickr.com/1920/1080/viewpoint,san-sebastian,cityscape?lock=307', 'Fotografisanje sa Monte Iguelda', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Fotografisanje sa Monte Iguelda'), NOW()),
+('https://loremflickr.com/1920/1080/cycling,san-sebastian,outdoor?lock=308', 'Biciklistički krug uz obalu Donostije', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Biciklistički krug uz obalu Donostije'), NOW()),
+('https://loremflickr.com/1920/1080/viewpoint,girona,cityscape?lock=309', 'Foto tura kroz Barri Vell', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Foto tura kroz Barri Vell'), NOW()),
+('https://loremflickr.com/1920/1080/walking-tour,girona,old-town?lock=310', 'Razgledanje katedrale i starih ulica', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Razgledanje katedrale i starih ulica'), NOW()),
+('https://loremflickr.com/1920/1080/shopping,girona,market?lock=311', 'Kupovina lokalnih proizvoda u Đironi', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Kupovina lokalnih proizvoda u Đironi'), NOW()),
+('https://loremflickr.com/1920/1080/walking-tour,girona,old-town?lock=312', 'Večernja šetnja uz Onjar', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Večernja šetnja uz Onjar'), NOW()),
+('https://loremflickr.com/1920/1080/swimming,cadiz,beach?lock=313', 'Plivanje na La Caleti', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Plivanje na La Caleti'), NOW()),
+('https://loremflickr.com/1920/1080/boat-tour,cadiz,coast?lock=314', 'Vožnja čamcem uz zidine Kadiza', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Vožnja čamcem uz zidine Kadiza'), NOW()),
+('https://loremflickr.com/1920/1080/food-tasting,cadiz,restaurant?lock=315', 'Degustacija morskih zalogaja Kadiza', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija morskih zalogaja Kadiza'), NOW()),
+('https://loremflickr.com/1920/1080/nightlife,cadiz,lights?lock=316', 'Noćni provod uz obalu Kadiza', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Noćni provod uz obalu Kadiza'), NOW()),
+('https://loremflickr.com/1920/1080/wellness,murcia,yoga?lock=317', 'Joga uz Seguru', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Joga uz Seguru'), NOW()),
+('https://loremflickr.com/1920/1080/shopping,murcia,market?lock=318', 'Kupovina u centru Mursije', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Kupovina u centru Mursije'), NOW()),
+('https://loremflickr.com/1920/1080/walking-tour,murcia,old-town?lock=319', 'Razgledanje trga Beljuga', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Razgledanje trga Beljuga'), NOW()),
+('https://loremflickr.com/1920/1080/wellness,murcia,yoga?lock=320', 'Spa popodne u Mursiji', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Spa popodne u Mursiji'), NOW()),
+('https://loremflickr.com/1920/1080/swimming,santander,beach?lock=321', 'Plivanje na El Sardineru', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Plivanje na El Sardineru'), NOW()),
+('https://loremflickr.com/1920/1080/kayaking,santander,coast?lock=322', 'Kajak uz obalu Santandera', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Kajak uz obalu Santandera'), NOW()),
+('https://loremflickr.com/1920/1080/viewpoint,santander,cityscape?lock=323', 'Fotografisanje sa Magdalenom', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Fotografisanje sa Magdalenom'), NOW()),
+('https://loremflickr.com/1920/1080/food-tasting,santander,restaurant?lock=324', 'Degustacija severnjačke kuhinje Santandera', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija severnjačke kuhinje Santandera'), NOW()),
+('https://loremflickr.com/1920/1080/scuba-diving,tenerife,sea?lock=325', 'Ronjenje uz Costa Adeje', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Ronjenje uz Costa Adeje'), NOW()),
+('https://loremflickr.com/1920/1080/paragliding,tenerife,cliffs?lock=326', 'Paraglajding iznad juga Tenerifa', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Paraglajding iznad juga Tenerifa'), NOW()),
+('https://loremflickr.com/1920/1080/hiking,tenerife,trail?lock=327', 'Planinarenje ka Teide vidikovcu', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Planinarenje ka Teide vidikovcu'), NOW()),
+('https://loremflickr.com/1920/1080/nightlife,tenerife,lights?lock=328', 'Noćni provod Costa Adeje', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Noćni provod Costa Adeje'), NOW()),
+('https://loremflickr.com/1920/1080/walking-tour,santiago-de-compostela,old-town?lock=329', 'Razgledanje istorijskog jezgra Santijaga', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Razgledanje istorijskog jezgra Santijaga'), NOW()),
+('https://loremflickr.com/1920/1080/food-tasting,santiago-de-compostela,restaurant?lock=330', 'Degustacija galisijske kuhinje', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija galisijske kuhinje'), NOW()),
+('https://loremflickr.com/1920/1080/shopping,santiago-de-compostela,market?lock=331', 'Kupovina na pijaci Kompostele', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Kupovina na pijaci Kompostele'), NOW()),
+('https://loremflickr.com/1920/1080/walking-tour,santiago-de-compostela,old-town?lock=332', 'Jutarnja šetnja kroz Alamedu', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Jutarnja šetnja kroz Alamedu'), NOW());
 
 -- 16.4 ITALY EXPANSION - OBJECTS, REVIEWS, ACTIVITIES
 WITH source("Name", "Description", "Address", "PhoneNumber", "Price", "ObjectTypeName", "LocalityName", "DestinationName", "CreatorEmail", "ManagerEmail", "Profile", "Lng", "Lat") AS (
@@ -34825,26 +34879,6 @@ ins_objects AS (
     JOIN "Users" mu ON mu."Email" = s."ManagerEmail"
     RETURNING "Id", "Name"
 ),
-ins_object_images AS (
-    INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
-    SELECT
-        CASE
-            WHEN s."Profile" = 'lodging' THEN 'https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=1400&q=80'
-            WHEN s."Profile" = 'food' THEN 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1400&q=80'
-            WHEN s."Profile" = 'shopping' THEN 'https://images.unsplash.com/photo-1481437156560-3205f6a55735?auto=format&fit=crop&w=1400&q=80'
-            WHEN s."Profile" = 'health' THEN 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?auto=format&fit=crop&w=1400&q=80'
-            WHEN s."Profile" = 'fuel' THEN 'https://images.unsplash.com/photo-1601584115197-04ecc0da31d7?auto=format&fit=crop&w=1400&q=80'
-            WHEN s."Profile" = 'culture' THEN 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1400&q=80'
-            WHEN s."Profile" = 'wellness' THEN 'https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&w=1400&q=80'
-            ELSE 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1400&q=80'
-        END,
-        s."Name",
-        true,
-        o."Id",
-        NOW()
-    FROM ranked_source s
-    JOIN ins_objects o ON o."Name" = s."Name"
-),
 ins_reviews_one AS (
     INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "CreatedAt")
     SELECT
@@ -34914,6 +34948,69 @@ ins_reviews_two AS (
     END
 )
 SELECT 1;
+
+INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
+VALUES
+('https://loremflickr.com/1920/1080/hotel,bari,stay?lock=501', 'Hotel Lungomare Bari', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Lungomare Bari'), NOW()),
+('https://loremflickr.com/1920/1080/restaurant,bari,dining?lock=502', 'Trattoria Bari Vecchia', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Trattoria Bari Vecchia'), NOW()),
+('https://loremflickr.com/1920/1080/art-gallery,bari,interior?lock=503', 'Galerija Svetog Nikole Bari', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Svetog Nikole Bari'), NOW()),
+('https://loremflickr.com/1920/1080/shopping-mall,bari,interior?lock=504', 'Centro Bari Galleria', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Centro Bari Galleria'), NOW()),
+('https://loremflickr.com/1920/1080/hospital,bari,medical?lock=505', 'Hospital Adriatico Bari', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Adriatico Bari'), NOW()),
+('https://loremflickr.com/1920/1080/gas-station,bari,roadtrip?lock=506', 'Repsol Lungomare Bari', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol Lungomare Bari'), NOW()),
+('https://loremflickr.com/1920/1080/souvenir-shop,bari,store?lock=507', 'Suvenirnica Bari Vecchia', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Bari Vecchia'), NOW()),
+('https://loremflickr.com/1920/1080/clinic,bari,medical?lock=508', 'Klinika San Nicola Bari', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Klinika San Nicola Bari'), NOW()),
+('https://loremflickr.com/1920/1080/gas-station,bari,roadtrip?lock=509', 'Q8 Porto Bari', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Q8 Porto Bari'), NOW()),
+('https://loremflickr.com/1920/1080/hotel,palermo,stay?lock=510', 'Hotel Quattro Canti Palermo', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Quattro Canti Palermo'), NOW()),
+('https://loremflickr.com/1920/1080/restaurant,palermo,dining?lock=511', 'Osteria Ballaro Palermo', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Osteria Ballaro Palermo'), NOW()),
+('https://loremflickr.com/1920/1080/museum,palermo,exhibition?lock=512', 'Muzej Normanske Palate Palermo', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Normanske Palate Palermo'), NOW()),
+('https://loremflickr.com/1920/1080/market,palermo,shopping?lock=513', 'Mercato Palermo Centrale', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercato Palermo Centrale'), NOW()),
+('https://loremflickr.com/1920/1080/hospital,palermo,medical?lock=514', 'Hospital Palermo Centro', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Palermo Centro'), NOW()),
+('https://loremflickr.com/1920/1080/gas-station,palermo,roadtrip?lock=515', 'Eni Mondello Palermo', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Eni Mondello Palermo'), NOW()),
+('https://loremflickr.com/1920/1080/souvenir-shop,palermo,store?lock=516', 'Suvenirnica Ballaro Palermo', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Ballaro Palermo'), NOW()),
+('https://loremflickr.com/1920/1080/clinic,palermo,medical?lock=517', 'Poliklinika Mondello Palermo', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Poliklinika Mondello Palermo'), NOW()),
+('https://loremflickr.com/1920/1080/gas-station,palermo,roadtrip?lock=518', 'Q8 Foro Italico Palermo', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Q8 Foro Italico Palermo'), NOW()),
+('https://loremflickr.com/1920/1080/hotel,trieste,stay?lock=519', 'Hotel Piazza Unita Trieste', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Piazza Unita Trieste'), NOW()),
+('https://loremflickr.com/1920/1080/food,trieste,restaurant?lock=520', 'Ristorante Canal Grande Trieste', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Ristorante Canal Grande Trieste'), NOW()),
+('https://loremflickr.com/1920/1080/museum,trieste,exhibition?lock=521', 'Muzej Morskog Trsta', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Morskog Trsta'), NOW()),
+('https://loremflickr.com/1920/1080/market,trieste,shopping?lock=522', 'Mercato Canal Grande Trieste', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercato Canal Grande Trieste'), NOW()),
+('https://loremflickr.com/1920/1080/hospital,trieste,medical?lock=523', 'Hospital Porto Trieste', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Porto Trieste'), NOW()),
+('https://loremflickr.com/1920/1080/gas-station,trieste,roadtrip?lock=524', 'Eni Miramare Trieste', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Eni Miramare Trieste'), NOW()),
+('https://loremflickr.com/1920/1080/souvenir-shop,trieste,store?lock=525', 'Suvenirnica Piazza Unita', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Piazza Unita'), NOW()),
+('https://loremflickr.com/1920/1080/hotel,matera,apartment?lock=526', 'Apartmani Sassi Matera', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartmani Sassi Matera'), NOW()),
+('https://loremflickr.com/1920/1080/restaurant,matera,dining?lock=527', 'Osteria Kamena Matera', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Osteria Kamena Matera'), NOW()),
+('https://loremflickr.com/1920/1080/museum,matera,exhibition?lock=528', 'Muzej Pecinskih Kuca Matera', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Pecinskih Kuca Matera'), NOW()),
+('https://loremflickr.com/1920/1080/shop,matera,store?lock=529', 'Bottega Sassi Matera', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Bottega Sassi Matera'), NOW()),
+('https://loremflickr.com/1920/1080/clinic,matera,medical?lock=530', 'Dom zdravlja Gravina Matera', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Gravina Matera'), NOW()),
+('https://loremflickr.com/1920/1080/gas-station,matera,roadtrip?lock=531', 'Q8 Murgia Matera', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Q8 Murgia Matera'), NOW()),
+('https://loremflickr.com/1920/1080/market,matera,shopping?lock=532', 'Trznica Piazza Matera', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Trznica Piazza Matera'), NOW()),
+('https://loremflickr.com/1920/1080/guesthouse,sorrento,travel?lock=533', 'Pansion Marina Grande Sorrento', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pansion Marina Grande Sorrento'), NOW()),
+('https://loremflickr.com/1920/1080/restaurant,sorrento,dining?lock=534', 'Limone Bistro Sorrento', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Limone Bistro Sorrento'), NOW()),
+('https://loremflickr.com/1920/1080/museum,sorrento,exhibition?lock=535', 'Muzej Obale Sorrenta', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Obale Sorrenta'), NOW()),
+('https://loremflickr.com/1920/1080/shopping-mall,sorrento,interior?lock=536', 'Galleria Corso Sorrento', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galleria Corso Sorrento'), NOW()),
+('https://loremflickr.com/1920/1080/hospital,sorrento,medical?lock=537', 'Hospital Costiera Sorrento', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Costiera Sorrento'), NOW()),
+('https://loremflickr.com/1920/1080/gas-station,sorrento,roadtrip?lock=538', 'Eni Marina Grande Sorrento', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Eni Marina Grande Sorrento'), NOW()),
+('https://loremflickr.com/1920/1080/souvenir-shop,sorrento,store?lock=539', 'Suvenirnica Villa Sorrento', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Villa Sorrento'), NOW()),
+('https://loremflickr.com/1920/1080/hotel,lecce,stay?lock=540', 'Hotel Barocco Lecce', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Barocco Lecce'), NOW()),
+('https://loremflickr.com/1920/1080/restaurant,lecce,dining?lock=541', 'Trattoria Sant''Oronzo Lecce', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Trattoria Sant''Oronzo Lecce'), NOW()),
+('https://loremflickr.com/1920/1080/art-gallery,lecce,interior?lock=542', 'Galerija Lecce Pietra', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Lecce Pietra'), NOW()),
+('https://loremflickr.com/1920/1080/market,lecce,shopping?lock=543', 'Mercato Salento Lecce', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercato Salento Lecce'), NOW()),
+('https://loremflickr.com/1920/1080/clinic,lecce,medical?lock=544', 'Klinika Lecce Centro', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Klinika Lecce Centro'), NOW()),
+('https://loremflickr.com/1920/1080/gas-station,lecce,roadtrip?lock=545', 'Q8 Porta Napoli Lecce', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Q8 Porta Napoli Lecce'), NOW()),
+('https://loremflickr.com/1920/1080/souvenir-shop,lecce,store?lock=546', 'Suvenirnica Barokni Lecce', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Barokni Lecce'), NOW()),
+('https://loremflickr.com/1920/1080/hotel,parma,apartment?lock=547', 'Apartmani Parma Duomo', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartmani Parma Duomo'), NOW()),
+('https://loremflickr.com/1920/1080/restaurant,parma,dining?lock=548', 'Osteria Ducale Parma', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Osteria Ducale Parma'), NOW()),
+('https://loremflickr.com/1920/1080/museum,parma,exhibition?lock=549', 'Muzej Parma Musica', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Parma Musica'), NOW()),
+('https://loremflickr.com/1920/1080/shopping-mall,parma,interior?lock=550', 'Parma Galleria Centrale', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Parma Galleria Centrale'), NOW()),
+('https://loremflickr.com/1920/1080/hospital,parma,medical?lock=551', 'Hospital Emilia Parma', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Emilia Parma'), NOW()),
+('https://loremflickr.com/1920/1080/gas-station,parma,roadtrip?lock=552', 'Eni Oltretorrente Parma', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Eni Oltretorrente Parma'), NOW()),
+('https://loremflickr.com/1920/1080/market,parma,shopping?lock=553', 'Mercato Parma Gourmet', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercato Parma Gourmet'), NOW()),
+('https://loremflickr.com/1920/1080/hotel,sardinia,stay?lock=554', 'Hotel Costa Smeralda', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Costa Smeralda'), NOW()),
+('https://loremflickr.com/1920/1080/restaurant,sardinia,dining?lock=555', 'Trattoria Golfo Orosei', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Trattoria Golfo Orosei'), NOW()),
+('https://loremflickr.com/1920/1080/museum,sardinia,exhibition?lock=556', 'Muzej Nuraga Sardinija', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Nuraga Sardinija'), NOW()),
+('https://loremflickr.com/1920/1080/souvenir-shop,sardinia,store?lock=557', 'Surf Shop Sardinija', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Surf Shop Sardinija'), NOW()),
+('https://loremflickr.com/1920/1080/clinic,sardinia,medical?lock=558', 'Poliklinika Cagliari Marina', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Poliklinika Cagliari Marina'), NOW()),
+('https://loremflickr.com/1920/1080/gas-station,sardinia,roadtrip?lock=559', 'Repsol Costa Smeralda', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol Costa Smeralda'), NOW()),
+('https://loremflickr.com/1920/1080/spa,sardinia,wellness?lock=560', 'Sardinia Sea Spa', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Sardinia Sea Spa'), NOW());
 
 WITH source("Name", "Description", "Lng", "Lat", "Price", "DurationMinutes", "ActivityTypeName", "LocalityName", "DestinationName", "ObjectName", "CreatorEmail", "Profile") AS (
     VALUES
@@ -35001,27 +35098,40 @@ ins_activities AS (
     END
     LEFT JOIN "Objects" o ON o."Name" = s."ObjectName"
     RETURNING "Id", "Name"
-),
-ins_activity_images AS (
-    INSERT INTO "Images" ("Url", "AltText", "IsMain", "ActivityId", "CreatedAt")
-    SELECT
-        CASE
-            WHEN s."Profile" = 'water' THEN 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1400&q=80'
-            WHEN s."Profile" = 'food' THEN 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=1400&q=80'
-            WHEN s."Profile" = 'shopping' THEN 'https://images.unsplash.com/photo-1481437156560-3205f6a55735?auto=format&fit=crop&w=1400&q=80'
-            WHEN s."Profile" = 'view' THEN 'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1400&q=80'
-            WHEN s."Profile" = 'bike' THEN 'https://images.unsplash.com/photo-1507035895480-2b3156c31fc8?auto=format&fit=crop&w=1400&q=80'
-            WHEN s."Profile" = 'boat' THEN 'https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1400&q=80'
-            WHEN s."Profile" = 'night' THEN 'https://images.unsplash.com/photo-1571266028243-d220c9c3c7d8?auto=format&fit=crop&w=1400&q=80'
-            WHEN s."Profile" = 'wellness' THEN 'https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&w=1400&q=80'
-            WHEN s."Profile" = 'adventure' THEN 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1400&q=80'
-            ELSE 'https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1400&q=80'
-        END,
-        s."Name",
-        true,
-        a."Id",
-        NOW()
-    FROM ranked_source s
-    JOIN ins_activities a ON a."Name" = s."Name"
 )
 SELECT 1;
+
+INSERT INTO "Images" ("Url", "AltText", "IsMain", "ActivityId", "CreatedAt")
+VALUES
+('https://loremflickr.com/1920/1080/swimming,bari,beach?lock=701', 'Jutarnje plivanje Lungomare Bari', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Jutarnje plivanje Lungomare Bari'), NOW()),
+('https://loremflickr.com/1920/1080/walking-tour,bari,old-town?lock=702', 'Razgledanje Bari Vecchie', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Razgledanje Bari Vecchie'), NOW()),
+('https://loremflickr.com/1920/1080/food-tasting,bari,restaurant?lock=703', 'Degustacija fokace u Bariju', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija fokace u Bariju'), NOW()),
+('https://loremflickr.com/1920/1080/shopping,bari,market?lock=704', 'Kupovina u Centro Bari Galleriji', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Kupovina u Centro Bari Galleriji'), NOW()),
+('https://loremflickr.com/1920/1080/viewpoint,palermo,cityscape?lock=705', 'Fotografisanje Quattro Cantija', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Fotografisanje Quattro Cantija'), NOW()),
+('https://loremflickr.com/1920/1080/food-tasting,palermo,restaurant?lock=706', 'Degustacija sicilijanske ulične hrane', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija sicilijanske ulične hrane'), NOW()),
+('https://loremflickr.com/1920/1080/swimming,palermo,beach?lock=707', 'Kupanje u Mondellu', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Kupanje u Mondellu'), NOW()),
+('https://loremflickr.com/1920/1080/nightlife,palermo,lights?lock=708', 'Noćni provod u Palermu', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Noćni provod u Palermu'), NOW()),
+('https://loremflickr.com/1920/1080/cycling,trieste,outdoor?lock=709', 'Biciklistički krug uz Kanal Grande', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Biciklistički krug uz Kanal Grande'), NOW()),
+('https://loremflickr.com/1920/1080/walking-tour,trieste,old-town?lock=710', 'Razgledanje Piazza Unita', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Razgledanje Piazza Unita'), NOW()),
+('https://loremflickr.com/1920/1080/food-tasting,trieste,restaurant?lock=711', 'Poseta restoranu uz kanal u Trstu', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Poseta restoranu uz kanal u Trstu'), NOW()),
+('https://loremflickr.com/1920/1080/kayaking,trieste,coast?lock=712', 'Kajak ispod Miramarea', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Kajak ispod Miramarea'), NOW()),
+('https://loremflickr.com/1920/1080/viewpoint,matera,cityscape?lock=713', 'Foto tura kroz Sassi', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Foto tura kroz Sassi'), NOW()),
+('https://loremflickr.com/1920/1080/walking-tour,matera,old-town?lock=714', 'Pešačenje do Belvederea Murgije', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Pešačenje do Belvederea Murgije'), NOW()),
+('https://loremflickr.com/1920/1080/walking-tour,matera,old-town?lock=715', 'Razgledanje Piazza Duomo Matere', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Razgledanje Piazza Duomo Matere'), NOW()),
+('https://loremflickr.com/1920/1080/wellness,matera,yoga?lock=716', 'Joga sa pogledom na Sassi', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Joga sa pogledom na Sassi'), NOW()),
+('https://loremflickr.com/1920/1080/boat-tour,sorrento,coast?lock=717', 'Vožnja čamcem ispod Sorenta', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Vožnja čamcem ispod Sorenta'), NOW()),
+('https://loremflickr.com/1920/1080/food-tasting,sorrento,restaurant?lock=718', 'Degustacija limunskih deserata Sorenta', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija limunskih deserata Sorenta'), NOW()),
+('https://loremflickr.com/1920/1080/shopping,sorrento,market?lock=719', 'Kupovina duž Corso Italie', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Kupovina duž Corso Italie'), NOW()),
+('https://loremflickr.com/1920/1080/swimming,sorrento,beach?lock=720', 'Plivanje kod Marine Grande', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Plivanje kod Marine Grande'), NOW()),
+('https://loremflickr.com/1920/1080/walking-tour,lecce,old-town?lock=721', 'Razgledanje baroknog Lečea', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Razgledanje baroknog Lečea'), NOW()),
+('https://loremflickr.com/1920/1080/shopping,lecce,market?lock=722', 'Kupovina u istorijskom jezgru Lečea', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Kupovina u istorijskom jezgru Lečea'), NOW()),
+('https://loremflickr.com/1920/1080/viewpoint,lecce,cityscape?lock=723', 'Fotografisanje zlatnog kamena Lečea', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Fotografisanje zlatnog kamena Lečea'), NOW()),
+('https://loremflickr.com/1920/1080/wine-tasting,lecce,restaurant?lock=724', 'Degustacija vina Salenta', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija vina Salenta'), NOW()),
+('https://loremflickr.com/1920/1080/food-tasting,parma,restaurant?lock=725', 'Degustacija parmezana i pršute', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija parmezana i pršute'), NOW()),
+('https://loremflickr.com/1920/1080/food-tasting,parma,restaurant?lock=726', 'Poseta restoranu u Parmi', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Poseta restoranu u Parmi'), NOW()),
+('https://loremflickr.com/1920/1080/cycling,parma,outdoor?lock=727', 'Biciklom kroz Parco Ducale', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Biciklom kroz Parco Ducale'), NOW()),
+('https://loremflickr.com/1920/1080/shopping,parma,market?lock=728', 'Kupovina gurmanskih proizvoda u Parmi', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Kupovina gurmanskih proizvoda u Parmi'), NOW()),
+('https://loremflickr.com/1920/1080/scuba-diving,sardinia,sea?lock=729', 'Ronjenje uz Costa Smeraldu', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Ronjenje uz Costa Smeraldu'), NOW()),
+('https://loremflickr.com/1920/1080/boat-tour,sardinia,coast?lock=730', 'Vožnja čamcem kroz Golfo Orosei', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Vožnja čamcem kroz Golfo Orosei'), NOW()),
+('https://loremflickr.com/1920/1080/swimming,sardinia,beach?lock=731', 'Plivanje u tirkiznim uvalama Sardinije', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Plivanje u tirkiznim uvalama Sardinije'), NOW()),
+('https://loremflickr.com/1920/1080/hiking,sardinia,trail?lock=732', 'Planinarenje iznad zaliva Orosei', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Planinarenje iznad zaliva Orosei'), NOW());
