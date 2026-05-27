@@ -381,7 +381,6 @@
   color: #1f2328;
 }
 
-.event-tag,
 .event-price {
   position: absolute;
   top: 10px;
@@ -393,9 +392,33 @@
 }
 
 .event-tag {
+  position: absolute;
+  top: 10px;
   left: 10px;
-  background: #1f93b6;
-  color: #fff;
+  z-index: 2;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 30px;
+  padding: 0 14px;
+
+  border-radius: 999px;
+
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+
+  border: 1px solid rgba(22, 138, 173, 0.14);
+
+  color: #1b2a34;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+
+  white-space: nowrap;
+
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
 }
 
 .event-price {
@@ -733,6 +756,13 @@
     border-bottom-color: var(--border);
   }
 
+  .event-tag {
+    background: rgba(7, 19, 25, 0.82) !important;
+    border-color: rgba(77, 194, 255, 0.18) !important;
+    color: #ffffff !important;
+    box-shadow: none !important;
+  }
+
   .header__title,
   .icon-btn,
   .results-bar__count,
@@ -805,7 +835,6 @@
   font-size: 12.5px;
 }
 
-/* ─── Page Size Menu — specifično pozicioniranje ─────────────────────────── */
 .page-size-anchor {
   position: relative;
   display: inline-block;

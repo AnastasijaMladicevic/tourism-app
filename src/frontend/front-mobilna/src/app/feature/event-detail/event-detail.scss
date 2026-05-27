@@ -825,7 +825,7 @@ button:hover {
     grid-template-columns: 1.6fr 1fr;
     gap: 40px;
     padding: 30px 20px 60px;
-    background: #f5f7fa;
+    background: var(--bg);
   }
 
   .right {
@@ -969,7 +969,7 @@ button:hover {
 
   .location-image::after {
     background: var(--surface-strong);
-    color: var(--text-dark);
+    color: #ffffff;
   }
 
   .gallery-item {
@@ -992,82 +992,7 @@ button:hover {
   }
 }
 
-:host-context(:root[data-theme='dark']) {
-
-  .header,
-  .card,
-  .hero-card {
-    background: var(--surface-strong);
-    border-color: var(--border);
-    box-shadow: none;
-  }
-
-  .content {
-    background: var(--bg);
-  }
-
-  .title,
-  .header__title,
-  .location-bold,
-  .venue-big,
-  .section h2,
-  .nearby-item__body h3,
-  .meta .date {
-    color: var(--text-dark);
-  }
-
-  .description,
-  .date,
-  .venue,
-  .meta .location,
-  .price-label,
-  .nearby-item__location,
-  .nearby-item__date,
-  .qr-card p {
-    color: var(--text-gray);
-  }
-
-  .ticket-card,
-  .info-card {
-    background: var(--surface);
-    border-color: var(--border);
-  }
-
-  .planner-btn,
-  .planner-btn--desktop {
-    background: rgba(77, 194, 255, 0.1);
-    color: #4dc2ff;
-    border: 1px solid rgba(77, 194, 255, 0.16);
-    box-shadow: none;
-  }
-
-  .planner-btn--active {
-    background: rgba(255, 107, 107, 0.12);
-    color: #ff6b6b;
-    border-color: rgba(255, 107, 107, 0.22);
-  }
-
-  .location-image::after {
-    background: var(--surface-strong);
-    color: var(--text-dark);
-  }
-
-  .gallery-item {
-    box-shadow: none;
-  }
-
-  .loading-screen {
-    background: rgba(7, 19, 25, 0.92);
-  }
-
-  .spinner {
-    border-color: rgba(255, 255, 255, 0.08);
-    border-top-color: var(--primary);
-  }
-
-  .qr-mini img {
-    background: var(--surface);
-    border-color: var(--border);
-    box-shadow: none;
-  }
+:root[data-theme='dark'] .location-image::after,
+[data-theme='dark'] .location-image::after {
+  color: #ffffff !important;
 }
