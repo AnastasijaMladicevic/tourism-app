@@ -162,24 +162,14 @@
   gap: 10px;
   overflow-x: auto;
   overflow-y: hidden;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   margin-top: 0;
-  padding: 2px 0 4px;
+  padding: 2px 0;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: thin;
-  scrollbar-color: #c9d9ea transparent;
+  scrollbar-width: none;
 
   &::-webkit-scrollbar {
-    height: 8px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: #c9d9ea;
-    border-radius: 999px;
+    display: none;
   }
 }
 
@@ -1778,10 +1768,12 @@
 
 @media (min-width: 431px) and (max-width: 768px) {
   .favorites-stage {
-    max-width: 520px;
+    max-width: none;
   }
 
   .favorites-content-shell {
+    max-width: 520px;
+    margin: 0 auto;
     padding-right: 24px;
     padding-left: 24px;
   }
@@ -2054,7 +2046,7 @@
     justify-content: flex-start;
     flex-wrap: nowrap;
     margin-left: 0;
-    padding: 0 0 8px;
+    padding: 0;
     row-gap: 0;
   }
 }
@@ -2142,12 +2134,39 @@
   }
 
   .favorites-chip,
+  .favorites-page-size__trigger,
+  .favorites-page-size__menu,
+  .favorites-page-size__item,
+  .card-chip,
   .favorite-card__meta-tag,
   .panel-tip__latest,
   .favorites-pagination__button {
     background: var(--surface-soft);
     color: var(--text-dark);
     border-color: var(--border);
+  }
+
+  .card-chip {
+    background: rgba(17, 35, 45, 0.9);
+    color: var(--text-dark);
+    box-shadow: 0 10px 22px rgba(0, 0, 0, 0.22);
+    backdrop-filter: blur(10px);
+  }
+
+  .favorites-page-size__trigger svg,
+  .favorites-page-size__icon,
+  .favorites-page-size__item:hover {
+    color: var(--primary);
+    stroke: currentColor;
+  }
+
+  .favorites-page-size__menu {
+    background: var(--surface-strong);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .favorites-page-size__item {
+    border: 0;
   }
 
   .collection-row {
@@ -2157,6 +2176,67 @@
 
   .collection-row__arrow {
     color: var(--text-gray);
+  }
+
+  .favorites-mobile-section__head h2,
+  .favorites-mobile-collection-card__copy strong,
+  .favorites-mobile-action-row__copy strong {
+    color: var(--text-dark);
+  }
+
+  .favorites-mobile-section__link,
+  .favorites-mobile-collection-card__copy small,
+  .favorites-mobile-collection-card__arrow,
+  .favorites-mobile-action-row__copy small,
+  .favorites-mobile-action-row__arrow {
+    color: var(--text-gray);
+  }
+
+  .favorites-mobile-collection-card,
+  .favorites-mobile-actions__card {
+    background: var(--surface-strong);
+    border-color: var(--border);
+    box-shadow: var(--shadow-soft);
+  }
+
+  .favorites-mobile-action-row + .favorites-mobile-action-row {
+    border-top-color: var(--border);
+  }
+
+  .favorites-mobile-collection-card__icon,
+  .favorites-mobile-action-row__icon {
+    background: rgba(77, 194, 255, 0.12);
+    color: #4dc2ff;
+  }
+
+  .favorites-mobile-collection-card__icon[data-tone='amber'],
+  .favorites-mobile-action-row__icon--green {
+    background: rgba(245, 158, 11, 0.14);
+    color: #fbbf24;
+  }
+
+  .favorites-mobile-collection-card__icon[data-tone='green'],
+  .favorites-mobile-action-row__icon--blue {
+    background: rgba(34, 197, 94, 0.14);
+    color: #4ade80;
+  }
+
+  .favorites-mobile-collection-card__icon[data-tone='violet'],
+  .favorites-mobile-action-row__icon--sky {
+    background: rgba(139, 92, 246, 0.14);
+    color: #c4b5fd;
+  }
+
+  .favorites-mobile-action-row__icon--slate {
+    background: rgba(148, 163, 184, 0.14);
+    color: #cbd5e1;
+  }
+
+  .favorite-card__action-badge {
+    background: rgba(34, 197, 94, 0.14);
+    color: #86efac;
+    border-color: rgba(34, 197, 94, 0.28);
+    box-shadow: none;
   }
 
   .favorites-chip--active {
