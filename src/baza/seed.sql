@@ -33894,3 +33894,51 @@ FROM "Destinations" d
 WHERE l."DestinationId" = d."Id"
   AND d."Name" IN ('Alicante', 'San Sebastian', 'Girona', 'Cadiz', 'Murcia', 'Santander', 'Tenerife', 'Santiago de Compostela')
   AND d."ManagedByUserId" IS NOT NULL;
+
+WITH source("Url", "AltText", "IsMain", "DestinationName") AS (
+    VALUES
+    ('https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1400&q=80', 'Alicante', true, 'Alicante'),
+    ('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1400&q=80', 'San Sebastian', true, 'San Sebastian'),
+    ('https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1400&q=80', 'Girona', true, 'Girona'),
+    ('https://images.unsplash.com/photo-1473116763249-2faaef81ccda?auto=format&fit=crop&w=1400&q=80', 'Cadiz', true, 'Cadiz'),
+    ('https://images.unsplash.com/photo-1508057198894-247b23fe5ade?auto=format&fit=crop&w=1400&q=80', 'Murcia', true, 'Murcia'),
+    ('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1400&q=80', 'Santander', true, 'Santander'),
+    ('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1400&q=80', 'Tenerife', true, 'Tenerife'),
+    ('https://images.unsplash.com/photo-1501594907352-04cda38ebc29?auto=format&fit=crop&w=1400&q=80', 'Santiago de Compostela', true, 'Santiago de Compostela')
+)
+INSERT INTO "Images" ("Url", "AltText", "IsMain", "DestinationId", "CreatedAt")
+SELECT s."Url", s."AltText", s."IsMain", d."Id", NOW()
+FROM source s
+JOIN "Destinations" d ON d."Name" = s."DestinationName";
+
+WITH source("Url", "AltText", "IsMain", "LocalityName") AS (
+    VALUES
+    ('https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1400&q=80', 'Explanada Alicante', true, 'Explanada Alicante'),
+    ('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1400&q=80', 'Playa del Postiguet', true, 'Playa del Postiguet'),
+    ('https://images.unsplash.com/photo-1521295121783-8a321d551ad2?auto=format&fit=crop&w=1400&q=80', 'Castillo Santa Barbara Alicante', true, 'Castillo Santa Barbara Alicante'),
+    ('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1400&q=80', 'La Concha San Sebastian', true, 'La Concha San Sebastian'),
+    ('https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1400&q=80', 'Parte Vieja San Sebastian', true, 'Parte Vieja San Sebastian'),
+    ('https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1400&q=80', 'Monte Igueldo', true, 'Monte Igueldo'),
+    ('https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1400&q=80', 'Barri Vell Girona', true, 'Barri Vell Girona'),
+    ('https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1400&q=80', 'Onyar Riverside Girona', true, 'Onyar Riverside Girona'),
+    ('https://images.unsplash.com/photo-1521295121783-8a321d551ad2?auto=format&fit=crop&w=1400&q=80', 'Girona Cathedral Quarter', true, 'Girona Cathedral Quarter'),
+    ('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1400&q=80', 'La Caleta Cadiz', true, 'La Caleta Cadiz'),
+    ('https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1400&q=80', 'Old Town Cadiz', true, 'Old Town Cadiz'),
+    ('https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1400&q=80', 'Paseo Campo del Sur', true, 'Paseo Campo del Sur'),
+    ('https://images.unsplash.com/photo-1508057198894-247b23fe5ade?auto=format&fit=crop&w=1400&q=80', 'Plaza Belluga Murcia', true, 'Plaza Belluga Murcia'),
+    ('https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1400&q=80', 'Murcia Old Town', true, 'Murcia Old Town'),
+    ('https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1400&q=80', 'Rio Segura Murcia', true, 'Rio Segura Murcia'),
+    ('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1400&q=80', 'El Sardinero Santander', true, 'El Sardinero Santander'),
+    ('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1400&q=80', 'Centro Botin Santander', true, 'Centro Botin Santander'),
+    ('https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1400&q=80', 'Peninsula Magdalena', true, 'Peninsula Magdalena'),
+    ('https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1400&q=80', 'Costa Adeje Tenerife', true, 'Costa Adeje Tenerife'),
+    ('https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1400&q=80', 'Teide Viewpoint Tenerife', true, 'Teide Viewpoint Tenerife'),
+    ('https://images.unsplash.com/photo-1508057198894-247b23fe5ade?auto=format&fit=crop&w=1400&q=80', 'Santa Cruz Tenerife Center', true, 'Santa Cruz Tenerife Center'),
+    ('https://images.unsplash.com/photo-1508057198894-247b23fe5ade?auto=format&fit=crop&w=1400&q=80', 'Obradoiro Santiago', true, 'Obradoiro Santiago'),
+    ('https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1400&q=80', 'Old Town Santiago', true, 'Old Town Santiago'),
+    ('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1400&q=80', 'Alameda Santiago', true, 'Alameda Santiago')
+)
+INSERT INTO "Images" ("Url", "AltText", "IsMain", "LocalityId", "CreatedAt")
+SELECT s."Url", s."AltText", s."IsMain", l."Id", NOW()
+FROM source s
+JOIN "Localities" l ON l."Name" = s."LocalityName";
