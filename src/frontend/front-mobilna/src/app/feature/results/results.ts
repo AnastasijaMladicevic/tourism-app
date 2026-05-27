@@ -21,6 +21,8 @@ import { ObjectService } from '../../services/object';
 import { LocalityService } from '../../services/locality';
 import { PendingActionService } from '../../services/pending-action';
 import { FavoriteStateService, FavoriteTarget } from '../../services/favorite-state';
+import { EventPlannerService } from '../../services/event-planner';
+import { PlannerLocalPreferencesService } from '../../services/planner-local-preferences';
 
 interface UnifiedSearchItem {
   id: number;
@@ -45,6 +47,8 @@ interface UnifiedSearchItem {
 export interface View extends UnifiedSearchItem {
   isFavorite: boolean;
   favoriteId?: number;
+  isPlanned?: boolean;
+  plannerId?: number;
 }
 @Component({
   selector: 'app-results',
@@ -74,7 +78,9 @@ export class ResultsComponent implements OnInit {
   recommended: UnifiedSearchItem[] = [];
   popular: UnifiedSearchItem[] = [];
   searchResults: UnifiedSearchItem[] = [];
+  isPlannerBusy = false;
   private readonly favoritePendingKeys = new Set<string>();
+  private readonly plannerMap = new Map<number, number>();
 
   mode: 'recommended' | 'popular' | 'search' = 'recommended';
   private imageCache = new Map<string, ImageDto[]>();
@@ -90,7 +96,9 @@ export class ResultsComponent implements OnInit {
     private imageService: ImageService,
     private locationTrackingService: LocationTrackingService,
     private pendingActionService: PendingActionService,
-    private favoriteStateService: FavoriteStateService
+    private favoriteStateService: FavoriteStateService,
+    private eventPlannerService: EventPlannerService,
+    private plannerLocalPreferencesService: PlannerLocalPreferencesService
   ) { }
   @ViewChild('top') top!: ElementRef;
   ngOnInit(): void {
@@ -148,6 +156,7 @@ export class ResultsComponent implements OnInit {
       );
       this.items = resolved;
       this.applyFavoriteState();
+      await this.syncPlannerState();
       this.itemTypes = this.extractUniqueTypes(this.items);
       this.updateDistances();
       await this.refreshVisibleItems();
@@ -395,6 +404,67 @@ export class ResultsComponent implements OnInit {
     return this.favoritePendingKeys.has(this.favoriteKey(itemType, itemId));
   }
 
+  isPlannerable(item: UnifiedSearchItem | View): boolean {
+    return item.type === 'event';
+  }
+
+  togglePlanner(item: View, event: Event): void {
+    this.consumeCardAction(event);
+
+    if (!this.isPlannerable(item)) {
+      return;
+    }
+
+    if (!this.authService.isLoggedIn()) {
+      this.pendingActionService.setAction({
+        type: 'add-to-planner',
+        payload: item,
+      });
+
+      this.router.navigate(['/login'], {
+        queryParams: { returnUrl: this.router.url }
+      });
+      return;
+    }
+
+    if (this.isPlannerBusy) {
+      return;
+    }
+
+    const existingId = item.plannerId ?? this.plannerMap.get(item.id);
+
+    if (existingId) {
+      this.isPlannerBusy = true;
+      this.eventPlannerService.remove(existingId).subscribe({
+        next: () => {
+          this.plannerLocalPreferencesService.remove(existingId);
+          this.plannerMap.delete(item.id);
+          this.patchPlannerState(item.id, false);
+          this.isPlannerBusy = false;
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.isPlannerBusy = false;
+          this.cdr.detectChanges();
+        }
+      });
+      return;
+    }
+
+    this.router.navigate(['/planner/add'], {
+      state: {
+        eventId: item.id,
+        title: item.name,
+        location: item.location,
+        startDate: (item as any).startDate ?? item.date,
+        endDate: (item as any).endDate,
+        type: item.typeName || 'Događaj',
+        imageUrl: item.mainImageUrl,
+        description: item.description,
+      }
+    });
+  }
+
   toggleFavorite(item: View, event: Event): void {
     this.consumeCardAction(event);
 
@@ -541,6 +611,7 @@ export class ResultsComponent implements OnInit {
         isFavorite: false
       }));
       this.applyFavoriteState();
+      await this.syncPlannerState();
 
       this.updateDistances();
       await this.refreshVisibleItems();
@@ -821,5 +892,49 @@ export class ResultsComponent implements OnInit {
 
   private applyFavoriteState(): void {
     this.favoriteStateService.applyToList(this.items, (item) => this.favoriteTarget(item));
+  }
+
+  private patchPlannerState(eventId: number, isPlanned: boolean, plannerId?: number): void {
+    const patch = (list: View[]) =>
+      list.map((entry) =>
+        entry.type === 'event' && entry.id === eventId
+          ? { ...entry, isPlanned, plannerId }
+          : entry,
+      );
+
+    this.items = patch(this.items);
+    this.visibleItems = patch(this.visibleItems);
+  }
+
+  private applyPlannerState(list: View[]): void {
+    for (const item of list) {
+      if (item.type !== 'event') {
+        continue;
+      }
+
+      item.isPlanned = this.plannerMap.has(item.id);
+      item.plannerId = this.plannerMap.get(item.id);
+    }
+  }
+
+  private async syncPlannerState(): Promise<void> {
+    if (!this.authService.isLoggedIn()) {
+      this.plannerMap.clear();
+      this.applyPlannerState(this.items);
+      this.applyPlannerState(this.visibleItems);
+      return;
+    }
+
+    try {
+      const response = await firstValueFrom(this.eventPlannerService.getMyPlanner({ page: 1, pageSize: 200 }));
+      this.plannerMap.clear();
+      response.items.forEach(item => this.plannerMap.set(Number(item.eventId), item.id));
+      this.applyPlannerState(this.items);
+      this.applyPlannerState(this.visibleItems);
+    } catch {
+      this.plannerMap.clear();
+      this.applyPlannerState(this.items);
+      this.applyPlannerState(this.visibleItems);
+    }
   }
 }

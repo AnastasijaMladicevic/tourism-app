@@ -610,6 +610,8 @@
   cursor: pointer;
   letter-spacing: 0.4px;
   transition: opacity 0.2s;
+  margin-top: auto;
+  margin-left: auto;
 
   &:hover {
     opacity: 0.75;

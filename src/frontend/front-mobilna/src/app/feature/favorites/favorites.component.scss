@@ -550,11 +550,12 @@
   min-width: 0;
   position: relative;
   display: block;
-  padding-right: 14px;
+  padding-left: 0;
+  overflow: visible;
 
   mat-icon {
     position: absolute;
-    left: -2px;
+    left: -18px;
     top: 50%;
     transform: translateY(-50%);
   }
@@ -562,7 +563,6 @@
   span {
     display: block;
     min-width: 0;
-    padding-left: 20px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -625,36 +625,42 @@
 
 .favorite-card__footer {
   grid-column: 1 / -1;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 12px;
   margin-top: 12px;
 }
 
 .card-action-btn {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
   margin-left: auto;
-  flex: 0 0 112px;
-  min-height: 40px;
-  min-width: 112px;
-  padding: 0 16px;
-  border: 1px solid #cfe0f1;
-  border-radius: 999px;
-  background: #fff;
+  flex: 0 0 auto;
+  min-height: auto;
+  min-width: auto;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
   color: #0f82aa;
   font-size: 14px;
   font-weight: 700;
   white-space: nowrap;
   cursor: pointer;
+  box-shadow: none;
+
+  &:hover {
+    opacity: 0.78;
+  }
 }
 
 .favorite-card__helper {
   color: #6f7d90;
   font-size: 13px;
   font-weight: 600;
+  margin-left: auto;
+  text-align: right;
 }
 
 .favorite-card__more-btn {
@@ -676,39 +682,62 @@
 }
 
 .favorites-pagination {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto auto auto;
+  justify-content: center;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-top: 8px;
-  padding: 8px 2px 0;
+  gap: 24px;
+  width: 100%;
+  margin-top: 10px;
+  padding: 8px 0 12px;
 }
 
 .favorites-pagination__button {
-  min-height: 44px;
-  padding: 0 18px;
-  border: 1px solid #dceaf0;
-  border-radius: 14px;
-  background: #ffffff;
-  color: #233244;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: #1ea7ff;
   font: inherit;
-  font-size: 14px;
-  font-weight: 800;
-  box-shadow: 0 8px 18px rgba(31, 37, 43, 0.05);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.25;
+  box-shadow: none;
   cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  transition: color 0.2s ease, opacity 0.2s ease;
+
+  &:first-child {
+    justify-self: end;
+  }
+
+  &:last-child {
+    justify-self: start;
+  }
+
+  &:not(:disabled):hover {
+    color: #39bdf8;
+  }
 
   &:disabled {
-    opacity: 0.48;
+    color: #7c8794;
+    opacity: 1;
     cursor: default;
     box-shadow: none;
   }
 }
 
 .favorites-pagination__status {
-  color: #5e7185;
-  font-size: 14px;
-  font-weight: 800;
+  justify-self: center;
+  color: #f6fbff;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.25;
   text-align: center;
+  white-space: nowrap;
 }
 
 .favorites-footer-note {
@@ -1974,8 +2003,7 @@
   }
 
   .favorite-card__footer {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
+    display: flex;
     align-items: center;
     gap: 12px;
     margin-top: auto;
@@ -1983,29 +2011,27 @@
     padding-bottom: 18px;
   }
 
-  .card-action-btn,
-  .favorite-card__helper {
-    min-width: 128px;
-    min-height: 42px;
-    padding: 0 22px;
-    border-radius: 999px;
-    font-size: 14px;
-    font-weight: 700;
-  }
-
   .card-action-btn {
-    border: 1px solid #d8e6f3;
-    background: #fff;
+    min-width: auto;
+    min-height: auto;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    background: transparent;
     color: #1093d0;
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.7);
+    box-shadow: none;
   }
 
   .favorite-card__helper {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    border: 1px solid #e2e8f0;
-    background: #f8fafc;
+    justify-content: flex-end;
+    min-width: auto;
+    min-height: auto;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    background: transparent;
     color: #8b97aa;
     white-space: nowrap;
   }
@@ -2149,6 +2175,24 @@
     border-color: var(--border);
   }
 
+  .favorites-pagination__button {
+    background: transparent;
+    border-color: transparent;
+    color: var(--primary);
+
+    &:not(:disabled):hover {
+      color: #7bd6ff;
+    }
+
+    &:disabled {
+      color: var(--text-muted);
+    }
+  }
+
+  .favorites-pagination__status {
+    color: var(--text-dark);
+  }
+
   .card-chip {
     background: rgba(17, 35, 45, 0.9);
     color: var(--text-dark);
@@ -2246,14 +2290,15 @@
     color: #fff;
   }
 
-  .favorite-heart,
-  .card-action-btn {
+  .favorite-heart {
     background: var(--surface-soft);
-    border-color: var(--border);
+    color: #ff8d8f;
   }
 
-  .favorite-heart {
-    color: #ff8d8f;
+  .card-action-btn {
+    background: transparent;
+    border-color: transparent;
+    color: #4dc2ff;
   }
 
   .panel-action__icon--blue,

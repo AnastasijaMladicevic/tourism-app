@@ -49,14 +49,14 @@
               [class.sort-menu__item--active]="sortOption === 'az'"
               (click)="setSort('az')"
             >
-              <mat-icon>sort_by_alpha</mat-icon> A -> Z
+              A -> Z
             </button>
             <button
               class="sort-menu__item"
               [class.sort-menu__item--active]="sortOption === 'za'"
               (click)="setSort('za')"
             >
-              <mat-icon>sort_by_alpha</mat-icon> Z -> A
+              Z -> A
             </button>
           </div>
         }
@@ -133,6 +133,12 @@
             </span>
           }
 
+          @if ((item.type === 'destination' || item.type === 'locality') && item.typeName) {
+            <span class="card__type-chip card__type-chip--overlay">
+              {{ item.typeName }}
+            </span>
+          }
+
           @if (isFavoriteable(item)) {
             <button
               type="button"
@@ -143,6 +149,19 @@
               (click)="toggleFavorite(item, $event)"
             >
               <mat-icon>{{ item.isFavorite ? 'favorite' : 'favorite_border' }}</mat-icon>
+            </button>
+          }
+
+          @if (isPlannerable(item)) {
+            <button
+              type="button"
+              class="planner-btn"
+              [class.planner-btn--active]="item.isPlanned"
+              [disabled]="isPlannerBusy"
+              (pointerdown)="consumeCardAction($event)"
+              (click)="togglePlanner(item, $event)"
+            >
+              <mat-icon>{{ item.isPlanned ? 'event_available' : 'event' }}</mat-icon>
             </button>
           }
         </div>
@@ -162,9 +181,6 @@
             @if (item.location) {
               <p class="card__destination">{{ item.location }}</p>
             }
-            <div class="card__meta">
-              <span class="card__type-chip">{{ item.typeName }}</span>
-            </div>
           } @else {
             <p class="card__type"><mat-icon>place</mat-icon> {{ item.location || item.typeName }}</p>
           }
@@ -172,7 +188,6 @@
           <p class="card__desc">{{ item.description }}</p>
 
           <div class="card__footer">
-            <span></span>
             <button class="card__details" (click)="viewDetails(item)">VIEW DETAILS</button>
           </div>
         </div>
