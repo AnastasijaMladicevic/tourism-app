@@ -10,7 +10,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { firstValueFrom } from 'rxjs';
+import { catchError, firstValueFrom, of } from 'rxjs';
 import { AuthService } from '../../services/auth';
 import { ImageDto, ImageService } from '../../services/image';
 import { LocationTrackingService } from '../../services/location-tracking';
@@ -20,6 +20,7 @@ import { EventService } from '../../services/event';
 import { ObjectService } from '../../services/object';
 import { LocalityService } from '../../services/locality';
 import { PendingActionService } from '../../services/pending-action';
+import { FavoriteStateService, FavoriteTarget } from '../../services/favorite-state';
 
 interface UnifiedSearchItem {
   id: number;
@@ -73,6 +74,7 @@ export class ResultsComponent implements OnInit {
   recommended: UnifiedSearchItem[] = [];
   popular: UnifiedSearchItem[] = [];
   searchResults: UnifiedSearchItem[] = [];
+  private readonly favoritePendingKeys = new Set<string>();
 
   mode: 'recommended' | 'popular' | 'search' = 'recommended';
   private imageCache = new Map<string, ImageDto[]>();
@@ -87,7 +89,8 @@ export class ResultsComponent implements OnInit {
     private cdr: ChangeDetectorRef,
     private imageService: ImageService,
     private locationTrackingService: LocationTrackingService,
-    private pendingActionService: PendingActionService
+    private pendingActionService: PendingActionService,
+    private favoriteStateService: FavoriteStateService
   ) { }
   @ViewChild('top') top!: ElementRef;
   ngOnInit(): void {
@@ -134,10 +137,17 @@ export class ResultsComponent implements OnInit {
     this.isLoading = true;
 
     try {
+      if (this.authService.isLoggedIn()) {
+        await firstValueFrom(
+          this.favoriteStateService.loadFavorites(true).pipe(catchError(() => of(new Map<string, number>()))),
+        );
+      }
+
       const resolved = await Promise.all(
         items.map(item => this.resolveItem(item))
       );
       this.items = resolved;
+      this.applyFavoriteState();
       this.itemTypes = this.extractUniqueTypes(this.items);
       this.updateDistances();
       await this.refreshVisibleItems();
@@ -367,8 +377,31 @@ export class ResultsComponent implements OnInit {
     this.currentPage = 1;
     void this.refreshVisibleItems();
   }
-  toggleFavorite(item: View, event: Event): void {
+
+  consumeCardAction(event: Event): void {
+    event.preventDefault();
     event.stopPropagation();
+
+    if ('stopImmediatePropagation' in event && typeof event.stopImmediatePropagation === 'function') {
+      event.stopImmediatePropagation();
+    }
+  }
+
+  isFavoriteable(item: UnifiedSearchItem | View): boolean {
+    return this.favoriteTarget(item) !== null;
+  }
+
+  isFavoritePending(itemId: number, itemType: string): boolean {
+    return this.favoritePendingKeys.has(this.favoriteKey(itemType, itemId));
+  }
+
+  toggleFavorite(item: View, event: Event): void {
+    this.consumeCardAction(event);
+
+    const target = this.favoriteTarget(item);
+    if (!target) {
+      return;
+    }
 
     if (!this.authService.isLoggedIn()) {
       this.pendingActionService.setAction({
@@ -383,11 +416,27 @@ export class ResultsComponent implements OnInit {
       return;
     }
 
-    this.items = this.items.map(x =>
-      x.id === item.id
-        ? { ...x, isFavorite: !x.isFavorite }
-        : x
-    );
+    const pendingKey = this.favoriteKey(target.type, target.entityId);
+    if (this.favoritePendingKeys.has(pendingKey)) {
+      return;
+    }
+
+    this.favoritePendingKeys.add(pendingKey);
+    this.favoriteStateService
+      .toggle(target, item.favoriteId)
+      .subscribe({
+        next: (state) => {
+          this.patchFavoriteState(target.type, target.entityId, state.isFavorite, state.favoriteId);
+        },
+        error: () => {
+          this.favoritePendingKeys.delete(pendingKey);
+          this.cdr.detectChanges();
+        },
+        complete: () => {
+          this.favoritePendingKeys.delete(pendingKey);
+          this.cdr.detectChanges();
+        },
+      });
   }
   prevPage(): void {
     if (this.currentPage === 1) return;
@@ -464,6 +513,12 @@ export class ResultsComponent implements OnInit {
     this.isLoading = true;
 
     try {
+      if (this.authService.isLoggedIn()) {
+        await firstValueFrom(
+          this.favoriteStateService.loadFavorites(true).pipe(catchError(() => of(new Map<string, number>()))),
+        );
+      }
+
       let items: UnifiedSearchItem[] = [];
 
       switch (this.mode) {
@@ -485,6 +540,7 @@ export class ResultsComponent implements OnInit {
         ...x,
         isFavorite: false
       }));
+      this.applyFavoriteState();
 
       this.updateDistances();
       await this.refreshVisibleItems();
@@ -728,5 +784,42 @@ export class ResultsComponent implements OnInit {
       longitude: x.longitude,
       averageRating: x.averageRating,
     };
+  }
+
+  private favoriteTarget(item: UnifiedSearchItem | View): FavoriteTarget | null {
+    switch (item.type) {
+      case 'destination':
+      case 'object':
+      case 'activity':
+      case 'locality':
+        return { type: item.type, entityId: item.id };
+      default:
+        return null;
+    }
+  }
+
+  private favoriteKey(itemType: string, itemId: number): string {
+    return `${itemType}:${itemId}`;
+  }
+
+  private patchFavoriteState(
+    itemType: FavoriteTarget['type'],
+    itemId: number,
+    isFavorite: boolean,
+    favoriteId?: number,
+  ): void {
+    const patch = (list: View[]) =>
+      list.map((entry) =>
+        entry.type === itemType && entry.id === itemId
+          ? { ...entry, isFavorite, favoriteId }
+          : entry,
+      );
+
+    this.items = patch(this.items);
+    this.visibleItems = patch(this.visibleItems);
+  }
+
+  private applyFavoriteState(): void {
+    this.favoriteStateService.applyToList(this.items, (item) => this.favoriteTarget(item));
   }
 }

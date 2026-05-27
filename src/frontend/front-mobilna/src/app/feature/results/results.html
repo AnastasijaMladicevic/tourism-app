@@ -133,13 +133,18 @@
             </span>
           }
 
-          <button
-            class="card__fav"
-            [class.card__fav--active]="item.isFavorite"
-            (click)="toggleFavorite(item, $event)"
-          >
-            <mat-icon>{{ item.isFavorite ? 'favorite' : 'favorite_border' }}</mat-icon>
-          </button>
+          @if (isFavoriteable(item)) {
+            <button
+              type="button"
+              class="card__fav"
+              [class.card__fav--active]="item.isFavorite"
+              [disabled]="isFavoritePending(item.id, item.type)"
+              (pointerdown)="consumeCardAction($event)"
+              (click)="toggleFavorite(item, $event)"
+            >
+              <mat-icon>{{ item.isFavorite ? 'favorite' : 'favorite_border' }}</mat-icon>
+            </button>
+          }
         </div>
 
         <div class="card__body">
