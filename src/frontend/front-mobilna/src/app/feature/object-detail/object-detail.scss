@@ -913,6 +913,17 @@ button:hover {
     gap: 8px;
     margin: 8px 0;
     color: var(--text-gray);
+
+    mat-icon {
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    a {
+      max-width: 70%;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
   }
 
   a {
