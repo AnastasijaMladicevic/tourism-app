@@ -33538,3 +33538,107 @@ VALUES
  'Ponuda je dobra, ali ume da bude velika gužva tokom prepodneva. Za lokalnu pijacu sasvim korektno.',
  'Approved',
  NOW());
+
+-- DODATNI DOGAĐAJI ZA CRNU GORU I SRBIJU - SVI TIPOVI
+WITH source("Name", "Description", "Lng", "Lat", "StartDate", "EndDate", "Price", "MaxVisitors", "EventTypeName", "DestinationName", "CreatorEmail") AS (
+    VALUES
+    ('Podgorica gradski derbi', 'Fudbalska utakmica u Podgorici sa navijačkom atmosferom, porodičnim sektorom i pratećim programom ispred stadiona.', 19.2620, 42.4410, '2026-06-12 19:00'::timestamp, '2026-06-12 21:00'::timestamp, 6.00, 12000, 'Utakmica', 'Podgorica', 'ana@spirego.com'),
+    ('Veče savremene drame Podgorica', 'Pozorišna predstava koja donosi savremenu dramu, razgovor sa glumcima nakon izvođenja i miran kulturni program u centru grada.', 19.2638, 42.4426, '2026-06-18 20:00'::timestamp, '2026-06-18 22:00'::timestamp, 7.00, 400, 'Predstava', 'Podgorica', 'ana@spirego.com'),
+    ('Morača Summer Fest', 'Letnji festival muzike, hrane i kreativnih zona pored Morače, namenjen posetiocima koji žele opušten gradski provod.', 19.2661, 42.4397, '2026-06-26 18:00'::timestamp, '2026-06-28 23:30'::timestamp, 12.00, 2500, 'Festival', 'Podgorica', 'ana@spirego.com'),
+    ('Izložba mlade crnogorske scene', 'Izložba slika, fotografija i instalacija mladih autora iz Crne Gore uz vođenje kustosa i otvoreni razgovor sa umetnicima.', 19.2598, 42.4429, '2026-07-02 11:00'::timestamp, '2026-07-15 20:00'::timestamp, 3.00, 300, 'Izložba', 'Podgorica', 'ana@spirego.com'),
+    ('Akustični nastup na Ribnici', 'Večernji nastup akustičnog benda uz reku Ribnicu, lagan repertoar i intimnu atmosferu za manji broj posetilaca.', 19.2649, 42.4395, '2026-07-08 21:00'::timestamp, '2026-07-08 23:00'::timestamp, 5.00, 250, 'Nastup', 'Podgorica', 'ana@spirego.com'),
+    ('Okupljanje ljubitelja putovanja', 'Neformalno okupljanje putnika, fotografa i lokalnih vodiča sa kratkim pričama o rutama kroz Crnu Goru.', 19.2630, 42.4430, '2026-07-14 18:00'::timestamp, '2026-07-14 21:00'::timestamp, 0.00, 180, 'Okupljanje', 'Podgorica', 'ana@spirego.com'),
+    ('Sajam domaćih proizvoda Podgorica', 'Sajam lokalne hrane, rukotvorina i suvenira iz različitih krajeva Crne Gore, uz degustacije i male radionice.', 19.2560, 42.4385, '2026-07-20 10:00'::timestamp, '2026-07-21 19:00'::timestamp, 0.00, 1200, 'Sajam', 'Podgorica', 'ana@spirego.com'),
+    ('Podgorica basket challenge', 'Sportski događaj sa rekreativnim basket utakmicama, takmičenjem u šutiranju trojki i programom za mlade sportiste.', 19.2506, 42.4421, '2026-07-26 16:00'::timestamp, '2026-07-26 21:00'::timestamp, 2.00, 900, 'Sportski događaj', 'Podgorica', 'ana@spirego.com'),
+    ('Konferencija digitalni turizam CG', 'Konferencija o digitalnim alatima u turizmu, promociji destinacija i saradnji lokalnih zajednica sa kreativnom industrijom.', 19.2465, 42.4428, '2026-08-03 09:30'::timestamp, '2026-08-03 17:00'::timestamp, 25.00, 350, 'Konferencija', 'Podgorica', 'ana@spirego.com'),
+    ('Radionica fotografije Podgorica', 'Praktična radionica urbane fotografije kroz šetnju centrom Podgorice, rad sa svetlom i osnovnu obradu fotografija.', 19.2592, 42.4418, '2026-08-09 10:00'::timestamp, '2026-08-09 14:00'::timestamp, 15.00, 40, 'Radionica', 'Podgorica', 'ana@spirego.com'),
+    ('Seminar održivog ugostiteljstva', 'Seminar za male ugostitelje o održivom poslovanju, lokalnim dobavljačima, smanjenju otpada i boljem iskustvu gostiju.', 19.2483, 42.4419, '2026-08-16 10:00'::timestamp, '2026-08-16 15:00'::timestamp, 18.00, 120, 'Seminar', 'Podgorica', 'ana@spirego.com'),
+    ('Takmičenje mladih kuvara CG', 'Kulinarsko takmičenje mladih kuvara sa temom savremenog tumačenja tradicionalnih crnogorskih jela.', 19.2587, 42.4403, '2026-08-22 12:00'::timestamp, '2026-08-22 18:00'::timestamp, 4.00, 500, 'Takmičenje', 'Podgorica', 'ana@spirego.com'),
+    ('Proslava dana grada Podgorica', 'Gradska proslava sa koncertima, vatrometom, porodičnim zonama i nastupima lokalnih kulturno-umetničkih društava.', 19.2635, 42.4411, '2026-08-28 18:00'::timestamp, '2026-08-28 23:30'::timestamp, 0.00, 5000, 'Proslava', 'Podgorica', 'ana@spirego.com'),
+    ('Stand-up veče Podgorica', 'Stand-up program regionalnih komičara sa kratkim setovima, improvizacijom i opuštenom atmosferom za večernji izlazak.', 19.2614, 42.4420, '2026-09-04 21:00'::timestamp, '2026-09-04 22:30'::timestamp, 8.00, 220, 'Stand-up', 'Podgorica', 'ana@spirego.com'),
+    ('DJ veče na obali Morače', 'DJ veče na otvorenom sa elektronskom muzikom, vizuelnim efektima i letnjom atmosferom pored Morače.', 19.2673, 42.4391, '2026-09-11 22:00'::timestamp, '2026-09-12 03:00'::timestamp, 10.00, 800, 'DJ veče', 'Podgorica', 'ana@spirego.com'),
+    ('Turnir u malom fudbalu Podgorica', 'Turnir rekreativnih ekipa u malom fudbalu sa grupnom fazom, finalom i nagradama za najbolje igrače.', 19.2517, 42.4430, '2026-09-18 17:00'::timestamp, '2026-09-20 22:00'::timestamp, 3.00, 1000, 'Turnir', 'Podgorica', 'ana@spirego.com'),
+    ('Beogradski večiti susret', 'Utakmica u Beogradu sa velikom sportskom atmosferom, fan zonom i pratećim programom za posetioce pre početka meča.', 20.4633, 44.7831, '2026-06-13 20:00'::timestamp, '2026-06-13 22:00'::timestamp, 9.00, 18000, 'Utakmica', 'Beograd', 'jelena.creator@spirego.com'),
+    ('Predstava na Dorćolu', 'Pozorišna predstava u intimnom prostoru Dorćola, sa savremenim tekstom, jakim glumačkim ansamblom i razgovorom posle izvedbe.', 20.4609, 44.8217, '2026-06-19 20:30'::timestamp, '2026-06-19 22:30'::timestamp, 8.00, 300, 'Predstava', 'Beograd', 'jelena.creator@spirego.com'),
+    ('Sava Street Festival', 'Urbani festival pored Save sa muzikom, hranom, dizajn marketom i programom za mlade kreativce.', 20.4489, 44.8125, '2026-06-27 17:00'::timestamp, '2026-06-29 23:30'::timestamp, 14.00, 4000, 'Festival', 'Beograd', 'jelena.creator@spirego.com'),
+    ('Izložba Novi pogledi Beograda', 'Izložba fotografija, grafika i video radova posvećenih savremenom Beogradu, rečnim obalama i svakodnevnom životu grada.', 20.4522, 44.8176, '2026-07-03 10:00'::timestamp, '2026-07-18 20:00'::timestamp, 4.00, 500, 'Izložba', 'Beograd', 'jelena.creator@spirego.com'),
+    ('Nastup jazz kvarteta', 'Nastup jazz kvarteta u centru Beograda sa autorskim kompozicijama, standardima i gostujućim vokalom.', 20.4592, 44.8150, '2026-07-09 21:00'::timestamp, '2026-07-09 23:00'::timestamp, 9.00, 260, 'Nastup', 'Beograd', 'jelena.creator@spirego.com'),
+    ('Okupljanje ljubitelja Dunava', 'Okupljanje lokalaca, turista i vodiča uz kratke priče o Dunavu, rečnim turama i skrivenim mestima za šetnju.', 20.4507, 44.8278, '2026-07-15 18:00'::timestamp, '2026-07-15 21:00'::timestamp, 0.00, 220, 'Okupljanje', 'Beograd', 'jelena.creator@spirego.com'),
+    ('Sajam knjiga na otvorenom', 'Sajam knjiga, stripova i malih izdavača sa potpisivanjima autora, čitanjima i kutkom za decu.', 20.4568, 44.8135, '2026-07-22 10:00'::timestamp, '2026-07-24 20:00'::timestamp, 0.00, 2500, 'Sajam', 'Beograd', 'jelena.creator@spirego.com'),
+    ('Ada sportski dan', 'Sportski događaj na Adi sa trčanjem, odbojkom na pesku, biciklističkim izazovom i rekreativnim zonama.', 20.4164, 44.7872, '2026-07-27 09:00'::timestamp, '2026-07-27 18:00'::timestamp, 2.00, 1800, 'Sportski događaj', 'Beograd', 'jelena.creator@spirego.com'),
+    ('Konferencija pametni gradovi Beograd', 'Konferencija o pametnim gradovima, mobilnosti, zelenim rešenjima i digitalnim servisima za turiste i stanovnike.', 20.4386, 44.8092, '2026-08-04 09:00'::timestamp, '2026-08-04 17:30'::timestamp, 35.00, 600, 'Konferencija', 'Beograd', 'jelena.creator@spirego.com'),
+    ('Radionica street art Beograd', 'Radionica ulične umetnosti sa uvodom u mural, rad sa sprejevima i zajedničkim oslikavanjem legalnog zida.', 20.4657, 44.8129, '2026-08-10 11:00'::timestamp, '2026-08-10 15:00'::timestamp, 16.00, 35, 'Radionica', 'Beograd', 'jelena.creator@spirego.com'),
+    ('Seminar hotelskog marketinga', 'Seminar za hotele i apartmane o digitalnom marketingu, recenzijama gostiju, sezonskim kampanjama i lokalnim partnerstvima.', 20.4480, 44.8106, '2026-08-17 10:00'::timestamp, '2026-08-17 15:30'::timestamp, 22.00, 160, 'Seminar', 'Beograd', 'jelena.creator@spirego.com'),
+    ('Takmičenje barista Beograd', 'Takmičenje barista sa degustacijama, latte art rundom i predstavljanjem lokalnih pržionica kafe.', 20.4611, 44.8159, '2026-08-23 12:00'::timestamp, '2026-08-23 19:00'::timestamp, 5.00, 600, 'Takmičenje', 'Beograd', 'jelena.creator@spirego.com'),
+    ('Proslava beogradskog leta', 'Velika proslava leta sa koncertima, hranom, svetlosnim instalacijama i programom za porodice na otvorenom.', 20.4479, 44.8131, '2026-08-29 18:00'::timestamp, '2026-08-29 23:30'::timestamp, 0.00, 7000, 'Proslava', 'Beograd', 'jelena.creator@spirego.com'),
+    ('Stand-up noć na Vračaru', 'Stand-up veče sa domaćim komičarima, novim materijalom i kratkim open mic segmentom za goste.', 20.4714, 44.7980, '2026-09-05 21:00'::timestamp, '2026-09-05 22:45'::timestamp, 9.00, 240, 'Stand-up', 'Beograd', 'jelena.creator@spirego.com'),
+    ('DJ veče Beton hala', 'DJ veče u zoni Beton hale sa house i disco setovima, gostujućim producentima i noćnom atmosferom pored reke.', 20.4481, 44.8180, '2026-09-12 22:30'::timestamp, '2026-09-13 04:00'::timestamp, 12.00, 900, 'DJ veče', 'Beograd', 'jelena.creator@spirego.com'),
+    ('Turnir u basketu Beograd', 'Turnir 3x3 basket ekipa sa kvalifikacijama, finalnom utakmicom, muzikom i nagradama za publiku.', 20.4562, 44.8119, '2026-09-19 16:00'::timestamp, '2026-09-20 21:00'::timestamp, 4.00, 1300, 'Turnir', 'Beograd', 'jelena.creator@spirego.com')
+)
+INSERT INTO "Events"
+("Name", "Description", "Geolocation", "StartDate", "EndDate", "Price", "MaxVisitors", "IsActive", "Status", "EventTypeId", "LocalityId", "DestinationId", "ObjectId", "CreatedByUserId", "CreatedAt", "UpdatedAt")
+SELECT
+    s."Name",
+    s."Description",
+    ST_SetSRID(ST_MakePoint(s."Lng", s."Lat"), 4326),
+    s."StartDate",
+    s."EndDate",
+    s."Price",
+    s."MaxVisitors",
+    true,
+    'Approved',
+    et."Id",
+    NULL,
+    d."Id",
+    NULL,
+    u."Id",
+    NOW(),
+    NOW()
+FROM source s
+JOIN "EventTypes" et ON
+    translate(replace(lower(et."Name"), 'đ', 'dj'), 'šžčć', 'szcc')
+    =
+    translate(replace(lower(s."EventTypeName"), 'đ', 'dj'), 'šžčć', 'szcc')
+JOIN "Destinations" d ON d."Name" = s."DestinationName"
+JOIN "Users" u ON u."Email" = s."CreatorEmail";
+
+-- GLAVNE SLIKE ZA DODATNE DOGAĐAJE
+WITH source("Url", "AltText", "IsMain", "EventName") AS (
+    VALUES
+    ('https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&w=1200&q=80', 'Podgorica gradski derbi', true, 'Podgorica gradski derbi'),
+    ('https://images.unsplash.com/photo-1503095396549-807759245b35?auto=format&fit=crop&w=1200&q=80', 'Veče savremene drame Podgorica', true, 'Veče savremene drame Podgorica'),
+    ('https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=80', 'Morača Summer Fest', true, 'Morača Summer Fest'),
+    ('https://images.unsplash.com/photo-1545987796-200677ee1011?auto=format&fit=crop&w=1200&q=80', 'Izložba mlade crnogorske scene', true, 'Izložba mlade crnogorske scene'),
+    ('https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=1200&q=80', 'Akustični nastup na Ribnici', true, 'Akustični nastup na Ribnici'),
+    ('https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1200&q=80', 'Okupljanje ljubitelja putovanja', true, 'Okupljanje ljubitelja putovanja'),
+    ('https://images.unsplash.com/photo-1528698827591-e19ccd7bc23d?auto=format&fit=crop&w=1200&q=80', 'Sajam domaćih proizvoda Podgorica', true, 'Sajam domaćih proizvoda Podgorica'),
+    ('https://images.unsplash.com/photo-1519861531473-9200262188bf?auto=format&fit=crop&w=1200&q=80', 'Podgorica basket challenge', true, 'Podgorica basket challenge'),
+    ('https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&w=1200&q=80', 'Konferencija digitalni turizam CG', true, 'Konferencija digitalni turizam CG'),
+    ('https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=1200&q=80', 'Radionica fotografije Podgorica', true, 'Radionica fotografije Podgorica'),
+    ('https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80', 'Seminar održivog ugostiteljstva', true, 'Seminar održivog ugostiteljstva'),
+    ('https://images.unsplash.com/photo-1556911220-bff31c812dba?auto=format&fit=crop&w=1200&q=80', 'Takmičenje mladih kuvara CG', true, 'Takmičenje mladih kuvara CG'),
+    ('https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&w=1200&q=80', 'Proslava dana grada Podgorica', true, 'Proslava dana grada Podgorica'),
+    ('https://images.unsplash.com/photo-1527224857830-43a7acc85260?auto=format&fit=crop&w=1200&q=80', 'Stand-up veče Podgorica', true, 'Stand-up veče Podgorica'),
+    ('https://images.unsplash.com/photo-1571266028243-d220c9c3c7d8?auto=format&fit=crop&w=1200&q=80', 'DJ veče na obali Morače', true, 'DJ veče na obali Morače'),
+    ('https://images.unsplash.com/photo-1517927033932-b3d18e61fb3a?auto=format&fit=crop&w=1200&q=80', 'Turnir u malom fudbalu Podgorica', true, 'Turnir u malom fudbalu Podgorica'),
+    ('https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&w=1200&q=80', 'Beogradski večiti susret', true, 'Beogradski večiti susret'),
+    ('https://images.unsplash.com/photo-1503095396549-807759245b35?auto=format&fit=crop&w=1200&q=80', 'Predstava na Dorćolu', true, 'Predstava na Dorćolu'),
+    ('https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=80', 'Sava Street Festival', true, 'Sava Street Festival'),
+    ('https://images.unsplash.com/photo-1545987796-200677ee1011?auto=format&fit=crop&w=1200&q=80', 'Izložba Novi pogledi Beograda', true, 'Izložba Novi pogledi Beograda'),
+    ('https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=1200&q=80', 'Nastup jazz kvarteta', true, 'Nastup jazz kvarteta'),
+    ('https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1200&q=80', 'Okupljanje ljubitelja Dunava', true, 'Okupljanje ljubitelja Dunava'),
+    ('https://images.unsplash.com/photo-1528698827591-e19ccd7bc23d?auto=format&fit=crop&w=1200&q=80', 'Sajam knjiga na otvorenom', true, 'Sajam knjiga na otvorenom'),
+    ('https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&w=1200&q=80', 'Ada sportski dan', true, 'Ada sportski dan'),
+    ('https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&w=1200&q=80', 'Konferencija pametni gradovi Beograd', true, 'Konferencija pametni gradovi Beograd'),
+    ('https://images.unsplash.com/photo-1499781350541-7783f6c6a0c8?auto=format&fit=crop&w=1200&q=80', 'Radionica street art Beograd', true, 'Radionica street art Beograd'),
+    ('https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80', 'Seminar hotelskog marketinga', true, 'Seminar hotelskog marketinga'),
+    ('https://images.unsplash.com/photo-1511920170033-f8396924c348?auto=format&fit=crop&w=1200&q=80', 'Takmičenje barista Beograd', true, 'Takmičenje barista Beograd'),
+    ('https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&w=1200&q=80', 'Proslava beogradskog leta', true, 'Proslava beogradskog leta'),
+    ('https://images.unsplash.com/photo-1527224857830-43a7acc85260?auto=format&fit=crop&w=1200&q=80', 'Stand-up noć na Vračaru', true, 'Stand-up noć na Vračaru'),
+    ('https://images.unsplash.com/photo-1571266028243-d220c9c3c7d8?auto=format&fit=crop&w=1200&q=80', 'DJ veče Beton hala', true, 'DJ veče Beton hala'),
+    ('https://images.unsplash.com/photo-1519861531473-9200262188bf?auto=format&fit=crop&w=1200&q=80', 'Turnir u basketu Beograd', true, 'Turnir u basketu Beograd')
+)
+INSERT INTO "Images" ("Url", "AltText", "IsMain", "EventId", "CreatedAt")
+SELECT s."Url", s."AltText", s."IsMain", e."Id", NOW()
+FROM source s
+JOIN "Events" e ON e."Name" = s."EventName";
