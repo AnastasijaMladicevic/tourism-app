@@ -1,20 +1,20 @@
 <section class="manager-objects-page manager-list-page">
   <header class="page-head">
     <div>
-      <p class="breadcrumbs">{{ 'layout.dashboard' | translate }} <span>></span> {{ 'layout.objects' | translate }}</p>
-      <h1>{{ 'layout.objects' | translate }}</h1>
+      <p class="breadcrumbs">Dashboard <span>></span> Objects</p>
+      <h1>Objects</h1>
       <p class="page-subtitle">{{ objectsCountLabel }}</p>
     </div>
   </header>
 
   <div class="toolbar card">
-    <label class="search-field" [attr.aria-label]="'manager.objects.searchAria' | translate">
+    <label class="search-field" aria-label="Search objects">
       <span class="material-symbols-outlined">search</span>
       <input
         type="text"
         [(ngModel)]="draftSearchQuery"
         (keyup)="onSearchEnter($event)"
-        [placeholder]="'manager.objects.searchPlaceholder' | translate"
+        placeholder="Search by name, category or region..."
       />
     </label>
 
@@ -23,46 +23,46 @@
   @if (filterPanelOpen) {
     <div class="filters-panel card">
       <label>
-        <span>{{ 'manager.objects.filter.status' | translate }}</span>
+        <span>Status</span>
         <select [(ngModel)]="statusFilter" (ngModelChange)="onApplyFilters()">
-          <option value="all">{{ 'manager.objects.filter.allStatuses' | translate }}</option>
+          <option value="all">All statuses</option>
           <option *ngFor="let option of statusOptions" [value]="option.value">{{ statusOptionLabel(option) }}</option>
         </select>
       </label>
 
       <label>
-        <span>{{ 'manager.objects.filter.type' | translate }}</span>
+        <span>Type</span>
         <select [(ngModel)]="typeFilter" (ngModelChange)="onApplyFilters()">
-          <option value="all">{{ 'manager.objects.filter.allTypes' | translate }}</option>
+          <option value="all">All types</option>
           <option *ngFor="let option of typeOptions" [value]="option.value">{{ option.label }}</option>
         </select>
       </label>
 
       <label>
-        <span>{{ 'manager.objects.filter.rating' | translate }}</span>
+        <span>Rating</span>
         <select [(ngModel)]="ratingFilter" (ngModelChange)="onApplyFilters()">
-          <option *ngFor="let option of ratingOptions" [value]="option.value">{{ option.labelKey | translate }}</option>
+          <option *ngFor="let option of ratingOptions" [value]="option.value">{{ option.label }}</option>
         </select>
       </label>
 
       <label>
-        <span>{{ 'manager.objects.filter.sortBy' | translate }}</span>
+        <span>Sort by</span>
         <select [(ngModel)]="sortBy" (ngModelChange)="onApplyFilters()">
-          <option *ngFor="let option of sortByOptions" [value]="option.value">{{ option.labelKey | translate }}</option>
+          <option *ngFor="let option of sortByOptions" [value]="option.value">{{ option.label }}</option>
         </select>
       </label>
 
       <label>
-        <span>{{ 'manager.objects.filter.order' | translate }}</span>
+        <span>Order</span>
         <select [(ngModel)]="sortOrder" (ngModelChange)="onApplyFilters()">
-          <option value="asc">{{ 'manager.objects.filter.ascending' | translate }}</option>
-          <option value="desc">{{ 'manager.objects.filter.descending' | translate }}</option>
+          <option value="asc">Ascending</option>
+          <option value="desc">Descending</option>
         </select>
       </label>
 
       <div class="filter-actions">
-        <button type="button" class="primary-btn filter-btn" (click)="onApplyFilters()">{{ 'manager.objects.filter.apply' | translate }}</button>
-        <button type="button" class="ghost-btn filter-btn secondary" (click)="onResetFilters()">{{ 'manager.objects.filter.reset' | translate }}</button>
+        <button type="button" class="primary-btn filter-btn" (click)="onApplyFilters()">Apply filters</button>
+        <button type="button" class="ghost-btn filter-btn secondary" (click)="onResetFilters()">Reset filters</button>
       </div>
     </div>
   }
@@ -71,29 +71,29 @@
     <div class="object-main-column">
       <div class="insights-grid">
         <article class="insight-card card" data-tone="blue">
-          <p>{{ 'manager.objects.stats.totalObjects' | translate }}</p>
+          <p>Total number of objects</p>
           <strong>{{ totalCount }}</strong>
-          <span>{{ 'manager.objects.stats.matchingFilters' | translate }}</span>
+          <span>Matching active filters</span>
         </article>
         <article class="insight-card card" data-tone="green">
-          <p>{{ 'manager.objects.stats.onThisPage' | translate }}</p>
+          <p>On this page</p>
           <strong>{{ pagedObjects.length }}</strong>
-          <span>{{ 'manager.objects.stats.visibleRows' | translate }}</span>
+          <span>Visible rows</span>
         </article>
         <article class="insight-card card" data-tone="amber">
-          <p>{{ 'manager.objects.stats.averageRating' | translate }}</p>
+          <p>Average rating</p>
           <strong>{{ averageRatingDisplay }}</strong>
-          <span>{{ 'manager.objects.stats.acrossPage' | translate }}</span>
+          <span>Across current page</span>
         </article>
       </div>
 
       <section class="object-table-wrap card">
         @if (isLoading) {
-          <div class="state state-loading">{{ 'manager.objects.loading' | translate }}</div>
+          <div class="state state-loading">Loading objects...</div>
         } @else if (errorMessage) {
           <div class="state state-error">{{ errorMessage }}</div>
         } @else if (!pagedObjects.length) {
-          <div class="state">{{ 'manager.objects.empty.filtered' | translate }}</div>
+          <div class="state">No objects found for the selected filters.</div>
         } @else {
           <div class="objects-mobile-list">
             @for (object of pagedObjects; track object.id) {
@@ -115,7 +115,7 @@
                     {{ destinationCellText(object) }}
                   </p>
                   <div class="object-mobile-card__meta">
-                    <span class="object-mobile-card__type">{{ object.objectTypeName || ('common.notAvailable' | translate) }}</span>
+                    <span class="object-mobile-card__type">{{ object.objectTypeName || 'Not available' }}</span>
                     <span class="object-mobile-card__rating">
                       <span class="material-symbols-outlined" aria-hidden="true">star</span>
                       {{ (object.averageRating ?? 0).toFixed(1) }}
@@ -125,7 +125,7 @@
                 <button
                   type="button"
                   class="object-mobile-card__edit"
-                  [attr.title]="'manager.objects.reviewObject' | translate"
+                  title="Review object"
                   (click)="onRowAction(object, $event)"
                 >
                   <span class="material-symbols-outlined">edit</span>
@@ -138,12 +138,12 @@
             <table>
               <thead>
                 <tr>
-                  <th>{{ 'manager.objects.table.status' | translate }}</th>
-                  <th>{{ 'manager.objects.table.objectDetails' | translate }}</th>
-                  <th>{{ 'manager.objects.table.type' | translate }}</th>
-                  <th>{{ 'manager.objects.table.destination' | translate }}</th>
-                  <th>{{ 'manager.objects.table.rating' | translate }}</th>
-                  <th>{{ 'manager.objects.table.action' | translate }}</th>
+                  <th>Status</th>
+                  <th>Object details</th>
+                  <th>Type</th>
+                  <th>Destination</th>
+                  <th>Rating</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody>
@@ -164,7 +164,7 @@
                     </div>
                   </td>
                   <td>
-                    <span class="type-pill">{{ object.objectTypeName || ('common.notAvailable' | translate) }}</span>
+                    <span class="type-pill">{{ object.objectTypeName || 'Not available' }}</span>
                   </td>
                   <td>{{ destinationCellText(object) }}</td>
                   <td class="rating-cell">{{ (object.averageRating ?? 0).toFixed(1) }}</td>
@@ -172,7 +172,7 @@
                     <button
                       type="button"
                       class="icon-btn"
-                      [attr.title]="'manager.objects.reviewObject' | translate"
+                      title="Review object"
                       (click)="onRowAction(object, $event)"
                     >
                       <span class="material-symbols-outlined">open_in_new</span>
@@ -184,17 +184,17 @@
           </div>
 
           <footer class="table-footer">
-            <p>{{ 'manager.objects.pagination.showing' | translate:{ start: pageStart, end: pageEnd, total: totalCount } }}</p>
+            <p>Showing {{ pageStart }} to {{ pageEnd }} of {{ totalCount }} objects</p>
             <div class="pager">
               <label class="page-size-control">
-                <span>{{ 'manager.objects.pagination.pageSize' | translate }}</span>
+                <span>Page size</span>
                 <select class="page-size-select" [(ngModel)]="pageSize" (ngModelChange)="onPageSizeChange($event)">
                   <option *ngFor="let option of pageSizeOptions" [ngValue]="option">{{ option }}</option>
                 </select>
               </label>
 
               <button type="button" class="ghost-btn small-btn" (click)="onPreviousPage()" [disabled]="currentPage === 1">
-                {{ 'manager.objects.pagination.previous' | translate }}
+                Previous
               </button>
               <button
                 type="button"
@@ -202,7 +202,7 @@
                 (click)="onNextPage()"
                 [disabled]="currentPage >= totalPages"
               >
-                {{ 'manager.objects.pagination.next' | translate }}
+                Next
               </button>
             </div>
           </footer>
@@ -212,13 +212,13 @@
 
     <aside class="detail-column card" [class.has-selection]="!!selectedObject">
       @if (selectedObject) {
-        <p class="detail-sheet-label">{{ 'manager.objects.selectedObject' | translate }}</p>
+        <p class="detail-sheet-label">Selected object</p>
         <div class="activity-hero">
           <div class="hero-media" [ngStyle]="getHeroStyle()">
-            <span class="hero-badge">{{ selectedObject.objectTypeName || ('common.objects' | translate) }}</span>
+            <span class="hero-badge">{{ selectedObject.objectTypeName || 'Objects' }}</span>
           </div>
           <div class="hero-copy">
-            <p class="eyebrow">{{ 'manager.objects.featuredObject' | translate }}</p>
+            <p class="eyebrow">Featured object</p>
             <h2>{{ selectedObject.name }}</h2>
             <p class="hero-meta">
               {{ selectedObject.destinationName || '—' }} · {{ selectedObject.localityName || '—' }}
@@ -231,26 +231,26 @@
 
         <div class="detail-metrics">
           <div class="metric-card">
-            <span>{{ 'manager.objects.pricing' | translate }}</span>
+            <span>Pricing</span>
             <strong>{{ formatPrice(selectedObject.price) }}</strong>
           </div>
           <div class="metric-card">
-            <span>{{ 'common.reviewsTitle' | translate }}</span>
+            <span>Reviews</span>
             <strong>{{ selectedObject.reviewCount ?? 0 }}</strong>
           </div>
         </div>
 
         <section class="detail-section">
           <div class="section-head">
-            <h3>{{ 'common.details' | translate }}</h3>
+            <h3>Details</h3>
           </div>
           <div class="schedule-item">
-            <span>{{ 'manager.objects.table.destination' | translate }}</span>
-            <strong>{{ selectedObject.destinationName || ('common.notAvailable' | translate) }}</strong>
+            <span>Destination</span>
+            <strong>{{ selectedObject.destinationName || 'Not available' }}</strong>
           </div>
           <div class="schedule-item">
-            <span>{{ 'manager.objects.locality' | translate }}</span>
-            <strong>{{ selectedObject.localityName || ('common.notAvailable' | translate) }}</strong>
+            <span>Locality</span>
+            <strong>{{ selectedObject.localityName || 'Not available' }}</strong>
           </div>
           <div class="schedule-item schedule-item-block">
             <ng-container *ngIf="getWorkingHoursRows(selectedObject.workingHours) as workingHoursRows">
@@ -264,29 +264,29 @@
               </div>
             </ng-container>
             <ng-template #noWorkingHours>
-              <strong class="working-hours-fallback">{{ 'common.notAvailable' | translate }}</strong>
+              <strong class="working-hours-fallback">Not available</strong>
             </ng-template>
           </div>
         </section>
 
         <section class="detail-section">
-          <h3>{{ 'manager.objects.description' | translate }}</h3>
-          <p class="description-copy">{{ selectedObject.description || ('manager.objects.noDescription' | translate) }}</p>
+          <h3>Description</h3>
+          <p class="description-copy">{{ selectedObject.description || 'No description provided for this object.' }}</p>
         </section>
 
         <section class="detail-section guest-reviews-section">
           <div class="section-head reviews-section-head">
-            <h3>{{ 'manager.objects.guestReviews' | translate }}</h3>
-            <span class="reviews-count">{{ selectedObject.reviewCount ?? selectedObjectReviews.length }} {{ 'dashboard.cc.total' | translate }}</span>
+            <h3>Guest reviews</h3>
+            <span class="reviews-count">{{ selectedObject.reviewCount ?? selectedObjectReviews.length }} total</span>
           </div>
           <p class="reviews-section-hint">
-            {{ 'manager.objects.reviewsHint' | translate }}
+            Tourists review this object only. Below are their ratings and any Content Creator replies.
           </p>
 
           @if (reviewsLoading) {
-            <p class="reviews-empty">{{ 'manager.objects.loadingGuestReviews' | translate }}</p>
+            <p class="reviews-empty">Loading guest reviews…</p>
           } @else if (!selectedObjectReviews.length) {
-            <p class="reviews-empty">{{ 'manager.objects.noGuestReviews' | translate }}</p>
+            <p class="reviews-empty">No guest reviews yet for this object.</p>
           } @else {
             <div class="reviews-preview-list">
               @for (thread of selectedObjectReviewsPreview; track thread.id) {
@@ -298,18 +298,18 @@
                   <p class="review-preview-text">{{ thread.touristReview }}</p>
                   @if (thread.creatorResponse?.trim()) {
                     <div class="cc-reply-snippet" [class.concerning]="isConcerningReply(thread)">
-                      <span class="reply-label">{{ 'manager.objects.ccReply' | translate }}</span>
+                      <span class="reply-label">CC reply</span>
                       <p>{{ thread.creatorResponse }}</p>
                     </div>
                   } @else {
-                    <span class="reply-pending">{{ 'manager.objects.noCreatorReply' | translate }}</span>
+                    <span class="reply-pending">No creator reply yet</span>
                   }
                 </article>
               }
             </div>
             @if (selectedObjectReviews.length > 2) {
               <button type="button" class="text-link-btn" (click)="onOpenSelectedObjectReview()">
-                {{ 'manager.objects.viewAllReviews' | translate:{ count: selectedObjectReviews.length } }}
+                View all {{ selectedObjectReviews.length }} reviews on object page
               </button>
             }
             @if (concerningReportThread) {
@@ -319,7 +319,7 @@
                 [queryParams]="reportCreatorQuery(concerningReportThread)"
               >
                 <span class="material-symbols-outlined">flag</span>
-                {{ 'manager.objects.reportCreator' | translate }}
+                Report creator
               </a>
             }
           }
@@ -339,7 +339,7 @@
             } @else {
               <div class="map-empty-state">
                 <span class="material-symbols-outlined">location_off</span>
-                <p>{{ 'manager.objects.noCoordinates' | translate }}</p>
+                <p>Coordinates are not available for this object.</p>
               </div>
             }
           </div>
@@ -348,14 +348,14 @@
         <div class="detail-cta">
           <button type="button" class="primary-btn full-cta sidebar-cta-btn" (click)="onOpenSelectedObjectReview()">
             <span class="material-symbols-outlined">rate_review</span>
-            {{ 'manager.objects.openObjectReview' | translate }}
+            Open object review & guest feedback
           </button>
         </div>
       } @else {
         <div class="empty-state">
-          <p class="eyebrow">{{ 'manager.objects.empty.noObjectSelected' | translate }}</p>
-          <h2>{{ 'manager.objects.empty.pickObjectTitle' | translate }}</h2>
-          <p>{{ 'manager.objects.empty.pickObjectBody' | translate }}</p>
+          <p class="eyebrow">No object selected</p>
+          <h2>Pick an object from the table</h2>
+          <p>Select a row to preview media, location, and approval status before opening the full review.</p>
         </div>
       }
     </aside>

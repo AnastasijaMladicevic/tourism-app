@@ -6,12 +6,11 @@ import { filter, Subscription } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 import { UserDto } from '../../models/user.model';
 import { NotificationBellComponent } from '../../shared/components/notification-bell/notification-bell.component';
-import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-content-creator-layout',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, NotificationBellComponent, TranslatePipe],
+  imports: [CommonModule, FormsModule, RouterModule, NotificationBellComponent],
   templateUrl: './contentcreatorlayout.component.html',
   styleUrls: ['./contentcreatorlayout.component.css'],
 })

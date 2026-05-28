@@ -7,14 +7,6 @@ import { ImageCropperComponent, ImageCroppedEvent } from 'ngx-image-cropper';
 import { environment } from '../../../../environment/environment';
 import { AuthService, UpdateUserDto } from '../../../services/auth.service';
 import { UserDto } from '../../../models/user.model';
-import { AppLanguage, TranslationService } from '../../../services/translation.service';
-
-type LanguageOption = {
-  value: AppLanguage;
-  label: string;
-  description: string;
-};
-
 type PermissionItem = {
   label: string;
   detail: string;
@@ -34,16 +26,6 @@ type ModalState = 'closed' | 'opening' | 'open' | 'closing';
 export class ProfileComponentContentCreator implements OnInit, OnDestroy {
   private static readonly DEFAULT_PROFILE_IMAGE_URL =
     `${environment.apiUrl.replace('/api', '')}/images/profiles/default_icon.png`;
-
-  readonly languageOptions: LanguageOption[] = [
-    { value: 'me', label: 'Montenegrin', description: 'Primary locale for Montenegro' },
-    { value: 'sr', label: 'Serbian', description: 'Latin script, regional default' },
-    { value: 'en', label: 'English', description: 'Global app language' },
-    { value: 'de', label: 'German', description: 'Deutsch for German-speaking users' },
-    { value: 'fr', label: 'French', description: 'Français for French-speaking users' },
-    { value: 'es', label: 'Spanish', description: 'Español for Spanish-speaking users' },
-    { value: 'it', label: 'Italian', description: 'Italiano for Italian-speaking users' },
-  ];
 
   readonly permissionItems: PermissionItem[] = [
     { label: 'Create objects, events, and activities', detail: 'Content Creator can create new objects, events, and activities, and they start in Pending state.' },
@@ -101,7 +83,6 @@ export class ProfileComponentContentCreator implements OnInit, OnDestroy {
 
   constructor(
     private authService: AuthService,
-    private translationService: TranslationService,
     private router: Router,
     private cdr: ChangeDetectorRef,
   ) { }
@@ -140,18 +121,8 @@ export class ProfileComponentContentCreator implements OnInit, OnDestroy {
     return `${this.user.firstName} ${this.user.lastName}`.trim() || 'Unknown User';
   }
 
-  get activeLanguageLabel(): string {
-    return this.languageOptions.find((option) => option.value === this.user.language)?.label ?? 'Not set';
-  }
-
   get permissionCount(): number {
     return this.permissionItems.length;
-  }
-
-  onLanguageSelected(language: string): void {
-    const normalized = this.normalizeLanguage(language);
-    this.user = { ...this.user, language: normalized };
-    this.translationService.setLanguage(normalized);
   }
 
   get roleBadgeClass(): string {
@@ -462,20 +433,14 @@ export class ProfileComponentContentCreator implements OnInit, OnDestroy {
   }
 
   private syncUserState(user: UserDto): void {
-    const selectedLanguage = this.normalizeLanguage(user.language ?? this.translationService.language());
-
     this.user = {
       ...user,
-      language: selectedLanguage,
+      language: user.language?.trim() || 'en',
       dateOfBirth: this.normalizeDateForInput(user.dateOfBirth),
     };
     this.initials = this.buildInitials(user);
     this.role = this.authService.getNormalizedRole(user) ?? '';
     this.avatarUrl = user.profileImageUrl?.trim() || ProfileComponentContentCreator.DEFAULT_PROFILE_IMAGE_URL;
-  }
-
-  private normalizeLanguage(language?: string | null): AppLanguage {
-    return this.translationService.normalizeLanguageCode(language);
   }
 
   private mergeUserState(updated: UserDto): UserDto {

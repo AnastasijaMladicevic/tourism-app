@@ -6,29 +6,29 @@
       <span class="material-symbols-outlined">logout</span>
     </div>
 
-    <h2>{{ 'auth.signOut.title' | translate }}</h2>
+    <h2>Confirm Sign Out?</h2>
 
     <p class="desc">
-      {{ 'auth.signOut.body' | translate }}
+      Are you sure you want to end your current session and leave the platform?
     </p>
 
     <div class="actions">
       <button type="button" class="logout" (click)="confirmSignOut()">
-        {{ 'layout.signOut' | translate }}
+        Sign Out
       </button>
 
       <button type="button" class="cancel" (click)="cancel()">
         <span class="material-symbols-outlined" aria-hidden="true">arrow_back</span>
-        {{ 'auth.signOut.keepSignedIn' | translate }}
+        Keep me signed in
       </button>
     </div>
 
     <div class="info">
       <span class="material-symbols-outlined shield" aria-hidden="true">shield</span>
       <div>
-        <strong>{{ 'auth.signOut.sessionSecurity' | translate }}</strong>
+        <strong>Session Security</strong>
         <p>
-          {{ 'auth.signOut.sessionNote' | translate }}
+          For your protection, sessions are automatically terminated after 30 minutes of inactivity.
         </p>
       </div>
     </div>

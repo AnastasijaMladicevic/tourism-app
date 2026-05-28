@@ -154,37 +154,6 @@
               </div>
             </div>
 
-            <div class="form-section">
-              <div class="section-label">Application Language</div>
-
-              <div class="language-summary">
-                <span>Current app language</span>
-                <strong>{{ activeLanguageLabel }}</strong>
-              </div>
-
-              <div class="language-options">
-                @for (option of languageOptions; track option.value) {
-                  <label class="language-option" [class.language-option--active]="user.language === option.value">
-                    <input
-                      class="language-option__input"
-                      type="radio"
-                      name="language"
-                      [value]="option.value"
-                      [(ngModel)]="user.language"
-                      (ngModelChange)="onLanguageSelected($event)"
-                    />
-
-                    <span class="language-option__content">
-                      <span class="language-option__label">{{ option.label }}</span>
-                      <span class="language-option__detail">{{ option.description }}</span>
-                    </span>
-
-                    <mat-icon class="language-option__check" fontSet="material-icons-outlined">check_circle</mat-icon>
-                  </label>
-                }
-              </div>
-            </div>
-
           </div>
 
           <aside class="profile-sidebar">

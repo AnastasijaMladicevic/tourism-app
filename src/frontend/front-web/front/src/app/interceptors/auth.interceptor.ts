@@ -3,8 +3,6 @@ import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, catchError, filter, finalize, switchMap, take, throwError } from 'rxjs';
 import { AuthService } from '../services/auth.service';
-import { TranslationService } from '../services/translation.service';
-
 let isRefreshing = false;
 const refreshedToken$ = new BehaviorSubject<string | null>(null);
 
@@ -32,7 +30,7 @@ function notifyBannedAction(error: HttpErrorResponse, authService: AuthService, 
   const message =
     typeof error.error?.message === 'string' && error.error.message.trim().length > 0
       ? error.error.message.trim()
-      : 'Ovaj nalog je trenutno u read-only režimu zbog bana.';
+      : 'This account is currently in read-only mode due to a ban.';
 
   sessionStorage.setItem('spirego-admin-ban-message', message);
   window.dispatchEvent(new CustomEvent('banned-user-action-blocked', { detail: message }));
@@ -44,10 +42,9 @@ function notifyBannedAction(error: HttpErrorResponse, authService: AuthService, 
 
 export const authInterceptor: HttpInterceptorFn = (request, next) => {
   const authService = inject(AuthService);
-  const translationService = inject(TranslationService);
   const router = inject(Router);
   const token = authService.getToken();
-  const language = translationService.currentLocale();
+  const language = 'en-US';
   const authRequest =
     token && !request.headers.has('Authorization') && !isAuthEndpoint(request.url)
       ? withAuthHeader(request, token)

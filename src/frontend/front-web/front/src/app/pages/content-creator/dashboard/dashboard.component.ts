@@ -4,8 +4,6 @@ import { RouterModule } from '@angular/router';
 import { TimeoutError, timeout } from 'rxjs';
 import { UserDto } from '../../../models/user.model';
 import { AuthService } from '../../../services/auth.service';
-import { TranslationService } from '../../../services/translation.service';
-import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 import {
   ContentCreatorDashboardOverviewDto,
   ContentCreatorDashboardPeriod,
@@ -98,7 +96,7 @@ const DASHBOARD_REQUEST_TIMEOUT_MS = 15000;
 @Component({
   selector: 'app-content-creator-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterModule, TranslatePipe],
+  imports: [CommonModule, RouterModule],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.css']
 })
@@ -107,8 +105,6 @@ export class ContentCreatorDashboardComponent implements OnInit {
   private readonly dashboardService = inject(ContentCreatorDashboardService);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly zone = inject(NgZone);
-  private readonly translationService = inject(TranslationService);
-
   readonly periodOptions = PERIOD_OPTIONS;
   readonly renderVersion = signal(0);
 
@@ -162,11 +158,11 @@ export class ContentCreatorDashboardComponent implements OnInit {
   get granularityHint(): string {
     switch (this.overview?.engagementTrendGranularity) {
       case 'week':
-        return this.translationService.translate('dashboard.groupedByWeek');
+        return 'Grouped by week';
       case 'month':
-        return this.translationService.translate('dashboard.groupedByMonth');
+        return 'Grouped by month';
       default:
-        return this.translationService.translate('dashboard.groupedByDay');
+        return 'Grouped by day';
     }
   }
 
@@ -188,13 +184,13 @@ export class ContentCreatorDashboardComponent implements OnInit {
     switch (status?.trim().toLowerCase()) {
       case 'approved':
       case 'published':
-        return this.translationService.translate('dashboard.cc.published');
+        return 'Published';
       case 'pending':
-        return this.translationService.translate('dashboard.cc.pending');
+        return 'Pending';
       case 'rejected':
-        return this.translationService.translate('dashboard.cc.rejected');
+        return 'Rejected';
       default:
-        return status || this.translationService.translate('common.notAvailable');
+        return status || 'Not available';
     }
   }
 
@@ -202,13 +198,13 @@ export class ContentCreatorDashboardComponent implements OnInit {
     switch (contentType?.trim().toLowerCase()) {
       case 'touristobject':
       case 'object':
-        return this.translationService.translate('common.objects');
+        return 'Objects';
       case 'event':
-        return this.translationService.translate('layout.events');
+        return 'Events';
       case 'activity':
-        return this.translationService.translate('layout.activities');
+        return 'Activities';
       default:
-        return contentType || this.translationService.translate('dashboard.cc.totalContent');
+        return contentType || 'Total content';
     }
   }
 
@@ -316,44 +312,44 @@ export class ContentCreatorDashboardComponent implements OnInit {
 
     this.kpiCards = [
       {
-        label: this.translationService.translate('dashboard.cc.publishedContent'),
+        label: 'Published content',
         value: this.formatNumber(summary.publishedContent),
-        meta: `${this.formatNumber(summary.totalContent)} ${this.translationService.translate('dashboard.cc.total')}`,
+        meta: `${this.formatNumber(summary.totalContent)} total`,
         tone: 'green',
         icon: 'task_alt',
       },
       {
-        label: this.translationService.translate('dashboard.cc.pendingContent'),
+        label: 'Pending content',
         value: this.formatNumber(summary.pendingContent),
-        meta: this.translationService.translate('dashboard.cc.waitingForModeration'),
+        meta: 'Waiting for moderation',
         tone: 'amber',
         icon: 'hourglass_top',
       },
       {
-        label: this.translationService.translate('dashboard.cc.rejectedContent'),
+        label: 'Rejected content',
         value: this.formatNumber(summary.rejectedContent),
-        meta: this.translationService.translate('dashboard.cc.needsEdits'),
+        meta: 'Needs edits before resubmission',
         tone: 'red',
         icon: 'cancel',
       },
       {
-        label: this.translationService.translate('dashboard.cc.favorites'),
+        label: 'Favorites',
         value: this.formatNumber(summary.favoritesInPeriod),
-        meta: this.translationService.translate('dashboard.cc.during', { period: overview.periodKey }),
+        meta: `During ${overview.periodKey}`,
         tone: 'purple',
         icon: 'favorite',
       },
       {
-        label: this.translationService.translate('dashboard.cc.plannerAdds'),
+        label: 'Planner adds',
         value: this.formatNumber(summary.plannerAddsInPeriod),
-        meta: this.translationService.translate('dashboard.cc.savedIntoPlans'),
+        meta: 'Saved into plans',
         tone: 'blue',
         icon: 'event_available',
       },
       {
-        label: this.translationService.translate('dashboard.cc.newReviews'),
+        label: 'New reviews',
         value: this.formatNumber(summary.unansweredReviews),
-        meta: this.translationService.translate('dashboard.cc.replySoon'),
+        meta: 'Reply soon',
         tone: 'teal',
         icon: 'forum',
       },
@@ -363,9 +359,9 @@ export class ContentCreatorDashboardComponent implements OnInit {
   private bindEngagementTrend(overview: ContentCreatorDashboardOverviewDto): void {
     const points = overview.engagementTrend ?? [];
     const seriesDefs = [
-      { key: 'favorites', label: this.translationService.translate('dashboard.cc.favorites'), color: '#7c3aed', pick: (point: typeof points[number]) => point.favorites },
-      { key: 'planner', label: this.translationService.translate('dashboard.cc.plannerAdds'), color: '#2563eb', pick: (point: typeof points[number]) => point.plannerAdds },
-      { key: 'reviews', label: this.translationService.translate('dashboard.cc.reviews'), color: '#0d9488', pick: (point: typeof points[number]) => point.reviews },
+      { key: 'favorites', label: 'Favorites', color: '#7c3aed', pick: (point: typeof points[number]) => point.favorites },
+      { key: 'planner', label: 'Planner adds', color: '#2563eb', pick: (point: typeof points[number]) => point.plannerAdds },
+      { key: 'reviews', label: 'Reviews', color: '#0d9488', pick: (point: typeof points[number]) => point.reviews },
     ];
     const allValues = points.flatMap((point) => [point.favorites, point.plannerAdds, point.reviews]);
     const maxVal = Math.max(...allValues, 0);
@@ -398,18 +394,18 @@ export class ContentCreatorDashboardComponent implements OnInit {
 
     this.engagementLabels = this.buildXAxisLabels(points, overview.engagementTrendGranularity);
     this.engagementSummary = [
-      { label: this.translationService.translate('dashboard.cc.favorites'), value: this.formatNumber(overview.summary.favoritesInPeriod), color: '#7c3aed' },
-      { label: this.translationService.translate('dashboard.cc.plannerAdds'), value: this.formatNumber(overview.summary.plannerAddsInPeriod), color: '#2563eb' },
-      { label: this.translationService.translate('dashboard.cc.reviews'), value: this.formatNumber(overview.summary.newReviewsInPeriod), color: '#0d9488' },
+      { label: 'Favorites', value: this.formatNumber(overview.summary.favoritesInPeriod), color: '#7c3aed' },
+      { label: 'Planner adds', value: this.formatNumber(overview.summary.plannerAddsInPeriod), color: '#2563eb' },
+      { label: 'Reviews', value: this.formatNumber(overview.summary.newReviewsInPeriod), color: '#0d9488' },
     ];
   }
 
   private bindContentStatus(overview: ContentCreatorDashboardOverviewDto): void {
     const rows = [
-      { key: 'overall', label: this.translationService.translate('dashboard.cc.contentStatusSplit'), bucket: overview.contentStatus.overall },
-      { key: 'objects', label: this.translationService.translate('common.objects'), bucket: overview.contentStatus.objects },
-      { key: 'events', label: this.translationService.translate('layout.events'), bucket: overview.contentStatus.events },
-      { key: 'activities', label: this.translationService.translate('layout.activities'), bucket: overview.contentStatus.activities },
+      { key: 'overall', label: 'Content status split', bucket: overview.contentStatus.overall },
+      { key: 'objects', label: 'Objects', bucket: overview.contentStatus.objects },
+      { key: 'events', label: 'Events', bucket: overview.contentStatus.events },
+      { key: 'activities', label: 'Activities', bucket: overview.contentStatus.activities },
     ];
     const maxTotal = Math.max(...rows.map((row) => row.bucket.total), 1);
 
@@ -472,9 +468,9 @@ export class ContentCreatorDashboardComponent implements OnInit {
   private buildDonutSlices(bucket: ContentCreatorDashboardStatusBucketDto): DonutSlice[] {
     const total = Math.max(bucket.total, 1);
     const definitions = [
-      { label: this.translationService.translate('dashboard.cc.published'), count: bucket.published, color: '#059669' },
-      { label: this.translationService.translate('dashboard.cc.pending'), count: bucket.pending, color: '#d97706' },
-      { label: this.translationService.translate('dashboard.cc.rejected'), count: bucket.rejected, color: '#dc2626' },
+      { label: 'Published', count: bucket.published, color: '#059669' },
+      { label: 'Pending', count: bucket.pending, color: '#d97706' },
+      { label: 'Rejected', count: bucket.rejected, color: '#dc2626' },
     ];
     let offset = 0;
 

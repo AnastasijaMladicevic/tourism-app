@@ -4,12 +4,9 @@ import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
 import { AuthService } from './services/auth.service';
 import { UserDto } from './models/user.model';
-import { TranslatePipe } from './shared/pipes/translate.pipe';
-import { DomTranslationService } from './services/dom-translation.service';
-
 @Component({
   selector: 'app-root',
-  imports: [CommonModule, RouterOutlet, TranslatePipe],
+  imports: [CommonModule, RouterOutlet],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
@@ -29,11 +26,9 @@ export class App implements OnInit, OnDestroy {
   constructor(
     private readonly authService: AuthService,
     private readonly router: Router,
-    private readonly domTranslationService: DomTranslationService,
   ) {}
 
   ngOnInit(): void {
-    this.domTranslationService.start();
     this.currentUrl = this.router.url;
     this.router.events
       .pipe(filter((event): event is NavigationEnd => event instanceof NavigationEnd))
@@ -53,8 +48,6 @@ export class App implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.domTranslationService.stop();
-
     if (this.roleCheckTimer) {
       clearInterval(this.roleCheckTimer);
     }
@@ -86,7 +79,7 @@ export class App implements OnInit, OnDestroy {
         }
 
         this.beginRoleRedirect(
-          'Tvoja Content Creator uloga je uklonjena. Preusmeravamo te na turisticku aplikaciju.',
+          'Your Content Creator role has been removed. Redirecting you to the tourist app.',
           this.resolvePublicAppHomeUrl(user),
         );
       },
@@ -145,12 +138,12 @@ export class App implements OnInit, OnDestroy {
       return;
     }
 
-    const reason = currentUser.banReason?.trim() || 'Krsenje pravila platforme.';
+    const reason = currentUser.banReason?.trim() || 'Violation of platform rules.';
     const expiresAt = currentUser.banExpiresAtUtc?.trim();
     this.bannedAccountNotice.set(
       expiresAt
-        ? `Ovaj nalog je banovan do ${this.formatUtc(expiresAt)}. Razlog: ${reason}`
-        : `Ovaj nalog je trajno banovan. Razlog: ${reason}`,
+        ? `This account is banned until ${this.formatUtc(expiresAt)}. Reason: ${reason}`
+        : `This account is permanently banned. Reason: ${reason}`,
     );
   }
 
