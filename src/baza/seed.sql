@@ -13127,7 +13127,7 @@ VALUES
 WITH source("Url", "AltText", "IsMain", "DestinationName") AS (
     VALUES
     ('https://i0.wp.com/media1.lepojeziveti.com/2018/04/vitorrio-emanuelle-panorama.jpg', 'Rome', true, 'Rome'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Venice%20Grand%20Canal.JPG', 'Venice', true, 'Venice'),
+    ('https://globusnis.rs/wp-content/uploads/2021/10/Venecija-7.jpg', 'Venice', true, 'Venice'),
     ('https://commons.wikimedia.org/wiki/Special:FilePath/Florence%20Duomo.jpg', 'Florence', true, 'Florence'),
     ('https://upload.wikimedia.org/wikipedia/commons/c/c3/Milan_skyline_skyscrapers_of_Porta_Nuova_business_district_%28cropped%29.jpg', 'Milan', true, 'Milan'),
     ('https://www.christiesrealestate.com/resizer/v2/Q3IJO5D2JNAAXOSSQRAYB7QRMI.jpg?auth=e5a620e3c1801a0cda31a292e7171a8ba7a4e84ccca51beab8a2923d7775e808', 'Naples', true, 'Naples'),
@@ -34256,7 +34256,7 @@ WITH source("Url", "AltText", "IsMain", "EventName") AS (
     ('https://images.unsplash.com/photo-1519861531473-9200262188bf?auto=format&fit=crop&w=1400&q=80', 'Kadiz obalski sportski dan', true, 'Kadiz obalski sportski dan'),
     ('https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&w=1400&q=80', 'Murcia gastro forum', true, 'Murcia gastro forum'),
     ('https://images.unsplash.com/photo-1528698827591-e19ccd7bc23d?auto=format&fit=crop&w=1400&q=80', 'Sajam severnih ukusa Santandera', true, 'Sajam severnih ukusa Santandera'),
-    ('https://images.unsplash.com/photo-1571266028243-d220c9c3c7d8?auto=format&fit=crop&w=1400&q=80', 'Tenerife noć vulkana i ritma', true, 'Tenerife noć vulkana i ritma'),
+    ('https://static.myeasol.net/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6IjIwMTI0YzdkLTNlNmMtNDcxMi05M2I4LTU2ZjBhMjc5ZTUwNyIsInB1ciI6ImJsb2JfaWQifX0=--8d722de2dd3855185bdc9f26e226426970c05727/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJqcGciLCJyZXNpemVfdG9fbGltaXQiOlsxOTIwLG51bGxdLCJzYXZlciI6eyJzdHJpcCI6dHJ1ZSwicXVhbGl0eSI6ODV9fSwicHVyIjoidmFyaWF0aW9uIn19--d7b849811809c7fffbb030edf0f6b75c59522433/240927TrickTenerifeXanaduLANTY076.jpg', 'Tenerife noć vulkana i ritma', true, 'Tenerife noć vulkana i ritma'),
     ('https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&w=1400&q=80', 'Veče hodočasnika u Santjagu', true, 'Veče hodočasnika u Santjagu')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "EventId", "CreatedAt")
@@ -34515,14 +34515,29 @@ VALUES
 
 WITH source("Url", "DestinationName", "IsMain", "AltText") AS (
     VALUES
-    ('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1400&q=80', 'Bari', true, 'Bari'),
-    ('https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1400&q=80', 'Palermo', true, 'Palermo'),
-    ('https://images.unsplash.com/photo-1501594907352-04cda38ebc29?auto=format&fit=crop&w=1400&q=80', 'Trieste', true, 'Trieste'),
-    ('https://images.unsplash.com/photo-1516483638261-f4dbaf036963?auto=format&fit=crop&w=1400&q=80', 'Matera', true, 'Matera'),
-    ('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1400&q=80', 'Sorrento', true, 'Sorrento'),
-    ('https://images.unsplash.com/photo-1521295121783-8a321d551ad2?auto=format&fit=crop&w=1400&q=80', 'Lecce', true, 'Lecce'),
-    ('https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1400&q=80', 'Parma', true, 'Parma'),
-    ('https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1400&q=80', 'Sardinija', true, 'Sardinija')
+    -- Bari: Lungomare/luka Barija (reisetopia, stvarna fotka Barija uz more)
+    ('https://images.unsplash.com/photo-1611238763458-0de1027136cf?auto=format&fit=crop&w=1400&q=80', 'Bari', true, 'Bari'),
+
+    -- Palermo: ulica Palerma sa katedralom (Cristina Gottardi)
+    ('https://images.unsplash.com/photo-1541777490254-a50eb9045486?auto=format&fit=crop&w=1400&q=80', 'Palermo', true, 'Palermo'),
+
+    -- Trieste: Piazza Unita d'Italia uz more (Daniele Bucciarelli)
+    ('https://images.unsplash.com/photo-1586172486224-6b48bd7b9682?auto=format&fit=crop&w=1400&q=80', 'Trieste', true, 'Trieste'),
+
+    -- Matera: Sassi di Matera pećinska naselja (Luca Micheli)
+    ('https://images.unsplash.com/photo-1528214096798-37891d32174c?auto=format&fit=crop&w=1400&q=80', 'Matera', true, 'Matera'),
+
+    -- Sorrento: pogled na grad i zaliv (aes, Unsplash)
+    ('https://images.unsplash.com/photo-1666380982418-0effa6190210?auto=format&fit=crop&w=1400&q=80', 'Sorrento', true, 'Sorrento'),
+
+    -- Lecce: barokna arhitektura Lečea (Freysteinn G. Jonsson)
+    ('https://images.unsplash.com/photo-1680938166156-07a91b54745e?auto=format&fit=crop&w=1400&q=80', 'Lecce', true, 'Lecce'),
+
+    -- Parma: Piazza Duomo sa katedralom i baptisterijom (Bernard Hermant)
+    ('https://images.unsplash.com/photo-1603034318372-547281a7eacf?auto=format&fit=crop&w=1400&q=80', 'Parma', true, 'Parma'),
+
+    -- Sardinija: tirkizno more Costa Smeralda (Chloe Frost-Smith)
+    ('https://gotripzi.com/cdn-cgi/image/onerror=redirect,width=1440,height=1080,format=webp/_astro/sardinia-it-hero.Cga8OrnP.webp', 'Sardinija', true, 'Sardinija')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "DestinationId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", d."Id", NOW()
@@ -34531,29 +34546,76 @@ JOIN "Destinations" d ON d."Name" = s."DestinationName";
 
 WITH source("Url", "LocalityName", "IsMain", "AltText") AS (
     VALUES
-    ('https://images.unsplash.com/photo-1516483638261-f4dbaf036963?auto=format&fit=crop&w=1400&q=80', 'Bari Vecchia', true, 'Bari Vecchia'),
-    ('https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1400&q=80', 'Lungomare Bari', true, 'Lungomare Bari'),
-    ('https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1400&q=80', 'Basilica San Nicola Bari', true, 'Basilica San Nicola Bari'),
-    ('https://images.unsplash.com/photo-1501594907352-04cda38ebc29?auto=format&fit=crop&w=1400&q=80', 'Quattro Canti Palermo', true, 'Quattro Canti Palermo'),
-    ('https://images.unsplash.com/photo-1488459716781-31db52582fe9?auto=format&fit=crop&w=1400&q=80', 'Mercato Ballaro Palermo', true, 'Mercato Ballaro Palermo'),
-    ('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1400&q=80', 'Mondello Palermo', true, 'Mondello Palermo'),
-    ('https://images.unsplash.com/photo-1508057198894-247b23fe5ade?auto=format&fit=crop&w=1400&q=80', 'Piazza Unita Trieste', true, 'Piazza Unita Trieste'),
-    ('https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1400&q=80', 'Canal Grande Trieste', true, 'Canal Grande Trieste'),
-    ('https://images.unsplash.com/photo-1467269204594-9661b134dd2b?auto=format&fit=crop&w=1400&q=80', 'Miramare Trieste', true, 'Miramare Trieste'),
-    ('https://a0.muscache.com/im/pictures/9be0808a-6b70-4d70-a70b-1e7036957045.jpg', 'Sassi di Matera', true, 'Sassi di Matera'),
-    ('https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1400&q=80', 'Belvedere Murgia Matera', true, 'Belvedere Murgia Matera'),
-    ('https://images.unsplash.com/photo-1508057198894-247b23fe5ade?auto=format&fit=crop&w=1400&q=80', 'Piazza Duomo Matera', true, 'Piazza Duomo Matera'),
-    ('https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1400&q=80', 'Marina Grande Sorrento', true, 'Marina Grande Sorrento'),
-    ('https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1400&q=80', 'Corso Italia Sorrento', true, 'Corso Italia Sorrento'),
-    ('https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1400&q=80', 'Villa Comunale Sorrento', true, 'Villa Comunale Sorrento'),
-    ('https://images.unsplash.com/photo-1501594907352-04cda38ebc29?auto=format&fit=crop&w=1400&q=80', 'Piazza Sant''Oronzo Lecce', true, 'Piazza Sant''Oronzo Lecce'),
-    ('https://images.unsplash.com/photo-1516483638261-f4dbaf036963?auto=format&fit=crop&w=1400&q=80', 'Centro Storico Lecce', true, 'Centro Storico Lecce'),
-    ('https://images.unsplash.com/photo-1467269204594-9661b134dd2b?auto=format&fit=crop&w=1400&q=80', 'Porta Napoli Lecce', true, 'Porta Napoli Lecce'),
-    ('https://images.unsplash.com/photo-1508057198894-247b23fe5ade?auto=format&fit=crop&w=1400&q=80', 'Piazza Duomo Parma', true, 'Piazza Duomo Parma'),
-    ('https://images.unsplash.com/photo-1473116763249-2faaef81ccda?auto=format&fit=crop&w=1400&q=80', 'Parco Ducale Parma', true, 'Parco Ducale Parma'),
-    ('https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1400&q=80', 'Oltretorrente Parma', true, 'Oltretorrente Parma'),
-    ('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1400&q=80', 'Costa Smeralda Sardinija', true, 'Costa Smeralda Sardinija'),
-    ('https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1400&q=80', 'Cagliari Marina Sardinija', true, 'Cagliari Marina Sardinija'),
+    -- Bari Vecchia: uske ulice starog Barija (Giulia Gasperini)
+    ('https://images.unsplash.com/photo-1536782025326-3b006b059aa7?auto=format&fit=crop&w=1400&q=80', 'Bari Vecchia', true, 'Bari Vecchia'),
+
+    -- Lungomare Bari: obalna šetnica Barija (reisetopia)
+    ('https://images.unsplash.com/photo-1611238763458-0de1027136cf?auto=format&fit=crop&w=1400&q=80', 'Lungomare Bari', true, 'Lungomare Bari'),
+
+    -- Basilica San Nicola: romanička bazilika u Bariju (Dan Rooney)
+    ('https://upload.wikimedia.org/wikipedia/commons/c/c3/Bari_BW_2016-10-19_13-35-11_stitch.jpg', 'Basilica San Nicola Bari', true, 'Basilica San Nicola Bari'),
+
+    -- Quattro Canti Palermo: barokni trg Palerma (Cristina Gottardi)
+    ('https://images.unsplash.com/photo-1541777490254-a50eb9045486?auto=format&fit=crop&w=1400&q=80', 'Quattro Canti Palermo', true, 'Quattro Canti Palermo'),
+
+    -- Mercato Ballaro: ulica Palerma sa restoranima (Eric)
+    ('https://images.unsplash.com/photo-1723316830226-4986a93ebb0b?auto=format&fit=crop&w=1400&q=80', 'Mercato Ballaro Palermo', true, 'Mercato Ballaro Palermo'),
+
+    -- Mondello Palermo: uska mediteranska ulica Palerma (Stepan Dudycha)
+    ('https://www.sicilia.info/wp-content/uploads/sites/91/mondello-hd.jpg', 'Mondello Palermo', true, 'Mondello Palermo'),
+
+    -- Piazza Unita Trieste: bela piazza uz Jadran (Daniele Bucciarelli)
+    ('https://images.unsplash.com/photo-1586172486224-6b48bd7b9682?auto=format&fit=crop&w=1400&q=80', 'Piazza Unita Trieste', true, 'Piazza Unita Trieste'),
+
+    -- Canal Grande Trieste: kanal sa palazima (Daniel Seßler)
+    ('https://images.unsplash.com/photo-1676706980757-e3b5d6c16321?auto=format&fit=crop&w=1400&q=80', 'Canal Grande Trieste', true, 'Canal Grande Trieste'),
+
+    -- Miramare Trieste: zamak uz more (Arno Senoner)
+    ('https://images.unsplash.com/photo-1623878991610-7416bc4e8c6f?auto=format&fit=crop&w=1400&q=80', 'Miramare Trieste', true, 'Miramare Trieste'),
+
+    -- Sassi di Matera: pećinska naselja Matere (Luca Micheli)
+    ('https://images.unsplash.com/photo-1528214096798-37891d32174c?auto=format&fit=crop&w=1400&q=80', 'Sassi di Matera', true, 'Sassi di Matera'),
+
+    -- Belvedere Murgia Matera: panorama Matere sa suprotne strane kanjona (Sebastian, Unsplash)
+    ('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/05/5a/f9/3e/belvedere-sassi-da-murgia.jpg?w=1200&h=900&s=1', 'Belvedere Murgia Matera', true, 'Belvedere Murgia Matera'),
+
+    -- Piazza Duomo Matera: katedrala Matere (Teodor Kuduschiev, Unsplash)
+    ('https://upload.wikimedia.org/wikipedia/commons/8/8c/Matera_-_View_from_Piazza_Duomo_-_3.jpg', 'Piazza Duomo Matera', true, 'Piazza Duomo Matera'),
+
+    -- Marina Grande Sorrento: stara ribarska luka Sorenta (Nick Fewings)
+    ('https://www.visitcampania.info/wp-content/uploads/2025/06/sorrento_spiaggia_marina_grande_04.jpg', 'Marina Grande Sorrento', true, 'Marina Grande Sorrento'),
+
+    -- Corso Italia Sorrento: grad sa zaljevom u pozadini (Keszthelyi Timi)
+    ('https://images.unsplash.com/photo-1658409731324-35e12090ad10?auto=format&fit=crop&w=1400&q=80', 'Corso Italia Sorrento', true, 'Corso Italia Sorrento'),
+
+    -- Villa Comunale Sorrento: pogled na grad i obalu (aes)
+    ('https://images.unsplash.com/photo-1666380982418-0effa6190210?auto=format&fit=crop&w=1400&q=80', 'Villa Comunale Sorrento', true, 'Villa Comunale Sorrento'),
+
+    -- Piazza Sant'Oronzo Lecce: centralni trg sa rimskim amfiteatrom (Luca)
+    ('https://images.unsplash.com/photo-1707234197821-9773c730cf08?auto=format&fit=crop&w=1400&q=80', 'Piazza Sant''Oronzo Lecce', true, 'Piazza Sant''Oronzo Lecce'),
+
+    -- Centro Storico Lecce: barokna kamena arhitektura (Freysteinn G. Jonsson)
+    ('https://images.unsplash.com/photo-1680938166156-07a91b54745e?auto=format&fit=crop&w=1400&q=80', 'Centro Storico Lecce', true, 'Centro Storico Lecce'),
+
+    -- Porta Napoli Lecce: panorama Lečea (Adrien Brun)
+    ('https://images.unsplash.com/photo-1682347641333-b9080bfe7af3?auto=format&fit=crop&w=1400&q=80', 'Porta Napoli Lecce', true, 'Porta Napoli Lecce'),
+
+    -- Piazza Duomo Parma: katedrala i baptisterija u Parmi (Bernard Hermant)
+    ('https://images.unsplash.com/photo-1603034318372-547281a7eacf?auto=format&fit=crop&w=1400&q=80', 'Piazza Duomo Parma', true, 'Piazza Duomo Parma'),
+
+    -- Parco Ducale Parma: park sa Palazzo Ducale (Lorenzo Bignami, Unsplash)
+    ('https://a.travel-assets.com/findyours-php/viewfinder/images/res40/16000/16582-share-image.jpg', 'Parco Ducale Parma', true, 'Parco Ducale Parma'),
+
+    -- Oltretorrente Parma: šareni borgo Parme (Antonio Sessa)
+    ('https://images.unsplash.com/photo-1601480772033-4c0c23c438a3?auto=format&fit=crop&w=1400&q=80', 'Oltretorrente Parma', true, 'Oltretorrente Parma'),
+
+    -- Costa Smeralda Sardinija: tirkizno more (Massimo Virgilio, Unsplash)
+    ('https://luxurylondon.co.uk/wp-content/uploads/2022/08/costa-smeralda-xl-hd.jpg', 'Costa Smeralda Sardinija', true, 'Costa Smeralda Sardinija'),
+
+    -- Cagliari Marina Sardinija: luka Kaljarija (Fadi Al Shami, Unsplash)
+    ('http://oidu.it/wp-content/uploads/2024/10/laura-lugaresi-PKXG1AdMzaI-unsplash-1024x683.jpg', 'Cagliari Marina Sardinija', true, 'Cagliari Marina Sardinija'),
+
+    -- Golfo Orosei Sardinija: dramatičan planinski zaliv (Ivan Ragozin, Unsplash)
     ('https://images.unsplash.com/photo-1493558103817-58b2924bce98?auto=format&fit=crop&w=1400&q=80', 'Golfo Orosei Sardinija', true, 'Golfo Orosei Sardinija')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "LocalityId", "CreatedAt")
@@ -34608,13 +34670,13 @@ LEFT JOIN "Objects" o ON o."Name" = s."ObjectName";
 WITH source("Url", "AltText", "IsMain", "EventName") AS (
     VALUES
     ('https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&w=1400&q=80', 'Bari veče fokače', true, 'Bari veče fokače'),
-    ('https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1400&q=80', 'Palermo noć pijaca', true, 'Palermo noć pijaca'),
+    ('https://www.justsicily.it/JS/wp-content/uploads/2023/09/js-palermo-notte-10.jpg', 'Palermo noć pijaca', true, 'Palermo noć pijaca'),
     ('https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1400&q=80', 'Trieste morske priče', true, 'Trieste morske priče'),
-    ('https://images.unsplash.com/photo-1545987796-200677ee1011?auto=format&fit=crop&w=1400&q=80', 'Matera svetla u kamenu', true, 'Matera svetla u kamenu'),
-    ('https://images.unsplash.com/photo-1571266028243-d220c9c3c7d8?auto=format&fit=crop&w=1400&q=80', 'Sorrento veče limuna', true, 'Sorrento veče limuna'),
+    ('https://res.cloudinary.com/enchanting/q_70,f_auto,w_999,h_667,c_fit/exodus-web/2021/12/sassi_at_night.jpg', 'Matera svetla u kamenu', true, 'Matera svetla u kamenu'),
+    ('https://nextstop-italy.com/wp-content/uploads/2020/03/Sorrento_2.jpg', 'Sorrento veče limuna', true, 'Sorrento veče limuna'),
     ('https://images.unsplash.com/photo-1527224857830-43a7acc85260?auto=format&fit=crop&w=1400&q=80', 'Stand-up pod baroknim svetlima Lečea', true, 'Stand-up pod baroknim svetlima Lečea'),
-    ('https://images.unsplash.com/photo-1528698827591-e19ccd7bc23d?auto=format&fit=crop&w=1400&q=80', 'Parma gurmanski susret', true, 'Parma gurmanski susret'),
-    ('https://images.unsplash.com/photo-1519861531473-9200262188bf?auto=format&fit=crop&w=1400&q=80', 'Regata zaliva Sardinije', true, 'Regata zaliva Sardinije')
+    ('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2a/a1/44/f8/una-serta.jpg?w=900&h=-1&s=1', 'Parma gurmanski susret', true, 'Parma gurmanski susret'),
+    ('https://www.paralympic.org/sites/default/files/2025-12/Starten%202...jpg', 'Regata zaliva Sardinije', true, 'Regata zaliva Sardinije')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "EventId", "CreatedAt")
 SELECT
@@ -35116,7 +35178,7 @@ VALUES
 
 -- TRST
 ('https://cdn.bubblyliving.com/wp-content/uploads/2025/08/20250501_162557_2-1170x658.webp', 'Biciklistički krug uz Kanal Grande', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Biciklistički krug uz Kanal Grande'), NOW()),
-('https://images.unsplash.com/photo-1555992336-03a23c7b20ee?w=1920&h=1080&fit=crop&sig=piazza', 'Razgledanje Piazza Unita', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Razgledanje Piazza Unita'), NOW()),
+('https://www.turismofvg.it/proxyvfs.axd/image_hd/r85041/18734-jpeg?v=100939&ext=.jpeg', 'Razgledanje Piazza Unita', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Razgledanje Piazza Unita'), NOW()),
 ('https://travelsonpoint.com/wp-content/uploads/2024/02/dreamstime_l_212445048-1024x683.jpg', 'Poseta restoranu uz kanal u Trstu', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Poseta restoranu uz kanal u Trstu'), NOW()),
 ('https://jistra.com/wp-content/uploads/2018/07/9-1-scaled.jpg', 'Kajak ispod Miramarea', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Kajak ispod Miramarea'), NOW()),
 
