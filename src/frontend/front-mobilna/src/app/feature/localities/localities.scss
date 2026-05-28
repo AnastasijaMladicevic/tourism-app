@@ -909,3 +909,41 @@
     box-shadow: none;
   }
 }
+
+.filters-row {
+  align-items: center !important;
+}
+
+.filters-scroll {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  overflow-y: hidden;
+  flex: 1;
+  min-width: 0;
+  padding: 2px 0;
+
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.filters-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.filter-btn {
+  flex: 0 0 auto;
+}
+
+.filter-btn--active {
+  background: var(--primary) !important;
+  border-color: var(--primary) !important;
+  color: #fff !important;
+  box-shadow: 0 8px 18px rgba(22, 138, 173, 0.22);
+}
+
+.filters-right {
+  align-items: center;
+  flex-shrink: 0;
+}

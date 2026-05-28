@@ -91,7 +91,7 @@
         [class.filter-btn--active]="activeFilter === 'All'"
         (click)="setFilter('All')"
       >
-        All
+      {{ 'common.all' | translate }}
       </button>
       @for (type of activityTypes; track type.id) {
         <button

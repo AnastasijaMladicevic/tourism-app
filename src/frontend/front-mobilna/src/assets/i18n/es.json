@@ -50,7 +50,16 @@
     "open": "Abrir",
     "delete": "Eliminar",
     "deleting": "Eliminando...",
-    "noResults": "Sin resultados"
+    "noResults": "Sin resultados",
+    "lowestPrice": "Precio más bajo"
+  },
+  "results": {
+    "title": "Resultados",
+    "searchPlaceholder": "Buscar...",
+    "nearest": "Más cercano",
+    "objectsFound": "{{count}} objetos encontrados",
+    "noItemsFound": "No se encontraron elementos.",
+    "pageOf": "Página {{current}} de {{total}}"
   },
   "moderatorAccess": {
     "title": "Acceso de moderador",

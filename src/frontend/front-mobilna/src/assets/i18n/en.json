@@ -50,7 +50,16 @@
     "open": "Open",
     "delete": "Delete",
     "deleting": "Deleting...",
-    "noResults": "No results"
+    "noResults": "No results",
+    "lowestPrice": "Lowest Price"
+  },
+  "results": {
+    "title": "Results",
+    "searchPlaceholder": "Search...",
+    "nearest": "Nearest",
+    "objectsFound": "{{count}} objects found",
+    "noItemsFound": "No items found.",
+    "pageOf": "Page {{current}} of {{total}}"
   },
   "moderatorAccess": {
     "title": "Moderator access",

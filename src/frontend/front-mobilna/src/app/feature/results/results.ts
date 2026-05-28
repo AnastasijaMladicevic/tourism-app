@@ -2,6 +2,7 @@ import {
   ChangeDetectorRef,
   Component,
   ElementRef,
+  HostListener,
   OnInit,
   ViewChild,
 } from '@angular/core';
@@ -23,6 +24,7 @@ import { PendingActionService } from '../../services/pending-action';
 import { FavoriteStateService, FavoriteTarget } from '../../services/favorite-state';
 import { EventPlannerService } from '../../services/event-planner';
 import { PlannerLocalPreferencesService } from '../../services/planner-local-preferences';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 interface UnifiedSearchItem {
   id: number;
@@ -52,7 +54,7 @@ export interface View extends UnifiedSearchItem {
 }
 @Component({
   selector: 'app-results',
-  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule],
+  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule, TranslatePipe],
   templateUrl: './results.html',
   styleUrl: './results.scss',
 })
@@ -79,6 +81,7 @@ export class ResultsComponent implements OnInit {
   popular: UnifiedSearchItem[] = [];
   searchResults: UnifiedSearchItem[] = [];
   isPlannerBusy = false;
+  showPageSizeMenu = false;
   private readonly favoritePendingKeys = new Set<string>();
   private readonly plannerMap = new Map<number, number>();
 
@@ -168,6 +171,29 @@ export class ResultsComponent implements OnInit {
       this.cdr.detectChanges();
     }
   }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement;
+
+    const clickedInsideSort = target.closest('.sort-anchor');
+    const clickedInsidePageSize = target.closest('.page-size-anchor');
+
+    if (!clickedInsideSort) {
+      this.showSortMenu = false;
+    }
+
+    if (!clickedInsidePageSize) {
+      this.showPageSizeMenu = false;
+    }
+  }
+
+  togglePageSizeMenu(event: Event): void {
+    event.stopPropagation();
+    this.showPageSizeMenu = !this.showPageSizeMenu;
+    this.showSortMenu = false;
+  }
+
   private normalizeFromHome(x: any): UnifiedSearchItem {
     return {
       id: x.itemId ?? x.id ?? 0,
@@ -382,6 +408,7 @@ export class ResultsComponent implements OnInit {
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   }
   onPageSizeChange(size: number): void {
+    this.showPageSizeMenu = false;
     this.pageSize = size;
     this.currentPage = 1;
     void this.refreshVisibleItems();

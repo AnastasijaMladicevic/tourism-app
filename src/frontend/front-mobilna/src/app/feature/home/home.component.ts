@@ -24,6 +24,7 @@ import { TranslationService } from '../../services/translation.service';
 import { ActiveRegionService } from '../../services/active-region';
 import { SmartSearchResultDto } from '../../services/smart-search';
 import { LocalityDto, LocalityService } from '../../services/locality';
+import { ElementRef, HostListener } from '@angular/core';
 
 interface PlaceCard {
   title: string;
@@ -172,8 +173,20 @@ export class HomeComponent implements OnInit, OnDestroy {
     private translationService: TranslationService,
     private activeRegionService: ActiveRegionService,
     private localityService: LocalityService,
+    private elementRef: ElementRef,
   ) { }
 
+  @HostListener('document:click', ['$event'])
+   onDocumentClick(event: MouseEvent): void {
+      const clickedInside = this.elementRef.nativeElement
+      .querySelector('.search-area')
+      ?.contains(event.target);
+
+    if (!clickedInside) {
+      this.showSuggestions = false;
+      this.flushUi();
+    }
+  }
   
   private applyPlannerState(list: EventCard[]): void {
     for (const item of list) {
@@ -384,7 +397,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const results = this.runLocalSearch(query, 8);
+    const results = this.runLocalSearch(query, 20);
     this.searchResults = results;
     this.showSuggestions = results.length > 0;
     this.flushUi();

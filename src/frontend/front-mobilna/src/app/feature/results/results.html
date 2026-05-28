@@ -1,10 +1,10 @@
 <div class="screen">
   <div #top></div>
   <div class="header">
-    <button class="icon-btn" (click)="goBack()" aria-label="Go back">
+    <button class="icon-btn" (click)="goBack()" [attr.aria-label]="'common.back' | translate">
       <mat-icon>arrow_back_ios</mat-icon>
     </button>
-    <h1 class="header__title">Results</h1>
+    <h1 class="header__title">{{ 'results.title' | translate }}</h1>
   </div>
 
   <div class="filters-row">
@@ -13,19 +13,30 @@
         <mat-icon>search</mat-icon>
         <input
           type="text"
-          placeholder="Search localities..."
+          [placeholder]="'results.searchPlaceholder' | translate"
           [(ngModel)]="searchQuery"
           (ngModelChange)="onSearchChange()"
         />
       </div>
-      <div class="list-controls">
-      <select [(ngModel)]="pageSize" (ngModelChange)="onPageSizeChange($event)">
-          @for (size of pageSizeOptions; track $index) {
-            <option [value]="size">
-              {{ size }}
-            </option>
-          }
-        </select>
+      <div class="page-size-anchor">
+        <div class="sort-trigger" (click)="togglePageSizeMenu($event)">
+          <span>{{ pageSize }}</span>
+          <mat-icon>expand_more</mat-icon>
+        </div>
+      
+        @if (showPageSizeMenu) {
+          <div class="page-size-menu">
+            @for (size of pageSizeOptions; track size) {
+              <button
+                class="page-size-menu__item"
+                [class.page-size-menu__item--active]="pageSize === size"
+                (click)="onPageSizeChange(size)"
+              >
+                {{ size }}
+              </button>
+            }
+          </div>
+        }
       </div>
       
       <div
@@ -42,7 +53,7 @@
               [class.sort-menu__item--active]="sortOption === 'distance'"
               (click)="setSort('distance')"
             >
-              <mat-icon>near_me</mat-icon> Nearest
+              <mat-icon>near_me</mat-icon> {{ 'results.nearest' | translate }}
             </button>
             <button
               class="sort-menu__item"
@@ -69,7 +80,7 @@
         [class.filter-btn--active]="activeFilter === 'All'"
         (click)="setFilter('All')"
       >
-        All
+      {{ 'common.all' | translate }}
       </button>
       @for (type of itemTypes; track type.id) {
         <button
@@ -84,14 +95,14 @@
   </div>
 
   <div class="results-bar">
-    <span class="results-bar__count">{{ totalCount }} objects found</span>
+    <span class="results-bar__count">{{ 'results.objectsFound' | translate:{ count: totalCount } }}</span>
   </div>
 
   @if (isLoading) {
     <div class="loading-screen">
       <div class="loading-content">
         <div class="spinner"></div>
-        <p>Loading...</p>
+        <p>{{ 'common.loading' | translate }}</p>
       </div>
     </div>
   }
@@ -100,7 +111,7 @@
     <div class="error-state">
       <mat-icon>error_outline</mat-icon>
       <p>{{ errorMessage }}</p>
-      <button (click)="loadData()">Retry</button>
+      <button (click)="loadData()">{{ 'common.retry' | translate }}</button>
     </div>
   }
 
@@ -188,7 +199,7 @@
           <p class="card__desc">{{ item.description }}</p>
 
           <div class="card__footer">
-            <button class="card__details" (click)="viewDetails(item)">VIEW DETAILS</button>
+            <button class="card__details" (click)="viewDetails(item)">{{ 'common.viewDetails' | translate }}</button>
           </div>
         </div>
       </div>
@@ -197,14 +208,14 @@
     @if (totalCount === 0 && !isLoading) {
       <div class="empty">
         <mat-icon>search_off</mat-icon>
-        <p>No items found.</p>
+        <p>{{ 'results.noItemsFound' | translate }}</p>
       </div>
     }
   </div>
 
   <div class="pagination">
-    <button mat-button (click)="prevPage()" [disabled]="currentPage === 1">Prev</button>
-    <span>Page {{ currentPage }} of {{ totalPages }}</span>
-    <button mat-button (click)="nextPage()" [disabled]="!hasNextPage">Next</button>
+    <button mat-button (click)="prevPage()" [disabled]="currentPage === 1">{{ 'common.prev' | translate }}</button>
+    <span>{{ 'results.pageOf' | translate:{ current: currentPage, total: totalPages } }}</span>
+    <button mat-button (click)="nextPage()" [disabled]="!hasNextPage">{{ 'common.next' | translate }}</button>
   </div>
 </div>

@@ -818,3 +818,35 @@
     font-weight: 600;
   }
 }
+
+:root[data-theme='dark'] {
+
+  .sort-menu,
+  .page-size-menu {
+    background: #102331 !important;
+    border: 1px solid rgba(77, 194, 255, 0.14) !important;
+    box-shadow: 0 14px 32px rgba(0, 0, 0, 0.38) !important;
+  }
+
+  .sort-menu__item,
+  .page-size-menu__item {
+    background: transparent !important;
+    color: #e8f3ff !important;
+  }
+
+  .sort-menu__item:hover,
+  .page-size-menu__item:hover {
+    background: rgba(77, 194, 255, 0.1) !important;
+    color: #4dc2ff !important;
+  }
+
+  .sort-menu__item--active,
+  .page-size-menu__item--active {
+    background: rgba(77, 194, 255, 0.12) !important;
+    color: #4dc2ff !important;
+  }
+
+  .sort-menu__item mat-icon {
+    color: #4dc2ff !important;
+  }
+}

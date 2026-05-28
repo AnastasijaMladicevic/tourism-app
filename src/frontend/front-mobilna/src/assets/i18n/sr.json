@@ -50,7 +50,16 @@
     "open": "Otvori",
     "delete": "Obriši",
     "deleting": "Brišem...",
-    "noResults": "Nema rezultata"
+    "noResults": "Nema rezultata",
+    "lowestPrice": "Najniža cena"
+  },
+  "results": {
+    "title": "Rezultati",
+    "searchPlaceholder": "Pretraži...",
+    "nearest": "Najbliže",
+    "objectsFound": "{{count}} pronađenih objekata",
+    "noItemsFound": "Nema pronađenih stavki.",
+    "pageOf": "Strana {{current}} od {{total}}"
   },
   "moderatorAccess": {
     "title": "Moderator pristup",

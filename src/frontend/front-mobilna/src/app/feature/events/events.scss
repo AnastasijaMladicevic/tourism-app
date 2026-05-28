@@ -907,3 +907,23 @@
     color: #4dc2ff;
   }
 }
+
+:host-context(:root[data-theme='dark']) {
+  .filter-btn {
+    background: var(--surface) !important;
+    border-color: var(--border) !important;
+    color: var(--text-dark) !important;
+  }
+
+  .filter-btn--active {
+    background: var(--primary) !important;
+    border-color: var(--primary) !important;
+    color: #fff !important;
+    box-shadow: 0 8px 18px rgba(22, 138, 173, 0.24);
+  }
+
+  .filter-btn--active:hover {
+    background: var(--primary) !important;
+    color: #fff !important;
+  }
+}

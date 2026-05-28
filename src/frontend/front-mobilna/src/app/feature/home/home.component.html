@@ -6,59 +6,100 @@
     </div>
 
     <div class="search-row">
-      <div class="search-bar">
-        <mat-icon>search</mat-icon>
-        <input
-          type="text"
-          [placeholder]="'home.searchPlaceholder' | translate"
-          [(ngModel)]="searchQuery"
-          (input)="onSearchInput()"
-          (keydown.enter)="submitSearch()"
-          autocomplete="off"
-        />
-        @if (searchQuery) {
-          <button class="clear-btn" (click)="clearSearch()">
-            <mat-icon>close</mat-icon>
-          </button>
-        }
-      </div>
-      <div class="region-wrapper">
-        <button class="filter-btn region-btn" type="button" (click)="openRegionPicker()">
 
+      <div class="search-area">
+    
+        <div class="search-bar">
+          <mat-icon>search</mat-icon>
+    
+          <input
+            type="text"
+            [placeholder]="'home.searchPlaceholder' | translate"
+            [(ngModel)]="searchQuery"
+            (input)="onSearchInput()"
+            (keydown.enter)="submitSearch()"
+            autocomplete="off"
+          />
+    
+          @if (searchQuery) {
+            <button class="clear-btn" (click)="clearSearch()">
+              <mat-icon>close</mat-icon>
+            </button>
+          }
+        </div>
+    
+        @if (showSuggestions && searchResults.length > 0) {
+          <div class="suggestions">
+    
+            @for (result of searchResults; track result.category + '-' + result.id) {
+    
+              <div
+                class="suggestion-item"
+                (mousedown)="selectSuggestion(result)"
+              >
+    
+                <div class="suggestion-item__image">
+    
+                  @if (result.imageUrl) {
+                    <img
+                      [src]="result.imageUrl"
+                      [alt]="result.name"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  } @else {
+                    <mat-icon>{{ result.icon }}</mat-icon>
+                  }
+    
+                </div>
+    
+                <div class="suggestion-item__body">
+    
+                  <span class="suggestion-item__name">
+                    {{ result.name }}
+                  </span>
+    
+                  <span class="suggestion-item__meta">
+                    {{ result.typeName }} · {{ result.location }}
+                  </span>
+    
+                </div>
+    
+              </div>
+    
+            }
+    
+          </div>
+        }
+    
+      </div> <!-- OVO JE BITNO -->
+    
+      <div class="region-wrapper">
+    
+        <button
+          class="filter-btn region-btn"
+          type="button"
+          (click)="openRegionPicker()"
+        >
+    
           <img
             class="region-flag"
             [src]="getRegionFlag()"
             [alt]="activeRegionNameKey | translate"
           />
-              
+    
           <span>
             {{ activeRegionNameKey | translate }}
           </span>
-        
-          <mat-icon class="region-arrow">chevron_right</mat-icon>
+    
+          <mat-icon class="region-arrow">
+            chevron_right
+          </mat-icon>
+    
         </button>
+    
       </div>
-      @if (showSuggestions && searchResults.length > 0) {
-        <div class="suggestions">
-          @for (result of searchResults; track result.category + '-' + result.id) {
-            <div class="suggestion-item" (mousedown)="selectSuggestion(result)">
-              <div class="suggestion-item__image">
-                @if (result.imageUrl) {
-                  <img [src]="result.imageUrl" [alt]="result.name" loading="lazy" decoding="async" />
-                } @else {
-                  <mat-icon>{{ result.icon }}</mat-icon>
-                }
-              </div>
-              <div class="suggestion-item__body">
-                <span class="suggestion-item__name">{{ result.name }}</span>
-                <span class="suggestion-item__meta"
-                  >{{ result.typeName }} · {{ result.location }}</span
-                >
-              </div>
-            </div>
-          }
-        </div>
-      }
+    
     </div>
 
     <div class="section">

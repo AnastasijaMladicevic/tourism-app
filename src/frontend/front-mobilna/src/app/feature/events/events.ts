@@ -15,6 +15,7 @@ import { EventPlannerService } from '../../services/event-planner';
 import { PendingActionService } from '../../services/pending-action';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { RouterHistoryService } from '../../services/router-history';
+import { TranslationService } from '../../services/translation.service';
 
 type EventCategory = 'All' | string;
 
@@ -59,6 +60,7 @@ export class EventsComponent implements OnInit {
   private readonly eventPlannerService = inject(EventPlannerService);
   private readonly pendingActionService = inject(PendingActionService);
   private readonly routerHistory = inject(RouterHistoryService);
+  private readonly translationService = inject(TranslationService);
   activeFilter = 'All';
   activeCategory: EventCategory = 'All';
   isLoading = true;
@@ -238,8 +240,22 @@ export class EventsComponent implements OnInit {
   }
 
   sortLabel(): string {
-    const map = { date: 'Soonest', az: 'A -> Z', za: 'Z -> A', price: 'Lowest Price', distance: 'Closest' };
-    return map[this.sortOption];
+    switch (this.sortOption) {
+      case 'date':
+        return this.translationService.translate('common.soonest');
+  
+      case 'distance':
+        return this.translationService.translate('common.nearest');
+  
+      case 'az':
+        return 'A -> Z';
+  
+      case 'price':
+        return this.translationService.translate('common.lowestPrice');
+  
+      default:
+        return 'Z -> A';
+    }
   }
 
   toggleSearch(): void {
