@@ -50,7 +50,8 @@ interface ManagerReportNameHint {
     './manager-reports.component.css',
     '../shared/manager-list-page-header.css',
     '../shared/manager-list-page-responsive.css',
-    '../shared/manager-page-stats-scroll.css'
+    '../shared/manager-page-stats-scroll.css',
+    '../shared/manager-stat-cards.css'
   ],
 })
 export class ManagerReportsComponent implements OnInit {
