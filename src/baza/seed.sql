@@ -12281,17 +12281,17 @@ WITH source("Url", "AltText", "IsMain", "DestinationName") AS (
     VALUES
     ('https://commons.wikimedia.org/wiki/Special:FilePath/Barcelona%20Skyline.jpg', 'Barcelona', true, 'Barcelona'),
     ('https://commons.wikimedia.org/wiki/Special:FilePath/La%20Barceloneta.jpg', 'Barcelona', false, 'Barcelona'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Gran%20Via%2C%20Madrid.jpg', 'Madrid', true, 'Madrid'),
+    ('https://www.putujuciranac.com/wp-content/uploads/2025/01/IMG_1235.jpg', 'Madrid', true, 'Madrid'),
     ('https://commons.wikimedia.org/wiki/Special:FilePath/Gran%20Via%2C%20Madrid%20-%20007.jpg', 'Madrid', false, 'Madrid'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/City%20of%20Arts%20and%20Sciences%2C%20Valencia%20%2852395812264%29.jpg', 'Valencia', true, 'Valencia'),
+    ('https://img.nh-hotels.net/8yYbq/aGoV8/original/Valencia_CAC.jpg?output-quality=70&resize=*:*&background-color=white', 'Valencia', true, 'Valencia'),
     ('https://commons.wikimedia.org/wiki/Special:FilePath/Valencia%20skyline%20sunset%20%284262234180%29.jpg', 'Valencia', false, 'Valencia'),
     ('https://res.klook.com/image/upload/fl_lossy.progressive,q_60/Mobile/City/tgt87tiezpat1en4zwn3.jpg', 'Seville', true, 'Seville'),
     ('https://www.travelandleisure.com/thmb/3KMVOlslbj0M3DL_QOBKn5O2TWU=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/TAL-granada-spain-LSTWALKEURO0924-bff8601ebd834c5da9e26bc5ac1b73d7.jpg', 'Granada', true, 'Granada'),
-    ('https://coeohouse.com/wp-content/uploads/2023/03/17-facts-about-Malaga.jpeg', 'Malaga', true, 'Malaga'),
+    ('https://malagatickets.tours/wp-content/uploads/2025/09/visit-malaga.jpg', 'Malaga', true, 'Malaga'),
     ('https://content.r9cdn.net/rimg/dimg/d7/6d/bf09ef37-city-22202-164d2243c9c.jpg?width=1366&height=768&xhint=1091&yhint=727&crop=true', 'Bilbao', true, 'Bilbao'),
     ('https://www.visitspain.info/en/wp-content/uploads/sites/162/zaragoza-aerial-hd.jpg', 'Zaragoza', true, 'Zaragoza'),
-    ('https://media.cntraveller.com/photos/657086671e46a2701f8db749/master/w_1600%2Cc_limit/cordoba_Mosque_December23_GettyImages-950377132.jpg', 'Cordoba', true, 'Cordoba'),
-    ('https://thesingular.space/uploads/imgen/8293-toledo.webp', 'Toledo', true, 'Toledo'),
+    ('https://content.r9cdn.net/rimg/dimg/b5/a3/14497dee-city-4940-1732d466ee5.jpg?width=1366&height=768&xhint=3598&yhint=1723&crop=true', 'Cordoba', true, 'Cordoba'),
+    ('https://images.trvl-media.com/place/5150/f2fce1a9-7635-4c64-a293-9aad5499c84a.jpg', 'Toledo', true, 'Toledo'),
     ('https://www.cataloniahotels.com/es/guia-de-viajes/wp-content/uploads/2025/09/AdobeStock_329547899-1536x1024.jpeg', 'Salamanca', true, 'Salamanca'),
     ('https://www.msccruises.fi/-/media/global-contents/destinations/ports/spain/ibiza/cruise-to-ibiza-spain.jpg?bc=transparent&as=1&mh=1395&mw=2460&hash=D57E6120DFBA325560A769B44338B6C2', 'Ibiza', true, 'Ibiza'),
     ('https://www.serneholtestate.com/wp-content/uploads/2025/08/Palma-de-Mallorca-1.webp', 'Mallorca', true, 'Mallorca')
@@ -12304,10 +12304,10 @@ JOIN "Destinations" d ON d."Name" = s."DestinationName";
 -- 14.9 IMAGES - LOCALITIES
 WITH source("Url", "AltText", "IsMain", "LocalityName") AS (
     VALUES
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Gothic%20Quarter%2C%20Barcelona.JPG', 'Gothic Quarter Barcelona', true, 'Gothic Quarter Barcelona'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/La%20Barceloneta.jpg', 'Barceloneta Beach', true, 'Barceloneta Beach'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Gran%20Via%2C%20Madrid.jpg', 'Gran Via Madrid', true, 'Gran Via Madrid'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/City%20of%20Arts%20and%20Sciences%2C%20Valencia%20%2852395812264%29.jpg', 'Ciudad de las Artes Valencia', true, 'Ciudad de las Artes Valencia')
+    ('https://touringbee.com/wp-content/uploads/barcelonat1_promo_3-scaled.jpg', 'Gothic Quarter Barcelona', true, 'Gothic Quarter Barcelona'),
+    ('https://ecotuktuk.com/wp-content/uploads/sites/5706/2025/08/Gemini_Generated_Image_gvx1kbgvx1kbgvx1.webp?w=1200&zoom=2', 'Barceloneta Beach', true, 'Barceloneta Beach'),
+    ('https://upload.wikimedia.org/wikipedia/commons/9/92/Gran_V%C3%ADa_%28Madrid%29_1.jpg', 'Gran Via Madrid', true, 'Gran Via Madrid'),
+    ('https://cd1.taquilla.com/data/images/t/83/ciudad-de-las-artes-y-las-ciencias.webp', 'Ciudad de las Artes Valencia', true, 'Ciudad de las Artes Valencia')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "LocalityId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", l."Id", NOW()
@@ -12336,10 +12336,10 @@ JOIN "Objects" o ON o."Name" = s."ObjectName";
 -- 14.11 IMAGES - EVENTS
 WITH source("Url", "AltText", "IsMain", "EventName") AS (
     VALUES
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Gothic%20Quarter%2C%20Barcelona.JPG', 'Barcelona Summer Lights', true, 'Barcelona Summer Lights'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/La%20Barceloneta.jpg', 'Barceloneta Sunset Session', true, 'Barceloneta Sunset Session'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Gran%20Via%2C%20Madrid.jpg', 'Madrid Culture Week', true, 'Madrid Culture Week'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/City%20of%20Arts%20and%20Sciences%2C%20Valencia%20%2852395812264%29.jpg', 'Valencia Paella Fest', true, 'Valencia Paella Fest')
+    ('https://pro.static.holabarcelonablog.tmb.cat/s3fs-public/2023-07/kevin-horvat-Nd8h38tRIlc-unsplash%20%281%29.jpg', 'Barcelona Summer Lights', true, 'Barcelona Summer Lights'),
+    ('https://images.stockcake.com/public/4/9/2/4922823d-f031-4c33-b084-8e391f73dc0c_large/beach-dj-sunset-stockcake.jpg', 'Barceloneta Sunset Session', true, 'Barceloneta Sunset Session'),
+    ('https://www.nextbestplan.ai/blog/2026_01_madrid_holy_week/pics/1.jpg', 'Madrid Culture Week', true, 'Madrid Culture Week'),
+    ('https://www.visitvalencia.com/sites/default/files/media/media-images/images/world_paella_day.jpg', 'Valencia Paella Fest', true, 'Valencia Paella Fest')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "EventId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", e."Id", NOW()
@@ -33897,14 +33897,14 @@ WHERE l."DestinationId" = d."Id"
 
 WITH source("Url", "AltText", "IsMain", "DestinationName") AS (
     VALUES
-    ('https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1400&q=80', 'Alicante', true, 'Alicante'),
-    ('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1400&q=80', 'San Sebastian', true, 'San Sebastian'),
-    ('https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1400&q=80', 'Girona', true, 'Girona'),
-    ('https://images.unsplash.com/photo-1473116763249-2faaef81ccda?auto=format&fit=crop&w=1400&q=80', 'Cadiz', true, 'Cadiz'),
-    ('https://images.unsplash.com/photo-1508057198894-247b23fe5ade?auto=format&fit=crop&w=1400&q=80', 'Murcia', true, 'Murcia'),
-    ('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1400&q=80', 'Santander', true, 'Santander'),
-    ('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=1400&q=80', 'Tenerife', true, 'Tenerife'),
-    ('https://images.unsplash.com/photo-1501594907352-04cda38ebc29?auto=format&fit=crop&w=1400&q=80', 'Santiago de Compostela', true, 'Santiago de Compostela')
+    ('https://www.barcelo.com/guia-turismo/wp-content/uploads/que-visitar-en-alicante.jpg', 'Alicante', true, 'Alicante'),
+    ('https://media.cntraveller.com/photos/64d0bac38fda363db57f28db/16:9/w_2560%2Cc_limit/san%2520sebastian-GettyImages-1151937563.jpeg', 'San Sebastian', true, 'San Sebastian'),
+    ('https://upload.wikimedia.org/wikipedia/commons/c/cd/Girona_des_de_l_aire_edited.jpg', 'Girona', true, 'Girona'),
+    ('https://thesibarist.com/wp-content/uploads/2023/06/FOTOS-CADIZ-CIUDAD-6-scaled.jpeg', 'Cadiz', true, 'Cadiz'),
+    ('https://images.trvl-media.com/place/2320/51f40880-4546-4006-aae8-f9c8aca9b3f1.jpg', 'Murcia', true, 'Murcia'),
+    ('https://images.trvl-media.com/place/553248621532487516/b50c7586-0b09-4372-a487-385e9d757c64.jpg', 'Santander', true, 'Santander'),
+    ('https://www.holidayhypermarket.co.uk/wp-content/uploads/2016/03/HH-Header-18-Amazing-Facts-Tenerife-shutterstock_2530038071-1920x1080-1.jpg', 'Tenerife', true, 'Tenerife'),
+    ('https://upload.wikimedia.org/wikipedia/commons/a/a1/Santiago_Cathedral_2021_-_west_panorama.jpg', 'Santiago de Compostela', true, 'Santiago de Compostela')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "DestinationId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", d."Id", NOW()
@@ -33913,30 +33913,30 @@ JOIN "Destinations" d ON d."Name" = s."DestinationName";
 
 WITH source("Url", "AltText", "IsMain", "LocalityName") AS (
     VALUES
-    ('https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1400&q=80', 'Explanada Alicante', true, 'Explanada Alicante'),
-    ('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1400&q=80', 'Playa del Postiguet', true, 'Playa del Postiguet'),
-    ('https://images.unsplash.com/photo-1521295121783-8a321d551ad2?auto=format&fit=crop&w=1400&q=80', 'Castillo Santa Barbara Alicante', true, 'Castillo Santa Barbara Alicante'),
-    ('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1400&q=80', 'La Concha San Sebastian', true, 'La Concha San Sebastian'),
-    ('https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1400&q=80', 'Parte Vieja San Sebastian', true, 'Parte Vieja San Sebastian'),
-    ('https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1400&q=80', 'Monte Igueldo', true, 'Monte Igueldo'),
-    ('https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1400&q=80', 'Barri Vell Girona', true, 'Barri Vell Girona'),
-    ('https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1400&q=80', 'Onyar Riverside Girona', true, 'Onyar Riverside Girona'),
-    ('https://images.unsplash.com/photo-1521295121783-8a321d551ad2?auto=format&fit=crop&w=1400&q=80', 'Girona Cathedral Quarter', true, 'Girona Cathedral Quarter'),
-    ('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1400&q=80', 'La Caleta Cadiz', true, 'La Caleta Cadiz'),
-    ('https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1400&q=80', 'Old Town Cadiz', true, 'Old Town Cadiz'),
-    ('https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1400&q=80', 'Paseo Campo del Sur', true, 'Paseo Campo del Sur'),
-    ('https://images.unsplash.com/photo-1508057198894-247b23fe5ade?auto=format&fit=crop&w=1400&q=80', 'Plaza Belluga Murcia', true, 'Plaza Belluga Murcia'),
-    ('https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1400&q=80', 'Murcia Old Town', true, 'Murcia Old Town'),
-    ('https://images.unsplash.com/photo-1494526585095-c41746248156?auto=format&fit=crop&w=1400&q=80', 'Rio Segura Murcia', true, 'Rio Segura Murcia'),
-    ('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1400&q=80', 'El Sardinero Santander', true, 'El Sardinero Santander'),
-    ('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1400&q=80', 'Centro Botin Santander', true, 'Centro Botin Santander'),
-    ('https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1400&q=80', 'Peninsula Magdalena', true, 'Peninsula Magdalena'),
-    ('https://images.unsplash.com/photo-1500375592092-40eb2168fd21?auto=format&fit=crop&w=1400&q=80', 'Costa Adeje Tenerife', true, 'Costa Adeje Tenerife'),
-    ('https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?auto=format&fit=crop&w=1400&q=80', 'Teide Viewpoint Tenerife', true, 'Teide Viewpoint Tenerife'),
-    ('https://images.unsplash.com/photo-1508057198894-247b23fe5ade?auto=format&fit=crop&w=1400&q=80', 'Santa Cruz Tenerife Center', true, 'Santa Cruz Tenerife Center'),
-    ('https://images.unsplash.com/photo-1508057198894-247b23fe5ade?auto=format&fit=crop&w=1400&q=80', 'Obradoiro Santiago', true, 'Obradoiro Santiago'),
-    ('https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=1400&q=80', 'Old Town Santiago', true, 'Old Town Santiago'),
-    ('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1400&q=80', 'Alameda Santiago', true, 'Alameda Santiago')
+    ('https://alicanteturismo.com/wp-content/uploads/2024/06/Explanada-de-espana.jpg', 'Explanada Alicante', true, 'Explanada Alicante'),
+    ('https://upload.wikimedia.org/wikipedia/commons/2/20/Playa_del_Postiguet_4.jpg', 'Playa del Postiguet', true, 'Playa del Postiguet'),
+    ('https://alicante.vectalia.es/wp-content/uploads/sites/2/2022/02/Imagen-Castillo-1.jpg', 'Castillo Santa Barbara Alicante', true, 'Castillo Santa Barbara Alicante'),
+    ('https://upload.wikimedia.org/wikipedia/commons/d/da/Kontxa_bay.jpg', 'La Concha San Sebastian', true, 'La Concha San Sebastian'),
+    ('https://sansebastianturismoa.eus/wp-content/uploads/2025/04/konstituzio-plaza-plaza-de-la-constitucin_25469190985_o-min.webp', 'Parte Vieja San Sebastian', true, 'Parte Vieja San Sebastian'),
+    ('https://www.monteigueldo.es/temas/igeldo/img/slider/parque-atracciones-monte-igueldo-diversion-ninos-mayores.jpg', 'Monte Igueldo', true, 'Monte Igueldo'),
+    ('https://media.cntraveler.com/photos/5a8c863fe9c49e2e4d80a496/master/pass/Barri-Vell__2018_Forc%CC%A7a-Vella-des-de-la-muralla_Roger-Colom.jpg', 'Barri Vell Girona', true, 'Barri Vell Girona'),
+    ('https://upload.wikimedia.org/wikipedia/commons/1/11/Girona_river-street.jpeg', 'Onyar Riverside Girona', true, 'Onyar Riverside Girona'),
+    ('https://upload.wikimedia.org/wikipedia/commons/1/1c/Girona_Cathedral_2020.jpg', 'Girona Cathedral Quarter', true, 'Girona Cathedral Quarter'),
+    ('https://upload.wikimedia.org/wikipedia/commons/3/35/Playa_de_la_Caleta%2C_C%C3%A1diz%2C_Espa%C3%B1a%2C_2015-12-08%2C_DD_53.JPG', 'La Caleta Cadiz', true, 'La Caleta Cadiz'),
+    ('https://loveincstatic.blob.core.windows.net/loveexploring/IMAGES/Cadiz/Cadiz-street-restaurant-cafes-where-to-eat-spain.jpg', 'Old Town Cadiz', true, 'Old Town Cadiz'),
+    ('https://media01.stockfood.com/largepreviews/MjIwNTM1NDA3NA==/71140454-Cityscape-of-Cadiz-baroque-cathedral-Paseo-Campo-del-Sur-twilight-Andalucia-Spain.jpg', 'Paseo Campo del Sur', true, 'Paseo Campo del Sur'),
+    ('https://www.mergili.at/worldimages/_data/i/upload/2020/03/02/20200302231110-d2c66155-me.jpg', 'Plaza Belluga Murcia', true, 'Plaza Belluga Murcia'),
+    ('https://ourworldforyou.com/wp-content/uploads/2024/02/Glorieta-de-Espana-explore-spain-historic-murcia-things-to-see-in-murcia-visit-spain-visit-murcia-places-to-visit-in-spain-best-cities-in-spain-V5.jpg', 'Murcia Old Town', true, 'Murcia Old Town'),
+    ('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/0e/b5/3f/fc/murcia-riverside-view.jpg?w=1200&h=-1&s=1', 'Rio Segura Murcia', true, 'Rio Segura Murcia'),
+    ('https://images.trvl-media.com/place/6121563/d94895d6-d666-4568-9ac0-96d09caba7d7.jpg', 'El Sardinero Santander', true, 'El Sardinero Santander'),
+    ('https://cdn.sanity.io/images/zi3g9jaq/production/0cd8fab2aa8f8feeeb717ab59b534685f78789a6-1400x768.jpg', 'Centro Botin Santander', true, 'Centro Botin Santander'),
+    ('https://images.trvl-media.com/place/6358901/29831250-21db-47d3-9b67-1779ae14ce9e.jpg', 'Peninsula Magdalena', true, 'Peninsula Magdalena'),
+    ('https://richiperez.com/wp-content/uploads/2024/09/que-ver-en-costa-adeje-tenerife.jpg', 'Costa Adeje Tenerife', true, 'Costa Adeje Tenerife'),
+    ('https://questtraveladventures.com/sites/default/files/media_hero_images/Tenerife-Teide---Header.jpg', 'Teide Viewpoint Tenerife', true, 'Teide Viewpoint Tenerife'),
+    ('https://upload.wikimedia.org/wikipedia/commons/c/c6/At_Palmetum_de_Santa_Cruz_de_Tenerife_2022_028.jpg', 'Santa Cruz Tenerife Center', true, 'Santa Cruz Tenerife Center'),
+    ('https://www.fundacionjacobea.org/wp-content/uploads/2018/08/IMG_3728.jpg', 'Obradoiro Santiago', true, 'Obradoiro Santiago'),
+    ('https://images.ctfassets.net/wv75stsetqy3/2ylyjrVi4hOdesnPq6gp4t/c9efa83a9d4b033c76deb39df0939305/istock-1011982760_optimized.jpg?q=60&fit=fill&fm=webp', 'Old Town Santiago', true, 'Old Town Santiago'),
+    ('https://cdn.tsunamipanel.com/100594/media/galleries/1920/parque-alameda-santiago-paseo-leones.jpg', 'Alameda Santiago', true, 'Alameda Santiago')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "LocalityId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", l."Id", NOW()
@@ -34250,14 +34250,14 @@ LEFT JOIN "Objects" o ON o."Name" = s."ObjectName";
 
 WITH source("Url", "AltText", "IsMain", "EventName") AS (
     VALUES
-    ('https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1400&q=80', 'Alicante Mediteranski vikend', true, 'Alicante Mediteranski vikend'),
-    ('https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1400&q=80', 'Noć pintxosa u San Sebastianu', true, 'Noć pintxosa u San Sebastianu'),
-    ('https://images.unsplash.com/photo-1545987796-200677ee1011?auto=format&fit=crop&w=1400&q=80', 'Dani starih zidina Girone', true, 'Dani starih zidina Girone'),
-    ('https://images.unsplash.com/photo-1519861531473-9200262188bf?auto=format&fit=crop&w=1400&q=80', 'Kadiz obalski sportski dan', true, 'Kadiz obalski sportski dan'),
+    ('https://alicante-smarthotel.com/wp-content/uploads/2026/03/paella-1024x600.jpg', 'Alicante Mediteranski vikend', true, 'Alicante Mediteranski vikend'),
+    ('https://www.journal.hr/wp-content/uploads/2024/09/pintxos_iStock-988644192-1080x721.jpg', 'Noć pintxosa u San Sebastianu', true, 'Noć pintxosa u San Sebastianu'),
+    ('https://i0.wp.com/media1.lepojeziveti.com/2024/02/Girona-katedrala-stepeniste.jpg', 'Dani starih zidina Girone', true, 'Dani starih zidina Girone'),
+    ('https://beachsoccer.com/wp-content/uploads/2023/03/cadiz-1.jpg', 'Kadiz obalski sportski dan', true, 'Kadiz obalski sportski dan'),
     ('https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&w=1400&q=80', 'Murcia gastro forum', true, 'Murcia gastro forum'),
-    ('https://images.unsplash.com/photo-1528698827591-e19ccd7bc23d?auto=format&fit=crop&w=1400&q=80', 'Sajam severnih ukusa Santandera', true, 'Sajam severnih ukusa Santandera'),
+    ('https://sajam.net/storage/news/a5WtDqA6QZ1UAq08Q6eB2yG52sqjHDq0M4ONzLkC.jpg', 'Sajam severnih ukusa Santandera', true, 'Sajam severnih ukusa Santandera'),
     ('https://static.myeasol.net/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6IjIwMTI0YzdkLTNlNmMtNDcxMi05M2I4LTU2ZjBhMjc5ZTUwNyIsInB1ciI6ImJsb2JfaWQifX0=--8d722de2dd3855185bdc9f26e226426970c05727/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJqcGciLCJyZXNpemVfdG9fbGltaXQiOlsxOTIwLG51bGxdLCJzYXZlciI6eyJzdHJpcCI6dHJ1ZSwicXVhbGl0eSI6ODV9fSwicHVyIjoidmFyaWF0aW9uIn19--d7b849811809c7fffbb030edf0f6b75c59522433/240927TrickTenerifeXanaduLANTY076.jpg', 'Tenerife noć vulkana i ritma', true, 'Tenerife noć vulkana i ritma'),
-    ('https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&w=1400&q=80', 'Veče hodočasnika u Santjagu', true, 'Veče hodočasnika u Santjagu')
+    ('https://santiagoways.com/wp-content/uploads/2017/12/parties-santiago-compostela.jpg', 'Veče hodočasnika u Santjagu', true, 'Veče hodočasnika u Santjagu')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "EventId", "CreatedAt")
 SELECT
