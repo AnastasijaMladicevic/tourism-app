@@ -1,4 +1,5 @@
 import { CommonModule } from '@angular/common';
+import { MatButtonModule } from '@angular/material/button';
 import { Component, HostListener, OnInit, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, finalize, forkJoin, map, of, switchMap } from 'rxjs';
@@ -57,7 +58,7 @@ interface FavoriteCollectionItem {
 @Component({
   selector: 'app-favorites',
   standalone: true,
-  imports: [CommonModule, MatIcon],
+  imports: [CommonModule, MatButtonModule, MatIcon],
   templateUrl: './favorites.component.html',
   styleUrl: './favorites.component.scss',
 })
@@ -67,8 +68,8 @@ export class FavoritesComponent implements OnInit {
     activity: '/assets/lovcen7.jpg',
     object: '/assets/sveti-stefan-4.jpg',
   } as const;
-  private readonly mobilePageSizeOptions = [3, 5] as const;
-  private readonly desktopPageSizeOptions = [6, 9, 12] as const;
+  private readonly mobilePageSizeOptions = [4, 8, 16, 24, 32] as const;
+  private readonly desktopPageSizeOptions = [4, 8, 16, 24, 32] as const;
   private readonly favoriteService = inject(FavoriteService);
   private readonly translationService = inject(TranslationService);
   private readonly destinationService = inject(DestinationService);
@@ -87,7 +88,7 @@ export class FavoritesComponent implements OnInit {
   protected readonly sortOption = signal<FavoriteSortOption>('newest');
   protected readonly activeFilter = signal('all');
   protected readonly currentPage = signal(1);
-  protected readonly pageSize = signal(5);
+  protected readonly pageSize = signal(4);
   protected readonly isDesktopViewport = signal(this.readIsDesktopViewport());
   protected readonly showAllCollections = signal(false);
   protected readonly isPageSizeMenuOpen = signal(false);

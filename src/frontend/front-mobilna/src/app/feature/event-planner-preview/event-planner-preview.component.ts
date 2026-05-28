@@ -1,4 +1,5 @@
 import { CommonModule } from '@angular/common';
+import { MatButtonModule } from '@angular/material/button';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -115,7 +116,7 @@ const FALLBACK_IMAGE_URL =
 @Component({
   selector: 'app-event-planner-preview',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, MatButtonModule],
   templateUrl: './event-planner-preview.component.html',
   styleUrl: './event-planner-preview.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -140,7 +141,7 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
   protected readonly activeChip = signal<PreviewCategoryKey>('all');
   protected readonly searchTerm = signal('');
   protected readonly selectedDateKey = signal('all');
-  protected readonly selectedRangeDays = signal(30);
+  protected readonly selectedRangeDays = signal(0);
   protected readonly cardsPerPage = signal(5);
   protected readonly currentPage = signal(1);
   protected readonly openDropdown = signal<PlannerToolbarDropdown | null>(null);
@@ -210,6 +211,10 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
 
     const firstEventDate = this.resolveEventSchedule(datedEvents[0]).startDate;
     if (!firstEventDate) {
+      return eventsForRange;
+    }
+
+    if (this.selectedRangeDays() === 0) {
       return eventsForRange;
     }
 
@@ -329,7 +334,7 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
   });
   protected readonly selectedRangeLabel = computed(() => {
     const match = this.rangeOptions().find((option) => option.value === this.selectedRangeDays());
-    return match?.label ?? this.translate('planner.preview.range7');
+    return match?.label ?? this.translate('common.all');
   });
   protected readonly selectedCardsPerPageLabel = computed(() =>
     this.cardsPerPageLabel(this.cardsPerPage()),
@@ -383,6 +388,7 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
       })),
   );
   protected readonly rangeOptions = computed<PlannerRangeOption[]>(() => [
+    { value: 0, label: this.translate('common.all') },
     { value: 7, label: this.translate('planner.preview.range7') },
     { value: 14, label: this.translate('planner.preview.range14') },
     { value: 30, label: this.translate('planner.preview.range30') },

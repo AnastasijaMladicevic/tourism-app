@@ -192,31 +192,31 @@
             }
           </div>
 
-          @if (totalPages() > 1) {
-            <nav class="favorites-pagination" [attr.aria-label]="translate('favorites.paginationAria')">
-              <button
-                type="button"
-                class="favorites-pagination__button"
-                [disabled]="currentPage() <= 1"
-                (click)="previousPage()"
-              >
-                {{ translate('common.prev') }}
-              </button>
+          <nav class="favorites-pagination" [attr.aria-label]="translate('favorites.paginationAria')">
+            <button
+              mat-button
+              type="button"
+              class="favorites-pagination__button"
+              [disabled]="currentPage() <= 1"
+              (click)="previousPage()"
+            >
+              {{ translate('common.prev') }}
+            </button>
 
-              <span class="favorites-pagination__status">
-                {{ translate('common.pageOf', { current: currentPage(), total: totalPages() }) }}
-              </span>
+            <span class="favorites-pagination__status">
+              {{ translate('common.pageOf', { current: currentPage(), total: totalPages() }) }}
+            </span>
 
-              <button
-                type="button"
-                class="favorites-pagination__button"
-                [disabled]="currentPage() >= totalPages()"
-                (click)="nextPage()"
-              >
-                {{ translate('common.next') }}
-              </button>
-            </nav>
-          }
+            <button
+              mat-button
+              type="button"
+              class="favorites-pagination__button"
+              [disabled]="currentPage() >= totalPages()"
+              (click)="nextPage()"
+            >
+              {{ translate('common.next') }}
+            </button>
+          </nav>
 
           <footer class="favorites-footer-note">
             {{ translate('favorites.footerShowingAll', { count: displayedFavorites().length }) }}

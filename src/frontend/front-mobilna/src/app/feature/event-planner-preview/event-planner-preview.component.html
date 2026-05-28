@@ -294,31 +294,31 @@
                 </article>
               }
 
-              @if (totalPages() > 1) {
-                <nav class="planner-pagination" [attr.aria-label]="translate('planner.preview.paginationAria')">
-                  <button
-                    type="button"
-                    class="planner-pagination__button"
-                    [disabled]="currentPage() <= 1"
-                    (click)="previousPage()"
-                  >
-                    {{ translate('common.prev') }}
-                  </button>
+              <nav class="planner-pagination" [attr.aria-label]="translate('planner.preview.paginationAria')">
+                <button
+                  mat-button
+                  type="button"
+                  class="planner-pagination__button"
+                  [disabled]="currentPage() <= 1"
+                  (click)="previousPage()"
+                >
+                  {{ translate('common.prev') }}
+                </button>
 
-                  <span class="planner-pagination__status">
-                    {{ translate('common.pageOf', { current: currentPage(), total: totalPages() }) }}
-                  </span>
+                <span class="planner-pagination__status">
+                  {{ translate('common.pageOf', { current: currentPage(), total: totalPages() }) }}
+                </span>
 
-                  <button
-                    type="button"
-                    class="planner-pagination__button"
-                    [disabled]="currentPage() >= totalPages()"
-                    (click)="nextPage()"
-                  >
-                    {{ translate('common.next') }}
-                  </button>
-                </nav>
-              }
+                <button
+                  mat-button
+                  type="button"
+                  class="planner-pagination__button"
+                  [disabled]="currentPage() >= totalPages()"
+                  (click)="nextPage()"
+                >
+                  {{ translate('common.next') }}
+                </button>
+              </nav>
             }
           </div>
 
