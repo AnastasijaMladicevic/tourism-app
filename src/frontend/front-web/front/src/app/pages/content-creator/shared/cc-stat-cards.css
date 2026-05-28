@@ -2,7 +2,7 @@
 
 .events-page .insights-grid,
 .activities-page .insights-grid,
-.objects-page .stats-grid {
+.objects-page .insights-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
@@ -10,7 +10,7 @@
 
 .events-page .insight-card,
 .activities-page .insight-card,
-.objects-page .stat-card {
+.objects-page .insight-card {
   border: 1px solid #e5e7eb;
   border-radius: 12px;
   padding: 14px;
@@ -20,13 +20,13 @@
 
 .events-page .insight-card.card,
 .activities-page .insight-card.card,
-.objects-page .stat-card.card {
+.objects-page .insight-card.card {
   box-shadow: none;
 }
 
 .events-page .insight-card p,
 .activities-page .insight-card p,
-.objects-page .stat-card p {
+.objects-page .insight-card p {
   margin: 0;
   font-size: 11px;
   font-weight: 700;
@@ -36,7 +36,7 @@
 
 .events-page .insight-card strong,
 .activities-page .insight-card strong,
-.objects-page .stat-card strong {
+.objects-page .insight-card strong {
   display: block;
   margin: 6px 0 0;
   font-size: 32px;
@@ -46,7 +46,7 @@
 
 .events-page .insight-card span,
 .activities-page .insight-card span,
-.objects-page .stat-card span {
+.objects-page .insight-card span {
   display: block;
   margin: 6px 0 0;
   font-size: 12px;
@@ -56,68 +56,59 @@
 /* Blue */
 .events-page .insight-card[data-tone='blue'],
 .activities-page .insight-card[data-tone='blue'],
-.objects-page .stat-card[data-tone='blue'],
-.objects-page .stat-card.blue {
+.objects-page .insight-card[data-tone='blue'] {
   background: #eff6ff;
   border-color: #bfdbfe;
 }
 
 .events-page .insight-card[data-tone='blue'] p,
 .activities-page .insight-card[data-tone='blue'] p,
-.objects-page .stat-card[data-tone='blue'] p,
-.objects-page .stat-card.blue p {
+.objects-page .insight-card[data-tone='blue'] p {
   color: #3b82f6;
 }
 
 .events-page .insight-card[data-tone='blue'] strong,
 .activities-page .insight-card[data-tone='blue'] strong,
-.objects-page .stat-card[data-tone='blue'] strong,
-.objects-page .stat-card.blue strong {
+.objects-page .insight-card[data-tone='blue'] strong {
   color: #1d4ed8;
 }
 
 /* Amber */
 .events-page .insight-card[data-tone='amber'],
 .activities-page .insight-card[data-tone='amber'],
-.objects-page .stat-card[data-tone='amber'],
-.objects-page .stat-card.amber {
+.objects-page .insight-card[data-tone='amber'] {
   background: #fffbeb;
   border-color: #fde68a;
 }
 
 .events-page .insight-card[data-tone='amber'] p,
 .activities-page .insight-card[data-tone='amber'] p,
-.objects-page .stat-card[data-tone='amber'] p,
-.objects-page .stat-card.amber p {
+.objects-page .insight-card[data-tone='amber'] p {
   color: #d97706;
 }
 
 .events-page .insight-card[data-tone='amber'] strong,
 .activities-page .insight-card[data-tone='amber'] strong,
-.objects-page .stat-card[data-tone='amber'] strong,
-.objects-page .stat-card.amber strong {
+.objects-page .insight-card[data-tone='amber'] strong {
   color: #b45309;
 }
 
 /* Green */
 .events-page .insight-card[data-tone='green'],
 .activities-page .insight-card[data-tone='green'],
-.objects-page .stat-card[data-tone='green'],
-.objects-page .stat-card.green {
+.objects-page .insight-card[data-tone='green'] {
   background: #ecfdf5;
   border-color: #a7f3d0;
 }
 
 .events-page .insight-card[data-tone='green'] p,
 .activities-page .insight-card[data-tone='green'] p,
-.objects-page .stat-card[data-tone='green'] p,
-.objects-page .stat-card.green p {
+.objects-page .insight-card[data-tone='green'] p {
   color: #059669;
 }
 
 .events-page .insight-card[data-tone='green'] strong,
 .activities-page .insight-card[data-tone='green'] strong,
-.objects-page .stat-card[data-tone='green'] strong,
-.objects-page .stat-card.green strong {
+.objects-page .insight-card[data-tone='green'] strong {
   color: #047857;
 }

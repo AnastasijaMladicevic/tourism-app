@@ -81,19 +81,19 @@
 
   <div class="objects-layout">
     <div class="main-column">
-      <div class="stats-grid">
-        <article class="stat-card card blue">
-          <p>Total Number of Objects</p>
+      <div class="insights-grid">
+        <article class="insight-card card" data-tone="blue">
+          <p>Total objects</p>
           <strong>{{ totalCount }}</strong>
-          <span>Total visible items</span>
+          <span>Matching active filters</span>
         </article>
-        <article class="stat-card card green">
-          <p>Total Published</p>
+        <article class="insight-card card" data-tone="green">
+          <p>On this page</p>
           <strong>{{ pagedObjects.length }}</strong>
-          <span>On current page</span>
+          <span>Visible rows</span>
         </article>
-        <article class="stat-card card amber">
-          <p>Average Rating</p>
+        <article class="insight-card card" data-tone="amber">
+          <p>Average rating</p>
           <strong>{{ averageRatingDisplay }}</strong>
           <span>Across current page</span>
         </article>

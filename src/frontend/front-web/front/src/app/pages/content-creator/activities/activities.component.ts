@@ -21,6 +21,7 @@ interface ActivityInsightCard {
   styleUrls: [
     './activities.component.css',
     '../shared/cc-list-page-header.css',
+    '../shared/cc-list-detail-layout.css',
     '../shared/cc-page-stats-scroll.css',
     '../shared/cc-stat-cards.css'
   ]
