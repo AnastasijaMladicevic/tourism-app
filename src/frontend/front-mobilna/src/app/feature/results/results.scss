@@ -134,13 +134,12 @@
   position: absolute;
   top: 44px;
   right: 0;
-  background: var(--white) !important;
-  border-color: var(--border);
+  background: var(--white);
   border-radius: 12px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
   overflow: hidden;
   z-index: 200;
-  min-width: 120px;
+  min-width: 170px;
 }
 
 .sort-menu__item {
@@ -148,13 +147,13 @@
   align-items: center;
   gap: 8px;
   width: 100%;
-  padding: 12px 14px;
+  padding: 11px 16px;
   border: none;
-  background: var(--white) !important;
-  color: var(--text-dark) !important;
+  background: transparent;
   text-align: left;
   font-family: 'DM Sans', sans-serif;
-  font-size: 13px;
+  font-size: 13.5px;
+  color: var(--emperor);
   cursor: pointer;
   transition: background 0.15s;
 
@@ -287,12 +286,6 @@
   }
 }
 
-.sort-trigger {
-  background: var(--white);
-  color: var(--text-dark);
-  border: 1px solid var(--border);
-}
-
 .search-inline {
   flex: 1;
   display: flex;
@@ -351,13 +344,12 @@
   padding: 7px 12px;
   border-radius: 20px;
   border: 1.5px solid var(--border);
-  background: var(--white) !important;
-  color: var(--text-dark) !important;
-  border-color: var(--border) !important;
+  background: var(--surface-strong);
   cursor: pointer;
   font-family: 'DM Sans', sans-serif;
   font-size: 13.5px;
   font-weight: 600;
+  color: var(--primary);
   position: relative;
   white-space: nowrap;
 
@@ -442,7 +434,7 @@
 .grid {
   display: grid;
   gap: 16px;
-  padding: 0 16px 16px;
+  padding: 0 16px 4px;
 
   // mobile: 1 column
   grid-template-columns: 1fr;
@@ -797,7 +789,7 @@
   justify-content: center;
   align-items: center;
   gap: 16px;
-  padding: 8px 16px 16px;
+  padding: 0 16px 0;
 }
 
 .list-controls {
@@ -842,7 +834,7 @@
   border-color: #38bdf8;
   color: white !important;
   box-shadow:
-    0 0 0 1px rgba(255,255,255,0.08),
+    0 0 0 1px rgba(255, 255, 255, 0.08),
     0 4px 18px rgba(56, 189, 248, 0.35);
 }
 
@@ -965,6 +957,7 @@
 }
 
 :host-context(:root[data-theme='dark']) {
+
   .header,
   .filters-row {
     background: linear-gradient(90deg, #03141c 0%, #082434 100%);
@@ -1086,6 +1079,7 @@
 }
 
 :host-context(:root[data-theme='dark']) {
+
   .card__fav,
   .card__fav--active {
     background: var(--surface-soft) !important;
