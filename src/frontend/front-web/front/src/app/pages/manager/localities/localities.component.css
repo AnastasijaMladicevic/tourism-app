@@ -164,19 +164,6 @@
   font-weight: 600;
 }
 
-.locality-content-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.75fr) minmax(280px, 0.95fr);
-  gap: 14px;
-  align-items: start;
-}
-
-.locality-main-column {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-}
-
 .locality-table-wrap {
   overflow: hidden;
 }
@@ -331,16 +318,6 @@ tbody tr:hover,
   letter-spacing: 0.08em;
   color: #6b7280;
   margin-bottom: 6px;
-}
-
-.detail-column {
-  position: sticky;
-  top: 80px;
-  padding: 18px;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  overflow: hidden;
 }
 
 .activity-hero {
@@ -591,12 +568,6 @@ tbody tr:hover,
 
   .filter-actions .filter-btn {
     width: 100%;
-  }
-}
-
-@media (max-width: 1140px) {
-  .locality-content-grid {
-    grid-template-columns: 1fr;
   }
 }
 

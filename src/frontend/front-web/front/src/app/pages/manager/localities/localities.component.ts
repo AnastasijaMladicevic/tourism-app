@@ -17,6 +17,7 @@ import { AuthService } from '../../../services/auth.service';
     '../shared/manager-list-page-header.css',
     '../shared/manager-list-page-responsive.css',
     '../shared/manager-cc-page-parity.css',
+    '../shared/manager-list-detail-layout.css',
     '../shared/manager-page-stats-scroll.css',
     '../shared/manager-stat-cards.css'
   ]

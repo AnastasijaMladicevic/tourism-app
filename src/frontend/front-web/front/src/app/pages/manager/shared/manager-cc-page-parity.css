@@ -34,13 +34,6 @@
   color: #111827;
 }
 
-.manager-list-page .stats-row,
-.manager-list-page .insights-grid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
-}
-
 .manager-list-page .table-card,
 .manager-list-page .object-table-wrap,
 .manager-list-page .event-table-wrap,
