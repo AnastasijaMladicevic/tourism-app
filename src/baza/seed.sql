@@ -12317,15 +12317,15 @@ JOIN "Localities" l ON l."Name" = s."LocalityName";
 -- 14.10 IMAGES - OBJECTS
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Barcelona%20Skyline.jpg', 'Hotel Casa Batllo Suites', true, 'Hotel Casa Batllo Suites'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Gothic%20Quarter%2C%20Barcelona.JPG', 'Hotel Casa Batllo Suites', false, 'Hotel Casa Batllo Suites'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Gothic%20Quarter%2C%20Barcelona.JPG', 'Tapas House Gothic', true, 'Tapas House Gothic'),
+    ('https://cf.bstatic.com/xdata/images/hotel/max1024x768/535440360.jpg?k=27c08e20c16d7f2d1065955e0d5861d90debc09c5fe1399d3bbc85257ac3bb5b&o=', 'Hotel Casa Batllo Suites', true, 'Hotel Casa Batllo Suites'),
+    ('https://www.iconichouses.org/foto/houses/Casa-Batllo.jpg', 'Hotel Casa Batllo Suites', false, 'Hotel Casa Batllo Suites'),
+    ('https://la-alcoba.com/wp-content/uploads/2026/01/restaurantes-barrio-gotico-la-alcoba-azul-gotico.jpg', 'Tapas House Gothic', true, 'Tapas House Gothic'),
     ('https://commons.wikimedia.org/wiki/Special:FilePath/Gothic%20Quarter%2C%20Barcelona%20%2821%29%20%2830446599463%29.jpg', 'Tapas House Gothic', false, 'Tapas House Gothic'),
     ('https://commons.wikimedia.org/wiki/Special:FilePath/La%20Barceloneta.jpg', 'Barceloneta Sunset Bar', true, 'Barceloneta Sunset Bar'),
     ('https://commons.wikimedia.org/wiki/Special:FilePath/La%20Barceloneta.jpg', 'Barceloneta Sunset Bar', false, 'Barceloneta Sunset Bar'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Gran%20Via%2C%20Madrid.jpg', 'Hotel Gran Via Palace', true, 'Hotel Gran Via Palace'),
+    ('https://cf.bstatic.com/xdata/images/hotel/max1024x768/477327824.jpg?k=9d1a0881e09b63c66a1721d76a2ad81964705e28623029c05e3c679c81e93f54&o=', 'Hotel Gran Via Palace', true, 'Hotel Gran Via Palace'),
     ('https://commons.wikimedia.org/wiki/Special:FilePath/Gran%20Via%2C%20Madrid%20-%20007.jpg', 'Hotel Gran Via Palace', false, 'Hotel Gran Via Palace'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/City%20of%20Arts%20and%20Sciences%2C%20Valencia%20%2852395812264%29.jpg', 'Oceanic Bistro Valencia', true, 'Oceanic Bistro Valencia'),
+    ('https://www.visitvalencia.com/sites/default/files/crm-images/GALERIA_Restaurante%20Oc%C3%A9anos_3.JPEG', 'Oceanic Bistro Valencia', true, 'Oceanic Bistro Valencia'),
     ('https://commons.wikimedia.org/wiki/Special:FilePath/Valencia%20skyline%20sunset%20%284262234180%29.jpg', 'Oceanic Bistro Valencia', false, 'Oceanic Bistro Valencia')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
@@ -34144,66 +34144,190 @@ SELECT 1;
 
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 VALUES
-('https://loremflickr.com/1920/1080/hotel,alicante,stay?lock=101', 'Hotel Mirador Alicante', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Mirador Alicante'), NOW()),
-('https://loremflickr.com/1920/1080/food,alicante,restaurant?lock=102', 'Arrocería Costa Blanca', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Arrocería Costa Blanca'), NOW()),
-('https://loremflickr.com/1920/1080/art-gallery,alicante,interior?lock=103', 'Galerija Santa Barbara', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Santa Barbara'), NOW()),
-('https://loremflickr.com/1920/1080/shopping-mall,alicante,interior?lock=104', 'Plaza Mar Alicante', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Plaza Mar Alicante'), NOW()),
-('https://loremflickr.com/1920/1080/hospital,alicante,medical?lock=105', 'Hospital Costa Alicante', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Costa Alicante'), NOW()),
-('https://loremflickr.com/1920/1080/gas-station,alicante,roadtrip?lock=106', 'Repsol Postiguet Alicante', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol Postiguet Alicante'), NOW()),
-('https://loremflickr.com/1920/1080/souvenir-shop,alicante,store?lock=107', 'Boutique Suveniri Explanada', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Boutique Suveniri Explanada'), NOW()),
-('https://loremflickr.com/1920/1080/clinic,alicante,medical?lock=108', 'Klinika Vista Med Alicante', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Klinika Vista Med Alicante'), NOW()),
-('https://loremflickr.com/1920/1080/gas-station,alicante,roadtrip?lock=109', 'Cepsa Castillo Alicante', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Cepsa Castillo Alicante'), NOW()),
-('https://loremflickr.com/1920/1080/guesthouse,san-sebastian,travel?lock=110', 'Pansion La Concha Residence', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pansion La Concha Residence'), NOW()),
-('https://loremflickr.com/1920/1080/food,san-sebastian,restaurant?lock=111', 'Pintxos Parte Vieja', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pintxos Parte Vieja'), NOW()),
-('https://loremflickr.com/1920/1080/art-gallery,san-sebastian,interior?lock=112', 'Galerija Atlantik Donostia', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Atlantik Donostia'), NOW()),
-('https://loremflickr.com/1920/1080/market,san-sebastian,shopping?lock=113', 'Mercado Kursaal San Sebastian', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercado Kursaal San Sebastian'), NOW()),
-('https://loremflickr.com/1920/1080/hospital,san-sebastian,medical?lock=114', 'Hospital Donostia Center', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Donostia Center'), NOW()),
-('https://loremflickr.com/1920/1080/gas-station,san-sebastian,roadtrip?lock=115', 'Repsol La Concha', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol La Concha'), NOW()),
-('https://loremflickr.com/1920/1080/souvenir-shop,san-sebastian,store?lock=116', 'Suveniri Parte Vieja', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suveniri Parte Vieja'), NOW()),
-('https://loremflickr.com/1920/1080/clinic,san-sebastian,medical?lock=117', 'Poliklinika Zurriola San Sebastian', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Poliklinika Zurriola San Sebastian'), NOW()),
-('https://loremflickr.com/1920/1080/gas-station,san-sebastian,roadtrip?lock=118', 'Cepsa Igueldo Drive', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Cepsa Igueldo Drive'), NOW()),
-('https://loremflickr.com/1920/1080/hotel,girona,apartment?lock=119', 'Apartmani Onyar Rooms', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartmani Onyar Rooms'), NOW()),
-('https://loremflickr.com/1920/1080/restaurant,girona,dining?lock=120', 'Restoran Barri Vell Girona', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Barri Vell Girona'), NOW()),
-('https://loremflickr.com/1920/1080/museum,girona,exhibition?lock=121', 'Muzej Mostova Girona', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Mostova Girona'), NOW()),
-('https://loremflickr.com/1920/1080/market,girona,shopping?lock=122', 'Girona Market Hall', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Girona Market Hall'), NOW()),
-('https://loremflickr.com/1920/1080/hospital,girona,medical?lock=123', 'Hospital Girona Nord', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Girona Nord'), NOW()),
-('https://loremflickr.com/1920/1080/gas-station,girona,roadtrip?lock=124', 'Repsol Girona Riverside', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol Girona Riverside'), NOW()),
-('https://loremflickr.com/1920/1080/souvenir-shop,girona,store?lock=125', 'Suvenirnica Katedrala Girona', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Katedrala Girona'), NOW()),
-('https://loremflickr.com/1920/1080/hotel,cadiz,stay?lock=126', 'Hotel La Caleta Cadiz', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel La Caleta Cadiz'), NOW()),
-('https://loremflickr.com/1920/1080/restaurant,cadiz,dining?lock=127', 'Taverna Campo del Sur', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Taverna Campo del Sur'), NOW()),
-('https://loremflickr.com/1920/1080/museum,cadiz,exhibition?lock=128', 'Muzej Atlantika Cadiz', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Atlantika Cadiz'), NOW()),
-('https://loremflickr.com/1920/1080/market,cadiz,shopping?lock=129', 'Mercado del Puerto Cadiz', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercado del Puerto Cadiz'), NOW()),
-('https://loremflickr.com/1920/1080/hospital,cadiz,medical?lock=130', 'Hospital Bahia Cadiz', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Bahia Cadiz'), NOW()),
-('https://loremflickr.com/1920/1080/gas-station,cadiz,roadtrip?lock=131', 'Cepsa La Caleta Cadiz', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Cepsa La Caleta Cadiz'), NOW()),
-('https://loremflickr.com/1920/1080/souvenir-shop,cadiz,store?lock=132', 'Suvenirnica Stari Kadiz', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Stari Kadiz'), NOW()),
-('https://loremflickr.com/1920/1080/hotel,murcia,stay?lock=133', 'Hotel Belluga Murcia', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Belluga Murcia'), NOW()),
-('https://loremflickr.com/1920/1080/food,murcia,restaurant?lock=134', 'Segura Tapas Murcia', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Segura Tapas Murcia'), NOW()),
-('https://loremflickr.com/1920/1080/spa,murcia,wellness?lock=135', 'Murcia Wellness Patio', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Murcia Wellness Patio'), NOW()),
-('https://loremflickr.com/1920/1080/shopping-mall,murcia,interior?lock=136', 'Centro Comercial Murcia Luz', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Centro Comercial Murcia Luz'), NOW()),
-('https://loremflickr.com/1920/1080/hospital,murcia,medical?lock=137', 'Hospital Segura Murcia', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Segura Murcia'), NOW()),
-('https://loremflickr.com/1920/1080/gas-station,murcia,roadtrip?lock=138', 'Repsol Murcia Centro', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol Murcia Centro'), NOW()),
-('https://loremflickr.com/1920/1080/souvenir-shop,murcia,store?lock=139', 'Suvenirnica Plaza Belluga', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Plaza Belluga'), NOW()),
-('https://loremflickr.com/1920/1080/guesthouse,santander,travel?lock=140', 'Pansion Sardinero Plaza', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pansion Sardinero Plaza'), NOW()),
-('https://loremflickr.com/1920/1080/food,santander,restaurant?lock=141', 'Restaurante Botin Norte', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restaurante Botin Norte'), NOW()),
-('https://loremflickr.com/1920/1080/art-gallery,santander,interior?lock=142', 'Galerija Costa Cantabrica', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Costa Cantabrica'), NOW()),
-('https://loremflickr.com/1920/1080/market,santander,shopping?lock=143', 'Mercado Sardinero Santander', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercado Sardinero Santander'), NOW()),
-('https://loremflickr.com/1920/1080/hospital,santander,medical?lock=144', 'Hospital Cantabrico Santander', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Cantabrico Santander'), NOW()),
-('https://loremflickr.com/1920/1080/gas-station,santander,roadtrip?lock=145', 'Repsol Sardinero Santander', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol Sardinero Santander'), NOW()),
-('https://loremflickr.com/1920/1080/souvenir-shop,santander,store?lock=146', 'Suveniri Magdalena', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suveniri Magdalena'), NOW()),
-('https://loremflickr.com/1920/1080/resort,tenerife,pool?lock=147', 'Resort Costa Adeje Blue', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Resort Costa Adeje Blue'), NOW()),
-('https://loremflickr.com/1920/1080/food,tenerife,restaurant?lock=148', 'Restaurante Volcán y Mar', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restaurante Volcán y Mar'), NOW()),
-('https://loremflickr.com/1920/1080/spa,tenerife,wellness?lock=149', 'Teide Outdoor Spa', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Teide Outdoor Spa'), NOW()),
-('https://loremflickr.com/1920/1080/shopping-mall,tenerife,interior?lock=150', 'Centro Comercial Adeje Sun', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Centro Comercial Adeje Sun'), NOW()),
-('https://loremflickr.com/1920/1080/hospital,tenerife,medical?lock=151', 'Hospital Tenerife Sur', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Tenerife Sur'), NOW()),
-('https://loremflickr.com/1920/1080/gas-station,tenerife,roadtrip?lock=152', 'Cepsa Costa Adeje', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Cepsa Costa Adeje'), NOW()),
-('https://loremflickr.com/1920/1080/souvenir-shop,tenerife,store?lock=153', 'Surf Shop Tenerife', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Surf Shop Tenerife'), NOW()),
-('https://loremflickr.com/1920/1080/hotel,santiago-de-compostela,stay?lock=154', 'Hotel Obradoiro Suites', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Obradoiro Suites'), NOW()),
-('https://loremflickr.com/1920/1080/food,santiago-de-compostela,restaurant?lock=155', 'Casa Gallega Santiago', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Casa Gallega Santiago'), NOW()),
-('https://loremflickr.com/1920/1080/museum,santiago-de-compostela,exhibition?lock=156', 'Muzej Hodočasnika Santiago', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Hodočasnika Santiago'), NOW()),
-('https://loremflickr.com/1920/1080/market,santiago-de-compostela,shopping?lock=157', 'Mercado Compostela Central', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercado Compostela Central'), NOW()),
-('https://loremflickr.com/1920/1080/hospital,santiago-de-compostela,medical?lock=158', 'Hospital Santiago Centro', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Santiago Centro'), NOW()),
-('https://loremflickr.com/1920/1080/gas-station,santiago-de-compostela,roadtrip?lock=159', 'Repsol Alameda Santiago', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol Alameda Santiago'), NOW());
+-- ═══ ALICANTE ═══
+-- Hotel Mirador Alicante: luksuzni hotelski lobi (Angelina Kusznirewicz)
+('https://images.unsplash.com/photo-1720540244592-b4124532b318?auto=format&fit=crop&w=1920&h=1080&q=80', 'Hotel Mirador Alicante', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Mirador Alicante'), NOW()),
 
+-- Arrocería Costa Blanca: španska hrana/tapas (CHUTTERSNAP)
+('https://images.unsplash.com/photo-1515669097368-22e68427d265?auto=format&fit=crop&w=1920&h=1080&q=80', 'Arrocería Costa Blanca', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Arrocería Costa Blanca'), NOW()),
+
+-- Galerija Santa Barbara: muzej/galerija enterijer (Dannie Jing)
+('https://images.unsplash.com/photo-1531243269054-5ebf6f34081e?auto=format&fit=crop&w=1920&h=1080&q=80', 'Galerija Santa Barbara', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Santa Barbara'), NOW()),
+
+-- Plaza Mar Alicante: shopping mall sa eskalatorima (Viktor SOLOMONIK)
+('https://images.unsplash.com/photo-1726159496287-596e93ca635b?auto=format&fit=crop&w=1920&h=1080&q=80', 'Plaza Mar Alicante', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Plaza Mar Alicante'), NOW()),
+
+-- Hospital Costa Alicante: bolnica eksterijer (National Cancer Institute)
+('https://api.immoabroad.com/uploads/ba44be9a94428c5503a9d63cae74870c.jpg', 'Hospital Costa Alicante', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Costa Alicante'), NOW()),
+
+-- Repsol Postiguet Alicante: benzinska pumpa (Tim Mossholder)
+('https://www.grupoglem.com/wp-content/uploads/2017/07/RIESMA-10-1024x576-1.jpg', 'Repsol Postiguet Alicante', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol Postiguet Alicante'), NOW()),
+
+-- Boutique Suveniri Explanada: suvenirnica/shop ulica (Joseph Corl)
+('https://images.unsplash.com/photo-1693835826680-82abb277bf7e?auto=format&fit=crop&w=1920&h=1080&q=80', 'Boutique Suveniri Explanada', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Boutique Suveniri Explanada'), NOW()),
+
+-- Klinika Vista Med Alicante: bolnica/klinika (Acton Crawford)
+('https://urvistahermosainternational.com/en/wp-content/uploads/sites/2/2018/12/hla-vistahermosa-best-private-hospital.jpg', 'Klinika Vista Med Alicante', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Klinika Vista Med Alicante'), NOW()),
+
+-- Cepsa Castillo Alicante: benzinska pumpa noć (Patrick Tomasso)
+('https://images.unsplash.com/photo-1545262810-77515befe149?auto=format&fit=crop&w=1920&h=1080&q=80&sat=-10', 'Cepsa Castillo Alicante', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Cepsa Castillo Alicante'), NOW()),
+
+-- ═══ SAN SEBASTIAN ═══
+-- Pansion La Concha Residence: pansion/guest house (photo-1675409145919)
+('https://images.unsplash.com/photo-1675409145919-277c0fc2aa7d?auto=format&fit=crop&w=1920&h=1080&q=80', 'Pansion La Concha Residence', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pansion La Concha Residence'), NOW()),
+
+-- Pintxos Parte Vieja: pintxos bar (Agent J, Unsplash tapas)
+('https://images.unsplash.com/photo-1534790566855-4cb788d389ec?auto=format&fit=crop&w=1920&h=1080&q=80', 'Pintxos Parte Vieja', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pintxos Parte Vieja'), NOW()),
+
+-- Galerija Atlantik Donostia: art galerija enterijer (aiden patrissi)
+('https://ekainartelanak.com/themes/euscommerce/assets/img/modules/appagebuilder/images/galeria_ekain_arte_lanak_.jpg', 'Galerija Atlantik Donostia', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Atlantik Donostia'), NOW()),
+
+-- Mercado Kursaal San Sebastian: tržnica (Adrien Olichon)
+('https://images.unsplash.com/photo-1588964895597-cfccd6e2dbf9?auto=format&fit=crop&w=1920&h=1080&q=80', 'Mercado Kursaal San Sebastian', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercado Kursaal San Sebastian'), NOW()),
+
+-- Hospital Donostia Center: bolnica eksterijer (National Cancer Institute)
+('https://www.idom.com/wp-content/uploads/2019/02/Cancer_Center_01_Project_Management_Idom_jmbielsa.jpg', 'Hospital Donostia Center', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Donostia Center'), NOW()),
+
+-- Repsol La Concha: benzinska pumpa
+('https://www.repsol.com/content/dam/aplicaciones/catalogo-componentes-assets/images-files/estacion-servicio-foster-anochecer.jpg', 'Repsol La Concha', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol La Concha'), NOW()),
+
+-- Suveniri Parte Vieja: suvenirnica ulica (Hans-Jürgen Weinhardt)
+('https://zaharrean.eus/wp-content/uploads/2021/07/IMG_1412.jpg', 'Suveniri Parte Vieja', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suveniri Parte Vieja'), NOW()),
+
+-- Poliklinika Zurriola San Sebastian: klinika moderna zgrada (Onur Can Elma)
+('https://centromedicozurriola.imq.es/hubfs/Centro-Medico-Quirurgico-IMQ_Zurriola.jpg', 'Poliklinika Zurriola San Sebastian', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Poliklinika Zurriola San Sebastian'), NOW()),
+
+-- Cepsa Igueldo Drive: benzinska pumpa
+('https://www.moeveglobal.com/stfls/corporativo/FICHEROS/estacion-servicio-cepsa.jpg', 'Cepsa Igueldo Drive', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Cepsa Igueldo Drive'), NOW()),
+
+-- ═══ GIRONA ═══
+-- Apartmani Onyar Rooms: apartman/guesthouse cozy (photo-1675409145919)
+('https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=1920&h=1080&q=80', 'Apartmani Onyar Rooms', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartmani Onyar Rooms'), NOW()),
+
+-- Restoran Barri Vell Girona: restoran enterijer (Filipp Romanovski)
+('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2c/2d/68/8f/caption.jpg?w=900&h=-1&s=1', 'Restoran Barri Vell Girona', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Barri Vell Girona'), NOW()),
+
+-- Muzej Mostova Girona: muzej enterijer (Claudio Testa)
+('https://images.unsplash.com/photo-1491156855053-9cdff72c7f85?auto=format&fit=crop&w=1920&h=1080&q=80', 'Muzej Mostova Girona', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Mostova Girona'), NOW()),
+
+-- Girona Market Hall: tržnica (Simon Karemann)
+('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/23/71/4b/54/caption.jpg?w=1200&h=1200&s=1', 'Girona Market Hall', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Girona Market Hall'), NOW()),
+
+-- Hospital Girona Nord: bolnica eksterijer (Acton Crawford)
+('https://images.unsplash.com/photo-1626315869436-d6781ba69d6e?auto=format&fit=crop&w=1920&h=1080&q=80&sat=-5', 'Hospital Girona Nord', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Girona Nord'), NOW()),
+
+-- Repsol Girona Riverside: benzinska pumpa
+('https://www.repsol.com/content/dam/repsol-corporate/es/productos-y-servicios/trabajadores-estacion-servicio-noche.jpg', 'Repsol Girona Riverside', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol Girona Riverside'), NOW()),
+
+-- Suvenirnica Katedrala Girona: shop/butik
+('https://s3-media0.fl.yelpcdn.com/bphoto/WLS2IttSS45h5F89HWG4NA/1000s.jpg', 'Suvenirnica Katedrala Girona', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Katedrala Girona'), NOW()),
+
+-- ═══ KADIZ ═══
+-- Hotel La Caleta Cadiz: hotel uz more (Roberto Nickson)
+('https://images.unsplash.com/photo-1445019980597-93fa8acb246c?auto=format&fit=crop&w=1920&h=1080&q=80', 'Hotel La Caleta Cadiz', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel La Caleta Cadiz'), NOW()),
+
+-- Taverna Campo del Sur: seafood restoran (Nacho Carretero Molero)
+('https://i.autoreserve.com/thumb/1600x1600/restaurant_image/image/063/232/168/63232168/06a9632c-06db-40a2-9792-c3168becc5f6(2).jpg?format=webp', 'Taverna Campo del Sur', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Taverna Campo del Sur'), NOW()),
+
+-- Muzej Atlantika Cadiz: muzej enterijer (Adrien Olichon)
+('https://images.unsplash.com/photo-1518998053901-5348d3961a04?auto=format&fit=crop&w=1920&h=1080&q=80', 'Muzej Atlantika Cadiz', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Atlantika Cadiz'), NOW()),
+
+-- Mercado del Puerto Cadiz: tržnica sa ribom (Simon Karemann)
+('https://d2mqpxndxh0mbq.cloudfront.net/uploads/s1/21/58/40/6/mercado-de-abasto-cadiz-pescado-17.jpeg', 'Mercado del Puerto Cadiz', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercado del Puerto Cadiz'), NOW()),
+
+-- Hospital Bahia Cadiz: bolnica (National Cancer Institute)
+('https://www.viamedsalud.com/wp-content/uploads/2024/11/hospital-cadiz-fachada.jpg', 'Hospital Bahia Cadiz', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Bahia Cadiz'), NOW()),
+
+-- Cepsa La Caleta Cadiz: benzinska pumpa
+('https://www.moeve.es/en/near-you/statics/store/00/01/04/97/PARTOO_IMAGE_SYNC_7c612327-482a-4a18-b4bf-76bc1882dc23.webp', 'Cepsa La Caleta Cadiz', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Cepsa La Caleta Cadiz'), NOW()),
+
+-- Suvenirnica Stari Kadiz: suvenirnica ulica (Alberto Frías, bela arhitektura Kadiza)
+('https://www.mojnovisad.com/files/news/2/5/6/29256/29256-f1.jpg', 'Suvenirnica Stari Kadiz', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Stari Kadiz'), NOW()),
+
+-- ═══ MURSIJA ═══
+-- Hotel Belluga Murcia: hotel lobi (Angelina Kusznirewicz, drugačiji kadar)
+('https://z.cdrst.com/foto/hotel-sf/1aa4/granderesp/hotel-hq-la-galeria-habitacion-13b6de63.jpg', 'Hotel Belluga Murcia', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Belluga Murcia'), NOW()),
+
+-- Segura Tapas Murcia: tapas hrana (Alyona Yankovska)
+('https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=1920&h=1080&q=80', 'Segura Tapas Murcia', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Segura Tapas Murcia'), NOW()),
+
+-- Murcia Wellness Patio: spa/wellness (Li Yang)
+('https://images.unsplash.com/photo-1529290130-4ca3753253ae?auto=format&fit=crop&w=1920&h=1080&q=80', 'Murcia Wellness Patio', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Murcia Wellness Patio'), NOW()),
+
+-- Centro Comercial Murcia Luz: shopping mall (Joshua Rawson-Harris)
+('https://www.lightecture.com/wp-content/uploads/2021/01/Centro-Comercial-Thader-iluminacion-Daniela-Viloria-12.jpg', 'Centro Comercial Murcia Luz', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Centro Comercial Murcia Luz'), NOW()),
+
+-- Hospital Segura Murcia: bolnica (National Cancer Institute)
+('https://images.unsplash.com/photo-1586773860383-dab5f3bc1bcc?auto=format&fit=crop&w=1920&h=1080&q=80&sat=-5', 'Hospital Segura Murcia', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Segura Murcia'), NOW()),
+
+-- Repsol Murcia Centro: benzinska pumpa
+('https://www.repsol.com/content/dam/repsol-corporate/es/productos-y-servicios/surtidor-estacion-servicio-repsol-nuevo.jpg', 'Repsol Murcia Centro', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol Murcia Centro'), NOW()),
+
+-- Suvenirnica Plaza Belluga: butik/shop
+('https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1920&h=1080&q=80&sat=5', 'Suvenirnica Plaza Belluga', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Plaza Belluga'), NOW()),
+
+-- ═══ SANTANDER ═══
+-- Pansion Sardinero Plaza: pansion soba (photo-1631049307264)
+('https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=1920&h=1080&q=80&sat=5', 'Pansion Sardinero Plaza', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pansion Sardinero Plaza'), NOW()),
+
+-- Restaurante Botin Norte: restoran sa morskim specijalitetima (Jay Wennington)
+('https://images.squarespace-cdn.com/content/v1/5c5885000cf57dd8a2c2b293/1631810031825-JX4PU3QREVGLI498IOWL/IMG_2641.jpg', 'Restaurante Botin Norte', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restaurante Botin Norte'), NOW()),
+
+-- Galerija Costa Cantabrica: art galerija (Alexander Rodionov)
+('https://www.santander.com/content/dam/santander-com/es/contenido-paginas/sala-de-comunicaci%C3%B3n/notas-de-prensa/2021/12/im-2021-12-02-santander-despliega-una-lona-en-la-fachada-del-espacio-pereda-con-replicas-de-las-obras-de-la-coleccion-banco-santander-galeria-2.jpeg', 'Galerija Costa Cantabrica', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Costa Cantabrica'), NOW()),
+
+-- Mercado Sardinero Santander: tržnica (Geraldine Lewa)
+('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/19/e6/e2/2f/photo6jpg.jpg?w=1200&h=1200&s=1', 'Mercado Sardinero Santander', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercado Sardinero Santander'), NOW()),
+
+-- Hospital Cantabrico Santander: bolnica (Acton Crawford)
+('https://upload.wikimedia.org/wikipedia/commons/a/af/Hospitallaredo.jpg', 'Hospital Cantabrico Santander', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Cantabrico Santander'), NOW()),
+
+-- Repsol Sardinero Santander: benzinska pumpa
+('https://cdn-3.expansion.mx/dims4/default/a5139db/2147483647/strip/true/crop/1200x673+0+0/resize/1200x673!/quality/90/?url=https%3A%2F%2Fcdn-3.expansion.mx%2F80%2F19%2F067a924f478a84ec7be0fc93135c%2Frepsolfb.jpg', 'Repsol Sardinero Santander', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol Sardinero Santander'), NOW()),
+
+-- Suveniri Magdalena: suvenirnica
+('https://media-cdn.tripadvisor.com/media/photo-s/1b/e7/63/ae/mayan-masks-at-the-friday.jpg', 'Suveniri Magdalena', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suveniri Magdalena'), NOW()),
+
+-- ═══ TENERIFE ═══
+-- Resort Costa Adeje Blue: resort bazen sa palmama (Cory Bjork)
+('https://images.unsplash.com/photo-1623718649591-311775a30c43?auto=format&fit=crop&w=1920&h=1080&q=80', 'Resort Costa Adeje Blue', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Resort Costa Adeje Blue'), NOW()),
+
+-- Restaurante Volcán y Mar: restoran uz more (Manuel Moreno)
+('https://www.atlanticohoy.com/uploads/s1/34/65/66/8/diseno-sin-titulo-2025-07-14t125347-487.webp', 'Restaurante Volcán y Mar', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restaurante Volcán y Mar'), NOW()),
+
+-- Teide Outdoor Spa: spa/wellness bazen (Roberto Nickson)
+('https://swedishhottub.com/wp-content/uploads/2023/04/Pacific-mork-svenska-badtunnor-1.jpg', 'Teide Outdoor Spa', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Teide Outdoor Spa'), NOW()),
+
+-- Centro Comercial Adeje Sun: shopping mall (shopping mall sa eskalatorima)
+('https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?auto=format&fit=crop&w=1920&h=1080&q=80&sat=5', 'Centro Comercial Adeje Sun', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Centro Comercial Adeje Sun'), NOW()),
+
+-- Hospital Tenerife Sur: bolnica (National Cancer Institute)
+('https://images.unsplash.com/photo-1586773860418-d37222d8fce3?auto=format&fit=crop&w=1920&h=1080&q=80&hue=10', 'Hospital Tenerife Sur', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Tenerife Sur'), NOW()),
+
+-- Cepsa Costa Adeje: benzinska pumpa
+('https://lh3.googleusercontent.com/gps-cs-s/APNQkAEJ67QcbYWf44RBNm7DNjGkw2B3aM3i2sHoH1sDdHIXkz07KKngZuSXnw48eVpXXZJGGO8Sk7Ahagt-1IrrV05N7vc1gyxHYtkHduLV3cy1OwFhGqY0NIFGZ6Apy7SLuY2r23rU=s1360-w1360-h1020-rw', 'Cepsa Costa Adeje', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Cepsa Costa Adeje'), NOW()),
+
+-- Surf Shop Tenerife: surf shop/prodavnica (Dean Milenkovic, Alicante shop ulica)
+('https://godzillasurfshop.es/cdn/shop/files/shopgodzilla7.jpg?v=1722344939&width=3840', 'Surf Shop Tenerife', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Surf Shop Tenerife'), NOW()),
+
+-- ═══ SANTIAGO DE COMPOSTELA ═══
+-- Hotel Obradoiro Suites: hotel lobi (Rod Long)
+('https://images.unsplash.com/photo-1582719508461-905c673771fd?auto=format&fit=crop&w=1920&h=1080&q=80', 'Hotel Obradoiro Suites', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Obradoiro Suites'), NOW()),
+
+-- Casa Gallega Santiago: galicijska kuhinja/restoran (Andrea Huls Pareja)
+('https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=1920&h=1080&q=80&sat=5', 'Casa Gallega Santiago', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Casa Gallega Santiago'), NOW()),
+
+-- Muzej Hodočasnika Santiago: muzej (Adrien Olichon, muzej enterijer)
+('https://museos.xunta.gal/sites/default/files/field/image/_aec1675.jpg', 'Muzej Hodočasnika Santiago', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Hodočasnika Santiago'), NOW()),
+
+-- Mercado Compostela Central: tržnica
+('https://www.turismo.gal/osdam/filestore/8/5/4/0/3_b387700af375e0f/85403scr_09e429228df3451.jpg', 'Mercado Compostela Central', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercado Compostela Central'), NOW()),
+
+-- Hospital Santiago Centro: bolnica
+('https://upload.wikimedia.org/wikipedia/commons/0/04/Hospital_San_Juan_de_Dios%2C_Santiago%2C_2017-08-27.jpg', 'Hospital Santiago Centro', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Santiago Centro'), NOW()),
+
+-- Repsol Alameda Santiago: benzinska pumpa
+('https://www.paxinasgalegas.es/imagenes/galuresa-meixonfrio-repsol_img27827t0m0w1600h800.jpg', 'Repsol Alameda Santiago', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol Alameda Santiago'), NOW());
 -- 16.5 DODATNI DOGAĐAJI ZA NOVE DESTINACIJE U ŠPANIJI
 WITH source("Name", "Description", "Lng", "Lat", "StartDate", "EndDate", "Price", "MaxVisitors", "EventTypeName", "LocalityName", "DestinationName", "ObjectName", "CreatorEmail", "ManagerEmail") AS (
     VALUES
