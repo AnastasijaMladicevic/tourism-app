@@ -27,7 +27,7 @@
 
 .header__title {
   flex: 1;
-  font-size: 28px;
+  font-size: 18px;
   font-weight: 700;
   color: var(--text-dark);
   margin: 0;
@@ -885,13 +885,6 @@
   min-width: 88px;
   justify-content: center;
   white-space: nowrap;
-}
-
-// ─── WHOLE FILTER BAR POLISH ──────────────────────────────────────────────────
-.filters-row {
-  box-shadow:
-    inset 0 -1px 0 rgba(255,255,255,0.03),
-    0 4px 18px rgba(0,0,0,0.18);
 }
 
 /* SORT DROPDOWN DARK FIX */
