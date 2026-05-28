@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, from, of } from 'rxjs';
-import { map, concatMap, toArray } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../environment/environment';
 import { ReviewDto } from './review';
 import { ActiveRegionService, RegionRequestOptions } from './active-region';
@@ -126,12 +126,6 @@ export interface CreateObjectDto {
   objectTypeId: number;
   destinationId?: number;
   localityId?: number;
-}
-
-export interface AddObjectImageDto {
-  url: string;
-  altText?: string;
-  isMain: boolean;
 }
 
 export interface UpdateObjectDto {
@@ -332,8 +326,15 @@ export class ObjectService {
     return this.http.post<ObjectDto>(this.url, dto);
   }
 
-  addImage(objectId: number, dto: AddObjectImageDto): Observable<ObjectImageDto> {
-    return this.http.post<ObjectImageDto>(`${this.url}/${objectId}/images`, dto);
+  addImage(objectId: number, file: File, isMain = false, altText?: string): Observable<ObjectImageDto> {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('isMain', String(isMain));
+    if (altText?.trim()) {
+      formData.append('altText', altText.trim());
+    }
+
+    return this.http.post<ObjectImageDto>(`${this.url}/${objectId}/images`, formData);
   }
 
   /** Lists images linked to a tourist object (same payload as `ObjectDto.images` when populated). */
@@ -349,22 +350,6 @@ export class ObjectService {
   /** Marks an image as the main image for its entity. */
   setMainImage(imageId: number): Observable<ObjectImageDto> {
     return this.http.patch<ObjectImageDto>(`${environment.apiUrl}/images/${imageId}/set-main`, {});
-  }
-
-  /**
-   * Attaches URLs sequentially after object creation. First URL is stored as main (backend rule).
-   * Use only when the object has no images yet.
-   */
-  attachImages(objectId: number, imageUrls: string[]): Observable<ObjectImageDto[]> {
-    const cleanUrls = imageUrls.map((u) => u.trim()).filter((u) => u.length > 0);
-    if (cleanUrls.length === 0) {
-      return of([]);
-    }
-
-    return from(cleanUrls).pipe(
-      concatMap((url, index) => this.addImage(objectId, { url, isMain: index === 0 })),
-      toArray()
-    );
   }
 
   update(id: number, dto: UpdateObjectDto): Observable<ObjectDto> {

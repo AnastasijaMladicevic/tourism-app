@@ -40,22 +40,29 @@
           <div>
             <span class="step-tag">STEP 1</span>
             <h2>Media Gallery</h2>
-            <p>Paste public image URLs and choose a primary cover image.</p>
+            <p>Upload up to 8 images and choose a primary cover image.</p>
           </div>
         </div>
 
         <div class="gallery-dropzone">
-          <p class="dropzone-title">Add Photo URL</p>
-          <p class="dropzone-copy">Images are attached after activity creation via the image endpoint.</p>
+          <p class="dropzone-title">Add Photos</p>
+          <p class="dropzone-copy">Choose local image files. They are uploaded after the activity is saved.</p>
 
           <div class="dropzone-input-row">
             <input
-              type="url"
-              [(ngModel)]="pendingImageUrl"
-              [ngModelOptions]="{ standalone: true }"
-              placeholder="https://example.com/image.jpg"
+              type="text"
+              [value]="imageUrls.length ? imageUrls.length + ' image(s) selected' : 'Select one or more image files...'"
+              readonly
             />
-            <button type="button" class="primary-btn" (click)="addImageUrl()">Add Photo</button>
+            <button type="button" class="primary-btn" (click)="galleryFileInput.click()">Add Photo</button>
+            <input
+              #galleryFileInput
+              type="file"
+              accept="image/*"
+              multiple
+              hidden
+              (change)="onGalleryFilesSelected($event)"
+            />
           </div>
         </div>
 

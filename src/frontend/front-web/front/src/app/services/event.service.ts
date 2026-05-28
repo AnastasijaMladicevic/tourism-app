@@ -242,6 +242,17 @@ export class EventService {
     return this.http.post<EventImageDto>(`${this.apiUrl}/${eventId}/images`, dto);
   }
 
+  uploadImage(eventId: number, file: File, isMain = false, altText?: string): Observable<EventImageDto> {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('isMain', String(isMain));
+    if (altText?.trim()) {
+      formData.append('altText', altText.trim());
+    }
+
+    return this.http.post<EventImageDto>(`${this.apiUrl}/${eventId}/images`, formData);
+  }
+
   getImages(eventId: number): Observable<EventImageDto[]> {
     return this.http.get<EventImageDto[]>(`${this.apiUrl}/${eventId}/images`);
   }

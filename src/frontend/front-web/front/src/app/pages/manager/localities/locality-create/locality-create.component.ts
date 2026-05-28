@@ -45,6 +45,7 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
   isDeleting = false;
   private readonly draftStorageKey = 'manager-locality-create-draft';
   private deleteRedirectTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  private readonly maxImageCount = 8;
 
   destinationOptions: DestinationOption[] = [];
   localityTypeOptions: LocalityTypeOption[] = [];
@@ -150,6 +151,10 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
 
     if (!this.form.name.trim() || !this.form.destinationId || !this.form.localityTypeId) {
       this.errorMessage = 'Name, destination, and type are required.';
+      return;
+    }
+    if (this.existingImages.length + this.imageFiles.length > this.maxImageCount) {
+      this.errorMessage = `A locality can have at most ${this.maxImageCount} images.`;
       return;
     }
 
@@ -308,11 +313,23 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
       return;
     }
 
-    for (const file of imageFiles) {
+    const remainingSlots = this.maxImageCount - (this.existingImages.length + this.imageFiles.length);
+    if (remainingSlots <= 0) {
+      this.errorMessage = `You can upload up to ${this.maxImageCount} images per locality.`;
+      input.value = '';
+      return;
+    }
+
+    const acceptedFiles = imageFiles.slice(0, remainingSlots);
+    for (const file of acceptedFiles) {
       this.imageFiles.push(file);
       this.imagePreviews.push(URL.createObjectURL(file));
     }
 
+    this.errorMessage =
+      acceptedFiles.length < imageFiles.length
+        ? `Only the first ${acceptedFiles.length} image(s) were added. Each locality can have up to ${this.maxImageCount} images.`
+        : '';
     this.pendingImageNames = this.imageFiles.map((file) => file.name).join(', ');
     input.value = '';
   }

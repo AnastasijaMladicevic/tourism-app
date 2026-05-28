@@ -85,7 +85,6 @@ export class EventFormComponent implements OnInit, OnDestroy {
   showDeleteModal = false;
   isImageDropActive = false;
 
-  pendingImageUrl = '';
   imageUrls: string[] = [];
   imagesSnapshot: EventImageDto[] = [];
   eventStatus = '';
@@ -97,6 +96,8 @@ export class EventFormComponent implements OnInit, OnDestroy {
   showTipsModal = false;
   private loadedEvent: EventDto | null = null;
   private deletionRequestSubmitted = false;
+  private readonly maxImageCount = 8;
+  private readonly pendingImageFiles = new Map<string, File>();
 
   private readonly fallbackEventTypes = [
     { id: 1, name: 'Festival' },
@@ -214,6 +215,7 @@ export class EventFormComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.releasePendingImagePreviews();
   }
 
   private loadDropdownOptions(): void {
@@ -460,32 +462,39 @@ export class EventFormComponent implements OnInit, OnDestroy {
     }
 
     const main = event.mainImageUrl?.trim();
-    if (main && /^https?:\/\//i.test(main)) {
+    if (main) {
       return [main];
     }
     return [];
   }
 
-  addImageUrl(): void {
-    const raw = this.pendingImageUrl.trim();
-    if (!raw) {
+  onGalleryFilesSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const selectedFiles = Array.from(input.files ?? []).filter((file) => file.type.startsWith('image/'));
+    if (!selectedFiles.length) {
       return;
     }
 
-    if (!this.isValidImageUrl(raw)) {
-      this.errorMessage = 'Please enter a valid image URL (http or https).';
+    const remainingSlots = this.maxImageCount - this.imageUrls.length;
+    if (remainingSlots <= 0) {
+      this.errorMessage = `You can upload up to ${this.maxImageCount} images per event.`;
+      input.value = '';
       return;
     }
 
-    const normalized = this.normalizeImageUrl(raw);
-    if (!normalized || this.imageUrls.includes(normalized)) {
-      this.pendingImageUrl = '';
-      return;
+    const acceptedFiles = selectedFiles.slice(0, remainingSlots);
+    for (const file of acceptedFiles) {
+      const previewUrl = URL.createObjectURL(file);
+      this.pendingImageFiles.set(previewUrl, file);
+      this.imageUrls.push(previewUrl);
     }
 
-    this.imageUrls.push(normalized);
-    this.pendingImageUrl = '';
-    this.errorMessage = '';
+    this.errorMessage =
+      acceptedFiles.length < selectedFiles.length
+        ? `Only the first ${remainingSlots} images were added. Each event can have up to ${this.maxImageCount} images.`
+        : '';
+
+    input.value = '';
   }
 
   removeImage(index: number): void {
@@ -493,7 +502,8 @@ export class EventFormComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.imageUrls.splice(index, 1);
+    const [removedUrl] = this.imageUrls.splice(index, 1);
+    this.revokePendingPreview(removedUrl);
   }
 
   setPrimaryImage(index: number): void {
@@ -536,8 +546,7 @@ export class EventFormComponent implements OnInit, OnDestroy {
       latitude: this.parseOptionalNumber(formValue.latitude),
       localityId: this.parseOptionalNumber(formValue.localityId),
       destinationId: this.parseOptionalNumber(formValue.destinationId),
-      objectId: this.parseOptionalNumber(formValue.objectId),
-      imageUrl: this.imageUrls.length > 0 ? this.getPersistentImageUrl(this.imageUrls[0]) : undefined
+      objectId: this.parseOptionalNumber(formValue.objectId)
     };
 
     const request$ = this.isEditMode && this.eventId
@@ -574,7 +583,7 @@ export class EventFormComponent implements OnInit, OnDestroy {
       return of(created);
     }
 
-    return this.eventService.attachImages(created.id, this.imageUrls).pipe(
+    return this.uploadPendingImages(created.id, this.imageUrls, 0).pipe(
       map(() => created),
       catchError(() => of(created))
     );
@@ -586,17 +595,15 @@ export class EventFormComponent implements OnInit, OnDestroy {
     snapshot: EventImageDto[]
   ): Observable<void> {
     const desired = desiredOrdered.map((u) => u.trim()).filter((u) => u.length > 0);
-    const desiredSet = new Set(desired);
+    const desiredExistingSet = new Set(desired.filter((url) => !this.pendingImageFiles.has(url)));
 
-    const toDelete = snapshot.filter((img) => !desiredSet.has(img.url.trim()));
-    const surviving = snapshot.filter((img) => desiredSet.has(img.url.trim()));
+    const toDelete = snapshot.filter((img) => !desiredExistingSet.has(img.url.trim()));
+    const surviving = snapshot.filter((img) => desiredExistingSet.has(img.url.trim()));
 
     const urlToId = new Map<string, number>();
     for (const img of surviving) {
       urlToId.set(img.url.trim(), img.id);
     }
-
-    const toAddOrdered = desired.filter((u) => !urlToId.has(u));
 
     const delete$ =
       toDelete.length === 0
@@ -607,27 +614,8 @@ export class EventFormComponent implements OnInit, OnDestroy {
         );
 
     return delete$.pipe(
-      switchMap(() => {
-        let pendingCount = surviving.length;
-
-        if (toAddOrdered.length === 0) {
-          return this.ensureMainImage(desired, urlToId);
-        }
-
-        return from(toAddOrdered).pipe(
-          concatMap((url) => {
-            const isMain = pendingCount === 0;
-            pendingCount++;
-            return this.eventService.addImage(eventId, { url, isMain }).pipe(
-              tap((dto) => {
-                urlToId.set(url.trim(), dto.id);
-              })
-            );
-          }),
-          toArray(),
-          switchMap(() => this.ensureMainImage(desired, urlToId))
-        );
-      })
+      switchMap(() => this.uploadPendingImages(eventId, desired, surviving.length, urlToId)),
+      switchMap((updatedMap) => this.ensureMainImage(desired, updatedMap))
     );
   }
 
@@ -780,18 +768,28 @@ export class EventFormComponent implements OnInit, OnDestroy {
     event.preventDefault();
     this.isImageDropActive = false;
 
-    const droppedUrl = this.getDroppedImageUrl(event);
-    if (!droppedUrl || !this.isValidImageUrl(droppedUrl)) {
+    const droppedFiles = Array.from(event.dataTransfer?.files ?? []).filter((file) => file.type.startsWith('image/'));
+    if (!droppedFiles.length) {
       return;
     }
 
-    const normalized = this.normalizeImageUrl(droppedUrl);
-    if (!normalized || this.imageUrls.includes(normalized)) {
+    const remainingSlots = this.maxImageCount - this.imageUrls.length;
+    if (remainingSlots <= 0) {
+      this.errorMessage = `You can upload up to ${this.maxImageCount} images per event.`;
       return;
     }
 
-    this.imageUrls.push(normalized);
-    this.errorMessage = '';
+    const acceptedFiles = droppedFiles.slice(0, remainingSlots);
+    for (const file of acceptedFiles) {
+      const previewUrl = URL.createObjectURL(file);
+      this.pendingImageFiles.set(previewUrl, file);
+      this.imageUrls.push(previewUrl);
+    }
+
+    this.errorMessage =
+      acceptedFiles.length < droppedFiles.length
+        ? `Only the first ${remainingSlots} images were added. Each event can have up to ${this.maxImageCount} images.`
+        : '';
     this.cdr.detectChanges();
   }
 
@@ -874,6 +872,36 @@ export class EventFormComponent implements OnInit, OnDestroy {
     return this.toNumber(value) ?? undefined;
   }
 
+  private uploadPendingImages(
+    eventId: number,
+    desiredOrdered: string[],
+    existingCount: number,
+    urlToId = new Map<string, number>()
+  ): Observable<Map<string, number>> {
+    const pendingEntries = desiredOrdered
+      .filter((url) => this.pendingImageFiles.has(url))
+      .map((previewUrl) => ({
+        previewUrl,
+        file: this.pendingImageFiles.get(previewUrl)!
+      }));
+
+    if (pendingEntries.length === 0) {
+      return of(urlToId);
+    }
+
+    return from(pendingEntries).pipe(
+      concatMap((entry, index) =>
+        this.eventService.uploadImage(eventId, entry.file, existingCount === 0 && index === 0).pipe(
+          tap((dto) => {
+            urlToId.set(entry.previewUrl, dto.id);
+          })
+        )
+      ),
+      toArray(),
+      map(() => urlToId)
+    );
+  }
+
   private formatDateOnlyForInput(date: string | Date | undefined): string {
     if (!date) {
       return '';
@@ -899,88 +927,24 @@ export class EventFormComponent implements OnInit, OnDestroy {
     return `${hours}:${minutes}`;
   }
 
-  private normalizeImageUrl(value: string): string {
-    const trimmed = value.trim();
-
-    if (!trimmed) {
-      return '';
+  private revokePendingPreview(previewUrl: string | undefined): void {
+    if (!previewUrl || !this.pendingImageFiles.has(previewUrl)) {
+      return;
     }
 
-    if (/^(data:|blob:|https?:\/\/|\/\/)/i.test(trimmed)) {
-      return trimmed;
-    }
-
-    try {
-      return encodeURI(new URL(trimmed, document.baseURI).href);
-    } catch {
-      return encodeURI(trimmed);
+    this.pendingImageFiles.delete(previewUrl);
+    if (previewUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(previewUrl);
     }
   }
 
-  private getPersistentImageUrl(value: string | null | undefined): string | undefined {
-    const normalized = this.normalizeImageUrl(value ?? '');
-
-    if (!normalized || normalized.startsWith('blob:') || normalized.startsWith('data:')) {
-      return undefined;
+  private releasePendingImagePreviews(): void {
+    for (const previewUrl of this.pendingImageFiles.keys()) {
+      if (previewUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(previewUrl);
+      }
     }
-    return normalized;
-  }
-
-  private getDroppedImageUrl(event: DragEvent): string {
-    const transfer = event.dataTransfer;
-    if (!transfer) {
-      return '';
-    }
-
-    const files = transfer.files;
-    if (files && files.length > 0) {
-      return '';
-    }
-
-    const plainText = transfer.getData('text/uri-list') || transfer.getData('text/plain');
-    const normalizedPlainText = plainText.trim();
-    if (this.isValidImageUrl(normalizedPlainText)) {
-      return normalizedPlainText;
-    }
-
-    const html = transfer.getData('text/html');
-    const extractedFromHtml = this.extractImageUrlFromHtml(html);
-    if (this.isValidImageUrl(extractedFromHtml)) {
-      return extractedFromHtml;
-    }
-
-    return '';
-  }
-
-  private extractImageUrlFromHtml(html: string): string {
-    if (!html) {
-      return '';
-    }
-
-    const srcMatch = html.match(/src=["']([^"']+)["']/i);
-    if (srcMatch?.[1]) {
-      return srcMatch[1].trim();
-    }
-
-    const hrefMatch = html.match(/href=["']([^"']+)["']/i);
-    if (hrefMatch?.[1]) {
-      return hrefMatch[1].trim();
-    }
-
-    return '';
-  }
-
-  private isValidImageUrl(value: string): boolean {
-    if (!value) {
-      return false;
-    }
-
-    try {
-      const parsed = new URL(value);
-      return parsed.protocol === 'http:' || parsed.protocol === 'https:';
-    } catch {
-      return false;
-    }
+    this.pendingImageFiles.clear();
   }
   toNumber(value: number | string | null | undefined): number | null {
     if (value == null || value === '') {

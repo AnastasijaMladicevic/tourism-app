@@ -12,16 +12,18 @@ import {
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { Subject, forkJoin, of } from 'rxjs';
+import { Observable, Subject, forkJoin, from, of } from 'rxjs';
 import {
   catchError,
+  concatMap,
   debounceTime,
   distinctUntilChanged,
   finalize,
   map,
   switchMap,
   takeUntil,
-  tap
+  tap,
+  toArray
 } from 'rxjs/operators';
 import {
   AdminUserListItemDto,
@@ -91,7 +93,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
 
   imageFiles: File[] = [];
   imagePreviews: string[] = [];
-  primaryPreviewImageIndex = 0;
+  primaryPreviewImageIndex: number | null = 0;
   destinationImages: DestinationImageDto[] = [];
   isUpdatingImages = false;
   isLoadingLinkedEntities = false;
@@ -101,6 +103,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
     activities: 0,
     localities: 0
   };
+  private readonly maxImageCount = 8;
 
   form: CreateDestinationDto = {
     name: '',
@@ -311,6 +314,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
     };
     this.fullDescription = destination.description ?? '';
     this.destinationImages = [...images].sort((a, b) => (a.isMain === b.isMain ? 0 : a.isMain ? -1 : 1));
+    this.primaryPreviewImageIndex = this.destinationImages.length > 0 ? null : 0;
 
     if (destination.managedByUserId) {
       this.adminUsersService.searchManagers('', 200).subscribe({
@@ -432,6 +436,9 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           this.destinationImages = this.destinationImages.filter((img) => img.id !== image.id);
+          if (!this.destinationImages.length && this.imagePreviews.length > 0 && this.primaryPreviewImageIndex == null) {
+            this.primaryPreviewImageIndex = 0;
+          }
           this.cdr.detectChanges();
         },
         error: (err) => {
@@ -779,12 +786,29 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
     if (!files?.length) {
       return;
     }
-    for (let i = 0; i < files.length; i++) {
+    const remainingSlots = this.maxImageCount - (this.destinationImages.length + this.imageFiles.length);
+    if (remainingSlots <= 0) {
+      this.errorMessage = `You can upload up to ${this.maxImageCount} images per destination.`;
+      input.value = '';
+      return;
+    }
+    const acceptedCount = Math.min(files.length, remainingSlots);
+    for (let i = 0; i < acceptedCount; i++) {
       const file = files[i];
       this.imageFiles.push(file);
       this.imagePreviews.push(URL.createObjectURL(file));
     }
-    if (this.primaryPreviewImageIndex >= this.imagePreviews.length) {
+    if (this.primaryPreviewImageIndex == null && this.destinationImages.length === 0 && this.imagePreviews.length > 0) {
+      this.primaryPreviewImageIndex = 0;
+    }
+    this.errorMessage =
+      acceptedCount < files.length
+        ? `Only the first ${acceptedCount} image(s) were added. Each destination can have up to ${this.maxImageCount} images.`
+        : '';
+    if (
+      this.primaryPreviewImageIndex != null &&
+      this.primaryPreviewImageIndex >= this.imagePreviews.length
+    ) {
       this.primaryPreviewImageIndex = Math.max(0, this.imagePreviews.length - 1);
     }
     input.value = '';
@@ -798,7 +822,10 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
     this.imagePreviews = this.imagePreviews.filter((_, i) => i !== index);
     this.imageFiles = this.imageFiles.filter((_, i) => i !== index);
     if (this.imagePreviews.length === 0) {
-      this.primaryPreviewImageIndex = 0;
+      this.primaryPreviewImageIndex = this.destinationImages.length === 0 ? 0 : null;
+      return;
+    }
+    if (this.primaryPreviewImageIndex == null) {
       return;
     }
     if (index < this.primaryPreviewImageIndex) {
@@ -823,6 +850,10 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
   private validateBasics(): boolean {
     if (!this.form.name.trim()) {
       this.errorMessage = 'Destination name is required.';
+      return false;
+    }
+    if (this.destinationImages.length + this.imageFiles.length > this.maxImageCount) {
+      this.errorMessage = `A destination can have at most ${this.maxImageCount} images.`;
       return false;
     }
     if (!this.selectedManager && this.savedDestinationId == null) {
@@ -882,33 +913,35 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
       .pipe(
         switchMap((saved: DestinationDto) => {
           this.savedDestinationId = saved.id;
-          if (!this.selectedManager) {
-            return of({ assigned: true as const });
-          }
-          if (isCreateRequest) {
-            return this.destinationService.assignManager(saved.id, this.selectedManager.id).pipe(
-              map(() => ({ assigned: true as const })),
-              catchError((err) =>
-                of({
-                  assigned: false as const,
-                  assignError:
-                    typeof err?.error?.message === 'string'
-                      ? err.error.message
-                      : 'Destination was saved, but assigning the manager failed.'
-                })
+          const assignment$ = !this.selectedManager
+            ? of({ assigned: true as const })
+            : this.destinationService.assignManager(saved.id, this.selectedManager.id).pipe(
+                map(() => ({ assigned: true as const })),
+                catchError((err) =>
+                  of({
+                    assigned: false as const,
+                    assignError:
+                      typeof err?.error?.message === 'string'
+                        ? err.error.message
+                        : 'Destination was saved, but assigning the manager failed.'
+                  })
+                )
+              );
+
+          return assignment$.pipe(
+            switchMap((assignmentResult) =>
+              this.uploadPendingImages(saved.id, this.destinationImages.length).pipe(
+                map(() => ({
+                  ...assignmentResult,
+                  imageUploadFailed: false as const
+                })),
+                catchError(() =>
+                  of({
+                    ...assignmentResult,
+                    imageUploadFailed: true as const
+                  })
+                )
               )
-            );
-          }
-          return this.destinationService.assignManager(saved.id, this.selectedManager.id).pipe(
-            map(() => ({ assigned: true as const })),
-            catchError((err) =>
-              of({
-                assigned: false as const,
-                assignError:
-                  typeof err?.error?.message === 'string'
-                    ? err.error.message
-                    : 'Destination was saved, but assigning the manager failed.'
-              })
             )
           );
         }),
@@ -917,6 +950,9 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
       .subscribe({
         next: (out) => {
           if (!out.assigned) {
+            if (!out.imageUploadFailed) {
+              this.resetPendingImages();
+            }
             if (published) {
               this.router.navigate(['/admin/destinations']);
               return;
@@ -931,7 +967,10 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
             return;
           }
           this.form.isActive = false;
-          this.draftSavedMessage = 'Draft saved to the server';
+          this.resetPendingImages();
+          this.draftSavedMessage = out.imageUploadFailed
+            ? 'Draft saved to the server, but some images could not be uploaded.'
+            : 'Draft saved to the server';
         },
         error: (err) => {
           const lockState = this.extractLockState(err);
@@ -944,6 +983,69 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
           this.errorMessage = this.extractApiErrorMessage(err);
         }
       });
+  }
+
+  private uploadPendingImages(
+    destinationId: number,
+    existingCount: number
+  ): Observable<DestinationImageDto[]> {
+    if (!this.imageFiles.length) {
+      return of([]);
+    }
+
+    const originalEntries = this.imageFiles.map((file, index) => ({ file, originalIndex: index }));
+    const selectedPrimaryIndex =
+      this.primaryPreviewImageIndex != null
+        ? this.primaryPreviewImageIndex
+        : existingCount === 0 && originalEntries.length > 0
+          ? 0
+          : null;
+
+    const uploadEntries = [...originalEntries];
+    if (existingCount === 0 && selectedPrimaryIndex != null && selectedPrimaryIndex > 0) {
+      const [selectedPrimary] = uploadEntries.splice(selectedPrimaryIndex, 1);
+      if (selectedPrimary) {
+        uploadEntries.unshift(selectedPrimary);
+      }
+    }
+
+    const uploadedByOriginalIndex = new Map<number, DestinationImageDto>();
+
+    return from(uploadEntries).pipe(
+      concatMap((entry, uploadIndex) =>
+        this.destinationService.addImage(
+          destinationId,
+          entry.file,
+          existingCount === 0 && uploadIndex === 0
+        ).pipe(
+          tap((image) => {
+            uploadedByOriginalIndex.set(entry.originalIndex, image);
+          })
+        )
+      ),
+      toArray(),
+      switchMap((uploadedImages) => {
+        if (existingCount > 0 && selectedPrimaryIndex != null) {
+          const selectedImage = uploadedByOriginalIndex.get(selectedPrimaryIndex);
+          if (selectedImage?.id) {
+            return this.destinationService.setMainImage(selectedImage.id).pipe(map(() => uploadedImages));
+          }
+        }
+
+        return of(uploadedImages);
+      })
+    );
+  }
+
+  private resetPendingImages(): void {
+    this.imagePreviews.forEach((url) => {
+      if (url.startsWith('blob:')) {
+        URL.revokeObjectURL(url);
+      }
+    });
+    this.imageFiles = [];
+    this.imagePreviews = [];
+    this.primaryPreviewImageIndex = this.destinationImages.length > 0 ? null : 0;
   }
 
   private extractLockState(err: unknown): DestinationEditLockDto | null {

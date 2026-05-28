@@ -10,7 +10,8 @@ import {
 } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators, AbstractControl, ValidationErrors, FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { catchError, finalize, forkJoin, map, of, switchMap } from 'rxjs';
+import { Observable, catchError, finalize, forkJoin, from, map, of, switchMap } from 'rxjs';
+import { concatMap, toArray } from 'rxjs/operators';
 import { MapComponent } from '../../../../shared/components/map/map';
 import {
   ActivitiesService,
@@ -68,7 +69,6 @@ interface DraftPayload {
     longitude: number | null;
     isVisible: boolean;
   };
-  images: string[];
 }
 
 @Component({
@@ -129,6 +129,7 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
   objects: ObjectOption[] = [];
   private loadedActivity: ActivityDto | null = null;
   private deletionRequestSubmitted = false;
+  private readonly maxImageCount = 8;
 
   private readonly draftKey = 'content-creator:add-activity-draft';
   private geocodeRequestId = 0;
@@ -144,13 +145,11 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
   locationContextQuery = '';
   isLocationContextSearching = false;
 
-  pendingImageUrl = '';
   imageUrls: string[] = [];
 
-  /** Normalized URLs already persisted for this activity when the edit form loaded (skip on save). */
-  private initialStoredImageUrlKeys = new Set<string>();
+  imagesSnapshot: ActivityImageDto[] = [];
   /** True if GET /activities/:id/images returned at least one row — activity already has a main image in DB. */
-  private hadStoredImagesWhenLoaded = false;
+  private readonly pendingImageFiles = new Map<string, File>();
 
   ngOnInit(): void {
     const idFromRoute = Number(this.route.snapshot.paramMap.get('id'));
@@ -160,8 +159,6 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
     }
 
     if (!this.isEditMode) {
-      this.initialStoredImageUrlKeys.clear();
-      this.hadStoredImagesWhenLoaded = false;
       this.loadDraft();
     }
 
@@ -185,7 +182,9 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnDestroy(): void { }
+  ngOnDestroy(): void {
+    this.releasePendingImagePreviews();
+  }
 
   get pageTitle(): string {
     return this.isEditMode ? 'Edit Activity' : 'Create Activity';
@@ -257,25 +256,33 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
     return this.objects.filter((objectItem) => !objectItem.destinationId || objectItem.destinationId === destinationId);
   }
 
-  addImageUrl(): void {
-    const url = this.pendingImageUrl.trim();
-    if (!url) {
+  onGalleryFilesSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const selectedFiles = Array.from(input.files ?? []).filter((file) => file.type.startsWith('image/'));
+    if (!selectedFiles.length) {
       return;
     }
 
-    if (!this.isValidHttpUrl(url)) {
-      this.errorMessage = 'Please enter a valid image URL (http or https).';
+    const remainingSlots = this.maxImageCount - this.imageUrls.length;
+    if (remainingSlots <= 0) {
+      this.errorMessage = `You can upload up to ${this.maxImageCount} images per activity.`;
+      input.value = '';
       return;
     }
 
-    if (this.imageUrls.includes(url)) {
-      this.pendingImageUrl = '';
-      return;
+    const acceptedFiles = selectedFiles.slice(0, remainingSlots);
+    for (const file of acceptedFiles) {
+      const previewUrl = URL.createObjectURL(file);
+      this.pendingImageFiles.set(previewUrl, file);
+      this.imageUrls.push(previewUrl);
     }
 
-    this.imageUrls.push(url);
-    this.pendingImageUrl = '';
-    this.errorMessage = '';
+    this.errorMessage =
+      acceptedFiles.length < selectedFiles.length
+        ? `Only the first ${remainingSlots} images were added. Each activity can have up to ${this.maxImageCount} images.`
+        : '';
+
+    input.value = '';
   }
 
   removeImage(index: number): void {
@@ -283,7 +290,8 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.imageUrls.splice(index, 1);
+    const [removedUrl] = this.imageUrls.splice(index, 1);
+    this.revokePendingPreview(removedUrl);
   }
 
   setPrimaryImage(index: number): void {
@@ -349,8 +357,7 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
     }
 
     const payload: DraftPayload = {
-      values: this.form.getRawValue(),
-      images: [...this.imageUrls]
+      values: this.form.getRawValue()
     };
 
     localStorage.setItem(this.draftKey, JSON.stringify(payload));
@@ -400,7 +407,14 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
 
     request
       .pipe(
-        switchMap((createdActivity) => this.attachImagesAfterCreate(createdActivity)),
+        switchMap((createdActivity) =>
+          this.isEditMode && this.activityId
+            ? this.syncImagesAfterSave(this.activityId, this.imageUrls, this.imagesSnapshot).pipe(
+                map(() => ({ createdActivity, imageUploadFailed: false })),
+                catchError(() => of({ createdActivity, imageUploadFailed: true }))
+              )
+            : this.attachImagesAfterCreate(createdActivity)
+        ),
         finalize(() => {
           this.isSubmitting = false;
         })
@@ -612,27 +626,45 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
   }
 
   private attachImagesAfterCreate(createdActivity: ActivityDto) {
-    const trimmedGallery = this.imageUrls.map((u) => u.trim()).filter((u) => u.length > 0);
-
-    let urlsToAttach: string[];
-    if (this.isEditMode) {
-      urlsToAttach = trimmedGallery.filter((url) => !this.initialStoredImageUrlKeys.has(this.normalizeImageUrlKey(url)));
-    } else {
-      urlsToAttach = trimmedGallery;
-    }
-
-    if (urlsToAttach.length === 0) {
+    if (this.imageUrls.length === 0) {
       return of({ createdActivity, imageUploadFailed: false });
     }
 
-    const treatAsAppend = this.isEditMode && this.hadStoredImagesWhenLoaded;
-
-    return this.activitiesService
-      .attachImages(createdActivity.id, urlsToAttach, { treatAsAppend })
+    return this.uploadPendingImages(createdActivity.id, this.imageUrls, 0)
       .pipe(
         map(() => ({ createdActivity, imageUploadFailed: false })),
         catchError(() => of({ createdActivity, imageUploadFailed: true }))
       );
+  }
+
+  private syncImagesAfterSave(
+    activityId: number,
+    desiredOrdered: string[],
+    snapshot: ActivityImageDto[]
+  ): Observable<void> {
+    const desired = desiredOrdered.map((url) => url.trim()).filter((url) => url.length > 0);
+    const desiredExistingSet = new Set(desired.filter((url) => !this.pendingImageFiles.has(url)));
+
+    const toDelete = snapshot.filter((image) => !desiredExistingSet.has(image.url.trim()));
+    const surviving = snapshot.filter((image) => desiredExistingSet.has(image.url.trim()));
+
+    const urlToId = new Map<string, number>();
+    for (const image of surviving) {
+      urlToId.set(image.url.trim(), image.id);
+    }
+
+    const delete$ =
+      toDelete.length === 0
+        ? of(undefined)
+        : forkJoin(toDelete.map((image) => this.activitiesService.deleteImageById(image.id))).pipe(
+            map(() => undefined),
+            catchError(() => of(undefined))
+          );
+
+    return delete$.pipe(
+      switchMap(() => this.uploadPendingImages(activityId, desired, surviving.length, urlToId)),
+      switchMap((updatedMap) => this.ensureMainImage(desired, updatedMap))
+    );
   }
 
   private loadActivity(): void {
@@ -716,10 +748,6 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
       if (draft.values) {
         this.form.patchValue(draft.values);
       }
-
-      if (Array.isArray(draft.images)) {
-        this.imageUrls = draft.images.filter((url) => typeof url === 'string' && url.length > 0);
-      }
     } catch {
       localStorage.removeItem(this.draftKey);
     }
@@ -729,15 +757,7 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
     this.activitiesService.getImages(activityId)
       .pipe(catchError(() => of([] as ActivityImageDto[])))
       .subscribe((images) => {
-        this.initialStoredImageUrlKeys.clear();
-        this.hadStoredImagesWhenLoaded = images.length > 0;
-
-        for (const image of images) {
-          const key = this.normalizeImageUrlKey(image.url);
-          if (key) {
-            this.initialStoredImageUrlKeys.add(key);
-          }
-        }
+        this.imagesSnapshot = images.map((image) => ({ ...image }));
 
         const orderedUrls = images
           .slice()
@@ -750,17 +770,77 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
         } else {
           const fallbackMain = this.loadedActivity?.mainImageUrl?.trim();
           this.imageUrls = fallbackMain ? [fallbackMain] : [];
-          if (fallbackMain) {
-            this.initialStoredImageUrlKeys.add(this.normalizeImageUrlKey(fallbackMain));
-          }
         }
 
         this.cdr.detectChanges();
       });
   }
 
-  private normalizeImageUrlKey(url: string): string {
-    return url.trim().toLowerCase();
+  private uploadPendingImages(
+    activityId: number,
+    desiredOrdered: string[],
+    existingCount: number,
+    urlToId = new Map<string, number>()
+  ): Observable<Map<string, number>> {
+    const pendingEntries = desiredOrdered
+      .filter((url) => this.pendingImageFiles.has(url))
+      .map((previewUrl) => ({
+        previewUrl,
+        file: this.pendingImageFiles.get(previewUrl)!
+      }));
+
+    if (pendingEntries.length === 0) {
+      return of(urlToId);
+    }
+
+    return from(pendingEntries).pipe(
+      concatMap((entry, index) =>
+        this.activitiesService.addImage(activityId, entry.file, existingCount === 0 && index === 0).pipe(
+          map((dto) => {
+            urlToId.set(entry.previewUrl, dto.id);
+            return dto;
+          })
+        )
+      ),
+      toArray(),
+      map(() => urlToId)
+    );
+  }
+
+  private ensureMainImage(desired: string[], urlToId: Map<string, number>): Observable<void> {
+    if (desired.length === 0) {
+      return of(undefined);
+    }
+
+    const mainId = urlToId.get(desired[0]);
+    if (!mainId) {
+      return of(undefined);
+    }
+
+    return this.activitiesService.setMainImage(mainId).pipe(
+      map(() => undefined),
+      catchError(() => of(undefined))
+    );
+  }
+
+  private revokePendingPreview(previewUrl: string | undefined): void {
+    if (!previewUrl || !this.pendingImageFiles.has(previewUrl)) {
+      return;
+    }
+
+    this.pendingImageFiles.delete(previewUrl);
+    if (previewUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(previewUrl);
+    }
+  }
+
+  private releasePendingImagePreviews(): void {
+    for (const previewUrl of this.pendingImageFiles.keys()) {
+      if (previewUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    }
+    this.pendingImageFiles.clear();
   }
 
   private syncEditModeOptions(): void {

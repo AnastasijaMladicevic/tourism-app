@@ -62,30 +62,36 @@
             @if (isManagerReview) {
               Read-only gallery shown before the review details.
             } @else {
-              Paste public image URLs and choose a primary cover image.
+              Upload up to 8 images and choose a primary cover image.
             }
           </p>
         </div>
 
         @if (!isManagerReview) {
           <div class="gallery-dropzone">
-            <p class="dropzone-title">Add Photo URL</p>
-            <p class="dropzone-copy">Images are attached after the object is saved via the image endpoint.</p>
+            <p class="dropzone-title">Add Photos</p>
+            <p class="dropzone-copy">Choose local image files. They are uploaded after the object is saved.</p>
 
             <div class="dropzone-input-row">
               <input
-                type="url"
-                [(ngModel)]="pendingImageUrl"
-                [ngModelOptions]="{ standalone: true }"
-                placeholder="https://example.com/image.jpg"
-                (keydown.enter)="$event.preventDefault(); addImageUrl()"
+                type="text"
+                [value]="hasEditableImages ? editableImageUrls.length + ' image(s) selected' : 'Select one or more image files...'"
+                readonly
               />
-              <button type="button" class="primary-btn" (click)="addImageUrl()">Add Photo</button>
+              <button type="button" class="primary-btn" (click)="galleryFileInput.click()">Add Photo</button>
+              <input
+                #galleryFileInput
+                type="file"
+                accept="image/*"
+                multiple
+                hidden
+                (change)="onGalleryFilesSelected($event)"
+              />
             </div>
           </div>
         }
 
-        @if (imageUrls.length > 0) {
+        @if (isManagerReview ? imageUrls.length > 0 : hasEditableImages) {
           @if (isManagerReview) {
             <div class="media-layout" aria-label="Object image gallery">
               <div class="media-preview" aria-label="Main object image preview">
@@ -108,7 +114,7 @@
             </div>
           } @else {
             <div class="gallery-grid">
-              <article class="gallery-item" *ngFor="let imageUrl of imageUrls; let index = index">
+              <article class="gallery-item" *ngFor="let imageUrl of editableImageUrls; let index = index">
                 <img [src]="imageUrl" alt="Object image preview" />
                 <div class="gallery-actions">
                   @if (index === 0) {
@@ -128,7 +134,7 @@
               @if (isManagerReview) {
                 No images submitted for this object.
               } @else {
-                Add at least one image URL above. Images are saved when you create or update the object.
+                Add one or more image files above. Images are saved when you create or update the object.
               }
             </p>
           </div>
