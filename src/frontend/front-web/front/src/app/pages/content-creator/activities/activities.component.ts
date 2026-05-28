@@ -21,7 +21,8 @@ interface ActivityInsightCard {
   styleUrls: [
     './activities.component.css',
     '../shared/cc-list-page-header.css',
-    '../shared/cc-page-stats-scroll.css'
+    '../shared/cc-page-stats-scroll.css',
+    '../shared/cc-stat-cards.css'
   ]
 })
 export class ContentCreatorActivitiesComponent implements OnInit, OnDestroy {

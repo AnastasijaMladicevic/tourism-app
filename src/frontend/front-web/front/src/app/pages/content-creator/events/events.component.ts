@@ -28,7 +28,8 @@ interface EventScheduleRow {
   styleUrls: [
     './events.component.css',
     '../shared/cc-list-page-header.css',
-    '../shared/cc-page-stats-scroll.css'
+    '../shared/cc-page-stats-scroll.css',
+    '../shared/cc-stat-cards.css'
   ]
 })
 export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
