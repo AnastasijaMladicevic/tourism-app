@@ -925,8 +925,13 @@
 }
 
 .sort-trigger:hover {
-  background: #0b2f43 !important;
-  color: #ffffff !important;
+  background: rgba(77, 194, 255, 0.08) !important;
+  border-color: rgba(77, 194, 255, 0.24) !important;
+  color: #4dc2ff !important;
+}
+
+.sort-trigger:hover mat-icon {
+  color: #4dc2ff !important;
 }
 
 .sort-trigger mat-icon {
@@ -956,8 +961,6 @@
 
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22) !important;
   text-shadow: none !important;
 }
 
@@ -1030,8 +1033,13 @@
   }
 
   .sort-trigger:hover {
-    background: #0b2f43 !important;
-    color: #ffffff !important;
+    background: rgba(77, 194, 255, 0.08) !important;
+    border-color: rgba(77, 194, 255, 0.24) !important;
+    color: #4dc2ff !important;
+  }
+
+  .sort-trigger:hover mat-icon {
+    color: #4dc2ff !important;
   }
 
   .sort-trigger mat-icon {
@@ -1065,5 +1073,59 @@
     &:hover {
       background: rgba(77, 194, 255, 0.08);
     }
+  }
+}
+
+.card__fav {
+  background: var(--surface-soft) !important;
+  border: none !important;
+  color: #e74c3c !important;
+  box-shadow: 0 8px 18px rgba(22, 138, 173, 0.16) !important;
+}
+
+.card__fav--active {
+  background: var(--surface-soft) !important;
+  box-shadow: 0 8px 18px rgba(22, 138, 173, 0.16) !important;
+}
+
+.card__fav svg {
+  display: block;
+}
+
+:host-context(:root[data-theme='dark']) {
+  .card__fav,
+  .card__fav--active {
+    background: var(--surface-soft) !important;
+    border: 1px solid var(--border) !important;
+    box-shadow: none !important;
+  }
+}
+
+.filter-btn,
+.filter-btn:hover,
+.filter-btn:active {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+.filter-btn--active {
+  background: var(--primary) !important;
+  border-color: var(--primary) !important;
+  color: #fff !important;
+  box-shadow: none !important;
+}
+
+:host-context(:root[data-theme='dark']) {
+  .filter-btn--active {
+    background: var(--primary) !important;
+    border-color: var(--primary) !important;
+    color: #fff !important;
+    box-shadow: none !important;
+  }
+
+  .filter-btn:hover {
+    transform: none !important;
+    background: rgba(77, 194, 255, 0.08) !important;
+    color: #4dc2ff !important;
   }
 }

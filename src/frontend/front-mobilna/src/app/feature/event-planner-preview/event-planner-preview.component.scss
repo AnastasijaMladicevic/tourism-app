@@ -94,7 +94,12 @@
 
 .hero-copy {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
+  width: 100%;
+}
+
+.hero-copy h1 {
+  text-align: left;
 }
 
 .back-link {
