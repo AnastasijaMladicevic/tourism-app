@@ -12990,7 +12990,7 @@ VALUES
  1,
  (SELECT "Id" FROM "Users" WHERE "Email" = 'lorenzo.creator@spirego.com'),
  NOW(), NOW()),
-('Belgrade Fortress Sunset Walk', 'Šetnja kroz Kalemegdan sa naglaskom na pogled ka ušću, kratke istorijske priče i preporuke za nastavak večeri u centru.',
+('Šetnja uz zalazak Sunca Beogradskom tvrđavom', 'Šetnja kroz Kalemegdan sa naglaskom na pogled ka ušću, kratke istorijske priče i preporuke za nastavak večeri u centru.',
  ST_SetSRID(ST_MakePoint(20.4487, 44.8233), 4326), 0.00, 105, true,
  (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Razgledanje'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Kalemegdan Beograd'),
@@ -12999,7 +12999,7 @@ VALUES
  1,
  (SELECT "Id" FROM "Users" WHERE "Email" = 'jelena.creator@spirego.com'),
  NOW(), NOW()),
-('Petrovaradin Fortress Walk', 'Obilazak tvrđave i njenih glavnih tačaka sa dovoljno vremena za pogled na Novi Sad i kraće fotografske pauze.',
+('Obilazak Petrovaradinske tvrđave', 'Obilazak tvrđave i njenih glavnih tačaka sa dovoljno vremena za pogled na Novi Sad i kraće fotografske pauze.',
  ST_SetSRID(ST_MakePoint(19.8641, 45.2529), 4326), 0.00, 95, true,
  (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Razgledanje'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Petrovaradin Fortress'),
@@ -13184,16 +13184,16 @@ WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
     ('https://cf.bstatic.com/xdata/images/hotel/max1024x768/64107180.jpg?k=bc957e3f08024b859b56f18c46f222dba97653e5e23037d1c6f51ac4971252d8&o=', 'Hotel Artemide Rome', true, 'Hotel Artemide Rome'),
     ('https://www.booknbook.it/storage/public/restaurants/1615-rione-13/profile/gallery/rione-13-esterno-1200x800-e1516009287545.jpeg', 'Rione 13 Trastevere', true, 'Rione 13 Trastevere'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Piazza%20San%20Marco%2C%20Venice.jpg', 'Hotel Canaletto Venice', true, 'Hotel Canaletto Venice'),
+    ('https://lirp.cdn-website.com/163c9646/dms3rep/multi/opt/028-1920w.JPG', 'Hotel Canaletto Venice', true, 'Hotel Canaletto Venice'),
     ('https://www.bistrotdevenise.com/images/contents/home/large/romantic-menu.jpg', 'Bistrot de Venise', true, 'Bistrot de Venise'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Ponte%20vecchio.jpg', 'Hotel Davanzati Florence', true, 'Hotel Davanzati Florence'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Florence%20Duomo.jpg', 'La Loggia Firenze', true, 'La Loggia Firenze'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Terazije%20Belgrade.jpg', 'Hotel Moskva Beograd', true, 'Hotel Moskva Beograd'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Terazije%20Belgrade.jpg', 'Restoran Frans Beograd', true, 'Restoran Frans Beograd'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Novi%20Sad%20-%20Trg%20Slobode.JPG', 'Hotel Pupin Novi Sad', true, 'Hotel Pupin Novi Sad'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Novi%20Sad%20-%20Trg%20Slobode.JPG', 'Kalem by Zak Novi Sad', true, 'Kalem by Zak Novi Sad'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Zlatibor-panorama.jpg', 'Hotel Zlatibor Mountain Resort', true, 'Hotel Zlatibor Mountain Resort'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Zlatibor-panorama.jpg', 'Lobby Bar Zlatibor', true, 'Lobby Bar Zlatibor')
+    ('https://www.hoteldavanzati.it/static/8edc6b4facf8f65c057a2e6e3fdc4777/0304f/7af89282-2f72-4fe4-a722-724c9c8bec69.jpg', 'Hotel Davanzati Florence', true, 'Hotel Davanzati Florence'),
+    ('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2c/8d/cf/04/caption.jpg?w=900&h=500&s=1', 'La Loggia Firenze', true, 'La Loggia Firenze'),
+    ('https://hotelmoskva.rs/image632.png', 'Hotel Moskva Beograd', true, 'Hotel Moskva Beograd'),
+    ('https://media-cdn.tripadvisor.com/media/photo-m/1280/1b/dc/68/7b/restaurant-garden.jpg', 'Restoran Frans Beograd', true, 'Restoran Frans Beograd'),
+    ('https://hotelpupin.rs/wp-content/uploads/2021/07/kotakt-1-min.jpeg', 'Hotel Pupin Novi Sad', true, 'Hotel Pupin Novi Sad'),
+    ('https://novisad.travel/wp-content/uploads/2020/06/Restoran-kalem-3_compressed.jpg', 'Kalem by Zak Novi Sad', true, 'Kalem by Zak Novi Sad'),
+    ('https://www.hotelzlatibor-resort.com/wp-content/uploads/2024/07/VIP-SPA.jpg', 'Hotel Zlatibor Mountain Resort', true, 'Hotel Zlatibor Mountain Resort'),
+    ('https://www.hotelzlatibor-resort.com/wp-content/uploads/2022/02/20220206-DMC02995.jpg', 'Lobby Bar Zlatibor', true, 'Lobby Bar Zlatibor')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
@@ -13203,12 +13203,12 @@ JOIN "Objects" o ON o."Name" = s."ObjectName";
 -- 15.10 ITALIJA + SRBIJA IMAGES - EVENTI
 WITH source("Url", "AltText", "IsMain", "EventName") AS (
     VALUES
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Roma%20Trastevere.jpg', 'Rome Piazza Music Evening', true, 'Rome Piazza Music Evening'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Venice%20Grand%20Canal.JPG', 'Venice Lagoon Taste Week', true, 'Venice Lagoon Taste Week'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Florence%20Duomo.jpg', 'Florence Artisan Evenings', true, 'Florence Artisan Evenings'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Terazije%20Belgrade.jpg', 'Belgrade Coffee and Jazz Night', true, 'Belgrade Coffee and Jazz Night'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Novi%20Sad%20-%20Trg%20Slobode.JPG', 'Novi Sad Gourmet Weekend', true, 'Novi Sad Gourmet Weekend'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Zlatibor-panorama.jpg', 'Zlatibor Mountain Taste Days', true, 'Zlatibor Mountain Taste Days')
+    ('https://youlocalrome.com/wp-content/uploads/2022/02/best-districts-to-go-out-in-rome-scaled.jpg', 'Rome Piazza Music Evening', true, 'Rome Piazza Music Evening'),
+    ('https://eawdlkutxnpxiurdpomt.supabase.co/storage/v1/object/public/images/blog/blog-1cbf5542-f113-4d98-95d9-6509187058ea.jpg', 'Venice Lagoon Taste Week', true, 'Venice Lagoon Taste Week'),
+    ('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2f/09/fb/b9/caption.jpg?w=1200&h=-1&s=1&cx=1920&cy=1080&chk=v1_13fcf1e2b85f4dd701fd', 'Florence Artisan Evenings', true, 'Florence Artisan Evenings'),
+    ('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2f/23/4b/97/caption.jpg?w=800&h=800&s=1', 'Belgrade Coffee and Jazz Night', true, 'Belgrade Coffee and Jazz Night'),
+    ('https://imageproxy.wolt.com/assets/676bc988a6a85f526b473891', 'Novi Sad Gourmet Weekend', true, 'Novi Sad Gourmet Weekend'),
+    ('https://www.hotelzlatibor-resort.com/wp-content/uploads/2023/10/ruj7.jpg', 'Zlatibor Mountain Taste Days', true, 'Zlatibor Mountain Taste Days')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "EventId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", e."Id", NOW()
@@ -13218,11 +13218,11 @@ JOIN "Events" e ON e."Name" = s."EventName";
 -- 15.11 ITALIJA + SRBIJA IMAGES - AKTIVNOSTI
 WITH source("Url", "AltText", "IsMain", "ActivityName") AS (
     VALUES
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Roma%20Trastevere.jpg', 'Trastevere Food Walk', true, 'Trastevere Food Walk'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Venice%20Grand%20Canal.JPG', 'Grand Canal Evening Walk', true, 'Grand Canal Evening Walk'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Ponte%20vecchio.jpg', 'Florence Sunset View Walk', true, 'Florence Sunset View Walk'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Kalemegdan%2C%20Belgrade.jpg', 'Belgrade Fortress Sunset Walk', true, 'Belgrade Fortress Sunset Walk'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Petrovaradin.jpg', 'Petrovaradin Fortress Walk', true, 'Petrovaradin Fortress Walk'),
+    ('https://cdn.tourcms.com/a/6659/475/1/default.jpg', 'Trastevere Food Walk', true, 'Trastevere Food Walk'),
+    ('https://www.vivovenetia.com/wp-content/uploads/2019/01/gondola-night.jpg', 'Grand Canal Evening Walk', true, 'Grand Canal Evening Walk'),
+    ('https://www.visittuscany.com/shared/make/immagini/tramonti-firenze_q6G.jpeg?__scale=w:1920,h:1000,t:2,q:85', 'Florence Sunset View Walk', true, 'Florence Sunset View Walk'),
+    ('https://upload.wikimedia.org/wikipedia/commons/5/5f/%D0%9A%D0%B0%D0%BB%D0%B5%D0%BC%D0%B5%D0%B3%D0%B4%D0%B0%D0%BD%2C_%D1%81%D0%BF%D0%BE%D0%BC%D0%B5%D0%BD%D0%B8%D0%BA_%D0%9F%D0%BE%D0%B1%D1%98%D0%B5%D0%B4%D0%BD%D0%B8%D0%BA%2C_%D0%91%D0%B8%D0%BE%D0%B3%D1%80%D0%B0%D0%B4.jpg', 'Šetnja uz zalazak Sunca Beogradskom tvrđavom', true, 'Šetnja uz zalazak Sunca Beogradskom tvrđavom'),
+    ('https://commons.wikimedia.org/wiki/Special:FilePath/Petrovaradin.jpg', 'Obilazak Petrovaradinske tvrđave', true, 'Obilazak Petrovaradinske tvrđave'),
     ('https://commons.wikimedia.org/wiki/Special:FilePath/Planina%20Zlatibor.JPG', 'Zlatibor Panorama Ride', true, 'Zlatibor Panorama Ride')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ActivityId", "CreatedAt")
@@ -34951,23 +34951,23 @@ SELECT 1;
 
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 VALUES
-('https://loremflickr.com/1920/1080/hotel,bari,stay?lock=501', 'Hotel Lungomare Bari', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Lungomare Bari'), NOW()),
-('https://loremflickr.com/1920/1080/restaurant,bari,dining?lock=502', 'Trattoria Bari Vecchia', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Trattoria Bari Vecchia'), NOW()),
-('https://loremflickr.com/1920/1080/art-gallery,bari,interior?lock=503', 'Galerija Svetog Nikole Bari', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Svetog Nikole Bari'), NOW()),
-('https://loremflickr.com/1920/1080/shopping-mall,bari,interior?lock=504', 'Centro Bari Galleria', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Centro Bari Galleria'), NOW()),
-('https://loremflickr.com/1920/1080/hospital,bari,medical?lock=505', 'Hospital Adriatico Bari', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Adriatico Bari'), NOW()),
-('https://loremflickr.com/1920/1080/gas-station,bari,roadtrip?lock=506', 'Repsol Lungomare Bari', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol Lungomare Bari'), NOW()),
-('https://loremflickr.com/1920/1080/souvenir-shop,bari,store?lock=507', 'Suvenirnica Bari Vecchia', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Bari Vecchia'), NOW()),
-('https://loremflickr.com/1920/1080/clinic,bari,medical?lock=508', 'Klinika San Nicola Bari', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Klinika San Nicola Bari'), NOW()),
-('https://loremflickr.com/1920/1080/gas-station,bari,roadtrip?lock=509', 'Q8 Porto Bari', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Q8 Porto Bari'), NOW()),
-('https://loremflickr.com/1920/1080/hotel,palermo,stay?lock=510', 'Hotel Quattro Canti Palermo', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Quattro Canti Palermo'), NOW()),
-('https://loremflickr.com/1920/1080/restaurant,palermo,dining?lock=511', 'Osteria Ballaro Palermo', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Osteria Ballaro Palermo'), NOW()),
-('https://loremflickr.com/1920/1080/museum,palermo,exhibition?lock=512', 'Muzej Normanske Palate Palermo', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Normanske Palate Palermo'), NOW()),
-('https://loremflickr.com/1920/1080/market,palermo,shopping?lock=513', 'Mercato Palermo Centrale', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercato Palermo Centrale'), NOW()),
-('https://loremflickr.com/1920/1080/hospital,palermo,medical?lock=514', 'Hospital Palermo Centro', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Palermo Centro'), NOW()),
+('https://www.hotels-apulia.com/data/Photos/OriginalPhoto/17172/1717297/1717297066.JPEG', 'Hotel Lungomare Bari', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Lungomare Bari'), NOW()),
+('https://static.gamberorosso.it/2023/11/bari.jpg', 'Trattoria Bari Vecchia', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Trattoria Bari Vecchia'), NOW()),
+('https://upload.wikimedia.org/wikipedia/commons/a/af/%22Die_Basilika_San_Nicola_ist_auch_heute_noch_ein_bedeutendes_Pilgerziel%22_01.jpg', 'Galerija Svetog Nikole Bari', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Svetog Nikole Bari'), NOW()),
+('https://www.baartgallery.com/wp-content/uploads/2022/08/PHOTO-2022-08-04-18-08-11.jpg', 'Centro Bari Galleria', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Centro Bari Galleria'), NOW()),
+('https://www.casalucihealthcare.com/wp-content/uploads/2024/04/casaluci-healthcare-policlinico-di-bari-2.jpg', 'Hospital Adriatico Bari', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Adriatico Bari'), NOW()),
+('https://www.bp.com/content/dam/bp/business-sites/en/global/air-bp/images/news-and-views/newsletter/2023/Bari%20Palese%20Airport.jpg', 'Repsol Lungomare Bari', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol Lungomare Bari'), NOW()),
+('https://www.wycieczkomania.pl/wp-content/uploads/2021/12/IMG_20211206_104833.jpg', 'Suvenirnica Bari Vecchia', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Bari Vecchia'), NOW()),
+('https://mcarchitecture.al/wp-content/uploads/2025/08/Dco-Clinic-Bari-9.jpg', 'Klinika San Nicola Bari', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Klinika San Nicola Bari'), NOW()),
+('https://assets.q8.be/f/318005/bc2bff8477/man-leaning-blue-car-q8-fuel-station-shop-cwa.jpeg/m/3840x0/filters:format(webp)', 'Q8 Porto Bari', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Q8 Porto Bari'), NOW()),
+('https://cf.bstatic.com/xdata/images/hotel/max1024x768/785166012.jpg?k=c08aecfa8b0aa2d073a3601704d58f68f0b214e6ccaf36b5b3adff926ac1735b&o=', 'Hotel Quattro Canti Palermo', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Quattro Canti Palermo'), NOW()),
+('https://siciliasecrets.com/wp-content/uploads/2023/11/Osteria-Ballaro-Sicilia-Secrets953.jpg', 'Osteria Ballaro Palermo', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Osteria Ballaro Palermo'), NOW()),
+('https://www.exoticca.com/wp-content/uploads/2025/10/Norman-Palace-Palermo.jpeg', 'Muzej Normanske Palate Palermo', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Normanske Palate Palermo'), NOW()),
+('https://images.trvl-media.com/place/6167281/38b7821e-0f2c-4c99-a844-e58226e67fef.jpg', 'Mercato Palermo Centrale', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercato Palermo Centrale'), NOW()),
+('https://revistahospitalaria.org/wp-content/uploads/2023/08/Clinica-Palermo-2.jpg', 'Hospital Palermo Centro', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Palermo Centro'), NOW()),
 ('https://www.palermotoday.it/~media/horizontal-hi/69558079199545/distributore-eni-mondello-via-venere-2.jpg', 'Eni Mondello Palermo', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Eni Mondello Palermo'), NOW()),
-('https://loremflickr.com/1920/1080/souvenir-shop,palermo,store?lock=516', 'Suvenirnica Ballaro Palermo', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Ballaro Palermo'), NOW()),
-('https://loremflickr.com/1920/1080/clinic,palermo,medical?lock=517', 'Poliklinika Mondello Palermo', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Poliklinika Mondello Palermo'), NOW()),
+('https://www.cooltourismical.com/wp-content/uploads/2021/08/Palermo-Jewelry-Store-Sicilian-Souvenirs-Shop.jpg', 'Suvenirnica Ballaro Palermo', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Ballaro Palermo'), NOW()),
+('https://himetop.wdfiles.com/local--files/the-paolo-giaccone-general-hospital/The%20Paolo%20Giaccone%20General%20Hospital%20%281%29.JPG', 'Poliklinika Mondello Palermo', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Poliklinika Mondello Palermo'), NOW()),
 ('https://elsamex.com/wp-content/uploads/2021/06/q8-scaled.jpg', 'Q8 Foro Italico Palermo', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Q8 Foro Italico Palermo'), NOW()),
 ('https://x3jh6o6w.cdn.imgeng.in/assets/uploads/DESTINATIONS_2017/2048X1363/trieste/savoia-excelsior-palace-destination-luoghi-salienti-trieste.jpg?imgeng=/w_1440', 'Hotel Piazza Unita Trieste', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Piazza Unita Trieste'), NOW()),
 ('https://images.trvl-media.com/place/553248621562150834/4fa07f37-4c8c-4bd5-8bf2-5dad51a9b4c0.jpg', 'Ristorante Canal Grande Trieste', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Ristorante Canal Grande Trieste'), NOW()),
@@ -34975,13 +34975,13 @@ VALUES
 ('https://www.lamiatrieste.com/wp-content/uploads/2016/10/Mercato-Coperto-Trieste-007-1920x1277.jpg', 'Mercato Canal Grande Trieste', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercato Canal Grande Trieste'), NOW()),
 ('https://shadow.doctorsinitaly.com/cdn/shop/files/trieste-program-doctors-in-italy-1.webp?v=1770221167&width=3840', 'Hospital Porto Trieste', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Porto Trieste'), NOW()),
 ('https://www.reuters.com/resizer/v2/KZLOET4H45PADBVTFRLLH4JRRQ.jpg?auth=756ae339d85b0bf571d712c8a31b71e6bddab3a2efc68fbab13ab9c650b4790b&width=1920&quality=80', 'Eni Miramare Trieste', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Eni Miramare Trieste'), NOW()),
-('https://loremflickr.com/1920/1080/souvenir-shop,trieste,store?lock=525', 'Suvenirnica Piazza Unita', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Piazza Unita'), NOW()),
-('https://loremflickr.com/1920/1080/hotel,matera,apartment?lock=526', 'Apartmani Sassi Matera', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartmani Sassi Matera'), NOW()),
-('https://loremflickr.com/1920/1080/restaurant,matera,dining?lock=527', 'Osteria Kamena Matera', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Osteria Kamena Matera'), NOW()),
-('https://loremflickr.com/1920/1080/museum,matera,exhibition?lock=528', 'Muzej Pecinskih Kuca Matera', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Pecinskih Kuca Matera'), NOW()),
+('https://images.ilpiccolo.it/view/acePublic/alias/contentid/0283cc9b-75b7-4e30-8a79-87af677a2ec1/0/magneti-souvenir.webp?f=16%3A9&w=840', 'Suvenirnica Piazza Unita', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Piazza Unita'), NOW()),
+('https://globetrender.com/wp-content/uploads/2024/11/Ang.Mag-39-scaled.jpg', 'Apartmani Sassi Matera', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartmani Sassi Matera'), NOW()),
+('https://www.sangiovanniosteria.com/public/images/head/osteria-sangiovanni.jpg', 'Osteria Kamena Matera', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Osteria Kamena Matera'), NOW()),
+('https://www.moom.bio/wp-content/uploads/2016/02/DSC5305.jpg', 'Muzej Pecinskih Kuca Matera', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Pecinskih Kuca Matera'), NOW()),
 ('https://images.winalist.com/blog/wp-content/uploads/2025/07/08095202/adobestock-235170277-1500x1000.jpeg', 'Bottega Sassi Matera', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Bottega Sassi Matera'), NOW()),
 ('https://bizlife.rs/wp-content/uploads/2022/01/operation-g97f5eaa23_1920.jpg', 'Dom zdravlja Gravina Matera', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Gravina Matera'), NOW()),
-('https://loremflickr.com/1920/1080/gas-station,matera,roadtrip?lock=531', 'Q8 Murgia Matera', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Q8 Murgia Matera'), NOW()),
+('https://assets.q8.be/f/318005/d5fa634788/q8-fuel-station-shop-aerial-cwa.jpeg/m/3840x0/filters:format(webp)', 'Q8 Murgia Matera', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Q8 Murgia Matera'), NOW()),
 ('https://www.italyscapes.com/wp-content/uploads/2024/10/7924_piazza-vittorio-veneto-1.jpg', 'Trznica Piazza Matera', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Trznica Piazza Matera'), NOW()),
 ('https://cf.bstatic.com/xdata/images/hotel/max1024x768/515309712.jpg?k=97631020c2356267021f83e30d67ca1bf1c744622c689d7bf72615d7e57521f9&o=', 'Pansion Marina Grande Sorrento', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pansion Marina Grande Sorrento'), NOW()),
 ('https://www.ilcaposuites.com/blog/images/delizia-al-limone-sorrento.jpg', 'Limone Bistro Sorrento', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Limone Bistro Sorrento'), NOW()),
@@ -35100,38 +35100,52 @@ ins_activities AS (
     RETURNING "Id", "Name"
 )
 SELECT 1;
-
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ActivityId", "CreatedAt")
 VALUES
-('https://loremflickr.com/1920/1080/swimming,bari,beach?lock=701', 'Jutarnje plivanje Lungomare Bari', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Jutarnje plivanje Lungomare Bari'), NOW()),
-('https://loremflickr.com/1920/1080/walking-tour,bari,old-town?lock=702', 'Razgledanje Bari Vecchie', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Razgledanje Bari Vecchie'), NOW()),
-('https://loremflickr.com/1920/1080/food-tasting,bari,restaurant?lock=703', 'Degustacija fokace u Bariju', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija fokace u Bariju'), NOW()),
-('https://loremflickr.com/1920/1080/shopping,bari,market?lock=704', 'Kupovina u Centro Bari Galleriji', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Kupovina u Centro Bari Galleriji'), NOW()),
-('https://loremflickr.com/1920/1080/viewpoint,palermo,cityscape?lock=705', 'Fotografisanje Quattro Cantija', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Fotografisanje Quattro Cantija'), NOW()),
-('https://loremflickr.com/1920/1080/food-tasting,palermo,restaurant?lock=706', 'Degustacija sicilijanske ulične hrane', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija sicilijanske ulične hrane'), NOW()),
-('https://loremflickr.com/1920/1080/swimming,palermo,beach?lock=707', 'Kupanje u Mondellu', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Kupanje u Mondellu'), NOW()),
-('https://loremflickr.com/1920/1080/nightlife,palermo,lights?lock=708', 'Noćni provod u Palermu', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Noćni provod u Palermu'), NOW()),
-('https://loremflickr.com/1920/1080/cycling,trieste,outdoor?lock=709', 'Biciklistički krug uz Kanal Grande', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Biciklistički krug uz Kanal Grande'), NOW()),
-('https://loremflickr.com/1920/1080/walking-tour,trieste,old-town?lock=710', 'Razgledanje Piazza Unita', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Razgledanje Piazza Unita'), NOW()),
-('https://loremflickr.com/1920/1080/food-tasting,trieste,restaurant?lock=711', 'Poseta restoranu uz kanal u Trstu', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Poseta restoranu uz kanal u Trstu'), NOW()),
-('https://loremflickr.com/1920/1080/kayaking,trieste,coast?lock=712', 'Kajak ispod Miramarea', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Kajak ispod Miramarea'), NOW()),
-('https://loremflickr.com/1920/1080/viewpoint,matera,cityscape?lock=713', 'Foto tura kroz Sassi', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Foto tura kroz Sassi'), NOW()),
-('https://loremflickr.com/1920/1080/walking-tour,matera,old-town?lock=714', 'Pešačenje do Belvederea Murgije', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Pešačenje do Belvederea Murgije'), NOW()),
-('https://loremflickr.com/1920/1080/walking-tour,matera,old-town?lock=715', 'Razgledanje Piazza Duomo Matere', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Razgledanje Piazza Duomo Matere'), NOW()),
-('https://loremflickr.com/1920/1080/wellness,matera,yoga?lock=716', 'Joga sa pogledom na Sassi', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Joga sa pogledom na Sassi'), NOW()),
-('https://loremflickr.com/1920/1080/boat-tour,sorrento,coast?lock=717', 'Vožnja čamcem ispod Sorenta', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Vožnja čamcem ispod Sorenta'), NOW()),
-('https://loremflickr.com/1920/1080/food-tasting,sorrento,restaurant?lock=718', 'Degustacija limunskih deserata Sorenta', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija limunskih deserata Sorenta'), NOW()),
-('https://loremflickr.com/1920/1080/shopping,sorrento,market?lock=719', 'Kupovina duž Corso Italie', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Kupovina duž Corso Italie'), NOW()),
-('https://loremflickr.com/1920/1080/swimming,sorrento,beach?lock=720', 'Plivanje kod Marine Grande', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Plivanje kod Marine Grande'), NOW()),
-('https://loremflickr.com/1920/1080/walking-tour,lecce,old-town?lock=721', 'Razgledanje baroknog Lečea', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Razgledanje baroknog Lečea'), NOW()),
-('https://loremflickr.com/1920/1080/shopping,lecce,market?lock=722', 'Kupovina u istorijskom jezgru Lečea', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Kupovina u istorijskom jezgru Lečea'), NOW()),
-('https://loremflickr.com/1920/1080/viewpoint,lecce,cityscape?lock=723', 'Fotografisanje zlatnog kamena Lečea', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Fotografisanje zlatnog kamena Lečea'), NOW()),
-('https://loremflickr.com/1920/1080/wine-tasting,lecce,restaurant?lock=724', 'Degustacija vina Salenta', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija vina Salenta'), NOW()),
-('https://loremflickr.com/1920/1080/food-tasting,parma,restaurant?lock=725', 'Degustacija parmezana i pršute', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija parmezana i pršute'), NOW()),
-('https://loremflickr.com/1920/1080/food-tasting,parma,restaurant?lock=726', 'Poseta restoranu u Parmi', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Poseta restoranu u Parmi'), NOW()),
-('https://loremflickr.com/1920/1080/cycling,parma,outdoor?lock=727', 'Biciklom kroz Parco Ducale', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Biciklom kroz Parco Ducale'), NOW()),
-('https://loremflickr.com/1920/1080/shopping,parma,market?lock=728', 'Kupovina gurmanskih proizvoda u Parmi', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Kupovina gurmanskih proizvoda u Parmi'), NOW()),
-('https://loremflickr.com/1920/1080/scuba-diving,sardinia,sea?lock=729', 'Ronjenje uz Costa Smeraldu', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Ronjenje uz Costa Smeraldu'), NOW()),
-('https://loremflickr.com/1920/1080/boat-tour,sardinia,coast?lock=730', 'Vožnja čamcem kroz Golfo Orosei', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Vožnja čamcem kroz Golfo Orosei'), NOW()),
-('https://loremflickr.com/1920/1080/swimming,sardinia,beach?lock=731', 'Plivanje u tirkiznim uvalama Sardinije', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Plivanje u tirkiznim uvalama Sardinije'), NOW()),
-('https://loremflickr.com/1920/1080/hiking,sardinia,trail?lock=732', 'Planinarenje iznad zaliva Orosei', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Planinarenje iznad zaliva Orosei'), NOW());
+-- BARI
+('https://img3.oastatic.com/img2/81651409/max/variant.webp', 'Jutarnje plivanje Lungomare Bari', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Jutarnje plivanje Lungomare Bari'), NOW()),
+('https://cdn.prod.website-files.com/63d5037cf3546dcb07a1db25/6460200ec147b29d6aaba878_642218134bf3fe263b1e0bc5_cristian-macovei-H5TnNMIcAkM-unsplash.jpeg', 'Razgledanje Bari Vecchie', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Razgledanje Bari Vecchie'), NOW()),
+('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1920&h=1080&fit=crop', 'Degustacija fokace u Bariju', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija fokace u Bariju'), NOW()),
+('https://www.kupi.com/kland-storage/images/670x0/30x30/attractions/it/bari/maximall-bari-santa-caterina/c3eb58db-2a81-4a0b-9816-267c0b1fe827.webp', 'Kupovina u Centro Bari Galleriji', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Kupovina u Centro Bari Galleriji'), NOW()),
+
+-- PALERMO
+('https://images.unsplash.com/photo-1523531294919-4bcd7c65e216?w=1920&h=1080&fit=crop', 'Fotografisanje Quattro Cantija', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Fotografisanje Quattro Cantija'), NOW()),
+('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1920&h=1080&fit=crop', 'Degustacija sicilijanske ulične hrane', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija sicilijanske ulične hrane'), NOW()),
+('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1920&h=1080&fit=crop&sig=mondello', 'Kupanje u Mondellu', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Kupanje u Mondellu'), NOW()),
+('https://images.unsplash.com/photo-1519214605650-76a613ee3245?w=1920&h=1080&fit=crop', 'Noćni provod u Palermu', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Noćni provod u Palermu'), NOW()),
+
+-- TRST
+('https://cdn.bubblyliving.com/wp-content/uploads/2025/08/20250501_162557_2-1170x658.webp', 'Biciklistički krug uz Kanal Grande', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Biciklistički krug uz Kanal Grande'), NOW()),
+('https://images.unsplash.com/photo-1555992336-03a23c7b20ee?w=1920&h=1080&fit=crop&sig=piazza', 'Razgledanje Piazza Unita', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Razgledanje Piazza Unita'), NOW()),
+('https://travelsonpoint.com/wp-content/uploads/2024/02/dreamstime_l_212445048-1024x683.jpg', 'Poseta restoranu uz kanal u Trstu', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Poseta restoranu uz kanal u Trstu'), NOW()),
+('https://jistra.com/wp-content/uploads/2018/07/9-1-scaled.jpg', 'Kajak ispod Miramarea', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Kajak ispod Miramarea'), NOW()),
+
+-- MATERA
+('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1920&h=1080&fit=crop', 'Foto tura kroz Sassi', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Foto tura kroz Sassi'), NOW()),
+('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/05/63/a3/37/belvedere.jpg?w=1200&h=-1&s=1', 'Pešačenje do Belvederea Murgije', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Pešačenje do Belvederea Murgije'), NOW()),
+('https://travelinculture.com/wp-content/uploads/2022/03/Rome-Piazza-Navona-kirkandmimi-wide-960-50.jpg', 'Razgledanje Piazza Duomo Matere', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Razgledanje Piazza Duomo Matere'), NOW()),
+('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&h=1080&fit=crop', 'Joga sa pogledom na Sassi', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Joga sa pogledom na Sassi'), NOW()),
+
+-- SORRENTO
+('https://www.losmundosdeceli.com/wp-content/uploads/2018/08/kayak-gruta-marina-gargano-campi-1080x640.jpg', 'Vožnja čamcem ispod Sorenta', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Vožnja čamcem ispod Sorenta'), NOW()),
+('https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=1920&h=1080&fit=crop', 'Degustacija limunskih deserata Sorenta', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija limunskih deserata Sorenta'), NOW()),
+('https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?w=1920&h=1080&fit=crop', 'Kupovina duž Corso Italie', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Kupovina duž Corso Italie'), NOW()),
+('https://www.visitcampania.info/wp-content/uploads/2025/06/sorrento_spiaggia_marina_grande_06.jpg', 'Plivanje kod Marine Grande', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Plivanje kod Marine Grande'), NOW()),
+
+-- LEČEA
+('https://images.unsplash.com/photo-1467269204594-9661b134dd2b?w=1920&h=1080&fit=crop', 'Razgledanje baroknog Lečea', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Razgledanje baroknog Lečea'), NOW()),
+('https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1920&h=1080&fit=crop&sig=lecce', 'Kupovina u istorijskom jezgru Lečea', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Kupovina u istorijskom jezgru Lečea'), NOW()),
+('https://images.unsplash.com/photo-1467269204594-9661b134dd2b?w=1920&h=1080&fit=crop&sig=gold', 'Fotografisanje zlatnog kamena Lečea', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Fotografisanje zlatnog kamena Lečea'), NOW()),
+('https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=1920&h=1080&fit=crop', 'Degustacija vina Salenta', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija vina Salenta'), NOW()),
+
+-- PARMA
+('https://images.unsplash.com/photo-1452195100486-9cc805987862?w=1920&h=1080&fit=crop', 'Degustacija parmezana i pršute', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija parmezana i pršute'), NOW()),
+('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1920&h=1080&fit=crop&sig=parma', 'Poseta restoranu u Parmi', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Poseta restoranu u Parmi'), NOW()),
+('https://d2fg1aan4gy9m1.cloudfront.net/ert/images/6903/conversions/Parma%2C-%C3%89tape-Parma-by-Tour-de-France-edizione-2024%2C-ph.-Extragiro%2C-CC-BY-NC-ND-4.0-webp.webp', 'Biciklom kroz Parco Ducale', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Biciklom kroz Parco Ducale'), NOW()),
+('https://i.pinimg.com/736x/7c/6a/da/7c6ada7d787dc7187899aa4261a3dbe9.jpg', 'Kupovina gurmanskih proizvoda u Parmi', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Kupovina gurmanskih proizvoda u Parmi'), NOW()),
+
+-- SARDINIJA
+('https://images.unsplash.com/photo-1544551763-77ef2d0cfc6c?w=1920&h=1080&fit=crop', 'Ronjenje uz Costa Smeraldu', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Ronjenje uz Costa Smeraldu'), NOW()),
+('https://www.solobagaglioamano.com/wp-content/uploads/2022/09/about2.jpg', 'Vožnja čamcem kroz Golfo Orosei', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Vožnja čamcem kroz Golfo Orosei'), NOW()),
+('https://www.openwaterswimming.com/wp-content/uploads/2021/12/sardinia.jpg', 'Plivanje u tirkiznim uvalama Sardinije', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Plivanje u tirkiznim uvalama Sardinije'), NOW()),
+('https://www.sardiniaexploring.com/wp-content/uploads/Sardinia-Exploring-Sardegna-Trekking-Golfo-Orosei-Bacu-Padente.jpg', 'Planinarenje iznad zaliva Orosei', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Planinarenje iznad zaliva Orosei'), NOW());
