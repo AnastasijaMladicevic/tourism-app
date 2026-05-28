@@ -98,11 +98,6 @@ export const routes: Routes = [
         path: 'map',
         loadComponent: () =>
           import('./pages/admin/map/map.component').then(m => m.MapComponent)
-      },
-      {
-        path: 'activity-log',
-        loadComponent: () =>
-          import('./pages/admin/activitylog/activitylog.component').then(m => m.ActivityLogComponent)
       }
     ]
   },
