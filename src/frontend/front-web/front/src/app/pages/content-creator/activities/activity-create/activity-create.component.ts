@@ -901,15 +901,6 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
     }
   }
 
-  private isValidHttpUrl(value: string): boolean {
-    try {
-      const parsed = new URL(value);
-      return parsed.protocol === 'http:' || parsed.protocol === 'https:';
-    } catch {
-      return false;
-    }
-  }
-
   private extractErrorMessage(error: unknown): string | undefined {
     if (!error || typeof error !== 'object') {
       return undefined;

@@ -957,7 +957,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
               this.router.navigate(['/admin/destinations']);
               return;
             }
-            this.errorMessage = out.assignError;
+            this.errorMessage = 'assignError' in out ? out.assignError : 'Destination was saved, but assigning the manager failed.';
             this.draftSavedMessage =
               'Draft saved to the server. You can fix manager assignment and save again.';
             return;
