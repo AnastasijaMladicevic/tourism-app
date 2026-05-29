@@ -18,6 +18,7 @@ type LanguageOption = {
 type PermissionItem = {
   label: string;
   detail: string;
+  icon: string;
 };
 
 type PasswordChangeStep = 'credentials' | 'otp';
@@ -46,14 +47,14 @@ export class ProfileComponentContentCreator implements OnInit, OnDestroy {
   ];
 
   readonly permissionItems: PermissionItem[] = [
-    { label: 'Create objects, events, and activities', detail: 'Content Creator can create new objects, events, and activities, and they start in Pending state.' },
-    { label: 'Edit own published content', detail: 'Content Creator can update only their own objects, events, and activities.' },
-    { label: 'Delete own unpublished content', detail: 'Content Creator can delete only their own content before it is Approved.' },
-    { label: 'Manage content images', detail: 'Content Creator can add images to their own objects, events, and activities.' },
-    { label: 'Respond to reviews', detail: 'Content Creator can reply to reviews on their own objects and edit or delete that reply.' },
-    { label: 'Request deletions', detail: 'Content Creator can request deletion of their own Approved objects, events, and activities.' },
-    { label: 'View own deletion requests', detail: 'Content Creator can list and inspect only their own deletion requests.' },
-    { label: 'View dashboard overview', detail: 'Content Creator can open the content creator dashboard overview.' },
+    { label: 'Create objects, events, and activities', detail: 'Content Creator can create new objects, events, and activities, and they start in Pending state.', icon: 'add_circle' },
+    { label: 'Edit own published content', detail: 'Content Creator can update only their own objects, events, and activities.', icon: 'edit' },
+    { label: 'Delete own unpublished content', detail: 'Content Creator can delete only their own content before it is Approved.', icon: 'delete' },
+    { label: 'Manage content images', detail: 'Content Creator can add images to their own objects, events, and activities.', icon: 'image' },
+    { label: 'Respond to reviews', detail: 'Content Creator can reply to reviews on their own objects and edit or delete that reply.', icon: 'rate_review' },
+    { label: 'Request deletions', detail: 'Content Creator can request deletion of their own Approved objects, events, and activities.', icon: 'request_page' },
+    { label: 'View own deletion requests', detail: 'Content Creator can list and inspect only their own deletion requests.', icon: 'list_alt' },
+    { label: 'View dashboard overview', detail: 'Content Creator can open the content creator dashboard overview.', icon: 'dashboard' },
   ];
 
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
@@ -74,6 +75,7 @@ export class ProfileComponentContentCreator implements OnInit, OnDestroy {
   pendingCropFile: File | null = null;
   isSaving = false;
   saveSuccess = false;
+  permissionsModalState: ModalState = 'closed';
   passwordModalState: ModalState = 'closed';
   passwordChangeStep: PasswordChangeStep = 'credentials';
   passwordError = '';
@@ -94,6 +96,7 @@ export class ProfileComponentContentCreator implements OnInit, OnDestroy {
   private pendingCroppedBlob: Blob | null = null;
   private otpExpiryTimerId: number | null = null;
   private otpResendTimerId: number | null = null;
+  private permissionsModalCloseTimerId: number | null = null;
   private passwordModalCloseTimerId: number | null = null;
 
   private static readonly OTP_EXPIRY_SECONDS = 300;
@@ -128,6 +131,7 @@ export class ProfileComponentContentCreator implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.revokeCropPreviewUrl();
+    this.clearPermissionsModalTimer();
     this.clearPasswordTimers();
     this.unlockBodyScroll();
   }
@@ -323,6 +327,35 @@ export class ProfileComponentContentCreator implements OnInit, OnDestroy {
     }, 20);
   }
 
+  openPermissionsModal(): void {
+    if (this.permissionsModalState !== 'closed') return;
+
+    this.permissionsModalState = 'opening';
+    this.lockBodyScroll();
+
+    window.setTimeout(() => {
+      if (this.permissionsModalState === 'opening') {
+        this.permissionsModalState = 'open';
+      }
+    }, 20);
+  }
+
+  closePermissionsModal(): void {
+    if (this.permissionsModalState === 'closed') return;
+
+    this.permissionsModalState = 'closing';
+
+    if (this.permissionsModalCloseTimerId) {
+      window.clearTimeout(this.permissionsModalCloseTimerId);
+    }
+
+    this.permissionsModalCloseTimerId = window.setTimeout(() => {
+      this.permissionsModalState = 'closed';
+      this.releaseBodyScrollIfNoModal();
+      this.permissionsModalCloseTimerId = null;
+    }, 220);
+  }
+
   closePasswordModal(forceClose = false): void {
     if (this.passwordModalState === 'closed' || (this.passwordLoading && !forceClose)) {
       return;
@@ -347,7 +380,7 @@ export class ProfileComponentContentCreator implements OnInit, OnDestroy {
       this.otpDemoCode = '';
       this.otpSecondsRemaining = 0;
       this.otpResendSecondsRemaining = 0;
-      this.unlockBodyScroll();
+      this.releaseBodyScrollIfNoModal();
       this.passwordModalCloseTimerId = null;
     }, 220);
   }
@@ -356,6 +389,8 @@ export class ProfileComponentContentCreator implements OnInit, OnDestroy {
   onEscapeKey(): void {
     if (this.passwordModalState !== 'closed') {
       this.closePasswordModal();
+    } else if (this.permissionsModalState !== 'closed') {
+      this.closePermissionsModal();
     }
   }
 
@@ -557,6 +592,13 @@ export class ProfileComponentContentCreator implements OnInit, OnDestroy {
     }
   }
 
+  private clearPermissionsModalTimer(): void {
+    if (this.permissionsModalCloseTimerId !== null) {
+      window.clearTimeout(this.permissionsModalCloseTimerId);
+      this.permissionsModalCloseTimerId = null;
+    }
+  }
+
   private clearOtpExpiryTimer(): void {
     if (this.otpExpiryTimerId !== null) {
       window.clearInterval(this.otpExpiryTimerId);
@@ -577,6 +619,12 @@ export class ProfileComponentContentCreator implements OnInit, OnDestroy {
 
   private unlockBodyScroll(): void {
     document.body.style.overflow = '';
+  }
+
+  private releaseBodyScrollIfNoModal(): void {
+    if (this.passwordModalState === 'closed' && this.permissionsModalState === 'closed') {
+      this.unlockBodyScroll();
+    }
   }
 
   private generateDemoOtpCode(): string {
