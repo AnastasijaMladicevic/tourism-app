@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Subject } from 'rxjs';
 
 export interface RouteBuilderPoint {
   id: number | string;
@@ -16,6 +17,9 @@ export class RouteBuilderStateService {
   private plannerOpen = false;
   private mapPickingRequested = false;
 
+  private readonly routePointsChangedSubject = new Subject<void>();
+  readonly routePointsChanged$ = this.routePointsChangedSubject.asObservable();
+
   getRoutePoints(): RouteBuilderPoint[] {
     return this.routePoints.map((point) => ({ ...point }));
   }
@@ -27,27 +31,32 @@ export class RouteBuilderStateService {
   openPlanner(points: RouteBuilderPoint[]): void {
     this.routePoints = points.map((point) => ({ ...point }));
     this.plannerOpen = true;
+    this.notifyRoutePointsChanged();
   }
 
   updateRoutePoints(points: RouteBuilderPoint[]): void {
     this.routePoints = points.map((point) => ({ ...point }));
     this.plannerOpen = this.routePoints.length > 0;
+    this.notifyRoutePointsChanged();
   }
 
   addRoutePoint(point: RouteBuilderPoint): void {
     this.routePoints = [...this.routePoints, { ...point }];
     this.plannerOpen = true;
+    this.notifyRoutePointsChanged();
   }
 
   prependRoutePoint(point: RouteBuilderPoint): void {
     this.routePoints = [{ ...point }, ...this.routePoints];
     this.plannerOpen = true;
+    this.notifyRoutePointsChanged();
   }
 
   clearPlanner(): void {
     this.routePoints = [];
     this.plannerOpen = false;
     this.mapPickingRequested = false;
+    this.notifyRoutePointsChanged();
   }
 
   requestMapPicking(): void {
@@ -58,5 +67,9 @@ export class RouteBuilderStateService {
     const requested = this.mapPickingRequested;
     this.mapPickingRequested = false;
     return requested;
+  }
+  
+  private notifyRoutePointsChanged(): void {
+    this.routePointsChangedSubject.next();
   }
 }

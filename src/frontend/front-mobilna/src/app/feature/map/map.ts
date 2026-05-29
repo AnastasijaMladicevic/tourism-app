@@ -263,6 +263,15 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.isDestroyed = false;
     window.addEventListener('map-marker-clicked', this.handleMapMarkerClicked);
     this.subscriptions.add(
+      this.routeBuilderStateService.routePointsChanged$.subscribe(() => {
+        this.ngZone.run(() => {
+          this.restoreRouteBuilderState();
+          this.cdr.detectChanges();
+        });
+      }),
+    );
+
+    this.subscriptions.add(
       this.locationTrackingService.trackingEnabled$.subscribe((enabled) => {
         this.ngZone.run(() => {
           this.isTracking = enabled;
@@ -2189,10 +2198,11 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     const right = lng + delta;
     const top = lat + delta;
     const bottom = lat - delta;
+  
     const url =
       `https://www.openstreetmap.org/export/embed.html?bbox=${left}%2C${bottom}%2C${right}%2C${top}` +
-      `&layer=mapnik&marker=${lat}%2C${lng}`;
-
+      `&layer=mapnik`;
+  
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
   }
 

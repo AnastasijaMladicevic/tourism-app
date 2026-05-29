@@ -51,7 +51,12 @@
     "delete": "Obriši",
     "deleting": "Brišem...",
     "noResults": "Nema rezultata",
-    "lowestPrice": "Najniža cena"
+    "lowestPrice": "Najniža cena",
+    "aboutDestination": "O destinaciji",
+    "aboutObject": "O objektu",
+    "aboutActivity": "O aktivnosti",
+    "aboutEvent": "O događaju",
+    "aboutLocality": "O lokalitetu"
   },
   "results": {
     "title": "Rezultati",
@@ -918,6 +923,7 @@
     "locationConsentTitle": "Uključi lokaciju da bi GPS radio",
     "locationConsentBody": "Praćenje lokacije trenutno nije uključeno. Klikni ispod i otvori podešavanja da uključiš saglasnost za praćenje lokacije.",
     "locationConsentAction": "Klikni ovde",
+    "getDirections": "Putanja",
     "filters": {
       "food": "Hrana i piće",
       "fuel": "Pumpe",

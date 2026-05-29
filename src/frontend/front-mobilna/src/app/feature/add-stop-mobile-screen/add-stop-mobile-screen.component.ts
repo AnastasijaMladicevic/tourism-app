@@ -343,21 +343,28 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
 
   async addToRoute(): Promise<void> {
     const selectedResult = this.selectedResult;
+  
     if (!selectedResult || selectedResult.lat == null || selectedResult.lng == null || this.isSubmitting) {
       return;
     }
-
+  
     this.isSubmitting = true;
-
+  
     try {
       this.storeRecentItem(selectedResult);
-      this.routeBuilderStateService.addRoutePoint( {
+  
+      const markerId = Number(selectedResult.id);
+  
+      this.routeBuilderStateService.addRoutePoint({
         id: selectedResult.id,
         name: selectedResult.name,
         type: selectedResult.markerType || selectedResult.typeName || selectedResult.category,
         lat: selectedResult.lat,
         lng: selectedResult.lng,
+        markerType: selectedResult.markerType || selectedResult.category,
+        markerId: Number.isFinite(markerId) ? markerId : undefined,
       });
+  
       await this.navigateBackToMap();
     } finally {
       this.isSubmitting = false;
@@ -1189,10 +1196,11 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
     const right = lng + delta;
     const top = lat + delta;
     const bottom = lat - delta;
+  
     const url =
       `https://www.openstreetmap.org/export/embed.html?bbox=${left}%2C${bottom}%2C${right}%2C${top}` +
-      `&layer=mapnik&marker=${lat}%2C${lng}`;
-
+      `&layer=mapnik`;
+  
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
   }
 

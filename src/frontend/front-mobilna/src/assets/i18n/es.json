@@ -915,6 +915,7 @@
     "locationConsentTitle": "Activa la ubicacion para que el GPS funcione",
     "locationConsentBody": "El seguimiento de ubicacion esta desactivado en este momento. Toca abajo para abrir ajustes y activar el consentimiento para el seguimiento de ubicacion.",
     "locationConsentAction": "Haz clic aqui",
+    "getDirections": "Cómo llegar",
     "filters": {
       "food": "Comida y bebida",
       "fuel": "Gasolineras",

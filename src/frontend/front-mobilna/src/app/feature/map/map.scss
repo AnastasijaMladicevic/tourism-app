@@ -2822,3 +2822,205 @@ body.route-navigation-active app-floating-ai-assistant {
 .leaflet-tile-container {
   will-change: transform;
 }
+
+/* ─── Add stop modal - dark mode fixes ───────────────────────────── */
+
+.add-stop-panel-backdrop {
+  background: rgba(2, 8, 12, 0.28) !important;
+  backdrop-filter: none !important;
+}
+
+.add-stop-panel {
+  background: rgba(18, 39, 49, 0.96) !important;
+  border: 1px solid rgba(76, 132, 156, 0.55) !important;
+  box-shadow: 0 32px 90px rgba(0, 0, 0, 0.45) !important;
+}
+
+.add-stop-panel__header,
+.add-stop-panel__footer {
+  border-color: rgba(76, 132, 156, 0.45) !important;
+  background: rgba(18, 39, 49, 0.72) !important;
+}
+
+.add-stop-panel__title h3,
+.add-stop-panel__location-card h4,
+.add-stop-panel__section-head h4,
+.add-stop-panel__result-body strong {
+  color: #eef7fb !important;
+}
+
+.add-stop-panel__close {
+  color: #9fb3bf !important;
+  background: rgba(255, 255, 255, 0.04) !important;
+}
+
+.add-stop-panel__close:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
+}
+
+.add-stop-panel__left,
+.add-stop-panel__preview {
+  background: rgba(18, 39, 49, 0.92) !important;
+}
+
+.add-stop-panel__preview {
+  border-left-color: rgba(76, 132, 156, 0.45) !important;
+}
+
+/* Search - skida crni kvadrat iza placeholdera */
+.add-stop-panel__search {
+  background: rgba(25, 55, 69, 0.78) !important;
+  border: 1px solid rgba(76, 132, 156, 0.5) !important;
+  box-shadow: none !important;
+  color: #9fb3bf !important;
+}
+
+.add-stop-panel__search input {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: 0 !important;
+  outline: 0 !important;
+  color: #eef7fb !important;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.add-stop-panel__search input::placeholder {
+  color: #9fb3bf !important;
+  opacity: 1;
+}
+
+.add-stop-panel__search input:-webkit-autofill,
+.add-stop-panel__search input:-webkit-autofill:hover,
+.add-stop-panel__search input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #eef7fb !important;
+  box-shadow: 0 0 0 1000px rgba(25, 55, 69, 1) inset !important;
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+/* Otkaži dugme da liči na dugme */
+.add-stop-panel__cancel {
+  min-height: 46px;
+  border: 1px solid rgba(116, 151, 166, 0.75) !important;
+  border-radius: 16px;
+  padding: 0 22px;
+  background: rgba(255, 255, 255, 0.04) !important;
+  color: #c8d6de !important;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.96rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition:
+    background-color 0.16s ease,
+    border-color 0.16s ease,
+    color 0.16s ease,
+    transform 0.12s ease;
+}
+
+.add-stop-panel__cancel:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(148, 190, 207, 0.95) !important;
+  color: #ffffff !important;
+  transform: translateY(-1px);
+}
+
+.add-stop-panel__cancel:active {
+  transform: scale(0.98);
+}
+
+/* Rezultati u dark mode */
+.add-stop-panel__result {
+  background: rgba(25, 55, 69, 0.78) !important;
+  border-color: rgba(76, 132, 156, 0.48) !important;
+}
+
+.add-stop-panel__result:hover {
+  background: rgba(30, 66, 82, 0.9) !important;
+  border-color: rgba(77, 194, 255, 0.55) !important;
+}
+
+.add-stop-panel__result--selected {
+  background: rgba(22, 151, 216, 0.16) !important;
+  border-color: #4dc2ff !important;
+}
+
+.add-stop-panel__result-icon {
+  background: rgba(22, 151, 216, 0.14) !important;
+  color: #4dc2ff !important;
+}
+
+.add-stop-panel__result-body span {
+  color: #a8bdc8 !important;
+}
+
+.add-stop-panel__result-body em {
+  color: #28b5e8 !important;
+}
+
+.add-stop-panel__result-radio {
+  background: rgba(255, 255, 255, 0.08) !important;
+  box-shadow: inset 0 0 0 2px rgba(168, 189, 200, 0.65) !important;
+}
+
+.add-stop-panel__result--selected .add-stop-panel__result-radio {
+  background: #1697d8 !important;
+  box-shadow: none !important;
+}
+
+/* Preview mapa */
+.add-stop-panel__location-map {
+  position: relative;
+  overflow: hidden;
+  border-radius: 18px;
+  border: 1px solid rgba(76, 132, 156, 0.48) !important;
+  background: rgba(25, 55, 69, 0.78) !important;
+}
+
+.add-stop-panel__location-frame {
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* Naš plavi pin preko iframe mape */
+.add-stop-panel__blue-pin {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 3;
+  transform: translate(-50%, -100%);
+  width: 42px;
+  height: 42px;
+  pointer-events: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.28));
+}
+
+.add-stop-panel__blue-pin mat-icon {
+  width: 42px;
+  height: 42px;
+  font-size: 42px;
+  color: #1697d8 !important;
+  text-shadow:
+    0 0 0 2px #ffffff,
+    0 2px 8px rgba(0, 0, 0, 0.28);
+}
+
+/* Blur map when add-stop route is open */
+
+html.route-add-stop-open .main-map,
+body.route-add-stop-open .main-map {
+  filter: blur(5px);
+  transform: scale(1.01);
+  transition: filter 0.2s ease, transform 0.2s ease;
+}
+
+html.route-add-stop-open .route-planner,
+body.route-add-stop-open .route-planner {
+  filter: blur(4px);
+  pointer-events: none;
+  transition: filter 0.2s ease;
+}

@@ -1,6 +1,10 @@
-<div class="add-stop-screen-shell" [class.add-stop-screen-shell--desktop]="isDesktopLayout">
+<div
+  class="add-stop-screen-shell"
+  [class.add-stop-screen-shell--desktop]="isDesktopLayout"
+  (click)="isDesktopLayout && close()"
+>
   @if (isDesktopLayout) {
-    <div class="add-stop-route-modal" role="dialog" aria-modal="true">
+    <div class="add-stop-route-modal" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
       <div class="add-stop-route-modal__header">
         <div class="add-stop-route-modal__title">
           <span class="add-stop-route-modal__title-icon">
@@ -202,15 +206,19 @@
               class="add-stop-route-modal__location-map"
               [attr.data-name]="selectedResult?.name || ('map.addStop.chooseStop' | translate)"
             >
-              @if (selectedResultPreviewMapUrl) {
-                <iframe
-                  class="add-stop-route-modal__location-frame"
-                  [src]="selectedResultPreviewMapUrl"
-                  [title]="'map.addStop.selectedStopLocationTitle' | translate"
-                  loading="lazy"
-                  referrerpolicy="no-referrer-when-downgrade"
-                ></iframe>
-              } @else {
+            @if (selectedResultPreviewMapUrl) {
+              <iframe
+                class="add-stop-route-modal__location-frame"
+                [src]="selectedResultPreviewMapUrl"
+                [title]="'map.addStop.selectedStopLocationTitle' | translate"
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+              ></iframe>
+            
+              <span class="add-stop-route-modal__blue-pin" aria-hidden="true">
+                <mat-icon>place</mat-icon>
+              </span>
+            } @else {
                 <div class="add-stop-route-modal__location-placeholder">
                   <mat-icon>place</mat-icon>
                 </div>

@@ -55,9 +55,9 @@ export class MyReviewsPreviewComponent implements OnInit {
   protected readonly searchTerm = signal('');
   protected readonly activeFilter = signal('all');
   protected readonly currentPage = signal(1);
-  protected readonly pageSize = signal(6);
+  protected readonly pageSize = signal(3);
   protected readonly showSizeDropdown = signal(false);
-  protected readonly pageSizeOptions = [3, 6, 10];
+  protected readonly pageSizeOptions = [3, 5];
   protected readonly deletingId = signal<number | null>(null);
 
   protected readonly filters = computed<ReviewFilter[]>(() => {

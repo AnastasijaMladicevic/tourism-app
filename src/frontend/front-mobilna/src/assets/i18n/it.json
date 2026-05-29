@@ -915,6 +915,7 @@
     "locationConsentTitle": "Attiva la posizione per usare il GPS",
     "locationConsentBody": "Il tracciamento della posizione e attualmente disattivato. Tocca qui sotto per aprire le impostazioni e attivare il consenso al tracciamento della posizione.",
     "locationConsentAction": "Clicca qui",
+    "getDirections": "Indicazioni stradali",
     "filters": {
       "food": "Cibo e bevande",
       "fuel": "Stazioni di servizio",
