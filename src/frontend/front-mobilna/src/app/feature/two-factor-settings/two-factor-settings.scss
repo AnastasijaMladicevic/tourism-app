@@ -153,7 +153,7 @@
   position: absolute;
   inset: 0;
   border-radius: 999px;
-  background: var(--surface-soft);
+  background: #d7e5eb;
   box-shadow: inset 0 0 0 1px rgba(117, 150, 165, 0.24);
   transition: 0.25s;
 }
@@ -165,7 +165,7 @@
   height: 22px;
   left: 3px;
   top: 3px;
-  background: var(--text-dark);
+  background: white;
   border-radius: 50%;
   transition: 0.25s;
 }
@@ -263,9 +263,5 @@
   .slider {
     background: var(--surface-soft);
     box-shadow: inset 0 0 0 1px var(--border);
-  }
-
-  .slider::before {
-    background: var(--text-dark);
   }
 }
