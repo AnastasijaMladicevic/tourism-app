@@ -62,7 +62,7 @@
 
 .content {
   flex: 1;
-  padding: 20px 16px 32px;
+  padding: 10px 16px 32px;
   background: transparent;
 }
 
@@ -79,26 +79,33 @@
 
 .profile-strip {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 15px;
+  gap: 8px;
   margin-bottom: 18px;
-  padding: 4px 0 8px;
+  padding: 2px 0 8px;
   background: transparent;
   border: none;
 }
 
 .avatar-wrap {
   position: relative;
-  width: 60px;
-  height: 60px;
+  width: 72px;
+  height: 72px;
   flex-shrink: 0;
+}
 
-  img {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    object-fit: cover;
-  }
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: contain;
+  object-position: center;
+  background: var(--surface-soft);
+  padding: 10px;
+  border: none;
+  box-shadow: 0 12px 24px rgba(22, 138, 173, 0.16);
+  display: block;
 }
 
 .avatar-fallback {
@@ -109,7 +116,7 @@
   color: #fff;
   display: grid;
   place-items: center;
-  font-size: 19px;
+  font-size: 22px;
   font-weight: 800;
   letter-spacing: 0.08em;
 }
@@ -118,14 +125,16 @@
   position: absolute;
   right: 1px;
   bottom: 4px;
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
   background: #1ec95b;
   border: 2px solid #fff;
 }
 
 .profile-copy {
+  text-align: center;
+
   h2 {
     font-size: 19px;
     font-weight: 800;

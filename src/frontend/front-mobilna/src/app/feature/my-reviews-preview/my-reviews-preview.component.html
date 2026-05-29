@@ -18,7 +18,7 @@
       <section class="profile-strip">
         <div class="avatar-wrap">
           @if (profileImageUrl()) {
-            <img [src]="profileImageUrl()!" [alt]="displayName()" />
+            <img class="avatar-img" [src]="profileImageUrl()!" [alt]="displayName()" />
           } @else {
             <div class="avatar-fallback">{{ initials() }}</div>
           }
