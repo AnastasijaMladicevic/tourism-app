@@ -49,6 +49,7 @@ export class MyReviewsPreviewComponent implements OnInit {
   private readonly cdr = inject(ChangeDetectorRef);
   protected readonly currentUser = signal<UserDto | null>(null);
   protected readonly reviews = signal<ReviewPreviewCard[]>([]);
+  protected readonly totalCount = signal(0);
   protected readonly isLoading = signal(true);
   protected readonly errorMessage = signal('');
   protected readonly searchTerm = signal('');
@@ -80,7 +81,9 @@ export class MyReviewsPreviewComponent implements OnInit {
     this.filteredReviews().slice(0, this.visibleCount()),
   );
 
-  protected readonly totalReviews = computed(() => this.reviews().length);
+  protected readonly totalReviews = computed(() =>
+    Math.max(this.totalCount(), this.reviews().length),
+  );
 
   protected readonly averageRating = computed(() => {
     const items = this.reviews();
@@ -147,15 +150,17 @@ export class MyReviewsPreviewComponent implements OnInit {
 
     forkJoin({
       user: this.authService.getById(currentUser.id).pipe(catchError(() => of(currentUser))),
-      reviews: this.reviewService.getMine({ page: 1, pageSize: 30 }).pipe(
+      reviews: this.reviewService.getMine({ page: 1, pageSize: 1000 }).pipe(
         catchError((err) => {
           console.error(err);
           this.errorMessage.set('myReviews.loadError');
-          return of({ items: [] as ReviewDto[] });
+          return of({ items: [] as ReviewDto[], totalCount: 0, page: 1, pageSize: 1000, totalPages: 0 });
         }),
       ),
     }).subscribe(({ user, reviews }) => {
       this.currentUser.set(user);
+      const pagedResponse = reviews as { items?: ReviewDto[]; totalCount?: number };
+      this.totalCount.set(pagedResponse.totalCount ?? 0);
       this.reviews.set(this.mapReviewsForUser(this.toArray<ReviewDto>(reviews)));
       this.isLoading.set(false);
       this.cdr.detectChanges();
