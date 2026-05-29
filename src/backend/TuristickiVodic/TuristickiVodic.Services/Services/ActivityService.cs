@@ -372,6 +372,8 @@ namespace TuristickiVodic.Services.Services
                 .Include(a => a.Destination)
                     .ThenInclude(d => d.Region)
                 .Include(a => a.Object)
+                .Include(a => a.CreatedBy)
+                .Include(a => a.ApprovedBy)
                 .Include(a => a.Images)
                 .FirstOrDefaultAsync(a => a.Id == id);
 
@@ -401,6 +403,8 @@ namespace TuristickiVodic.Services.Services
                 .Include(a => a.Destination)
                     .ThenInclude(d => d.Region)
                 .Include(a => a.Object)
+                .Include(a => a.CreatedBy)
+                .Include(a => a.ApprovedBy)
                 .Include(a => a.Images)
                 .FirstOrDefaultAsync(a => a.Id == id && a.CreatedByUserId == userId);
 
@@ -423,6 +427,8 @@ namespace TuristickiVodic.Services.Services
                 .Include(a => a.Destination)
                     .ThenInclude(d => d.Region)
                 .Include(a => a.Object)
+                .Include(a => a.CreatedBy)
+                .Include(a => a.ApprovedBy)
                 .Include(a => a.Images)
                 .FirstOrDefaultAsync(a => a.Id == id);
 
