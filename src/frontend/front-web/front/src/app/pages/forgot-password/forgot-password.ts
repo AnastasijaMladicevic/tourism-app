@@ -1,11 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { finalize } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 
 type ForgotPasswordStep = 'email' | 'code' | 'password' | 'success';
+
+const FORGOT_PASSWORD_DEMO_MODE = true;
 
 @Component({
   selector: 'app-forgot-password',
@@ -18,7 +20,8 @@ export class ForgotPasswordComponent {
   private readonly fb = inject(FormBuilder);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
-  private readonly cdr = inject(ChangeDetectorRef);
+
+  readonly demoMode = FORGOT_PASSWORD_DEMO_MODE;
 
   readonly emailForm = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
@@ -61,6 +64,15 @@ export class ForgotPasswordComponent {
   }
 
   submitEmailStep(): void {
+    if (this.demoMode) {
+      this.errorMessage = '';
+      this.resetEmail = this.email?.value?.trim() || 'demo@spirego.com';
+      this.step = 'code';
+      this.message = 'Demo mode: enter any code to continue.';
+      this.codeForm.reset();
+      return;
+    }
+
     if (this.emailForm.invalid || this.isLoading) {
       this.emailForm.markAllAsTouched();
       return;
@@ -72,13 +84,35 @@ export class ForgotPasswordComponent {
 
     const email = this.email?.value?.trim() ?? '';
     this.resetEmail = email;
-    this.step = 'code';
-    this.message = 'Demo mode: enter any 6-digit code to continue.';
-    this.codeForm.reset();
-    this.isLoading = false;
+
+    this.authService
+      .forgotPassword(email)
+      .pipe(finalize(() => {
+        this.isLoading = false;
+      }))
+      .subscribe({
+        next: () => {
+          this.step = 'code';
+          this.message = 'A verification code has been sent to your email.';
+          this.codeForm.reset();
+        },
+        error: (error: any) => {
+          this.errorMessage = error?.error?.message ?? 'Unable to send reset code.';
+        },
+      });
   }
 
   submitCodeStep(): void {
+    if (this.demoMode) {
+      this.errorMessage = '';
+      this.message = '';
+      this.resetCode = this.code?.value?.trim() || '000000';
+      this.resetSessionToken = 'demo-reset-session';
+      this.step = 'password';
+      this.passwordForm.reset();
+      return;
+    }
+
     if (this.codeForm.invalid || this.isLoading) {
       this.codeForm.markAllAsTouched();
       return;
@@ -89,14 +123,32 @@ export class ForgotPasswordComponent {
     this.message = '';
 
     const code = this.code?.value?.trim() ?? '';
-    this.resetCode = code;
-    this.resetSessionToken = 'demo-reset-session';
-    this.step = 'password';
-    this.passwordForm.reset();
-    this.isLoading = false;
+
+    this.authService
+      .verifyResetCode({ email: this.resetEmail, code })
+      .pipe(finalize(() => {
+        this.isLoading = false;
+      }))
+      .subscribe({
+        next: (response: { resetSessionToken?: string; ResetSessionToken?: string }) => {
+          this.resetCode = code;
+          this.resetSessionToken =
+            response.resetSessionToken ?? response.ResetSessionToken ?? '';
+          this.step = 'password';
+          this.passwordForm.reset();
+        },
+        error: (error: any) => {
+          this.errorMessage = error?.error?.message ?? 'Invalid or expired reset code.';
+        },
+      });
   }
 
   submitPasswordStep(): void {
+    if (this.demoMode) {
+      this.router.navigateByUrl('/login');
+      return;
+    }
+
     if (this.passwordForm.invalid || this.isLoading) {
       this.passwordForm.markAllAsTouched();
       return;
@@ -127,12 +179,9 @@ export class ForgotPasswordComponent {
         confirmPassword,
         this.resetSessionToken,
       )
-      .pipe(
-        finalize(() => {
-          this.isLoading = false;
-          this.cdr.detectChanges();
-        }),
-      )
+      .pipe(finalize(() => {
+        this.isLoading = false;
+      }))
       .subscribe({
         next: () => {
           this.step = 'success';
