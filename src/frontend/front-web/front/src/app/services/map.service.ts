@@ -528,24 +528,33 @@ export class MapService {
     const detailsHref = `/admin/destinations/edit/${destinationId}`;
 
     return `
-      <div class="destination-popup" style="width: 100%; max-width: 280px; display: flex; flex-direction: column; gap: 10px; font-family: inherit;">
-        <div style="border-radius: 14px; overflow: hidden; background: #f8fafc; border: 1px solid #e5e7eb; min-height: 132px; display: flex; align-items: center; justify-content: center;">
-          ${imageUrl
-            ? `<img src="${imageUrl}" alt="${name}" style="width: 100%; height: 132px; object-fit: cover; display: block;" />`
-            : `<div style="padding: 20px; color: #94a3b8; font-size: 13px; text-align: center;">No image available</div>`}
-        </div>
-        <div style="display: flex; flex-direction: column; gap: 4px;">
-          <strong style="font-size: 14px; line-height: 1.3; color: #0f172a;">${name}</strong>
-          ${region ? `<span style="font-size: 12px; color: #64748b;">${region}</span>` : ''}
-        </div>
-        <a
-          href="${detailsHref}"
-          style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 9px 12px; border-radius: 10px; background: linear-gradient(135deg, #2563eb, #1d4ed8); color: #ffffff; text-decoration: none; font-size: 13px; font-weight: 700;"
-        >
-          View details
-        </a>
-      </div>
-    `;
+  <div class="destination-popup">
+    <button type="button" class="destination-popup__close" onclick="document.querySelector('.leaflet-popup-close-button')?.dispatchEvent(new MouseEvent('click', { bubbles: true }))">
+      ×
+    </button>
+
+    <div class="destination-popup__image-wrap">
+      ${imageUrl
+        ? `<img src="${imageUrl}" alt="${name}" class="destination-popup__image" />`
+        : `<div class="destination-popup__empty">No image available</div>`}
+    </div>
+
+    <div class="destination-popup__body">
+      <strong class="destination-popup__title">${name}</strong>
+
+      ${region ? `
+        <span class="destination-popup__location">
+          <span class="material-symbols-outlined">location_on</span>
+          ${region}
+        </span>
+      ` : ''}
+    </div>
+
+    <a href="${detailsHref}" class="destination-popup__details">
+      View details
+    </a>
+  </div>
+`;
   }
 
   private escapeHtml(value: string): string {
