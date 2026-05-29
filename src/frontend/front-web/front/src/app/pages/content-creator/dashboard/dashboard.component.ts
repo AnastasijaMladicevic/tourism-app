@@ -98,7 +98,7 @@ const DASHBOARD_REQUEST_TIMEOUT_MS = 15000;
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.css']
+  styleUrls: ['./dashboard.component.css', '../../admin/shared/admin-page-title.css']
 })
 export class ContentCreatorDashboardComponent implements OnInit {
   private readonly authService = inject(AuthService);

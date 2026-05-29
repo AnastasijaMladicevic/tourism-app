@@ -23,9 +23,7 @@
   margin-bottom: 6px;
 }
 
-.page-header h1 {
-  font-size: 28px;
-  line-height: 1.1;
+.page-header .page-title {
   margin-bottom: 6px;
 }
 
@@ -965,8 +963,7 @@ tbody tr:hover,
     display: none;
   }
 
-  .page-header h1 {
-    font-size: 24px;
+  .page-header .page-title {
     margin-bottom: 0;
   }
 

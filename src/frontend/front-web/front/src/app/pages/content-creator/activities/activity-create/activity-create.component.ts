@@ -76,7 +76,10 @@ interface DraftPayload {
   standalone: true,
   imports: [CommonModule, FormsModule, ReactiveFormsModule, MapComponent],
   templateUrl: './activity-create.component.html',
-  styleUrl: './activity-create.component.css'
+  styleUrls: [
+    './activity-create.component.css',
+    '../../../admin/shared/admin-page-title.css'
+  ]
 })
 export class ActivityCreateComponent implements OnInit, OnDestroy {
   private readonly fb = inject(FormBuilder);

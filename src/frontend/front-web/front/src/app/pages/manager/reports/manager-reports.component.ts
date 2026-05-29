@@ -48,6 +48,7 @@ interface ManagerReportNameHint {
   templateUrl: './manager-reports.component.html',
   styleUrls: [
     './manager-reports.component.css',
+    '../../admin/shared/admin-page-title.css',
     '../shared/manager-list-page-header.css',
     '../shared/manager-list-page-responsive.css',
     '../shared/manager-page-stats-scroll.css',

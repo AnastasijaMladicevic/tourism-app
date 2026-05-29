@@ -27,7 +27,7 @@ type BanDurationOption = '30-days' | 'permanent' | 'custom';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './edit-team-member.component.html',
-  styleUrls: ['./create-team-member.component.css']
+  styleUrls: ['./create-team-member.component.css', '../shared/admin-page-title.css']
 })
 export class EditTeamMemberComponent {
   private readonly router = inject(Router);

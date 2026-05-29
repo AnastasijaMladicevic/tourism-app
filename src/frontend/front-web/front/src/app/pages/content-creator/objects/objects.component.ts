@@ -19,6 +19,7 @@ interface WorkingHoursRow {
   templateUrl: './objects.component.html',
   styleUrls: [
     './objects.component.css',
+    '../../admin/shared/admin-page-title.css',
     '../shared/cc-list-page-header.css',
     '../shared/cc-list-detail-layout.css',
     '../shared/cc-page-stats-scroll.css',

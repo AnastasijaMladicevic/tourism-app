@@ -77,6 +77,7 @@ interface ManagerReportNameHint {
   templateUrl: './manager-creator-reviews.component.html',
   styleUrls: [
     './manager-creator-reviews.component.css',
+    '../../admin/shared/admin-page-title.css',
     '../shared/manager-list-page-header.css',
     '../shared/manager-list-page-responsive.css',
     '../shared/manager-page-stats-scroll.css'

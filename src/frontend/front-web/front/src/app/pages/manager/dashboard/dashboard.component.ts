@@ -86,7 +86,12 @@ const MANAGER_DASHBOARD_PERIOD_STORAGE_KEY = 'manager-dashboard-selected-period'
   standalone: true,
   imports: [CommonModule, RouterLink],
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.css', '../shared/manager-list-page-header.css', '../shared/manager-list-page-responsive.css'],
+  styleUrls: [
+    './dashboard.component.css',
+    '../../admin/shared/admin-page-title.css',
+    '../shared/manager-list-page-header.css',
+    '../shared/manager-list-page-responsive.css'
+  ],
 })
 export class ManagerDashboardComponent implements OnInit {
   private readonly authService = inject(AuthService);

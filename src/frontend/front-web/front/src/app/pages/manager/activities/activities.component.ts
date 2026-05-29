@@ -15,6 +15,7 @@ import { MapComponent as SharedMapComponent } from '../../../shared/components/m
   templateUrl: './activities.component.html',
   styleUrls: [
     './activities.component.css',
+    '../../admin/shared/admin-page-title.css',
     '../shared/manager-list-page-header.css',
     '../shared/manager-list-page-responsive.css',
     '../shared/manager-cc-page-parity.css',

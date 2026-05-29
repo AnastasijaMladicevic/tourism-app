@@ -20,6 +20,7 @@ interface ActivityInsightCard {
   templateUrl: './activities.component.html',
   styleUrls: [
     './activities.component.css',
+    '../../admin/shared/admin-page-title.css',
     '../shared/cc-list-page-header.css',
     '../shared/cc-list-detail-layout.css',
     '../shared/cc-page-stats-scroll.css',

@@ -14,7 +14,11 @@ interface DetailItem {
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './event-details.component.html',
-  styleUrls: ['./event-details.component.css']
+  styleUrls: [
+    './event-details.component.css',
+    '../../../admin/shared/admin-page-title.css',
+    '../../shared/cc-list-page-header.css'
+  ]
 })
 export class EventDetailsComponent implements OnInit {
   private readonly route = inject(ActivatedRoute);

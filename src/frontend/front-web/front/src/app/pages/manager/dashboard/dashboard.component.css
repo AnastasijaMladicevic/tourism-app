@@ -15,14 +15,6 @@
   flex-wrap: wrap;
 }
 
-.page-head h1 {
-  margin: 0 0 4px;
-  font-size: 34px;
-  line-height: 1.1;
-  font-weight: 700;
-  letter-spacing: -0.4px;
-}
-
 .subtle-text {
   margin: 6px 0 0;
   font-size: 14px;
@@ -842,10 +834,6 @@
   .review-health,
   .upcoming-grid {
     grid-template-columns: 1fr;
-  }
-
-  .page-head h1 {
-    font-size: 28px;
   }
 
   .head-actions {

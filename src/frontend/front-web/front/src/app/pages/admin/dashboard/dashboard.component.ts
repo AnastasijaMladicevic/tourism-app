@@ -99,7 +99,11 @@ const ADMIN_DASHBOARD_PERIOD_STORAGE_KEY = 'admin-dashboard-selected-period';
   standalone: true,
   imports: [CommonModule, RouterLink, AdminPlatformMapComponent],
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.css', '../shared/admin-page-stats-scroll.css'],
+  styleUrls: [
+    './dashboard.component.css',
+    '../shared/admin-page-title.css',
+    '../shared/admin-page-stats-scroll.css'
+  ],
 })
 export class DashboardComponent implements OnInit {
   private readonly authService = inject(AuthService);
