@@ -1128,9 +1128,12 @@
         "events": "Događaji",
         "myPlanner": "Moj planer"
       },
+      "mobileSuggestedCta": "Predloženo",
+      "heroBody": "Pregledaj događaje po datumu i brzo dodaj stavke koje želiš da sačuvaš u svom planeru.",
       "searchPlaceholder": "Pretraži događaje",
       "allCategories": "Sve kategorije",
       "dateFilterAll": "Datum",
+      "displayedDays": "Prikazano {{count}} dana",
       "range7": "7 dana",
       "range14": "14 dana",
       "range30": "Mesec",

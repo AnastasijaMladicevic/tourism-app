@@ -1128,9 +1128,12 @@
         "events": "Events",
         "myPlanner": "My planner"
       },
+      "mobileSuggestedCta": "Suggested",
+      "heroBody": "Browse events by date and quickly add the ones you want to keep in your planner.",
       "searchPlaceholder": "Search events",
       "allCategories": "All categories",
       "dateFilterAll": "Date",
+      "displayedDays": "Showing {{count}} days",
       "range7": "7 days",
       "range14": "14 days",
       "range30": "Month",

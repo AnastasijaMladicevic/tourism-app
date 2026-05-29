@@ -239,6 +239,17 @@ export class AddToPlannerComponent implements OnInit {
     return this.selectedDayIds().includes(dayId);
   }
 
+  protected openDatePicker(input: HTMLInputElement): void {
+    const pickerInput = input as HTMLInputElement & { showPicker?: () => void };
+
+    if (typeof pickerInput.showPicker === 'function') {
+      pickerInput.showPicker();
+      return;
+    }
+
+    pickerInput.click();
+  }
+
   protected save(): void {
     if (!this.eventId || this.isSaving()) {
       this.feedback.set(this.translate('addToPlanner.feedbackOnlyEvents'));

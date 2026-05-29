@@ -1124,9 +1124,12 @@
         "events": "Eventi",
         "myPlanner": "Il mio pianificatore"
       },
+      "mobileSuggestedCta": "Suggeriti",
+      "heroBody": "Sfoglia gli eventi per data e aggiungi rapidamente quelli che vuoi tenere nel tuo pianificatore.",
       "searchPlaceholder": "Cerca eventi",
       "allCategories": "Tutte le categorie",
       "dateFilterAll": "Data",
+      "displayedDays": "Mostrando {{count}} giorni",
       "range7": "7 giorni",
       "range14": "14 giorni",
       "range30": "Mese",

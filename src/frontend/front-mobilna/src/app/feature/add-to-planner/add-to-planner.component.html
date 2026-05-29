@@ -64,58 +64,60 @@
           <p class="support-hint">
             {{ translate('addToPlanner.lockedHint') }}
           </p>
-
-          @if (canSelectMultipleDays()) {
-            <p class="support-hint support-hint--info">
-              {{ translate('addToPlanner.multiDaySelectionHint') }}
-            </p>
-          }
         }
 
-        <div class="field-grid">
-          <label class="field-card field-card--full">
-            <span>
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <rect x="4" y="5" width="16" height="15" rx="2" />
-                <path d="M8 3v4" />
-                <path d="M16 3v4" />
-                <path d="M4 10h16" />
-              </svg>
-              {{ translate('addToPlanner.travelDate') }}
-            </span>
-
-            <div class="field-card__surface">
-              <input
-                type="date"
-                [ngModel]="travelDate()"
-                (ngModelChange)="onTravelDateChange($event)"
-                [attr.min]="minSelectableDate"
-                [attr.max]="maxSelectableDate"
-              />
-            </div>
-
-            <small>{{ selectedDateLabel() }}</small>
-          </label>
+        <div class="calendar-strip-label">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="4" y="5" width="16" height="15" rx="2" />
+            <path d="M8 3v4" />
+            <path d="M16 3v4" />
+            <path d="M4 10h16" />
+          </svg>
+          <span>Izaberite kada zelite da odete na dogadjaj</span>
         </div>
 
-        <div class="calendar-strip">
-          @for (day of days(); track day.id) {
-            <button
-              type="button"
-              class="calendar-pill"
-              [class.calendar-pill--active]="isDaySelected(day.id)"
-              [attr.aria-pressed]="isDaySelected(day.id)"
-              (click)="selectDay(day)"
-            >
-              <span>{{ day.label }}</span>
-              <strong>{{ day.date }}</strong>
-            </button>
-          }
-        </div>
+        <div class="calendar-strip-row">
+          <div class="calendar-strip">
+            @for (day of days(); track day.id) {
+              <button
+                type="button"
+                class="calendar-pill"
+                [class.calendar-pill--active]="isDaySelected(day.id)"
+                [attr.aria-pressed]="isDaySelected(day.id)"
+                (click)="selectDay(day)"
+              >
+                <span>{{ day.label }}</span>
+                <strong>{{ day.date }}</strong>
+              </button>
+            }
+          </div>
 
-        @if (canSelectMultipleDays()) {
-          <p class="calendar-selection-note">{{ selectedDateLabel() }}</p>
-        }
+          <button
+            type="button"
+            class="calendar-picker-btn"
+            (click)="openDatePicker(travelDatePicker)"
+            [attr.aria-label]="translate('addToPlanner.travelDate')"
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="4" y="5" width="16" height="15" rx="2" />
+              <path d="M8 3v4" />
+              <path d="M16 3v4" />
+              <path d="M4 10h16" />
+            </svg>
+          </button>
+
+          <input
+            #travelDatePicker
+            class="calendar-picker-native-input"
+            type="date"
+            [ngModel]="travelDate()"
+            (ngModelChange)="onTravelDateChange($event)"
+            [attr.min]="minSelectableDate"
+            [attr.max]="maxSelectableDate"
+            tabindex="-1"
+            aria-hidden="true"
+          />
+        </div>
 
         <div class="field-grid field-grid--split">
 

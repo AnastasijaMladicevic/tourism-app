@@ -107,6 +107,33 @@
           </button>
         </section>
 
+        <section class="favorites-mobile-section favorites-mobile-collections">
+          <div class="favorites-mobile-section__head">
+            <h2>{{ translate('favorites.collectionsTitle') }}</h2>
+          </div>
+
+          <div class="favorites-mobile-collections__grid">
+            @for (item of collectionItems().slice(0, 4); track trackCollection($index, item)) {
+              <button
+                type="button"
+                class="favorites-mobile-collection-card"
+                (click)="setActiveFilter(item.value, $event)"
+              >
+                <span class="favorites-mobile-collection-card__icon" [attr.data-tone]="item.tone">
+                  <mat-icon>{{ item.icon }}</mat-icon>
+                </span>
+
+                <span class="favorites-mobile-collection-card__copy">
+                  <strong>{{ item.label }}</strong>
+                  <small>{{ collectionCountLabel(item.count) }}</small>
+                </span>
+
+                <mat-icon class="favorites-mobile-collection-card__arrow">chevron_right</mat-icon>
+              </button>
+            }
+          </div>
+        </section>
+
         <aside class="favorites-panel">
           <section class="panel-card">
             <div class="panel-card__head">
@@ -267,34 +294,6 @@
             <p>{{ translate('favorites.emptyBodyModern') }}</p>
           </article>
         }
-
-        <section class="favorites-mobile-section favorites-mobile-collections">
-          <div class="favorites-mobile-section__head">
-            <h2>{{ translate('favorites.collectionsTitle') }}</h2>
-            <button type="button" class="favorites-mobile-section__link">{{ translate('favorites.collectionsLinkShort') }}</button>
-          </div>
-
-          <div class="favorites-mobile-collections__grid">
-            @for (item of collectionItems().slice(0, 4); track trackCollection($index, item)) {
-              <button
-                type="button"
-                class="favorites-mobile-collection-card"
-                (click)="setActiveFilter(item.value, $event)"
-              >
-                <span class="favorites-mobile-collection-card__icon" [attr.data-tone]="item.tone">
-                  <mat-icon>{{ item.icon }}</mat-icon>
-                </span>
-
-                <span class="favorites-mobile-collection-card__copy">
-                  <strong>{{ item.label }}</strong>
-                  <small>{{ collectionCountLabel(item.count) }}</small>
-                </span>
-
-                <mat-icon class="favorites-mobile-collection-card__arrow">chevron_right</mat-icon>
-              </button>
-            }
-          </div>
-        </section>
 
       </main>
 
