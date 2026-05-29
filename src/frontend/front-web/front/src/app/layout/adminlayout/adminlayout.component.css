@@ -180,6 +180,11 @@
   cursor: pointer;
 }
 
+.topbar-user .user-meta,
+.topbar-user .user-avatar {
+  cursor: pointer;
+}
+
 .user-meta {
   display: flex;
   flex-direction: column;

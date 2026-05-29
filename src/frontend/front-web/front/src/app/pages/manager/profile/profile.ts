@@ -28,7 +28,7 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
     `${environment.apiUrl.replace('/api', '')}/images/profiles/default_icon.png`;
 
   readonly permissionItems: PermissionItem[] = [
-    { label: 'View manager dashboard', detail: 'Open the manager overview at /api/manager/dashboard/overview.' },
+    { label: 'View manager dashboard', detail: 'Open the manager overview.' },
     { label: 'Manage events', detail: 'List assigned events, inspect details, approve them, and toggle active state.' },
     { label: 'Manage activities', detail: 'List assigned activities, inspect details, approve them, and toggle active state.' },
     { label: 'Manage tourist objects', detail: 'List assigned tourist objects, inspect details, approve them, and toggle active state.' },
