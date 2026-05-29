@@ -7,6 +7,7 @@ export class DomTranslationService implements OnDestroy {
   private readonly zone = inject(NgZone);
   private readonly languageEffect = effect(() => {
     this.translationService.language();
+    this.translationService.translationsVersion();
     this.scheduleTranslation();
   });
 

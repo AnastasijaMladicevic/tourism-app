@@ -14,6 +14,7 @@
   display: flex;
   flex-direction: column;
 }
+
 .topbar {
   min-height: 76px;
   display: grid;
@@ -288,7 +289,9 @@
   padding-bottom: 2px;
   scrollbar-width: none;
 
-  &::-webkit-scrollbar { display: none; }
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .filter-chip {
@@ -346,7 +349,9 @@
   &__chevron {
     transition: transform 0.18s ease;
 
-    &--open { transform: rotate(180deg); }
+    &--open {
+      transform: rotate(180deg);
+    }
   }
 }
 
@@ -373,7 +378,9 @@
     text-align: left;
     cursor: pointer;
 
-    &:hover { background: var(--surface-soft); }
+    &:hover {
+      background: var(--surface-soft);
+    }
 
     &--active {
       background: #1792ba;
@@ -744,11 +751,28 @@
   .status-chip {
     min-height: 32px;
     font-size: 14px;
+    flex: 0 0 auto;
+    white-space: nowrap;
   }
 
   .filter-row {
-    flex-wrap: wrap;
-    overflow: visible;
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+
+    user-select: none;
+    cursor: grab;
+  }
+
+  .filter-row:active {
+    cursor: grabbing;
+  }
+
+  .filter-row::-webkit-scrollbar {
+    display: none;
   }
 }
 
@@ -758,13 +782,13 @@
     min-height: 100dvh;
     background: var(--bg);
   }
-  
+
   .reviews-preview-page {
     min-height: 100dvh;
     background: var(--bg);
     padding: 0;
   }
-  
+
   .reviews-preview-shell,
   .content,
   .topbar,

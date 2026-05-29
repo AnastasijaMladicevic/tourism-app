@@ -1,9 +1,10 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { APP_INITIALIZER, ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideRouter, withRouterConfig } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 
 import { routes } from './app.routes';
 import { authInterceptor } from './interceptors/auth.interceptor';
+import { TranslationService } from './services/translation.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -15,6 +16,14 @@ export const appConfig: ApplicationConfig = {
         onSameUrlNavigation: 'reload'
       })
     ),
-    provideHttpClient(withInterceptors([authInterceptor]))
+    provideHttpClient(withInterceptors([authInterceptor])),
+    {
+      provide: APP_INITIALIZER,
+      useFactory: (translationService: TranslationService) => {
+        return () => translationService.loadInitialTranslations();
+      },
+      deps: [TranslationService],
+      multi: true,
+    },
   ]
 };

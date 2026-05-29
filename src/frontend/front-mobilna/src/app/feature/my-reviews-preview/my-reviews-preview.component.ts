@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, OnInit, computed, inject, signal } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild, computed, inject, signal, AfterViewInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { catchError, forkJoin, of } from 'rxjs';
 import { environment } from '../../../environment/environment';
@@ -59,7 +59,44 @@ export class MyReviewsPreviewComponent implements OnInit {
   protected readonly showSizeDropdown = signal(false);
   protected readonly pageSizeOptions = [3, 5];
   protected readonly deletingId = signal<number | null>(null);
+  @ViewChild('filterRow') filterRow!: ElementRef<HTMLElement>;
 
+  private isDragging = false;
+  private startX = 0;
+  private scrollLeft = 0;
+  ngAfterViewInit(): void {
+    const slider = this.filterRow.nativeElement;
+
+    slider.addEventListener('mousedown', (e: MouseEvent) => {
+      this.isDragging = true;
+
+      this.startX = e.pageX - slider.offsetLeft;
+      this.scrollLeft = slider.scrollLeft;
+
+      slider.classList.add('dragging');
+    });
+
+    slider.addEventListener('mouseleave', () => {
+      this.isDragging = false;
+      slider.classList.remove('dragging');
+    });
+
+    slider.addEventListener('mouseup', () => {
+      this.isDragging = false;
+      slider.classList.remove('dragging');
+    });
+
+    slider.addEventListener('mousemove', (e: MouseEvent) => {
+      if (!this.isDragging) return;
+
+      e.preventDefault();
+
+      const x = e.pageX - slider.offsetLeft;
+      const walk = (x - this.startX) * 1.5;
+
+      slider.scrollLeft = this.scrollLeft - walk;
+    });
+  }
   protected readonly filters = computed<ReviewFilter[]>(() => {
     const typeFilters = [...new Set(this.reviews().map((item) => item.objectType.trim()).filter(Boolean))]
       .sort((a, b) => a.localeCompare(b, this.translationService.currentLocale()))
