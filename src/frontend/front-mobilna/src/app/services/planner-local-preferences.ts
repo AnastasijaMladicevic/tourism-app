@@ -4,6 +4,7 @@ export interface PlannerLocalPreference {
   plannerId: number;
   eventId: number;
   plannedDate: string;
+  plannedDates?: string[];
   startTime: string;
   durationMinutes: number;
   notes: string;
@@ -31,7 +32,7 @@ export class PlannerLocalPreferencesService {
       }
 
       const parsed = JSON.parse(raw) as PlannerLocalPreference[];
-      return Array.isArray(parsed) ? parsed : [];
+      return Array.isArray(parsed) ? parsed.map((item) => this.normalizePreference(item)) : [];
     } catch {
       return [];
     }
@@ -44,7 +45,7 @@ export class PlannerLocalPreferencesService {
   upsert(preference: PlannerLocalPreference): void {
     const items = this.list();
     const nextItems = items.filter((item) => item.plannerId !== preference.plannerId);
-    nextItems.push(preference);
+    nextItems.push(this.normalizePreference(preference));
     localStorage.setItem(this.storageKey, JSON.stringify(nextItems));
   }
 
@@ -58,34 +59,70 @@ export class PlannerLocalPreferencesService {
     fallbackStart: string,
     fallbackEnd?: string | null,
   ): PlannerResolvedSchedule {
+    return this.resolveSchedules(plannerId, fallbackStart, fallbackEnd)[0];
+  }
+
+  resolveSchedules(
+    plannerId: number,
+    fallbackStart: string,
+    fallbackEnd?: string | null,
+  ): PlannerResolvedSchedule[] {
     const preference = this.findByPlannerId(plannerId);
     const fallbackDurationMinutes = this.resolveDurationMinutes(fallbackStart, fallbackEnd);
 
     if (preference) {
-      const startDate = this.mergeDateAndTime(preference.plannedDate, preference.startTime);
-      const safeStartDate = this.isValidDate(startDate) ? startDate : this.parseDate(fallbackStart);
       const durationMinutes = fallbackDurationMinutes ?? this.normalizeDuration(preference.durationMinutes);
+      const plannedDates = this.resolvePlannedDates(preference);
+      const safePlannedDates = plannedDates.length
+        ? plannedDates
+        : [this.toDateInputValue(this.parseDate(fallbackStart))];
 
-      return {
-        startDate: safeStartDate,
-        endDate: this.addMinutes(safeStartDate, durationMinutes),
-        notes: preference.notes,
-        isPriority: preference.isPriority,
-        durationMinutes,
-      };
+      return safePlannedDates.map((plannedDate) => {
+        const startDate = this.mergeDateAndTime(plannedDate, preference.startTime);
+        const safeStartDate = this.isValidDate(startDate) ? startDate : this.parseDate(fallbackStart);
+
+        return {
+          startDate: safeStartDate,
+          endDate: this.addMinutes(safeStartDate, durationMinutes),
+          notes: preference.notes,
+          isPriority: preference.isPriority,
+          durationMinutes,
+        };
+      });
     }
 
     const startDate = this.parseDate(fallbackStart);
     const durationMinutes = fallbackDurationMinutes ?? 90;
     const endDate = this.addMinutes(startDate, durationMinutes);
 
+    return [
+      {
+        startDate,
+        endDate,
+        notes: '',
+        isPriority: false,
+        durationMinutes,
+      },
+    ];
+  }
+
+  private normalizePreference(preference: PlannerLocalPreference): PlannerLocalPreference {
+    const plannedDates = this.resolvePlannedDates(preference);
+
     return {
-      startDate,
-      endDate,
-      notes: '',
-      isPriority: false,
-      durationMinutes,
+      ...preference,
+      plannedDate: plannedDates[0] ?? preference.plannedDate,
+      plannedDates,
     };
+  }
+
+  private resolvePlannedDates(preference: PlannerLocalPreference): string[] {
+    const plannedDates = Array.isArray(preference.plannedDates)
+      ? preference.plannedDates
+      : [preference.plannedDate];
+
+    return [...new Set(plannedDates.filter((value) => this.dateOnlyPattern.test(value)))]
+      .sort((left, right) => left.localeCompare(right));
   }
 
   private parseDate(value: string): Date {
@@ -124,6 +161,13 @@ export class PlannerLocalPreferencesService {
 
   private addMinutes(date: Date, minutes: number): Date {
     return new Date(date.getTime() + minutes * 60000);
+  }
+
+  private toDateInputValue(date: Date): string {
+    const year = date.getFullYear();
+    const month = `${date.getMonth() + 1}`.padStart(2, '0');
+    const day = `${date.getDate()}`.padStart(2, '0');
+    return `${year}-${month}-${day}`;
   }
 
   private normalizeDuration(minutes: number): number {

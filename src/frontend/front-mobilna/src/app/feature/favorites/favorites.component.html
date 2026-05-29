@@ -38,6 +38,7 @@
                     type="button"
                     class="favorites-chip"
                     [class.favorites-chip--active]="activeFilter() === chip.value"
+                    [attr.aria-pressed]="activeFilter() === chip.value"
                     (click)="setActiveFilter(chip.value, $event)"
                   >
                     <span>{{ chip.label }}</span>
@@ -105,6 +106,76 @@
             </span>
           </button>
         </section>
+
+        <section class="favorites-mobile-section favorites-mobile-collections">
+          <div class="favorites-mobile-section__head">
+            <h2>{{ translate('favorites.collectionsTitle') }}</h2>
+          </div>
+
+          <div class="favorites-mobile-collections__grid">
+            @for (item of collectionItems().slice(0, 4); track trackCollection($index, item)) {
+              <button
+                type="button"
+                class="favorites-mobile-collection-card"
+                (click)="setActiveFilter(item.value, $event)"
+              >
+                <span class="favorites-mobile-collection-card__icon" [attr.data-tone]="item.tone">
+                  <mat-icon>{{ item.icon }}</mat-icon>
+                </span>
+
+                <span class="favorites-mobile-collection-card__copy">
+                  <strong>{{ item.label }}</strong>
+                  <small>{{ collectionCountLabel(item.count) }}</small>
+                </span>
+
+                <mat-icon class="favorites-mobile-collection-card__arrow">chevron_right</mat-icon>
+              </button>
+            }
+          </div>
+        </section>
+
+        <aside class="favorites-panel">
+          <section class="panel-card">
+            <div class="panel-card__head">
+              <h3>{{ translate('favorites.collectionsTitle') }}</h3>
+            </div>
+
+            @if (collectionItems().length) {
+              <div class="collection-list">
+                @for (item of visibleCollectionItems(); track trackCollection($index, item)) {
+                  <button
+                    type="button"
+                    class="collection-row"
+                    (click)="setActiveFilter(item.value, $event)"
+                  >
+                    <span class="collection-row__icon" [attr.data-tone]="item.tone">
+                      <mat-icon>{{ item.icon }}</mat-icon>
+                    </span>
+
+                    <span class="collection-row__copy">
+                      <strong>{{ item.label }}</strong>
+                      <small>{{ collectionCountLabel(item.count) }}</small>
+                    </span>
+
+                    <mat-icon class="collection-row__arrow">chevron_right</mat-icon>
+                  </button>
+                }
+              </div>
+
+              @if (hasMoreCollectionItems()) {
+                <button
+                  type="button"
+                  class="panel-card__link panel-card__link--button"
+                  (click)="toggleCollectionsExpanded()"
+                >
+                  {{ showAllCollections() ? translate('favorites.collectionsCollapseLink') : translate('favorites.collectionsLink') }}
+                </button>
+              }
+            } @else {
+              <p class="panel-empty">{{ translate('favorites.panelEmpty') }}</p>
+            }
+          </section>
+        </aside>
 
         <div class="favorites-status-row">
           <span>{{ savedCountLabel() }}</span>
@@ -176,13 +247,12 @@
                     </span>
 
                     @if (item.canOpenDetails) {
-                      <button
-                        type="button"
-                        class="card-action-btn"
+                      <span
+                        class="card-action-link"
                         (click)="openFavoriteAction(item, $event)"
                       >
-                        <span>{{ translate('common.details') }}</span>
-                      </button>
+                        {{ translate('common.details') }}
+                      </span>
                     } @else {
                       <span class="favorite-card__helper">{{ translate('favorites.plannerEventsOnly') }}</span>
                     }
@@ -192,35 +262,32 @@
             }
           </div>
 
-          @if (totalPages() > 1) {
-            <nav class="favorites-pagination" [attr.aria-label]="translate('favorites.paginationAria')">
-              <button
-                type="button"
-                class="favorites-pagination__button"
-                [disabled]="currentPage() <= 1"
-                (click)="previousPage()"
-              >
-                {{ translate('common.prev') }}
-              </button>
+          <nav class="favorites-pagination" [attr.aria-label]="translate('favorites.paginationAria')">
+            <button
+              mat-button
+              type="button"
+              class="favorites-pagination__button"
+              [disabled]="currentPage() <= 1"
+              (click)="previousPage()"
+            >
+              {{ translate('common.prev') }}
+            </button>
 
-              <span class="favorites-pagination__status">
-                {{ translate('common.pageOf', { current: currentPage(), total: totalPages() }) }}
-              </span>
+            <span class="favorites-pagination__status">
+              {{ translate('common.pageOf', { current: currentPage(), total: totalPages() }) }}
+            </span>
 
-              <button
-                type="button"
-                class="favorites-pagination__button"
-                [disabled]="currentPage() >= totalPages()"
-                (click)="nextPage()"
-              >
-                {{ translate('common.next') }}
-              </button>
-            </nav>
-          }
+            <button
+              mat-button
+              type="button"
+              class="favorites-pagination__button"
+              [disabled]="currentPage() >= totalPages()"
+              (click)="nextPage()"
+            >
+              {{ translate('common.next') }}
+            </button>
+          </nav>
 
-          <footer class="favorites-footer-note">
-            {{ translate('favorites.footerShowingAll', { count: displayedFavorites().length }) }}
-          </footer>
         } @else {
           <article class="favorites-empty">
             <strong>{{ translate('favorites.emptyTitleModern') }}</strong>
@@ -228,79 +295,8 @@
           </article>
         }
 
-        <section class="favorites-mobile-section favorites-mobile-collections">
-          <div class="favorites-mobile-section__head">
-            <h2>{{ translate('favorites.collectionsTitle') }}</h2>
-            <button type="button" class="favorites-mobile-section__link">{{ translate('favorites.collectionsLinkShort') }}</button>
-          </div>
-
-          <div class="favorites-mobile-collections__grid">
-            @for (item of collectionItems().slice(0, 4); track trackCollection($index, item)) {
-              <button
-                type="button"
-                class="favorites-mobile-collection-card"
-                (click)="setActiveFilter(item.value, $event)"
-              >
-                <span class="favorites-mobile-collection-card__icon" [attr.data-tone]="item.tone">
-                  <mat-icon>{{ item.icon }}</mat-icon>
-                </span>
-
-                <span class="favorites-mobile-collection-card__copy">
-                  <strong>{{ item.label }}</strong>
-                  <small>{{ collectionCountLabel(item.count) }}</small>
-                </span>
-
-                <mat-icon class="favorites-mobile-collection-card__arrow">chevron_right</mat-icon>
-              </button>
-            }
-          </div>
-        </section>
-
       </main>
 
-      <aside class="favorites-panel">
-        <section class="panel-card">
-          <div class="panel-card__head">
-            <h3>{{ translate('favorites.collectionsTitle') }}</h3>
-          </div>
-
-          @if (collectionItems().length) {
-            <div class="collection-list">
-              @for (item of visibleCollectionItems(); track trackCollection($index, item)) {
-                <button
-                  type="button"
-                  class="collection-row"
-                  (click)="setActiveFilter(item.value, $event)"
-                >
-                  <span class="collection-row__icon" [attr.data-tone]="item.tone">
-                    <mat-icon>{{ item.icon }}</mat-icon>
-                  </span>
-
-                  <span class="collection-row__copy">
-                    <strong>{{ item.label }}</strong>
-                    <small>{{ collectionCountLabel(item.count) }}</small>
-                  </span>
-
-                  <mat-icon class="collection-row__arrow">chevron_right</mat-icon>
-                </button>
-              }
-            </div>
-
-            @if (hasMoreCollectionItems()) {
-              <button
-                type="button"
-                class="panel-card__link panel-card__link--button"
-                (click)="toggleCollectionsExpanded()"
-              >
-                {{ showAllCollections() ? translate('favorites.collectionsCollapseLink') : translate('favorites.collectionsLink') }}
-              </button>
-            }
-          } @else {
-            <p class="panel-empty">{{ translate('favorites.panelEmpty') }}</p>
-          }
-        </section>
-
-      </aside>
     </section>
   </div>
 
