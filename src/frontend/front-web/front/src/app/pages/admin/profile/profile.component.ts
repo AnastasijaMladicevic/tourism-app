@@ -29,7 +29,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     `${environment.apiUrl.replace('/api', '')}/images/profiles/default_icon.png`;
 
   readonly permissionItems: PermissionItem[] = [
-    { label: 'View admin dashboard', detail: 'Open the admin overview at /api/admin/dashboard/overview.', icon: 'dashboard' },
+    { label: 'View admin dashboard', detail: 'Open the admin overview.', icon: 'dashboard' },
     { label: 'Manage user accounts', detail: 'View users, inspect user details, and find users by email.', icon: 'groups' },
     { label: 'Manage admin access', detail: 'Register manager and admin accounts, plus review creator requests.', icon: 'key' },
     { label: 'Moderate users', detail: 'Approve, reject, demote, ban, unban, activate, or deactivate accounts.', icon: 'shield' },
