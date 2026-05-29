@@ -94,13 +94,11 @@ export class EditTeamMemberComponent {
   ];
 
   readonly languages = [
+    'Serbian',
     'English (US)',
     'English (UK)',
-    'German',
-    'French',
     'Spanish',
-    'Italian',
-    'Croatian'
+    'Italian'
   ];
 
   readonly regionOptions = [
@@ -113,13 +111,11 @@ export class EditTeamMemberComponent {
 
   /** Maps UI labels to API `language` codes (max 5 chars per backend). */
   private readonly languageCodes: Record<string, string> = {
+    Serbian: 'sr',
     'English (US)': 'en',
-    'English (UK)': 'en-GB',
-    German: 'de',
-    French: 'fr',
+    'English (UK)': 'en',
     Spanish: 'es',
-    Italian: 'it',
-    Croatian: 'hr'
+    Italian: 'it'
   };
 
   constructor() {

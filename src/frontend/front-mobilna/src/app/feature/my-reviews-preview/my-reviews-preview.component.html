@@ -70,7 +70,7 @@
       </label>
 
       <div class="controls-row">
-        <div class="filter-row">
+        <div class="filter-row" #filterRow>
           @for (filter of filters(); track trackFilter($index, filter)) {
             <button
               class="filter-chip"
