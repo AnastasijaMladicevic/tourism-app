@@ -278,12 +278,13 @@
 }
 
 .filter-row {
+  flex: 1 1 0;
+  min-width: 0;
   display: flex;
+  flex-wrap: nowrap;
   gap: 8px;
   overflow-x: auto;
-  flex: 1 1 auto;
-  min-width: 0;
-  flex-wrap: nowrap;
+  overflow-y: visible;
   padding-bottom: 2px;
   scrollbar-width: none;
 
@@ -384,46 +385,37 @@
 
 .pagination {
   display: flex;
-  align-items: center;
   justify-content: center;
-  gap: 12px;
+  align-items: center;
+  gap: 16px;
   margin-top: 20px;
-  padding: 4px 0 8px;
 
   &__btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    height: 38px;
-    padding: 0 16px;
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    background: var(--surface);
-    color: var(--text-dark);
+    border: none;
+    background: transparent;
+    color: var(--mat-text-button-label-text-color, var(--mat-sys-primary, #005db0));
     font-size: 14px;
     font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 8px;
     cursor: pointer;
-    transition: opacity 0.15s;
+    transition: background 0.15s ease;
+    font-family: inherit;
 
-    svg {
-      width: 16px;
-      height: 16px;
-      fill: none;
-      stroke: currentColor;
-      stroke-width: 2;
-      stroke-linecap: round;
-      stroke-linejoin: round;
+    &:hover:not(:disabled) {
+      background: var(--mat-text-button-hover-state-layer-color, rgba(0, 93, 176, 0.08));
     }
 
     &:disabled {
-      opacity: 0.38;
-      cursor: not-allowed;
+      color: var(--text-gray);
+      font-weight: 400;
+      cursor: default;
+      background: transparent;
     }
   }
 
   &__info {
     font-size: 14px;
-    font-weight: 600;
     color: var(--text-gray);
   }
 }
