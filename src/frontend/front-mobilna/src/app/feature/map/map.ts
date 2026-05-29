@@ -486,16 +486,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     const point = this.getRoutePointFromItem(this.selectedItem, this.selectedType);
     if (!point) return;
 
-    const initialPoints: RoutePoint[] = [];
-    const myLocationPoint = this.createMyLocationRoutePoint();
-
-    if (myLocationPoint) {
-      initialPoints.push(myLocationPoint);
-    }
-
-    initialPoints.push(point);
-
-    this.routePoints = initialPoints;
+    this.routePoints = [point];
     this.routeBuilderStateService.openPlanner(this.routePoints);
     this.totalDistance = 0;
     this.totalDuration = 0;
@@ -503,10 +494,6 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.openRoutePlannerForEditing({ resetPosition: true });
     this.syncRoutePointMarkers();
     this.closeCard();
-
-    if (this.routePoints.length > 1) {
-      void this.calculateRoute();
-    }
   }
 
   getDirections(): void {
@@ -567,19 +554,18 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   clearPlannedRouteKeepMyLocation(): void {
     this.deactivateRouteNavigation();
     const existingOrigin = this.routePoints.find((point) => point.id === -1 && point.type === 'gps') ?? null;
-    const myLocationPoint = existingOrigin ?? this.createMyLocationRoutePoint();
 
     this.clearDirections();
     this.routeSearchResults = [];
     this.routeSearchQuery = '';
     this.showAddStopPanel = false;
 
-    if (!myLocationPoint) {
+    if (!existingOrigin) {
       this.clearPlannedRoute();
       return;
     }
 
-    this.routePoints = [{ ...myLocationPoint }];
+    this.routePoints = [{ ...existingOrigin }];
     this.totalDistance = 0;
     this.totalDuration = 0;
     this.routeBuilderStateService.updateRoutePoints(this.routePoints);
@@ -1413,15 +1399,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     const point = this.getRoutePointFromItem(this.selectedItem, this.selectedType);
     if (!point) return;
 
-    const initialPoints: RoutePoint[] = [];
-    const myLocationPoint = this.createMyLocationRoutePoint();
-    if (myLocationPoint) {
-      initialPoints.push(myLocationPoint);
-    }
-    initialPoints.push(point);
-
-    this.routePoints = initialPoints;
-
+    this.routePoints = [point];
     this.showDirectionsModal = true;
   }
 
@@ -1719,15 +1697,8 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.shouldCenterOnNextLocation = !this.userLocation;
     this.syncRouteNavigationPageState(true);
 
-    let routeChanged = false;
     if (this.userLocation) {
-      routeChanged = this.syncNavigationRouteOrigin(this.userLocation);
       this.focusNavigationOnLocation(this.userLocation);
-    }
-
-    if (routeChanged) {
-      this.routeBuilderStateService.updateRoutePoints(this.routePoints);
-      this.syncRoutePointMarkers();
     }
 
     void this.calculateRoute({ preserveViewport: true });
@@ -2352,8 +2323,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const firstPoint = this.routePoints[0];
     if (!this.isGpsRoutePoint(firstPoint)) {
-      this.routePoints = [liveOrigin, ...this.routePoints];
-      return true;
+      return false;
     }
 
     const previousOrigin = L.latLng(firstPoint.lat, firstPoint.lng);
