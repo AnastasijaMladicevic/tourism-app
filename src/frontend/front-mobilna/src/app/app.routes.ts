@@ -359,13 +359,6 @@ export const routes: Routes = [
       ),
   },
   {
-    path: 'map/add-stop',
-    loadComponent: () =>
-      import('./feature/add-stop-mobile-screen/add-stop-mobile-screen.component').then(
-        (m) => m.AddStopMobileScreenComponent,
-      ),
-  },
-  {
     path: 'my-reviews',
     canActivate: [profileAuthGuard],
     loadComponent: () =>
@@ -411,7 +404,16 @@ export const routes: Routes = [
   {
     path: 'map',
     loadComponent: () =>
-      import('./feature/map/map').then(m => m.MapComponent)
+      import('./feature/map/map').then(m => m.MapComponent),
+    children: [
+      {
+        path: 'add-stop',
+        loadComponent: () =>
+          import('./feature/add-stop-mobile-screen/add-stop-mobile-screen.component').then(
+            (m) => m.AddStopMobileScreenComponent,
+          ),
+      },
+    ],
   },
   {
     path: 'object/:id',

@@ -11,6 +11,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
+import { RouterOutlet } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import 'leaflet.markercluster';
@@ -93,7 +94,7 @@ const SEARCH_STOP_WORDS = new Set([
 @Component({
   selector: 'app-map',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule, DragDropModule, TranslatePipe],
+  imports: [CommonModule, FormsModule, MatIconModule, DragDropModule, TranslatePipe, RouterOutlet],
   templateUrl: './map.html',
   styleUrls: ['./map.scss'],
   encapsulation: ViewEncapsulation.None,
@@ -229,6 +230,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   };
   get plannerHeightStyle(): string | null {
+    if (this.isRouteListCollapsed) return null;
     const activeHeight = this.isRoutePlannerDragging ? this.routePlannerDragCurrentHeight : this.routePlannerSettledHeight;
     return activeHeight == null ? null : `${activeHeight}px`;
   }

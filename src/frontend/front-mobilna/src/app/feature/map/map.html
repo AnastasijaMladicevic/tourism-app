@@ -61,6 +61,7 @@
       [class.route-planner--navigation-active]="isRouteNavigationActive"
       [class.route-planner--expanded]="isRoutePlannerExpanded"
       [class.route-planner--dragging]="isRoutePlannerDragging"
+      [class.route-planner--collapsed]="isRouteListCollapsed"
       [style.height]="plannerHeightStyle"
     >
       <div
@@ -531,4 +532,5 @@
       </div>
     </div>
   }
+  <router-outlet></router-outlet>
 </div>

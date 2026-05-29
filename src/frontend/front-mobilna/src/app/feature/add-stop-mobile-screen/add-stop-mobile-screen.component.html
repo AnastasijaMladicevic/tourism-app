@@ -24,17 +24,6 @@
               (ngModelChange)="searchQuery = $event; onSearchChange()"
               [placeholder]="'map.addStop.searchPlaceholder' | translate"
             />
-            <mat-icon>mic_none</mat-icon>
-          </div>
-
-          <div class="add-stop-route-modal__my-location-row">
-            <button class="add-stop-route-modal__my-location-btn" type="button" (click)="useMyLocation()">
-              <mat-icon>my_location</mat-icon>
-              {{ 'map.routePlanner.useMyLocation' | translate }}
-            </button>
-            @if (showLocationAlreadyInRouteHint) {
-              <span class="add-stop-route-modal__location-hint">{{ 'map.routePlanner.locationAlreadyInRoute' | translate }}</span>
-            }
           </div>
 
           <div class="add-stop-route-modal__chips">
@@ -51,11 +40,19 @@
             }
           </div>
 
-          <button class="add-stop-route-modal__manual" type="button" (click)="chooseOnMap()">
-            <span class="add-stop-route-modal__manual-icon"><mat-icon>place</mat-icon></span>
-            <span>{{ 'map.addStop.chooseManuallyOnMap' | translate }}</span>
-            <mat-icon>chevron_right</mat-icon>
-          </button>
+          <div class="add-stop-route-modal__actions-row">
+            <button class="add-stop-route-modal__my-location-btn" type="button" (click)="useMyLocation()">
+              <mat-icon>my_location</mat-icon>
+              {{ 'map.routePlanner.useMyLocation' | translate }}
+            </button>
+            <button class="add-stop-route-modal__manual-btn" type="button" (click)="chooseOnMap()">
+              <mat-icon>place</mat-icon>
+              {{ 'map.addStop.chooseManuallyOnMap' | translate }}
+            </button>
+            @if (showLocationAlreadyInRouteHint) {
+              <span class="add-stop-route-modal__location-hint">{{ 'map.routePlanner.locationAlreadyInRoute' | translate }}</span>
+            }
+          </div>
 
           <div class="add-stop-route-modal__results">
             @if (shouldShowSearchResultsSection) {
@@ -271,6 +268,16 @@
               <mat-icon>mic_none</mat-icon>
             </button>
           </label>
+
+          <div class="add-stop-screen__my-location-row">
+            <button class="add-stop-screen__my-location-btn" type="button" (click)="useMyLocation()">
+              <mat-icon>my_location</mat-icon>
+              {{ 'map.routePlanner.useMyLocation' | translate }}
+            </button>
+            @if (showLocationAlreadyInRouteHint) {
+              <span class="add-stop-screen__location-hint">{{ 'map.routePlanner.locationAlreadyInRoute' | translate }}</span>
+            }
+          </div>
 
           <div class="add-stop-screen__chips">
             @for (category of categories; track category.key) {

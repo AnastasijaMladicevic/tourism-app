@@ -26,6 +26,14 @@ body.route-navigation-active app-floating-ai-assistant {
   display: none !important;
 }
 
+html.route-add-stop-open .search-bar,
+body.route-add-stop-open .search-bar,
+html.route-add-stop-open .filter-chips,
+body.route-add-stop-open .filter-chips {
+  visibility: hidden;
+  pointer-events: none;
+}
+
 // ─── Search bar ────────────────────────────────────────────────────────────────
 .search-bar {
   position: absolute;
@@ -322,6 +330,11 @@ body.route-navigation-active app-floating-ai-assistant {
 
 .route-planner--dragging {
   transition: none;
+}
+
+.route-planner--collapsed {
+  min-height: auto !important;
+  height: auto !important;
 }
 
 .route-planner--navigation-active {
