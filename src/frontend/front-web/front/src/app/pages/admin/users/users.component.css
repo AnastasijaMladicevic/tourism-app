@@ -417,6 +417,13 @@
   stroke-width: 2;
 }
 
+.chart-hover-zone {
+  fill: rgba(255, 255, 255, 0.001);
+  stroke: transparent;
+  pointer-events: all;
+  cursor: default;
+}
+
 .chart-empty {
   position: absolute;
   inset: 0;

@@ -1128,11 +1128,12 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
     return Number.isFinite(n) ? n : null;
   }
 
-  /**
-   * Full name is not returned on object DTOs. When the signed-in user owns the object,
-   * use profile from session; otherwise we cannot resolve another user's name without a BE field or admin API.
-   */
   private resolveCreatorDisplayName(o: ObjectDto): string {
+    const apiName = o.createdByFullName?.trim();
+    if (apiName) {
+      return apiName;
+    }
+
     const uid = this.normalizeOptionalId(o.createdByUserId);
     const me = this.authService.getCurrentUser();
     if (uid != null && me?.id != null && Number(me.id) === uid) {

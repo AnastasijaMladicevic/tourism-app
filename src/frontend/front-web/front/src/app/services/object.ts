@@ -33,6 +33,7 @@ export interface ObjectDto {
   reviewCount?: number;
   /** Present on API responses for tourist objects (ownership / audit). */
   createdByUserId?: number;
+  createdByFullName?: string;
   createdAt?: string;
   updatedAt?: string;
   status?: string;

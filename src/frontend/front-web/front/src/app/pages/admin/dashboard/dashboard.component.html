@@ -418,12 +418,17 @@
               [enableClustering]="true"
               [destinations]="mapDestinations"
               [mapId]="mapComponentId"
+              (markerSelected)="onMapDestinationSelected($event)"
             ></app-admin-platform-map>
           </ng-container>
           <ng-template #emptyMapPreview>
             <p class="empty-note empty-note--map">No mapped destination points are available right now.</p>
           </ng-template>
         </div>
+
+        <p class="map-selection-note" *ngIf="mapDestinations.length">
+          {{ selectedMapDestinationSummary }}
+        </p>
       </article>
     </div>
   </ng-container>

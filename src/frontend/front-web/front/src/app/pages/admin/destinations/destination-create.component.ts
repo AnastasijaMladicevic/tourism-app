@@ -317,10 +317,30 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
     this.primaryPreviewImageIndex = this.destinationImages.length > 0 ? null : 0;
 
     if (destination.managedByUserId) {
-      this.adminUsersService.searchManagers('', 200).subscribe({
-        next: (res) => {
-          const manager = res.items.find((u) => u.id === destination.managedByUserId) ?? null;
-          this.selectedManager = manager;
+      this.adminUsersService.getUserById(destination.managedByUserId).subscribe({
+        next: (user) => {
+          this.selectedManager = {
+            id: Number(user.id ?? destination.managedByUserId),
+            firstName: user.firstName ?? '',
+            lastName: user.lastName ?? '',
+            email: user.email ?? '',
+            roleName: user.roleName ?? user.role ?? 'Manager',
+            profileImageUrl: user.profileImageUrl ?? null,
+            country: user.country ?? null,
+            isActive: user.isActive,
+            createdAt: user.createdAt,
+            isBanned: user.isBanned,
+            banReason: user.banReason ?? null,
+            banExpiresAtUtc: user.banExpiresAtUtc ?? null,
+            bannedAtUtc: user.bannedAtUtc ?? null,
+            hasActiveSession: user.hasActiveSession,
+            activeSessionExpiresAtUtc: user.activeSessionExpiresAtUtc ?? null,
+            editLock: user.editLock ?? null
+          };
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.selectedManager = null;
           this.cdr.detectChanges();
         }
       });
@@ -856,7 +876,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
       this.errorMessage = `A destination can have at most ${this.maxImageCount} images.`;
       return false;
     }
-    if (!this.selectedManager && this.savedDestinationId == null) {
+    if (!this.selectedManager) {
       this.errorMessage = 'Please select a manager.';
       return false;
     }

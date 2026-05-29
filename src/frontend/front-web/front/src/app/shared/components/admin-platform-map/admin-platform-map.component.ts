@@ -61,6 +61,7 @@ export class AdminPlatformMapComponent implements AfterViewInit, OnChanges, OnDe
   @Output() mapReady = new EventEmitter<void>();
   @Output() destinationsLoaded = new EventEmitter<DestinationDto[]>();
   @Output() markersSummary = new EventEmitter<AdminPlatformMapMarkersSummary>();
+  @Output() markerSelected = new EventEmitter<DestinationDto>();
 
   @HostBinding('class.admin-platform-map--compact')
   get hostCompactClass(): boolean {
@@ -172,6 +173,7 @@ export class AdminPlatformMapComponent implements AfterViewInit, OnChanges, OnDe
         destination.longitude!,
         'destination',
         destination,
+        () => this.markerSelected.emit(destination),
       );
     });
 

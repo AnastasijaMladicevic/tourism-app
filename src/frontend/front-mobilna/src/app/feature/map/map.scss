@@ -2617,29 +2617,37 @@ body.route-navigation-active app-floating-ai-assistant {
 
 // ─── CDK drag - stop kartice ───────────────────────────────────────────────────
 .route-stop-card {
-  &.cdk-drag-preview {
-    box-sizing: border-box;
-    width: var(--cdk-drag-preview-width, 100%);
-    max-width: 100%;
-    overflow: hidden;
-    box-shadow:
-      0 20px 40px rgba(15, 23, 42, 0.14),
-      inset 0 0 0 1px rgba(148, 163, 184, 0.18);
-    opacity: 0.96;
-    border-radius: 20px;
-    background: white;
-    pointer-events: none;
-  }
-
-  &.cdk-drag-placeholder {
-    opacity: 0;
-  }
-
-  &.cdk-drag-animating {
-    transition: transform 200ms ease;
-  }
+  align-items: center;
 }
 
+.route-stop-card__grip,
+.route-stop-card__remove {
+  align-self: center !important;
+  margin-top: 0 !important;
+}
+
+.route-stop-card.cdk-drag-placeholder {
+  opacity: 0.35 !important;
+  background: var(--surface-strong) !important;
+  border: 1px dashed var(--border) !important;
+}
+
+:host ::ng-deep .cdk-drag-preview {
+  background: var(--surface-strong) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 20px !important;
+  color: var(--text-dark) !important;
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.28) !important;
+  opacity: 0.98 !important;
+}
+
+:host ::ng-deep .cdk-drag-preview .route-stop-card__body strong {
+  color: var(--text-dark) !important;
+}
+
+:host ::ng-deep .cdk-drag-preview .route-stop-card__body span {
+  color: var(--text-gray) !important;
+}
 .route-planner__list.cdk-drop-list-dragging .route-stop-card:not(.cdk-drag-placeholder) {
   transition: transform 200ms ease;
 }

@@ -252,6 +252,9 @@ export class MapService {
 
     this.activeMarkerKey = key;
     this.syncVisibleMarkers();
+    if (found.marker.getPopup()) {
+      found.marker.openPopup();
+    }
 
     window.dispatchEvent(
       new CustomEvent('map-marker-clicked', {

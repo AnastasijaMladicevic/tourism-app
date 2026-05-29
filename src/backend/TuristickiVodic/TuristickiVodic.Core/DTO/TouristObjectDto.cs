@@ -36,6 +36,7 @@ namespace TuristickiVodic.Core.DTO
         public string RegionName { get; set; } = string.Empty;
         public string RegionCode { get; set; } = string.Empty;
         public int CreatedByUserId { get; set; }
+        public string? CreatedByFullName { get; set; }
         public int? ApprovedByUserId { get; set; }
         public DateTime? ApprovedAt { get; set; }
         public string? RejectionReason { get; set; }

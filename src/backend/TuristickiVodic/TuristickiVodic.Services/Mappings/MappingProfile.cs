@@ -312,6 +312,9 @@ namespace TuristickiVodic.Services.Mappings
                     opt => opt.MapFrom(src => src.ObjectType != null ? src.ObjectType.Name : string.Empty))
                 .ForMember(dest => dest.LocalityName,
                     opt => opt.MapFrom(src => src.Locality != null ? src.Locality.Name : string.Empty))
+                .ForMember(dest => dest.CreatedByFullName,
+                    opt => opt.MapFrom(src =>
+                        src.CreatedBy != null ? (src.CreatedBy.FirstName + " " + src.CreatedBy.LastName) : null))
                 .ForMember(dest => dest.DistanceMeters,
                     opt => opt.Ignore())
                 .ForMember(dest => dest.HasPendingDeletionRequest,
