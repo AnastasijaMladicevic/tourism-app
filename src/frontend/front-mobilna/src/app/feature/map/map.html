@@ -501,7 +501,7 @@
               {{ getWorkingStatus() ? 'OPEN NOW' : 'CLOSED' }}
             </span>
           }
-          @if (selectedItem.distanceKm != null) {
+          @if (selectedItem.distanceKm != null && isTracking) {
             <span class="badge badge--distance">
               <mat-icon>near_me</mat-icon>{{ formatDistance(selectedItem.distanceKm) }}
             </span>

@@ -258,6 +258,9 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
           this.isTracking = enabled;
           if (!enabled) {
             this.deactivateRouteNavigation();
+            this.showLocationConsentPrompt = true;
+          } else {
+            this.showLocationConsentPrompt = false;
           }
           this.cdr.detectChanges();
         });

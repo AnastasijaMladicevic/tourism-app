@@ -191,7 +191,7 @@
     "emailInvalid": "Invalid email format",
     "passwordRules": "Password must be at least 6 characters long, contain at least one uppercase letter, one number, and one special character.",
     "rememberMe": "Remember me",
-    "continueWithGoogle": "Continue with Google"
+    "continueWithGoogle": "Continue with Google",
     "loggingIn": "Logging in...",
     "logIn": "Log In",
     "orContinueWithGoogle": "or continue with Google",
