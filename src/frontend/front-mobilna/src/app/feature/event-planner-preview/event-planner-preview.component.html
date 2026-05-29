@@ -1,4 +1,7 @@
-<main class="planner-preview">
+<main
+  class="planner-preview"
+  [class.planner-preview--mobile-planner]="isMobileViewport() && activeMobileTab === 'planner'"
+>
   <header class="planner-mobile-header">
     <h1 class="planner-mobile-header__title">{{ translate('planner.title') }}</h1>
   </header>
@@ -208,9 +211,6 @@
               <section class="preview-empty-state">
                 <strong>{{ translate('planner.emptyTitle') }}</strong>
                 <p>{{ translate('planner.preview.emptyBody') }}</p>
-                <button type="button" class="planner-cta-button preview-empty-state__button" (click)="openEvents()">
-                  <span>{{ translate('planner.addEventCta') }}</span>
-                </button>
               </section>
             } @else {
               @for (event of previewCards(); track event.id) {
@@ -284,8 +284,8 @@
 
                       <button
                         type="button"
-                        class="planner-add-button event-card__details-button"
-                        (click)="openEventDetails(event.id)"
+                        class="event-card__details-link"
+                        (click)="openEventDetails(event.eventId)"
                       >
                         <span>{{ translate('common.details') }}</span>
                       </button>
@@ -333,9 +333,9 @@
                 <h3>{{ translate('planner.preview.highlightsTitle') }}</h3>
               </div>
 
-              @if (mobileHighlights().length) {
+              @if (suggestedHighlights().length) {
                 <div class="mobile-highlights-card__list">
-                  @for (highlight of mobileHighlights(); track highlight.eventId) {
+                  @for (highlight of suggestedHighlights(); track highlight.eventId) {
                     <button
                       type="button"
                       class="mobile-highlight-row"
@@ -378,7 +378,7 @@
                   <section class="planner-group">
                     <div class="planner-group__label">{{ group.label }}</div>
 
-                    @for (event of group.items; track event.id) {
+                    @for (event of group.items; track event.scheduleKey) {
                       <article class="planner-item">
                         <div class="planner-item__time">
                           <span class="planner-item__dot" aria-hidden="true"></span>
@@ -441,7 +441,7 @@
                 <section class="planner-group">
                   <div class="planner-group__label">{{ group.label }}</div>
 
-                  @for (event of group.items; track event.id) {
+                  @for (event of group.items; track event.scheduleKey) {
                     <article class="planner-item">
                       <div class="planner-item__time">
                         <span class="planner-item__dot" aria-hidden="true"></span>
@@ -491,9 +491,9 @@
             <h3>{{ translate('planner.preview.highlightsTitle') }}</h3>
           </div>
 
-          @if (upcomingHighlights().length > 0) {
+          @if (suggestedHighlights().length > 0) {
             <div class="upcoming-highlight-card__list">
-              @for (highlight of upcomingHighlights(); track highlight.id) {
+              @for (highlight of suggestedHighlights(); track highlight.id) {
                 <button
                   type="button"
                   class="upcoming-highlight-row"

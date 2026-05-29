@@ -64,6 +64,12 @@
           <p class="support-hint">
             {{ translate('addToPlanner.lockedHint') }}
           </p>
+
+          @if (canSelectMultipleDays()) {
+            <p class="support-hint support-hint--info">
+              {{ translate('addToPlanner.multiDaySelectionHint') }}
+            </p>
+          }
         }
 
         <div class="field-grid">
@@ -97,7 +103,8 @@
             <button
               type="button"
               class="calendar-pill"
-              [class.calendar-pill--active]="selectedDayId() === day.id"
+              [class.calendar-pill--active]="isDaySelected(day.id)"
+              [attr.aria-pressed]="isDaySelected(day.id)"
               (click)="selectDay(day)"
             >
               <span>{{ day.label }}</span>
@@ -105,6 +112,10 @@
             </button>
           }
         </div>
+
+        @if (canSelectMultipleDays()) {
+          <p class="calendar-selection-note">{{ selectedDateLabel() }}</p>
+        }
 
         <div class="field-grid field-grid--split">
 

@@ -196,6 +196,13 @@
   line-height: 1.45;
 }
 
+.support-hint--info {
+  margin-top: -4px;
+  border-color: rgba(22, 138, 173, 0.24);
+  background: rgba(22, 138, 173, 0.08);
+  color: #168aad;
+}
+
 .field-grid {
   display: grid;
   gap: 18px;
@@ -338,6 +345,14 @@
     color: #fff;
     box-shadow: 0 16px 28px rgba(22, 138, 173, 0.2);
   }
+}
+
+.calendar-selection-note {
+  margin: 12px 2px 0;
+  color: var(--text-gray);
+  font-size: 13px;
+  line-height: 1.45;
+  font-weight: 700;
 }
 
 .warning-card {

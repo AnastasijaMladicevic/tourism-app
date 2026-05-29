@@ -20,6 +20,7 @@ interface PlannerDay {
 }
 
 interface PlannerStop {
+  scheduleKey: string;
   plannerId: number;
   eventId: number;
   title: string;
@@ -34,6 +35,8 @@ interface PlannerStop {
   imageUrl: string;
   startDate: Date;
   endDate?: Date | null;
+  originalStartDate: string;
+  originalEndDate?: string | null;
   dayKey: string;
   isPriority: boolean;
   notes: string;
@@ -130,8 +133,8 @@ export class PlannerComponent implements OnInit {
     return item.key;
   }
 
-  protected trackStop(_: number, item: PlannerStop): number {
-    return item.plannerId;
+  protected trackStop(_: number, item: PlannerStop): string {
+    return item.scheduleKey;
   }
 
   protected selectDay(dayKey: string): void {
@@ -233,52 +236,59 @@ export class PlannerComponent implements OnInit {
         finalize(() => this.isLoading.set(false)),
       )
       .subscribe((items) => {
-        this.plannerItems.set(items);
-        this.profileStatsCache.write({ plans: items.length });
+        const flattenedItems = items.flat();
+        this.plannerItems.set(flattenedItems);
+        this.profileStatsCache.write({ plans: flattenedItems.length });
         this.ensureSelectedDay();
       });
   }
 
   private enrichPlannerItem(item: EventPlannerDto) {
     return this.eventService.getById(item.eventId).pipe(
-      map((eventDetails) => this.mapPlannerItem(item, eventDetails)),
-      catchError(() => of(this.mapPlannerItem(item))),
+      map((eventDetails) => this.mapPlannerItems(item, eventDetails)),
+      catchError(() => of(this.mapPlannerItems(item))),
     );
   }
 
-  private mapPlannerItem(item: EventPlannerDto, eventDetails?: EventDto): PlannerStop {
-    const resolvedSchedule = this.plannerLocalPreferences.resolveSchedule(
+  private mapPlannerItems(item: EventPlannerDto, eventDetails?: EventDto): PlannerStop[] {
+    const resolvedSchedules = this.plannerLocalPreferences.resolveSchedules(
       item.id,
       item.startDate,
       item.endDate,
     );
-    const startDate = resolvedSchedule.startDate;
-    const endDate = resolvedSchedule.endDate;
     const imageUrl =
       this.resolveMediaUrl(eventDetails?.mainImageUrl) ||
       this.resolveMediaUrl(eventDetails?.images?.find((image) => image.isMain)?.url) ||
       this.resolveMediaUrl(eventDetails?.images?.[0]?.url) ||
       this.defaultPlannerImage;
 
-    return {
-      plannerId: item.id,
-      eventId: item.eventId,
-      title: item.eventName,
-      category: item.eventTypeName || this.translate('event.title'),
-      location: this.buildLocation(item, eventDetails),
-      destinationName: (eventDetails?.destinationName || item.destinationName || '').trim(),
-      localityName: (eventDetails?.localityName || item.localityName || '').trim(),
-      objectName: (eventDetails?.objectName || item.objectName || '').trim(),
-      quote: this.buildQuote(item, eventDetails),
-      timeLabel: this.formatTime(startDate),
-      durationLabel: this.formatDuration(startDate, endDate),
-      imageUrl,
-      startDate,
-      endDate,
-      dayKey: this.toDayKey(startDate),
-      isPriority: resolvedSchedule.isPriority,
-      notes: resolvedSchedule.notes,
-    };
+    return resolvedSchedules.map((resolvedSchedule) => {
+      const startDate = resolvedSchedule.startDate;
+      const endDate = resolvedSchedule.endDate;
+
+      return {
+        scheduleKey: `${item.id}-${this.toDayKey(startDate)}-${startDate.getTime()}`,
+        plannerId: item.id,
+        eventId: item.eventId,
+        title: item.eventName,
+        category: item.eventTypeName || this.translate('event.title'),
+        location: this.buildLocation(item, eventDetails),
+        destinationName: (eventDetails?.destinationName || item.destinationName || '').trim(),
+        localityName: (eventDetails?.localityName || item.localityName || '').trim(),
+        objectName: (eventDetails?.objectName || item.objectName || '').trim(),
+        quote: this.buildQuote(item, eventDetails),
+        timeLabel: this.formatTime(startDate),
+        durationLabel: this.formatDuration(startDate, endDate),
+        imageUrl,
+        startDate,
+        endDate,
+        originalStartDate: eventDetails?.startDate || item.startDate,
+        originalEndDate: eventDetails?.endDate || item.endDate,
+        dayKey: this.toDayKey(startDate),
+        isPriority: resolvedSchedule.isPriority,
+        notes: resolvedSchedule.notes,
+      };
+    });
   }
 
   private createDay(date: Date): PlannerDay {
@@ -478,14 +488,18 @@ export class PlannerComponent implements OnInit {
   }
   editPlanner(eventItem: PlannerStop, event?: Event): void {
     event?.stopPropagation();
+    const preference = this.plannerLocalPreferences.findByPlannerId(eventItem.plannerId);
     this.router.navigate(['/planner/add'], {
       state: {
         plannerId: eventItem.plannerId,
         eventId: eventItem.eventId,
         title: eventItem.title,
         location: eventItem.location,
-        startDate: eventItem.startDate,
-        endDate: eventItem.endDate,
+        startDate: eventItem.originalStartDate,
+        endDate: eventItem.originalEndDate,
+        plannedDate: this.toDayKey(eventItem.startDate),
+        plannedDates: preference?.plannedDates,
+        startTime: `${`${eventItem.startDate.getHours()}`.padStart(2, '0')}:${`${eventItem.startDate.getMinutes()}`.padStart(2, '0')}`,
         type: eventItem.category || 'Dogadjaj',
         imageUrl: eventItem.imageUrl || this.resolveMediaUrl(eventItem.imageUrl),
         description: eventItem.quote,
