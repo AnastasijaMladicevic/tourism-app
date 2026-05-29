@@ -9,6 +9,7 @@ export interface DestinationDto {
   name: string;
   description?: string;
   mainImageUrl?: string;
+  mapPopupVariant?: 'card' | 'label';
   latitude?: number;
   longitude?: number;
   distanceKm?: number;

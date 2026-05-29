@@ -252,7 +252,7 @@
             <div class="creator-avatar-lg">{{ creatorInitials(selectedThread.creatorName) }}</div>
             <div>
               <p class="context-title">{{ selectedThread.creatorName }}</p>
-              <p class="context-sub">Creator ID {{ selectedThread.creatorId }}</p>
+              <p class="context-sub">{{ creatorScopeSummary(selectedThread.creatorId) }}</p>
             </div>
           </div>
         </section>

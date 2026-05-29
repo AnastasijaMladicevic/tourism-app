@@ -738,13 +738,6 @@
   min-height: 260px;
 }
 
-.map-selection-note {
-  margin: 12px 2px 0;
-  font-size: 12px;
-  font-weight: 600;
-  color: #475569;
-}
-
 .empty-note {
   margin: 0;
   font-size: 13px;

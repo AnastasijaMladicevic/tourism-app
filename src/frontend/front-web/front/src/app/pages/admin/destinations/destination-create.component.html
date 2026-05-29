@@ -11,11 +11,11 @@
         <h1 class="page-title">{{ form.name.trim() || 'New destination' }}</h1>
       </div>
       <div class="title-actions">
-        <button type="button" class="btn btn-ghost btn-with-icon" (click)="onSaveDraft()" [disabled]="isSubmitting || isLoadingDestination || isEditBlocked">
+        <button type="button" class="btn btn-ghost btn-with-icon" (click)="onSaveDraft()" [disabled]="isSubmitting || isLoadingDestination || isEditBlocked || !selectedManager">
           <span class="material-symbols-outlined">save</span>
           Save draft
         </button>
-        <button type="button" class="btn btn-primary btn-with-icon" (click)="onSubmit()" [disabled]="isSubmitting || isLoadingDestination || isEditBlocked">
+        <button type="button" class="btn btn-primary btn-with-icon" (click)="onSubmit()" [disabled]="isSubmitting || isLoadingDestination || isEditBlocked || !selectedManager">
           <span class="material-symbols-outlined">check_circle</span>
           {{ isSubmitting ? 'Saving…' : isEditMode ? 'Save changes' : 'Create destination' }}
         </button>
@@ -437,7 +437,7 @@
           } @else {
             <div class="empty-managers">
               <span class="material-symbols-outlined">person_add</span>
-              <p>No managers assigned yet.</p>
+              <p>Select a manager before you can save this destination.</p>
             </div>
           }
         </div>

@@ -184,9 +184,7 @@ export class DashboardComponent implements OnInit {
       : this.selectedMapDestination.name;
   }
 
-  onMapDestinationSelected(destination: DestinationDto): void {
-    this.selectedMapDestination = destination;
-  }
+  onMapDestinationSelected(_: DestinationDto): void {}
 
   private loadOverview(): void {
     this.isLoading = true;
@@ -422,6 +420,7 @@ export class DashboardComponent implements OnInit {
       .map((point) => ({
         id: point.destinationId,
         name: point.destinationName,
+        mapPopupVariant: 'label',
         latitude: point.latitude,
         longitude: point.longitude,
         isActive: true,

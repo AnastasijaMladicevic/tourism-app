@@ -216,11 +216,13 @@ export class MapService {
     if (type === 'destination') {
       const popupHtml = this.buildDestinationPopupHtml(data);
       if (popupHtml) {
+        const isLabelPopup = data?.mapPopupVariant === 'label';
         marker.bindPopup(popupHtml, {
           closeButton: false,
           autoPanPadding: [24, 24],
-          maxWidth: 300,
-          minWidth: 240,
+          maxWidth: isLabelPopup ? 260 : 300,
+          minWidth: isLabelPopup ? 80 : 240,
+          offset: [0, isLabelPopup ? -18 : -10],
         });
       }
     }
@@ -511,6 +513,15 @@ export class MapService {
 
     const name = this.escapeHtml(String(destination?.name ?? 'Destination'));
     const region = this.escapeHtml(String(destination?.regionName ?? destination?.destinationTypeName ?? ''));
+    if (destination?.mapPopupVariant === 'label') {
+      return `
+        <div style="display: flex; flex-direction: column; gap: 2px; align-items: center; justify-content: center; min-width: 120px; max-width: 220px; padding: 12px 18px; border-radius: 16px; background: #ffffff; box-shadow: 0 18px 40px rgba(15, 23, 42, 0.18); border: 1px solid rgba(148, 163, 184, 0.24); font-family: inherit; text-align: center;">
+          <strong style="font-size: 15px; line-height: 1.35; color: #0f172a; font-weight: 700;">${name}</strong>
+          ${region ? `<span style="font-size: 12px; line-height: 1.35; color: #64748b;">${region}</span>` : ''}
+        </div>
+      `;
+    }
+
     const imageUrl = this.escapeHtml(
       String(destination?.mainImageUrl ?? destination?.images?.find((image: any) => image?.isMain)?.url ?? destination?.images?.[0]?.url ?? ''),
     );

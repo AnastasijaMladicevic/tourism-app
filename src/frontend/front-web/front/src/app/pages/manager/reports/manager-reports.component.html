@@ -118,7 +118,7 @@
                     </span>
                   </div>
                   <p class="report-mobile-card__meta">
-                    Creator ID {{ report.reportedUserId }} · {{ formatDate(report.createdAt) }}
+                    {{ report.destinationName && report.destinationName !== '—' ? report.destinationName + ' · ' + formatDate(report.createdAt) : formatDate(report.createdAt) }}
                   </p>
                   <p class="report-mobile-card__reason">{{ report.reason }}</p>
                   @if (report.status === 'Pending') {
@@ -160,7 +160,7 @@
                     <td>
                       <div class="creator-cell">
                         <strong>{{ report.reportedUserName }}</strong>
-                        <span>Creator ID {{ report.reportedUserId }}</span>
+                        <span>{{ report.destinationName && report.destinationName !== '—' ? report.destinationName : 'Account report' }}</span>
                       </div>
                     </td>
                     <td class="reason-cell">{{ report.reason }}</td>
