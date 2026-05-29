@@ -511,7 +511,14 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
   }
 
   goBack(): void {
-    this.routerHistory.goBack();
+    const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+  
+    if (returnUrl && returnUrl.startsWith('/')) {
+      this.router.navigateByUrl(returnUrl);
+      return;
+    }
+  
+    this.routerHistory.goBack('/objects');
   }
 
   private getType(): string {

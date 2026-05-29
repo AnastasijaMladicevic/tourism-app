@@ -304,7 +304,14 @@ export class ActivityDetailComponent implements OnInit, OnDestroy {
   }
 
   goBack(): void {
-    this.routerHistory.goBack();
+    const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+  
+    if (returnUrl?.startsWith('/')) {
+      this.router.navigateByUrl(returnUrl);
+      return;
+    }
+    
+    this.routerHistory.goBack('/activities');
   }
 
   viewOnMap(): void {

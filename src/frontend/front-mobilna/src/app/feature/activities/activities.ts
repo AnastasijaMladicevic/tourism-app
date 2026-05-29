@@ -66,6 +66,7 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
   private hasInitializedLanguageWatcher = false;
   private lastLanguage = 'sr';
   private searchTimeout: ReturnType<typeof setTimeout> | null = null;
+  private readonly listStateKey = 'activities-list-state';
 
   constructor(
     private readonly router: Router,
@@ -102,6 +103,7 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
       this.isTracking = enabled;
 
       if (this.sortOption === 'distance') {
+        this.restoreListState();
         void this.loadData();
         return;
       }
@@ -119,6 +121,7 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
       this.userLocation = loc ? { lat: loc.latitude, lng: loc.longitude } : null;
 
       if (this.sortOption === 'distance') {
+        this.restoreListState();
         void this.loadData();
         return;
       }
@@ -132,6 +135,7 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
       this.cdr.detectChanges();
     });
 
+    this.restoreListState();
     void this.loadData();
 
     window.addEventListener('favorite-object', (event: Event & { detail?: ActivityView }) => {
@@ -144,6 +148,33 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
 
   get totalPages(): number {
     return Math.max(1, Math.ceil(this.totalCount / this.pageSize));
+  }
+
+  private saveListState(): void {
+    sessionStorage.setItem(this.listStateKey, JSON.stringify({
+      searchQuery: this.searchQuery,
+      activeFilter: this.activeFilter,
+      sortOption: this.sortOption,
+      currentPage: this.currentPage,
+      pageSize: this.pageSize,
+    }));
+  }
+  
+  private restoreListState(): void {
+    const raw = sessionStorage.getItem(this.listStateKey);
+    if (!raw) return;
+  
+    try {
+      const state = JSON.parse(raw);
+  
+      this.searchQuery = state.searchQuery ?? '';
+      this.activeFilter = state.activeFilter ?? 'All';
+      this.sortOption = state.sortOption ?? 'az';
+      this.currentPage = state.currentPage ?? 1;
+      this.pageSize = state.pageSize ?? 8;
+    } catch {
+      sessionStorage.removeItem(this.listStateKey);
+    }
   }
 
   getDistance(activity: ActivityView): number | null {
@@ -213,12 +244,15 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
       this.showPageSizeMenu = false;
     }
   }
+
   onPageSizeChange(size: number): void {
     this.pageSize = size;
     this.currentPage = 1;
+    this.saveListState();
     this.refreshVisibleActivities();
     this.cdr.detectChanges();
   }
+
   togglePageSizeMenu(event: Event): void {
     event.stopPropagation();
 
@@ -290,6 +324,7 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
     if (this.currentPage === 1) return;
 
     this.currentPage--;
+    this.saveListState();
     this.refreshVisibleActivities();
     this.top.nativeElement.scrollIntoView({ behavior: 'smooth' });
   }
@@ -298,12 +333,19 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
     if (!this.hasNextPage) return;
 
     this.currentPage++;
+    this.saveListState();
     this.refreshVisibleActivities();
     this.top.nativeElement.scrollIntoView({ behavior: 'smooth' });
   }
 
   viewDetails(activity: ActivityView): void {
-    this.router.navigate(['/activity', activity.id]);
+    this.saveListState();
+  
+    this.router.navigate(['/activity', activity.id], {
+      queryParams: {
+        returnUrl: this.router.url
+      }
+    });
   }
 
   getMainImage(activity: ActivityView): string {
@@ -604,7 +646,12 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
   }
 
   sortLabel(): string {
-    const map = { az: 'A -> Z', za: 'Z -> A', distance: 'Nearest' };
+    const map = {
+      az: 'A -> Z',
+      za: 'Z -> A',
+      distance: this.translationService.translate('common.nearest'),
+    };
+  
     return map[this.sortOption];
   }
 
@@ -612,12 +659,14 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
     this.sortOption = option;
     this.showSortMenu = false;
     this.currentPage = 1;
+    this.saveListState();
     this.refreshVisibleActivities();
   }
 
   setFilter(filter: string): void {
     this.activeFilter = filter;
     this.currentPage = 1;
+    this.saveListState();
     this.refreshVisibleActivities();
   }
 
@@ -644,6 +693,7 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
 
   onSearchChange(): void {
     this.currentPage = 1;
+    this.saveListState();
     this.refreshVisibleActivities();
   }
 

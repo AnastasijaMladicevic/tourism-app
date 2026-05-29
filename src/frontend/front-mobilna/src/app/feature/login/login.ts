@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -15,6 +15,7 @@ import { PendingActionService } from '../../services/pending-action';
 import { RouterHistoryService } from '../../services/router-history';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../services/translation.service';
+import { GoogleIdentityService } from '../../services/google-identity';
 import { environment } from '../../../environment/environment';
 
 @Component({
@@ -25,6 +26,8 @@ import { environment } from '../../../environment/environment';
   styleUrl: './login.scss',
 })
 export class LoginComponent {
+  @ViewChild('googleBtnContainer', { static: false }) googleBtnContainerRef?: ElementRef<HTMLDivElement>;
+
   form: FormGroup;
   hidePassword = true;
   isLoading = false;
@@ -41,6 +44,7 @@ export class LoginComponent {
     private pendingActionService: PendingActionService,
     private routerHistory: RouterHistoryService,
     private translationService: TranslationService,
+    private googleIdentityService: GoogleIdentityService,
   ) {
     this.returnUrl = this.readReturnUrl();
     this.form = this.fb.group({
@@ -125,29 +129,68 @@ export class LoginComponent {
     });
   }
 
-  loginWithGoogleRedirect(): void {
-    if (!this.googleClientId) return;
-
-    const redirectUri = `${window.location.origin}/auth/google/callback`;
-    const url =
-      `https://accounts.google.com/o/oauth2/v2/auth` +
-      `?client_id=${encodeURIComponent(this.googleClientId)}` +
-      `&redirect_uri=${encodeURIComponent(redirectUri)}` +
-      `&response_type=code` +
-      `&scope=${encodeURIComponent('openid email profile')}` +
-      `&prompt=select_account`;
-
-    window.location.href = url;
-  }
-
   private loadGoogleAuthSettings(): void {
     this.authService.getPublicAuthSettings().subscribe({
       next: (settings) => {
         this.googleClientId = settings.googleClientId?.trim() || environment.googleClientId || null;
         this.cdr.detectChanges();
+        this.scheduleGoogleButtonRender();
       },
       error: () => {
         this.googleClientId = environment.googleClientId || null;
+        this.cdr.detectChanges();
+        this.scheduleGoogleButtonRender();
+      },
+    });
+  }
+
+  private scheduleGoogleButtonRender(): void {
+    if (!this.googleClientId) return;
+    setTimeout(() => void this.renderGoogleButton(), 50);
+  }
+
+  private async renderGoogleButton(): Promise<void> {
+    if (!this.googleClientId) return;
+    const container = this.googleBtnContainerRef?.nativeElement
+      ?? document.getElementById('google-btn-container') as HTMLDivElement | null;
+    if (!container) return;
+
+    try {
+      await this.googleIdentityService.renderButton(
+        container,
+        this.googleClientId,
+        (credential) => this.handleGoogleCredential(credential),
+        'signin_with',
+      );
+      this.cdr.detectChanges();
+    } catch (err) {
+      console.error('Google Sign-In render failed:', err);
+    }
+  }
+
+  private handleGoogleCredential(idToken: string): void {
+    this.isLoading = true;
+    this.errorMessage = '';
+    this.cdr.detectChanges();
+
+    this.authService.loginWithGoogle({ idToken, rememberMe: false }).subscribe({
+      next: (response) => {
+        this.isLoading = false;
+        this.cdr.detectChanges();
+
+        const role = response.user?.roleName?.toLowerCase();
+        if (role && role !== 'tourist') {
+          this.errorMessage = this.translationService.translate('login.onlyTourists');
+          this.authService.logout().subscribe();
+          this.cdr.detectChanges();
+          return;
+        }
+
+        this.handleSuccessfulTouristLogin();
+      },
+      error: (err) => {
+        this.isLoading = false;
+        this.errorMessage = err?.error?.message ?? this.translationService.translate('login.invalidCredentials');
         this.cdr.detectChanges();
       },
     });

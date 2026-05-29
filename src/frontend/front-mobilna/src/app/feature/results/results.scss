@@ -800,6 +800,27 @@
 }
 
 
+.card__type-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  min-height: 30px;
+  padding: 0 14px;
+  border-radius: 999px;
+
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+
+  color: #374151;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+
+  backdrop-filter: blur(10px);
+}
+
 // ─── FILTERS SCROLL ───────────────────────────────────────────────────────────
 .filters-scroll {
   display: flex;
@@ -924,29 +945,10 @@
 }
 
 
-.card__type-chip,
 :host-context(:root[data-theme='dark']) .card__type-chip {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  min-height: 30px;
-  padding: 0 14px;
-  border-radius: 999px;
-
   background: rgba(8, 24, 33, 0.72) !important;
   border: 1px solid rgba(255, 255, 255, 0.22) !important;
-
   color: #ffffff !important;
-
-  font-size: 12px;
-  font-weight: 700;
-  line-height: 1;
-  white-space: nowrap;
-
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  text-shadow: none !important;
 }
 
 .card__type-chip--overlay {

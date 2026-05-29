@@ -68,6 +68,8 @@ export class DestinationsComponent implements OnInit, OnDestroy {
   private hasInitializedLanguageWatcher = false;
   private lastLanguage = 'sr';
   private searchTimeout: ReturnType<typeof setTimeout> | null = null;
+  private readonly listStateKey = 'destinations-list-state';
+
 
   constructor(
     private router: Router,
@@ -124,6 +126,8 @@ export class DestinationsComponent implements OnInit, OnDestroy {
       this.refreshVisibleDestinations();
       this.cdr.detectChanges();
     });
+
+    this.restoreListState();
     void this.loadData();
     window.addEventListener('favorite-object', (event: any) => {
       const obj = event.detail;
@@ -231,12 +235,42 @@ export class DestinationsComponent implements OnInit, OnDestroy {
 
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   }
+
+  private saveListState(): void {
+    sessionStorage.setItem(this.listStateKey, JSON.stringify({
+      searchQuery: this.searchQuery,
+      activeFilter: this.activeFilter,
+      sortOption: this.sortOption,
+      currentPage: this.currentPage,
+      pageSize: this.pageSize,
+    }));
+  }
+  
+  private restoreListState(): void {
+    const raw = sessionStorage.getItem(this.listStateKey);
+    if (!raw) return;
+  
+    try {
+      const state = JSON.parse(raw);
+  
+      this.searchQuery = state.searchQuery ?? '';
+      this.activeFilter = state.activeFilter ?? 'All';
+      this.sortOption = state.sortOption ?? 'az';
+      this.currentPage = state.currentPage ?? 1;
+      this.pageSize = state.pageSize ?? 8;
+    } catch {
+      sessionStorage.removeItem(this.listStateKey);
+    }
+  }
+
   onPageSizeChange(size: number | string): void {
     this.pageSize = Number(size);
     this.currentPage = 1;
+    this.saveListState();
     void this.refreshVisibleDestinations();
     this.cdr.detectChanges();
   }
+
   togglePageSizeMenu(event: Event): void {
     event.stopPropagation();
 
@@ -246,9 +280,11 @@ export class DestinationsComponent implements OnInit, OnDestroy {
 
     this.showPageSizeMenu = !this.showPageSizeMenu;
   }
+
   setFilter(filter: string): void {
     this.activeFilter = filter;
     this.currentPage = 1;
+    this.saveListState();
     void this.refreshVisibleDestinations();
   }
 
@@ -256,9 +292,10 @@ export class DestinationsComponent implements OnInit, OnDestroy {
     if (this.searchTimeout) {
       clearTimeout(this.searchTimeout);
     }
-  
+
     this.searchTimeout = setTimeout(() => {
       this.currentPage = 1;
+      this.saveListState();
       void this.refreshVisibleDestinations();
     }, 250);
   }
@@ -267,6 +304,7 @@ export class DestinationsComponent implements OnInit, OnDestroy {
     if (this.currentPage === 1) return;
 
     this.currentPage--;
+    this.saveListState();
     void this.refreshVisibleDestinations();
     this.top.nativeElement.scrollIntoView({ behavior: 'smooth' });
   }
@@ -275,6 +313,7 @@ export class DestinationsComponent implements OnInit, OnDestroy {
     if (!this.hasNextPage) return;
 
     this.currentPage++;
+    this.saveListState();
     void this.refreshVisibleDestinations();
     this.top.nativeElement.scrollIntoView({ behavior: 'smooth' });
   }
@@ -348,6 +387,8 @@ export class DestinationsComponent implements OnInit, OnDestroy {
   setSort(option: 'az' | 'za' | 'distance'): void {
     this.sortOption = option;
     this.showSortMenu = false;
+    this.currentPage = 1;
+    this.saveListState();
     void this.refreshVisibleDestinations();
   }
 
@@ -423,7 +464,10 @@ export class DestinationsComponent implements OnInit, OnDestroy {
   }
 
   viewDetails(destination: DestinationView): void {
-    this.router.navigate(['/destination', destination.id]);
+    this.saveListState();
+    this.router.navigate(['/destination', destination.id], {
+      queryParams: { returnUrl: this.router.url }
+    });
   }
 
   goBack(): void {

@@ -920,7 +920,7 @@ button:hover {
     }
 
     a {
-      max-width: 70%;
+      max-width: none;
       overflow-wrap: anywhere;
       word-break: break-word;
     }
@@ -933,6 +933,7 @@ button:hover {
 }
 
 .contact-info__details {
+  flex: 1;
   min-width: 0;
 }
 

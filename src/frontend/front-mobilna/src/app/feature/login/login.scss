@@ -291,6 +291,17 @@ select:-webkit-autofill {
   }
 }
 
+.google-btn-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  min-height: 44px;
+
+  iframe {
+    border-radius: 20px !important;
+  }
+}
+
 .google-fallback-btn {
   display: flex;
   align-items: center;

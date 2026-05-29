@@ -185,9 +185,16 @@ export class DestinationDetailComponent implements OnInit, OnDestroy {
   }
 
   goBack(): void {
-    this.routerHistory.goBack();
+    const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+  
+    if (returnUrl && returnUrl.startsWith('/')) {
+      this.router.navigateByUrl(returnUrl);
+      return;
+    }
+  
+    this.routerHistory.goBack('/destinations');
   }
-
+  
   viewOnMap(): void {
     if (this.destination?.latitude == null || this.destination?.longitude == null) return;
 

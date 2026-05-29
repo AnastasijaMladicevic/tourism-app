@@ -299,7 +299,14 @@ export class LocalityDetailComponent implements OnInit {
   }
 
   goBack(): void {
-    this.routerHistory.goBack();
+    const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+  
+    if (returnUrl?.startsWith('/')) {
+      this.router.navigateByUrl(returnUrl);
+      return;
+    }
+  
+    this.routerHistory.goBack('/localities');
   }
 
   viewOnMap(): void {
