@@ -16,6 +16,7 @@ import {
 import { LocalityService, LocalityDto } from '../../../services/locality.service';
 import { ObjectDto } from '../../../services/object';
 import { environment } from '../../../../environment/environment';
+import { HERO_IMAGE_ROTATION_INTERVAL_MS } from '../../../shared/constants/hero-image-rotation';
 
 export type AdminDestinationStatus = 'active' | 'draft' | 'archived';
 
@@ -62,7 +63,6 @@ interface DestinationInsightCard {
   ]
 })
 export class DestinationsComponent implements OnInit, OnDestroy {
-  private static readonly HERO_ROTATION_INTERVAL_MS = 8000;
 
   private readonly destinationService = inject(DestinationService);
   private readonly adminUsersService = inject(AdminUsersService);
@@ -282,7 +282,7 @@ export class DestinationsComponent implements OnInit, OnDestroy {
       this.currentHeroImageIndex =
         (this.currentHeroImageIndex + 1) % this.heroImageUrls.length;
       this.cdr.detectChanges();
-    }, DestinationsComponent.HERO_ROTATION_INTERVAL_MS);
+    }, HERO_IMAGE_ROTATION_INTERVAL_MS);
   }
 
   private stopHeroImageRotation(): void {

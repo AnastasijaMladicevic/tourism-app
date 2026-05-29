@@ -213,7 +213,16 @@
       @if (selectedObject) {
         <p class="detail-sheet-label">Selected object</p>
         <div class="activity-hero">
-          <div class="hero-media" [ngStyle]="getHeroStyle()">
+          <div class="hero-media" [class.has-slides]="heroImageUrls.length > 0">
+            <div class="hero-media-slides" aria-hidden="true">
+              @for (url of heroImageUrls; track trackByHeroImage($index, url); let i = $index) {
+                <div
+                  class="hero-media-slide"
+                  [class.is-active]="i === currentHeroImageIndex"
+                  [ngStyle]="getHeroSlideStyle(url)"
+                ></div>
+              }
+            </div>
             <span class="hero-badge">{{ selectedObject.objectTypeName || 'Objects' }}</span>
           </div>
           <div class="hero-copy">
