@@ -61,6 +61,7 @@ export class EventsComponent implements OnInit {
   private readonly pendingActionService = inject(PendingActionService);
   private readonly routerHistory = inject(RouterHistoryService);
   private readonly translationService = inject(TranslationService);
+  private readonly listStateKey = 'events-list-state';
   activeFilter = 'All';
   activeCategory: EventCategory = 'All';
   isLoading = true;
@@ -97,6 +98,7 @@ export class EventsComponent implements OnInit {
       this.cdr.detectChanges();
     });
 
+    this.restoreListState();
     this.loadEvents();
     this.loadPlanner();
 
@@ -104,6 +106,35 @@ export class EventsComponent implements OnInit {
       const obj = event.detail;
       if (obj) this.togglePlanner(obj, new Event('click'));
     });
+  }
+
+  private saveListState(): void {
+    sessionStorage.setItem(this.listStateKey, JSON.stringify({
+      searchQuery: this.searchQuery,
+      activeFilter: this.activeFilter,
+      activeCategory: this.activeCategory,
+      sortOption: this.sortOption,
+      currentPage: this.currentPage,
+      pageSize: this.pageSize,
+    }));
+  }
+  
+  private restoreListState(): void {
+    const raw = sessionStorage.getItem(this.listStateKey);
+    if (!raw) return;
+  
+    try {
+      const state = JSON.parse(raw);
+  
+      this.searchQuery = state.searchQuery ?? '';
+      this.activeFilter = state.activeFilter ?? 'All';
+      this.activeCategory = state.activeCategory ?? 'All';
+      this.sortOption = state.sortOption ?? 'date';
+      this.currentPage = state.currentPage ?? 1;
+      this.pageSize = state.pageSize ?? 8;
+    } catch {
+      sessionStorage.removeItem(this.listStateKey);
+    }
   }
 
   togglePlanner(eventItem: EventCard, e?: Event): void {
@@ -211,12 +242,15 @@ export class EventsComponent implements OnInit {
 
     return list;
   }
+
   onPageSizeChange(size: number): void {
     this.pageSize = size;
     this.currentPage = 1;
+    this.saveListState();
     void this.refreshVisibleEvents();
     this.cdr.detectChanges();
   }
+
   togglePageSizeMenu(event: Event): void {
     event.stopPropagation();
 
@@ -229,6 +263,7 @@ export class EventsComponent implements OnInit {
   setCategory(category: EventCategory): void {
     this.activeCategory = category;
     this.currentPage = 1;
+    this.saveListState();
     this.refreshVisibleEvents();
   }
 
@@ -236,6 +271,7 @@ export class EventsComponent implements OnInit {
     this.sortOption = option;
     this.showSortMenu = false;
     this.currentPage = 1;
+    this.saveListState();
     this.refreshVisibleEvents();
   }
 
@@ -263,12 +299,14 @@ export class EventsComponent implements OnInit {
     if (!this.showSearch) {
       this.searchQuery = '';
       this.currentPage = 1;
+      this.saveListState();
       this.refreshVisibleEvents();
     }
   }
 
   onSearchChange(): void {
     this.currentPage = 1;
+    this.saveListState();
     this.refreshVisibleEvents();
   }
 
@@ -276,6 +314,7 @@ export class EventsComponent implements OnInit {
     if (this.currentPage === 1) return;
 
     this.currentPage--;
+    this.saveListState();
     this.refreshVisibleEvents();
     this.top.nativeElement.scrollIntoView({ behavior: 'smooth' });
   }
@@ -284,6 +323,7 @@ export class EventsComponent implements OnInit {
     if (!this.hasNextPage) return;
 
     this.currentPage++;
+    this.saveListState();
     this.refreshVisibleEvents();
     this.top.nativeElement.scrollIntoView({ behavior: 'smooth' });
   }
@@ -297,7 +337,13 @@ export class EventsComponent implements OnInit {
   }
 
   openEvent(id: number): void {
-    this.router.navigate(['/event', id]);
+    this.saveListState();
+  
+    this.router.navigate(['/event', id], {
+      queryParams: {
+        returnUrl: this.router.url
+      }
+    });
   }
 
   private applyPlannerState(list: EventCard[]): void {
@@ -435,9 +481,11 @@ export class EventsComponent implements OnInit {
     this.applyPlannerState(this.visibleEvents);
     this.flushUi();
   }
+
   setFilter(filter: string): void {
     this.activeFilter = filter;
     this.currentPage = 1;
+    this.saveListState();
     void this.refreshVisibleEvents();
   }
 

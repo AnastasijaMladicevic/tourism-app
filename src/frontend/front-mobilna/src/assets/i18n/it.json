@@ -191,6 +191,7 @@
     "emailInvalid": "Formato email non valido",
     "passwordRules": "La password deve contenere almeno 6 caratteri, una lettera maiuscola, un numero e un carattere speciale.",
     "rememberMe": "Ricordami",
+    "continueWithGoogle": "Continua con Google",
     "loggingIn": "Accesso in corso...",
     "logIn": "Accedi",
     "orContinueWithGoogle": "oppure continua con Google",
@@ -914,6 +915,7 @@
     "locationConsentTitle": "Attiva la posizione per usare il GPS",
     "locationConsentBody": "Il tracciamento della posizione e attualmente disattivato. Tocca qui sotto per aprire le impostazioni e attivare il consenso al tracciamento della posizione.",
     "locationConsentAction": "Clicca qui",
+    "getDirections": "Indicazioni stradali",
     "filters": {
       "food": "Cibo e bevande",
       "fuel": "Stazioni di servizio",

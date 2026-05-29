@@ -106,8 +106,10 @@
   object-fit: contain;
   object-position: center;
   display: block;
-  //background: var(--surface-soft);
-  padding: 8px;
+  background: var(--surface-soft);
+  padding: 10px;
+  border: none;
+  box-shadow: 0 14px 28px rgba(22, 138, 173, 0.16);
 }
 
 .status-dot {

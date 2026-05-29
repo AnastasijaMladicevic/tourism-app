@@ -1,6 +1,10 @@
-<div class="add-stop-screen-shell" [class.add-stop-screen-shell--desktop]="isDesktopLayout">
+<div
+  class="add-stop-screen-shell"
+  [class.add-stop-screen-shell--desktop]="isDesktopLayout"
+  (click)="isDesktopLayout && close()"
+>
   @if (isDesktopLayout) {
-    <div class="add-stop-route-modal" role="dialog" aria-modal="true">
+    <div class="add-stop-route-modal" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
       <div class="add-stop-route-modal__header">
         <div class="add-stop-route-modal__title">
           <span class="add-stop-route-modal__title-icon">
@@ -24,7 +28,6 @@
               (ngModelChange)="searchQuery = $event; onSearchChange()"
               [placeholder]="'map.addStop.searchPlaceholder' | translate"
             />
-            <mat-icon>mic_none</mat-icon>
           </div>
 
           <div class="add-stop-route-modal__chips">
@@ -41,11 +44,19 @@
             }
           </div>
 
-          <button class="add-stop-route-modal__manual" type="button" (click)="chooseOnMap()">
-            <span class="add-stop-route-modal__manual-icon"><mat-icon>place</mat-icon></span>
-            <span>{{ 'map.addStop.chooseManuallyOnMap' | translate }}</span>
-            <mat-icon>chevron_right</mat-icon>
-          </button>
+          <div class="add-stop-route-modal__actions-row">
+            <button class="add-stop-route-modal__my-location-btn" type="button" (click)="useMyLocation()">
+              <mat-icon>my_location</mat-icon>
+              {{ 'map.routePlanner.useMyLocation' | translate }}
+            </button>
+            <button class="add-stop-route-modal__manual-btn" type="button" (click)="chooseOnMap()">
+              <mat-icon>place</mat-icon>
+              {{ 'map.addStop.chooseManuallyOnMap' | translate }}
+            </button>
+            @if (showLocationAlreadyInRouteHint) {
+              <span class="add-stop-route-modal__location-hint">{{ 'map.routePlanner.locationAlreadyInRoute' | translate }}</span>
+            }
+          </div>
 
           <div class="add-stop-route-modal__results">
             @if (shouldShowSearchResultsSection) {
@@ -195,15 +206,19 @@
               class="add-stop-route-modal__location-map"
               [attr.data-name]="selectedResult?.name || ('map.addStop.chooseStop' | translate)"
             >
-              @if (selectedResultPreviewMapUrl) {
-                <iframe
-                  class="add-stop-route-modal__location-frame"
-                  [src]="selectedResultPreviewMapUrl"
-                  [title]="'map.addStop.selectedStopLocationTitle' | translate"
-                  loading="lazy"
-                  referrerpolicy="no-referrer-when-downgrade"
-                ></iframe>
-              } @else {
+            @if (selectedResultPreviewMapUrl) {
+              <iframe
+                class="add-stop-route-modal__location-frame"
+                [src]="selectedResultPreviewMapUrl"
+                [title]="'map.addStop.selectedStopLocationTitle' | translate"
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+              ></iframe>
+            
+              <span class="add-stop-route-modal__blue-pin" aria-hidden="true">
+                <mat-icon>place</mat-icon>
+              </span>
+            } @else {
                 <div class="add-stop-route-modal__location-placeholder">
                   <mat-icon>place</mat-icon>
                 </div>
@@ -261,6 +276,16 @@
               <mat-icon>mic_none</mat-icon>
             </button>
           </label>
+
+          <div class="add-stop-screen__my-location-row">
+            <button class="add-stop-screen__my-location-btn" type="button" (click)="useMyLocation()">
+              <mat-icon>my_location</mat-icon>
+              {{ 'map.routePlanner.useMyLocation' | translate }}
+            </button>
+            @if (showLocationAlreadyInRouteHint) {
+              <span class="add-stop-screen__location-hint">{{ 'map.routePlanner.locationAlreadyInRoute' | translate }}</span>
+            }
+          </div>
 
           <div class="add-stop-screen__chips">
             @for (category of categories; track category.key) {

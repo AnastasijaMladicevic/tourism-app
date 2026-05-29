@@ -1445,7 +1445,7 @@ th {
 .manager-report-modal {
   width: 100%;
   max-width: 520px;
-  max-height: min(90vh, 720px);
+  max-height: min(95vh, 850px);
   overflow: auto;
   border-radius: 14px;
   background: #fff;

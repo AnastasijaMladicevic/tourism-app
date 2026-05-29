@@ -62,7 +62,7 @@
 
 .content {
   flex: 1;
-  padding: 20px 16px 32px;
+  padding: 10px 16px 32px;
   background: transparent;
 }
 
@@ -79,26 +79,33 @@
 
 .profile-strip {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 15px;
+  gap: 8px;
   margin-bottom: 18px;
-  padding: 4px 0 8px;
+  padding: 2px 0 8px;
   background: transparent;
   border: none;
 }
 
 .avatar-wrap {
   position: relative;
-  width: 60px;
-  height: 60px;
+  width: 72px;
+  height: 72px;
   flex-shrink: 0;
+}
 
-  img {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    object-fit: cover;
-  }
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: contain;
+  object-position: center;
+  background: var(--surface-soft);
+  padding: 10px;
+  border: none;
+  box-shadow: 0 12px 24px rgba(22, 138, 173, 0.16);
+  display: block;
 }
 
 .avatar-fallback {
@@ -109,7 +116,7 @@
   color: #fff;
   display: grid;
   place-items: center;
-  font-size: 19px;
+  font-size: 22px;
   font-weight: 800;
   letter-spacing: 0.08em;
 }
@@ -118,14 +125,16 @@
   position: absolute;
   right: 1px;
   bottom: 4px;
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
   background: #1ec95b;
   border: 2px solid #fff;
 }
 
 .profile-copy {
+  text-align: center;
+
   h2 {
     font-size: 19px;
     font-weight: 800;
@@ -261,35 +270,153 @@
   }
 }
 
-.filter-row {
+.controls-row {
   display: flex;
-  gap: 12px;
-  margin-bottom: 22px;
-  overflow-x: auto;
-  padding-bottom: 2px;
-  scrollbar-width: none;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
 }
 
-.filter-row::-webkit-scrollbar {
-  display: none;
+.filter-row {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 8px;
+  overflow-x: auto;
+  overflow-y: visible;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar { display: none; }
 }
 
 .filter-chip {
   flex: 0 0 auto;
-  min-width: 76px;
-  height: 40px;
-  border: none;
+  height: 38px;
+  border: 1px solid var(--border);
   border-radius: 999px;
   background: var(--surface);
-  color: #2a2f39;
-  font-size: 15px;
+  color: var(--text-dark);
+  font-size: 14px;
   font-weight: 500;
-  padding: 0 18px;
+  padding: 0 14px;
+  white-space: nowrap;
+  cursor: pointer;
 
   &--active {
     background: #1792ba;
+    border-color: #1792ba;
     color: #fff;
     font-weight: 700;
+  }
+}
+
+.size-selector {
+  position: relative;
+  flex-shrink: 0;
+
+  &__btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 38px;
+    padding: 0 12px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface);
+    color: var(--text-dark);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+
+    svg {
+      width: 15px;
+      height: 15px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      flex-shrink: 0;
+    }
+  }
+
+  &__chevron {
+    transition: transform 0.18s ease;
+
+    &--open { transform: rotate(180deg); }
+  }
+}
+
+.size-dropdown {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  min-width: 140px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+  z-index: 50;
+  overflow: hidden;
+
+  &__item {
+    width: 100%;
+    padding: 11px 16px;
+    border: none;
+    background: transparent;
+    color: var(--text-dark);
+    font-size: 14px;
+    font-weight: 500;
+    text-align: left;
+    cursor: pointer;
+
+    &:hover { background: var(--surface-soft); }
+
+    &--active {
+      background: #1792ba;
+      color: #fff;
+      font-weight: 700;
+    }
+  }
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-top: 20px;
+
+  &__btn {
+    border: none;
+    background: transparent;
+    color: var(--mat-text-button-label-text-color, var(--mat-sys-primary, #005db0));
+    font-size: 14px;
+    font-weight: 600;
+    padding: 6px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+    font-family: inherit;
+
+    &:hover:not(:disabled) {
+      background: var(--mat-text-button-hover-state-layer-color, rgba(0, 93, 176, 0.08));
+    }
+
+    &:disabled {
+      color: var(--text-gray);
+      font-weight: 400;
+      cursor: default;
+      background: transparent;
+    }
+  }
+
+  &__info {
+    font-size: 14px;
+    color: var(--text-gray);
   }
 }
 

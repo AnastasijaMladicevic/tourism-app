@@ -61,6 +61,7 @@
       [class.route-planner--navigation-active]="isRouteNavigationActive"
       [class.route-planner--expanded]="isRoutePlannerExpanded"
       [class.route-planner--dragging]="isRoutePlannerDragging"
+      [class.route-planner--collapsed]="isRouteListCollapsed"
       [style.height]="plannerHeightStyle"
     >
       <div
@@ -167,6 +168,16 @@
             </button>
           </div>
 
+          <div class="route-planner__my-location-row">
+            <button class="route-planner__my-location-btn" type="button" (click)="useMyLocation()">
+              <mat-icon>my_location</mat-icon>
+              {{ 'map.routePlanner.useMyLocation' | translate }}
+            </button>
+            @if (showLocationAlreadyInRouteHint) {
+              <span class="route-planner__location-hint">{{ 'map.routePlanner.locationAlreadyInRoute' | translate }}</span>
+            }
+          </div>
+
           <div
             cdkDropList
             cdkDropListOrientation="vertical"
@@ -221,7 +232,7 @@
   @if (showAddStopPanel) {
     <div class="add-stop-panel-backdrop" (click)="closeAddStopPanel()"></div>
 
-    <div class="add-stop-panel" role="dialog" aria-modal="true">
+    <div class="add-stop-panel" role="dialog" aria-modal="true" (click)="$event.stopPropagation()">
       <div class="add-stop-panel__header">
         <div class="add-stop-panel__title">
           <span class="add-stop-panel__title-icon">
@@ -354,6 +365,10 @@
                   loading="lazy"
                   referrerpolicy="no-referrer-when-downgrade"
                 ></iframe>
+
+                <span class="add-stop-panel__blue-pin" aria-hidden="true">
+                  <mat-icon>place</mat-icon>
+                </span>
               } @else {
                 <div class="add-stop-panel__location-placeholder">
                   <mat-icon>place</mat-icon>
@@ -501,7 +516,7 @@
               {{ getWorkingStatus() ? 'OPEN NOW' : 'CLOSED' }}
             </span>
           }
-          @if (selectedItem.distanceKm != null) {
+          @if (selectedItem.distanceKm != null && isTracking) {
             <span class="badge badge--distance">
               <mat-icon>near_me</mat-icon>{{ formatDistance(selectedItem.distanceKm) }}
             </span>
@@ -510,15 +525,16 @@
 
         <div class="bottom-card__actions">
           @if (shouldShowDetailsButton()) {
-            <button class="bottom-card__btn" (click)="openDetails()">Details</button>
+            <button class="bottom-card__btn" (click)="openDetails()">{{ 'common.viewDetails' | translate }}</button>
           }
 
           <button class="bottom-card__btn bottom-card__btn--primary" (click)="openDirections()">
             <mat-icon>directions</mat-icon>
-            Get Directions
+            {{ 'map.getDirections' | translate }}
           </button>
         </div>
       </div>
     </div>
   }
+  <router-outlet></router-outlet>
 </div>

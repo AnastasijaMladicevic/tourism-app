@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, HostBinding, HostListener, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
@@ -15,6 +15,7 @@ import {
   RouteBuilderPoint,
   RouteBuilderStateService,
 } from '../../services/route-builder-state.service';
+import { LocationTrackingService } from '../../services/location-tracking';
 import { TranslationService } from '../../services/translation.service';
 import { environment } from '../../../environment/environment';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
@@ -82,6 +83,12 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
   isSubmitting = false;
   hasMoreResults = false;
   isDesktopLayout = false;
+  showLocationAlreadyInRouteHint = false;
+
+  @HostBinding('class.add-stop-host--desktop')
+  get isDesktopHost(): boolean {
+    return this.isDesktopLayout;
+  }
 
   private readonly collapsedResultLimit = 6;
   private visibleResultLimit = this.collapsedResultLimit;
@@ -102,6 +109,7 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
     private readonly localityService: LocalityService,
     private readonly sanitizer: DomSanitizer,
     private readonly routeBuilderStateService: RouteBuilderStateService,
+    private readonly locationTrackingService: LocationTrackingService,
     private readonly translationService: TranslationService,
   ) {}
 
@@ -302,23 +310,61 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
     return !!this.selectedResult && this.selectedResult.lat != null && this.selectedResult.lng != null;
   }
 
-  async addToRoute(): Promise<void> {
-    const selectedResult = this.selectedResult;
-    if (!selectedResult || selectedResult.lat == null || selectedResult.lng == null || this.isSubmitting) {
+  async useMyLocation(): Promise<void> {
+    const isTracking = this.locationTrackingService.isTrackingEnabled();
+    const location = this.locationTrackingService.getCurrentLocation();
+
+    if (!isTracking || !location) {
+      await this.navigateBackToMap({ state: { openLocationConsent: true } });
       return;
     }
 
-    this.isSubmitting = true;
+    const currentPoints = this.routeBuilderStateService.getRoutePoints();
+    const alreadyInRoute = currentPoints.some((p) => p.id === -1 && p.type === 'gps');
+    if (alreadyInRoute) {
+      this.showLocationAlreadyInRouteHint = true;
+      setTimeout(() => {
+        this.showLocationAlreadyInRouteHint = false;
+        this.cdr.detectChanges();
+      }, 2500);
+      this.cdr.detectChanges();
+      return;
+    }
 
+    this.routeBuilderStateService.prependRoutePoint({
+      id: -1,
+      name: this.translate('map.routePlanner.myLocation'),
+      type: 'gps',
+      lat: location.latitude,
+      lng: location.longitude,
+    });
+    await this.navigateBackToMap();
+  }
+
+  async addToRoute(): Promise<void> {
+    const selectedResult = this.selectedResult;
+  
+    if (!selectedResult || selectedResult.lat == null || selectedResult.lng == null || this.isSubmitting) {
+      return;
+    }
+  
+    this.isSubmitting = true;
+  
     try {
       this.storeRecentItem(selectedResult);
-      this.routeBuilderStateService.addRoutePoint( {
+  
+      const markerId = Number(selectedResult.id);
+  
+      this.routeBuilderStateService.addRoutePoint({
         id: selectedResult.id,
         name: selectedResult.name,
         type: selectedResult.markerType || selectedResult.typeName || selectedResult.category,
         lat: selectedResult.lat,
         lng: selectedResult.lng,
+        markerType: selectedResult.markerType || selectedResult.category,
+        markerId: Number.isFinite(markerId) ? markerId : undefined,
       });
+  
       await this.navigateBackToMap();
     } finally {
       this.isSubmitting = false;
@@ -1150,10 +1196,11 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
     const right = lng + delta;
     const top = lat + delta;
     const bottom = lat - delta;
+  
     const url =
       `https://www.openstreetmap.org/export/embed.html?bbox=${left}%2C${bottom}%2C${right}%2C${top}` +
-      `&layer=mapnik&marker=${lat}%2C${lng}`;
-
+      `&layer=mapnik`;
+  
     return this.sanitizer.bypassSecurityTrustResourceUrl(url);
   }
 

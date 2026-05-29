@@ -69,7 +69,7 @@ export class LocationSettingsComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.locationTrackingService.trackingEnabled$.subscribe((enabled) => {
         this.locationEnabled = enabled;
-        this.showLocationConsentHint = this.hasLocationConsentContext && !enabled;
+        this.showLocationConsentHint = !enabled;
         this.cdr.markForCheck();
       }),
     );
@@ -80,7 +80,7 @@ export class LocationSettingsComponent implements OnInit, OnDestroy {
           this.hasLocationConsentContext = true;
         }
         this.locationConsentMode = params.get('liveShare') === '1' ? 'liveShare' : 'default';
-        this.showLocationConsentHint = this.hasLocationConsentContext && !this.locationEnabled;
+        this.showLocationConsentHint = !this.locationEnabled;
         void this.syncLocationTrackingState();
       }),
     );
@@ -151,7 +151,7 @@ export class LocationSettingsComponent implements OnInit, OnDestroy {
       this.pendingLocationEnableRequest = true;
       this.locationTrackingService.startTracking();
       this.locationEnabled = this.locationTrackingService.isTrackingEnabled();
-      this.showLocationConsentHint = this.hasLocationConsentContext && !this.locationEnabled;
+      this.showLocationConsentHint = !this.locationEnabled;
       this.cdr.markForCheck();
       return;
     }
@@ -163,7 +163,7 @@ export class LocationSettingsComponent implements OnInit, OnDestroy {
     }
     this.locationTrackingService.stopTracking();
     this.locationEnabled = false;
-    this.showLocationConsentHint = this.hasLocationConsentContext;
+    this.showLocationConsentHint = true;
     this.cdr.markForCheck();
   }
 
@@ -358,7 +358,7 @@ export class LocationSettingsComponent implements OnInit, OnDestroy {
     }
 
     this.locationEnabled = this.locationTrackingService.isTrackingEnabled();
-    this.showLocationConsentHint = this.hasLocationConsentContext && !this.locationEnabled;
+    this.showLocationConsentHint = !this.locationEnabled;
 
     if (this.locationEnabled) {
       this.pendingLocationEnableRequest = false;

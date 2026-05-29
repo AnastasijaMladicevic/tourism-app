@@ -191,6 +191,7 @@
     "emailInvalid": "Formato de email no válido",
     "passwordRules": "La contraseña debe tener al menos 6 caracteres, una letra mayúscula, un número y un carácter especial.",
     "rememberMe": "Recordarme",
+    "continueWithGoogle": "Continuar con Google",
     "loggingIn": "Iniciando sesión...",
     "logIn": "Iniciar sesión",
     "orContinueWithGoogle": "o continúa con Google",
@@ -207,7 +208,7 @@
     "subtitle1": "Introduce el correo asociado a tu cuenta",
     "subtitle2": "para restablecer tu contraseña",
     "emailPlaceholder": "Introduce tu correo",
-    "hint": "Por favor introduce tu correo registrado",
+    "hint": "Introduce tu correo registrado",
     "submit": "Solicitar enlace de restablecimiento",
     "sending": "Enviando...",
     "errors": {
@@ -914,6 +915,7 @@
     "locationConsentTitle": "Activa la ubicacion para que el GPS funcione",
     "locationConsentBody": "El seguimiento de ubicacion esta desactivado en este momento. Toca abajo para abrir ajustes y activar el consentimiento para el seguimiento de ubicacion.",
     "locationConsentAction": "Haz clic aqui",
+    "getDirections": "Cómo llegar",
     "filters": {
       "food": "Comida y bebida",
       "fuel": "Gasolineras",

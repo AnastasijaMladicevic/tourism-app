@@ -26,18 +26,6 @@ export class LocationTrackingService {
   readonly location$ = this.locationSubject.asObservable();
 
   constructor(private readonly authService: AuthService) {
-    if (this.trackingEnabledSubject.value && !this.canUseGeolocation() && !this.canUseIpFallback()) {
-      this.stopTracking();
-      return;
-    }
-
-    if (this.trackingEnabledSubject.value) {
-      if (this.canUseGeolocation()) {
-        this.ensureTracking();
-      } else if (this.canUseIpFallback()) {
-        this.ensureIpFallback();
-      }
-    }
   }
 
   isTrackingEnabled(): boolean {
@@ -296,16 +284,6 @@ export class LocationTrackingService {
 
   private setTrackingEnabled(enabled: boolean): void {
     this.trackingEnabledSubject.next(enabled);
-
-    if (typeof sessionStorage === 'undefined') {
-      return;
-    }
-
-    if (enabled) {
-      sessionStorage.setItem(this.enabledKey, 'true');
-    } else {
-      sessionStorage.removeItem(this.enabledKey);
-    }
   }
 
   private persistSnapshot(snapshot: TrackedLocation): void {
@@ -325,11 +303,7 @@ export class LocationTrackingService {
   }
 
   private readEnabled(): boolean {
-    if (typeof sessionStorage === 'undefined') {
-      return false;
-    }
-
-    return sessionStorage.getItem(this.enabledKey) === 'true';
+    return false;
   }
 
   private readSnapshot(): TrackedLocation | null {

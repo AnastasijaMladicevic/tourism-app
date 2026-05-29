@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { profileAuthGuard } from './guards/profile-auth.guard';
+import { GoogleCallbackComponent } from './feature/google-callback/google-callback';
 
 const objectTypeRoutes: Routes = [
   {
@@ -89,6 +90,10 @@ export const routes: Routes = [
     path: '',
     pathMatch: 'full',
     redirectTo: 'home',
+  },
+  {
+    path: 'auth/google/callback',
+    component: GoogleCallbackComponent,
   },
   {
     path: 'login',
@@ -359,13 +364,6 @@ export const routes: Routes = [
       ),
   },
   {
-    path: 'map/add-stop',
-    loadComponent: () =>
-      import('./feature/add-stop-mobile-screen/add-stop-mobile-screen.component').then(
-        (m) => m.AddStopMobileScreenComponent,
-      ),
-  },
-  {
     path: 'my-reviews',
     canActivate: [profileAuthGuard],
     loadComponent: () =>
@@ -411,7 +409,16 @@ export const routes: Routes = [
   {
     path: 'map',
     loadComponent: () =>
-      import('./feature/map/map').then(m => m.MapComponent)
+      import('./feature/map/map').then(m => m.MapComponent),
+    children: [
+      {
+        path: 'add-stop',
+        loadComponent: () =>
+          import('./feature/add-stop-mobile-screen/add-stop-mobile-screen.component').then(
+            (m) => m.AddStopMobileScreenComponent,
+          ),
+      },
+    ],
   },
   {
     path: 'object/:id',

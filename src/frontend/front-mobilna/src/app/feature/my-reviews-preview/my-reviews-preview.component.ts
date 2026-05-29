@@ -49,11 +49,15 @@ export class MyReviewsPreviewComponent implements OnInit {
   private readonly cdr = inject(ChangeDetectorRef);
   protected readonly currentUser = signal<UserDto | null>(null);
   protected readonly reviews = signal<ReviewPreviewCard[]>([]);
+  protected readonly totalCount = signal(0);
   protected readonly isLoading = signal(true);
   protected readonly errorMessage = signal('');
   protected readonly searchTerm = signal('');
   protected readonly activeFilter = signal('all');
-  protected readonly visibleCount = signal(6);
+  protected readonly currentPage = signal(1);
+  protected readonly pageSize = signal(3);
+  protected readonly showSizeDropdown = signal(false);
+  protected readonly pageSizeOptions = [3, 5];
   protected readonly deletingId = signal<number | null>(null);
 
   protected readonly filters = computed<ReviewFilter[]>(() => {
@@ -76,11 +80,18 @@ export class MyReviewsPreviewComponent implements OnInit {
     });
   });
 
-  protected readonly visibleReviews = computed(() =>
-    this.filteredReviews().slice(0, this.visibleCount()),
+  protected readonly totalPages = computed(() =>
+    Math.max(1, Math.ceil(this.filteredReviews().length / this.pageSize())),
   );
 
-  protected readonly totalReviews = computed(() => this.reviews().length);
+  protected readonly visibleReviews = computed(() => {
+    const start = (this.currentPage() - 1) * this.pageSize();
+    return this.filteredReviews().slice(start, start + this.pageSize());
+  });
+
+  protected readonly totalReviews = computed(() =>
+    Math.max(this.totalCount(), this.reviews().length),
+  );
 
   protected readonly averageRating = computed(() => {
     const items = this.reviews();
@@ -147,15 +158,17 @@ export class MyReviewsPreviewComponent implements OnInit {
 
     forkJoin({
       user: this.authService.getById(currentUser.id).pipe(catchError(() => of(currentUser))),
-      reviews: this.reviewService.getMine({ page: 1, pageSize: 30 }).pipe(
+      reviews: this.reviewService.getMine({ page: 1, pageSize: 1000 }).pipe(
         catchError((err) => {
           console.error(err);
           this.errorMessage.set('myReviews.loadError');
-          return of({ items: [] as ReviewDto[] });
+          return of({ items: [] as ReviewDto[], totalCount: 0, page: 1, pageSize: 1000, totalPages: 0 });
         }),
       ),
     }).subscribe(({ user, reviews }) => {
       this.currentUser.set(user);
+      const pagedResponse = reviews as { items?: ReviewDto[]; totalCount?: number };
+      this.totalCount.set(pagedResponse.totalCount ?? 0);
       this.reviews.set(this.mapReviewsForUser(this.toArray<ReviewDto>(reviews)));
       this.isLoading.set(false);
       this.cdr.detectChanges();
@@ -164,25 +177,37 @@ export class MyReviewsPreviewComponent implements OnInit {
 
   protected setFilter(filter: string): void {
     this.activeFilter.set(filter);
-    this.visibleCount.set(6);
+    this.currentPage.set(1);
+    this.showSizeDropdown.set(false);
   }
 
   protected setSearch(value: string): void {
     this.searchTerm.set(value);
-    this.visibleCount.set(6);
+    this.currentPage.set(1);
+  }
+
+  protected prevPage(): void {
+    this.currentPage.update((p) => Math.max(1, p - 1));
+  }
+
+  protected nextPage(): void {
+    this.currentPage.update((p) => Math.min(this.totalPages(), p + 1));
+  }
+
+  protected setPageSize(size: number): void {
+    this.pageSize.set(size);
+    this.currentPage.set(1);
+    this.showSizeDropdown.set(false);
+  }
+
+  protected toggleSizeDropdown(): void {
+    this.showSizeDropdown.update((v) => !v);
   }
 
   protected stars(count: number): number[] {
     return Array.from({ length: count }, (_, index) => index);
   }
 
-  protected loadMore(): void {
-    this.visibleCount.update((count) => count + 6);
-  }
-
-  protected canLoadMore(): boolean {
-    return this.filteredReviews().length > this.visibleCount();
-  }
 
   protected hasAnyReviews(): boolean {
     return this.totalReviews() > 0;

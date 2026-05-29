@@ -7557,13 +7557,13 @@ VALUES
 (
     '/images/entity_images/localities/510aba96031cbfdeaf30d183.jpg',
     'Centar Andrijevice',
-    true,
+    false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Andrijevice'),
     NOW()),
 (
     '/images/entity_images/localities/8af061e3d47d3346bd24a270.jpg',
     'Centar Andrijevice',
-    false,
+    true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Andrijevice'),
     NOW()),
 (
@@ -10508,7 +10508,7 @@ VALUES
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zetski dom'),
     NOW()),
 (
-    '/images/entity_images/objects/9f85c18415f4ec3a4e26efa2.jpg'
+    '/images/entity_images/objects/9f85c18415f4ec3a4e26efa2.jpg',
     'Nikšićko pozorište',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Nikšićko pozorište'),
@@ -22736,7 +22736,7 @@ VALUES
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara.serbia.tourist@spirego.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Bohemian Garni'),
- 5,
+ 4,
  'Hotel ima odličnu lokaciju i baš prijatan ambijent. Sve je bilo čisto i uredno.',
  NOW()),
 
@@ -22761,7 +22761,7 @@ VALUES
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'filip.serbia.tourist@spirego.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Zavičaj Skadarlija'),
- 4,
+ 5,
  'Velike porcije i dobra domaća kuhinja. Restoran je često pun, ali vredi čekati.',
  NOW()),
 
@@ -22774,8 +22774,8 @@ VALUES
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara.serbia.tourist@spirego.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Bukoleon Apartment'),
- 5,
- 'Apartman je lepo sređen i na odličnoj lokaciji. Sve znamenitosti su bile veoma blizu.',
+ 4,
+ 'Apartman je lepo sređen i na odličnoj lokaciji. Sve znamenitosti su bile veoma blizu. Jedino što nema lift.',
  NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'andrija.serbia.tourist@spirego.com'),
@@ -22793,8 +22793,8 @@ VALUES
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'teodora.serbia.tourist@spirego.com'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Velika Skadarlija'),
- 5,
- 'Prelep restoran sa odličnom domaćom hranom i muzikom. Veče u Skadarliji je bilo baš posebno.',
+ 3,
+ 'Ništa specijalno iskreno.',
  NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'filip.serbia.tourist@spirego.com'),
@@ -33671,76 +33671,601 @@ ins_objects AS (
     JOIN "Users" cu ON cu."Email" = s."CreatorEmail"
     JOIN "Users" mu ON mu."Email" = s."ManagerEmail"
     RETURNING "Id", "Name"
-),
-ins_reviews_one AS (
-    INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "CreatedAt")
-    SELECT
-        u."Id",
-        o."Id",
-        CASE s."Profile"
-            WHEN 'lodging' THEN (ARRAY[5,4,4,3,5])[1 + (s.rn % 5)]
-            WHEN 'food' THEN (ARRAY[5,4,3,5,4])[1 + (s.rn % 5)]
-            WHEN 'culture' THEN (ARRAY[4,5,3,4,5])[1 + (s.rn % 5)]
-            WHEN 'shopping' THEN (ARRAY[4,3,5,4,2])[1 + (s.rn % 5)]
-            WHEN 'health' THEN (ARRAY[5,4,4,3,5])[1 + (s.rn % 5)]
-            WHEN 'fuel' THEN (ARRAY[4,3,5,2,4])[1 + (s.rn % 5)]
-            WHEN 'wellness' THEN (ARRAY[5,4,4,5,3])[1 + (s.rn % 5)]
-            ELSE 4
-        END,
-        CASE s."Profile"
-            WHEN 'lodging' THEN s."Name" || ' je imao dobru lokaciju i uredan prostor, pa je boravak protekao bez komplikacija.'
-            WHEN 'food' THEN 'U objektu ' || s."Name" || ' smo dobili ukusna jela i prijatnu uslugu, bez osećaja žurbe.'
-            WHEN 'culture' THEN s."Name" || ' je prijatno mesto za kraći obilazak i ostavio je bolji utisak nego što sam očekivao.'
-            WHEN 'shopping' THEN s."Name" || ' ima dobar izbor i pregledan raspored, pa je kupovina prošla lakše nego što sam očekivao.'
-            WHEN 'health' THEN 'Osoblje u objektu ' || s."Name" || ' bilo je ljubazno i organizacija je delovala jasno od prijema do izlaska.'
-            WHEN 'fuel' THEN 'Na pumpi ' || s."Name" || ' je sve bilo čisto, a usluga brza i korektna.'
-            WHEN 'wellness' THEN 'U objektu ' || s."Name" || ' je atmosfera bila mirna, a tretmani i prostor dovoljno uredni za opušten predah.'
-            ELSE s."Name" || ' je ostavio korektan utisak.'
-        END,
-        NOW()
-    FROM ranked_source s
-    JOIN ins_objects o ON o."Name" = s."Name"
-    JOIN "Users" u ON u."Email" = CASE
-        WHEN s.rn % 3 = 1 THEN 'alejandro.tourist@spirego.com'
-        WHEN s.rn % 3 = 2 THEN 'isabel.tourist@spirego.com'
-        ELSE 'miguel.tourist@spirego.com'
-    END
-),
-ins_reviews_two AS (
-    INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "CreatedAt")
-    SELECT
-        u."Id",
-        o."Id",
-        CASE s."Profile"
-            WHEN 'lodging' THEN (ARRAY[4,3,5,4,2])[1 + (s.rn % 5)]
-            WHEN 'food' THEN (ARRAY[4,3,5,2,4])[1 + (s.rn % 5)]
-            WHEN 'culture' THEN (ARRAY[3,4,2,5,4])[1 + (s.rn % 5)]
-            WHEN 'shopping' THEN (ARRAY[3,4,2,5,4])[1 + (s.rn % 5)]
-            WHEN 'health' THEN (ARRAY[4,3,5,2,4])[1 + (s.rn % 5)]
-            WHEN 'fuel' THEN (ARRAY[3,2,4,4,5])[1 + (s.rn % 5)]
-            WHEN 'wellness' THEN (ARRAY[4,3,5,4,2])[1 + (s.rn % 5)]
-            ELSE 3
-        END,
-        CASE s."Profile"
-            WHEN 'lodging' THEN 'Boravak u objektu ' || s."Name" || ' bio je korektan, ali su se videle i sitnice oko buke ili prostora.'
-            WHEN 'food' THEN 'Hrana u objektu ' || s."Name" || ' je bila dobra, ali je ritam usluge varirao kada je bilo više gostiju.'
-            WHEN 'culture' THEN s."Name" || ' je zanimljiv, ali bi postavka i signalizacija mogli da budu jasnije organizovani.'
-            WHEN 'shopping' THEN 'Ponuda u objektu ' || s."Name" || ' je solidna, ali je u pojedinim terminima bilo više gužve nego što prija.'
-            WHEN 'health' THEN 'U objektu ' || s."Name" || ' je sve išlo korektno, mada je čekanje u jačem terminu bilo primetno.'
-            WHEN 'fuel' THEN 'Pumpa ' || s."Name" || ' radi posao, ali je u špicu znalo da bude malo sporije nego što sam očekivao.'
-            WHEN 'wellness' THEN 'Objekat ' || s."Name" || ' je prijatan, ali bi pojedini delovi usluge mogli da budu ujednačeniji.'
-            ELSE s."Name" || ' je ostavio mešovit utisak.'
-        END,
-        NOW()
-    FROM ranked_source s
-    JOIN ins_objects o ON o."Name" = s."Name"
-    JOIN "Users" u ON u."Email" = CASE
-        WHEN s.rn % 3 = 1 THEN 'isabel.tourist@spirego.com'
-        WHEN s.rn % 3 = 2 THEN 'miguel.tourist@spirego.com'
-        ELSE 'alejandro.tourist@spirego.com'
-    END
 )
 SELECT 1;
+
+-- SPANIJA RECENZIJE - OBJEKTI, SVAKI OBJEKAT POSEBNO
+
+-- Hotel Mirador Alicante
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'alejandro.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Mirador Alicante'),
+ 5, 'Soba je bila cista, lokacija prakticna, a prijava prosla brzo i bez stresa.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'isabel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Mirador Alicante'),
+ 3, 'Smestaj je korektan za kratak boravak, ali se uvece cula buka iz hodnika.', 'Approved', NOW());
+
+-- Arrocería Costa Blanca
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'isabel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Arrocería Costa Blanca'),
+ 4, 'Lep restoran za veceru, mada su cene malo vise nego sto sam ocekivao.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'miguel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Arrocería Costa Blanca'),
+ 2, 'Ambijent je lep, ali usluga je bila spora i jedno jelo je stiglo mlako.', 'Approved', NOW());
+
+-- Galerija Santa Barbara
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'miguel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Santa Barbara'),
+ 3, 'Vredi svratiti, ali bi oznake i objasnjenja za posetioce mogla biti jasnija.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'alejandro.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Santa Barbara'),
+ 5, 'Postavka je zanimljiva i lako se obilazi, posebno ako volite istoriju i umetnost.', 'Approved', NOW());
+
+-- Plaza Mar Alicante
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'alejandro.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Plaza Mar Alicante'),
+ 2, 'Nije mi se dopao raspored prodavnica, a guzva je dodatno kvarila utisak.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'isabel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Plaza Mar Alicante'),
+ 3, 'Moze da posluzi za osnovnu kupovinu, mada izbor nije bas ujednacen.', 'Approved', NOW());
+
+-- Hospital Costa Alicante
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'isabel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Costa Alicante'),
+ 1, 'Vrlo lose iskustvo zbog dugog cekanja i slabe organizacije prijema.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'miguel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Costa Alicante'),
+ 4, 'Korektna usluga i jasne informacije, uz malo cekanja u glavnom terminu.', 'Approved', NOW());
+
+-- Repsol Postiguet Alicante
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'miguel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol Postiguet Alicante'),
+ 5, 'Pumpa je cista, usluga brza i dobra je za kratku pauzu tokom puta.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'alejandro.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol Postiguet Alicante'),
+ 4, 'Prakticna lokacija i korektna prodavnica, bez vecih zamerki.', 'Approved', NOW());
+
+-- Boutique Suveniri Explanada
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'alejandro.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Boutique Suveniri Explanada'),
+ 4, 'Dobar izbor radnji i korisna lokacija, ali je vikendom dosta guzve.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'isabel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Boutique Suveniri Explanada'),
+ 2, 'Nije mi se dopao raspored prodavnica, a guzva je dodatno kvarila utisak.', 'Approved', NOW());
+
+-- Klinika Vista Med Alicante
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'isabel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Klinika Vista Med Alicante'),
+ 3, 'Sve je zavrseno, ali proces deluje sporo i prostor bi mogao biti prijatniji.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'miguel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Klinika Vista Med Alicante'),
+ 5, 'Prijem je bio brz, osoblje smireno i organizacija bolja nego sto sam ocekivao.', 'Approved', NOW());
+
+-- Cepsa Castillo Alicante
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'miguel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Cepsa Castillo Alicante'),
+ 2, 'Pumpa je korisna zbog lokacije, ali je prodavnica imala slabiji izbor.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'alejandro.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Cepsa Castillo Alicante'),
+ 3, 'Sve osnovno radi kako treba, ali je u spicu bilo sporije nego sto sam ocekivao.', 'Approved', NOW());
+
+-- Pansion La Concha Residence
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'alejandro.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pansion La Concha Residence'),
+ 1, 'Nisam zadovoljan boravkom jer je soba bila previse bucna i usluga spora.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'isabel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pansion La Concha Residence'),
+ 3, 'Smestaj je korektan za kratak boravak, ali se uvece cula buka iz hodnika.', 'Approved', NOW());
+
+-- Pintxos Parte Vieja
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'isabel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pintxos Parte Vieja'),
+ 5, 'Hrana je bila odlicna, porcije taman dovoljne, a osoblje vrlo prijatno.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'miguel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pintxos Parte Vieja'),
+ 4, 'Lep restoran za veceru, mada su cene malo vise nego sto sam ocekivao.', 'Approved', NOW());
+
+-- Galerija Atlantik Donostia
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'miguel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Atlantik Donostia'),
+ 4, 'Lep kulturni prostor za kratak obilazak, sa nekoliko stvarno dobrih detalja.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'alejandro.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Atlantik Donostia'),
+ 2, 'Prostor ima potencijal, ali deluje nedovoljno organizovano za turiste.', 'Approved', NOW());
+
+-- Mercado Kursaal San Sebastian
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'alejandro.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercado Kursaal San Sebastian'),
+ 3, 'Moze da posluzi za osnovnu kupovinu, mada izbor nije bas ujednacen.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'isabel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercado Kursaal San Sebastian'),
+ 5, 'Ponuda je raznovrsna, prostor pregledan i lako je zavrsiti kupovinu bez lutanja.', 'Approved', NOW());
+
+-- Hospital Donostia Center
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'isabel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Donostia Center'),
+ 2, 'Cekanje je bilo dugo, a komunikacija na salteru ne bas jasna.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'miguel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Donostia Center'),
+ 3, 'Sve je zavrseno, ali proces deluje sporo i prostor bi mogao biti prijatniji.', 'Approved', NOW());
+
+-- Repsol La Concha
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'miguel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol La Concha'),
+ 1, 'Nisam zadovoljan jer se dugo cekalo, a osoblje nije delovalo zainteresovano.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'alejandro.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol La Concha'),
+ 4, 'Prakticna lokacija i korektna prodavnica, bez vecih zamerki.', 'Approved', NOW());
+
+-- Suveniri Parte Vieja
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'alejandro.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suveniri Parte Vieja'),
+ 5, 'Ponuda je raznovrsna, prostor pregledan i lako je zavrsiti kupovinu bez lutanja.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'isabel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suveniri Parte Vieja'),
+ 4, 'Dobar izbor radnji i korisna lokacija, ali je vikendom dosta guzve.', 'Approved', NOW());
+
+-- Poliklinika Zurriola San Sebastian
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'isabel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Poliklinika Zurriola San Sebastian'),
+ 4, 'Korektna usluga i jasne informacije, uz malo cekanja u glavnom terminu.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'miguel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Poliklinika Zurriola San Sebastian'),
+ 2, 'Cekanje je bilo dugo, a komunikacija na salteru ne bas jasna.', 'Approved', NOW());
+
+-- Cepsa Igueldo Drive
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'miguel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Cepsa Igueldo Drive'),
+ 3, 'Sve osnovno radi kako treba, ali je u spicu bilo sporije nego sto sam ocekivao.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'alejandro.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Cepsa Igueldo Drive'),
+ 5, 'Pumpa je cista, usluga brza i dobra je za kratku pauzu tokom puta.', 'Approved', NOW());
+
+-- Apartmani Onyar Rooms
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'alejandro.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartmani Onyar Rooms'),
+ 4, 'Dobar izbor za obilazak grada, posebno zbog blizine glavnih setalista.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'isabel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartmani Onyar Rooms'),
+ 2, 'Lokacija je dobra, ali soba je delovala starije i kupatilo bi moralo bolje da se odrzava.', 'Approved', NOW());
+
+-- Restoran Barri Vell Girona
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'isabel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Barri Vell Girona'),
+ 1, 'Lose iskustvo, cekanje je bilo predugo i hrana nije opravdala cenu.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'miguel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Barri Vell Girona'),
+ 4, 'Lep restoran za veceru, mada su cene malo vise nego sto sam ocekivao.', 'Approved', NOW());
+
+-- Muzej Mostova Girona
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'miguel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Mostova Girona'),
+ 5, 'Postavka je zanimljiva i lako se obilazi, posebno ako volite istoriju i umetnost.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'alejandro.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Mostova Girona'),
+ 4, 'Lep kulturni prostor za kratak obilazak, sa nekoliko stvarno dobrih detalja.', 'Approved', NOW());
+
+-- Girona Market Hall
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'alejandro.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Girona Market Hall'),
+ 4, 'Dobar izbor radnji i korisna lokacija, ali je vikendom dosta guzve.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'isabel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Girona Market Hall'),
+ 2, 'Nije mi se dopao raspored prodavnica, a guzva je dodatno kvarila utisak.', 'Approved', NOW());
+
+-- Hospital Girona Nord
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'isabel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Girona Nord'),
+ 3, 'Sve je zavrseno, ali proces deluje sporo i prostor bi mogao biti prijatniji.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'miguel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Girona Nord'),
+ 5, 'Prijem je bio brz, osoblje smireno i organizacija bolja nego sto sam ocekivao.', 'Approved', NOW());
+
+-- Repsol Girona Riverside
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'miguel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol Girona Riverside'),
+ 2, 'Pumpa je korisna zbog lokacije, ali je prodavnica imala slabiji izbor.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'alejandro.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol Girona Riverside'),
+ 3, 'Sve osnovno radi kako treba, ali je u spicu bilo sporije nego sto sam ocekivao.', 'Approved', NOW());
+
+-- Suvenirnica Katedrala Girona
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'alejandro.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Katedrala Girona'),
+ 1, 'Slab izbor i neprijatna guzva, ne bih se vracao bez potrebe.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'isabel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Katedrala Girona'),
+ 4, 'Dobar izbor radnji i korisna lokacija, ali je vikendom dosta guzve.', 'Approved', NOW());
+
+-- Hotel La Caleta Cadiz
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'isabel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel La Caleta Cadiz'),
+ 5, 'Soba je bila cista, lokacija prakticna, a prijava prosla brzo i bez stresa.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'miguel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel La Caleta Cadiz'),
+ 3, 'Smestaj je korektan za kratak boravak, ali se uvece cula buka iz hodnika.', 'Approved', NOW());
+
+-- Taverna Campo del Sur
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'miguel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Taverna Campo del Sur'),
+ 4, 'Lep restoran za veceru, mada su cene malo vise nego sto sam ocekivao.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'alejandro.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Taverna Campo del Sur'),
+ 2, 'Ambijent je lep, ali usluga je bila spora i jedno jelo je stiglo mlako.', 'Approved', NOW());
+
+-- Muzej Atlantika Cadiz
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'alejandro.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Atlantika Cadiz'),
+ 3, 'Vredi svratiti, ali bi oznake i objasnjenja za posetioce mogla biti jasnija.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'isabel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Atlantika Cadiz'),
+ 5, 'Postavka je zanimljiva i lako se obilazi, posebno ako volite istoriju i umetnost.', 'Approved', NOW());
+
+-- Mercado del Puerto Cadiz
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'isabel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercado del Puerto Cadiz'),
+ 2, 'Nije mi se dopao raspored prodavnica, a guzva je dodatno kvarila utisak.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'miguel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercado del Puerto Cadiz'),
+ 3, 'Moze da posluzi za osnovnu kupovinu, mada izbor nije bas ujednacen.', 'Approved', NOW());
+
+-- Hospital Bahia Cadiz
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'miguel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Bahia Cadiz'),
+ 1, 'Vrlo lose iskustvo zbog dugog cekanja i slabe organizacije prijema.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'alejandro.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Bahia Cadiz'),
+ 4, 'Korektna usluga i jasne informacije, uz malo cekanja u glavnom terminu.', 'Approved', NOW());
+
+-- Cepsa La Caleta Cadiz
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'alejandro.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Cepsa La Caleta Cadiz'),
+ 5, 'Pumpa je cista, usluga brza i dobra je za kratku pauzu tokom puta.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'isabel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Cepsa La Caleta Cadiz'),
+ 4, 'Prakticna lokacija i korektna prodavnica, bez vecih zamerki.', 'Approved', NOW());
+
+-- Suvenirnica Stari Kadiz
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'isabel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Stari Kadiz'),
+ 4, 'Dobar izbor radnji i korisna lokacija, ali je vikendom dosta guzve.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'miguel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Stari Kadiz'),
+ 2, 'Nije mi se dopao raspored prodavnica, a guzva je dodatno kvarila utisak.', 'Approved', NOW());
+
+-- Hotel Belluga Murcia
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'miguel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Belluga Murcia'),
+ 2, 'Lokacija je dobra, ali soba je delovala starije i kupatilo bi moralo bolje da se odrzava.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'alejandro.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Belluga Murcia'),
+ 5, 'Soba je bila cista, lokacija prakticna, a prijava prosla brzo i bez stresa.', 'Approved', NOW());
+
+-- Segura Tapas Murcia
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'alejandro.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Segura Tapas Murcia'),
+ 2, 'Ambijent je lep, ali usluga je bila spora i jedno jelo je stiglo mlako.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'isabel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Segura Tapas Murcia'),
+ 3, 'Ukus je bio solidan, ali se na glavno jelo cekalo duze nego sto je prijatno.', 'Approved', NOW());
+
+-- Murcia Wellness Patio
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'isabel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Murcia Wellness Patio'),
+ 1, 'Ne bih ponovio posetu jer je tretman kasnio i prostor nije bio dovoljno miran.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'miguel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Murcia Wellness Patio'),
+ 4, 'Lep wellness za predah, mada bi rezervacije mogle biti bolje organizovane.', 'Approved', NOW());
+
+-- Centro Comercial Murcia Luz
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'miguel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Centro Comercial Murcia Luz'),
+ 5, 'Ponuda je raznovrsna, prostor pregledan i lako je zavrsiti kupovinu bez lutanja.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'alejandro.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Centro Comercial Murcia Luz'),
+ 4, 'Dobar izbor radnji i korisna lokacija, ali je vikendom dosta guzve.', 'Approved', NOW());
+
+-- Hospital Segura Murcia
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'alejandro.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Segura Murcia'),
+ 4, 'Korektna usluga i jasne informacije, uz malo cekanja u glavnom terminu.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'isabel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Segura Murcia'),
+ 2, 'Cekanje je bilo dugo, a komunikacija na salteru ne bas jasna.', 'Approved', NOW());
+
+-- Repsol Murcia Centro
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'isabel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol Murcia Centro'),
+ 3, 'Sve osnovno radi kako treba, ali je u spicu bilo sporije nego sto sam ocekivao.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'miguel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol Murcia Centro'),
+ 5, 'Pumpa je cista, usluga brza i dobra je za kratku pauzu tokom puta.', 'Approved', NOW());
+
+-- Suvenirnica Plaza Belluga
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'miguel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Plaza Belluga'),
+ 2, 'Nije mi se dopao raspored prodavnica, a guzva je dodatno kvarila utisak.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'alejandro.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Plaza Belluga'),
+ 3, 'Moze da posluzi za osnovnu kupovinu, mada izbor nije bas ujednacen.', 'Approved', NOW());
+
+-- Pansion Sardinero Plaza
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'alejandro.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pansion Sardinero Plaza'),
+ 1, 'Nisam zadovoljan boravkom jer je soba bila previse bucna i usluga spora.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'isabel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pansion Sardinero Plaza'),
+ 3, 'Smestaj je korektan za kratak boravak, ali se uvece cula buka iz hodnika.', 'Approved', NOW());
+
+-- Restaurante Botin Norte
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'isabel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restaurante Botin Norte'),
+ 5, 'Hrana je bila odlicna, porcije taman dovoljne, a osoblje vrlo prijatno.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'miguel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restaurante Botin Norte'),
+ 4, 'Lep restoran za veceru, mada su cene malo vise nego sto sam ocekivao.', 'Approved', NOW());
+
+-- Galerija Costa Cantabrica
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'miguel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Costa Cantabrica'),
+ 4, 'Lep kulturni prostor za kratak obilazak, sa nekoliko stvarno dobrih detalja.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'alejandro.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Costa Cantabrica'),
+ 2, 'Prostor ima potencijal, ali deluje nedovoljno organizovano za turiste.', 'Approved', NOW());
+
+-- Mercado Sardinero Santander
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'alejandro.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercado Sardinero Santander'),
+ 3, 'Moze da posluzi za osnovnu kupovinu, mada izbor nije bas ujednacen.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'isabel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercado Sardinero Santander'),
+ 5, 'Ponuda je raznovrsna, prostor pregledan i lako je zavrsiti kupovinu bez lutanja.', 'Approved', NOW());
+
+-- Hospital Cantabrico Santander
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'isabel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Cantabrico Santander'),
+ 2, 'Cekanje je bilo dugo, a komunikacija na salteru ne bas jasna.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'miguel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Cantabrico Santander'),
+ 3, 'Sve je zavrseno, ali proces deluje sporo i prostor bi mogao biti prijatniji.', 'Approved', NOW());
+
+-- Repsol Sardinero Santander
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'miguel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol Sardinero Santander'),
+ 1, 'Nisam zadovoljan jer se dugo cekalo, a osoblje nije delovalo zainteresovano.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'alejandro.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol Sardinero Santander'),
+ 4, 'Prakticna lokacija i korektna prodavnica, bez vecih zamerki.', 'Approved', NOW());
+
+-- Suveniri Magdalena
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'alejandro.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suveniri Magdalena'),
+ 5, 'Ponuda je raznovrsna, prostor pregledan i lako je zavrsiti kupovinu bez lutanja.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'isabel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suveniri Magdalena'),
+ 4, 'Dobar izbor radnji i korisna lokacija, ali je vikendom dosta guzve.', 'Approved', NOW());
+
+-- Resort Costa Adeje Blue
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'isabel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Resort Costa Adeje Blue'),
+ 3, 'Smestaj je korektan za kratak boravak, ali se uvece cula buka iz hodnika.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'miguel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Resort Costa Adeje Blue'),
+ 4, 'Dobar izbor za obilazak grada, posebno zbog blizine glavnih setalista.', 'Approved', NOW());
+
+-- Restaurante Volcán y Mar
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'miguel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restaurante Volcán y Mar'),
+ 3, 'Ukus je bio solidan, ali se na glavno jelo cekalo duze nego sto je prijatno.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'alejandro.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restaurante Volcán y Mar'),
+ 5, 'Hrana je bila odlicna, porcije taman dovoljne, a osoblje vrlo prijatno.', 'Approved', NOW());
+
+-- Teide Outdoor Spa
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'alejandro.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Teide Outdoor Spa'),
+ 2, 'Prostor deluje lepo na prvi pogled, ali usluga nije bila dovoljno pazljiva.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'isabel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Teide Outdoor Spa'),
+ 3, 'Prijatno je, ali nije sve bilo na nivou koji cena sugerise.', 'Approved', NOW());
+
+-- Centro Comercial Adeje Sun
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'isabel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Centro Comercial Adeje Sun'),
+ 1, 'Slab izbor i neprijatna guzva, ne bih se vracao bez potrebe.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'miguel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Centro Comercial Adeje Sun'),
+ 4, 'Dobar izbor radnji i korisna lokacija, ali je vikendom dosta guzve.', 'Approved', NOW());
+
+-- Hospital Tenerife Sur
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'miguel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Tenerife Sur'),
+ 5, 'Prijem je bio brz, osoblje smireno i organizacija bolja nego sto sam ocekivao.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'alejandro.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Tenerife Sur'),
+ 4, 'Korektna usluga i jasne informacije, uz malo cekanja u glavnom terminu.', 'Approved', NOW());
+
+-- Cepsa Costa Adeje
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'alejandro.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Cepsa Costa Adeje'),
+ 4, 'Prakticna lokacija i korektna prodavnica, bez vecih zamerki.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'isabel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Cepsa Costa Adeje'),
+ 2, 'Pumpa je korisna zbog lokacije, ali je prodavnica imala slabiji izbor.', 'Approved', NOW());
+
+-- Surf Shop Tenerife
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'isabel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Surf Shop Tenerife'),
+ 3, 'Moze da posluzi za osnovnu kupovinu, mada izbor nije bas ujednacen.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'miguel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Surf Shop Tenerife'),
+ 5, 'Ponuda je raznovrsna, prostor pregledan i lako je zavrsiti kupovinu bez lutanja.', 'Approved', NOW());
+
+-- Hotel Obradoiro Suites
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'miguel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Obradoiro Suites'),
+ 4, 'Dobar izbor za obilazak grada, posebno zbog blizine glavnih setalista.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'alejandro.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Obradoiro Suites'),
+ 2, 'Lokacija je dobra, ali soba je delovala starije i kupatilo bi moralo bolje da se odrzava.', 'Approved', NOW());
+
+-- Casa Gallega Santiago
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'alejandro.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Casa Gallega Santiago'),
+ 1, 'Lose iskustvo, cekanje je bilo predugo i hrana nije opravdala cenu.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'isabel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Casa Gallega Santiago'),
+ 4, 'Lep restoran za veceru, mada su cene malo vise nego sto sam ocekivao.', 'Approved', NOW());
+
+-- Muzej Hodočasnika Santiago
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'isabel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Hodočasnika Santiago'),
+ 5, 'Postavka je zanimljiva i lako se obilazi, posebno ako volite istoriju i umetnost.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'miguel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Hodočasnika Santiago'),
+ 4, 'Lep kulturni prostor za kratak obilazak, sa nekoliko stvarno dobrih detalja.', 'Approved', NOW());
+
+-- Mercado Compostela Central
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'miguel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercado Compostela Central'),
+ 4, 'Dobar izbor radnji i korisna lokacija, ali je vikendom dosta guzve.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'alejandro.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercado Compostela Central'),
+ 2, 'Nije mi se dopao raspored prodavnica, a guzva je dodatno kvarila utisak.', 'Approved', NOW());
+
+-- Hospital Santiago Centro
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'alejandro.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Santiago Centro'),
+ 3, 'Sve je zavrseno, ali proces deluje sporo i prostor bi mogao biti prijatniji.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'isabel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Santiago Centro'),
+ 5, 'Prijem je bio brz, osoblje smireno i organizacija bolja nego sto sam ocekivao.', 'Approved', NOW());
+
+-- Repsol Alameda Santiago
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'isabel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol Alameda Santiago'),
+ 2, 'Pumpa je korisna zbog lokacije, ali je prodavnica imala slabiji izbor.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'miguel.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol Alameda Santiago'),
+ 3, 'Sve osnovno radi kako treba, ali je u spicu bilo sporije nego sto sam ocekivao.', 'Approved', NOW());
+
 
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 VALUES
@@ -34723,76 +35248,611 @@ ins_objects AS (
     JOIN "Users" cu ON cu."Email" = s."CreatorEmail"
     JOIN "Users" mu ON mu."Email" = s."ManagerEmail"
     RETURNING "Id", "Name"
-),
-ins_reviews_one AS (
-    INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "CreatedAt")
-    SELECT
-        u."Id",
-        o."Id",
-        CASE s."Profile"
-            WHEN 'lodging' THEN (ARRAY[5,4,4,3,5])[1 + (s.rn % 5)]
-            WHEN 'food' THEN (ARRAY[5,4,3,5,4])[1 + (s.rn % 5)]
-            WHEN 'culture' THEN (ARRAY[4,5,3,4,5])[1 + (s.rn % 5)]
-            WHEN 'shopping' THEN (ARRAY[4,3,5,4,2])[1 + (s.rn % 5)]
-            WHEN 'health' THEN (ARRAY[5,4,4,3,5])[1 + (s.rn % 5)]
-            WHEN 'fuel' THEN (ARRAY[4,3,5,2,4])[1 + (s.rn % 5)]
-            WHEN 'wellness' THEN (ARRAY[5,4,4,5,3])[1 + (s.rn % 5)]
-            ELSE 4
-        END,
-        CASE s."Profile"
-            WHEN 'lodging' THEN s."Name" || ' je imao dobru lokaciju i uredan prostor, pa je boravak protekao bez komplikacija.'
-            WHEN 'food' THEN 'U objektu ' || s."Name" || ' smo dobili ukusna jela i prijatnu uslugu, bez osećaja žurbe.'
-            WHEN 'culture' THEN s."Name" || ' je prijatno mesto za kraći obilazak i ostavio je bolji utisak nego što sam očekivao.'
-            WHEN 'shopping' THEN s."Name" || ' ima dobar izbor i pregledan raspored, pa je kupovina prošla lakše nego što sam očekivao.'
-            WHEN 'health' THEN 'Osoblje u objektu ' || s."Name" || ' bilo je ljubazno i organizacija je delovala jasno od prijema do izlaska.'
-            WHEN 'fuel' THEN 'Na pumpi ' || s."Name" || ' je sve bilo čisto, a usluga brza i korektna.'
-            WHEN 'wellness' THEN 'U objektu ' || s."Name" || ' je atmosfera bila mirna, a tretmani i prostor dovoljno uredni za opušten predah.'
-            ELSE s."Name" || ' je ostavio korektan utisak.'
-        END,
-        NOW()
-    FROM ranked_source s
-    JOIN ins_objects o ON o."Name" = s."Name"
-    JOIN "Users" u ON u."Email" = CASE
-        WHEN s.rn % 3 = 1 THEN 'chiara.italy.tourist@spirego.com'
-        WHEN s.rn % 3 = 2 THEN 'marco.italy.tourist@spirego.com'
-        ELSE 'bianca.italy.tourist@spirego.com'
-    END
-),
-ins_reviews_two AS (
-    INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "CreatedAt")
-    SELECT
-        u."Id",
-        o."Id",
-        CASE s."Profile"
-            WHEN 'lodging' THEN (ARRAY[4,3,5,4,2])[1 + (s.rn % 5)]
-            WHEN 'food' THEN (ARRAY[4,3,5,2,4])[1 + (s.rn % 5)]
-            WHEN 'culture' THEN (ARRAY[3,4,2,5,4])[1 + (s.rn % 5)]
-            WHEN 'shopping' THEN (ARRAY[3,4,2,5,4])[1 + (s.rn % 5)]
-            WHEN 'health' THEN (ARRAY[4,3,5,2,4])[1 + (s.rn % 5)]
-            WHEN 'fuel' THEN (ARRAY[3,2,4,4,5])[1 + (s.rn % 5)]
-            WHEN 'wellness' THEN (ARRAY[4,3,5,4,2])[1 + (s.rn % 5)]
-            ELSE 3
-        END,
-        CASE s."Profile"
-            WHEN 'lodging' THEN 'Boravak u objektu ' || s."Name" || ' bio je korektan, ali su se videle i sitnice oko buke ili prostora.'
-            WHEN 'food' THEN 'Hrana u objektu ' || s."Name" || ' je bila dobra, ali je ritam usluge varirao kada je bilo više gostiju.'
-            WHEN 'culture' THEN s."Name" || ' je zanimljiv, ali bi postavka i signalizacija mogli da budu jasnije organizovani.'
-            WHEN 'shopping' THEN 'Ponuda u objektu ' || s."Name" || ' je solidna, ali je u pojedinim terminima bilo više gužve nego što prija.'
-            WHEN 'health' THEN 'U objektu ' || s."Name" || ' je sve išlo korektno, mada je čekanje u jačem terminu bilo primetno.'
-            WHEN 'fuel' THEN 'Pumpa ' || s."Name" || ' radi posao, ali je u špicu znalo da bude malo sporije nego što sam očekivao.'
-            WHEN 'wellness' THEN 'Objekat ' || s."Name" || ' je prijatan, ali bi pojedini delovi usluge mogli da budu ujednačeniji.'
-            ELSE s."Name" || ' je ostavio mešovit utisak.'
-        END,
-        NOW()
-    FROM ranked_source s
-    JOIN ins_objects o ON o."Name" = s."Name"
-    JOIN "Users" u ON u."Email" = CASE
-        WHEN s.rn % 3 = 1 THEN 'marco.italy.tourist@spirego.com'
-        WHEN s.rn % 3 = 2 THEN 'bianca.italy.tourist@spirego.com'
-        ELSE 'chiara.italy.tourist@spirego.com'
-    END
 )
 SELECT 1;
+
+-- ITALIJA RECENZIJE - OBJEKTI, SVAKI OBJEKAT POSEBNO
+
+-- Hotel Lungomare Bari
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Lungomare Bari'),
+ 5, 'Soba je bila cista, lokacija prakticna, a prijava prosla brzo i bez stresa.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Lungomare Bari'),
+ 3, 'Smestaj je korektan za kratak boravak, ali se uvece cula buka iz hodnika.', 'Approved', NOW());
+
+-- Trattoria Bari Vecchia
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Trattoria Bari Vecchia'),
+ 4, 'Lep restoran za veceru, mada su cene malo vise nego sto sam ocekivao.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Trattoria Bari Vecchia'),
+ 2, 'Ambijent je lep, ali usluga je bila spora i jedno jelo je stiglo mlako.', 'Approved', NOW());
+
+-- Galerija Svetog Nikole Bari
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Svetog Nikole Bari'),
+ 3, 'Vredi svratiti, ali bi oznake i objasnjenja za posetioce mogla biti jasnija.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Svetog Nikole Bari'),
+ 5, 'Postavka je zanimljiva i lako se obilazi, posebno ako volite istoriju i umetnost.', 'Approved', NOW());
+
+-- Centro Bari Galleria
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Centro Bari Galleria'),
+ 2, 'Nije mi se dopao raspored prodavnica, a guzva je dodatno kvarila utisak.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Centro Bari Galleria'),
+ 3, 'Moze da posluzi za osnovnu kupovinu, mada izbor nije bas ujednacen.', 'Approved', NOW());
+
+-- Hospital Adriatico Bari
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Adriatico Bari'),
+ 1, 'Vrlo lose iskustvo zbog dugog cekanja i slabe organizacije prijema.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Adriatico Bari'),
+ 4, 'Korektna usluga i jasne informacije, uz malo cekanja u glavnom terminu.', 'Approved', NOW());
+
+-- Repsol Lungomare Bari
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol Lungomare Bari'),
+ 5, 'Pumpa je cista, usluga brza i dobra je za kratku pauzu tokom puta.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol Lungomare Bari'),
+ 4, 'Prakticna lokacija i korektna prodavnica, bez vecih zamerki.', 'Approved', NOW());
+
+-- Suvenirnica Bari Vecchia
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Bari Vecchia'),
+ 4, 'Dobar izbor radnji i korisna lokacija, ali je vikendom dosta guzve.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Bari Vecchia'),
+ 2, 'Nije mi se dopao raspored prodavnica, a guzva je dodatno kvarila utisak.', 'Approved', NOW());
+
+-- Klinika San Nicola Bari
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Klinika San Nicola Bari'),
+ 3, 'Sve je zavrseno, ali proces deluje sporo i prostor bi mogao biti prijatniji.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Klinika San Nicola Bari'),
+ 5, 'Prijem je bio brz, osoblje smireno i organizacija bolja nego sto sam ocekivao.', 'Approved', NOW());
+
+-- Q8 Porto Bari
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Q8 Porto Bari'),
+ 2, 'Pumpa je korisna zbog lokacije, ali je prodavnica imala slabiji izbor.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Q8 Porto Bari'),
+ 3, 'Sve osnovno radi kako treba, ali je u spicu bilo sporije nego sto sam ocekivao.', 'Approved', NOW());
+
+-- Hotel Quattro Canti Palermo
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Quattro Canti Palermo'),
+ 1, 'Nisam zadovoljan boravkom jer je soba bila previse bucna i usluga spora.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Quattro Canti Palermo'),
+ 3, 'Smestaj je korektan za kratak boravak, ali se uvece cula buka iz hodnika.', 'Approved', NOW());
+
+-- Osteria Ballaro Palermo
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Osteria Ballaro Palermo'),
+ 5, 'Hrana je bila odlicna, porcije taman dovoljne, a osoblje vrlo prijatno.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Osteria Ballaro Palermo'),
+ 4, 'Lep restoran za veceru, mada su cene malo vise nego sto sam ocekivao.', 'Approved', NOW());
+
+-- Muzej Normanske Palate Palermo
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Normanske Palate Palermo'),
+ 4, 'Lep kulturni prostor za kratak obilazak, sa nekoliko stvarno dobrih detalja.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Normanske Palate Palermo'),
+ 2, 'Prostor ima potencijal, ali deluje nedovoljno organizovano za turiste.', 'Approved', NOW());
+
+-- Mercato Palermo Centrale
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercato Palermo Centrale'),
+ 3, 'Moze da posluzi za osnovnu kupovinu, mada izbor nije bas ujednacen.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercato Palermo Centrale'),
+ 5, 'Ponuda je raznovrsna, prostor pregledan i lako je zavrsiti kupovinu bez lutanja.', 'Approved', NOW());
+
+-- Hospital Palermo Centro
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Palermo Centro'),
+ 2, 'Cekanje je bilo dugo, a komunikacija na salteru ne bas jasna.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Palermo Centro'),
+ 3, 'Sve je zavrseno, ali proces deluje sporo i prostor bi mogao biti prijatniji.', 'Approved', NOW());
+
+-- Eni Mondello Palermo
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Eni Mondello Palermo'),
+ 1, 'Nisam zadovoljan jer se dugo cekalo, a osoblje nije delovalo zainteresovano.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Eni Mondello Palermo'),
+ 4, 'Prakticna lokacija i korektna prodavnica, bez vecih zamerki.', 'Approved', NOW());
+
+-- Suvenirnica Ballaro Palermo
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Ballaro Palermo'),
+ 5, 'Ponuda je raznovrsna, prostor pregledan i lako je zavrsiti kupovinu bez lutanja.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Ballaro Palermo'),
+ 4, 'Dobar izbor radnji i korisna lokacija, ali je vikendom dosta guzve.', 'Approved', NOW());
+
+-- Poliklinika Mondello Palermo
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Poliklinika Mondello Palermo'),
+ 4, 'Korektna usluga i jasne informacije, uz malo cekanja u glavnom terminu.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Poliklinika Mondello Palermo'),
+ 2, 'Cekanje je bilo dugo, a komunikacija na salteru ne bas jasna.', 'Approved', NOW());
+
+-- Q8 Foro Italico Palermo
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Q8 Foro Italico Palermo'),
+ 3, 'Sve osnovno radi kako treba, ali je u spicu bilo sporije nego sto sam ocekivao.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Q8 Foro Italico Palermo'),
+ 5, 'Pumpa je cista, usluga brza i dobra je za kratku pauzu tokom puta.', 'Approved', NOW());
+
+-- Hotel Piazza Unita Trieste
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Piazza Unita Trieste'),
+ 4, 'Dobar izbor za obilazak grada, posebno zbog blizine glavnih setalista.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Piazza Unita Trieste'),
+ 2, 'Lokacija je dobra, ali soba je delovala starije i kupatilo bi moralo bolje da se odrzava.', 'Approved', NOW());
+
+-- Ristorante Canal Grande Trieste
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Ristorante Canal Grande Trieste'),
+ 1, 'Lose iskustvo, cekanje je bilo predugo i hrana nije opravdala cenu.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Ristorante Canal Grande Trieste'),
+ 4, 'Lep restoran za veceru, mada su cene malo vise nego sto sam ocekivao.', 'Approved', NOW());
+
+-- Muzej Morskog Trsta
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Morskog Trsta'),
+ 4, 'Zanimljiv muzej i lako se obilazi, posebno ako volite istoriju i umetnost.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Morskog Trsta'),
+ 4, 'Lep muzej. Vidi se da je zaista dobro očuvan.', 'Approved', NOW());
+
+-- Mercato Canal Grande Trieste
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercato Canal Grande Trieste'),
+ 4, 'Dobar izbor radnji i korisna lokacija, ali je vikendom dosta guzve.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercato Canal Grande Trieste'),
+ 2, 'Nije mi se dopao raspored prodavnica, a guzva je dodatno kvarila utisak.', 'Approved', NOW());
+
+-- Hospital Porto Trieste
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Porto Trieste'),
+ 3, 'Sve je zavrseno, ali proces deluje sporo i prostor bi mogao biti prijatniji.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Porto Trieste'),
+ 5, 'Prijem je bio brz, osoblje smireno i organizacija bolja nego sto sam ocekivao.', 'Approved', NOW());
+
+-- Eni Miramare Trieste
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Eni Miramare Trieste'),
+ 2, 'Pumpa je korisna zbog lokacije, ali je prodavnica imala slabiji izbor.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Eni Miramare Trieste'),
+ 3, 'Sve osnovno radi kako treba, ali je u spicu bilo sporije nego sto sam ocekivao.', 'Approved', NOW());
+
+-- Suvenirnica Piazza Unita
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Piazza Unita'),
+ 1, 'Slab izbor i neprijatna guzva, ne bih se vracao bez potrebe.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Piazza Unita'),
+ 4, 'Dobar izbor radnji i korisna lokacija, ali je vikendom dosta guzve.', 'Approved', NOW());
+
+-- Apartmani Sassi Matera
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartmani Sassi Matera'),
+ 5, 'Soba je bila cista, lokacija prakticna, a prijava prosla brzo i bez stresa.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartmani Sassi Matera'),
+ 2, 'Smeštaj je korektan za kratak boravak, ali se uveče čula buka iz hodnika. Verovatno se neću vratiti', 'Approved', NOW());
+
+-- Osteria Kamena Matera
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Osteria Kamena Matera'),
+ 4, 'Lep restoran za večeru, mada su cene malo veće nego što sam očekivao.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Osteria Kamena Matera'),
+ 2, 'Ambijent je lep, ali usluga je bila spora i jedno jelo je stiglo hladno!', 'Approved', NOW());
+
+-- Muzej Pecinskih Kuca Matera
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Pecinskih Kuca Matera'),
+ 3, 'Vredi svratiti, ali bi oznake i objasnjenja za posetioce mogla biti jasnija.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Pecinskih Kuca Matera'),
+ 2, 'Malo mi je bilo dosadno. Muzej kao i svaki drugi...', 'Approved', NOW());
+
+-- Bottega Sassi Matera
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Bottega Sassi Matera'),
+ 2, 'Nije mi se dopao raspored prodavnica, a guzva je dodatno kvarila utisak.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Bottega Sassi Matera'),
+ 3, 'Može da posluzi za osnovnu kupovinu, mada izbor nije baš ujednačen.', 'Approved', NOW());
+
+-- Dom zdravlja Gravina Matera
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Gravina Matera'),
+ 1, 'Vrlo lose iskustvo zbog dugog cekanja i slabe organizacije prijema.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Gravina Matera'),
+ 4, 'Korektna usluga i jasne informacije, uz malo cekanja u glavnom terminu.', 'Approved', NOW());
+
+-- Q8 Murgia Matera
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Q8 Murgia Matera'),
+ 5, 'Pumpa je cista, usluga brza i dobra je za kratku pauzu tokom puta.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Q8 Murgia Matera'),
+ 4, 'Prakticna lokacija i korektna prodavnica, bez vecih zamerki.', 'Approved', NOW());
+
+-- Tržnica Piazza Matera
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Tržnica Piazza Matera'),
+ 4, 'Dobar izbor radnji i korisna lokacija, ali je vikendom dosta guzve.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Tržnica Piazza Matera'),
+ 2, 'Nije mi se dopao raspored prodavnica, a guzva je dodatno kvarila utisak.', 'Approved', NOW());
+
+-- Pansion Marina Grande Sorrento
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pansion Marina Grande Sorrento'),
+ 2, 'Lokacija je dobra, ali soba je delovala starije i kupatilo bi moralo bolje da se odrzava.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pansion Marina Grande Sorrento'),
+ 5, 'Soba je bila cista, lokacija prakticna, a prijava prosla brzo i bez stresa.', 'Approved', NOW());
+
+-- Limone Bistro Sorrento
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Limone Bistro Sorrento'),
+ 2, 'Ambijent je lep, ali usluga je bila spora i jedno jelo je stiglo mlako.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Limone Bistro Sorrento'),
+ 3, 'Ukus je bio solidan, ali se na glavno jelo cekalo duze nego sto je prijatno.', 'Approved', NOW());
+
+-- Muzej Obale Sorrenta
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Obale Sorrenta'),
+ 1, 'Obilazak me nije odusevio jer je bilo premalo informacija i atmosfera je bila prazna.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Obale Sorrenta'),
+ 4, 'Lep kulturni prostor za kratak obilazak, sa nekoliko stvarno dobrih detalja.', 'Approved', NOW());
+
+-- Galleria Corso Sorrento
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galleria Corso Sorrento'),
+ 5, 'Ponuda je raznovrsna, prostor pregledan i lako je zavrsiti kupovinu bez lutanja.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galleria Corso Sorrento'),
+ 4, 'Dobar izbor radnji i korisna lokacija, ali je vikendom dosta guzve.', 'Approved', NOW());
+
+-- Hospital Costiera Sorrento
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Costiera Sorrento'),
+ 4, 'Korektna usluga i jasne informacije, uz malo cekanja u glavnom terminu.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Costiera Sorrento'),
+ 2, 'Cekanje je bilo dugo, a komunikacija na salteru ne bas jasna.', 'Approved', NOW());
+
+-- Eni Marina Grande Sorrento
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Eni Marina Grande Sorrento'),
+ 3, 'Sve osnovno radi kako treba, ali je u spicu bilo sporije nego sto sam ocekivao.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Eni Marina Grande Sorrento'),
+ 5, 'Pumpa je cista, usluga brza i dobra je za kratku pauzu tokom puta.', 'Approved', NOW());
+
+-- Suvenirnica Villa Sorrento
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Villa Sorrento'),
+ 2, 'Nije mi se dopao raspored prodavnica, a guzva je dodatno kvarila utisak.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Villa Sorrento'),
+ 3, 'Moze da posluzi za osnovnu kupovinu, mada izbor nije bas ujednacen.', 'Approved', NOW());
+
+-- Hotel Barocco Lecce
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Barocco Lecce'),
+ 1, 'Nisam zadovoljan boravkom jer je soba bila previse bucna i usluga spora.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Barocco Lecce'),
+ 3, 'Smestaj je korektan za kratak boravak, ali se uvece cula buka iz hodnika.', 'Approved', NOW());
+
+-- Trattoria Sant''Oronzo Lecce
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Trattoria Sant''Oronzo Lecce'),
+ 5, 'Hrana je bila odlicna, porcije taman dovoljne, a osoblje vrlo prijatno.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Trattoria Sant''Oronzo Lecce'),
+ 4, 'Lep restoran za veceru, mada su cene malo vise nego sto sam ocekivao.', 'Approved', NOW());
+
+-- Galerija Lecce Pietra
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Lecce Pietra'),
+ 4, 'Lep kulturni prostor za kratak obilazak, sa nekoliko stvarno dobrih detalja.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Lecce Pietra'),
+ 2, 'Prostor ima potencijal, ali deluje nedovoljno organizovano za turiste.', 'Approved', NOW());
+
+-- Mercato Salento Lecce
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercato Salento Lecce'),
+ 3, 'Moze da posluzi za osnovnu kupovinu, mada izbor nije bas ujednacen.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercato Salento Lecce'),
+ 5, 'Ponuda je raznovrsna, prostor pregledan i lako je zavrsiti kupovinu bez lutanja.', 'Approved', NOW());
+
+-- Klinika Lecce Centro
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Klinika Lecce Centro'),
+ 2, 'Cekanje je bilo dugo, a komunikacija na salteru ne bas jasna.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Klinika Lecce Centro'),
+ 3, 'Sve je zavrseno, ali proces deluje sporo i prostor bi mogao biti prijatniji.', 'Approved', NOW());
+
+-- Q8 Porta Napoli Lecce
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Q8 Porta Napoli Lecce'),
+ 1, 'Nisam zadovoljan jer se dugo cekalo, a osoblje nije delovalo zainteresovano.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Q8 Porta Napoli Lecce'),
+ 4, 'Prakticna lokacija i korektna prodavnica, bez vecih zamerki.', 'Approved', NOW());
+
+-- Suvenirnica Barokni Lecce
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Barokni Lecce'),
+ 5, 'Ponuda je raznovrsna, prostor pregledan i lako je zavrsiti kupovinu bez lutanja.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Barokni Lecce'),
+ 4, 'Dobar izbor radnji i korisna lokacija, ali je vikendom dosta guzve.', 'Approved', NOW());
+
+-- Apartmani Parma Duomo
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartmani Parma Duomo'),
+ 3, 'Smestaj je korektan za kratak boravak, ali se uvece cula buka iz hodnika.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartmani Parma Duomo'),
+ 4, 'Dobar izbor za obilazak grada, posebno zbog blizine glavnih setalista.', 'Approved', NOW());
+
+-- Osteria Ducale Parma
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Osteria Ducale Parma'),
+ 3, 'Ukus je bio solidan, ali se na glavno jelo cekalo duze nego sto je prijatno.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Osteria Ducale Parma'),
+ 5, 'Hrana je bila odlicna, porcije taman dovoljne, a osoblje vrlo prijatno.', 'Approved', NOW());
+
+-- Muzej Parma Musica
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Parma Musica'),
+ 2, 'Prostor ima potencijal, ali deluje nedovoljno organizovano za turiste.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Parma Musica'),
+ 3, 'Vredi svratiti, ali bi oznake i objasnjenja za posetioce mogla biti jasnija.', 'Approved', NOW());
+
+-- Parma Galleria Centrale
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Parma Galleria Centrale'),
+ 1, 'Slab izbor i neprijatna guzva, ne bih se vracao bez potrebe.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Parma Galleria Centrale'),
+ 4, 'Dobar izbor radnji i korisna lokacija, ali je vikendom dosta guzve.', 'Approved', NOW());
+
+-- Hospital Emilia Parma
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Emilia Parma'),
+ 5, 'Prijem je bio brz, osoblje smireno i organizacija bolja nego sto sam ocekivao.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Emilia Parma'),
+ 4, 'Korektna usluga i jasne informacije, uz malo cekanja u glavnom terminu.', 'Approved', NOW());
+
+-- Eni Oltretorrente Parma
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Eni Oltretorrente Parma'),
+ 4, 'Prakticna lokacija i korektna prodavnica, bez vecih zamerki.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Eni Oltretorrente Parma'),
+ 2, 'Pumpa je korisna zbog lokacije, ali je prodavnica imala slabiji izbor.', 'Approved', NOW());
+
+-- Mercato Parma Gourmet
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercato Parma Gourmet'),
+ 3, 'Moze da posluzi za osnovnu kupovinu, mada izbor nije bas ujednacen.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercato Parma Gourmet'),
+ 5, 'Ponuda je raznovrsna, prostor pregledan i lako je zavrsiti kupovinu bez lutanja.', 'Approved', NOW());
+
+-- Hotel Costa Smeralda
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Costa Smeralda'),
+ 4, 'Dobar izbor za obilazak grada, posebno zbog blizine glavnih setalista.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Costa Smeralda'),
+ 2, 'Lokacija je dobra, ali soba je delovala starije i kupatilo bi moralo bolje da se odrzava.', 'Approved', NOW());
+
+-- Trattoria Golfo Orosei
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Trattoria Golfo Orosei'),
+ 1, 'Lose iskustvo, cekanje je bilo predugo i hrana nije opravdala cenu.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Trattoria Golfo Orosei'),
+ 4, 'Lep restoran za veceru, mada su cene malo vise nego sto sam ocekivao.', 'Approved', NOW());
+
+-- Muzej Nuraga Sardinija
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Nuraga Sardinija'),
+ 3, 'Muzej je okej i lako se obilazi ako volite istoriju i umetnost.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Nuraga Sardinija'),
+ 4, 'Lep kulturni prostor za kratak obilazak, sa nekoliko stvarno dobrih detalja.', 'Approved', NOW());
+
+-- Surf Shop Sardinija
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Surf Shop Sardinija'),
+ 4, 'Dobar izbor radnji i korisna lokacija, ali je vikendom dosta guzve.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Surf Shop Sardinija'),
+ 2, 'Nije mi se dopao raspored prodavnica, a guzva je dodatno kvarila utisak.', 'Approved', NOW());
+
+-- Poliklinika Cagliari Marina
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Poliklinika Cagliari Marina'),
+ 3, 'Sve je zavrseno, ali proces deluje sporo i prostor bi mogao biti prijatniji.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Poliklinika Cagliari Marina'),
+ 5, 'Prijem je bio brz, osoblje smireno i organizacija bolja nego sto sam ocekivao.', 'Approved', NOW());
+
+-- Repsol Costa Smeralda
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'marco.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol Costa Smeralda'),
+ 2, 'Pumpa je korisna zbog lokacije, ali je prodavnica imala slabiji izbor.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol Costa Smeralda'),
+ 3, 'Sve osnovno radi kako treba, ali je u spicu bilo sporije nego sto sam ocekivao.', 'Approved', NOW());
+
+-- Sardinia Sea Spa
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'bianca.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Sardinia Sea Spa'),
+ 1, 'Ne bih ponovio posetu jer je tretman kasnio i prostor nije bio dovoljno miran.', 'Approved', NOW()),
+((SELECT "Id" FROM "Users" WHERE "Email" = 'chiara.italy.tourist@spirego.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Sardinia Sea Spa'),
+ 4, 'Lep wellness za predah, mada bi rezervacije mogle biti bolje organizovane.', 'Approved', NOW());
+
 
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 VALUES

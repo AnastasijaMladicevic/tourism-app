@@ -561,9 +561,9 @@ div.state-banner {
 
 .donut-section {
   display: grid;
-  grid-template-columns: 138px 1fr;
+  grid-template-columns: 110px minmax(0, 1fr);
   align-items: center;
-  gap: 16px;
+  gap: 12px;
   margin-bottom: 18px;
   padding: 12px;
   border: 1px solid #eef2f7;
@@ -573,9 +573,28 @@ div.state-banner {
 
 .donut-wrap {
   position: relative;
-  width: 132px;
-  height: 132px;
+  width: 108px;
+  height: 108px;
   margin: 0 auto;
+}
+
+.donut-legend {
+  min-width: 0;
+}
+
+.donut-legend li {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+}
+
+.donut-legend li span:nth-child(2) {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.donut-legend strong {
+  font-size: 11px;
 }
 
 .donut-svg {

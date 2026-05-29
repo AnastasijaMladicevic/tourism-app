@@ -69,6 +69,7 @@ export class ObjectsComponent implements OnInit, OnDestroy {
   private hasInitializedLanguageWatcher = false;
   private lastLanguage = 'sr';
   private searchTimeout: ReturnType<typeof setTimeout> | null = null;
+  private readonly listStateKey = 'objects-list-state';
   private readonly groupedTypeMap: Record<string, string[]> = {
     'hrana i pice': ['restaurant', 'kafana'],
     pumpe: ['gas_station'],
@@ -134,7 +135,6 @@ export class ObjectsComponent implements OnInit, OnDestroy {
       } else {
         this.updateDistances();
       }
-
       this.cdr.detectChanges();
     });
 
@@ -153,11 +153,15 @@ export class ObjectsComponent implements OnInit, OnDestroy {
     this.route.data.subscribe((routeData) => {
       const type = routeData['type'] as string | null;
       this.pageTitle = this.translationService.translate('object.listTitle');
-
+    
       this.hideTypeFilters = Boolean(type);
-      this.activeFilter = type ?? 'All';
-      this.currentPage = 1;
-
+    
+      this.restoreListState();
+    
+      if (type) {
+        this.activeFilter = type;
+      }
+    
       void this.loadData();
     });
 
@@ -173,9 +177,41 @@ export class ObjectsComponent implements OnInit, OnDestroy {
     return Math.max(1, Math.ceil(this.totalCount / this.pageSize));
   }
 
+  private saveListState(): void {
+    sessionStorage.setItem(this.listStateKey, JSON.stringify({
+      searchQuery: this.searchQuery,
+      activeFilter: this.activeFilter,
+      minRatingFilter: this.minRatingFilter,
+      sortOption: this.sortOption,
+      currentPage: this.currentPage,
+      pageSize: this.pageSize,
+    }));
+  }
+  
+  private restoreListState(): boolean {
+    const raw = sessionStorage.getItem(this.listStateKey);
+    if (!raw) return false;
+  
+    try {
+      const state = JSON.parse(raw);
+  
+      this.searchQuery = state.searchQuery ?? '';
+      this.activeFilter = state.activeFilter ?? 'All';
+      this.minRatingFilter = state.minRatingFilter ?? 0;
+      this.sortOption = state.sortOption ?? 'rating';
+      this.currentPage = state.currentPage ?? 1;
+      this.pageSize = state.pageSize ?? 8;
+  
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   onPageSizeChange(size: number): void {
     this.pageSize = size;
     this.currentPage = 1;
+    this.saveListState();
     this.refreshVisibleObjects();
     this.cdr.detectChanges();
   }
@@ -579,23 +615,27 @@ export class ObjectsComponent implements OnInit, OnDestroy {
   setFilter(filter: string): void {
     this.activeFilter = filter;
     this.currentPage = 1;
+    this.saveListState();
     this.refreshVisibleObjects();
   }
 
   setMinRating(rating: number): void {
     this.minRatingFilter = rating;
     this.currentPage = 1;
+    this.saveListState();
     this.refreshVisibleObjects();
   }
 
   onSearchChange(): void {
     this.currentPage = 1;
+    this.saveListState();
     this.refreshVisibleObjects();
   }
 
   prevPage(): void {
     if (this.currentPage === 1) return;
     this.currentPage--;
+    this.saveListState();
     this.refreshVisibleObjects();
     this.top.nativeElement.scrollIntoView({ behavior: 'smooth' });
   }
@@ -603,6 +643,7 @@ export class ObjectsComponent implements OnInit, OnDestroy {
   nextPage(): void {
     if (!this.hasNextPage) return;
     this.currentPage++;
+    this.saveListState();
     this.refreshVisibleObjects();
     this.top.nativeElement.scrollIntoView({ behavior: 'smooth' });
   }
@@ -621,6 +662,7 @@ export class ObjectsComponent implements OnInit, OnDestroy {
     this.sortOption = option;
     this.showSortMenu = false;
     this.currentPage = 1;
+    this.saveListState();
     this.refreshVisibleObjects();
   }
 
@@ -739,12 +781,11 @@ export class ObjectsComponent implements OnInit, OnDestroy {
   }
 
   viewDetails(obj: ObjectView): void {
-    if (obj.objectTypeName?.trim()) {
-      this.router.navigate(['/object', obj.id]);
-      return;
-    }
+    this.saveListState();
 
-    this.router.navigate(['/objects']);
+    this.router.navigate(['/object', obj.id], {
+      queryParams: { returnUrl: this.router.url }
+    });
   }
 
   goBack(): void {

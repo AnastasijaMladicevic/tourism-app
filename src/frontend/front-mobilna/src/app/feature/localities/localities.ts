@@ -66,6 +66,7 @@ export class LocalitiesComponent implements OnInit, OnDestroy {
   private hasInitializedLanguageWatcher = false;
   private lastLanguage = 'sr';
   private searchTimeout: ReturnType<typeof setTimeout> | null = null;
+  private readonly listStateKey = 'localities-list-state';
 
   constructor(
     private readonly router: Router,
@@ -102,6 +103,7 @@ export class LocalitiesComponent implements OnInit, OnDestroy {
       this.isTracking = enabled;
 
       if (this.sortOption === 'distance') {
+        this.restoreListState();
         void this.loadData();
         return;
       }
@@ -119,6 +121,7 @@ export class LocalitiesComponent implements OnInit, OnDestroy {
       this.userLocation = loc ? { lat: loc.latitude, lng: loc.longitude } : null;
 
       if (this.sortOption === 'distance') {
+        this.restoreListState();
         void this.loadData();
         return;
       }
@@ -132,6 +135,7 @@ export class LocalitiesComponent implements OnInit, OnDestroy {
       this.cdr.detectChanges();
     });
 
+    this.restoreListState();
     void this.loadData();
 
     window.addEventListener('favorite-object', (event: Event & { detail?: LocalityView }) => {
@@ -154,12 +158,15 @@ export class LocalitiesComponent implements OnInit, OnDestroy {
       this.showPageSizeMenu = false;
     }
   }
+
   onPageSizeChange(size: number): void {
     this.pageSize = size;
     this.currentPage = 1;
+    this.saveListState();
     void this.refreshVisibleLocalities();
     this.cdr.detectChanges();
   }
+
   togglePageSizeMenu(event: Event): void {
     event.stopPropagation();
 
@@ -169,6 +176,34 @@ export class LocalitiesComponent implements OnInit, OnDestroy {
 
     this.showPageSizeMenu = !this.showPageSizeMenu;
   }
+
+  private saveListState(): void {
+    sessionStorage.setItem(this.listStateKey, JSON.stringify({
+      searchQuery: this.searchQuery,
+      activeFilter: this.activeFilter,
+      sortOption: this.sortOption,
+      currentPage: this.currentPage,
+      pageSize: this.pageSize,
+    }));
+  }
+  
+  private restoreListState(): void {
+    const raw = sessionStorage.getItem(this.listStateKey);
+    if (!raw) return;
+  
+    try {
+      const state = JSON.parse(raw);
+  
+      this.searchQuery = state.searchQuery ?? '';
+      this.activeFilter = state.activeFilter ?? 'All';
+      this.sortOption = state.sortOption ?? 'az';
+      this.currentPage = state.currentPage ?? 1;
+      this.pageSize = state.pageSize ?? 8;
+    } catch {
+      sessionStorage.removeItem(this.listStateKey);
+    }
+  }
+
   isFavoritePending(localityId: number): boolean {
     return this.favoritePendingIds.has(localityId);
   }
@@ -231,6 +266,7 @@ export class LocalitiesComponent implements OnInit, OnDestroy {
     if (this.currentPage === 1) return;
 
     this.currentPage--;
+    this.saveListState();
     void this.refreshVisibleLocalities();
     this.top.nativeElement.scrollIntoView({ behavior: 'smooth' });
   }
@@ -239,12 +275,19 @@ export class LocalitiesComponent implements OnInit, OnDestroy {
     if (!this.hasNextPage) return;
 
     this.currentPage++;
+    this.saveListState();
     void this.refreshVisibleLocalities();
     this.top.nativeElement.scrollIntoView({ behavior: 'smooth' });
   }
 
   viewDetails(locality: LocalityView): void {
-    this.router.navigate(['/locality', locality.id]);
+    this.saveListState();
+  
+    this.router.navigate(['/locality', locality.id], {
+      queryParams: {
+        returnUrl: this.router.url
+      }
+    });
   }
 
   getLocalityLocation(locality: LocalityView): string {
@@ -584,12 +627,14 @@ export class LocalitiesComponent implements OnInit, OnDestroy {
     this.sortOption = option;
     this.showSortMenu = false;
     this.currentPage = 1;
+    this.saveListState();
     void this.refreshVisibleLocalities();
   }
 
   setFilter(filter: string): void {
     this.activeFilter = filter;
     this.currentPage = 1;
+    this.saveListState();
     void this.refreshVisibleLocalities();
   }
 
@@ -616,6 +661,7 @@ export class LocalitiesComponent implements OnInit, OnDestroy {
 
   onSearchChange(): void {
     this.currentPage = 1;
+    this.saveListState();
     void this.refreshVisibleLocalities();
   }
 
