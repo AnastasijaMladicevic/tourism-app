@@ -10,6 +10,7 @@ import { UserDto } from '../../../models/user.model';
 type PermissionItem = {
   label: string;
   detail: string;
+  icon: string;
 };
 
 type PasswordChangeStep = 'credentials' | 'otp';
@@ -28,14 +29,14 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
     `${environment.apiUrl.replace('/api', '')}/images/profiles/default_icon.png`;
 
   readonly permissionItems: PermissionItem[] = [
-    { label: 'View manager dashboard', detail: 'Open the manager overview.' },
-    { label: 'Manage events', detail: 'List assigned events, inspect details, approve them, and toggle active state.' },
-    { label: 'Manage activities', detail: 'List assigned activities, inspect details, approve them, and toggle active state.' },
-    { label: 'Manage tourist objects', detail: 'List assigned tourist objects, inspect details, approve them, and toggle active state.' },
-    { label: 'Manage localities', detail: 'Create, update, toggle active state, and delete localities in the managed destination.' },
-    { label: 'Add locality images', detail: 'Upload images for localities that belong to the managed destination.' },
-    { label: 'Review deletion requests', detail: 'View and review deletion requests for the managed destination.' },
-    { label: 'Manage manager reports', detail: 'Create reports, view your own reports, and withdraw your own reports.' },
+    { label: 'View manager dashboard', detail: 'Open the manager overview at /api/manager/dashboard/overview.', icon: 'dashboard' },
+    { label: 'Manage events', detail: 'List assigned events, inspect details, approve them, and toggle active state.', icon: 'event' },
+    { label: 'Manage activities', detail: 'List assigned activities, inspect details, approve them, and toggle active state.', icon: 'local_activity' },
+    { label: 'Manage tourist objects', detail: 'List assigned tourist objects, inspect details, approve them, and toggle active state.', icon: 'storefront' },
+    { label: 'Manage localities', detail: 'Create, update, toggle active state, and delete localities in the managed destination.', icon: 'location_city' },
+    { label: 'Add locality images', detail: 'Upload images for localities that belong to the managed destination.', icon: 'image' },
+    { label: 'Review deletion requests', detail: 'View and review deletion requests for the managed destination.', icon: 'delete_sweep' },
+    { label: 'Manage manager reports', detail: 'Create reports, view your own reports, and withdraw your own reports.', icon: 'article' },
   ];
 
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
@@ -56,6 +57,7 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
   pendingCropFile: File | null = null;
   isSaving = false;
   saveSuccess = false;
+  permissionsModalState: ModalState = 'closed';
   passwordModalState: ModalState = 'closed';
   passwordChangeStep: PasswordChangeStep = 'credentials';
   passwordError = '';
@@ -76,6 +78,7 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
   private pendingCroppedBlob: Blob | null = null;
   private otpExpiryTimerId: number | null = null;
   private otpResendTimerId: number | null = null;
+  private permissionsModalCloseTimerId: number | null = null;
   private passwordModalCloseTimerId: number | null = null;
 
   private static readonly OTP_EXPIRY_SECONDS = 300;
@@ -109,6 +112,7 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.revokeCropPreviewUrl();
+    this.clearPermissionsModalTimer();
     this.clearPasswordTimers();
     this.unlockBodyScroll();
   }
@@ -294,6 +298,35 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
     }, 20);
   }
 
+  openPermissionsModal(): void {
+    if (this.permissionsModalState !== 'closed') return;
+
+    this.permissionsModalState = 'opening';
+    this.lockBodyScroll();
+
+    window.setTimeout(() => {
+      if (this.permissionsModalState === 'opening') {
+        this.permissionsModalState = 'open';
+      }
+    }, 20);
+  }
+
+  closePermissionsModal(): void {
+    if (this.permissionsModalState === 'closed') return;
+
+    this.permissionsModalState = 'closing';
+
+    if (this.permissionsModalCloseTimerId) {
+      window.clearTimeout(this.permissionsModalCloseTimerId);
+    }
+
+    this.permissionsModalCloseTimerId = window.setTimeout(() => {
+      this.permissionsModalState = 'closed';
+      this.releaseBodyScrollIfNoModal();
+      this.permissionsModalCloseTimerId = null;
+    }, 220);
+  }
+
   closePasswordModal(forceClose = false): void {
     if (this.passwordModalState === 'closed' || (this.passwordLoading && !forceClose)) {
       return;
@@ -318,7 +351,7 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
       this.otpDemoCode = '';
       this.otpSecondsRemaining = 0;
       this.otpResendSecondsRemaining = 0;
-      this.unlockBodyScroll();
+      this.releaseBodyScrollIfNoModal();
       this.passwordModalCloseTimerId = null;
     }, 220);
   }
@@ -327,6 +360,8 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
   onEscapeKey(): void {
     if (this.passwordModalState !== 'closed') {
       this.closePasswordModal();
+    } else if (this.permissionsModalState !== 'closed') {
+      this.closePermissionsModal();
     }
   }
 
@@ -522,6 +557,13 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
     }
   }
 
+  private clearPermissionsModalTimer(): void {
+    if (this.permissionsModalCloseTimerId !== null) {
+      window.clearTimeout(this.permissionsModalCloseTimerId);
+      this.permissionsModalCloseTimerId = null;
+    }
+  }
+
   private clearOtpExpiryTimer(): void {
     if (this.otpExpiryTimerId !== null) {
       window.clearInterval(this.otpExpiryTimerId);
@@ -542,6 +584,12 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
 
   private unlockBodyScroll(): void {
     document.body.style.overflow = '';
+  }
+
+  private releaseBodyScrollIfNoModal(): void {
+    if (this.passwordModalState === 'closed' && this.permissionsModalState === 'closed') {
+      this.unlockBodyScroll();
+    }
   }
 
   private generateDemoOtpCode(): string {

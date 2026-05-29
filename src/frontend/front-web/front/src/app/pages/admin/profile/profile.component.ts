@@ -10,6 +10,7 @@ import { UserDto } from '../../../models/user.model';
 type PermissionItem = {
   label: string;
   detail: string;
+  icon: string;
 };
 
 type PasswordChangeStep = 'credentials' | 'otp';
@@ -28,13 +29,13 @@ export class ProfileComponent implements OnInit, OnDestroy {
     `${environment.apiUrl.replace('/api', '')}/images/profiles/default_icon.png`;
 
   readonly permissionItems: PermissionItem[] = [
-    { label: 'View admin dashboard', detail: 'Open the admin overview.' },
-    { label: 'Manage user accounts', detail: 'View users, inspect user details, and find users by email.' },
-    { label: 'Manage admin access', detail: 'Register manager and admin accounts, plus review creator requests.' },
-    { label: 'Moderate users', detail: 'Approve, reject, demote, ban, unban, activate, or deactivate accounts.' },
-    { label: 'Manage destinations', detail: 'Create, update, assign managers to, or delete destinations.' },
-    { label: 'Control destination images', detail: 'Add destination images and handle destination edit locks.' },
-    { label: 'Review manager reports', detail: 'List all reports and review pending manager reports.' },
+    { label: 'View admin dashboard', detail: 'Open the admin overview at /api/admin/dashboard/overview.', icon: 'dashboard' },
+    { label: 'Manage user accounts', detail: 'View users, inspect user details, and find users by email.', icon: 'groups' },
+    { label: 'Manage admin access', detail: 'Register manager and admin accounts, plus review creator requests.', icon: 'key' },
+    { label: 'Moderate users', detail: 'Approve, reject, demote, ban, unban, activate, or deactivate accounts.', icon: 'shield' },
+    { label: 'Manage destinations', detail: 'Create, update, assign managers to, or delete destinations.', icon: 'location_on' },
+    { label: 'Control destination images', detail: 'Add destination images and handle destination edit locks.', icon: 'image' },
+    { label: 'Review manager reports', detail: 'List all reports and review pending manager reports.', icon: 'article' },
   ];
 
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
@@ -55,6 +56,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   pendingCropFile: File | null = null;
   isSaving = false;
   saveSuccess = false;
+  permissionsModalState: ModalState = 'closed';
   passwordModalState: ModalState = 'closed';
   passwordChangeStep: PasswordChangeStep = 'credentials';
   passwordError = '';
@@ -75,6 +77,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   private pendingCroppedBlob: Blob | null = null;
   private otpExpiryTimerId: number | null = null;
   private otpResendTimerId: number | null = null;
+  private permissionsModalCloseTimerId: number | null = null;
   private passwordModalCloseTimerId: number | null = null;
 
   private static readonly OTP_EXPIRY_SECONDS = 300;
@@ -108,6 +111,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.revokeCropPreviewUrl();
+    this.clearPermissionsModalTimer();
     this.clearPasswordTimers();
     this.unlockBodyScroll();
   }
@@ -293,6 +297,35 @@ export class ProfileComponent implements OnInit, OnDestroy {
     }, 20);
   }
 
+  openPermissionsModal(): void {
+    if (this.permissionsModalState !== 'closed') return;
+
+    this.permissionsModalState = 'opening';
+    this.lockBodyScroll();
+
+    window.setTimeout(() => {
+      if (this.permissionsModalState === 'opening') {
+        this.permissionsModalState = 'open';
+      }
+    }, 20);
+  }
+
+  closePermissionsModal(): void {
+    if (this.permissionsModalState === 'closed') return;
+
+    this.permissionsModalState = 'closing';
+
+    if (this.permissionsModalCloseTimerId) {
+      window.clearTimeout(this.permissionsModalCloseTimerId);
+    }
+
+    this.permissionsModalCloseTimerId = window.setTimeout(() => {
+      this.permissionsModalState = 'closed';
+      this.releaseBodyScrollIfNoModal();
+      this.permissionsModalCloseTimerId = null;
+    }, 220);
+  }
+
   closePasswordModal(forceClose = false): void {
     if (this.passwordModalState === 'closed' || (this.passwordLoading && !forceClose)) {
       return;
@@ -317,7 +350,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
       this.otpDemoCode = '';
       this.otpSecondsRemaining = 0;
       this.otpResendSecondsRemaining = 0;
-      this.unlockBodyScroll();
+      this.releaseBodyScrollIfNoModal();
       this.passwordModalCloseTimerId = null;
     }, 220);
   }
@@ -326,6 +359,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
   onEscapeKey(): void {
     if (this.passwordModalState !== 'closed') {
       this.closePasswordModal();
+    } else if (this.permissionsModalState !== 'closed') {
+      this.closePermissionsModal();
     }
   }
 
@@ -521,6 +556,13 @@ export class ProfileComponent implements OnInit, OnDestroy {
     }
   }
 
+  private clearPermissionsModalTimer(): void {
+    if (this.permissionsModalCloseTimerId !== null) {
+      window.clearTimeout(this.permissionsModalCloseTimerId);
+      this.permissionsModalCloseTimerId = null;
+    }
+  }
+
   private clearOtpExpiryTimer(): void {
     if (this.otpExpiryTimerId !== null) {
       window.clearInterval(this.otpExpiryTimerId);
@@ -541,6 +583,12 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   private unlockBodyScroll(): void {
     document.body.style.overflow = '';
+  }
+
+  private releaseBodyScrollIfNoModal(): void {
+    if (this.passwordModalState === 'closed' && this.permissionsModalState === 'closed') {
+      this.unlockBodyScroll();
+    }
   }
 
   private generateDemoOtpCode(): string {
