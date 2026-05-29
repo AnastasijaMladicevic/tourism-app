@@ -248,6 +248,7 @@
     "title": "My reviews",
     "searchPlaceholder": "Search my reviews...",
     "totalReviews": "{{count}} reviews in total",
+    "perPage": "per page",
     "loadingText": "Preparing your reviews and account statistics.",
     "loadError": "Your reviews are currently unavailable.",
     "emptyTitle": "You don't have any reviews yet",

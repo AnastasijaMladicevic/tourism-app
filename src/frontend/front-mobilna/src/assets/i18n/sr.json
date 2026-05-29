@@ -248,6 +248,7 @@
     "title": "Moji utisci",
     "searchPlaceholder": "Pretraži moje utiske...",
     "totalReviews": "Ukupno {{count}} utisaka",
+    "perPage": "po strani",
     "loadingText": "Pripremamo tvoje utiske i statistiku naloga.",
     "loadError": "Tvoji utisci trenutno nisu dostupni.",
     "emptyTitle": "Još nemaš utisaka",

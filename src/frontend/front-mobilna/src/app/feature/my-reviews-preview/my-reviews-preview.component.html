@@ -69,17 +69,41 @@
         />
       </label>
 
-      <div class="filter-row">
-        @for (filter of filters(); track trackFilter($index, filter)) {
-          <button
-            class="filter-chip"
-            type="button"
-            [class.filter-chip--active]="activeFilter() === filter.value"
-            (click)="setFilter(filter.value)"
-          >
-            {{ filter.label }}
+      <div class="controls-row">
+        <div class="filter-row">
+          @for (filter of filters(); track trackFilter($index, filter)) {
+            <button
+              class="filter-chip"
+              type="button"
+              [class.filter-chip--active]="activeFilter() === filter.value"
+              (click)="setFilter(filter.value)"
+            >
+              {{ filter.label }}
+            </button>
+          }
+        </div>
+
+        <div class="size-selector">
+          <button class="size-selector__btn" type="button" (click)="toggleSizeDropdown()">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M7 12h10M10 18h4"/></svg>
+            <span>{{ pageSize() }} {{ 'myReviews.perPage' | translate }}</span>
+            <svg class="size-selector__chevron" [class.size-selector__chevron--open]="showSizeDropdown()" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
           </button>
-        }
+          @if (showSizeDropdown()) {
+            <div class="size-dropdown">
+              @for (opt of pageSizeOptions; track opt) {
+                <button
+                  class="size-dropdown__item"
+                  type="button"
+                  [class.size-dropdown__item--active]="pageSize() === opt"
+                  (click)="setPageSize(opt)"
+                >
+                  {{ opt }} {{ 'myReviews.perPage' | translate }}
+                </button>
+              }
+            </div>
+          }
+        </div>
       </div>
 
       @if (isLoading()) {
@@ -168,8 +192,18 @@
           }
         </section>
 
-        @if (canLoadMore()) {
-          <button class="load-more-btn" type="button" (click)="loadMore()">{{ 'myReviews.loadMore' | translate }}</button>
+        @if (totalPages() > 1) {
+          <div class="pagination">
+            <button class="pagination__btn" type="button" [disabled]="currentPage() === 1" (click)="prevPage()">
+              <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg>
+              {{ 'common.prev' | translate }}
+            </button>
+            <span class="pagination__info">{{ 'common.pageOf' | translate:{ current: currentPage(), total: totalPages() } }}</span>
+            <button class="pagination__btn" type="button" [disabled]="currentPage() === totalPages()" (click)="nextPage()">
+              {{ 'common.next' | translate }}
+              <svg viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg>
+            </button>
+          </div>
         }
       }
     </div>

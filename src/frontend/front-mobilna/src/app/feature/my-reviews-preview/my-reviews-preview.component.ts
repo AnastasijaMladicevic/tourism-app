@@ -54,7 +54,10 @@ export class MyReviewsPreviewComponent implements OnInit {
   protected readonly errorMessage = signal('');
   protected readonly searchTerm = signal('');
   protected readonly activeFilter = signal('all');
-  protected readonly visibleCount = signal(6);
+  protected readonly currentPage = signal(1);
+  protected readonly pageSize = signal(6);
+  protected readonly showSizeDropdown = signal(false);
+  protected readonly pageSizeOptions = [3, 6, 10];
   protected readonly deletingId = signal<number | null>(null);
 
   protected readonly filters = computed<ReviewFilter[]>(() => {
@@ -77,9 +80,14 @@ export class MyReviewsPreviewComponent implements OnInit {
     });
   });
 
-  protected readonly visibleReviews = computed(() =>
-    this.filteredReviews().slice(0, this.visibleCount()),
+  protected readonly totalPages = computed(() =>
+    Math.max(1, Math.ceil(this.filteredReviews().length / this.pageSize())),
   );
+
+  protected readonly visibleReviews = computed(() => {
+    const start = (this.currentPage() - 1) * this.pageSize();
+    return this.filteredReviews().slice(start, start + this.pageSize());
+  });
 
   protected readonly totalReviews = computed(() =>
     Math.max(this.totalCount(), this.reviews().length),
@@ -169,25 +177,37 @@ export class MyReviewsPreviewComponent implements OnInit {
 
   protected setFilter(filter: string): void {
     this.activeFilter.set(filter);
-    this.visibleCount.set(6);
+    this.currentPage.set(1);
+    this.showSizeDropdown.set(false);
   }
 
   protected setSearch(value: string): void {
     this.searchTerm.set(value);
-    this.visibleCount.set(6);
+    this.currentPage.set(1);
+  }
+
+  protected prevPage(): void {
+    this.currentPage.update((p) => Math.max(1, p - 1));
+  }
+
+  protected nextPage(): void {
+    this.currentPage.update((p) => Math.min(this.totalPages(), p + 1));
+  }
+
+  protected setPageSize(size: number): void {
+    this.pageSize.set(size);
+    this.currentPage.set(1);
+    this.showSizeDropdown.set(false);
+  }
+
+  protected toggleSizeDropdown(): void {
+    this.showSizeDropdown.update((v) => !v);
   }
 
   protected stars(count: number): number[] {
     return Array.from({ length: count }, (_, index) => index);
   }
 
-  protected loadMore(): void {
-    this.visibleCount.update((count) => count + 6);
-  }
-
-  protected canLoadMore(): boolean {
-    return this.filteredReviews().length > this.visibleCount();
-  }
 
   protected hasAnyReviews(): boolean {
     return this.totalReviews() > 0;
