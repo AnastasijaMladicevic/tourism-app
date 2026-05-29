@@ -191,6 +191,7 @@
     "emailInvalid": "Formato de email no válido",
     "passwordRules": "La contraseña debe tener al menos 6 caracteres, una letra mayúscula, un número y un carácter especial.",
     "rememberMe": "Recordarme",
+    "continueWithGoogle": "Continuar con Google",
     "loggingIn": "Iniciando sesión...",
     "logIn": "Iniciar sesión",
     "orContinueWithGoogle": "o continúa con Google",

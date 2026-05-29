@@ -290,3 +290,39 @@ select:-webkit-autofill {
     }
   }
 }
+
+.google-fallback-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  max-width: 320px;
+  height: 50px;
+  padding: 0 20px;
+  border-radius: 20px;
+  border: none;
+  background: var(--surface-strong);
+  color: var(--text-dark);
+  font-family: 'Nunito', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  margin: 0 auto;
+  transition: background 0.2s, border-color 0.2s;
+
+  svg {
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+  }
+
+  span {
+    line-height: 1;
+  }
+
+  &:hover {
+    background: var(--surface-strong);
+    opacity: 0.85;
+  }
+}

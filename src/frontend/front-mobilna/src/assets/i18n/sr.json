@@ -165,7 +165,7 @@
     "more": "Još"
   },
   "home": {
-    "greeting": "Zdravo, drago nam je što ste ponovo tu",
+    "greeting": "Zdravo, drago nam je što si ponovo tu",
     "searchPlaceholder": "Pitaj gde da ideš, šta da vidiš ili gde da jedeš...",
     "chooseRegion": "Izaberi region",
     "categories": "Kategorije",
@@ -191,6 +191,7 @@
     "emailInvalid": "Email format nije ispravan",
     "passwordRules": "Lozinka mora imati najmanje 6 karaktera, jedno veliko slovo, jedan broj i jedan specijalni karakter.",
     "rememberMe": "Zapamti me",
+    "continueWithGoogle": "Prijavi se pomoću Google naloga",
     "loggingIn": "Prijavljivanje...",
     "logIn": "Prijavi se",
     "orContinueWithGoogle": "ili nastavi pomoću Google naloga",

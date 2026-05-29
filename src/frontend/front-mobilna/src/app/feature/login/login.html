@@ -8,27 +8,14 @@
         <app-logo size="lg"></app-logo>
       </div>
     </div>
-    
 
     <div class="form">
       <form [formGroup]="form" (keydown.enter)="submit()">
         <!-- EMAIL -->
-
         <div class="input-group">
           <span class="input-icon">
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
-              <path
-                d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
-              />
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
               <polyline points="22,6 12,13 2,6" />
             </svg>
           </span>
@@ -44,42 +31,30 @@
             }
           </div>
         }
-        <!-- PASSWORD -->
 
+        <!-- PASSWORD -->
         <div class="input-group">
           <span class="input-icon">
-            <svg
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-            >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
               <path d="M7 11V7a5 5 0 0 1 10 0v4" />
             </svg>
           </span>
-
           <input
             [type]="hidePassword ? 'password' : 'text'"
             [placeholder]="'login.password' | translate"
             formControlName="password"
           />
-
           <button class="icon eye" type="button" (click)="togglePassword()">
             {{ hidePassword ? 'visibility_off' : 'visibility' }}
           </button>
         </div>
         @if (password?.touched && password?.invalid) {
           <div class="error">
-            <span>
-              {{ 'login.passwordRules' | translate }}
-            </span>
+            <span>{{ 'login.passwordRules' | translate }}</span>
           </div>
         }
+
         <div class="remember-me">
           <input type="checkbox" formControlName="rememberMe" id="rememberMe" />
           <label for="rememberMe">{{ 'login.rememberMe' | translate }}</label>
@@ -89,39 +64,31 @@
       <button class="login-btn" (click)="submit()" [disabled]="form.invalid || isLoading">
         {{ isLoading ? ('login.loggingIn' | translate) : ('login.logIn' | translate) }}
       </button>
-
       @if (googleClientId) {
         <div class="social-auth">
-          <!-- <div class="social-divider">{{ 'login.orContinueWithGoogle' | translate }}</div> -->
-          <div class="google-button-shell">
-            <div #googleButtonContainer class="google-button-container"></div>
-          </div>
-          @if (googleLoading) {
-            <div class="google-loading">{{ 'common.loading' | translate }}</div>
-          }
+          <button class="google-fallback-btn" type="button" (click)="loginWithGoogleRedirect()">
+            <svg width="18" height="18" viewBox="0 0 48 48">
+              <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+              <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+              <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+              <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+            </svg>
+            <span>{{ 'login.continueWithGoogle' | translate }}</span>
+          </button>
         </div>
       }
 
       @if (errorMessage) {
         <div class="error">{{ errorMessage }}</div>
       }
+
       <p class="links">
         <span class="row">
           {{ 'login.noAccount' | translate }}
           <span class="link signup" (click)="goRegister()">{{ 'login.signUp' | translate }}</span>
         </span>
-
         <span class="link forgot" (click)="goForgot()">{{ 'login.forgotPassword' | translate }}</span>
       </p>
     </div>
-
-    <!-- <div class="footer">
-      By signing in, you agree to our
-      <span>
-        <span class="terms" (click)="goTerms()">Terms of Service</span>
-        and
-        <span class="terms" (click)="goTerms()">Privacy Policy</span>
-      </span>
-    </div> -->
   </div>
 </div>
