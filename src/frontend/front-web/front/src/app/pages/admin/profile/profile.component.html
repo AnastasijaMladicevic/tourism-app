@@ -127,6 +127,49 @@
                     <input id="country" class="form-input" type="text" [(ngModel)]="user.country" />
                   </div>
                 </div>
+
+                <div class="form-group">
+                  <label class="form-label" id="language-label">Language</label>
+                  <div class="language-dropdown" #languageDropdown>
+                    <button
+                      type="button"
+                      class="language-dropdown__trigger"
+                      [class.language-dropdown__trigger--open]="languageMenuOpen"
+                      (click)="toggleLanguageMenu($event)"
+                      aria-haspopup="listbox"
+                      [attr.aria-expanded]="languageMenuOpen"
+                      aria-labelledby="language-label"
+                    >
+                      <mat-icon class="language-dropdown__icon" fontSet="material-icons-outlined">translate</mat-icon>
+                      <span class="language-dropdown__value">{{ selectedLanguageLabel }}</span>
+                      <mat-icon class="language-dropdown__chevron" fontSet="material-icons-outlined">
+                        {{ languageMenuOpen ? 'expand_less' : 'expand_more' }}
+                      </mat-icon>
+                    </button>
+
+                    @if (languageMenuOpen) {
+                      <ul class="language-dropdown__menu" role="listbox" aria-labelledby="language-label">
+                        @for (option of languageOptions; track option.code) {
+                          <li role="presentation">
+                            <button
+                              type="button"
+                              class="language-dropdown__option"
+                              [class.language-dropdown__option--active]="user.language === option.code"
+                              role="option"
+                              [attr.aria-selected]="user.language === option.code"
+                              (click)="selectLanguage(option.code, $event)"
+                            >
+                              <span>{{ option.label }}</span>
+                              @if (user.language === option.code) {
+                                <mat-icon fontSet="material-icons-outlined">check</mat-icon>
+                              }
+                            </button>
+                          </li>
+                        }
+                      </ul>
+                    }
+                  </div>
+                </div>
               </div>
             </div>
 

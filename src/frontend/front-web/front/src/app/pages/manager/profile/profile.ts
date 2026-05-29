@@ -17,6 +17,11 @@ type PasswordChangeStep = 'credentials' | 'otp';
 
 type ModalState = 'closed' | 'opening' | 'open' | 'closing';
 
+type ProfileLanguageOption = {
+  code: string;
+  label: string;
+};
+
 @Component({
   selector: 'app-profile',
   standalone: true,
@@ -40,6 +45,14 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
   ];
 
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
+  @ViewChild('languageDropdown') languageDropdown?: ElementRef<HTMLElement>;
+
+  readonly languageOptions: ProfileLanguageOption[] = [
+    { code: 'sr', label: 'Serbian/Montenegrin' },
+    { code: 'en', label: 'English' },
+    { code: 'es', label: 'Spanish' },
+    { code: 'it', label: 'Italian' },
+  ];
 
   user: UserDto = {
     firstName: '',
@@ -73,6 +86,7 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
   otpDemoCode = '';
   otpSecondsRemaining = 0;
   otpResendSecondsRemaining = 0;
+  languageMenuOpen = false;
 
   private cropPreviewUrl: string | null = null;
   private pendingCroppedBlob: Blob | null = null;
@@ -356,8 +370,43 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
     }, 220);
   }
 
+  get selectedLanguageLabel(): string {
+    const code = (this.user.language ?? 'en').trim();
+    return this.languageOptions.find((option) => option.code === code)?.label ?? 'English';
+  }
+
+  toggleLanguageMenu(event: Event): void {
+    event.stopPropagation();
+    this.languageMenuOpen = !this.languageMenuOpen;
+  }
+
+  selectLanguage(code: string, event: Event): void {
+    event.stopPropagation();
+    this.user.language = code;
+    this.languageMenuOpen = false;
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (!this.languageMenuOpen) {
+      return;
+    }
+
+    const target = event.target as Node;
+    if (this.languageDropdown?.nativeElement.contains(target)) {
+      return;
+    }
+
+    this.languageMenuOpen = false;
+  }
+
   @HostListener('document:keydown.escape')
   onEscapeKey(): void {
+    if (this.languageMenuOpen) {
+      this.languageMenuOpen = false;
+      return;
+    }
+
     if (this.passwordModalState !== 'closed') {
       this.closePasswordModal();
     } else if (this.permissionsModalState !== 'closed') {
