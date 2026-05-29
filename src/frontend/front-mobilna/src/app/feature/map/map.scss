@@ -146,8 +146,13 @@ body.route-navigation-active app-floating-ai-assistant {
 }
 
 .suggestions__scroll::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.22);
+  background: rgba(100, 116, 139, 0.4);
   border-radius: 999px;
+}
+
+.dark .suggestions__scroll::-webkit-scrollbar-thumb,
+.dark-theme .suggestions__scroll::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.22);
 }
 
 .suggestion-item {
@@ -523,6 +528,18 @@ body.route-navigation-active app-floating-ai-assistant {
   display: grid;
   grid-template-columns: 1fr;
   gap: 10px;
+}
+
+.route-planner__my-location-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.route-planner__location-hint {
+  font-size: 0.78rem;
+  color: var(--text-gray);
+  white-space: nowrap;
 }
 
 .route-planner__my-location-btn {

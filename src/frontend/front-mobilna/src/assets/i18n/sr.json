@@ -938,6 +938,7 @@
       "addStop": "Dodaj stanicu",
       "addStopPlaceholder": "Dodaj stanicu ili destinaciju...",
       "useMyLocation": "Koristi moju lokaciju",
+      "locationAlreadyInRoute": "Lokacija je već dodata u rutu",
       "myLocation": "Moja lokacija",
       "notSelected": "Nije izabrano",
       "recenter": "Centriraj ponovo",
@@ -946,7 +947,7 @@
     },
     "addStop": {
       "title": "Dodaj stanicu",
-      "titleToRoute": "Dodaj stanicu na rutu",
+      "titleToRoute": "Dodaj stanicu u rutu",
       "searchPlaceholder": "Pretrazi mesto, adresu ili kategoriju",
       "searchCompactPlaceholder": "Pretrazi mesto...",
       "searchAria": "Pretrazi mesto",

@@ -39,6 +39,11 @@ export class RouteBuilderStateService {
     this.plannerOpen = true;
   }
 
+  prependRoutePoint(point: RouteBuilderPoint): void {
+    this.routePoints = [{ ...point }, ...this.routePoints];
+    this.plannerOpen = true;
+  }
+
   clearPlanner(): void {
     this.routePoints = [];
     this.plannerOpen = false;

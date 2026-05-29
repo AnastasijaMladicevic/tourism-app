@@ -185,6 +185,9 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   private allItems: SearchResult[] = [];
   private readonly subscriptions = new Subscription();
   private shouldCenterOnNextLocation = false;
+  private locationHintTimer: ReturnType<typeof setTimeout> | null = null;
+  private readonly GPS_CONSENT_PENDING_KEY = 'spirego-gps-consent-pending';
+  showLocationAlreadyInRouteHint = false;
   private searchDebounceTimer: ReturnType<typeof setTimeout> | null = null;
   private routeSearchDebounceTimer: ReturnType<typeof setTimeout> | null = null;
   private addStopPanelSearchDebounceTimer: ReturnType<typeof setTimeout> | null = null;
@@ -315,6 +318,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         this.isTracking = this.locationTrackingService.isTrackingEnabled();
         this.applyTrackedLocation(this.locationTrackingService.getCurrentLocation());
         this.restoreRouteBuilderState();
+        this.checkPendingLocationConsentAndApply();
         this.scheduleViewportStabilization();
         if (!state?.lat || !state?.lng) {
           this.focusActiveRegion();
@@ -329,10 +333,16 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     this.isDestroyed = true;
     this.routeCalculationVersion++;
+    this.activeFilters = [];
+    this.applyFilters();
     window.removeEventListener('map-marker-clicked', this.handleMapMarkerClicked);
     this.detachViewportListeners();
     this.clearViewportStabilizationTimers();
     this.subscriptions.unsubscribe();
+    if (this.locationHintTimer) {
+      clearTimeout(this.locationHintTimer);
+      this.locationHintTimer = null;
+    }
     if (this.searchDebounceTimer) {
       clearTimeout(this.searchDebounceTimer);
       this.searchDebounceTimer = null;
@@ -381,6 +391,9 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
   openLocationConsentSettings(): void {
     this.showLocationConsentPrompt = false;
+    if (typeof sessionStorage !== 'undefined') {
+      sessionStorage.setItem(this.GPS_CONSENT_PENDING_KEY, '1');
+    }
     void this.router.navigate(['/location-settings'], {
       queryParams: { locationConsent: '1' },
     });
@@ -1679,19 +1692,36 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
+    const hasGpsInRoute = this.routePoints.some((p) => this.isGpsRoutePoint(p));
+
     if (this.isRouteNavigationActive && !this.isNavigationAutoCenterEnabled) {
-      this.resumeRouteNavigationAutoCenter();
+      if (hasGpsInRoute) {
+        this.resumeRouteNavigationAutoCenter();
+      } else {
+        const firstPoint = this.routePoints[0];
+        const map = this.mapService.getMap();
+        if (firstPoint && map) {
+          map.flyTo(L.latLng(firstPoint.lat, firstPoint.lng), 14, { duration: 0.9 });
+        }
+      }
       return;
     }
 
     this.closeLocationConsentPrompt();
+
     this.isRouteNavigationActive = true;
-    this.isNavigationAutoCenterEnabled = this.isTracking;
+    this.isNavigationAutoCenterEnabled = hasGpsInRoute && this.isTracking;
     this.exitMapStopPicking();
     this.syncRouteNavigationPageState(true);
 
-    if (this.userLocation) {
+    if (hasGpsInRoute && this.userLocation) {
       this.focusNavigationOnLocation(this.userLocation);
+    } else {
+      const firstPoint = this.routePoints[0];
+      const map = this.mapService.getMap();
+      if (firstPoint && map) {
+        map.flyTo(L.latLng(firstPoint.lat, firstPoint.lng), 14, { duration: 0.9 });
+      }
     }
 
     void this.calculateRoute({ preserveViewport: true });
@@ -1702,10 +1732,20 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
-    this.isNavigationAutoCenterEnabled = true;
+    const hasGpsInRoute = this.routePoints.some((p) => this.isGpsRoutePoint(p));
+    this.isNavigationAutoCenterEnabled = hasGpsInRoute && this.isTracking;
 
-    if (this.userLocation) {
+    if (hasGpsInRoute && this.userLocation) {
       this.focusNavigationOnLocation(this.userLocation, true);
+      return;
+    }
+
+    if (!hasGpsInRoute) {
+      const firstPoint = this.routePoints[0];
+      const map = this.mapService.getMap();
+      if (firstPoint && map) {
+        map.flyTo(L.latLng(firstPoint.lat, firstPoint.lng), 14, { duration: 0.9 });
+      }
       return;
     }
 
@@ -1910,13 +1950,52 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
+    const alreadyInRoute = this.routePoints.some((p) => this.isGpsRoutePoint(p));
+    if (alreadyInRoute) {
+      this.showLocationAlreadyInRouteHint = true;
+      if (this.locationHintTimer) clearTimeout(this.locationHintTimer);
+      this.locationHintTimer = setTimeout(() => {
+        this.showLocationAlreadyInRouteHint = false;
+        this.cdr.detectChanges();
+      }, 2500);
+      this.cdr.detectChanges();
+      return;
+    }
+
     const locationPoint = this.createMyLocationRoutePoint();
     if (!locationPoint) {
       this.openLocationConsentPrompt();
       return;
     }
 
-    this.appendRoutePoint(locationPoint, { disableMapPickingAfterAdd: true });
+    this.prependRoutePoint(locationPoint);
+  }
+
+  private prependRoutePoint(routePoint: RoutePoint): void {
+    this.openRoutePlannerForEditing();
+    this.routePoints = [routePoint, ...this.routePoints];
+    this.routeBuilderStateService.updateRoutePoints(this.routePoints);
+    this.syncRoutePointMarkers();
+    if (this.routePoints.length >= 2) {
+      void this.calculateRoute();
+    }
+    this.cdr.detectChanges();
+  }
+
+  private checkPendingLocationConsentAndApply(): void {
+    if (typeof sessionStorage === 'undefined') return;
+    if (!sessionStorage.getItem(this.GPS_CONSENT_PENDING_KEY)) return;
+    if (!this.isTracking || !this.userLocation) return;
+
+    sessionStorage.removeItem(this.GPS_CONSENT_PENDING_KEY);
+
+    const alreadyInRoute = this.routePoints.some((p) => this.isGpsRoutePoint(p));
+    if (alreadyInRoute) return;
+
+    const locationPoint = this.createMyLocationRoutePoint();
+    if (!locationPoint) return;
+
+    this.prependRoutePoint(locationPoint);
   }
 
   openAddStopPanel(): void {
@@ -2306,7 +2385,8 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private syncActiveRouteNavigation(latlng: L.LatLng): void {
     const routeChanged = this.syncNavigationRouteOrigin(latlng);
-    if (this.isNavigationAutoCenterEnabled) {
+    const hasGpsInRoute = this.routePoints.some((p) => this.isGpsRoutePoint(p));
+    if (this.isNavigationAutoCenterEnabled && hasGpsInRoute) {
       this.focusNavigationOnLocation(latlng);
     }
 

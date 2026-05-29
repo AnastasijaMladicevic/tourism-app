@@ -938,6 +938,7 @@
       "addStop": "Add Stop",
       "addStopPlaceholder": "Add a stop or destination...",
       "useMyLocation": "Use my location",
+      "locationAlreadyInRoute": "Location is already in the route",
       "myLocation": "My Location",
       "notSelected": "Not selected",
       "recenter": "Re-center",

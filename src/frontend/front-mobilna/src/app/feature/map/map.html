@@ -167,10 +167,15 @@
             </button>
           </div>
 
-          <button class="route-planner__my-location-btn" type="button" (click)="useMyLocation()">
-            <mat-icon>my_location</mat-icon>
-            {{ 'map.routePlanner.useMyLocation' | translate }}
-          </button>
+          <div class="route-planner__my-location-row">
+            <button class="route-planner__my-location-btn" type="button" (click)="useMyLocation()">
+              <mat-icon>my_location</mat-icon>
+              {{ 'map.routePlanner.useMyLocation' | translate }}
+            </button>
+            @if (showLocationAlreadyInRouteHint) {
+              <span class="route-planner__location-hint">{{ 'map.routePlanner.locationAlreadyInRoute' | translate }}</span>
+            }
+          </div>
 
           <div
             cdkDropList
