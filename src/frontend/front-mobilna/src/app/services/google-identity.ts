@@ -8,8 +8,14 @@ declare global {
           initialize: (options: {
             client_id: string;
             callback: (response: { credential?: string }) => void;
+            auto_select?: boolean;
+            cancel_on_tap_outside?: boolean;
+            context?: string;
+            ux_mode?: string;
+            use_fedcm_for_prompt?: boolean;
           }) => void;
           renderButton: (element: HTMLElement, options: Record<string, unknown>) => void;
+          prompt?: (momentListener?: (notification: unknown) => void) => void;
           cancel?: () => void;
         };
       };
@@ -20,6 +26,57 @@ declare global {
 @Injectable({ providedIn: 'root' })
 export class GoogleIdentityService {
   private scriptPromise: Promise<void> | null = null;
+
+  async initializeForCustomButton(
+    clientId: string,
+    onCredential: (credential: string) => void,
+  ): Promise<boolean> {
+    if (!clientId || typeof window === 'undefined') return false;
+
+    try {
+      await this.loadScript();
+    } catch {
+      return false;
+    }
+
+    const google = window.google?.accounts?.id;
+    if (!google) return false;
+
+    google.initialize({
+      client_id: clientId,
+      callback: (response) => {
+        if (response?.credential) {
+          onCredential(response.credential);
+        }
+      },
+      auto_select: false,
+      cancel_on_tap_outside: true,
+    });
+
+    return true;
+  }
+
+  promptSignIn(): boolean {
+    const google = window.google?.accounts?.id;
+    if (typeof google?.prompt !== 'function') return false;
+    google.prompt();
+    return true;
+  }
+
+  async renderButtonOrFallback(
+    container: HTMLElement,
+    clientId: string,
+    onCredential: (credential: string) => void,
+    text: 'signin_with' | 'signup_with' | 'continue_with' = 'continue_with',
+  ): Promise<boolean> {
+    try {
+      await this.renderButton(container, clientId, onCredential, text);
+    } catch {
+      return false;
+    }
+    await new Promise<void>((r) => setTimeout(r, 300));
+    return !!container.querySelector('iframe');
+  }
 
   async renderButton(
     container: HTMLElement,

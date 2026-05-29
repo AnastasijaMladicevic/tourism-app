@@ -208,7 +208,7 @@
     "subtitle1": "Provide the email address linked with your account",
     "subtitle2": "to reset your password",
     "emailPlaceholder": "Enter your email",
-    "hint": "Please enter your registered email",
+    "hint": "Enter your registered email",
     "submit": "Request Password Reset Link",
     "sending": "Sending...",
     "errors": {

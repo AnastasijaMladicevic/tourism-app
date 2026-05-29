@@ -208,7 +208,7 @@
     "subtitle1": "Introduce el correo asociado a tu cuenta",
     "subtitle2": "para restablecer tu contraseña",
     "emailPlaceholder": "Introduce tu correo",
-    "hint": "Por favor introduce tu correo registrado",
+    "hint": "Introduce tu correo registrado",
     "submit": "Solicitar enlace de restablecimiento",
     "sending": "Enviando...",
     "errors": {

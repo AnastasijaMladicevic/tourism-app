@@ -291,14 +291,14 @@ select:-webkit-autofill {
   }
 }
 
-.google-btn-container {
+.google-gis-container {
   width: 100%;
   display: flex;
   justify-content: center;
   min-height: 44px;
 
-  iframe {
-    border-radius: 20px !important;
+  &--hidden {
+    display: none;
   }
 }
 

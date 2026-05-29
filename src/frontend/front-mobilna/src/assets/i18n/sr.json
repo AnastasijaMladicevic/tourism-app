@@ -205,16 +205,16 @@
   },
   "forgotPassword": {
     "title": "Zaboravljena lozinka",
-    "subtitle1": "Unesite email adresu povezanu sa vašim nalogom",
-    "subtitle2": "da biste resetovali lozinku",
-    "emailPlaceholder": "Unesite vaš email",
-    "hint": "Molimo unesite registrovani email",
+    "subtitle1": "Unesi email adresu povezanu sa tvojim nalogom",
+    "subtitle2": "da bi resetovao lozinku",
+    "emailPlaceholder": "Unesi tvoj email",
+    "hint": "Unesi registrovani email",
     "submit": "Zatraži link za reset lozinke",
     "sending": "Slanje...",
     "errors": {
       "emailRequired": "Email je obavezan",
       "emailInvalid": "Neispravan format email adrese",
-      "generic": "Došlo je do greške. Pokušajte ponovo."
+      "generic": "Došlo je do greške. Pokušaj ponovo."
     }
   },
   "newCredentials": {
@@ -338,9 +338,9 @@
     "moderator": "Zatraži dozvolu za moderatora",
     "about": "O nama",
     "logout": "Odjavi se",
-    "visitedTitle": "BILA SAM TU",
+    "visitedTitle": "BIO SAM TU",
     "visitedEmpty": "Još nema potvrđenih poseta. Kada se približiš destinaciji ili lokalitetu uz uključen GPS, ovde će se pojaviti.",
-    "beenThere": "Bila sam tu",
+    "beenThere": "Bio sam tu",
     "visitedDestination": "Destinacija",
     "visitedLocality": "Lokalitet",
     "shareLocationTitle": "PODELI LOKACIJU",

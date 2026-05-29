@@ -1,4 +1,4 @@
-import { Component, ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
+import { Component, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -25,15 +25,15 @@ import { environment } from '../../../environment/environment';
   templateUrl: './login.html',
   styleUrl: './login.scss',
 })
-export class LoginComponent {
-  @ViewChild('googleBtnContainer', { static: false }) googleBtnContainerRef?: ElementRef<HTMLDivElement>;
-
+export class LoginComponent implements OnDestroy {
   form: FormGroup;
   hidePassword = true;
   isLoading = false;
   errorMessage = '';
   returnUrl = '/home';
   googleClientId: string | null = null;
+  private googlePopupListener: ((e: MessageEvent) => void) | null = null;
+  private googlePopupCheckInterval: ReturnType<typeof setInterval> | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -129,43 +129,60 @@ export class LoginComponent {
     });
   }
 
+  signInWithGoogle(): void {
+    if (!this.googleClientId) return;
+
+    const nonce = Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
+    const redirectUri = `${window.location.origin}/auth/google/callback`;
+    const url = new URL('https://accounts.google.com/o/oauth2/v2/auth');
+    url.searchParams.set('client_id', this.googleClientId);
+    url.searchParams.set('redirect_uri', redirectUri);
+    url.searchParams.set('response_type', 'id_token');
+    url.searchParams.set('scope', 'openid email profile');
+    url.searchParams.set('nonce', nonce);
+    url.searchParams.set('prompt', 'select_account');
+
+    this.cleanupGooglePopup();
+
+    const popup = window.open(url.toString(), 'google-signin', 'width=500,height=620,top=100,left=200');
+
+    this.googlePopupListener = (event: MessageEvent) => {
+      if (event.origin !== window.location.origin) return;
+      if (event.data?.type !== 'google-id-token') return;
+      this.cleanupGooglePopup();
+      const idToken = event.data.idToken as string;
+      if (idToken) this.handleGoogleCredential(idToken);
+    };
+
+    window.addEventListener('message', this.googlePopupListener);
+
+    this.googlePopupCheckInterval = setInterval(() => {
+      if (popup?.closed) this.cleanupGooglePopup();
+    }, 1000);
+  }
+
+  private cleanupGooglePopup(): void {
+    if (this.googlePopupListener) {
+      window.removeEventListener('message', this.googlePopupListener);
+      this.googlePopupListener = null;
+    }
+    if (this.googlePopupCheckInterval) {
+      clearInterval(this.googlePopupCheckInterval);
+      this.googlePopupCheckInterval = null;
+    }
+  }
+
   private loadGoogleAuthSettings(): void {
     this.authService.getPublicAuthSettings().subscribe({
       next: (settings) => {
         this.googleClientId = settings.googleClientId?.trim() || environment.googleClientId || null;
         this.cdr.detectChanges();
-        this.scheduleGoogleButtonRender();
       },
       error: () => {
         this.googleClientId = environment.googleClientId || null;
         this.cdr.detectChanges();
-        this.scheduleGoogleButtonRender();
       },
     });
-  }
-
-  private scheduleGoogleButtonRender(): void {
-    if (!this.googleClientId) return;
-    setTimeout(() => void this.renderGoogleButton(), 50);
-  }
-
-  private async renderGoogleButton(): Promise<void> {
-    if (!this.googleClientId) return;
-    const container = this.googleBtnContainerRef?.nativeElement
-      ?? document.getElementById('google-btn-container') as HTMLDivElement | null;
-    if (!container) return;
-
-    try {
-      await this.googleIdentityService.renderButton(
-        container,
-        this.googleClientId,
-        (credential) => this.handleGoogleCredential(credential),
-        'signin_with',
-      );
-      this.cdr.detectChanges();
-    } catch (err) {
-      console.error('Google Sign-In render failed:', err);
-    }
   }
 
   private handleGoogleCredential(idToken: string): void {
@@ -205,6 +222,10 @@ export class LoginComponent {
         window.dispatchEvent(new CustomEvent('add-to-planner', { detail: action.payload }));
         break;
     }
+  }
+
+  ngOnDestroy(): void {
+    this.cleanupGooglePopup();
   }
 
   goBack(): void { this.routerHistory.goBack(); }

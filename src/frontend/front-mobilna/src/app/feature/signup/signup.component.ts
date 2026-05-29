@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, HostListener, OnDestroy } from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
@@ -27,9 +27,7 @@ interface SignupLanguageOption {
   templateUrl: './signup.component.html',
   styleUrl: './signup.component.scss',
 })
-export class SignupComponent {
-  @ViewChild('googleButtonContainer') private googleButtonContainer?: ElementRef<HTMLElement>;
-
+export class SignupComponent implements OnDestroy {
   private readonly phonePattern = /^\+?[0-9][0-9\s/-]{5,19}$/;
   showLanguageMenu = false;
   isLoading = false;
@@ -37,8 +35,8 @@ export class SignupComponent {
   hidePassword = true;
   hideConfirmPassword = true;
   googleClientId: string | null = null;
-  googleLoading = false;
-  private viewReady = false;
+  private googlePopupListener: ((e: MessageEvent) => void) | null = null;
+  private googlePopupCheckInterval: ReturnType<typeof setInterval> | null = null;
 
   form;
   protected readonly languageOptions: SignupLanguageOption[];
@@ -75,11 +73,6 @@ export class SignupComponent {
     }));
 
     this.loadGoogleAuthSettings();
-  }
-
-  ngAfterViewInit(): void {
-    this.viewReady = true;
-    this.scheduleGoogleButtonRender();
   }
 
   private passwordStrengthValidator(control: AbstractControl): ValidationErrors | null {
@@ -174,52 +167,64 @@ export class SignupComponent {
       });
   }
 
+  ngOnDestroy(): void {
+    this.cleanupGooglePopup();
+  }
+
+  signInWithGoogle(): void {
+    if (!this.googleClientId) return;
+
+    const nonce = Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
+    const redirectUri = `${window.location.origin}/auth/google/callback`;
+    const url = new URL('https://accounts.google.com/o/oauth2/v2/auth');
+    url.searchParams.set('client_id', this.googleClientId);
+    url.searchParams.set('redirect_uri', redirectUri);
+    url.searchParams.set('response_type', 'id_token');
+    url.searchParams.set('scope', 'openid email profile');
+    url.searchParams.set('nonce', nonce);
+    url.searchParams.set('prompt', 'select_account');
+
+    this.cleanupGooglePopup();
+
+    const popup = window.open(url.toString(), 'google-signup', 'width=500,height=620,top=100,left=200');
+
+    this.googlePopupListener = (event: MessageEvent) => {
+      if (event.origin !== window.location.origin) return;
+      if (event.data?.type !== 'google-id-token') return;
+      this.cleanupGooglePopup();
+      const idToken = event.data.idToken as string;
+      if (idToken) this.registerWithGoogle(idToken);
+    };
+
+    window.addEventListener('message', this.googlePopupListener);
+
+    this.googlePopupCheckInterval = setInterval(() => {
+      if (popup?.closed) this.cleanupGooglePopup();
+    }, 1000);
+  }
+
+  private cleanupGooglePopup(): void {
+    if (this.googlePopupListener) {
+      window.removeEventListener('message', this.googlePopupListener);
+      this.googlePopupListener = null;
+    }
+    if (this.googlePopupCheckInterval) {
+      clearInterval(this.googlePopupCheckInterval);
+      this.googlePopupCheckInterval = null;
+    }
+  }
+
   private loadGoogleAuthSettings(): void {
     this.authService.getPublicAuthSettings().subscribe({
       next: (settings) => {
         this.googleClientId = settings.googleClientId?.trim() || environment.googleClientId || null;
         this.cdr.detectChanges();
-        this.scheduleGoogleButtonRender();
       },
       error: () => {
         this.googleClientId = environment.googleClientId || null;
         this.cdr.detectChanges();
-        this.scheduleGoogleButtonRender();
       },
     });
-  }
-
-  private scheduleGoogleButtonRender(): void {
-    setTimeout(() => {
-      void this.tryRenderGoogleButton();
-    }, 0);
-  }
-
-  private async tryRenderGoogleButton(): Promise<void> {
-    if (!this.viewReady || !this.googleClientId) {
-      return;
-    }
-
-    if (!this.googleButtonContainer?.nativeElement) {
-      this.scheduleGoogleButtonRender();
-      return;
-    }
-
-    this.googleLoading = true;
-
-    try {
-      await this.googleIdentityService.renderButton(
-        this.googleButtonContainer.nativeElement,
-        this.googleClientId,
-        (credential) => this.registerWithGoogle(credential),
-        'signup_with',
-      );
-    } catch {
-      this.googleClientId = null;
-    } finally {
-      this.googleLoading = false;
-      this.cdr.detectChanges();
-    }
   }
 
   private registerWithGoogle(idToken: string): void {
