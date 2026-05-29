@@ -789,12 +789,19 @@ namespace TuristickiVodic.API.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var isActive = dto.State == UserAccountState.Active;
-            var result = await _userService.ToggleUserActiveAsync(id, isActive);
-            if (!result)
-                return NotFound();
+            try
+            {
+                var isActive = dto.State == UserAccountState.Active;
+                var result = await _userService.ToggleUserActiveAsync(id, isActive);
+                if (!result)
+                    return NotFound();
 
-            return Ok(new { message = $"User {(isActive ? "activated" : "deactivated")} successfully" });
+                return Ok(new { message = $"User {(isActive ? "activated" : "deactivated")} successfully" });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
         // Samo Admin može da briše korisnike, ali ne i sam sebe

@@ -114,6 +114,16 @@
                     [attr.d]="internalChartLineAdmins"
                     class="chart-line chart-line--team-admin"
                   />
+                  <rect
+                    *ngFor="let zone of internalChartHoverZones"
+                    class="chart-hover-zone"
+                    [attr.x]="zone.x"
+                    y="0"
+                    [attr.width]="zone.width"
+                    height="100"
+                  >
+                    <title>{{ zone.title }}</title>
+                  </rect>
                 </svg>
                 <div class="chart-empty" *ngIf="internalChartIsEmpty">
                   No new admin, manager, or content-creator accounts in the last {{ chartDays }} days (from loaded team).
@@ -207,6 +217,16 @@
                     [attr.d]="touristChartLineSignups"
                     class="chart-line chart-line--signups"
                   />
+                  <rect
+                    *ngFor="let zone of touristChartHoverZones"
+                    class="chart-hover-zone"
+                    [attr.x]="zone.x"
+                    y="0"
+                    [attr.width]="zone.width"
+                    height="100"
+                  >
+                    <title>{{ zone.title }}</title>
+                  </rect>
                 </svg>
                 <div class="chart-empty" *ngIf="touristChartIsEmpty">
                   No tourist registrations in the last {{ chartDays }} days to chart by country.

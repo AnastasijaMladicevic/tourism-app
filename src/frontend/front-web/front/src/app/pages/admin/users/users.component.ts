@@ -45,6 +45,12 @@ interface OriginsPieSlice {
   shareLabel: string;
 }
 
+interface ChartHoverZone {
+  x: number;
+  width: number;
+  title: string;
+}
+
 const MAX_USER_LIST_PAGES = 40;
 const MAX_REVIEW_LIST_PAGES = 25;
 const USERS_LOAD_TIMEOUT_MS = 90_000;
@@ -108,6 +114,7 @@ export class UsersComponent implements OnInit {
   internalChartIsEmpty = false;
   internalChartSubtitle = '';
   internalChartXLabels: { label: string }[] = [];
+  internalChartHoverZones: ChartHoverZone[] = [];
   readonly gridLineYs = [0, 25, 50, 75, 100];
 
   /** Tourist tab: geography-focused chart (signups vs distinct origin countries per day). */
@@ -120,6 +127,7 @@ export class UsersComponent implements OnInit {
   touristChartIsEmpty = false;
   touristChartSubtitle = '';
   touristChartXLabels: { label: string }[] = [];
+  touristChartHoverZones: ChartHoverZone[] = [];
 
   /** KPIs when Tourists tab is selected. */
   touristKpiTotal = 0;
@@ -1258,6 +1266,12 @@ export class UsersComponent implements OnInit {
     this.touristChartLineDistinctOrigins = this.buildLinePath(dailyDistinctOrigins, this.touristChartMaxY);
     this.touristChartAreaSignups = this.buildAreaPath(dailySignups, this.touristChartMaxY);
     this.touristChartXLabels = this.buildChartXLabels(CHART_DAYS);
+    const touristDayLabels = this.buildChartDayLabels(CHART_DAYS);
+    this.touristChartHoverZones = this.buildChartHoverZones(
+      touristDayLabels,
+      (index) =>
+        `${touristDayLabels[index]} · Signups: ${dailySignups[index]} · Distinct origins: ${dailyDistinctOrigins[index]}`
+    );
   }
 
   /** Per day, count distinct non-empty origin countries among tourists who registered that day. */
@@ -1324,6 +1338,12 @@ export class UsersComponent implements OnInit {
     this.internalChartLineManagers = this.buildLinePath(dailyManagers, this.internalChartMaxY);
     this.internalChartLineCreators = this.buildLinePath(dailyCreators, this.internalChartMaxY);
     this.internalChartXLabels = this.buildChartXLabels(CHART_DAYS);
+    const internalDayLabels = this.buildChartDayLabels(CHART_DAYS);
+    this.internalChartHoverZones = this.buildChartHoverZones(
+      internalDayLabels,
+      (index) =>
+        `${internalDayLabels[index]} · Admins: ${dailyAdmins[index]} · Managers: ${dailyManagers[index]} · Content creators: ${dailyCreators[index]}`
+    );
   }
 
   private buildDailyBucketsFromUsers(users: AdminUserListItemDto[], days: number): number[] {
@@ -1357,18 +1377,36 @@ export class UsersComponent implements OnInit {
   }
 
   private buildChartXLabels(days: number): { label: string }[] {
+    const labels = this.buildChartDayLabels(days);
+    const indices = [0, Math.floor(days / 4), Math.floor(days / 2), Math.floor((3 * days) / 4), days - 1];
+    const unique = [...new Set(indices)].filter((i) => i >= 0 && i < days).sort((a, b) => a - b);
+    return unique.map((i) => ({ label: labels[i] }));
+  }
+
+  private buildChartDayLabels(days: number): string[] {
     const now = new Date();
     const start = new Date(now);
     start.setHours(0, 0, 0, 0);
     start.setDate(now.getDate() - (days - 1));
     const fmt = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' });
-    const indices = [0, Math.floor(days / 4), Math.floor(days / 2), Math.floor((3 * days) / 4), days - 1];
-    const unique = [...new Set(indices)].filter((i) => i >= 0 && i < days).sort((a, b) => a - b);
-    return unique.map((i) => {
+    return Array.from({ length: days }, (_, i) => {
       const d = new Date(start);
       d.setDate(start.getDate() + i);
-      return { label: fmt.format(d) };
+      return fmt.format(d);
     });
+  }
+
+  private buildChartHoverZones(days: string[], titleForIndex: (index: number) => string): ChartHoverZone[] {
+    if (!days.length) {
+      return [];
+    }
+
+    const width = 100 / days.length;
+    return days.map((_, index) => ({
+      x: index * width,
+      width,
+      title: titleForIndex(index),
+    }));
   }
 
   private buildLinePath(values: number[], maxY: number): string {

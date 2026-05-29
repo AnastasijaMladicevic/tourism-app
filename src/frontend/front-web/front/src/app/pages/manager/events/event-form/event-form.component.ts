@@ -251,6 +251,12 @@ export class ManagerEventFormComponent implements OnInit, OnDestroy {
   }
 
   private resolveCreatorName(event: EventDto): void {
+    const directName = event.createdByFullName?.trim();
+    if (directName) {
+      this.createdByName = directName;
+      return;
+    }
+
     if (!event.createdByUserId) {
       this.createdByName = '';
       return;

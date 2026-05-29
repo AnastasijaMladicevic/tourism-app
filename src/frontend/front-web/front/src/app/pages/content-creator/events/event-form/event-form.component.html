@@ -54,23 +54,29 @@
         <div class="gallery-card-head">
           <span class="step-tag">STEP 1</span>
           <h2>Media Gallery</h2>
-          <p class="gallery-intro">Paste public image URLs and choose a primary cover image.</p>
+          <p class="gallery-intro">Upload up to 8 images and choose a primary cover image.</p>
         </div>
 
         <div class="gallery-dropzone">
-          <p class="dropzone-title">Add Photo URL</p>
-          <p class="dropzone-copy">Images are attached after the event is saved via the image endpoint.</p>
+          <p class="dropzone-title">Add Photos</p>
+          <p class="dropzone-copy">Choose local image files or drop them here. They are uploaded after the event is saved.</p>
 
           <div class="dropzone-input-row">
             <input
-              type="url"
+              type="text"
               class="form-control"
-              [(ngModel)]="pendingImageUrl"
-              [ngModelOptions]="{ standalone: true }"
-              placeholder="https://example.com/event-banner.jpg"
-              (keydown.enter)="$event.preventDefault(); addImageUrl()"
+              [value]="imageUrls.length ? imageUrls.length + ' image(s) selected' : 'Select one or more image files...'"
+              readonly
             />
-            <button type="button" class="primary-btn" (click)="addImageUrl()">Add Photo</button>
+            <button type="button" class="primary-btn" (click)="galleryFileInput.click()">Add Photo</button>
+            <input
+              #galleryFileInput
+              type="file"
+              accept="image/*"
+              multiple
+              hidden
+              (change)="onGalleryFilesSelected($event)"
+            />
           </div>
         </div>
 
@@ -91,7 +97,7 @@
         } @else {
           <div class="image-preview-empty">
             <span class="material-symbols-outlined">image</span>
-            <p>Add at least one image URL above. Images are saved when you create or update the event.</p>
+            <p>Add one or more image files above. Images are saved when you create or update the event.</p>
           </div>
         }
       </div>

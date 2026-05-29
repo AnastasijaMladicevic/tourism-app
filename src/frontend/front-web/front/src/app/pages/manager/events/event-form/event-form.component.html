@@ -273,8 +273,12 @@
         <article class="creator-card">
           <div class="creator-avatar">{{ creatorInitials }}</div>
           <div>
-            <strong>Creator</strong>
-            <p class="sidebar-muted">{{ creatorDisplayName }}</p>
+            @if (createdByName.trim()) {
+              <strong>Created by {{ creatorDisplayName }}</strong>
+            } @else {
+              <strong>Creator</strong>
+              <p class="sidebar-muted">{{ creatorDisplayName }}</p>
+            }
             @if (creatorTimeline) {
               <p>{{ creatorTimeline }}</p>
             }

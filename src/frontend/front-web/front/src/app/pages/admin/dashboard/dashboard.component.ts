@@ -133,6 +133,7 @@ export class DashboardComponent implements OnInit {
   topDestinationRows: TopDestinationRow[] = [];
   regionVisitRows: RegionVisitRow[] = [];
   mapDestinations: DestinationDto[] = [];
+  selectedMapDestination: DestinationDto | null = null;
   mapComponentId = 'admin-dashboard-map-0';
   private mapRenderVersion = 0;
 
@@ -171,6 +172,19 @@ export class DashboardComponent implements OnInit {
       (this.overview?.destinationEngagement.ratedDestinations ?? 0) > 0
     );
   }
+
+  get selectedMapDestinationSummary(): string {
+    if (!this.selectedMapDestination) {
+      return 'Click a marker to see which destination it represents.';
+    }
+
+    const region = this.selectedMapDestination.regionName?.trim();
+    return region
+      ? `${this.selectedMapDestination.name} · ${region}`
+      : this.selectedMapDestination.name;
+  }
+
+  onMapDestinationSelected(_: DestinationDto): void {}
 
   private loadOverview(): void {
     this.isLoading = true;
@@ -266,6 +280,7 @@ export class DashboardComponent implements OnInit {
     this.topDestinationRows = [];
     this.regionVisitRows = [];
     this.mapDestinations = [];
+    this.selectedMapDestination = null;
   }
 
   private bindUserGrowth(overview: AdminDashboardOverviewDto): void {
@@ -405,6 +420,7 @@ export class DashboardComponent implements OnInit {
       .map((point) => ({
         id: point.destinationId,
         name: point.destinationName,
+        mapPopupVariant: 'label',
         latitude: point.latitude,
         longitude: point.longitude,
         isActive: true,
@@ -413,6 +429,7 @@ export class DashboardComponent implements OnInit {
         regionId: point.regionId,
         regionName: point.regionName,
       }));
+    this.selectedMapDestination = null;
     this.mapRenderVersion += 1;
     this.mapComponentId = `admin-dashboard-map-${this.mapRenderVersion}`;
   }

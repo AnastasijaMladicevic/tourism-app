@@ -184,6 +184,25 @@ export class ActivitiesService {
     return this.http.put<ActivityDto>(`${this.apiUrl}/${id}`, dto);
   }
 
+  addImage(activityId: number, file: File, isMain = false, altText?: string): Observable<ActivityImageDto> {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('isMain', String(isMain));
+    if (altText?.trim()) {
+      formData.append('altText', altText.trim());
+    }
+
+    return this.http.post<ActivityImageDto>(`${this.apiUrl}/${activityId}/images`, formData);
+  }
+
+  deleteImageById(imageId: number): Observable<void> {
+    return this.http.delete<void>(`${environment.apiUrl}/images/${imageId}`);
+  }
+
+  setMainImage(imageId: number): Observable<ActivityImageDto> {
+    return this.http.patch<ActivityImageDto>(`${environment.apiUrl}/images/${imageId}/set-main`, {});
+  }
+
   delete(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }

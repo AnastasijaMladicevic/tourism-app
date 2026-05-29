@@ -1,5 +1,5 @@
 import { CommonModule, Location } from '@angular/common';
-import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -34,7 +34,7 @@ type WorkingDayKey = 'pon' | 'uto' | 'sre' | 'cet' | 'pet' | 'sub' | 'ned';
   templateUrl: './object-create.component.html',
   styleUrl: './object-create.component.css'
 })
-export class ObjectCreateComponent implements OnInit {
+export class ObjectCreateComponent implements OnInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
@@ -82,12 +82,13 @@ export class ObjectCreateComponent implements OnInit {
   objectId: number | null = null;
   private deletionRequestSubmitted = false;
   private loadedObject: ObjectDto | null = null;
+  private readonly maxImageCount = 8;
 
-  /** Pending URL input (same pattern as Add Activity). */
-  pendingImageUrl = '';
-
-  /** Ordered gallery URLs; index 0 is the primary cover image. */
+  /** Read-only gallery used in manager review mode. */
   imageUrls: string[] = [];
+  /** Editable gallery used in content creator mode. */
+  editableImageUrls: string[] = [];
+  private readonly pendingImageFiles = new Map<string, File>();
   selectedReviewImageUrl = '';
 
   /** Last-known server image rows for this object (used to delete/update on save). */
@@ -139,6 +140,10 @@ export class ObjectCreateComponent implements OnInit {
     nedOpen: this.fb.nonNullable.control(''),
     nedClose: this.fb.nonNullable.control('')
   });
+
+  ngOnDestroy(): void {
+    this.releasePendingImagePreviews();
+  }
 
   ngOnInit(): void {
     this.isManagerReview = this.route.snapshot.data['managerReview'] === true;
@@ -465,52 +470,65 @@ export class ObjectCreateComponent implements OnInit {
     return this.form.controls.latitude.value != null && this.form.controls.longitude.value != null;
   }
 
-  addImageUrl(): void {
+  get hasEditableImages(): boolean {
+    return this.editableImageUrls.length > 0;
+  }
+
+  onGalleryFilesSelected(event: Event): void {
     if (this.isManagerReview) {
       return;
     }
 
-    const url = this.pendingImageUrl.trim();
-    if (!url) {
+    const input = event.target as HTMLInputElement;
+    const selectedFiles = Array.from(input.files ?? []).filter((file) => file.type.startsWith('image/'));
+    if (!selectedFiles.length) {
       return;
     }
 
-    if (!this.isValidHttpUrl(url)) {
-      this.errorMessage = 'Please enter a valid image URL (http or https).';
+    const remainingSlots = this.maxImageCount - this.editableImageUrls.length;
+    if (remainingSlots <= 0) {
+      this.errorMessage = `You can upload up to ${this.maxImageCount} images per object.`;
+      input.value = '';
       return;
     }
 
-    if (this.imageUrls.includes(url)) {
-      this.pendingImageUrl = '';
-      return;
+    const acceptedFiles = selectedFiles.slice(0, remainingSlots);
+    for (const file of acceptedFiles) {
+      const previewUrl = URL.createObjectURL(file);
+      this.pendingImageFiles.set(previewUrl, file);
+      this.editableImageUrls.push(previewUrl);
     }
 
-    this.imageUrls.push(url);
-    this.pendingImageUrl = '';
-    this.errorMessage = '';
+    this.errorMessage =
+      acceptedFiles.length < selectedFiles.length
+        ? `Only the first ${remainingSlots} images were added. Each object can have up to ${this.maxImageCount} images.`
+        : '';
+
+    input.value = '';
   }
 
   removeImage(index: number): void {
     if (this.isManagerReview) {
       return;
     }
-    if (index < 0 || index >= this.imageUrls.length) {
+    if (index < 0 || index >= this.editableImageUrls.length) {
       return;
     }
 
-    this.imageUrls.splice(index, 1);
+    const [removedUrl] = this.editableImageUrls.splice(index, 1);
+    this.revokePendingPreview(removedUrl);
   }
 
   setPrimaryImage(index: number): void {
     if (this.isManagerReview) {
       return;
     }
-    if (index <= 0 || index >= this.imageUrls.length) {
+    if (index <= 0 || index >= this.editableImageUrls.length) {
       return;
     }
 
-    const [selected] = this.imageUrls.splice(index, 1);
-    this.imageUrls.unshift(selected);
+    const [selected] = this.editableImageUrls.splice(index, 1);
+    this.editableImageUrls.unshift(selected);
   }
 
   selectReviewImage(url: string): void {
@@ -706,7 +724,7 @@ export class ObjectCreateComponent implements OnInit {
       .pipe(
         switchMap((obj) => {
           if (this.isEditMode && this.objectId) {
-            return this.syncImagesAfterSave(this.objectId, this.imageUrls, this.imagesSnapshot).pipe(map(() => obj));
+            return this.syncImagesAfterSave(this.objectId, this.editableImageUrls, this.imagesSnapshot).pipe(map(() => obj));
           }
           return this.attachImagesAfterCreate(obj as ObjectDto);
         }),
@@ -725,11 +743,11 @@ export class ObjectCreateComponent implements OnInit {
   }
 
   private attachImagesAfterCreate(created: ObjectDto): Observable<ObjectDto> {
-    if (this.imageUrls.length === 0) {
+    if (this.editableImageUrls.length === 0) {
       return of(created);
     }
 
-    return this.objectService.attachImages(created.id, this.imageUrls).pipe(
+    return this.uploadPendingImages(created.id, this.editableImageUrls, 0).pipe(
       map(() => created),
       catchError(() => of(created))
     );
@@ -744,17 +762,15 @@ export class ObjectCreateComponent implements OnInit {
     snapshot: ObjectImageDto[]
   ): Observable<void> {
     const desired = desiredOrdered.map((u) => u.trim()).filter((u) => u.length > 0);
-    const desiredSet = new Set(desired);
+    const desiredExistingSet = new Set(desired.filter((url) => !this.pendingImageFiles.has(url)));
 
-    const toDelete = snapshot.filter((img) => !desiredSet.has(img.url.trim()));
-    const surviving = snapshot.filter((img) => desiredSet.has(img.url.trim()));
+    const toDelete = snapshot.filter((img) => !desiredExistingSet.has(img.url.trim()));
+    const surviving = snapshot.filter((img) => desiredExistingSet.has(img.url.trim()));
 
     const urlToId = new Map<string, number>();
     for (const img of surviving) {
       urlToId.set(img.url.trim(), img.id);
     }
-
-    const toAddOrdered = desired.filter((u) => !urlToId.has(u));
 
     const delete$ =
       toDelete.length === 0
@@ -765,27 +781,8 @@ export class ObjectCreateComponent implements OnInit {
           );
 
     return delete$.pipe(
-      switchMap(() => {
-        let pendingCount = surviving.length;
-
-        if (toAddOrdered.length === 0) {
-          return this.ensureMainImage(desired, urlToId);
-        }
-
-        return from(toAddOrdered).pipe(
-          concatMap((url) => {
-            const isMain = pendingCount === 0;
-            pendingCount++;
-            return this.objectService.addImage(objectId, { url, isMain }).pipe(
-              tap((dto) => {
-                urlToId.set(url.trim(), dto.id);
-              })
-            );
-          }),
-          toArray(),
-          switchMap(() => this.ensureMainImage(desired, urlToId))
-        );
-      })
+      switchMap(() => this.uploadPendingImages(objectId, desired, surviving.length, urlToId)),
+      switchMap((updatedMap) => this.ensureMainImage(desired, updatedMap))
     );
   }
 
@@ -805,13 +802,54 @@ export class ObjectCreateComponent implements OnInit {
     );
   }
 
-  private isValidHttpUrl(value: string): boolean {
-    try {
-      const parsed = new URL(value);
-      return parsed.protocol === 'http:' || parsed.protocol === 'https:';
-    } catch {
-      return false;
+  private uploadPendingImages(
+    objectId: number,
+    desiredOrdered: string[],
+    existingCount: number,
+    urlToId = new Map<string, number>()
+  ): Observable<Map<string, number>> {
+    const pendingEntries = desiredOrdered
+      .filter((url) => this.pendingImageFiles.has(url))
+      .map((previewUrl) => ({
+        previewUrl,
+        file: this.pendingImageFiles.get(previewUrl)!
+      }));
+
+    if (pendingEntries.length === 0) {
+      return of(urlToId);
     }
+
+    return from(pendingEntries).pipe(
+      concatMap((entry, index) =>
+        this.objectService.addImage(objectId, entry.file, existingCount === 0 && index === 0).pipe(
+          tap((dto) => {
+            urlToId.set(entry.previewUrl, dto.id);
+          })
+        )
+      ),
+      toArray(),
+      map(() => urlToId)
+    );
+  }
+
+  private revokePendingPreview(previewUrl: string | undefined): void {
+    if (!previewUrl || !this.pendingImageFiles.has(previewUrl)) {
+      return;
+    }
+
+    this.pendingImageFiles.delete(previewUrl);
+    if (previewUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(previewUrl);
+    }
+  }
+
+  private releasePendingImagePreviews(): void {
+    for (const previewUrl of this.pendingImageFiles.keys()) {
+      if (previewUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(previewUrl);
+      }
+    }
+    this.pendingImageFiles.clear();
   }
 
   private loadOptions(): void {
@@ -941,7 +979,7 @@ export class ObjectCreateComponent implements OnInit {
     }
 
     const main = o.mainImageUrl?.trim();
-    if (main && /^https?:\/\//i.test(main)) {
+    if (main) {
       return [main];
     }
     return [];
@@ -985,8 +1023,14 @@ export class ObjectCreateComponent implements OnInit {
     this.deletionRequestSubmitted = !!objectItem.hasPendingDeletionRequest;
     const imgs = objectItem.images ?? [];
     this.imagesSnapshot = imgs.map((i) => ({ ...i }));
-    this.imageUrls = this.buildOrderedImageUrls(objectItem);
-    this.selectedReviewImageUrl = this.imageUrls[0] ?? '';
+    const orderedImageUrls = this.buildOrderedImageUrls(objectItem);
+    if (this.isManagerReview) {
+      this.imageUrls = orderedImageUrls;
+      this.selectedReviewImageUrl = this.imageUrls[0] ?? '';
+    } else {
+      this.releasePendingImagePreviews();
+      this.editableImageUrls = orderedImageUrls;
+    }
 
     this.form.patchValue(
       {
@@ -1084,11 +1128,12 @@ export class ObjectCreateComponent implements OnInit {
     return Number.isFinite(n) ? n : null;
   }
 
-  /**
-   * Full name is not returned on object DTOs. When the signed-in user owns the object,
-   * use profile from session; otherwise we cannot resolve another user's name without a BE field or admin API.
-   */
   private resolveCreatorDisplayName(o: ObjectDto): string {
+    const apiName = o.createdByFullName?.trim();
+    if (apiName) {
+      return apiName;
+    }
+
     const uid = this.normalizeOptionalId(o.createdByUserId);
     const me = this.authService.getCurrentUser();
     if (uid != null && me?.id != null && Number(me.id) === uid) {

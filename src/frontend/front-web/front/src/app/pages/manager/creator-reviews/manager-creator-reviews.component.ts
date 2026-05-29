@@ -369,6 +369,15 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
     return this.initials(fullName);
   }
 
+  creatorScopeSummary(creatorId: number): string {
+    const objectCount = this.creatorObjectCounts.get(creatorId) ?? 0;
+    if (objectCount > 0) {
+      return `${objectCount} object${objectCount === 1 ? '' : 's'} in your destinations`;
+    }
+
+    return 'Active in your destinations';
+  }
+
   private loadManagedDestinationLabel(): void {
     this.destinationService
       .getAll({ page: 1, pageSize: 100, sortBy: 'name', sortOrder: 'asc' }, { bypassRegion: true })
@@ -543,7 +552,7 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
       return known;
     }
 
-    return `Content creator #${creatorId}`;
+    return 'Unknown creator';
   }
 
   private resolveMissingCreatorNames(creatorIds: number[]): void {
@@ -598,7 +607,7 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
       return false;
     }
 
-    return !/^Content creator #\d+$/i.test(name);
+    return !/^unknown creator$/i.test(name);
   }
 
   private applyCreatorNamesToThreads(): void {

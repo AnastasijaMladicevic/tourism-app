@@ -2431,7 +2431,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.igalo@spirego.com'),
  NOW(), NOW(), NOW()),
 
- ('Igralište Lovćen National Park', 'Dečije igralište u prirodnom ambijentu Nacionalnog parka Lovćen', 'Lovćen National Park, Cetinje', NULL, NULL,
+ ('Igralište Lovćen', 'Dečije igralište u prirodnom ambijentu Nacionalnog parka Lovćen', 'Lovćen National Park, Cetinje', NULL, NULL,
  NULL, NULL, '{"pon":"00:00-24:00","uto":"00:00-24:00","sre":"00:00-24:00","cet":"00:00-24:00","pet":"00:00-24:00","sub":"00:00-24:00","ned":"00:00-24:00"}',
  NULL, ARRAY['Drvene sprave', 'Klackalice', 'Ljuljaške', 'Priroda'], ST_SetSRID(ST_MakePoint(18.79377, 42.39303), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Igralište'),
@@ -5207,15 +5207,15 @@ VALUES
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Miločer Park'),
  3, 'Ok, ali više za šetnju nego igru.', NOW()),
 
--- Igralište Lovćen National Park
+-- Igralište Lovćen
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Lovćen National Park'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Lovćen'),
  5, 'Neverovatan pogled i priroda.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Lovćen National Park'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Lovćen'),
  4, 'Lepo iskustvo, ali vetrovito.', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Lovćen National Park'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Lovćen'),
  3, 'Zanimljivo, ali nije klasično igralište.', NOW()),
 
 
@@ -5762,641 +5762,622 @@ VALUES
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "DestinationId", "CreatedAt")
 VALUES
 (
-    'https://afar.brightspotcdn.com/dims4/default/3a97ce6/2147483647/strip/false/crop/1600x800+0+0/resize/1486x743!/quality/90/?url=https%3A%2F%2Fk3-prod-afar-media.s3.us-west-2.amazonaws.com%2Fbrightspot%2Ff4%2F0e%2Fabb2c7bf50f46954835d19e83029%2Foriginal-956aea8bdeae0f9b8479b054a6ff8e85.jpg',
+    '/images/entity_images/destinations/cf69c13b1e9118af7fcf850f.jpg',
     'Kotor',
     true,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
     NOW()),
 (
-    'https://www.mojacrnagora.rs/wp-content/uploads/2018/08/Kotor-Stari-Grad-02-1024x682.jpg',
+    '/images/entity_images/destinations/9d3634e002f98858abaed423.jpg',
     'Kotor',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
     NOW()),
 (
-    'https://images.myguide-cdn.com/montenegro/companies/kotor-stari-grad/large/kotor-stari-grad-81619.jpg',
+    '/images/entity_images/destinations/b803f7ed4f96a95416207c9e.jpg',
     'Kotor',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
     NOW()),
 (
-    'https://kofer.info/wp-content/uploads/2020/03/shutterstock_1703935768.jpg',
+    '/images/entity_images/destinations/530375aff179c4f09ed80170.jpg',
     'Kotor',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
     NOW()),
 (
-    'https://www.portomontenegro.com/wp-content/uploads/2022/04/faruk-kaymak-b_e5K7B3MzQ-unsplash-2-1-960x800.jpg',
+    '/images/entity_images/destinations/c0b638edcedfc6e2b5e5d372.jpg',
     'Kotor',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/d/d4/%D0%91%D0%BE%D0%BA%D0%B0_%D0%9A%D0%BE%D1%82%D0%BE%D1%80%D1%81%D0%BA%D0%B0_%D0%BD%D0%BE%D1%9B%D1%83.jpg',
+    '/images/entity_images/destinations/7de14cbca1aa950d8f774358.jpg',
     'Kotorski zaliv',
     true,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotorski zaliv'),
     NOW()),
 (
-    'https://casadelmare.me/img/79-slider-558621_356092237777763_285909338129387_945137_1930249661_n.jpg',
+    '/images/entity_images/destinations/f4f750f515918b8407069a43.jpg',
     'Kotorski zaliv',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotorski zaliv'),
     NOW()),
 (
-    'https://www.montenegrosubmarine.me/assets/images/img/Boka%20Bay%20222.jpg',
+    '/images/entity_images/destinations/7536e28024ba1971b542974f.jpg',
     'Kotorski zaliv',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotorski zaliv'),
     NOW()),
 (
-    'https://rtcg.me/upload/media/2022/4/15/1194081/image00020.jpeg',
+    '/images/entity_images/destinations/7584abe6c9a69f81cf991e03.jpg',
     'Kotorski zaliv',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotorski zaliv'),
     NOW()),
 (
-    'https://casadelmare.me/img/79-pagegallery-nature-3232601.jpg',
+    '/images/entity_images/destinations/7304c5c6329cd598a96e2c0f.jpg',
     'Kotorski zaliv',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotorski zaliv'),
     NOW()),
 (
-    'https://casadelmare.me/img/boka2opti.jpg',
-    'Kotorski zaliv',
-    false,
-    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotorski zaliv'),
-    NOW()),
-(
-    'https://cdn.getyourguide.com/img/tour/d0e7aad0b9468ab05df7bfe45c64e847fb78b5169d162c26cfd2a925689c7eda.jpeg/99.jpg',
+    '/images/entity_images/destinations/0d5c434cf5c6652d8c900fb8.jpg',
     'Budva',
     true,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Budva_%281%29.jpg/1280px-Budva_%281%29.jpg',
+    '/images/entity_images/destinations/beb4afec40cf75c17fbd4e68.jpg',
     'Budva',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
     NOW()),
 (
-    'https://img.travelnaut.com/web/db/photose/location/eu/me/budva/d5425c5cac459175ff14316cd2c2f82b.jpeg?format=webp&width=3840&quality=75',
+    '/images/entity_images/destinations/ab1bad1b05358f427a3a38ef.jpg',
     'Budva',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
     NOW()),
 (
-    'https://cdn.relax.si/source/destinations/budva_481b6cb9-1a47-440d-870d-de6afad89fe4.webp',
+    '/images/entity_images/destinations/03850b3d01ad40e7ea52101f.jpg',
     'Budva',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
     NOW()),
 (
-    'https://www.halotours.rs/core/media/budva-stari-grad-1.jpg',
+    '/images/entity_images/destinations/a56a920918101329b9273cee.jpg',
     'Budva',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
     NOW()),
 (
-    'https://b3992170.smushcdn.com/3992170/wp-content/uploads/2024/11/Budva-Featured-1200x900.jpg?lossy=2&strip=1&webp=1',
+    '/images/entity_images/destinations/24ca4ffc8d4db1a58884e84e.jpg',
     'Budva',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
     NOW()),
 (
-    'https://kofer.info/wp-content/uploads/2020/02/shutterstock_191127089.jpg',
+    '/images/entity_images/destinations/85d789cd633e065e96d57ced.jpg',
     'Budva',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
     NOW()),
 (
-    'https://butuaresidence.com/wp-content/uploads/2018/03/988242_20190203050212_5c566a9bb7896801fb658cf0jpeg_ls.jpg',
+    '/images/entity_images/destinations/aa9415b676ef2288b317cbed.jpg',
     'Budva',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
     NOW()),
 (
-    'https://kamenovo.me/wp-content/uploads/2020/07/budva-stari-grad.jpg',
+    '/images/entity_images/destinations/4744f5950eb93800e206634c.jpg',
     'Budva',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2025/06/08/00/5651288_ricardova-glava_ls.jpg',
+    '/images/entity_images/destinations/4b6d601eaee7fa4aeac2a624.jpg',
     'Budva',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
     NOW()),
 (
-    'https://www.mtlrentacar.com/uploads/5dd410b39156f.jpg',
+    '/images/entity_images/destinations/30fd0a97295bf4faa7bb9fb1.jpg',
     'Durmitor',
     true,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Durmitor'),
     NOW()),
 (
-    'https://srbijazamlade.rs/fajlovi/productitem/194_638c9bed0dfdf.jpg',
+    '/images/entity_images/destinations/da64d92eb4e56358733b1698.jpg',
     'Durmitor',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Durmitor'),
     NOW()),
 (
-    'https://montours.me/wp-content/uploads/2024/11/National-Park-Durmitor-Trip-.jpg',
+    '/images/entity_images/destinations/5d5a0103643922db216baa47.jpg',
     'Durmitor',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Durmitor'),
     NOW()),
 (
-    'https://explore-serbia.rs/wp-content/uploads/2023/03/Crno-jezero-Durmitor.jpg',
+    '/images/entity_images/destinations/b0135345f0133f3a84fc589d.jpg',
     'Durmitor',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Durmitor'),
     NOW()),
 (
-    'https://nparkovi.me/educational_corner/durmitor/images/npark-durmitor-01.jpg',
+    '/images/entity_images/destinations/82ce3d410b432364a866b74a.jpg',
     'Durmitor',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Durmitor'),
     NOW()),
 (
-    'https://www.funtravelnis.rs/wp-content/uploads/2017/11/durmitor-2.jpg',
+    '/images/entity_images/destinations/54519e6edf82a074d366b9ab.jpg',
     'Durmitor',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Durmitor'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Sveti_Stefan_(06).jpg/1280px-Sveti_Stefan_(06).jpg',
+    '/images/entity_images/destinations/b8857341b36e07b8f396046d.jpg',
     'Sveti Stefan',
     true,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Sveti Stefan'),
     NOW()),
 (
-    'https://i.ytimg.com/vi/GqaIdM-zQcc/maxresdefault.jpg',
+    '/images/entity_images/destinations/cb15f0cf697a09660ff8b113.jpg',
     'Sveti Stefan',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Sveti Stefan'),
     NOW()),
 (
-    'https://i0.wp.com/sarajevotimes.com/wp-content/uploads/2025/06/IMG_4573.jpeg?fit=670%2C446&ssl=1',
+    '/images/entity_images/destinations/ebc4a26482cd358f16308551.jpg',
     'Sveti Stefan',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Sveti Stefan'),
     NOW()),
 (
-    'https://thetwirlingtraveler.nl/wp-content/uploads/2023/08/IMG_1174.jpg',
+    '/images/entity_images/destinations/7381fbaf497cb3d426cd700e.jpg',
     'Sveti Stefan',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Sveti Stefan'),
     NOW()),
 (
-    'https://cf.bstatic.com/xdata/images/hotel/max1024x768/328531171.jpg?k=deadf8ac55f804730deed83810ba03bf3bae80ce63d4ba5132bbaea59e55bbd4&o=',
+    '/images/entity_images/destinations/7a44d52c7693226fd92ddcff.jpg',
     'Sveti Stefan',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Sveti Stefan'),
     NOW()),
 (
-    'https://img.freepik.com/premium-photo/sveti-stefan-island-near-budva-montenegro-luxury-resort-with-beautiful-beach-adriatic-sea-famous-travel-destination_545689-5403.jpg',
+    '/images/entity_images/destinations/dd50f6c5be798a74e77bf468.jpg',
     'Sveti Stefan',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Sveti Stefan'),
     NOW()),
 (
-    'https://www.pelago.com/img/collections/podgorica/0614-0301_podgorica-large.jpg',
+    '/images/entity_images/destinations/f243ac711fa0049324094b13.jpg',
     'Podgorica',
     true,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Podgorica'),
     NOW()),
 (
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQqTPvjpUP6lwFTZ6ncPwS33xZWGDuKo8UN6w&s',
+    '/images/entity_images/destinations/857768f19db7a7b6e9ea12cd.jpg',
     'Podgorica',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Podgorica'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/4/4b/PodgoricaOverview.jpg',
+    '/images/entity_images/destinations/acbdcd7bcff82e34b4b3f512.jpg',
     'Podgorica',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Podgorica'),
     NOW()),
 (
-    'https://d37rmf1ynyg9aw.cloudfront.net/fit-in/1280x1280/data/v4/resources/images/736413d4-55f2-4775-bbc9-0db59d457858.jpg',
+    '/images/entity_images/destinations/4cdbc47b13d4fb7df4e478b5.jpg',
     'Podgorica',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Podgorica'),
     NOW()),
 (
-    'https://images.trvl-media.com/place/10048/00b6d9ee-0ab8-44e6-8080-8e12858437b4.jpg',
+    '/images/entity_images/destinations/9096315ea53a3baff4d0d6f4.jpg',
     'Podgorica',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Podgorica'),
     NOW()),
 (
-    'https://cdn.airmontenegro.com/public/media/library/2026/01/20260116_141458_flight-belgrade-podgorica.webp',
+    '/images/entity_images/destinations/e03fff5f9f5b17ba078ad265.jpg',
     'Podgorica',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Podgorica'),
     NOW()),
 (
-    'https://idsb.tmgrup.com.tr/ly/uploads/images/2023/04/03/265755.jpg',
+    '/images/entity_images/destinations/7dc676734b3ee991dee97aca.jpg',
     'Herceg Novi',
     true,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Herceg Novi'),
     NOW()),
 (
-    'https://hercegnovi.travel/images/app/stari-grad.jpg',
+    '/images/entity_images/destinations/3c5b8b587de70d1cb7447a94.jpg',
     'Herceg Novi',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Herceg Novi'),
     NOW()),
 (
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRu9l8gWkFoJXuTFICuqvCXqLSqTI19OeTQrg&s',
+    '/images/entity_images/destinations/13d7b100cb3f11f695e77411.jpg',
     'Herceg Novi',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Herceg Novi'),
     NOW()),
 (
-    'https://b2cservice.kontiki.rs/media/images/location/0/595/534',
+    '/images/entity_images/destinations/39eb834a04569ac251c0db51.jpg',
     'Herceg Novi',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Herceg Novi'),
     NOW()),
 (
-    'https://novaontheroad.com/wp-content/uploads/2024/09/things-to-do-in-herceg-novi10.png',
+    '/images/entity_images/destinations/6cdec4214db9b7db96059f95.jpg',
     'Herceg Novi',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Herceg Novi'),
     NOW()),
 (
-    'https://www.visit-montenegro.com/wp-content/uploads/2026/01/Depositphotos_668449212_XL-scaled.jpg',
+    '/images/entity_images/destinations/ad1f578ea98129b2daee848c.jpg',
     'Bar',
     true,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Bar'),
     NOW()),
 (
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ4peM4e7ivXjmLQe1x1PGXrnVapOK5k9ixWw&s',
+    '/images/entity_images/destinations/7eddf2f34c94cc60d6410650.jpg',
     'Bar',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Bar'),
     NOW()),
 (
-    'https://bar.me/wp-content/uploads/geografski-polozaj.jpg',
+    '/images/entity_images/destinations/f732f72bbe25aac3c66bd3c6.jpg',
     'Bar',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Bar'),
     NOW()),
 (
-    'https://www.olympic.rs/wp-content/uploads/Bar-1.jpg',
+    '/images/entity_images/destinations/6a22a26681b67fb0c967cb68.jpg',
     'Bar',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Bar'),
     NOW()),
 (
-    'https://apartmani-crna-gora.me/files/thumbnail/barrrrrrrrrrrr%20(1).jpg',
+    '/images/entity_images/destinations/c348d43feac3758115423c5d.jpg',
     'Bar',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Bar'),
     NOW()),
 (
-    'https://www.travelland.rs/wp-content/uploads/Bar-CG.jpg',
+    '/images/entity_images/destinations/8b53875c1ab2e42c108708db.jpg',
     'Bar',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Bar'),
     NOW()),
 (
-    'https://ulcinj.travel/wp-content/uploads/2024/02/47.jpg',
+    '/images/entity_images/destinations/0ec9bf29c1441eca0fdba36d.jpg',
     'Ulcinj',
     true,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Ulcinj'),
     NOW()),
 (
-    'https://tvsensor.com/wp-content/uploads/2025/05/ulcinj-castle-during-1024x633-1.jpg',
+    '/images/entity_images/destinations/1d3a34703b06c79dab2be51e.jpg',
     'Ulcinj',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Ulcinj'),
     NOW()),
 (
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT_P5n_UZEjenN5H9UYadcGrsjSLVnJACoylQ&s',
+    '/images/entity_images/destinations/b2e8b6198df3f1401f501953.jpg',
     'Ulcinj',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Ulcinj'),
     NOW()),
 (
-    'https://gte-gcms.images.tshiftcdn.com/AI0DIWHkBQZyx6oBkSd3hz/resize=width:2048,fit:max/dd3OMz6gRqiIyc6u5M9v?crop=1.91%3A1&fit=crop&width=1200',
+    '/images/entity_images/destinations/5f5b56980819e60cc17b7749.jpg',
     'Ulcinj',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Ulcinj'),
     NOW()),
 (
-    'https://www.unesco.org/sites/default/files/structured_data/cce001/7874280_cetinje-3.jpg',
+    '/images/entity_images/destinations/fca1182e332e867c54a78bc5.jpg',
     'Cetinje',
     true,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Cetinje'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/11/91/02/43/caption.jpg?w=1200&h=700&s=1',
+    '/images/entity_images/destinations/7f74fdd37d31d7d330193439.jpg',
     'Cetinje',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Cetinje'),
     NOW()),
 (
-    'https://komunalnocetinje.me/files/slideshow/1677505382-slide1-min.JPG',
+    '/images/entity_images/destinations/bb8aec8398831c979b9896a1.jpg',
     'Cetinje',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Cetinje'),
     NOW()),
 (
-    'https://s3.eu-central-1.amazonaws.com/web.repository/gradska-static/static-images/06_cetinje/cetinje_hero_1920x1080.jpg',
+    '/images/entity_images/destinations/bd09f70743ca5df1ff3a6b35.jpg',
     'Cetinje',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Cetinje'),
     NOW()),
 (
-    'https://rtnk.me/wp-content/uploads/2023/11/Niksic-foto-Milan-Sapuric-22-3.jpg',
+    '/images/entity_images/destinations/32c40b30feaa536165e37974.jpg',
     'Nikšić',
     true,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Nikšić'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/d/d3/Nikšić.jpg',
+    '/images/entity_images/destinations/643b2f168b60ac87f2467c75.jpg',
     'Nikšić',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Nikšić'),
     NOW()),
 (
-    'https://rtnk.me/wp-content/uploads/2025/08/niksic-rtnk.jpg',
+    '/images/entity_images/destinations/33a5cc4b22465c0ab84844da.jpg',
     'Nikšić',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Nikšić'),
     NOW()),
 (
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQWVeb5mWVFUHrP0NE5AEUvRAJATkTuTocOqA&s',
+    '/images/entity_images/destinations/98a7c7946b73658fd1eb8d3b.jpg',
     'Nikšić',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Nikšić'),
     NOW()),
 (
-    'https://diplomacyandcommerce.me/wp-content/uploads/2025/12/Diplomacy-and-Commerce-Montenegro-niksic-2030-capital-of-culture.jpeg',
+    '/images/entity_images/destinations/2a4e3e50f05277402a64a046.jpg',
     'Nikšić',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Nikšić'),
     NOW()),
 (
-    'https://opstinativat.me/wp-content/uploads/2020/09/DJI_0022-1-1100x450.jpg',
+    '/images/entity_images/destinations/4f0bc7f4481bcc5a2bf4d7e1.jpg',
     'Tivat',
     true,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Tivat'),
     NOW()),
 (
-    'https://mymagicearth.com/wp-content/uploads/2020/12/Post-Image_Tivat-the-Town-with-a-Modern-Porto-Montenegro-scaled.jpg',
+    '/images/entity_images/destinations/c93b1271b4aa06267e37526b.jpg',
     'Tivat',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Tivat'),
     NOW()),
 (
-    'https://www.visit-montenegro.com/wp-content/uploads/2026/01/tivat-aerial-scaled.jpg',
+    '/images/entity_images/destinations/e80e773e7f2607c8dc5753c8.jpg',
     'Tivat',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Tivat'),
     NOW()),
 (
-    'https://www.b92.net/data/images/2024-05-04/23696_shutterstock-1248509359_f.jpg',
+    '/images/entity_images/destinations/4f9d5ceb77187e600992a89e.jpg',
     'Tivat',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Tivat'),
     NOW()),
 (
-    'https://www.montenegro.travel/imagine_cache/900x900/uploads/1_MICE/tivat.jpg',
+    '/images/entity_images/destinations/e5fc58ee7e692cda53f73bef.jpg',
     'Tivat',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Tivat'),
     NOW()),
 (
-    'https://tosamja.media/wp-content/uploads/2024/08/tivat-luka-porto-montenegro.jpg',
+    '/images/entity_images/destinations/ee7e416dc4e3ed4fbcee26ca.jpg',
     'Tivat',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Tivat'),
     NOW()),
 (
-    'https://montenegrovillas.com/storage/app/uploads/public/635/658/ea1/635658ea10bce141065334.webp',
+    '/images/entity_images/destinations/a701955d9d1082eaa3c2c572.jpg',
     'Tivat',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Tivat'),
     NOW()),
 (
-    'https://ocdn.eu/pulscms-transforms/1/3fjktkpTURBXy85YjhmOTMwYzFjYzQ2MDZhYTNmYmRmYmIxZmYxYzVhMC5qcGeRkwXNBLDNA4Q',
+    '/images/entity_images/destinations/cdc30cb3729cd689c03fca34.jpg',
     'Igalo',
     true,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Igalo'),
     NOW()),
 (
-    'https://forzatravel.rs/fajlovi/productitem/institut-dr-simo-milosevic-844.jpg',
+    '/images/entity_images/destinations/a1d9b5d620c61930c8d04ade.jpg',
     'Igalo',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Igalo'),
     NOW()),
 (
-    'https://igalospa.com/wp-content/uploads/2019/07/podvodna-tus-masaza-institut-igalo.jpg',
+    '/images/entity_images/destinations/21fe3328f54822622689227b.jpg',
     'Igalo',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Igalo'),
     NOW()),
 (
-    'https://startravelnis.rs/wp-content/uploads/2022/02/igalo-institut-simo-14.jpg',
+    '/images/entity_images/destinations/1eba343742d8c759048d4227.jpg',
     'Igalo',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Igalo'),
     NOW()),
 (
-    'https://beaches-searcher.com/images/beaches/499201004/ME201004.jpg',
-    'Igalo',
-    false,
-    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Igalo'),
-    NOW()),
-(
-    'https://www.portomontenegro.com/wp-content/uploads/2022/05/Lovćen23-1.jpg',
+    '/images/entity_images/destinations/b6b1a3b65c161973669fe28f.jpg',
     'Lovćen',
     true,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Lovćen'),
     NOW()),
 
 (
-    'https://upload.wikimedia.org/wikipedia/commons/2/20/Jezerski_vrh_na_Lovćenu_-_Njegosev_mauzolej_08.jpg',
+    '/images/entity_images/destinations/3bd97ff6f6b50e4e6427ae6e.jpg',
     'Lovćen',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Lovćen'),
     NOW()),
 
 (
-    'https://nparkovi.me/educational_corner/Lovćen/images/npark-Lovćen-03.jpg',
+    '/images/entity_images/destinations/136dedf267e2c5d8e8522358.jpg',
     'Lovćen',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Lovćen'),
     NOW()),
 
 (
-    'https://360monte.me/wp-content/uploads/2024/03/kotor-to-Lovćen-6396-original.jpg',
+    '/images/entity_images/destinations/27606615e7547db658a19795.jpg',
     'Lovćen',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Lovćen'),
     NOW()),
 
 (
-    'https://visitcetinje.com/lat/wp-content/uploads/2024/10/Lovćen.jpg',
-    'Lovćen',
-    false,
-    (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Lovćen'),
-    NOW()),
-
-(
-    'https://upload.wikimedia.org/wikipedia/commons/b/b6/Lac_de_Shkodra.jpg',
+    '/images/entity_images/destinations/a9b9ce40bbb20a4bdbf65f14.jpg',
     'Skadarsko jezero',
     true,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Skadarsko jezero'),
     NOW()),
 
 (
-    'https://srbijazamlade.rs/fajlovi/product/skadarsjo-jezero-248_6424454f74cf6.jpg',
+    '/images/entity_images/destinations/38456d19a9d3f4b8bc81034a.jpg',
     'Skadarsko jezero',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Skadarsko jezero'),
     NOW()),
 
 (
-    'https://www.atlantixtravel.com/cdn/shop/files/awesome-view-of-skadar-lake-surrounded-by-green-mo_64e5f424-3326-48b2-be39-f44ce82a8216.jpg?v=1686938493&width=1946',
+    '/images/entity_images/destinations/bf98c033f67913913bfabb95.jpg',
     'Skadarsko jezero',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Skadarsko jezero'),
     NOW()),
 
 (
-    'https://nparkovi.me/storage/images/news/1768068289.jpg',
+    '/images/entity_images/destinations/a4f4f0db7d2287421c567319.jpg',
     'Skadarsko jezero',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Skadarsko jezero'),
     NOW()),
 
 (
-    'https://bokascooter.com/wp-content/uploads/2024/02/skadarsko-jezero.jpg',
+    '/images/entity_images/destinations/8e049c8740dc7010b1ae1c12.jpg',
     'Skadarsko jezero',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Skadarsko jezero'),
     NOW()),
 
 (
-    'https://upload.wikimedia.org/wikipedia/commons/0/0e/Kola%C5%A1in_Town_Center.jpg',
+    '/images/entity_images/destinations/12136e8bff9c75a4fd0e291e.jpg',
     'Kolašin',
     true,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kolašin'),
     NOW()),
 
 (
-    'https://upload.wikimedia.org/wikipedia/commons/2/24/Kolasin_-_Town_view.JPG',
+    '/images/entity_images/destinations/78ae4f3159ae857fc761d057.jpg',
     'Kolašin',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kolašin'),
     NOW()),
 
 (
-    'https://skijalista.me/wp-content/uploads/DJI_0765.jpg',
+    '/images/entity_images/destinations/f0904d5800157659186cd758.jpg',
     'Kolašin',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kolašin'),
     NOW()),
     
 (
-    'https://www.kolasin.com/img/hero/hero-2.jpg',
+    '/images/entity_images/destinations/2735aba0540ab80e87d47694.jpg',
     'Kolašin',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kolašin'),
     NOW()),
 (
-    'https://www.gradnja.rs/wp-content/uploads/2023/09/swissotel-kolasin-resort-02.jpg',
+    '/images/entity_images/destinations/d26ea04b56f12af49fccbb8f.jpg',
     'Kolašin',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kolašin'),
     NOW()),
 
 (
-    'https://www.zabljak.com/img/hero/hero-2.jpg',
+    '/images/entity_images/destinations/058dcbf452c926caa9ed10a5.jpg',
     'Žabljak',
     true,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Žabljak'),
     NOW()),
 
 (
-    'https://content.r9cdn.net/rimg/dimg/58/3a/77a7ed40-city-59219-17337d814d2.jpg?width=1366&height=768&xhint=2475&yhint=2129&crop=true',
+    '/images/entity_images/destinations/49a81b5d983d74ec374edb03.jpg',
     'Žabljak',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Žabljak'),
     NOW()),
 
 (
-    'https://rezidenthotel.com/wp-content/uploads/2025/05/crno-jezero-zabljak-rezident-hotel.webp',
+    '/images/entity_images/destinations/8f9fd3f1ded9b8ddbbc4ca4a.jpg',
     'Žabljak',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Žabljak'),
     NOW()),
 (
-    'https://pohcdn.com/sites/default/files/styles/paragraph__live_banner__lb_image__1880bp/public/live_banner/zabljak-1.jpg',
+    '/images/entity_images/destinations/ceb45881cb517633dd52bfb2.jpg',
     'Žabljak',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Žabljak'),
     NOW()),
 (
-    'https://adria.fun/wp-content/uploads/2025/12/Zabljak-Photo-Bigguns-Depositphotos.webp',
+    '/images/entity_images/destinations/ffa9aea860d07241355d169f.jpg',
     'Žabljak',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Žabljak'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/e/e0/Plu%C5%BEine_Piva_Lake.JPG',
+    '/images/entity_images/destinations/26d5b2c8ab437994fc67910c.jpg',
     'Plužine',
     true,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Plužine'),
     NOW()),
 (
-    'https://itinari-images.s3.eu-west-1.amazonaws.com/activity/images/original/23532394-bfda-4db1-8912-8b18f5c253ac-istock-501058345.jpg',
+    '/images/entity_images/destinations/06d1f2c383e6c61de09b7e7a.jpg',
     'Plužine',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Plužine'),
     NOW()),
 (
-    'https://www.pluzine.me/wp-content/uploads/2023/08/IMG_20230206_131749-scaled.jpg',
+    '/images/entity_images/destinations/1fa464f904e4f6e1f3b152d1.jpg',
     'Plužine',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Plužine'),
     NOW()),
 (
-    'https://opstinaandrijevica.me/wp-content/uploads/2020/10/trg-Andrijevica.jpg',
+    '/images/entity_images/destinations/ebc30db7d8ccef7e282f6b13.jpg',
     'Andrijevica',
     true,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Andrijevica'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/5/59/Andrijevica_town_hall%2C_Montenegro.jpg',
+    '/images/entity_images/destinations/1ca1ce9a522892270b4b5a54.jpg',
     'Andrijevica',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Andrijevica'),
     NOW()),
 (
-    'https://opstinaandrijevica.me/wp-content/uploads/2018/11/IMG-2c31ffdb4d20092ba61fb97d9bf0ada5-V.jpg',
+    '/images/entity_images/destinations/5601680919f8bcf58dd690fd.jpg',
     'Andrijevica',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Andrijevica'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/b/bf/Plav.jpg',
+    '/images/entity_images/destinations/d6991e4026b771b4b5436352.jpg',
     'Plav',
     true,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Plav'),
     NOW()),
 (
-    'https://radioberane.me/wp-content/uploads/2024/10/Plav-1200x900-1.jpg',
+    '/images/entity_images/destinations/865988fda2971de0e9144567.jpg',
     'Plav',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Plav'),
     NOW()),
 (
-    'https://media-api.skupstina.me/media/skupstina/2023/07/18/1689679638-plav.jpg?cacheControl=1689679655',
+    '/images/entity_images/destinations/8f2ad5ff5f8d8cf9530cca27.jpg',
     'Plav',
     false,
     (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Plav'),
@@ -6409,289 +6390,277 @@ VALUES
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "EventId", "CreatedAt")
 VALUES
 (
-    'https://sbkotorsistercity.com/wp-content/uploads/sites/106/2025/09/KotorArt.png',
+    '/images/entity_images/events/075d4627249c6a7442506f1a.jpg',
     'Logo',
     true,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'KotorArt festival'),
     NOW()),
 (
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSBA0xI7-o4rZ9sVD3J8u7gNO3NExDx5tGDiw&s',
+    '/images/entity_images/events/c73120e0f4a7039469814cce.jpg',
     'Logo',
     false,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'KotorArt festival'),
     NOW()),
 (
-    'https://kotor.art/wp-content/uploads/2025/02/kotor-art-festival-002.jpg',
+    '/images/entity_images/events/c71f930302bb388c713b892b.jpg',
     'Publika na KotorArt festivalu',
     false,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'KotorArt festival'),
     NOW()),
 (
-    'https://www.montenegrofortravellers.com/sites/default/files/styles/monte1140x550/public/events/mezhdunarodnyy_festival_kotorart.jpg?itok=jy61u3fJ',
+    '/images/entity_images/events/211b2e19711886441ce36408.jpg',
     'Bina KotorArt festivala',
     false,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'KotorArt festival'),
     NOW()),
 (
-    'https://kotor.art/wp-content/uploads/2025/02/kotor-art-festival-006-1024x681.jpg',
+    '/images/entity_images/events/9f9f7c770b1cc1a8d0b007e7.jpg',
     'Neki izvođač na festivalu',
     false,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'KotorArt festival'),
     NOW()),
 (
-    'https://sbkotorsistercity.com/wp-content/uploads/sites/106/2023/03/SBKotorApril.jpeg',
+    '/images/entity_images/events/b15e895425b47b6f19a070ac.jpg',
     'KotorArt festival',
     false,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'KotorArt festival'),
     NOW()),
 (
-    'https://www.radiodux.me/sites/default/files/2017/10-07-2017-gradska-muzika-kotor-priredila-gradu-velicanstvenu-noc/dsc0935resize.jpg',
+    '/images/entity_images/events/1ce4ad5d2d4d4d089aa54d44.jpg',
     'Veče klasične muzike',
     true,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'Veče klasične muzike'),
     NOW()),
 (
-    'https://radiokotor.info/files/images/1771230895-1771170853-IMG-a22537d6019981f93e0bc6c1e3e12e28-V.jpg',
+    '/images/entity_images/events/dfc79f42860010d023bf80fe.jpg',
     'Poster',
     false,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'Veče klasične muzike'),
     NOW()),
 (
-    'https://bokanews.me/wp-content/uploads/2025/12/Begovic_resize.jpg',
+    '/images/entity_images/events/1c18cba249f040db3ee49bf0.jpg',
     'Veče klasične muzike izvođač',
     false,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'Veče klasične muzike'),
     NOW()),
 (
-    'https://www.wofafestivals.com/wp-content/uploads/2024/10/IMG_2885-scaled.webp',
+    '/images/entity_images/events/d1cfa87ca0794410aa14f7b4.jpg',
     'devojčica sa zastavom',
     true,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'Budva Summer Festival'),
     NOW()),
 (
-    'https://eaff.eu/cache/images/festivals/998/1600x900c/998-2.jpg',
+    '/images/entity_images/events/98c8a3e43b25cef2833fcb7d.jpg',
     'Igra',
     false,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'Budva Summer Festival'),
     NOW()),
 (
-    'https://www.wofafestivals.com/wp-content/uploads/2024/10/IMG_2470-scaled.webp',
+    '/images/entity_images/events/60e8b8654acf55c479b5be30.jpg',
     'Kolo',
     false,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'Budva Summer Festival'),
     NOW()),
 (
-    'https://dancingastronaut.com/wp-content/uploads/2022/11/FgO_zYEWQAE8Iya.jpg',
+    '/images/entity_images/events/7282e724f20145505072a779.jpg',
     'Naslovna',
     true,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'DJ Night Mogren'),
     NOW()),
 (
-    'https://i1.sndcdn.com/avatars-Ai7sk2G6lJfwqYux-Yo4y5A-t500x500.jpg',
+    '/images/entity_images/events/2f3225286b884f179e51564b.jpg',
     'Poster',
     false,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'DJ Night Mogren'),
     NOW()),
 (
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQEylQmHhAkQGi4ZNUGxMCLFn_QXr9HaqYTQg&s',
+    '/images/entity_images/events/69587cce093f09d352137a64.jpg',
     'DJ',
     false,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'DJ Night Mogren'),
     NOW()),
 (
-    'https://img.freepik.com/free-photo/closeup-shot-dj-s-equipment-people-dancing-club_181624-58753.jpg?semt=ais_hybrid&w=740&q=80',
+    '/images/entity_images/events/0ac7af784c041c3860f24bb2.jpg',
     'NightClub',
     false,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'DJ Night Mogren'),
     NOW()),
 (
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQt6JR4eLND81QXmtmlPO8ZTpkTdrVdg-i0Og&s',
+    '/images/entity_images/events/50b33cac99528d1e75447aa7.jpg',
     'DJ Nigel',
     false,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'DJ Night Mogren'),
     NOW()),
 (
-    'https://viaferratapiva.me/wp-content/uploads/2025/10/via-ferrata-durmitor-montenegro-hiking.webp',
+    '/images/entity_images/events/1580c0124021cc5dd252ac02.jpg',
     'Okup',
     true,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'Planinarski susret'),
     NOW()),
 (
-    'https://www.jankovac.hr/wp-content/grand-media/image/Durmitor_2018_005.jpg',
+    '/images/entity_images/events/feda5af3e9d1fdb17085c5e4.jpg',
     'Par',
     false,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'Planinarski susret'),
     NOW()),
 (
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ4A95dHfmkuuRKJMl0755n-_t4GrVbpYo95A&s',
+    '/images/entity_images/events/825b6c11b0f9b3fcb6327f1a.jpg',
     'Pešačenje',
     false,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'Planinarski susret'),
     NOW()),
 (
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTr0woQBFbTZNwJ8HJW22FvCNEMX_glAUpH4w&s',
+    '/images/entity_images/events/bce07a2015af2ebc6651fa97.jpg',
     'Grupna slika',
     false,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'Planinarski susret'),
     NOW()),
 (
-    'https://rtnk.me/wp-content/uploads/2025/02/praznik-mimoze-mediabiro.jpg',
+    '/images/entity_images/events/8ae9ad1d4d559e31c781a991.jpg',
     'Praznik mimoze',
     true,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'Praznik mimoze'),
     NOW()),
 (
-    'https://kofer.info/wp-content/uploads/2025/11/Praznik-mimoze-1.jpg',
+    '/images/entity_images/events/8b8f04aaec0c6f48ead745df.jpg',
     'Praznik mimoze',
     false,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'Praznik mimoze'),
     NOW()),
 (
-    'https://bokanews.me/wp-content/uploads/2019/02/Praznik-mimoze.jpg',
+    '/images/entity_images/events/0585affbcefba863cdaf6a23.jpg',
     'Praznik mimoze',
     false,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'Praznik mimoze'),
     NOW()),
 (
-    'https://tvpljevlja.me/wp-content/uploads/2024/08/Naslovna-HN-scaled.jpg',
+    '/images/entity_images/events/31664667ae49618ec0c732ec.jpg',
     'Herceg Novi Film Festival',
     true,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'Herceg Novi Film Festival'),
     NOW()),
 (
-    'https://ocdn.eu/pulscms/MDA_/73620fb78a50a240022ca7880a8dbbf6.jpg',
+    '/images/entity_images/events/127afa3c24e66a82e320f15d.jpg',
     'Herceg Novi Film Festival',
     false,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'Herceg Novi Film Festival'),
     NOW()),
 (
-    'https://rthn.co.me/wp-content/uploads/2025/08/Stevan-Katic-Svecano-otvaranje-Filmskog-festivala-avgust-2025.jpg',
+    '/images/entity_images/events/ea3c511632a14edaf54c5667.jpg',
     'Herceg Novi Film Festival',
     false,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'Herceg Novi Film Festival'),
     NOW()),
 (
-    'https://i0.wp.com/primorski.me/wp-content/uploads/2025/07/Borbelj.jpg?fit=1920%2C1080&ssl=1',
+    '/images/entity_images/events/139e9101e2ecd725b61b5ec3.jpg',
     'Durmitor Trail Run',
     true,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'Durmitor Trail Run'),
     NOW()),
 (
-    'https://cdn.prod.website-files.com/690e0151e8414f731febec7b/690f31b494e729b06fdfdcf5_2_DTR_Predrag_Vuckovic_0232-OPT.jpg',
+    '/images/entity_images/events/f726df8687c84bf343aa5046.jpg',
     'Durmitor Trail Run',
     false,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'Durmitor Trail Run'),
     NOW()),
 (
-    'https://tvpljevlja.me/wp-content/uploads/2025/07/517425959_122148161768761130_2327081083293456390_n.jpg',
+    '/images/entity_images/events/361502b8a19b1547de32ee88.jpg',
     'Durmitor Trail Run',
     false,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'Durmitor Trail Run'),
     NOW()),
 (
-    'https://wildbeautyart.me/wp-content/uploads/2025/08/Otvaranje-WBA1.jpg',
+    '/images/entity_images/events/15ae4f4cdd31cec9f964e991.jpg',
     'Wild Beauty Art Festival',
     true,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'Wild Beauty Art Festival'),
     NOW()),
 (
-    'https://www.standard.co.me/wp-content/uploads/2022/07/Foto-Media-biro-2-scaled.jpg',
+    '/images/entity_images/events/5d4f681b055f419ae4ecc53a.jpg',
     'Wild Beauty Art Festival',
     false,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'Wild Beauty Art Festival'),
     NOW()),
 (
-    'https://wildbeautyart.me/wp-content/uploads/2024/04/WBA-001-084.jpg',
+    '/images/entity_images/events/183c7ee2505679c5581f5b43.jpg',
     'Wild Beauty Art Festival',
     false,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'Wild Beauty Art Festival'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2024/08/19/09/5586859_bedem-fest_share.jpg',
+    '/images/entity_images/events/3587bdc384601f80c7c5d32e.jpg',
     'Bedem Fest',
     true,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'Bedem Fest'),
     NOW()),
 (
-    'https://seerural.org/wp-content/uploads/2018/08/2-3.jpg',
-    'Bedem Fest',
-    false,
-    (SELECT "Id" FROM "Events" WHERE "Name" = 'Bedem Fest'),
-    NOW()),
-(
-    'https://rtnk.me/wp-content/uploads/2025/08/Tvrđava-bedem-foto-bedem-fest.jpg-1.webp',
-    'Bedem Fest',
-    false,
-    (SELECT "Id" FROM "Events" WHERE "Name" = 'Bedem Fest'),
-    NOW()),
-(
-    'https://feral.bar/posts/feral-bar-1757362607_545546734_1314459850682048_5282717821817942881_n.jpg',
+    '/images/entity_images/events/a4a56aad389f9eba1144b6ea.jpg',
     'Petrovac Jazz Fest',
     true,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'Petrovac Jazz Fest'),
     NOW()),
 (
-    'https://rtnk.me/wp-content/uploads/2023/10/petrovac-jazz-festival-foto-organizatori.jpg',
+    '/images/entity_images/events/5ecb284e8aa270f6bff8de6f.jpg',
     'Petrovac Jazz Fest',
     false,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'Petrovac Jazz Fest'),
     NOW()),
 (
-    'https://urbanikult.com/wp-content/uploads/2025/07/file2.jpeg',
+    '/images/entity_images/events/7f8fc30f813f2ecb76c6f3d4.jpg',
     'Petrovac Jazz Fest',
     false,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'Petrovac Jazz Fest'),
     NOW()),
 (
-    'https://rtnk.me/wp-content/uploads/2024/07/1720724699491333-scaled.jpg',
+    '/images/entity_images/events/bf866f92e4abf270b3fe4b5e.jpg',
     'Dani muzike Herceg Novi',
     true,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'Dani muzike Herceg Novi'),
     NOW()),
 (
-    'https://hercegnovi.cool/wp-content/uploads/2025/07/dani-muzike-2025-otvaranje.jpg',
+    '/images/entity_images/events/f2e787747191cd2beab08d9f.jpg',
     'Dani muzike Herceg Novi',
     false,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'Dani muzike Herceg Novi'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2025/07/11/10/5658673_dani-muzike-hn-2_share.jpg',
+    '/images/entity_images/events/869d51fdbcaf2b1ccbdb3807.jpg',
     'Dani muzike Herceg Novi',
     false,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'Dani muzike Herceg Novi'),
     NOW()),
 (
-    'https://sharemontenegro.me/wp-content/uploads/2025/02/Biser-Jadrana-festival-tivat.jpg',
+    '/images/entity_images/events/eb8053d8ef76c9ea44c138b8.jpg',
     'Biser Jadrana Tivat',
     true,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'Biser Jadrana Tivat'),
     NOW()),
 (
-    'https://radiotivat.com/wp-content/uploads/2024/07/unnamed-16-2500x1875.jpg',
+    '/images/entity_images/events/ec2e6a0bc6204cad08faab5b.jpg',
     'Biser Jadrana Tivat',
     false,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'Biser Jadrana Tivat'),
     NOW()),
 (
-    'https://eurovoix-world.com/wp-content/uploads/2025/07/Biser-Jadrana-2025.jpg',
+    '/images/entity_images/events/ee5a57860c61708b135c35bb.jpg',
     'Biser Jadrana Tivat',
     false,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'Biser Jadrana Tivat'),
     NOW()),
 (
-    'https://vqngfgxokvygyrxfsmyj.supabase.co/storage/v1/object/public/uploads/events/1773349783420-7rjbva4lqxt.jpg',
+    '/images/entity_images/events/00e9cf650ae964874d7e8bd2.jpg',
     'Lake Fest 2026',
     true,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'Lake Fest 2026'),
     NOW()),
 (
-    'https://zguzirvtfputyttwfaab.supabase.co/storage/v1/object/public/media/festivals/festival-1767857257771-qok2ci6uce7.webp',
+    '/images/entity_images/events/977d7061f3d9b6b5ba8ee731.jpg',
     'Lake Fest 2026',
     false,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'Lake Fest 2026'),
     NOW()),
 (
-    'https://gradski.me/wp-content/uploads/2026/03/lake-fest-scaled-1.webp',
+    '/images/entity_images/events/f103620eeeafc71e2db7eaeb.jpg',
     'Lake Fest 2026',
     false,
     (SELECT "Id" FROM "Events" WHERE "Name" = 'Lake Fest 2026'),
@@ -6704,1273 +6673,1177 @@ VALUES
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "LocalityId", "CreatedAt")
 VALUES
 (
-    'https://upload.wikimedia.org/wikipedia/commons/2/2c/Mogren_beach_aptil_19_th.jpg',
+    '/images/entity_images/localities/2429ed0bb9f663e6a7eac10c.jpg',
     'Plaža Mogren',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Plaža Mogren'),
     NOW()),
 (
-    'https://upoznajcrnugoru.com/wp-content/uploads/2018/04/Plaza-Mogren-Budva_fs.jpg',
+    '/images/entity_images/localities/18a1df1c5f2d802b887b45cc.jpg',
     'Plaža Mogren',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Plaža Mogren'),
     NOW()),
 (
-    'https://sharemontenegro.me/wp-content/uploads/2019/06/62000806_632077597307537_4593433872003235840_n.jpg',
+    '/images/entity_images/localities/ae1334e5b98060385e47906b.jpg',
     'Plaža Mogren',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Plaža Mogren'),
     NOW()),
 (
-    'https://hgbudvanskarivijera.com/media/yootheme/cache/52/mogren-1-2-plaza-52d17106.jpg',
+    '/images/entity_images/localities/9a74c2cd63a697124dfb5c2f.jpg',
     'Plaža Mogren',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Plaža Mogren'),
     NOW()),
 (
-    'https://media.istockphoto.com/id/1481840480/photo/the-iron-gate-to-the-old-town-of-budva.jpg?s=612x612&w=0&k=20&c=NfMBwy76q1IjxDfStL2_887kLmLryFIlXipBJYnGzeo=',
+    '/images/entity_images/localities/e5e23760277c0ac2c4f6aea8.jpg',
     'Stari grad Budva',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Budva'),
     NOW()),
 (
-    'https://foodbook.me/storage/restaurants/3/PAsmXBVhYOPiT5lSFvCVuZKt3KAl2sZmiB0bbY9R.jpg',
+    '/images/entity_images/localities/07a5a0e229502308f0081b8c.jpg',
     'Stari grad Budva',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Budva'),
     NOW()),
 (
-    'https://www.ekapija.com/thumbs/budva_stari_grad_060323_tw1024.jpg',
+    '/images/entity_images/localities/c97861965489147ab5b05466.jpg',
     'Stari grad Budva',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Budva'),
     NOW()),
 (
-    'https://foodbook.me/storage/restaurants/139/SESjiK44XQxShsTrOwPmlsy8eTcRf3s5uQRwGHUg.jpg',
+    '/images/entity_images/localities/89921de4eaa030ccd22f779e.jpg',
     'Stari grad Budva',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Budva'),
     NOW()),
 (
-    'https://www.gradnja.rs/wp-content/uploads/2020/12/Podgorica_Cover.jpg',
+    '/images/entity_images/localities/1746e447b805ee03b26c6bba.jpg',
     'Centar Podgorice',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Podgorice'),
     NOW()),
 (
-    'https://www.standard.co.me/wp-content/uploads/2020/12/Trg-nezavisnosti.jpg',
+    '/images/entity_images/localities/fcf12f7779be4c214ca8efeb.jpg',
     'Centar Podgorice',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Podgorice'),
     NOW()),
 (
-    'https://cdnuploads.aa.com.tr/uploads/Contents/2022/01/01/thumbs_b_c_4a0d89f632f4e881ec6fe1fc00c7df08.jpg?v=123852',
+    '/images/entity_images/localities/e55bddba8fa1adfa469a2312.jpg',
     'Centar Podgorice',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Podgorice'),
     NOW()),
 (
-    'https://www.cdm.me/wp-content/uploads/2017/10/bDMIFv_podgorica-marathon-1-768x511.jpg',
+    '/images/entity_images/localities/40d8af860ded2c816f257a02.jpg',
     'Centar Podgorice',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Podgorice'),
     NOW()),
 (
-    'https://24kroz7.com/247/wp-content/uploads/2024/05/2-5-1024x683.jpg',
+    '/images/entity_images/localities/8885b1b35602b86467c84e9a.jpg',
     'Crno jezero',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Crno jezero'),
     NOW()),
 (
-    'https://wevotravel.com/wp-content/uploads/2023/04/turisticka-agencija-guliver-izlet-durmitor-tara-moraca-panorama.jpg',
+    '/images/entity_images/localities/b54d5b965095079909082b28.jpg',
     'Crno jezero',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Crno jezero'),
     NOW()),
 (
-    'https://bookaweb.s3.eu-central-1.amazonaws.com/media/30306/crno-jezero-2-%281%29.jpg',
+    '/images/entity_images/localities/717ef9e2d47667efb1c57944.jpg',
     'Crno jezero',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Crno jezero'),
     NOW()),
 (
-    'https://www.montenegrocar.me/data/public/crno-jezero-pogled-iz-sume.webp',
-    'Crno jezero',
-    false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Crno jezero'),
-    NOW()),
-(
-    'https://kofer.info/wp-content/uploads/2020/03/shutterstock_291029393.jpg',
+    '/images/entity_images/localities/2f8a68e95d4ae710c530321d.jpg',
     'Šetalište Pet Danica',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Šetalište Pet Danica'),
     NOW()),
 (
-    'https://kofer.info/wp-content/uploads/2020/03/shutterstock_1548398111-1000x600.jpg',
+    '/images/entity_images/localities/e16ae9ac7d058c33914680d7.jpg',
     'Šetalište Pet Danica',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Šetalište Pet Danica'),
     NOW()),
 (
-    'https://bokanews.me/wp-content/uploads/2019/11/%C5%A1etali%C5%A1te.jpg',
+    '/images/entity_images/localities/6a37892db69ad9050de2387f.jpg',
     'Šetalište Pet Danica',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Šetalište Pet Danica'),
     NOW()),
 (
-    'https://www.montenegrofortravellers.com/sites/default/files/styles/monte1140x550/public/place/Šetaliste_pet_danica_gorodskaya_naberezhnaya_pet_danica_v_herceg-novi.jpg?itok=fPmqL_Ro',
-    'Šetalište Pet Danica',
-    false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Šetalište Pet Danica'),
-    NOW()),
-(
-    'https://bar.me/wp-content/uploads/bar_61.jpg',
+    '/images/entity_images/localities/66a6becf4f4cfe8dcb20b784.jpg',
     'Stari Bar',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari Bar'),
     NOW()),
 (
-    'https://foodbook.me/storage/restaurants/511/X0g1zQpHiJZTtGQ4PreZkHg8707hokwFLSzM57Y4.jpg',
+    '/images/entity_images/localities/9514e010cc19783c886492bc.jpg',
     'Stari Bar',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari Bar'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2024/10/20/18/5600044_viber-image-20241018-161252598_ls.jpg',
+    '/images/entity_images/localities/cbcaffe2c623a6ff09a9083c.jpg',
     'Stari Bar',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari Bar'),
     NOW()),
 (
-    'https://sharemontenegro.me/wp-content/uploads/2020/04/Bar_Crna_Gora_Stari_Grad_Foto_Balkan_Media_Tim.jpg',
+    '/images/entity_images/localities/f5e7d9677cd42117d77b4dfa.jpg',
     'Stari Bar',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari Bar'),
     NOW()),
 (
-    'https://visitadabojana.com/wp-content/uploads/2025/09/velika-plaza-aerial-coastline-view.webp',
+    '/images/entity_images/localities/14402f3ded00e9696b3891d1.jpg',
     'Velika plaža',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Velika plaža'),
     NOW()),
 (
-    'https://www.gradnja.rs/wp-content/uploads/2025/04/velika-plaza-ulcinj.jpg',
+    '/images/entity_images/localities/29048fe9a2740ae39601ce10.jpg',
     'Velika plaža',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Velika plaža'),
     NOW()),
 (
-    'https://kofer.info/wp-content/uploads/2020/02/shutterstock_1809771406-1000x600.jpg',
+    '/images/entity_images/localities/7e141354122a809ddf017c5a.jpg',
     'Velika plaža',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Velika plaža'),
     NOW()),
 (
-    'https://itinari-images.s3.eu-west-1.amazonaws.com/activity/images/original/610157eb-d89f-4b83-82df-62255fbe753b-velika_6.jpg',
+    '/images/entity_images/localities/e6c93edc29037fe50973d911.jpg',
     'Velika plaža',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Velika plaža'),
     NOW()),
 (
-    'https://www.golivegotravel.nl/wp-content/uploads/2018/04/Stair-Grad-Kotor-8-1160x773.jpg',
+    '/images/entity_images/localities/bb4e0aa74da3bf455752b0ae.jpg',
     'Stari grad Kotor',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
     NOW()),
 (
-    'https://putovanjazapet.com/wp-content/uploads/2021/12/Zadivljujuci-Kotor-grad-za-sva-godisnja-doba.jpg',
+    '/images/entity_images/localities/d4b362fe94677036c10d858a.jpg',
     'Stari grad Kotor',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
     NOW()),
 (
-    'https://images.myguide-cdn.com/montenegro/companies/kotor-stari-grad/large/kotor-stari-grad-81619.jpg',
+    '/images/entity_images/localities/b803f7ed4f96a95416207c9e.jpg',
     'Stari grad Kotor',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
     NOW()),
 (
-    'https://bookaweb.s3.eu-central-1.amazonaws.com/media/29566/stari-grad-kotor-2.jpg',
+    '/images/entity_images/localities/df540966e9fdd5cdaa415ca7.jpg',
     'Stari grad Kotor',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/3/35/Monastero_di_cetinje%2C_01.JPG',
+    '/images/entity_images/localities/f517e519a340b83d0df9fae8.jpg',
     'Cetinjski manastir',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Cetinjski manastir'),
     NOW()),
 (
-    'https://media.pobjeda.me/media/2022/09/24/1664011895-glavna-manastiri-tekst-cetinjski-manastir-foto-lazar-pejovic-001-12-i_1280x800.jpg?cacheControl=1664011896',
+    '/images/entity_images/localities/25d87fd03a618723064473c1.jpg',
     'Cetinjski manastir',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Cetinjski manastir'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/d/dc/Cetinjski_manastir.jpg',
+    '/images/entity_images/localities/2e686ab9c8a3e518278a47ba.jpg',
     'Cetinjski manastir',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Cetinjski manastir'),
     NOW()),
 (
-    'https://leks.canu.ac.me/web/Slike/Fig-LLUCG-3234-2759.jpg',
+    '/images/entity_images/localities/d7185cfd116aaaada4a856fb.jpg',
     'Cetinjski manastir',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Cetinjski manastir'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/7/78/Trg_Slobode_NK.JPG',
+    '/images/entity_images/localities/46f94cb706cec7f8e5a97cb0.jpg',
     'Trg Slobode',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Trg Slobode'),
     NOW()),
 (
-    'https://lovinmontenegro.com/wp-content/uploads/2025/06/freedom-square-niksic-4.jpg',
+    '/images/entity_images/localities/32967d2176590638b1152c6c.jpg',
     'Trg Slobode',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Trg Slobode'),
     NOW()),
 (
-    'https://lovinmontenegro.com/wp-content/uploads/2025/06/freedom-square-niksic-3.jpg',
-    'Trg Slobode',
-    false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Trg Slobode'),
-    NOW()),
-(
-    'https://mondo.me/Picture/757775/jpeg/image00007.jpeg?ts=2025-02-11T10:54:15',
-    'Trg Slobode',
-    false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Trg Slobode'),
-    NOW()),
-(
-    'https://upload.wikimedia.org/wikipedia/commons/0/0e/Porto_Montenegro.jpg',
+    '/images/entity_images/localities/cb85290e85eaf22378794a7e.jpg',
     'Porto Montenegro',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Porto Montenegro'),
     NOW()),
 (
-    'https://www.americanexpress.com/en-us/travel/discover/photos/300669/127803/1600/Droneshot1.jpg?ch=560',
+    '/images/entity_images/localities/bbb0fe83713b127dff7d4b79.jpg',
     'Porto Montenegro',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Porto Montenegro'),
     NOW()),
 (
-    'https://www.godubrovnik.com/wp-content/uploads/pm_summer-campaign3.jpg',
+    '/images/entity_images/localities/09c02ffb00aa65c363e1ed78.jpg',
     'Porto Montenegro',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Porto Montenegro'),
     NOW()),
 (
-    'https://www.journal.rs/wp-content/uploads/2025/10/Porto-Montenegro-scaled.jpg',
+    '/images/entity_images/localities/a6d29208b4302327506297dc.jpg',
     'Porto Montenegro',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Porto Montenegro'),
     NOW()),
 (
-    'https://www.ekapija.com/thumbs169/spomenik_na_trebjesi_041224_tw1024.jpg',
+    '/images/entity_images/localities/78f3babb4972c09b888d2cbc.jpg',
     'Spomen park Slobode Nikšić',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Spomen park Slobode Nikšić'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2021/03/29/20/5312665_spomenik-trubjela_share.jpg',
+    '/images/entity_images/localities/e59507de55d4d6b4b59307db.jpg',
     'Spomen park Slobode Nikšić',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Spomen park Slobode Nikšić'),
     NOW()),
 (
-    'https://podgorica.travel/wp-content/uploads/2024/04/kralj_nikola_04-08-26-scaled.jpg',
+    '/images/entity_images/localities/8923418aa43d408c3666f409.jpg',
     'Spomen park Slobode Nikšić',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Spomen park Slobode Nikšić'),
     NOW()),
 (
-    'https://media.pobjeda.me/media/2023/07/13/1689264523-1920-1280-max-1.jpg',
+    '/images/entity_images/localities/3cd826883ed8d53d835a2ec4.jpg',
     'Spomen park Slobode Nikšić',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Spomen park Slobode Nikšić'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/d/d2/View_over_Njegusi.jpg',
+    '/images/entity_images/localities/aa25d4cc49b0ce9a855b7910.jpg',
     'Njeguši',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Njeguši'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/3/31/Njegusi_-_Church.jpg',
+    '/images/entity_images/localities/2f19511ae5e5f8a54f066a6f.jpg',
     'Njeguši',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Njeguši'),
     NOW()),
 (
-    'https://adriaticways.com/wp-content/uploads/2025/12/Njegusi-Village-Montenegro-3.webp',
+    '/images/entity_images/localities/14d3f8704f36bb180e1eeaf6.jpg',
     'Njeguši',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Njeguši'),
     NOW()),
 (
-    'https://tinymontenegro.com/wp-content/uploads/2023/10/imageedit_1_2824406581.jpg',
+    '/images/entity_images/localities/caacad2486fbfca786adb976.jpg',
     'Virpazar',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Virpazar'),
     NOW()),
 (
-    'https://skadarlakeboatcruise.com/wp-content/uploads/The-view-from-the-bridge-Virpzar-2.jpg',
+    '/images/entity_images/localities/2a0df1fe96c34d74fd46bfd2.jpg',
     'Virpazar',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Virpazar'),
     NOW()),
 (
-    'https://www.visit-montenegro.com/wp-content/uploads/2026/01/virpazar-01-scaled.jpg',
+    '/images/entity_images/localities/ea25b06ef3f818be6941ee3c.jpg',
     'Virpazar',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Virpazar'),
     NOW()),
 (
-    'https://undiscoveredmontenegro.com/wp-content/uploads/2025/02/Virpazar-view-2.png',
+    '/images/entity_images/localities/9d70eed6315eff4f715679d8.jpg',
     'Virpazar',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Virpazar'),
     NOW()),
 (
-    'https://montenegro.org/wp-content/uploads/2024/09/image-13.png',
+    '/images/entity_images/localities/e6302cc0b17fe65fa1b08250.jpg',
     'Virpazar',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Virpazar'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/9/96/Biogradsko_jezero_%282%29.JPG',
+    '/images/entity_images/localities/b50049e8f31b10793e721479.jpg',
     'Biogradsko jezero',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Biogradsko jezero'),
     NOW()),
 (
-    'https://adria.fun/wp-content/uploads/2023/07/Biogradsko-jezero-Photo-Montenegro.travel-ok.jpg',
+    '/images/entity_images/localities/93ac66d19592aee2104718c6.jpg',
     'Biogradsko jezero',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Biogradsko jezero'),
     NOW()),
 (
-    'https://www.kolasin.com/img/article/biogradska-gora/biogradska-gora-1.jpg',
+    '/images/entity_images/localities/e5fe17e4455116f5f9655ff5.jpg',
     'Biogradsko jezero',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Biogradsko jezero'),
     NOW()),
 (
-    'https://srbijazamlade.rs/fajlovi/productitem/188_638de85feedde.jpg',
+    '/images/entity_images/localities/3e1eab34877601f6ff7e1e4f.jpg',
     'Biogradsko jezero',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Biogradsko jezero'),
     NOW()),
 (
-    'https://assets.etv.me/pb-etv/swp/8p72gy/media/2025043013044_039b228ce2c7d26b0a001edb45bd6f107d6155f35499555ec618f703eb29fe8b.jpg',
+    '/images/entity_images/localities/fa8efa29a13796f491585bb5.jpg',
     'Biogradsko jezero',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Biogradsko jezero'),
     NOW()),
 (
-    'https://www.gradnja.rs/wp-content/uploads/2023/12/trg-zabljak-konkurs-03.jpg',
+    '/images/entity_images/localities/04bbb9e85b799b56e336bc81.jpg',
     'Centar Žabljaka',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Žabljaka'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/5/5c/%C5%BDabljak%2C_Montenegro_-_town_centre_2.jpg',
+    '/images/entity_images/localities/6320101ae61190bb75040bf0.jpg',
     'Centar Žabljaka',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Žabljaka'),
     NOW()),
 (
-    'https://rtnk.me/wp-content/uploads/2025/10/zabljak-rtnk.jpg',
+    '/images/entity_images/localities/fbbd2dde2233fb4c42eab398.jpg',
     'Centar Žabljaka',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Žabljaka'),
     NOW()),
 (
-    'https://static.dan.co.me/images/slike/new/2023/05/28/1850818.jpg',
+    '/images/entity_images/localities/3b5ae9cd7be645891b26a6ec.jpg',
     'Centar Žabljaka',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Žabljaka'),
     NOW()),
 (
-    'https://mondo.me/Picture/812309/jpeg/591559472_1196910645682401_8312711898158084581_n.jpg?ts=2025-12-01T08:54:54',
+    '/images/entity_images/localities/3fc714c01eb5d97903321e80.jpg',
     'Centar Žabljaka',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Žabljaka'),
     NOW()),
 (
-    'https://jasninaputovanja.me/wp-content/uploads/2022/04/IMG_3529-2000x1333.jpg',
+    '/images/entity_images/localities/aa3eed6b2e56901b810d44e1.jpg',
     'Petrovac',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Petrovac'),
     NOW()),
 (
-    'https://www.funtravelnis.rs/wp-content/uploads/2018/01/petrovac-1.jpg',
+    '/images/entity_images/localities/fba89a311087551b2525141c.jpg',
     'Petrovac',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Petrovac'),
     NOW()),
 (
-    'https://cf.bstatic.com/xdata/images/hotel/max1024x768/845653015.jpg?k=35580afaf5ebb156d3ca8b0c7020fa201ff48211e50dbc4226df0ba91bef762b&o=',
+    '/images/entity_images/localities/8a1790163c5ab38d0211829d.jpg',
     'Petrovac',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Petrovac'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/1/1c/Kotorski_zaliv_-_panoramio_%281%29.jpg',
+    '/images/entity_images/localities/d2c68fc375883282f0310942.jpg',
     'Muo',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Muo'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/f/fd/Muo%2C_Montenegro.jpg',
+    '/images/entity_images/localities/e9141d324ed4a232f357df37.jpg',
     'Muo',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Muo'),
     NOW()),
 (
-    'https://a0.muscache.com/im/pictures/miso/Hosting-614451281032174205/original/a6f3da60-66fd-4538-ad2d-cb2aed4b3bce.png',
-    'Muo',
-    false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Muo'),
-    NOW()),
-(
-    'https://upload.wikimedia.org/wikipedia/commons/3/3f/Preview_of_the_Bay_of_Kotor_from_Dobrota_Palazzi_resort.jpg',
+    '/images/entity_images/localities/d1ec9510937f3b74c4ef0679.jpg',
     'Dobrota',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Dobrota'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/7/71/Dobrota%2C_Bah%C3%ADa_de_Kotor%2C_Montenegro%2C_2014-04-19%2C_DD_08.JPG',
+    '/images/entity_images/localities/74b92f87849c11295dbd3c0b.jpg',
     'Dobrota',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Dobrota'),
     NOW()),
 (
-    'https://forzatravel.rs/fajlovi/city/dobrota-462.png',
+    '/images/entity_images/localities/35cb8b8cdd6352d547b333ae.jpg',
     'Dobrota',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Dobrota'),
     NOW()),
 (
-    'https://sharemontenegro.me/wp-content/uploads/2020/10/DJI_0237.jpg',
+    '/images/entity_images/localities/77ca96d722fd35d4c93799e4.jpg',
     'Centar Cetinja',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Cetinja'),
     NOW()),
 (
-    'https://i0.wp.com/cetinjskilist.com/wp-content/uploads/2025/04/IMG-20250328-WA0005.jpg?resize=1200%2C800&ssl=1',
+    '/images/entity_images/localities/c719e51d32ed1a580ef00cfa.jpg',
     'Centar Cetinja',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Cetinja'),
     NOW()),
 (
-    'https://www.ekapija.com/thumbs/cetinje_centar_1_141119_tw1024.jpg',
+    '/images/entity_images/localities/d1eeb4b05e0981c7fe2e54c9.jpg',
     'Centar Cetinja',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Cetinja'),
     NOW()),
 (
-    'https://apartmani-igalo.com/images/herceg-novi-stari-grad.jpg',
+    '/images/entity_images/localities/8e931b40549eb4eb2c9eb9c5.jpg',
     'Centar Herceg Novog',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Herceg Novog'),
     NOW()),
 (
-    'https://www.ekapija.com/thumbs/herceg_novi_0060220_tw1024.jpg',
+    '/images/entity_images/localities/7f4e4e24aa4474d61649087b.jpg',
     'Centar Herceg Novog',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Herceg Novog'),
     NOW()),
 (
-    'https://www.ekapija.com/thumbs/omladinski_centar_hn_130122_tw1024.jpg',
+    '/images/entity_images/localities/79749d0ad588db30a6c947b0.jpg',
     'Centar Herceg Novog',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Herceg Novog'),
     NOW()),
 (
-    'https://www.visit-montenegro.com/wp-content/uploads/2026/01/ostrog-monastery-01-scaled.jpg',
+    '/images/entity_images/localities/5551a1f8c4df7ecb6571b178.jpg',
     'Ostrog',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Ostrog'),
     NOW()),
 (
-    'https://lifeontheroam.com/wp-content/uploads/2024/11/Ostrog-Monastery-Montenegro-tn.webp',
+    '/images/entity_images/localities/4945a74f01c277289939ae98.jpg',
     'Ostrog',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Ostrog'),
     NOW()),
 (
-    'https://jez.co.rs/storage/2022/02/22-donji-manastir-ostrog.jpg',
+    '/images/entity_images/localities/ed9fe447f974e29b1e91f0ac.jpg',
     'Ostrog',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Ostrog'),
     NOW()),
 (
-    'https://amforaproperty.com/files/crm/22559133/4e70e0c4-2cc6-42d1-ae52-ec062e3a430d.jpeg',
+    '/images/entity_images/localities/e72c8fd1abc643c1a3c70bb0.jpg',
     'Centar Budve',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Budve'),
     NOW()),
 (
-    'https://amforaproperty.com/files/crm/22283597/fff12ad3-485b-4d4e-ba69-a436acd2bc6e.jpeg',
+    '/images/entity_images/localities/d624d5df17e7c241b1c3da93.jpg',
     'Centar Budve',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Budve'),
     NOW()),
 (
-    'https://bizniscg.me/wp-content/uploads/2021/08/Budva_1-1-1024x768.jpg',
+    '/images/entity_images/localities/9206ef14e49d3314e4396c79.jpg',
     'Centar Budve',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Budve'),
     NOW()),
 (
-    'https://image.jimcdn.com/app/cms/image/transf/none/path/s2155450c0f32d414/image/i45ecc2ae70448b4a/version/1583408463/image.jpg',
+    '/images/entity_images/localities/570730e303425f2b2635a891.jpg',
     'Centar Igala',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Igala'),
     NOW()),
 (
-    'https://image.jimcdn.com/app/cms/image/transf/none/path/s2155450c0f32d414/image/i0784beb8bdda8d01/version/1583408478/image.jpg',
+    '/images/entity_images/localities/59a835db54923b99979544f5.jpg',
     'Centar Igala',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Igala'),
     NOW()),
 (
-    'https://i0.wp.com/www.apartmani.me/img/oglasi/688/izdaje-se-apartman-u-centru-igala-crna-gora-jrd.jpg?fit=1920%2C1080&ssl=1',
+    '/images/entity_images/localities/ca7ff724e7537d7800ae49ec.jpg',
     'Centar Igala',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Igala'),
     NOW()),
 (
-    'https://assets.alohatours.rs/images/core/cities/card/orahovac.jpg',
+    '/images/entity_images/localities/77af32b5361487e047e6a96a.jpg',
     'Orahovac',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Orahovac'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/a/a0/Orahovac.jpg',
+    '/images/entity_images/localities/a1ce9d6310d7a8f4035eb02b.jpg',
     'Orahovac',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Orahovac'),
     NOW()),
 (
-    'https://www.olympic.rs/wp-content/uploads/orahovac-full.jpg',
+    '/images/entity_images/localities/69c9317050eaf2c6d263fa11.jpg',
     'Orahovac',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Orahovac'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/0c/ea/0c/04/caption.jpg?w=1400&h=1400&s=1',
+    '/images/entity_images/localities/7eb2f5bdc3f0088e6f67c204.jpg',
     'Kamenari',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Kamenari'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/17/ca/ac/c7/adriatica.jpg?w=1100&h=-1&s=1',
+    '/images/entity_images/localities/ee9427facdd52e2653d51787.jpg',
     'Kamenari',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Kamenari'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/0e/6c/57/f3/photo2jpg.jpg?w=1200&h=1200&s=1',
+    '/images/entity_images/localities/64fec2cce37909d9279b2515.jpg',
     'Kamenari',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Kamenari'),
     NOW()),
 (
-    'https://sharemontenegro.me/wp-content/uploads/2020/04/Bar_Crna_Gora_Stari_Grad_Foto_Balkan_Media_Tim.jpg',
+    '/images/entity_images/localities/f5e7d9677cd42117d77b4dfa.jpg',
     'Centar Bara',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Bara'),
     NOW()),
 (
-    'https://accordingtokristina.com/wp-content/uploads/2020/02/Uzbrdo-do-starog-grada-%C2%A9-According-to-Kristina-1440x964.jpg',
+    '/images/entity_images/localities/4ddc63ae6efd4590c685643a.jpg',
     'Centar Bara',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Bara'),
     NOW()),
 (
-    'https://gradski.me/wp-content/uploads/2025/10/bar1.jpg',
+    '/images/entity_images/localities/3d9f5a4fd6d802dea539a6e1.jpg',
     'Centar Bara',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Bara'),
     NOW()),
 (
-    'https://rtnk.me/wp-content/uploads/2025/03/grahovo-rtcg.jpg',
+    '/images/entity_images/localities/5ac531a3a59bcaed87d9a175.jpg',
     'Grahovac',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Grahovac'),
     NOW()),
 (
-    'https://cf.bstatic.com/xdata/images/hotel/max1024x768/496683289.jpg?k=febb1c8844a596b28e0be442f0e647e64c0ffcfad77d118811389de9750e5182&o=',
+    '/images/entity_images/localities/94548904262eba79ef7f7db6.jpg',
     'Grahovac',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Grahovac'),
     NOW()),
 (
-    'https://bar.travel/wp-content/uploads/2022/03/Vidikovac-Tudjemili-scaled.jpg',
+    '/images/entity_images/localities/d15de2764ad80c41e9b6be94.jpg',
     'Tuđemili',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Tuđemili'),
     NOW()),
 (
-    'https://immo-monte.me/wp-content/uploads/2022/12/Immo-Monte_Spomenik_360-3-scaled.jpg',
+    '/images/entity_images/localities/8c8d1f0266131be683d5fc0a.jpg',
     'Tuđemili',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Tuđemili'),
     NOW()),
 (
-    'https://cozymontenegro.com/wp-content/uploads/2022/07/Road-and-parking-of-Viewpoint-Tudjemili-1630x860.jpg',
+    '/images/entity_images/localities/c87b56f33a5a641365cd471d.jpg',
     'Tuđemili',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Tuđemili'),
     NOW()),
 (
-    'https://cdn-processed.tmatic.travel/0bb6654d-5c90-4825-b927-a6eaece8e632.jpg',
+    '/images/entity_images/localities/9df140b0047b7462180335ed.jpg',
     'Fundina',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Fundina'),
     NOW()),
 (
-    'https://jasninaputovanja.me/wp-content/uploads/2020/09/105-980x980.jpg',
+    '/images/entity_images/localities/f985079dd0571301a93aedea.jpg',
     'Fundina',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Fundina'),
     NOW()),
 (
-    'https://montenegro-for.me/wp-content/uploads/2015/11/Circuit-Kucka-Korita8-Fundina.jpg',
+    '/images/entity_images/localities/b9990903add9e5826b06e210.jpg',
     'Fundina',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Fundina'),
     NOW()),
 (
-    'https://bookaweb.s3.eu-central-1.amazonaws.com/media/28723/inbound4956367721833486138.jpg',
+    '/images/entity_images/localities/4fbd0547c9bb21f61ee637ce.jpg',
     'Centar Nikšića',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Nikšića'),
     NOW()),
 (
-    'https://rtnk.me/wp-content/uploads/2023/11/Niksic-foto-Milan-Sapuric-22-3.jpg',
+    '/images/entity_images/localities/32c40b30feaa536165e37974.jpg',
     'Centar Nikšića',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Nikšića'),
     NOW()),
 (
-    'https://www.in4s.net/wp-content/uploads/2020/09/Centar-Niksic.jpg',
+    '/images/entity_images/localities/886cc9d576c4485d1d88ce4b.jpg',
     'Centar Nikšića',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Nikšića'),
     NOW()),
 (
-    'https://www.ponte.rs/UPLOADS-PONTE/2022/12/CANJ.jpg',
+    '/images/entity_images/localities/00e1734c4857c90874578dbb.jpg',
     'Čanj',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Čanj'),
     NOW()),
 (
-    'https://www.jadranskibiser.com/img/canj2.jpg',
+    '/images/entity_images/localities/a88c2e4fc711b1753007ccb3.jpg',
     'Čanj',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Čanj'),
     NOW()),
 (
-    'https://maestralcanj.com/images/gallery/beach-1.jpg',
+    '/images/entity_images/localities/ed0ee53cb6e90f8a6b720e6c.jpg',
     'Čanj',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Čanj'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/4/4d/Kotor_Montenegro.jpg',
+    '/images/entity_images/localities/76c1e7b42052713a428a852a.jpg',
     'Centar Kotora',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Kotora'),
     NOW()),
 (
-    'https://bookaweb.s3.eu-central-1.amazonaws.com/media/29599/kotor-trg-oruzja.jpg',
+    '/images/entity_images/localities/b44b6c8a056d5cdd2966133b.jpg',
     'Centar Kotora',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Kotora'),
     NOW()),
 (
-    'https://www.visit-montenegro.com/wp-content/uploads/2026/02/Depositphotos_250074826_XL-scaled.jpg',
+    '/images/entity_images/localities/f04ddd5f5c6d16f37dce7df7.jpg',
     'Centar Kotora',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Kotora'),
     NOW()),
 (
-    'https://bokanews.me/wp-content/uploads/2018/11/Tivat-centar.jpg',
+    '/images/entity_images/localities/c3db127ee09343e172f02517.jpg',
     'Centar Tivta',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Tivta'),
     NOW()),
 (
-    'https://cf.bstatic.com/xdata/images/hotel/max1024x768/449313311.jpg?k=7d594eccd3716db7f70ee270d518f17cef37c9cfba36c5cb469009ed466387bc&o=',
+    '/images/entity_images/localities/00969337d7721bf7e10fa412.jpg',
     'Centar Tivta',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Tivta'),
     NOW()),
 (
-    'https://bokanews.me/wp-content/uploads/2018/12/Tivat-_Centar.jpg',
+    '/images/entity_images/localities/0411ff8c08e8115a8eb6cc39.jpg',
     'Centar Tivta',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Tivta'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/0/0e/Kola%C5%A1in_Town_Center.jpg',
+    '/images/entity_images/localities/12136e8bff9c75a4fd0e291e.jpg',
     'Centar Kolašina',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Kolašina'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2019/08/01/00/4576536_20190801200824_acc0e98099a547218011496814c7bb54b86f69d29170423b0b7e42d4b595c412_ls.jpg',
+    '/images/entity_images/localities/9b4aaa8324c3a01885db6237.jpg',
     'Centar Kolašina',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Kolašina'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2020/05/08/00/5166375_20200508120532_15b2b4d6e5e4b8fac8536ee8b7cc6fd69d14f19dc573ca6773d8cf252cfe964f_ff.jpg',
+    '/images/entity_images/localities/58e342d159677e1d4d108ebf.jpg',
     'Centar Kolašina',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Kolašina'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/13/42/92/9c/slovenska-beach.jpg?w=1200&h=-1&s=1',
+    '/images/entity_images/localities/e8393df55b84ae29e2a8b283.jpg',
     'Slovenska plaža',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Slovenska plaža'),
     NOW()),
 (
-    'https://www.hgbudvanskarivijera.com/images/hotel-slovenska-plaza/novo-totali/dji_0516.jpg',
+    '/images/entity_images/localities/66999f29b60cf67d2bcc7acd.jpg',
     'Slovenska plaža',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Slovenska plaža'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/e/e4/Slovenska_Beach_in_Budva%2C_Montenegro_aa.jpg',
+    '/images/entity_images/localities/6aa523d93c768c98fce0600c.jpg',
     'Slovenska plaža',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Slovenska plaža'),
     NOW()),
 (
-    'https://lusticabay.com/wp-content/uploads/2022/04/Marina-Village-Lustica-Bay-e1655734430415.jpg',
+    '/images/entity_images/localities/85e2aeb1a45c20d16ea30f4f.jpg',
     'Luštica',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Luštica'),
     NOW()),
 (
-    'https://d1tfdfyb9rvaxg.cloudfront.net/chedilusticabay.com-1070583806/cms/cache/v2/6315646eed574.jpg/1920x1080/fit/80/81f4fda3ffdd2153fdb2520418512bba.jpg',
+    '/images/entity_images/localities/abb63cda8a5d4f7f58a85312.jpg',
     'Luštica',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Luštica'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/4/4b/%D0%A1%D0%B2%D1%98%D0%B5%D1%82%D0%BB%D0%BE%D0%BF%D0%B8%D1%81_%D0%B7%D0%B2%D0%BE%D0%BD%D0%B8%D0%BA%D0%B0_%D1%81%D1%80%D0%B1%D1%81%D0%BA%D0%B5_%D0%BF%D1%80%D0%B0%D0%B2%D0%BE%D1%81%D0%BB%D0%B0%D0%B2%D0%BD%D0%B5_%D1%86%D1%80%D0%BA%D0%B2%D0%B5_%D0%A1%D0%B2._%D0%9D%D0%B5%D0%B4%D1%98%D0%B5%D1%99%D0%B5_%D1%83_%D0%97%D0%B0%D0%B1%D1%80%D1%92%D1%83%2C_%D0%9B%D1%83%D1%88%D1%82%D0%B8%D1%86%D0%B0.jpg',
+    '/images/entity_images/localities/2d6c00c18956c81276e872e3.jpg',
     'Luštica',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Luštica'),
     NOW()),
 (
-    'https://velikaplaza.com/wp-content/uploads/2020/03/dsc_0020.jpg',
+    '/images/entity_images/localities/0956afcbe880177a06cf7c7f.jpg',
     'Centar Ulcinja',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Ulcinja'),
     NOW()),
 (
-    'https://foodbook.me/storage/blog/35/YilRuxmtjlxIt2EK3dPr5oSJpoeuLJGgy5PIqWU8.jpg',
+    '/images/entity_images/localities/5f56851fc8fd8fe0ce1d9fc0.jpg',
     'Centar Ulcinja',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Ulcinja'),
     NOW()),
 (
-    'https://content.estitor.com/86a4da2c-a4b3-492d-8b72-9b355c1d2307-md.webp',
+    '/images/entity_images/localities/bef9752d58066e410f0a649d.jpg',
     'Centar Ulcinja',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Ulcinja'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/f/f3/Widok_na_Perast_z_zachodu_01.JPG',
+    '/images/entity_images/localities/96a020aaeba1dac7436698ca.jpg',
     'Perast',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Perast'),
     NOW()),
 (
-    'https://www.mcadriatic.com/wp-content/uploads/2021/03/perast-3.jpg',
+    '/images/entity_images/localities/496c0ada7e55978bcbb3068e.jpg',
     'Perast',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Perast'),
     NOW()),
 (
-    'https://www.miroandsons.com/wp-content/uploads/2022/11/perastladyoftherock.webp',
-    'Perast',
-    false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Perast'),
-    NOW()),
-(
-    'https://beachatlas.s3.us-east-2.amazonaws.com/a20f585f-f4d3-43a7-817f-40e06eb2ae74.jpeg',
+    '/images/entity_images/localities/92d73546c270669e9e977767.jpg',
     'Radanovići',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Radanovići'),
     NOW()),
 (
-    'https://www.maestrotravel.rs/wp-content/uploads/2024/03/Radanovi%C4%87i.jpg',
+    '/images/entity_images/localities/2e6e159c950fac04fac4199d.jpg',
     'Radanovići',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Radanovići'),
     NOW()),
 (
-    'https://cdn.nadjidom.com/images/photos/large/2025/12/03/-a41-4900-1679557921-viber-slika-2023-03-22-13-35-56-571.jpg',
+    '/images/entity_images/localities/d5aced2fb593294363e39e8d.jpg',
     'Radanovići',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Radanovići'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/2/21/Podgorica-Tuzi_Vulaj_village_IMG_1321_De%C4%8Di%C4%87_mountain.JPG',
+    '/images/entity_images/localities/e6697b6dd4a1568d65edeb85.jpg',
     'Tuzi',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Tuzi'),
     NOW()),
 (
-    'https://tuzi.org.me/wp-content/uploads/2019/03/niagara-1.jpg',
+    '/images/entity_images/localities/a098ec6ee208e643dd5bfc7b.jpg',
     'Tuzi',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Tuzi'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2023/12/27/21/5539362_tuzi_share.jpg',
+    '/images/entity_images/localities/922e6f91712c88b5a7eb709f.jpg',
     'Tuzi',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Tuzi'),
     NOW()),
 (
-    'https://bosnjackidnk.com/wp-content/uploads/2021/08/image_2021-08-27_143828.png',
+    '/images/entity_images/localities/364bac49e4eab7e60951f4ba.jpg',
     'Građani',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Građani'),
     NOW()),
 (
-    'https://www.poreklo.rs/wp-content/uploads/2019/07/selo.jpg',
+    '/images/entity_images/localities/d72e0417ab97dc2c43e79219.jpg',
     'Građani',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Građani'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2021/07/13/22/5348555_2247292_ff.jpg',
+    '/images/entity_images/localities/e99cf6fe808f94042f2eac44.jpg',
     'Građani',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Građani'),
     NOW()),
 (
-    'https://static.wixstatic.com/media/943f6a_dc7129f291b94358a2bc3811c6fa4ab3~mv2.jpg/v1/fill/w_2500,h_1668,al_c/943f6a_dc7129f291b94358a2bc3811c6fa4ab3~mv2.jpg',
+    '/images/entity_images/localities/c1605b504a44a475008cbaab.jpg',
     'Podostrog',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Podostrog'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/6/6a/Budva%2C_kl%C3%A1%C5%A1ter_Podostrog.jpg',
+    '/images/entity_images/localities/9ef3369c35332732fd9e4238.jpg',
     'Podostrog',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Podostrog'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Podostrog%2C_ji%C5%BEn%C3%AD_okraj_Budvy.jpg/1280px-Podostrog%2C_ji%C5%BEn%C3%AD_okraj_Budvy.jpg',
-    'Podostrog',
-    false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Podostrog'),
-    NOW()),
-(
-    'https://upload.wikimedia.org/wikipedia/commons/f/f6/Budva_%2826939787035%29.jpg',
+    '/images/entity_images/localities/534596c0998be845ac5c889e.jpg',
     'Bečići',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Bečići'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/7/72/Be%C4%8Di%C4%87i%2C_Montenegro_-_panoramio_%286%29.jpg',
+    '/images/entity_images/localities/c9bb17e35a0db80406f2cd70.jpg',
     'Bečići',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Bečići'),
     NOW()),
 (
-    'https://kontiki.ba/Handler/LocationPictHandler.ashx?LocationTvRecId=92&LocationPictTvRecId=528',
-    'Bečići',
-    false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Bečići'),
-    NOW()),
-(
-    'https://sothebysrealty.me/wp-content/uploads/2023/01/39-Podgorica-Mareza-luxury-villa-with-a-swimming-pool-1-1536x863.jpg',
+    '/images/entity_images/localities/a5a5999f9bba6c113cb7ecb1.jpg',
     'Imanje',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Imanje'),
     NOW()),
 (
-    'https://podgorica.travel/wp-content/uploads/2024/04/VED_1500-scaled-e1713447102971.jpg',
+    '/images/entity_images/localities/e93cd95d51d58e162c46c703.jpg',
     'Imanje',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Imanje'),
     NOW()),
 (
-    'https://www.imanje-knjaz.me/files/images/1733817908-BI4_6135%20copy.jpg',
+    '/images/entity_images/localities/b05368714f5b8a8b566520ca.jpg',
     'Imanje',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Imanje'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/3/3c/R%C3%ADo_Moraca%2C_norte_de_Podgorica%2C_Montenegro%2C_2014-04-14%2C_DD_09.JPG',
+    '/images/entity_images/localities/f5a647e3d3da1fd2f7121de3.jpg',
     'Morača',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Morača'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/8/84/%D0%A7%D0%B5%D1%80%D0%BD%D0%BE%D0%B3%D0%BE%D1%80%D0%B8%D1%8F%2C_%D0%9C%D0%BE%D0%BD%D0%B0%D1%81%D1%82%D1%8B%D1%80%D1%8C_%D0%9C%D0%BE%D1%80%D0%B0%D1%87%D0%B0.jpg',
-    'Morača',
-    false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Morača'),
-    NOW()),
-(
-    'https://podgorica.travel/wp-content/uploads/2024/04/moraca-1-scaled.jpg',
-    'Morača',
-    false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Morača'),
-    NOW()),
-(
-    'https://forzatravel.rs/fajlovi/city/prcanj-455.jpg',
+    '/images/entity_images/localities/e86b3d96ffde8cd45f8aab5b.jpg',
     'Prčanj',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Prčanj'),
     NOW()),
 (
-    'https://www.adriaticvacationrentals.com/wp-content/uploads/2025/06/Prcanj-feature.jpg',
+    '/images/entity_images/localities/74dc9aa544eeeab25b36147b.jpg',
     'Prčanj',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Prčanj'),
     NOW()),
 (
-    'https://montenegro-for.me/wp-content/uploads/2025/05/old-parish-church-Prcanj1.jpg',
-    'Prčanj',
-    false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Prčanj'),
-    NOW()),
-(
-    'https://s-medijicg.com/images/stories/2020/08/19/ANDRIJEVICA-CENTAR-2.jpeg',
+    '/images/entity_images/localities/510aba96031cbfdeaf30d183.jpg',
     'Centar Andrijevice',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Andrijevice'),
     NOW()),
 (
-    'https://rtcg.me/upload//media/2024/2/20/20/59/29/1655559/thumbs/2887806/andrijevica.jpg',
+    '/images/entity_images/localities/8af061e3d47d3346bd24a270.jpg',
     'Centar Andrijevice',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Andrijevice'),
     NOW()),
 (
-    'https://rtcg.me/upload//media/2024/3/28/21/24/827/1706228/thumbs/3079682/andrijevica.jpg',
-    'Centar Andrijevice',
-    false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Andrijevice'),
-    NOW()),
-(
-    'https://www.vijesti.me/data/images/2023/03/06/10/5472797_pjesnicka-rijec-1_share.jpg',
+    '/images/entity_images/localities/cc91ed7246c2b4bba6dafed1.jpg',
     'Centar Plužina',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Plužina'),
     NOW()),
 (
-    'https://parkpiva.com/wp-content/uploads/2019/06/Pluzine-dron21-1024x768.jpg',
+    '/images/entity_images/localities/003cfe25a35270db22460eba.jpg',
     'Centar Plužina',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Plužina'),
     NOW()),
 (
-    'https://rtcg.me/upload//media/2023/7/19/12/10/687/1456199/thumbs/2160808/thumb0.jpg',
+    '/images/entity_images/localities/fcea31e0cc9acca21ab1f226.jpg',
     'Centar Plužina',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Plužina'),
     NOW()),
 (
-    'https://parkpiva.com/wp-content/uploads/2016/10/Pivsko-jezero-Park-Piva.jpg',
+    '/images/entity_images/localities/8821f6bd1e24a9255deeea42.jpg',
     'Pivsko jezero',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Pivsko jezero'),
     NOW()),
 (
-    'https://www.tararafting.com/wp-content/uploads/2021/11/Piva-lake.jpg',
+    '/images/entity_images/localities/f5e55f58c27cc1773bb8a213.jpg',
     'Pivsko jezero',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Pivsko jezero'),
     NOW()),
 (
-    'https://srbijazamlade.rs/fajlovi/productitem/tara-rafting_63bd7ab432fbe.jpg',
-    'Pivsko jezero',
-    false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Pivsko jezero'),
-    NOW()),
-(
-    'https://www.mojacrnagora.rs/wp-content/uploads/2018/07/Kom-1.jpg',
+    '/images/entity_images/localities/6141678824016bd8d0707943.jpg',
     'Komarnica',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Komarnica'),
     NOW()),
 (
-    'https://montenegro-for.me/wp-content/uploads/2020/06/Komarnica-Canyon.jpg',
+    '/images/entity_images/localities/616561bfe3cfdd6da2ee3be5.jpg',
     'Komarnica',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Komarnica'),
     NOW()),
 (
-    'https://cf.bstatic.com/xdata/images/hotel/max1024x768/693363952.jpg?k=79ef5b9634d70655662ce869e52f8c05fe22e2f28309317b0a95364b684d5a8b&o=',
+    '/images/entity_images/localities/24010d18ae230a600e9e70d9.jpg',
     'Komarnica',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Komarnica'),
     NOW()),
 (
-    'https://www.ponte.rs/UPLOADS-PONTE/2022/12/SUTOMORE.jpg',
+    '/images/entity_images/localities/fae37786e68d2e55597ce97c.jpg',
     'Sutomore',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Sutomore'),
     NOW()),
 (
-    'https://server.nyaralashorvatorszagban.com/uploads/original/921512ae56e10f39163c4b2aec6264c4.webp',
+    '/images/entity_images/localities/f56f643c4afdaf85cbc89732.jpg',
     'Sutomore',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Sutomore'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/0f/68/20/b0/photo0jpg.jpg?w=1200&h=-1&s=1',
+    '/images/entity_images/localities/98308d1fafd9a376986b1c9b.jpg',
     'Sutomore',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Sutomore'),
     NOW()),
 (
-    'https://casopisprostor.me/images/prostor_58_web-191.jpg',
+    '/images/entity_images/localities/dbb0fc56c6bbb41fc4ec07c1.jpg',
     'Katuni',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Katuni'),
     NOW()),
 (
-    'https://www.ruralholiday.me/wp-content/uploads/2019/08/PENTAX-K-5-14-09-2012-18-25-19.jpg',
+    '/images/entity_images/localities/655f442c47037d1ef46b7dd0.jpg',
     'Katuni',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Katuni'),
     NOW()),
 (
-    'https://mladiberana.me/wp-content/uploads/2024/08/katun.jpg',
+    '/images/entity_images/localities/6d7851a20a6d827ff137a441.jpg',
     'Katuni',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Katuni'),
     NOW()),
 (
-    'https://vcdn.bergfex.at/images/resized/profiles/detail/36a/e6e861aeb705da50a149a6722c96c36a.jpg',
+    '/images/entity_images/localities/7dd21a7c656c86ae88996c73.jpg',
     'Trešnjevik',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Trešnjevik'),
     NOW()),
 (
-    'https://vcdn.bergfex.at/images/resized/profiles/detail/357/fea532dc5d4660446535dca5670f1357.jpg',
+    '/images/entity_images/localities/f5b497ec499d8bfa9f5bbb48.jpg',
     'Trešnjevik',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Trešnjevik'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2021/01/21/14/5290805_1942600_share.jpg',
+    '/images/entity_images/localities/4a3b98be3120d6a023f30a53.jpg',
     'Trešnjevik',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Trešnjevik'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2024/05/26/15/5569651_2374098_ff.jpg',
+    '/images/entity_images/localities/2bdef4d9c0759fa343722713.jpg',
     'Kralje',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Kralje'),
     NOW()),
 (
-    'https://www.toandrijevica.me/wp-content/gallery/kralje/dsc00693.jpg',
+    '/images/entity_images/localities/ed40862d26d9346f4945b3db.jpg',
     'Kralje',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Kralje'),
     NOW()),
 (
-    'https://www.hotels-me.net/data/Imgs/OriginalPhoto/6134/613405/613405265/kraljska-koliba-kralje-s-cottage-andrijevica-img-68.JPEG',
+    '/images/entity_images/localities/d2489dadcc90ed0a0b666807.jpg',
     'Kralje',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Kralje'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/sr/8/8a/Samarkova_luka-Kuti.JPG',
+    '/images/entity_images/localities/07780a5b7491a7660b70f4d5.jpg',
     'Kuti',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Kuti'),
     NOW()),
 (
-    'https://www.toandrijevica.me/wp-content/uploads/2013/12/IMG_1319.jpg',
+    '/images/entity_images/localities/26aeba67df0e4a7520c10fdc.jpg',
     'Kuti',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Kuti'),
     NOW()),
 (
-    'https://rtcg.me/upload//media/2025/8/21/19/51/89/2267641/resize/2267644/3_1200x900',
+    '/images/entity_images/localities/7ad087dc4a8331fd0d7f1441.jpg',
     'Kuti',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Kuti'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/3/34/Crnojevica_rijeka.jpg',
+    '/images/entity_images/localities/d3a7838595b6996dbea2b465.jpg',
     'Rijeka Crnojevića',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Rijeka Crnojevića'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/f/fe/Rijeka_Crnojevi%C4%87a.jpg',
+    '/images/entity_images/localities/f1dc757155f58331e5f84cad.jpg',
     'Rijeka Crnojevića',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Rijeka Crnojevića'),
     NOW()),
 (
-    'https://sharemontenegro.me/wp-content/uploads/2019/10/viber_image_2019-10-30_14-21-45.jpg',
-    'Rijeka Crnojevića',
-    false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Rijeka Crnojevića'),
-    NOW()),
-(
-    'https://lifeontheroam.com/wp-content/uploads/2024/11/Lipa-Cave-Montenegro-tn.webp',
+    '/images/entity_images/localities/e5235eb488da49068646133f.jpg',
     'Lipa',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Lipa'),
     NOW()),
 (
-    'https://montenegro-for.me/wp-content/uploads/2015/09/Durmitor1-Prutas.jpg',
+    '/images/entity_images/localities/f090644ab270318adec42851.jpg',
     'Lipa',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Lipa'),
     NOW()),
 (
-    'https://cdn.getyourguide.com/image/format=auto,fit=crop,gravity=auto,quality=60,width=375,height=375,dpr=2/tour_img/5ee0ced438735.jpeg',
+    '/images/entity_images/localities/ed45712ca5dd09df13c71cf7.jpg',
     'Lipa',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Lipa'),
     NOW()),
 (
-    'https://www.montenegro.travel/imagine_cache/og/uploads/banners/1_unique_montengro/1.Bridge-on-the-river-Tara.webp',
+    '/images/entity_images/localities/b2289f70c23710f829c43000.jpg',
     'Kanjon Tare',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Kanjon Tare'),
     NOW()),
 (
-    'https://www.putokaz.me/images/Zanimljivosti/U_Crnoj_Gori/7_Kanjon_Tare__Najdublji_kanjon_Evrope__/1406546530.jpg',
+    '/images/entity_images/localities/ae76eec975490dc12c5c2c92.jpg',
     'Kanjon Tare',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Kanjon Tare'),
     NOW()),
 (
-    'https://www.amiradio.rs/wp-content/uploads/2024/08/nature-7018528_1280.jpg',
+    '/images/entity_images/localities/c4e815dd7a167939567453ca.jpg',
     'Kanjon Tare',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Kanjon Tare'),
     NOW()),
 (
-    'https://s0.wklcdn.com/image_200/6002773/147428061/92972676Master.jpg',
+    '/images/entity_images/localities/bfec4ecb96df84fe6ac76bb2.jpg',
     'Ćurevac',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Ćurevac'),
     NOW()),
 (
-    'https://sailingstonetravel.b-cdn.net/wp-content/uploads/2021/11/Durmitor-National-Park-Hiking-to-the-Curevac-Viewpoint-56-copy.jpg.webp',
+    '/images/entity_images/localities/07ff993b5b5ccd8b682a3323.jpg',
     'Ćurevac',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Ćurevac'),
     NOW()),
 (
-    'https://sailingstonetravel.b-cdn.net/wp-content/uploads/2021/11/Durmitor-National-Park-Hiking-to-the-Curevac-Viewpoint-55-copy.jpg',
+    '/images/entity_images/localities/80ce2783d95dedd49aaf7952.jpg',
     'Ćurevac',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Ćurevac'),
     NOW()),
 (
-    'https://www.montenegroprospects.com/sites/default/files/styles/realty_xxl/public/2022-04/ruins_for_sale_13471_9.jpg.webp?itok=crOxvsaa',
+    '/images/entity_images/localities/50f8ad83afcd935be8fed7f7.jpg',
     'Kameno',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Kameno'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2019/08/01/00/4576028_20190801140820_4c02bf037ed118ef7fe1c4ccaca44c35f4c154c4e2d20688158b515e34a2871f_share.jpg',
+    '/images/entity_images/localities/091af292ac55986259cf8694.jpg',
     'Kameno',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Kameno'),
     NOW()),
 (
-    'https://www.montenegroprospects.com/sites/default/files/styles/realty_xxl/public/2022-04/ruins_for_sale_13471_6.jpg.webp?itok=U6aYvVSX',
+    '/images/entity_images/localities/547029f4b170f8f6dd939c88.jpg',
     'Kameno',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Kameno'),
     NOW()),
 (
-    'https://forte-mare.com/wp-content/uploads/2024/02/1-7-7.jpg',
+    '/images/entity_images/localities/8e781ee6adbdeba8d15570b1.jpg',
     'Podi',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Podi'),
     NOW()),
 (
-    'https://monteonline.org/wp-content/uploads/2025/06/familnyj-dom-s-vidom-na-zaliv-i-otkrytoe-more-v-podi-herczeg-novi_01.jpg',
+    '/images/entity_images/localities/e2bc1e3d0671a9d3fe5a33f9.jpg',
     'Podi',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Podi'),
     NOW()),
 (
-    'https://nekretnina.me/wp-content/uploads/2025/01/23-min.jpg',
+    '/images/entity_images/localities/f2ca4412264f7f3c854ee559.jpg',
     'Podi',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Podi'),
     NOW()),
 (
-    'https://onogost.me/wp-content/uploads/2023/12/Tvrđava-onogost-nasa-slika.jpg',
+    '/images/entity_images/localities/807fc4577c310df697e93116.jpg',
     'Tvrđava Onogošt',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Tvrđava Onogošt'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2019/03/31/00/4355293_20190331200328_505cdd0bc5d93f91405c69c3bf1364fc2a58fc8e384cf6288526dc7f64d8f17c_share.jpg',
+    '/images/entity_images/localities/f7335821f4e4e9f68fe15198.jpg',
     'Tvrđava Onogošt',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Tvrđava Onogošt'),
     NOW()),
 (
-    'https://adria.fun/wp-content/uploads/2023/09/Onogost-Nikisic-Photo-Adria.fun_.JPG-2-ok.jpg',
+    '/images/entity_images/localities/a55ad753d0d6689f2a42b209.jpg',
     'Tvrđava Onogošt',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Tvrđava Onogošt'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/e/ec/%D0%A1%D0%B2%D1%98%D0%B5%D1%82%D0%BB%D0%BE%D0%BF%D0%B8%D1%81_%D1%98%D0%B5%D0%B7%D0%B5%D1%80%D0%B0_%D0%9A%D1%80%D1%83%D0%BF%D0%B0%D1%86_%D0%BA%D0%BE%D0%B4_%D0%9D%D0%B8%D0%BA%D1%88%D0%B8%D1%9B%D0%B03.jpg',
+    '/images/entity_images/localities/6b795ecf7fc3a7588d0ce865.jpg',
     'Krupačko jezero',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Krupačko jezero'),
     NOW()),
 (
-    'https://wevotravel.com/wp-content/uploads/2023/04/1_1-5-1536x1151-1.jpg',
-    'Krupačko jezero',
-    false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Krupačko jezero'),
-    NOW()),
-(
-    'https://wevotravel.com/wp-content/uploads/2023/04/3_1-3.jpg',
-    'Krupačko jezero',
-    false,
-    (SELECT "Id" FROM "Localities" WHERE "Name" = 'Krupačko jezero'),
-    NOW()),
-(
-    'https://www.ekapija.com/thumbs/grad_plav_060323_tw1024.jpg',
+    '/images/entity_images/localities/a89dae8f93edb7dcb64f5400.jpg',
     'Centar Plava',
     true,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Plava'),
     NOW()),
 (
-    'https://montenegrina.net/wp-content/uploads/2018/12/Plav-1.jpg',
+    '/images/entity_images/localities/d2586f08b1b0f8edc39c88b0.jpg',
     'Centar Plava',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Plava'),
     NOW()),    
 (
-    'https://montenegrina.net/wp-content/uploads/2018/12/Plav-2.jpg',
+    '/images/entity_images/localities/fc5e618c9de9d28420b4ceb5.jpg',
     'Centar Plava',
     false,
     (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Plava'),
@@ -7982,3691 +7855,3422 @@ VALUES
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 VALUES
 (
-    'https://images.trvl-media.com/lodging/3000000/2500000/2497700/2497664/26b21f8d.jpg?impolicy=resizecrop&rw=575&rh=575&ra=fill',
+    '/images/entity_images/objects/70fa83b3d8acfd2c5a858b94.jpg',
     'Hotel Vardar',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Vardar'),
     NOW()),
 (
-    'https://vardarkotor.me-hotel.com/data/Imgs/OriginalPhoto/13136/1313656/1313656486/hotel-vardar-kotor-img-5.JPEG',
+    '/images/entity_images/objects/e053518fa7ec8f8eef19c7dd.jpg',
     'Hotel Vardar',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Vardar'),
     NOW()),
 (
-    'https://soleazur.rs/uploads/0000/1/2021/11/22/vardar-kotor-2.jpg',
+    '/images/entity_images/objects/6c6df5311ec8c1b3924f5acd.jpg',
     'Hotel Vardar',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Vardar'),
     NOW()),
 (
-    'https://alf.ua/public/uploads/media/thumbnails/0002/06/4cfefe4960e0f0615dbcfbb47d94d9b76d0497a4.jpeg',
+    '/images/entity_images/objects/4005fc15814d80f721ae905a.jpg',
     'Hotel Vardar',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Vardar'),
     NOW()),
 (
-    'https://mcdn.pro/data/objects/images/40419/1-5vpoci-l-ptkdlq.jpg',
+    '/images/entity_images/objects/62941c5e9996ba48873b5ec2.jpg',
     'Hotel Avala',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Avala'),
     NOW()),
 (
-    'https://globus-tours.co/storage/2023/05/avala-resort-2.jpg',
+    '/images/entity_images/objects/9d20e73df09d8e535939c114.jpg',
     'Hotel Avala',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Avala'),
     NOW()),
 (
-    'https://www.kongresniturizam.com/storage/objects/vGHRn278rdNRSipA.jpg',
+    '/images/entity_images/objects/bf61d59bd77586ce98d2bc1c.jpg',
     'Hotel Avala',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Avala'),
     NOW()),
 (
-    'https://www.avalaresort.com/photos/1/Gallery/Spa%20&%20Wellness/homepage/DSC_7301.jpg',
+    '/images/entity_images/objects/ab2c200a9a011b1f8de6392d.jpg',
     'Hotel Avala',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Avala'),
     NOW()),
 (
-    'https://www.luxurylifestylemag.co.uk/wp-content/uploads/2022/11/140-Hotel-Vardar-photo-Edvard-Nalbantjan-.jpg',
+    '/images/entity_images/objects/50f3e619ab578fed1de5401d.jpg',
     'Restoran Galion',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Galion'),
     NOW()),
 (
-    'https://www.luxurylifestylemag.co.uk/wp-content/uploads/2022/11/132-Hotel-Vardar-photo-Edvard-Nalbantjan-.jpg',
+    '/images/entity_images/objects/630dbb8e5409c65d42ed10d2.jpg',
     'Restoran Galion',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Galion'),
     NOW()),
 (
-    'https://turistickiinfocentar.rs/wp-content/uploads/CF026968favsmanjeno-min-1-1-scaled.jpg',
+    '/images/entity_images/objects/adf88efc232fd128e8dfedff.jpg',
     'Restoran Galion',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Galion'),
     NOW()),
 (
-    'https://www.montenegrofortravellers.com/sites/default/files/styles/monte1140x550/public/place/restaurant_galion_restoran_galion_v_kotore.jpg?itok=wLuoKPQe',
+    '/images/entity_images/objects/1b4cf3fb220769ff5100e41f.jpg',
     'Restoran Galion',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Galion'),
     NOW()),
 (
-    'https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=1920,fit=crop/A854j9RqjjF9MZww/hmphoto-24-dWxbarqLqquob7Qz.jpg',
+    '/images/entity_images/objects/5abfb0a254a2d854e993c749.jpg',
     'Mogren Beach Bar',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mogren Beach Bar'),
     NOW()),
 (
-    'https://adriaticways.com/wp-content/uploads/2026/01/Mogren-2-Beach.webp',
+    '/images/entity_images/objects/619c40464c602b0bb6fe1c85.jpg',
     'Mogren Beach Bar',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mogren Beach Bar'),
     NOW()),
 (
-    'https://montenegro.org/wp-content/uploads/2023/11/IMG_7522-1024x768.jpg',
+    '/images/entity_images/objects/b264a658a5c8ca33f1e97602.jpg',
     'Mogren Beach Bar',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mogren Beach Bar'),
     NOW()),
 (
-    'https://montenegro.org/wp-content/uploads/2023/11/IMG_7553-1024x768.jpg',
+    '/images/entity_images/objects/92abf338612a75a1edfe30a5.jpg',
     'Mogren Beach Bar',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mogren Beach Bar'),
     NOW()),
 (
-    'https://www.antenam.net/uploads/a/f/9/af9e3af739604df73554e1fb290f080a.jpeg',
+    '/images/entity_images/objects/af64bc63c584e93890436ec1.jpg',
     'Planinarski dom Durmitor',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Durmitor'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2019/02/17/00/3076728_20190217020252_5c68bf02b789684ea0f98e47jpeg_ls.jpg',
+    '/images/entity_images/objects/8703941ae0ef8ea5b9665b90.jpg',
     'Planinarski dom Durmitor',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Durmitor'),
     NOW()),
 (
-    'https://durmitor.wordpress.com/wp-content/uploads/2012/03/planinarski-dom-orjen.jpg?w=584',
+    '/images/entity_images/objects/e7170b3c787b75fc525b1959.jpg',
     'Planinarski dom Durmitor',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Durmitor'),
     NOW()),
 (
-    'https://lh3.googleusercontent.com/p/AF1QipNRrYNagkDHzZ-UBtBHSm3Y7nF12mw_KBVbmdgZ=s1600-w640',
+    '/images/entity_images/objects/470f8b3a07b4c743217b7bbc.jpg',
     'Planinarski dom Durmitor',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Durmitor'),
     NOW()),
 (
-    'https://rtnk.me/wp-content/uploads/2025/10/gradska-kuca-rtnk.jpg',
+    '/images/entity_images/objects/a4dc50ae182165a12b26b12b.jpg',
     'Biblioteka Nikšić',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Biblioteka Nikšić'),
     NOW()),
 (
-    'https://www.standard.co.me/wp-content/uploads/2018/02/ed05e0e0c4febd7b2b95b70b5743b93a.jpg',
+    '/images/entity_images/objects/af752aaceab3574e999976df.jpg',
     'Biblioteka Nikšić',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Biblioteka Nikšić'),
     NOW()),
 (
-    'https://rtnk.me/wp-content/uploads/2025/04/gradska-kuca-rtnk.jpg',
+    '/images/entity_images/objects/3d1ba414c31e47014509a2cf.jpg',
     'Biblioteka Nikšić',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Biblioteka Nikšić'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images_intext/2019/10/16/14/20191016151024_6475cc02abfa00ff342bb2b5f0f51fd8170852b7828c926115eea5cc932b93ea.jpeg',
+    '/images/entity_images/objects/ce594f211e29183c64994a24.jpg',
     'Biblioteka Nikšić',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Biblioteka Nikšić'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/Katoli%C4%8Dka_crkva_svetog_Nikole_u_Starom_Baru.JPG/1280px-Katoli%C4%8Dka_crkva_svetog_Nikole_u_Starom_Baru.JPG',
+    '/images/entity_images/objects/3d9b2a09c70d093aa13e61a5.jpg',
     'Crkva Svetog Nikole Bar',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Crkva Svetog Nikole Bar'),
     NOW()),
 (
-    'https://mitropolija.com/wp-content/uploads/2019/05/08.jpg',
+    '/images/entity_images/objects/e7dc1bb41f7a06b9f48f819d.jpg',
     'Crkva Svetog Nikole Bar',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Crkva Svetog Nikole Bar'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/1/15/Pravoslavna_crkva_sv._Nikole_u_Starom_Baru.jpg',
-    'Crkva Svetog Nikole Bar',
-    false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Crkva Svetog Nikole Bar'),
-    NOW()),
-(
-    'https://images.openai.com/static-rsc-4/cg0pAy_gi4jJAH0p6vW6roIhN_4p01jmxGgbEq4g6KOxn6RB36KVyBQGDD_z9GweIyWAeEv8MvlJjQ-x9ebwT-jBpcKxzaa4PIshjLIl-CMmyg1rOB0DnrVpA6yKvul7P-qGmypBs4HGbl6YbnQ9SXiikdvuYh_WFHtraGVBI24q3nf8GbRqFPqTIfRgf19o?purpose=fullsize',
+    '/images/entity_images/objects/8ce9e97a20082c80b921aede.jpg',
     'Restoran Jezero',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Jezero'),
     NOW()),
 (
-    'https://images.openai.com/static-rsc-4/FGCGeHTOEhn7iRz5Zf3zduzGyRpI3oWMpmGMB9MLowZQVPXvaZxyapywMCj0fspxIIm1czG5MUMOWY6LNEUPFgWkcwTPgSkDc5LuTm9RQz_WVxPQ6qEYL_Az2XeKMWDbOWbfUTMV2oX1lvBUKnC5DQwl_xJ-4kUV-NBMKJ_xhmPCOogx7tIkalv0VVfFXdIL?purpose=fullsize',
+    '/images/entity_images/objects/7ee0e2a138c0e8bfdb00f6d7.jpg',
     'Restoran Jezero',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Jezero'),
     NOW()), 
 (
-    'https://images.openai.com/static-rsc-4/4xXo4sv034rWBeC3wyhiApeBGI1zjC9sWok5uw-zc00W9G9sf8iuOBHyX_Syym1HD9U_XFEqm5UpAeMUsPky8TL4CCgjidreQEBspAmefiK8JfJ9x212eIYkHOzeqIkcVeeexLqjAYD1r27G4_v5yBFtxjPlXF8PlajszCVRq12zAXV1Nyh4hyIuUNjPKitW?purpose=fullsize',
+    '/images/entity_images/objects/01b6b2f56ccd8a6455d03f64.jpg',
     'Restoran Jezero',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Jezero'),
     NOW()),
     (
-    'https://images.openai.com/static-rsc-4/Dw0azf0HD_TmcThiY9gyKsWWwVyDcf14vwjtPPDlmIeME56axW2iPuYn9a6qs4hmvK9D_T8hlTQ4e744sBbg3MRmhmALtYPsU0hqYj-jM7Gyw5Flhahs1Ifk4CZiZuIhLEle2WGs1Bv4OHb9bTiCfPdYBqSa2XNTDnaR3LCgWIk9Zjfg0EtTiYt6dNjzlXc3?purpose=fullsize',
+    '/images/entity_images/objects/36da18ae52ca1b6e24078285.jpg',
     'Restoran Jezero',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Jezero'),
     NOW()),
 (
-    'https://www.plantaze.com/wp-content/uploads/2026/02/restoranhrana8-637x1024.jpg',
+    '/images/entity_images/objects/63a9723247e5879e7fa966f0.jpg',
     'Restoran Jezero',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Jezero'),
     NOW()),
 (
-    'https://images.mindtrip.ai/restaurants/6498/58dd/50d5/ab5e/af05/40ba/db52/f6a2',
+    '/images/entity_images/objects/95ae14e230ad9ce76241ef96.jpg',
     'Restoran Jezero',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Jezero'),
     NOW()),
 (
-    'https://cf.bstatic.com/xdata/images/hotel/max1024x768/77650626.jpg?k=5626605edcaec3c0992f24c5d442839d08193e6d27e5c514ba354d7b20394a75&o=',
+    '/images/entity_images/objects/83c8064cf058e4b475c38085.jpg',
     'Hotel Bianca Kolašin',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Bianca Kolašin'),
     NOW()),
 (
-    'https://cf.bstatic.com/xdata/images/hotel/max1024x768/19026752.jpg?k=e14990f4ba96f2a7cf0c568743d3285f1ad3a7129866214c4f33d8e67b9d6d91&o=',
+    '/images/entity_images/objects/a2d5a184ff6167c7c4ce6030.jpg',
     'Hotel Bianca Kolašin',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Bianca Kolašin'),
     NOW()),
 (
-    'https://images.trvl-media.com/lodging/3000000/2360000/2351700/2351617/9d2b65dc.jpg?impolicy=fcrop&w=1200&h=800&quality=medium',
+    '/images/entity_images/objects/ea7239895d3a24ac752d07ec.jpg',
     'Hotel Bianca Kolašin',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Bianca Kolašin'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/29/f6/7c/ec/caption.jpg?w=1200&h=1200&s=1',
+    '/images/entity_images/objects/9e225122e43e5cf9dbc7ff29.jpg',
     'Hotel Bianca Kolašin',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Bianca Kolašin'),
     NOW()),
 (
-    'https://www.hotels-me.net/data/Photos/OriginalPhoto/17144/1714498/1714498335.JPEG',
+    '/images/entity_images/objects/5b7b8cc68e6c92309e81a5e4.jpg',
     'Hotel Bianca Kolašin',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Bianca Kolašin'),
     NOW()),
 (
-    'https://foodbook.me/storage/restaurants/375/bhPAke1vwjwf6FaVL5GK35nsvkuPbVTPVkYutaXU.jpg',
+    '/images/entity_images/objects/691546d2e8397ffedfa792f2.jpg',
     'Konoba Scala Santa',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Konoba Scala Santa'),
     NOW()),
 (
-    'https://foodbook.me/storage/restaurants/20/qSIrzDnAzB1h2gCED4v3XBRvYbR1dq90qrAZHJEx.jpg',
+    '/images/entity_images/objects/67b75d83d2c55d4673eda2f9.jpg',
     'Konoba Scala Santa',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Konoba Scala Santa'),
     NOW()),
 (
-    'https://images.myguide-cdn.com/montenegro/companies/konoba-scala-santa/large/konoba-scala-santa-467850.jpg',
+    '/images/entity_images/objects/f7611b924e2ec1e8e94e8b28.jpg',
     'Konoba Scala Santa',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Konoba Scala Santa'),
     NOW()),
 (
-    'https://foodbook.me/storage/restaurants/tPAx7eIGQIYSrRDBKeusUbTjftogq85754RUa72E.jpeg',
+    '/images/entity_images/objects/bc6a49e3449c9675e6dbf665.jpg',
     'Restoran Pod Volat',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Pod Volat'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/31/2d/c1/0b/caption.jpg?w=1200&h=1200&s=1',
+    '/images/entity_images/objects/079c61a9f5038b2e53cf3bdd.jpg',
     'Restoran Pod Volat',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Pod Volat'),
     NOW()),
 (
-    'https://foodbook.me/storage/restaurants/44/SccUnOVMVGNhU3jRNlwMdupinmSwbskT8eMeSUFe.jpg',
+    '/images/entity_images/objects/e4d38988ce80797986cf48c2.jpg',
     'Restoran Pod Volat',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Pod Volat'),
     NOW()),
 (
-    'https://media-cdn.tripadvisor.com/media/photo-m/1280/2b/5f/2a/14/mayabay-porto-montenegro.jpg',
+    '/images/entity_images/objects/0a380bc0c199a82eb42329d3.jpg',
     'MayaBay Porto Montenegro',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'MayaBay Porto Montenegro'),
     NOW()),
 (
-    'https://www.mayabayrestaurant.com/uploads/media/1416x1424/03/303-MayaBay%20Porto%20Montenegro.webp?v=1-0',
+    '/images/entity_images/objects/ab6b2dad5565bd218e5517f6.jpg',
     'MayaBay Porto Montenegro',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'MayaBay Porto Montenegro'),
     NOW()),
 (
-    'https://www.mayabayrestaurant.com/uploads/media/960x1098/07/177-big%20last.webp?v=1-0',
+    '/images/entity_images/objects/b7a3cd0a24060ed4efb2b51a.jpg',
     'MayaBay Porto Montenegro',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'MayaBay Porto Montenegro'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/18/3b/43/d9/entrance.jpg?w=1200&h=1200&s=1',
+    '/images/entity_images/objects/b2911687763e4dbf4433528b.jpg',
     'Konoba Batričević Njeguši',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Konoba Batričević Njeguši'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/18/3b/46/3a/hanging-hams.jpg?w=1200&h=1200&s=1',
+    '/images/entity_images/objects/3687f5e82281f644785a46b3.jpg',
     'Konoba Batričević Njeguši',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Konoba Batričević Njeguši'),
     NOW()),
 (
-    'https://media-cdn.tripadvisor.com/media/photo-m/1280/18/3b/43/e4/inside.jpg',
+    '/images/entity_images/objects/74eed40447cd6e25ba66c8e6.jpg',
     'Konoba Batričević Njeguši',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Konoba Batričević Njeguši'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2c/f8/37/7e/caption.jpg?w=1200&h=1200&s=1',
+    '/images/entity_images/objects/fa35ff3a43152bc35bb61e1e.jpg',
     'Restoran Ulcinj Sunset',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Ulcinj Sunset'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2d/19/f9/d4/caption.jpg?w=1100&h=1100&s=1',
+    '/images/entity_images/objects/0f1a657e66eba69afb41ebca.jpg',
     'Restoran Ulcinj Sunset',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Ulcinj Sunset'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/29/a2/8c/01/beach-restaurant.jpg?w=900&h=500&s=1',
+    '/images/entity_images/objects/e7b5bc9f4c3c56ccbbf54b75.jpg',
     'Restoran Ulcinj Sunset',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Ulcinj Sunset'),
     NOW()),
 (
-    'https://media-cdn.tripadvisor.com/media/photo-m/1280/1b/06/6e/15/restaurant-oro.jpg',
+    '/images/entity_images/objects/19a9c7163ba59febb0502d12.jpg',
     'Restaurant OrO',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restaurant OrO'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/30/cb/c8/43/caption.jpg?w=1100&h=1100&s=1',
+    '/images/entity_images/objects/63714183cf797c78e0cfd1e2.jpg',
     'Restaurant OrO',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restaurant OrO'),
     NOW()),
 (
-    'https://restaurantoro.me/wp-content/uploads/2024/09/Restaurant-Oro-O-nama-slika.webp',
+    '/images/entity_images/objects/05277a6a69ed9d3f4a343aba.jpg',
     'Restaurant OrO',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restaurant OrO'),
     NOW()),
 (
-    'https://www.sto.com/media/images/references/hotel_regent_montenegro/Hotel-Regent--46602-2400-1600_1200.webp',
+    '/images/entity_images/objects/8e81b49b7ef31dd3423a9942.jpg',
     'Regent Porto Montenegro',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Regent Porto Montenegro'),
     NOW()),
 (
-    'https://pierretravel.rs/media/sys/accomodation/image/52517.jpeg',
-    'Regent Porto Montenegro',
-    false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Regent Porto Montenegro'),
-    NOW()),
-(
-    'https://pierretravel.rs/media/sys/accomodation/image/52523.jpeg',
-    'Regent Porto Montenegro',
-    false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Regent Porto Montenegro'),
-    NOW()),
-(
-    'https://montenegrostars.com/templates/yootheme/cache/d8/4-d8292314.jpeg',
+    '/images/entity_images/objects/ad583774056f38db7d141651.jpg',
     'Hotel Splendid Conference & Spa Resort',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Splendid Conference & Spa Resort'),
     NOW()),
 (
-    'https://mcdn.pro/data/objects/images/28628/splendid-23-asj1va-l-v3airh.jpg',
+    '/images/entity_images/objects/d94c6c6234ca6fee5571135c.jpg',
     'Hotel Splendid Conference & Spa Resort',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Splendid Conference & Spa Resort'),
     NOW()),
 (
-    'https://splendidspa-montenegro.com/templates/yootheme/cache/f6/3-f6177fdc.jpeg',
-    'Hotel Splendid Conference & Spa Resort',
-    false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Splendid Conference & Spa Resort'),
-    NOW()),
-(
-    'https://assets.hyatt.com/content/dam/hyatt/hyattdam/images/2023/08/10/0922/TIVRK-P0218-Beachfront.jpg/TIVRK-P0218-Beachfront.4x3.jpg',
+    '/images/entity_images/objects/2a5fe90b15d84da0999fcb3b.jpg',
     'Hyatt Regency Kotor Bay Resort',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hyatt Regency Kotor Bay Resort'),
     NOW()),
 (
-    'https://assets.hyatt.com/content/dam/hyatt/hyattdam/images/2023/11/01/0624/TIVRK-P0731-Lighthouse-Restaurant-Terrace-Banquet.jpg/TIVRK-P0731-Lighthouse-Restaurant-Terrace-Banquet.16x9.jpg?imwidth=1920',
+    '/images/entity_images/objects/8c861b8bcc4b91979d2e7066.jpg',
     'Hyatt Regency Kotor Bay Resort',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hyatt Regency Kotor Bay Resort'),
     NOW()),
 (
-    'https://www.yachtscroatia.com/var/site/storage/images/_aliases/i1920/6/2/5/0/110526-20-eng-GB/3486df69a1bb-Hyatt-Regency-Montenegro-desktop-00.jpg.webp',
+    '/images/entity_images/objects/0a220142405a3124a2b4f229.jpg',
     'Hyatt Regency Kotor Bay Resort',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hyatt Regency Kotor Bay Resort'),
     NOW()),
 (
-    'https://www.palmonbayspa.com/upload/home_pic.jpg',
+    '/images/entity_images/objects/41294cfc1c58fb304b2a6da4.jpg',
     'Hotel Palmon Bay',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Palmon Bay'),
     NOW()),
 (
-    'https://www.palmonbayspa.com/upload/hello-lightbulb-295376-unsplash.jpg',
+    '/images/entity_images/objects/0ec17fd46339f45d4391f90a.jpg',
     'Hotel Palmon Bay',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Palmon Bay'),
     NOW()),
 (
-    'https://media.jet2.com/is/image/jet2/TIV_81125_Palmon_Bay_Hotel_And_Spa_0919_02?wid=3840&qlt=85&dpr=off',
+    '/images/entity_images/objects/503a7de756aa1ad81f6f0ce3.jpg',
     'Hotel Palmon Bay',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Palmon Bay'),
     NOW()),
 (
-    'https://cdn.prod.website-files.com/628ba2ca6ae2f8e75697f7e4/63ac5a4eeb96a70ffead357d_Lazure_AboutUs_1.webp',
+    '/images/entity_images/objects/7693d964b17af39a3fd85582.jpg',
     'Lazure Hotel & Marina',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lazure Hotel & Marina'),
     NOW()),
 (
-    'https://cdn.prod.website-files.com/628ba2ca6ae2f8e75697f7e4/669e54b3429033261caefcf7_Lazure%20Hotel%20Beach%20and%20Pool_2.webp',
+    '/images/entity_images/objects/a38be6e0f8497a7d936ce0d5.jpg',
     'Lazure Hotel & Marina',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lazure Hotel & Marina'),
     NOW()),
 (
-    'https://cdn.prod.website-files.com/628ba2ca6ae2f8e75697f7e4/669666f5cca21c6f3b42db11_Lazure%20Hotel%20Beach%20and%20Pool_10.webp',
+    '/images/entity_images/objects/5a0b2d33d7bd9289324670db.jpg',
     'Lazure Hotel & Marina',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lazure Hotel & Marina'),
     NOW()),
 (
-    'https://www.hgbudvanskarivijera.com/images/hotel-palas/plaza/plaza-(24).jpg',
+    '/images/entity_images/objects/1226a7cbffa10885d6112d6a.jpg',
     'Hotel Palas',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Palas'),
     NOW()),
 (
-    'https://mcdn.pro/data/objects/images/28364/palas-petrovac-7-jaayre-l-nh76cy.jpg',
+    '/images/entity_images/objects/64dec75c7b12849b5e011150.jpg',
     'Hotel Palas',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Palas'),
     NOW()),
 (
-    'https://forzatravel.rs/fajlovi/productitem/palas-hotel-821.jpg',
+    '/images/entity_images/objects/53ecb86ed0ad43d8f6b25478.jpg',
     'Hotel Palas',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Palas'),
     NOW()),
 (
-    'https://www.thehotelguru.com/_images/a8/55/a85501df945edd9a7be06b5b7bb34261/s1654x900.jpg',
+    '/images/entity_images/objects/8483d3793ce369e4d620e3e0.jpg',
     'Hotel Forza Mare',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Forza Mare'),
     NOW()),
 (
-    'https://cf.bstatic.com/xdata/images/hotel/max1024x768/160724293.jpg?k=5d21cfd98bbaa478427c01472d5c04211c7776db48523a2797b6161b365ee063&o=',
+    '/images/entity_images/objects/ab672c50574a0b18128609df.jpg',
     'Hotel Forza Mare',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Forza Mare'),
     NOW()),
 (
-    'https://cf.bstatic.com/xdata/images/hotel/max1024x768/160718669.jpg?k=11068f73047646554ab217912194220c0214aee6382c05d69753128bbdbd7391&o=',
+    '/images/entity_images/objects/263120ff610c1cbb84c3fc16.jpg',
     'Hotel Forza Mare',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Forza Mare'),
     NOW()),
 (
-    'https://static.cupid.travel/hotels/343928627.jpg',
+    '/images/entity_images/objects/1694df1b3922ec35ee51bded.jpg',
     'Hotel Princess',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Princess'),
     NOW()),
 (
-    'https://cdn.prod.website-files.com/620e119cf262fe407493be3b/66eae88552a351f2e0b504e8_1149.jpg',
+    '/images/entity_images/objects/7a6dbf41b187a8d15daca670.jpg',
     'Hotel Princess',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Princess'),
     NOW()),
 (
-    'https://cdn.prod.website-files.com/620e119cf262fe407493be3b/663c7318bc0829e0a9756677_LOBBY1.jpg',
+    '/images/entity_images/objects/f0e486ef6179fb10fa6c1aff.jpg',
     'Hotel Princess',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Princess'),
     NOW()),
 (
-    'https://media-cdn.tripadvisor.com/media/photo-m/1280/17/60/49/33/centreville-hotel-experiences.jpg',
+    '/images/entity_images/objects/71ece3790d23e29ddf85a392.jpg',
     'Hotel CentreVille Podgorica',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel CentreVille Podgorica'),
     NOW()),
 (
-    'https://www.anduarch.me/sites/default/files/images/03_9.jpg',
+    '/images/entity_images/objects/560705419fe4c8759d2d075d.jpg',
     'Hotel CentreVille Podgorica',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel CentreVille Podgorica'),
     NOW()),
 (
-    'https://www.anduarch.me/sites/default/files/images/12.jpg',
+    '/images/entity_images/objects/5596fbcd6c274c8b4f0387e0.jpg',
     'Hotel CentreVille Podgorica',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel CentreVille Podgorica'),
     NOW()),
 (
-    'https://www.polarstar.me/files/images/category/2016/03/18/hotel_polar_star_1.jpg',
+    '/images/entity_images/objects/1f75571791e5edec5cc19eff.jpg',
     'Hotel Polar Star',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Polar Star'),
     NOW()),
 (
-    'https://www.polarstar.me/files/images/category/2016/03/19/polar_star_5.jpg',
+    '/images/entity_images/objects/cfaefca788ecc171ca5c95b5.jpg',
     'Hotel Polar Star',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Polar Star'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/22/04/50/f9/hotel-polar-star.jpg?w=1100&h=1100&s=1',
+    '/images/entity_images/objects/fffb3a381bae275d47d96419.jpg',
     'Hotel Polar Star',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Polar Star'),
     NOW()),
 (
-    'https://tcdn.mindtrip.ai/images/745425/1hhxwnd.png',
+    '/images/entity_images/objects/20badb4eda10d7566d665c05.jpg',
     'Gradska kafanica Žabljak',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Gradska kafanica Žabljak'),
     NOW()),
 (
-    'https://tcdn.mindtrip.ai/images/745425/e68yl7.png',
+    '/images/entity_images/objects/a2eea9ad659f4d1701bf3028.jpg',
     'Gradska kafanica Žabljak',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Gradska kafanica Žabljak'),
     NOW()),
 (
-    'https://d2kihw5e8drjh5.cloudfront.net/eyJidWNrZXQiOiJ1dGEtaW1hZ2VzIiwia2V5IjoicGxhY2VfaW1nL2k5V25YLThXUXFTYklJb3o1bXNVZ3ciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjY0MCwiaGVpZ2h0Ijo2NDAsImZpdCI6Imluc2lkZSJ9LCJyb3RhdGUiOm51bGwsInRvRm9ybWF0IjogIndlYnAifX0=',
+    '/images/entity_images/objects/949262582759c70f8c0f3a0c.jpg',
     'Gradska kafanica Žabljak',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Gradska kafanica Žabljak'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2f/a9/69/d2/delicious-food-and-great.jpg?w=1100&h=1100&s=1',
+    '/images/entity_images/objects/e6679c96f33349e90e03bb79.jpg',
     'Konoba Stari grad',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Konoba Stari grad'),
     NOW()),
 (
-    'https://foodbook.me/storage/restaurants/3/PAsmXBVhYOPiT5lSFvCVuZKt3KAl2sZmiB0bbY9R.jpg',
+    '/images/entity_images/objects/07a5a0e229502308f0081b8c.jpg',
     'Konoba Stari grad',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Konoba Stari grad'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2f/a9/69/d7/delicious-food-and-great.jpg?w=1100&h=1100&s=1',
+    '/images/entity_images/objects/de234df15f973c12d46501b4.jpg',
     'Konoba Stari grad',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Konoba Stari grad'),
     NOW()),
 (
-    'https://glovo.dhmedia.io/image/stores-glovo/stores/a49b8c02f265dba2b2a77d1a78e72e7677c53985885e1d57e9e9ee3bd9ce2812?t=W3sicmVzaXplIjp7Im1vZGUiOiJmaXQiLCJ3aWR0aCI6MTI4MCwiaGVpZ2h0IjoxMjB9fSx7IndlYnAiOnsicSI6ImxvdyJ9fV0=',
+    '/images/entity_images/objects/04130662c2ae4dbad8f566ae.jpg',
     'Kafana Marković',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kafana Marković'),
     NOW()),
 (
-    'https://mindtrip.ai/restaurants/5e28/8b4a/cd96/ba6c/1fc9/995d/3604/f63b',
-    'Kafana Marković',
-    false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kafana Marković'),
-    NOW()),
-(
-    'https://scontent.fbeg7-2.fna.fbcdn.net/v/t1.6435-9/131350056_2225937470871146_8621430501454951551_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=7b2446&_nc_ohc=XRyXQ0M3xAkQ7kNvwH-mkJR&_nc_oc=AdofnOxUdqJ-ZTaA6-8Dc46LySbC0YV85tedPBz8cSRbOSWh55aPIBpRSiPjCt1Xmmk&_nc_zt=23&_nc_ht=scontent.fbeg7-2.fna&_nc_gid=sp2WVHyCZerzOHPuVK_LhQ&oh=00_Af2rJ-xWDsuEhw8kX-UICFhNTXcEOiNYR5vuByQsCuqUog&oe=6A12D591',
-    'Kafana Marković',
-    false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kafana Marković'),
-    NOW()),
-(
-    'https://i0.wp.com/maja.team/wp-content/uploads/2025/08/Planinarski-dom-Skrka.jpg?fit=1600%2C739&ssl=1',
+    '/images/entity_images/objects/c9be39a35037f00ea825632c.jpg',
     'Planinarski dom Škrka',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Škrka'),
     NOW()),
 (
-    'https://mindtrip.ai/attractions/160d/6a7a/9e9c/101a/4e94/9809/feb2/d9c0',
-    'Planinarski dom Škrka',
-    false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Škrka'),
-    NOW()),
-(
-    'https://mindtrip.ai/restaurants/40ef/4b21/97b3/4d06/b02b/021d/7e32/5810',
-    'Planinarski dom Škrka',
-    false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Škrka'),
-    NOW()),
-(
-    'https://img1.oastatic.com/img2/19566032/max/variant.webp',
+    '/images/entity_images/objects/977ceaa1205a9291751cdb93.jpg',
     'Planinarski dom Vranjak',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Vranjak'),
     NOW()),
 (
-    'https://vcdn.bergfex.at/images/resized/profiles/detail/10d/7b1e98f1a11c7f844d1d8b8a5a4d310d.jpg',
-    'Planinarski dom Vranjak',
-    false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Vranjak'),
-    NOW()),
-(
-    'https://scontent.fbeg7-2.fna.fbcdn.net/v/t39.30808-6/475125747_1027593859387344_943200687554655804_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=2a1932&_nc_ohc=DZj8T1r9o-wQ7kNvwF5m8RC&_nc_oc=AdoMASlvknSwIXCxsrn5r1I81iwtRxShRO-UPJX7fKM7eWIKeVpfWu3HyV1PXXyiJgE&_nc_zt=23&_nc_ht=scontent.fbeg7-2.fna&_nc_gid=7dzdTixrMYPdZ9fl9rPgBQ&oh=00_Af3OeJoPTqNpvIZ3Aj3XIrDfjL86_hOb4qZWmIN3Tqnwjw&oe=69F14462',
-    'Planinarski dom Vranjak',
-    false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Vranjak'),
-    NOW()),
-(
-    'https://upload.wikimedia.org/wikipedia/commons/7/70/Former_Italian_Embassy_in_Cetinje%2C_Montenegro.jpg',
+    '/images/entity_images/objects/fcc2bb4561c69b3f0c932e6b.jpg',
     'Nacionalna biblioteka Crne Gore Đurđe Crnojević',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Nacionalna biblioteka Crne Gore Đurđe Crnojević'),
     NOW()),
 (
-    'https://www.nb-cg.me/fajlovi/p1ib9hmscud4uh5g41k1cj815fd6.jpeg',
-    'Nacionalna biblioteka Crne Gore Đurđe Crnojević',
-    false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Nacionalna biblioteka Crne Gore Đurđe Crnojević'),
-    NOW()),
-(
-    'https://www.czkdanilovgrad.me/wp-content/uploads/2024/05/viber_image_2024-05-16_10-34-07-345.jpg',
-    'Nacionalna biblioteka Crne Gore Đurđe Crnojević',
-    false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Nacionalna biblioteka Crne Gore Đurđe Crnojević'),
-    NOW()),
-(
-    'https://lh3.googleusercontent.com/proxy/yKEWJ8QT7AOuJXgry43berYLICOpIMBmfhVoDtRa4ygT2chAAXHdtos8bhg2ww5dxK1aO0Ign8qzzucbZyDX1ozK1j2VUPF-yWZanu-LKlPu4MxTt4dN0TNb_fjuv8I5',
+    '/images/entity_images/objects/6307d7c07fce6d49a28767d9.jpg',
     'Narodna biblioteka Radosav Ljumović',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Narodna biblioteka Radosav Ljumović'),
     NOW()),
 (
-    'https://www.standard.co.me/wp-content/uploads/2018/02/ed05e0e0c4febd7b2b95b70b5743b93a.jpg',
+    '/images/entity_images/objects/af752aaceab3574e999976df.jpg',
     'Narodna biblioteka Radosav Ljumović',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Narodna biblioteka Radosav Ljumović'),
     NOW()),
 (
-    'https://mondo.me/Picture/354583/jpeg/knjige.jpeg',
+    '/images/entity_images/objects/b2cd70a19c31fb4906934ef8.jpg',
     'Narodna biblioteka Radosav Ljumović',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Narodna biblioteka Radosav Ljumović'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2019/02/25/00/4115345_2019022512020_5c73cb0fb789683b9225368ejpeg_share.jpg',
+    '/images/entity_images/objects/9e50af02fde3f3007dbbce29.jpg',
     'Gradska biblioteka i čitaonica Herceg Novi',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Gradska biblioteka i čitaonica Herceg Novi'),
     NOW()),
 (
-    'https://www.bibliotekahercegnovi.co.me/index.php/lat/%D0%B3%D0%B0%D0%BB%D0%B5%D1%80%D0%B8%D1%98%D0%B0/130-%D0%B8%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D0%BE%D0%BD%D0%B0-%D0%BF%D0%B8%D1%81%D0%BC%D0%B5%D0%BD%D0%BE%D1%81%D1%82/detail/3386-%D0%B8%D0%BD%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%86%D0%B8%D0%BE%D0%BD%D0%B0-%D0%BF%D0%B8%D1%81%D0%BC%D0%B5%D0%BD%D0%BE%D1%81%D1%82?phocadownload=2',
+    '/images/entity_images/objects/1757a6d0fb1692e69747f644.jpg',
     'Gradska biblioteka i čitaonica Herceg Novi',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Gradska biblioteka i čitaonica Herceg Novi'),
     NOW()),
 (
-    'https://bokanews.me/wp-content/uploads/2015/06/Herceg-Novi.jpg',
+    '/images/entity_images/objects/a25a897bc8e23dd60b3fb589.jpg',
     'Gradska biblioteka i čitaonica Herceg Novi',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Gradska biblioteka i čitaonica Herceg Novi'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Ostrog_monastery_-_panoramio.jpg/960px-Ostrog_monastery_-_panoramio.jpg',
+    '/images/entity_images/objects/eee1285dc4bc7dccb70ff114.jpg',
     'Manastir Ostrog',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Manastir Ostrog'),
     NOW()),
 (
-    'https://wevotravel.com/wp-content/uploads/2025/08/manastirostrog-2.webp',
+    '/images/entity_images/objects/0cf0a8d9e3804ed54db70a66.jpg',
     'Manastir Ostrog',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Manastir Ostrog'),
     NOW()),
 (
-    'https://religija.republika.rs/data/images/2024-06-19/31605_profimedia-0514288768-1_fxl.jpg',
+    '/images/entity_images/objects/0d3ca3e3d6e627b2bbda82b5.jpg',
     'Manastir Ostrog',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Manastir Ostrog'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/2/20/Cathedral_Kotor.JPG',
+    '/images/entity_images/objects/a98684187f6dcb8691027d28.jpg',
     'Katedrala Svetog Tripuna',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Katedrala Svetog Tripuna'),
     NOW()),
 (
-    'https://bokanews.me/wp-content/uploads/2016/01/Katedrala-Svetog-Tripuna.jpg',
+    '/images/entity_images/objects/005b92944c6a2339e4849fbf.jpg',
     'Katedrala Svetog Tripuna',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Katedrala Svetog Tripuna'),
     NOW()),
 (
-    'https://bokanews.me/wp-content/uploads/2014/12/Katedrala-Svetog-Tripuna1.jpg',
-    'Katedrala Svetog Tripuna',
-    false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Katedrala Svetog Tripuna'),
-    NOW()),
-(
-    'https://upload.wikimedia.org/wikipedia/commons/4/42/Church_of_St._Nicholas%2C_Kotor%2C_Montenegro_%2852632091089%29.jpg',
+    '/images/entity_images/objects/880bdc5203571b009b146bbf.jpg',
     'Crkva Svetog Nikole',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Crkva Svetog Nikole'),
     NOW()),
 (
-    'https://bokanews.me/wp-content/uploads/2015/01/DSC_8706_resize.jpg',
+    '/images/entity_images/objects/09f084eeb989e2ba9c1e51ce.jpg',
     'Crkva Svetog Nikole',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Crkva Svetog Nikole'),
     NOW()),
 (
-    'https://www.orthphoto.net/photo/202511/149734.jpg',
+    '/images/entity_images/objects/144ac619180b93eaa09bac55.jpg',
     'Crkva Svetog Nikole',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Crkva Svetog Nikole'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/2/2d/Pravoslavna_katedrala_svetog_Ivana_Vladimira_u_Baru.jpeg',
+    '/images/entity_images/objects/505711e53c36b0c861a92c39.jpg',
     'Crkva Svetog Jovana Vladimira',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Crkva Svetog Jovana Vladimira'),
     NOW()),
 (
-    'https://www.svetijovanvladimir.rs/wp-content/uploads/2024/02/IMG-20240204-WA0024.jpg',
+    '/images/entity_images/objects/505fba1168a4051463fdd37a.jpg',
     'Crkva Svetog Jovana Vladimira',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Crkva Svetog Jovana Vladimira'),
     NOW()),
 (
-    'https://tumagazin.rs/wp-content/uploads/2021/02/oltar-i-apsida.jpg',
-    'Crkva Svetog Jovana Vladimira',
-    false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Crkva Svetog Jovana Vladimira'),
-    NOW()),
-(
-    'https://www.rentalino.com/uploads/8D7EF73D-8A1E-4F0B-9E9C-B375E158CB16_1.jpeg',
+    '/images/entity_images/objects/042794e24fd873f40031cb59.jpg',
     'Apartments Đurović',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Đurović'),
     NOW()),
 (
-    'https://crnagoraapartmani.me/wp-content/uploads/2022/05/6B428420-417E-43D9-9286-2230E89695B4_1.jpeg',
+    '/images/entity_images/objects/b4ebe509346a066f476244c6.jpg',
     'Apartments Đurović',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Đurović'),
     NOW()),
 (
-    'https://www.viladjuricpetrovac.me/wp-content/uploads/2024/02/petrovac_2023_2-1.jpg',
+    '/images/entity_images/objects/97ba5f96e2625b673646c97c.jpg',
     'Apartments Đurović',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Đurović'),
     NOW()),
 (
-    'https://images.trvl-media.com/lodging/24000000/23570000/23568200/23568189/3db2c668.jpg?impolicy=fcrop&w=1200&h=800&quality=medium',
+    '/images/entity_images/objects/b78fe5ed678520e912df6544.jpg',
     'Apartments Vuković',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Vuković'),
     NOW()),
 (
-    'https://www.turizzam.com/upload/objects/1427306960_InCQyB/DSC00106.JPG',
+    '/images/entity_images/objects/fb3dad38d827acd943123911.jpg',
     'Apartments Vuković',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Vuković'),
     NOW()),
 (
-    'https://www.turizzam.com/upload/objects/1427306960_InCQyB/DSC00188_resize.JPG',
+    '/images/entity_images/objects/be6808fc95b3e0ccdccf38bb.jpg',
     'Apartments Vuković',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Vuković'),
     NOW()),
 (
-    'https://cf.bstatic.com/xdata/images/hotel/max1024x768/448886275.jpg?k=b4e8ec5ae4506773f6214c0b37422b85a3c0a15d98d4659bf0abccea7a3202c6&o=',
+    '/images/entity_images/objects/efb6276be40fa8826d590a82.jpg',
     'Lux Apartment Budva',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lux Apartment Budva'),
     NOW()),
 (
-    'https://cf.bstatic.com/xdata/images/hotel/max1024x768/448886323.jpg?k=d9e965d8d2c52fc67e79f8ae6610bb5f20f769dd0a3887482396a18c28566628&o=',
+    '/images/entity_images/objects/13f6d39aedab280ad4e17d47.jpg',
     'Lux Apartment Budva',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lux Apartment Budva'),
     NOW()),
 (
-    'https://www.hotels-me.net/data/Photos/OriginalPhoto/13764/1376425/1376425880/lux-apartment-budva-budva-photo-11.JPEG',
+    '/images/entity_images/objects/f2dee94d40f2d775c903cf45.jpg',
     'Lux Apartment Budva',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lux Apartment Budva'),
     NOW()),
 (
-    'https://cdn.worldota.net/t/1200x616/content/3a/fe/3afef9c94f03ba9f85c44e8e4b3a7bdd61ef114b.jpeg',
+    '/images/entity_images/objects/6c6a4d7e770441811382421e.jpg',
     'Apartmani M Herceg Novi',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartmani M Herceg Novi'),
     NOW()),
 (
-    'https://lbcdn.airpaz.com/hotelimages/5517959/apartman-m-igalo-60205935f03e038f2bb36c11cf56b867.jpg',
+    '/images/entity_images/objects/3fe0b0be98448f44bd67d40a.jpg',
     'Apartmani M Herceg Novi',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartmani M Herceg Novi'),
     NOW()),
 (
-    'https://cf.bstatic.com/xdata/images/hotel/max1024x768/554471434.jpg?k=11547c7479ebdca5eea8170e1e8ec4c383f040a307a08f2172c86d3f15e2cdf8&o=',
+    '/images/entity_images/objects/01a69f87c9640eb3ce824329.jpg',
     'Apartmani M Herceg Novi',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartmani M Herceg Novi'),
     NOW()),
 (
-    'https://bynder.onthebeach.co.uk/cdn-cgi/image/width=1400,quality=80,fit=cover,format=auto/m/36a0226153b0f64d/original/Hotel-Casa-del-Mare-Amfora-Montenegro-KOTOR-General-view-8.jpg',
+    '/images/entity_images/objects/42ac9ae44604cf3768813e15.jpg',
     'Boutique Hotel Casa del Mare - Amfora',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Boutique Hotel Casa del Mare - Amfora'),
     NOW()),
 (
-    'https://forzatravel.rs/fajlovi/productitem/a869211d-370.jpg',
+    '/images/entity_images/objects/0c6a071d10ea1f4c3e0b383e.jpg',
     'Boutique Hotel Casa del Mare - Amfora',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Boutique Hotel Casa del Mare - Amfora'),
     NOW()),
 (
-    'https://forzatravel.rs/fajlovi/productitem/79e9b011-940.jpg',
+    '/images/entity_images/objects/56d367de4efea9cc2594af99.jpg',
     'Boutique Hotel Casa del Mare - Amfora',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Boutique Hotel Casa del Mare - Amfora'),
     NOW()),
 (
-    'https://cdn.worldota.net/t/1200x616/content/a2/c8/a2c8b0b910c933f89adb5949662156cbaf33693e.jpeg',
+    '/images/entity_images/objects/6f94005addfb902bbdd0ff53.jpg',
     'Apartments Mijović',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Mijović'),
     NOW()),
 (
-    'https://cf.bstatic.com/xdata/images/hotel/max1024x768/209630322.jpg?k=fa8338c75f30184cbe50d55852d402067ce988dd8a3e050348bf4c23b0589d6d&o=',
+    '/images/entity_images/objects/b2982f8446d016fa434bc6fc.jpg',
     'Apartments Mijović',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Mijović'),
     NOW()),
 (
-    'https://cf.bstatic.com/xdata/images/hotel/max1024x768/209639468.jpg?k=e359adff7fd69f5afe224a07054800b49bc48ae021152b1d7d465ec1455decba&o=',
+    '/images/entity_images/objects/1e597479a65aaf3d0c607028.jpg',
     'Apartments Mijović',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Mijović'),
     NOW()),
 (
-    'https://cf.bstatic.com/xdata/images/hotel/max1024x768/382636212.jpg?k=7256a6565339155e4e015fb94f406d1f28c58b63a648b28bd0090e36ebc8762d&o=',
+    '/images/entity_images/objects/b9df2dd7e116c2c9d2409e79.jpg',
     'Durmitor View Apartments',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Durmitor View Apartments'),
     NOW()),
 (
-    'https://cf.bstatic.com/xdata/images/hotel/max1024x768/504628046.jpg?k=64c6540e7457f487783195825d9f11aa98de8ffb1fe7315b3307668c666f15df&o=',
+    '/images/entity_images/objects/05bd075cb28354cd39a6eb17.jpg',
     'Durmitor View Apartments',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Durmitor View Apartments'),
     NOW()),
 (
-    'https://static.cupid.travel/hotels/485140447.jpg',
+    '/images/entity_images/objects/d00b50360b839325979710ce.jpg',
     'Durmitor View Apartments',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Durmitor View Apartments'),
     NOW()),
 (
-    'https://i.szalas.hu/hotels/755448/original/41000719.jpg',
+    '/images/entity_images/objects/60d2fcd889c289bc08456ff1.jpg',
     'Apartments Aleksandar',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Aleksandar'),
     NOW()),
 (
-    'https://www.hotels-me.net/data/Imgs/OriginalPhoto/16542/1654294/1654294378/apartman-aleksandar-ulcinj-img-26.JPEG',
+    '/images/entity_images/objects/ae2eee1dbfb74b66aefd1337.jpg',
     'Apartments Aleksandar',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Aleksandar'),
     NOW()),
 (
-    'https://lbcdn.airpaz.com/hotelimages/4661551/ulcinj-apartment-seaview-wifi-tv-aircondition-kitchen-1cf3be5e8e25e7b837382af924fc6250.jpg',
+    '/images/entity_images/objects/d2e5b0bc82a4444e1afbc362.jpg',
     'Apartments Aleksandar',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Aleksandar'),
     NOW()),
 (
-    'https://www.ljubanovic.com/uploads/5eb3fb1ca4a62.jpg',
+    '/images/entity_images/objects/1a47950693e134ebfa5279f6.jpg',
     'Villa Ljubanović Apartments',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Villa Ljubanović Apartments'),
     NOW()),
 (
-    'https://www.ljubanovic.com/uploads/5eb40199023fa.jpg',
+    '/images/entity_images/objects/e057d9c29deceab5a2ed7f52.jpg',
     'Villa Ljubanović Apartments',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Villa Ljubanović Apartments'),
     NOW()),
 (
-    'https://www.ljubanovic.com/uploads/6409e33eca94a.jpg',
+    '/images/entity_images/objects/2c911abad18a4bda7dad799a.jpg',
     'Villa Ljubanović Apartments',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Villa Ljubanović Apartments'),
     NOW()),
 (
-    'https://aw-d.tripcdn.com/images/0225812000kwqkap3C7DB.jpg',
+    '/images/entity_images/objects/acc8fe88d2ffc2043fc2a486.jpg',
     'Casa Nuova',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Casa Nuova'),
     NOW()),
 (
-    'https://a0.muscache.com/im/pictures/17cb31db-75a4-409f-afab-853aa31f3fc1.jpg',
+    '/images/entity_images/objects/747241d5e68f3d98bad46140.jpg',
     'Casa Nuova',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Casa Nuova'),
     NOW()),
 (
-    'https://lh3.googleusercontent.com/p/AF1QipN9Q8Lf62zuaVRNKnNyuhoQojY5-UG6VeroWDek=w1400-h920-k-no',
+    '/images/entity_images/objects/c134028c42a80677f98bbda7.jpg',
     'Casa Nuova',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Casa Nuova'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/0d/81/b3/82/swimming-pool-banya-wellness.jpg?w=1200&h=-1&s=1',
+    '/images/entity_images/objects/5374b47683ba88248bef3b7e.jpg',
     'Banya Wellness & Spa',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Banya Wellness & Spa'),
     NOW()),
 (
-    'https://www.montenegrofortravellers.com/sites/default/files/u9/hilton.jpg',
+    '/images/entity_images/objects/e35551b163f711a3fb4be215.jpg',
     'Banya Wellness & Spa',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Banya Wellness & Spa'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/27/3c/c2/08/wellnwss-spa.jpg?w=1200&h=-1&s=1',
+    '/images/entity_images/objects/579e532f9e0411f8c8299f0a.jpg',
     'Banya Wellness & Spa',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Banya Wellness & Spa'),
     NOW()),
 (
-    'https://www.atlantic.travel/sites/default/files/styles/colorbox_images/public/Slike%20hotela/hotel_mediteranski_centar_igalo_letovanje_atlantic_travel_11.jpg?itok=knqEq2kO',
+    '/images/entity_images/objects/8cf7f0447ca0151ef4570907.jpg',
     'Wellness Center Simo Milošević',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Wellness Center Simo Milošević'),
     NOW()),
 (
-    'https://www.montenegro.travel/uploads/content/2_explore/3i.Institute-Simo-Milosevic-Igalo.webp',
+    '/images/entity_images/objects/144dfe983a3598e926cd8bb2.jpg',
     'Wellness Center Simo Milošević',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Wellness Center Simo Milošević'),
     NOW()),
 (
-    'https://www.atlantic.travel/sites/default/files/styles/colorbox_images/public/Slike%20hotela/hotel_mediteranski_centar_igalo_letovanje_atlantic_travel_4.jpg?itok=gphMEL9A',
+    '/images/entity_images/objects/8f7b1903bc89236fb3eb6081.jpg',
     'Wellness Center Simo Milošević',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Wellness Center Simo Milošević'),
     NOW()),
 (
-    'https://perla.me/public_content/images_media/h_images/1165.jpg',
+    '/images/entity_images/objects/991fd8cd52c747190ab09969.jpg',
     'Perla Residence Spa',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Perla Residence Spa'),
     NOW()),
 (
-    'https://perla.me/public_content/images_media/h_images/1230.jpg',
+    '/images/entity_images/objects/c5979876fcc16236691c76d6.jpg',
     'Perla Residence Spa',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Perla Residence Spa'),
     NOW()),
 (
-    'https://perla.me/public_content/images_media/h_images/1168.jpg',
+    '/images/entity_images/objects/c0052e5698d4ed6971081768.jpg',
     'Perla Residence Spa',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Perla Residence Spa'),
     NOW()),
 (
-    'https://www.hotels-me.net/data/Photos/OriginalPhoto/16865/1686516/1686516537/photo-huma-kotor-bay-hotel-and-villas-kotor-1.JPEG',
+    '/images/entity_images/objects/b7d6cacc71544911867a0c0d.jpg',
     'Huma Bay Spa',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Huma Bay Spa'),
     NOW()),
 (
-    'https://www.humahotel.me/wp-content/uploads/2021/06/SHANTI-SPA_05.jpg',
+    '/images/entity_images/objects/6033ea8b42d89c2c9fbe2c12.jpg',
     'Huma Bay Spa',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Huma Bay Spa'),
     NOW()),
 (
-    'https://images.myguide-cdn.com/montenegro/companies/huma-kotor-bay/slider/huma-kotor-bay-618753.jpg',
+    '/images/entity_images/objects/1e512bc100eb41f70de76ef4.jpg',
     'Huma Bay Spa',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Huma Bay Spa'),
     NOW()),
 (
-    'https://bynder.onthebeach.co.uk/cdn-cgi/image/width=1400,quality=80,fit=cover,format=auto/m/1fb903a7ee3c7f5/original/Boutique-Hotel-SPA-Casa-del-Mare-Mediterraneo-Montenegro-MONTENEGRO-General-view-5.jpg',
+    '/images/entity_images/objects/e1c0e4c7281e628cdb55382d.jpg',
     'Casa del Mare Spa',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Casa del Mare Spa'),
     NOW()),
 (
-    'https://casadelmare.me/img/wellness-casa-del-mare-mediterraneo-16.jpg',
+    '/images/entity_images/objects/b134acd375df821ac4befab2.jpg',
     'Casa del Mare Spa',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Casa del Mare Spa'),
     NOW()),
 (
-    'https://media.joinup.travel/storage/hotel/50106/photos/Casa-Del-Mare-La-Roche-Mne-19.jpg',
+    '/images/entity_images/objects/abbbcc201cb5888cefbcef3c.jpg',
     'Casa del Mare Spa',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Casa del Mare Spa'),
     NOW()),
 (
-    'https://podgorica.travel/wp-content/uploads/2024/04/TWE_3481-scaled.jpg',
+    '/images/entity_images/objects/ea0a37fe9fd88b4b880faa48.jpg',
     'Spomenik Partizanu borcu na Gorici',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Partizanu borcu na Gorici'),
     NOW()),
 (
-    'https://live.staticflickr.com/65535/54993977246_9d783e700c_h.jpg',
+    '/images/entity_images/objects/eef7535b1ffb6182b8fd1c48.jpg',
     'Spomenik Partizanu borcu na Gorici',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Partizanu borcu na Gorici'),
     NOW()),
 (
-    'https://www.antenam.net/uploads/f/0/0/f006d8de31d87443dcef4d45addd5fd6.JPG',
+    '/images/entity_images/objects/a41f7df7bc531d7fbccbe552.jpg',
     'Spomenik Partizanu borcu na Gorici',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Partizanu borcu na Gorici'),
     NOW()),
 (
-    'https://c.files.bbci.co.uk/13E4/production/_125329050_img_7260.jpg',
+    '/images/entity_images/objects/41de075b1a22c328307a7529.jpg',
     'Spomenik Vladimiru i Kosari',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Vladimiru i Kosari'),
     NOW()),
 (
-    'https://gdb.rferl.org/035c0000-0aff-0242-8cef-08da1ee162f9_cx0_cy2_cw0_w1080_h608.jpg',
+    '/images/entity_images/objects/754059fbf519f57b4c6d0969.jpg',
     'Spomenik Vladimiru i Kosari',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Vladimiru i Kosari'),
     NOW()),
 (
-    'https://www.standard.co.me/wp-content/uploads/2022/04/277968852_1482947772101290_2413669999739147690_n-1-1200x555.jpg',
+    '/images/entity_images/objects/148a29ff7eec7af14b497fa2.jpg',
     'Spomenik Vladimiru i Kosari',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Vladimiru i Kosari'),
     NOW()),
 (
-    'https://podgorica.travel/wp-content/uploads/2024/04/kralj_nikola-05-20-1.jpg',
+    '/images/entity_images/objects/d24058ad095adc4c4a4880dc.jpg',
     'Spomenik kralju Nikoli',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik kralju Nikoli'),
     NOW()),
+
 (
-    'https://upload.wikimedia.org/wikipedia/commons/c/c4/Spomenik_kralju_Nikoli_u_Podgorici.jpg',
-    'Spomenik kralju Nikoli',
-    false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik kralju Nikoli'),
-    NOW()),
-(
-    'https://podgoricacars.com/images/podgorica-king-nikola-monument-podgorica.webp',
+    '/images/entity_images/objects/c53818e5e7915bfebba0e7a5.jpg',
     'Spomenik kralju Nikoli',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik kralju Nikoli'),
     NOW()),
 (
-    'https://borba.me/wp-content/uploads/2021/11/Ljubo-Cupic-spomenik-1.jpg',
+    '/images/entity_images/objects/0494c2392371c56437adf76b.jpg',
     'Spomenik Ljubu Čupiću',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Ljubu Čupiću'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2019/01/30/00/378174_20190130060116_5c513370b7896801fa611150jpeg_ff.jpg',
+    '/images/entity_images/objects/864c0fdea4cc27cef8ddbaa4.jpg',
     'Spomenik Ljubu Čupiću',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Ljubu Čupiću'),
     NOW()),
 (
-    'https://rtcg.me/upload//media/2024/6/13/10/9/907/1795332/thumbs/3415224/thumb0.jpg',
+    '/images/entity_images/objects/044513ec942b95850f537ebb.jpg',
     'Spomenik Ljubu Čupiću',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Ljubu Čupiću'),
     NOW()),
 (
-    'https://onogost.me/wp-content/uploads/2020/07/107386482_3629926013688663_821234783065601292_n.jpg',
+    '/images/entity_images/objects/caea6bd158092c95a6a7e4df.jpg',
     'Spomenik palim borcima na Grahovcu',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik palim borcima na Grahovcu'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2025/05/09/13/5644158_viber-image-20250509-130542481_ff.jpg',
+    '/images/entity_images/objects/f6f0959fa0dfdb42160781a4.jpg',
     'Spomenik palim borcima na Grahovcu',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik palim borcima na Grahovcu'),
     NOW()),
 (
-    'https://mladiniksica.me/wp-content/uploads/2020/07/grahovac.jpg',
+    '/images/entity_images/objects/8de6b4a3620e4df0e8036995.jpg',
     'Spomenik palim borcima na Grahovcu',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik palim borcima na Grahovcu'),
     NOW()),
 (
-    'https://immo-monte.me/wp-content/uploads/2022/12/Immo-Monte_Spomenik_360-3-scaled.jpg',
+    '/images/entity_images/objects/8c8d1f0266131be683d5fc0a.jpg',
     'Spomenik Tuđemilima',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Tuđemilima'),
     NOW()),
 (
-    'https://feral.bar/posts/feral-bar-1759856681_IMG_4510.jpeg',
+    '/images/entity_images/objects/87443a825968924b5d38ef90.jpg',
     'Spomenik Tuđemilima',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Tuđemilima'),
     NOW()),
 (
-    'https://prch.me/wp-content/uploads/2023/03/image00023-768x1024.jpeg',
+    '/images/entity_images/objects/381ee74cabb3cd7ceee8c26a.jpg',
     'Spomenik Tuđemilima',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Tuđemilima'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2019/02/04/00/1203410_2019020414024_5c5838a8b7896801fb67f4d5jpeg_share.jpg',
+    '/images/entity_images/objects/e4cfdb8586e02d05427cbeb6.jpg',
     'Spomenik Puniši Račiću',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Puniši Račiću'),
     NOW()),
 (
-    'https://www.in4s.net/wp-content/uploads/2017/07/punisa-racic.jpg',
+    '/images/entity_images/objects/5fd7d942ac003505eb66e7d1.jpg',
     'Spomenik Puniši Račiću',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Puniši Račiću'),
     NOW()),
 (
-    'https://www.politika.rs/thumbs//upload/Article/Image/2017_07///906z513_spomenik-punisa-racic-rtcg.jpg',
+    '/images/entity_images/objects/7a04517d8f2664045505e0bf.jpg',
     'Spomenik Puniši Račiću',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Puniši Račiću'),
     NOW()),
 (
-    'https://rtcg.me/upload//media/2022/10/25/20/55/623/1249616/resize/1249617/1212_1125x900',
+    '/images/entity_images/objects/b841547074b6c07769d0f8ea.jpg',
     'Spomenik herojima Božićnog ustanka',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik herojima Božićnog ustanka'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2020/01/06/00/4917393_2020010612010_f25e15c4313c648c1f1017be66f7dbaad176d8170c64d64a9877d21fe6370a77_share.jpg',
+    '/images/entity_images/objects/fb074e4a798961f6279d07d5.jpg',
     'Spomenik herojima Božićnog ustanka',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik herojima Božićnog ustanka'),
     NOW()),
 (
-    'https://www.standard.co.me/wp-content/uploads/2021/01/prijestonica_polaganje-vijenaca_5.jpg',
+    '/images/entity_images/objects/d2ea8a4579b35c665140ed1b.jpg',
     'Spomenik herojima Božićnog ustanka',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik herojima Božićnog ustanka'),
     NOW()),
 (
-    'https://24kroz7.com/stav/crnom-gorom-uzduz-i-poprijeko-panoramski-put-krug-oko-korita/attachment/9-18/',
+    '/images/entity_images/objects/9f07f6c8511bcec286e83f56.jpg',
     'Spomenik bici na Fundini',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik bici na Fundini'),
     NOW()),
 (
-    'https://rtcg.me/upload//media/2025/7/2/9/26/194/2216041/resize/2216044/viber_slika_2025-08-02_09-12-01-390-641x1024_1437x900',
+    '/images/entity_images/objects/40ae0668c453b448222952b0.jpg',
     'Spomenik bici na Fundini',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik bici na Fundini'),
     NOW()),
 (
-    'https://cdn-processed.tmatic.travel/0bb6654d-5c90-4825-b927-a6eaece8e632.jpg',
+    '/images/entity_images/objects/9df140b0047b7462180335ed.jpg',
     'Spomenik bici na Fundini',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik bici na Fundini'),
     NOW()),
 (
-    'https://gdb.rferl.org/034d0000-0aff-0242-1ccb-08dad5f22e02_cx0_cy1_cw0_w1080_r0_s.jpg',
+    '/images/entity_images/objects/52e57f8612340a947dfd71e5.jpg',
     'Spomenik Njegošu na Lovćenu',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Njegošu na Lovćenu'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/1/18/Lovćen.jpg',
+    '/images/entity_images/objects/b7c8e1acaa3986412deb89f6.jpg',
     'Spomenik Njegošu na Lovćenu',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Njegošu na Lovćenu'),
     NOW()),
 (
-    'https://cdns.russiatoday.com/srbmedia/images/2024.10/original/6707de14e1947654b80885af.jpg',
-    'Spomenik Njegošu na Lovćenu',
-    false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Njegošu na Lovćenu'),
-    NOW()),
-(
-    'https://apartments-sofija.com/wp-content/uploads/top-hill-budva.jpg',
+    '/images/entity_images/objects/77db8c0fd0225ec4b8f680de.jpg',
     'Top Hill Club',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Top Hill Club'),
     NOW()),
 (
-    'https://nikola.its.me/wp-content/uploads/2019/02/20150716_173832.jpg',
+    '/images/entity_images/objects/7a6161f6c6b4fa6a740877ec.jpg',
     'Top Hill Club',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Top Hill Club'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2022/03/16/18/5398030_top-hil1_share.jpg',
+    '/images/entity_images/objects/f737487a0752013639a5ddde.jpg',
     'Top Hill Club',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Top Hill Club'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2d/0b/80/d6/caption.jpg?w=1100&h=1100&s=1',
+    '/images/entity_images/objects/e26cfc7fa19e28f95d3c783e.jpg',
     'Emporio Club',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Emporio Club'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/0c/d2/41/43/photo0jpg.jpg?w=1200&h=1200&s=1',
+    '/images/entity_images/objects/c8ed6d9144320e64515397c3.jpg',
     'Emporio Club',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Emporio Club'),
     NOW()),
 (
-    'https://tcdn.mindtrip.ai/images/692129/1hcmty2.png',
+    '/images/entity_images/objects/a7b290694aaeaac1c30a23bc.jpg',
     'Emporio Club',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Emporio Club'),
     NOW()),
 (
-    'https://commons.wikimedia.org/wiki/Special:FilePath/Nightclub%2020170423.jpg',
+    '/images/entity_images/objects/a1705453d754650f336032e1.jpg',
     'Maximus Club Kotor',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Maximus Club Kotor'),
     NOW()),
 (
-    'https://commons.wikimedia.org/wiki/Special:FilePath/Old%20Town%20Walls%20and%20Architecture%20at%20Night%20-%20Kotor%20-%20Montenegro.jpg',
-    'Maximus Club Kotor',
-    false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Maximus Club Kotor'),
-    NOW()),
-(
-    'https://commons.wikimedia.org/wiki/Special:FilePath/Nightclub%20%287427599458%29.jpg',
-    'Maximus Club Kotor',
-    false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Maximus Club Kotor'),
-    NOW()),
-(
-    'https://users.minmedia.me/media/p1cipovr8ukogln0f66ptd3o7a.jpg',
+    '/images/entity_images/objects/27fd105721eeabb234d3011c.jpg',
     'Omnia Nightclub',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Omnia Nightclub'),
     NOW()),
 (
-    'https://users.minmedia.me/media/p1cipovr92121q12c3dnp10fo84ig.jpg',
+    '/images/entity_images/objects/a3c1b44e57490425924a6515.jpg',
     'Omnia Nightclub',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Omnia Nightclub'),
     NOW()),
 (
-    'https://budvanocu.gumlet.io/p1j15f470019ifvb51pn4128i97e10.jpg?width=1200',
+    '/images/entity_images/objects/acf3985b3bd1cd5f82326554.jpg',
     'Omnia Nightclub',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Omnia Nightclub'),
     NOW()),
 (
-    'https://grazia.hr/wp-content/uploads/2022/06/Diamond-Club-cover.jpg',
+    '/images/entity_images/objects/9141c3e66f2741b3f3117992.jpg',
     'Diamond Night Club',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Diamond Night Club'),
     NOW()),
 (
-    'https://wevotravel.com/wp-content/uploads/2023/04/292314671_413964377418770_2368314707489563238_n.jpg',
+    '/images/entity_images/objects/22a4d524c3bedf4489d9db8b.jpg',
     'Diamond Night Club',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Diamond Night Club'),
     NOW()),
 (
-    'https://img.restaurantguru.com/r93c-Diamond-interior-2021-09-8.jpg',
+    '/images/entity_images/objects/978690437d61a4bf1fb56375.jpg',
     'Diamond Night Club',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Diamond Night Club'),
     NOW()),
 (
-    'https://users.minmedia.me/media/p1cj0qc8v9ibeo4l1gc619jhbqr4.jpg',
+    '/images/entity_images/objects/fee20ae336169ffd7fade0ec.jpg',
     'Miami Club Budva',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Miami Club Budva'),
     NOW()),
 (
-    'https://www.girlabouttheglobe.com/wp-content/uploads/DSC02606.jpg',
+    '/images/entity_images/objects/a92f2570e0d9c3b0c9a215fa.jpg',
     'Miami Club Budva',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Miami Club Budva'),
     NOW()),
 (
-    'https://www.montenegrofortravellers.com/sites/default/files/styles/monte1140x550/public/place/miami_club_budva_nochnoy_klub_miami_v_budve.jpg?itok=kdItKER3',
-    'Miami Club Budva',
-    false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Miami Club Budva'),
-    NOW()),
-(
-    'https://www.madamamsterdam.nl/wp-content/uploads/2024/06/bg-skybar-scaled.jpg',
+    '/images/entity_images/objects/e081293638a8ff69bc3f7cff.jpg',
     'Madam Open Bar',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Madam Open Bar'),
     NOW()),
 (
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQHukJXF7MY3klo5pF7f2jkG5aJoxZHwndimw&s',
+    '/images/entity_images/objects/8c322fe4546169b7740435e4.jpg',
     'Madam Open Bar',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Madam Open Bar'),
     NOW()),
 (
-    'https://travelinamsterdam.com/wp-content/uploads/2023/03/Madam-skybar-Amsterdam.jpg',
+    '/images/entity_images/objects/2dbf9477a6ed271121571264.jpg',
     'Madam Open Bar',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Madam Open Bar'),
     NOW()),
 (
-    'https://hercegplanet.com/wp-content/uploads/2022/09/IMG-20210906-WA0021-1.jpg',
+    '/images/entity_images/objects/7ecaf1cfeed103337f5e63e3.jpg',
     'Beach club Raffaelo',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Beach club Raffaelo'),
     NOW()),
 (
-    'https://hercegplanet.com/wp-content/uploads/2022/09/IMG-20210906-WA0031-1.jpg',
+    '/images/entity_images/objects/3882aa06afe74abbc53cd20b.jpg',
     'Beach club Raffaelo',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Beach club Raffaelo'),
     NOW()),
 (
-    'https://hercegplanet.com/wp-content/uploads/2022/09/IMG-20210906-WA0022-1.jpg',
+    '/images/entity_images/objects/b2fb74496500a1dc78e4631e.jpg',
     'Beach club Raffaelo',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Beach club Raffaelo'),
     NOW()),
 (
-    'https://caffemontenegro.me/images/restorani_i_Kafići/montenegro_pub/7_copy.jpg',
+    '/images/entity_images/objects/325652373419cfe94c110304.jpg',
     'Montenegro Pub',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Montenegro Pub'),
     NOW()),
 (
-    'https://caffemontenegro.me/images/restorani_i_Kafići/montenegro_pub/4_copy.jpg',
+    '/images/entity_images/objects/d144df95ce9e1d4ddeee6aa9.jpg',
     'Montenegro Pub',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Montenegro Pub'),
     NOW()),
 (
-    'https://images.myguide-cdn.com/montenegro/companies/montenegro-pub/large/montenegro-pub-469651.jpg',
+    '/images/entity_images/objects/faaee58f975320ccd13147a6.jpg',
     'Montenegro Pub',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Montenegro Pub'),
     NOW()),
 (
-    'https://users.minmedia.me/media/p1h1ei37qr1jj7tdovu8h791bq8i.jpg',
+    '/images/entity_images/objects/365bdc12fc7b8dbc0fd53252.jpg',
     'Night Club Ambiente',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Night Club Ambiente'),
     NOW()),
 (
-    'https://users.minmedia.me/media/p1h1ei37qr1vg1jei7a2pbo1urch.jpg',
+    '/images/entity_images/objects/430c8470296edcf76eb4062d.jpg',
     'Night Club Ambiente',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Night Club Ambiente'),
     NOW()),
 (
-    'https://users.minmedia.me/media/p1h1ei37qs11uhldm46a1cu51vodv.jpg',
+    '/images/entity_images/objects/334472b874632a43312cfa3c.jpg',
     'Night Club Ambiente',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Night Club Ambiente'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2021/03/29/21/5312725_jugopetrol-2_ff.jpg',
+    '/images/entity_images/objects/93a4a5d907409c8af3a2d8d1.jpg',
     'EKO Pumpa Budva',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'EKO Pumpa Budva'),
     NOW()),
 (
-    'https://photos.wikimapia.org/p/00/02/68/00/68_big.jpg',
+    '/images/entity_images/objects/5053ed5002089e6ee14a0126.jpg',
     'EKO Pumpa Budva',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'EKO Pumpa Budva'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2021/03/29/21/5312727_jugopetrol-1_ff.jpg',
+    '/images/entity_images/objects/353d8f56671309e3546ce216.jpg',
     'EKO Pumpa Budva',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'EKO Pumpa Budva'),
     NOW()),
 (
-    'https://investitor.me/wp-content/uploads/2018/06/85F3E958-71C9-435A-8134-874144DC980A.gif',
+    '/images/entity_images/objects/dcb5617a0af45debf15a7829.jpg',
     'Petrol Podgorica',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Petrol Podgorica'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2020/03/02/00/5026241_20200302070332_be98e0c53041cb82d727b6d433d0dbb0875d477fb1aebb9088b93a3d8788568f_share.jpg',
+    '/images/entity_images/objects/dfddbf1f3481ee481a74df34.jpg',
     'Petrol Podgorica',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Petrol Podgorica'),
     NOW()),
 (
-    'https://investitor.me/wp-content/uploads/2018/12/F6CCA876-399A-4EEE-9B98-F073145723EE.jpeg',
+    '/images/entity_images/objects/cbd46cdabb2ccf6c99a0329b.jpg',
     'Petrol Podgorica',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Petrol Podgorica'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2025/10/24/08/5680549_10040620-ispitivanje-goriva-institut_ls.jpg',
+    '/images/entity_images/objects/00ca3197b14fe2d009e35f3f.jpg',
     'Lukoil Konik Podgorica',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lukoil Konik Podgorica'),
     NOW()),
 (
-    'https://lacollina.me/wp-content/uploads/lukOil.jpg',
+    '/images/entity_images/objects/f202a2de57738330e5dad2c1.jpg',
     'Lukoil Konik Podgorica',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lukoil Konik Podgorica'),
     NOW()),
 (
-    'https://investitor.me/wp-content/uploads/2025/10/194117930_2972928092978733_351637732346719376_n-1-1024x678.jpg',
+    '/images/entity_images/objects/a56cd25c5b27a639e1193036.jpg',
     'Lukoil Konik Podgorica',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lukoil Konik Podgorica'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2019/02/19/00/3497061_20190219230216_5c6c80c1b789684e9f15dbcdjpeg_ls.jpg',
+    '/images/entity_images/objects/e2df5ed9840923c53d30a161.jpg',
     'INA Škaljari Kotor',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'INA Škaljari Kotor'),
     NOW()),
 (
-    'https://www.ekapija.com/thumbs/ina_pumpa_300713_tw1024.jpg',
+    '/images/entity_images/objects/558cbb26ca51f96806d83709.jpg',
     'INA Škaljari Kotor',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'INA Škaljari Kotor'),
     NOW()),
 (
-    'https://bokanews.me/wp-content/uploads/2016/12/INA-2-768x568.jpg',
+    '/images/entity_images/objects/9f8dd25524b0c87484500365.jpg',
     'INA Škaljari Kotor',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'INA Škaljari Kotor'),
     NOW()),
 (
-    'https://radiotivat.com/wp-content/uploads/2021/11/maxresdefault-2-1280x720.jpg',
+    '/images/entity_images/objects/f6114b14385757bd95e200d1.jpg',
     'EKO Tivat',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'EKO Tivat'),
     NOW()),
 (
-    'https://ibt.co.me/wp-content/uploads/2018/06/eko1-1170x780.jpg',
+    '/images/entity_images/objects/d07b367b297e75bf0a918647.jpg',
     'EKO Tivat',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'EKO Tivat'),
     NOW()),
 (
-    'https://investitor.me/wp-content/uploads/2020/03/eko-pumpa-1-1024x768.jpg',
+    '/images/entity_images/objects/aea953154424bde420dff998.jpg',
     'EKO Tivat',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'EKO Tivat'),
     NOW()),
 (
-    'https://kalamper.com/wp-content/uploads/IMG_9854-scaled.jpg',
+    '/images/entity_images/objects/9f7228883b2bff2e2bbfd62a.jpg',
     'Petrol Bar',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Petrol Bar'),
     NOW()),
 (
-    'https://kalamper.com/wp-content/uploads/0527-scaled.jpg',
+    '/images/entity_images/objects/f12014da13df89e0848df476.jpg',
     'Petrol Bar',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Petrol Bar'),
     NOW()),
 (
-    'https://kalamper.com/wp-content/uploads/1643276004-IMG_3604-min-scaled.jpg',
+    '/images/entity_images/objects/190d033d9d554196bc3555be.jpg',
     'Petrol Bar',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Petrol Bar'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2025/10/24/08/5680549_10040620-ispitivanje-goriva-institut_share.jpg',
+    '/images/entity_images/objects/970e56782a04866b4ce0b091.jpg',
     'Lukoil Kolašin',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lukoil Kolašin'),
     NOW()),
 (
-    'https://www.ekapija.com/thumbs/benzinska_pumpa_100222_tw1024.jpg',
+    '/images/entity_images/objects/7f8ec64470ff0567f314fc05.jpg',
     'Lukoil Kolašin',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lukoil Kolašin'),
     NOW()),
 (
-    'https://www.b92.net/data/images/2025-10-30/182700_4947385_f.jpg',
+    '/images/entity_images/objects/d8cabf79a65a06e59e27886a.jpg',
     'Lukoil Kolašin',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lukoil Kolašin'),
     NOW()),
 (
-    'https://www.ekapija.com/thumbs169/eko_pumpa_igalo_heceg_novi_071224_tw1024.jpg',
+    '/images/entity_images/objects/5edb9975585bbe761165d19f.jpg',
     'Eko Igalo Banja',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Eko Igalo Banja'),
     NOW()),
 (
-    'https://komunalnostambeno.me/wp-content/uploads/2017/08/skver-igalo-5-1024x768.jpg',
+    '/images/entity_images/objects/44ba2f6e790371d8bef84604.jpg',
     'Eko Igalo Banja',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Eko Igalo Banja'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2021/03/29/21/5312725_jugopetrol-2_ff.jpg',
+    '/images/entity_images/objects/93a4a5d907409c8af3a2d8d1.jpg',
     'Eko Igalo Banja',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Eko Igalo Banja'),
     NOW()),
 (
-    'https://www.ekapija.com/thumbs169/pumpa_eko_skaljari_kotor_121224_tw1024.jpg',
+    '/images/entity_images/objects/c9865dd5826f86342ed3c106.jpg',
     'EKO Kotor',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'EKO Kotor'),
     NOW()),
 (
-    'https://bates.eu.com/wp-content/uploads/2014/06/Helenic-Petroleum_EKO-FS-2.jpg',
+    '/images/entity_images/objects/e02e35ed8b6203cb13c1fac6.jpg',
     'EKO Kotor',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'EKO Kotor'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2019/02/23/00/3884762_20190223030216_5c70ad77b789683b911908a2jpeg_share.jpg',
+    '/images/entity_images/objects/b74913d3035265183692a12f.jpg',
     'EKO Kotor',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'EKO Kotor'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2022/04/12/08/5403961_lapcici-hd_share.jpg',
+    '/images/entity_images/objects/ad2886e4cd07114400cb8f73.jpg',
     'EKO Žabljak',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'EKO Žabljak'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2026/04/04/08/5717493_benzinska-pumpa-gorivo-15_share.jpg',
+    '/images/entity_images/objects/68be0879271d4cb6ff3ebf79.jpg',
     'EKO Žabljak',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'EKO Žabljak'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2026/03/18/22/5713801_benzinska-pumpa-gorivo-47_share.jpg',
+    '/images/entity_images/objects/5b80ef9f5d207dd95adffff4.jpg',
     'EKO Žabljak',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'EKO Žabljak'),
     NOW()),
 (
-    'https://media-cdn.tripadvisor.com/media/photo-m/1280/19/1a/f0/b8/photo0jpg.jpg',
+    '/images/entity_images/objects/2baf83dca12e688ca99987b6.jpg',
     'Casper Bar Budva',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Casper Bar Budva'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/30/01/d6/67/caption.jpg?w=1100&h=1100&s=1',
+    '/images/entity_images/objects/e5d4588636b917461464d278.jpg',
     'Casper Bar Budva',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Casper Bar Budva'),
     NOW()),
 (
-    'https://images.happycow.net/venues/1024/18/21/hcmp182190_1152109.jpeg',
+    '/images/entity_images/objects/8a4de29c55ac93cee91296b7.jpg',
     'Casper Bar Budva',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Casper Bar Budva'),
     NOW()),
 (
-    'https://www.montenegrofortravellers.com/sites/default/files/styles/monte1140x550/public/place/beach_bar_azzuro_plyazhnyy_bar_azzuro_v_budve.jpg?itok=fIWAZAb6',
+    '/images/entity_images/objects/654257f33dd031d1870dc9fe.jpg',
     'Azzuro Beach',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Azzuro Beach'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2a/26/7a/45/caption.jpg?w=1200&h=1200&s=1',
+    '/images/entity_images/objects/2c523ca5768dad758525c3e1.jpg',
     'Azzuro Beach',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Azzuro Beach'),
     NOW()),
 (
-    'https://www.portoazzuro.gr/images/main-gallery/19.jpg',
+    '/images/entity_images/objects/15cc92fc38f004c8cfee9401.jpg',
     'Azzuro Beach',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Azzuro Beach'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2c/ef/71/be/caption.jpg?w=1100&h=1100&s=1',
+    '/images/entity_images/objects/06e6a4b25875adedd2af9dbb.jpg',
     'Kafić Marshall’s Gelato & Coffee',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kafić Marshall’s Gelato & Coffee'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2c/6a/8e/86/caption.jpg?w=1100&h=1100&s=1',
+    '/images/entity_images/objects/6591538bc3804406b2b2fafe.jpg',
     'Kafić Marshall’s Gelato & Coffee',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kafić Marshall’s Gelato & Coffee'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2c/ef/71/bf/caption.jpg?w=1100&h=1100&s=1',
+    '/images/entity_images/objects/861b2b6d3580ed72eec6abae.jpg',
     'Kafić Marshall’s Gelato & Coffee',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kafić Marshall’s Gelato & Coffee'),
     NOW()),
 (
-    'https://media.evendo.com/locations-resized/LandmarkImages/1920x466/a2276aad-03fe-49ff-b5f0-52cfc1d09c33',
+    '/images/entity_images/objects/483fe5c35baae708d2d9c530.jpg',
     'Karver Bookstore & Cafe Podgorica',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Karver Bookstore & Cafe Podgorica'),
     NOW()),
 (
-    'https://airial.travel/_next/image?url=https%3A%2F%2Fmedia-cdn.tripadvisor.com%2Fmedia%2Fphoto-w%2F23%2F3b%2Ff1%2Fc5%2Fsecond-floor.jpg&w=3840&q=75',
+    '/images/entity_images/objects/d1cdf3edd2a4b46735890a09.jpg',
     'Karver Bookstore & Cafe Podgorica',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Karver Bookstore & Cafe Podgorica'),
     NOW()),
 (
-    'https://substackcdn.com/image/fetch/$s_!VTc3!,f_auto,q_auto:good,fl_progressive:steep/https%3A%2F%2Fsubstack-post-media.s3.amazonaws.com%2Fpublic%2Fimages%2F6640df02-763d-42ec-b191-fa9b44560e38_4080x3072.jpeg',
+    '/images/entity_images/objects/d1cdf3edd2a4b46735890a09.jpg',
     'Karver Bookstore & Cafe Podgorica',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Karver Bookstore & Cafe Podgorica'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/6/62/Restoran_Dojmi_01.jpg',
+    '/images/entity_images/objects/ea824928083bf1b46c0c167b.jpg',
     'Dojmi Cafe Kotor',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dojmi Cafe Kotor'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2a/69/78/15/caption.jpg?w=1100&h=1100&s=1',
+    '/images/entity_images/objects/247fb21697e0e7bcd9c60b4b.jpg',
     'Dojmi Cafe Kotor',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dojmi Cafe Kotor'),
     NOW()),
 (
-    'https://tcdn.mindtrip.ai/images/301349/1gb0grv.png',
-    'Dojmi Cafe Kotor',
-    false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dojmi Cafe Kotor'),
-    NOW()),
-(
-    'https://foodbook.me/storage/restaurants/24/DgaWv0DRTYnApBxrA9rxwsKb4o3OTyK3ztPB6oQq.jpg',
+    '/images/entity_images/objects/a6cfc1cde91bc6eb5c8b0d00.jpg',
     'Citadela Cafe Kotor',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Citadela Cafe Kotor'),
     NOW()),
 (
-    'https://foodbook.me/storage/restaurants/24/Zk7YdRJPhPzQl7GeDseLY1cisUoUYwvfUjy56hJT.jpg',
+    '/images/entity_images/objects/1b772ec559fcaf5219e87df8.jpg',
     'Citadela Cafe Kotor',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Citadela Cafe Kotor'),
     NOW()),
 (
-    'https://foodbook.me/storage/restaurants/24/wl2xMqw93vHiG4zg87r72SLmMarvEWf1ODaiUWy6.jpg',
+    '/images/entity_images/objects/75c2da65a6f3793536e0520b.jpg',
     'Citadela Cafe Kotor',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Citadela Cafe Kotor'),
     NOW()),
 (
-    'https://media-cdn.tripadvisor.com/media/photo-m/1280/19/f1/d8/be/welcome-to-the-al-posto.jpg',
+    '/images/entity_images/objects/07a3dde4945614516af3be87.jpg',
     'Al Posto Giusto Tivat',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Al Posto Giusto Tivat'),
     NOW()),
 (
-    'https://foodbook.me/storage/restaurants/507/aFN6bzh9op5Ttb5KqmfOlyoVDzTPlLNIROZY7t7k.jpeg',
+    '/images/entity_images/objects/997587f1983a9ca05d92a0dc.jpg',
     'Al Posto Giusto Tivat',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Al Posto Giusto Tivat'),
     NOW()),
 (
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ5CNzLv4FtIW1hCzk0n6BV48I3fQg0j6DXCQ&s',
+    '/images/entity_images/objects/f7433f7d2f32e94baba0bcc6.jpg',
     'Al Posto Giusto Tivat',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Al Posto Giusto Tivat'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/30/3e/d3/6f/caption.jpg?w=1100&h=1100&s=1',
+    '/images/entity_images/objects/4aa15ab254cb4ad151fbeabd.jpg',
     'Astoria Cafe Luštica',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Astoria Cafe Luštica'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2b/67/11/40/caption.jpg?w=1200&h=1200&s=1',
+    '/images/entity_images/objects/c1375aed965fe4f6a385efc1.jpg',
     'Astoria Cafe Luštica',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Astoria Cafe Luštica'),
     NOW()),
 (
-    'https://traveldrinkdine.com/europe/a-unique-stay-at-hotel-astoria-in-kotor/attachment/19737947919_f9d05fdd5b_o/',
+    '/images/entity_images/objects/f184d6d296d68f95d78383f0.jpg',
     'Astoria Cafe Luštica',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Astoria Cafe Luštica'),
     NOW()),
 (
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQitI7jmXWhXI9BjwB1FTj1hQdZhKq8hxf64g&s',
+    '/images/entity_images/objects/15afabbe84bf0332f4adf0b4.jpg',
     'HEIST Bar Ulcinj',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'HEIST Bar Ulcinj'),
     NOW()),
 (
-    'https://media.evendo.com/locations-resized/BarImages/360x263/bb2f4aa1-4c04-49fc-a21d-a93f63f303f9',
+    '/images/entity_images/objects/7d7c894f1036047a50e062bd.jpg',
     'HEIST Bar Ulcinj',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'HEIST Bar Ulcinj'),
     NOW()),
 (
-    'https://wevotravel.com/wp-content/uploads/2023/05/287971475_570707484664331_4376306791416374200_n.jpg',
+    '/images/entity_images/objects/f4f03e7eea4f899f7bf0bf17.jpg',
     'HEIST Bar Ulcinj',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'HEIST Bar Ulcinj'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2e/57/69/6b/caption.jpg?w=1200&h=1200&s=1',
+    '/images/entity_images/objects/c7b807e3a44de279a9adeec2.jpg',
     'Grand Central Cetinje',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Grand Central Cetinje'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2e/5c/d8/09/caption.jpg?w=1200&h=1200&s=1',
+    '/images/entity_images/objects/18edeb9440f11376612b5b1c.jpg',
     'Grand Central Cetinje',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Grand Central Cetinje'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2e/5b/2e/f1/caption.jpg?w=700&h=700&s=1',
+    '/images/entity_images/objects/0251f5a3d54073f567f6571a.jpg',
     'Grand Central Cetinje',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Grand Central Cetinje'),
     NOW()),
 (
-    'https://users.minmedia.me/media/p1dr8knd5o16f115fr5pk1p0k7bm6.jpg',
+    '/images/entity_images/objects/298325391aa5ace0f07e3b4f.jpg',
     'Beer & Bike Club',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Beer & Bike Club'),
     NOW()),
 (
-    'https://media-cdn.tripadvisor.com/media/photo-m/1280/2f/8f/e7/6a/caption.jpg',
+    '/images/entity_images/objects/35b2baa32bc965c74a04424c.jpg',
     'Beer & Bike Club',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Beer & Bike Club'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/31/07/51/c4/caption.jpg?w=900&h=500&s=1',
+    '/images/entity_images/objects/ec311124c819eb0ae5c7cd49.jpg',
     'Beer & Bike Club',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Beer & Bike Club'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2d/b8/90/8a/caption.jpg?w=1100&h=1100&s=1',
+    '/images/entity_images/objects/dba61430e45c78b925b0ea93.jpg',
     'The Clubhouse Porto Montenegro',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'The Clubhouse Porto Montenegro'),
     NOW()),
 (
-    'https://images.myguide-cdn.com/montenegro/companies/the-clubhouse-porto-montenegro/large/the-clubhouse-porto-montenegro-472056.jpg',
+    '/images/entity_images/objects/e6da8c61fbba5e7cdf683ce2.jpg',
     'The Clubhouse Porto Montenegro',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'The Clubhouse Porto Montenegro'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/1c/5f/85/64/outdoor-seating.jpg?w=1200&h=1200&s=1',
+    '/images/entity_images/objects/2969b82e5418088beac73f11.jpg',
     'The Clubhouse Porto Montenegro',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'The Clubhouse Porto Montenegro'),
     NOW()),
 (
-    'https://image-tc.galaxy.tf/wijpeg-a14cy3mhsj1y1s38nranesi0a/hb-rooftop-bar-dusk-1920x1080.jpg?width=1920',
+    '/images/entity_images/objects/b6183ae8340c31bc22004119.jpg',
     'Havana Beach Bar',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Havana Beach Bar'),
     NOW()),
 (
-    'https://image-tc.galaxy.tf/wijpeg-19i5769gq7xr0c933i2dv6f4x/hb-rootop-bar-evening-1920x1080.jpg?width=1920',
+    '/images/entity_images/objects/8cc4ad99806b171a6cdbe5c9.jpg',
     'Havana Beach Bar',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Havana Beach Bar'),
     NOW()),
 (
-    'https://image-tc.galaxy.tf/wijpeg-ap7zt8j248q3gahwdywtpfrrf/hb-rooftopppl-1920x1080.jpg?width=1920',
+    '/images/entity_images/objects/0763aa0c70f28b299695e083.jpg',
     'Havana Beach Bar',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Havana Beach Bar'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2a/8f/8c/ef/caption.jpg?w=1100&h=1100&s=1',
+    '/images/entity_images/objects/d289763d5b561179b856689e.jpg',
     'Evergreen Jazz Bar',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Evergreen Jazz Bar'),
     NOW()),
 (
-    'https://tcdn.mindtrip.ai/images/391965/1i452a2.png',
+    '/images/entity_images/objects/842e6c98789f33cbe926bf2a.jpg',
     'Evergreen Jazz Bar',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Evergreen Jazz Bar'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2d/74/21/47/caption.jpg?w=1200&h=1200&s=1',
+    '/images/entity_images/objects/579d82e92d4e216db14cfca8.jpg',
     'Evergreen Jazz Bar',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Evergreen Jazz Bar'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/25/1a/c2/c2/caption.jpg?w=1200&h=1200&s=1',
+    '/images/entity_images/objects/a70a2a64d020480ec50a47ee.jpg',
     'Itaka Library Bar',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Itaka Library Bar'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/29/7a/ca/fd/caption.jpg?w=1100&h=1100&s=1',
+    '/images/entity_images/objects/a0a587ec8972dffcad67d11d.jpg',
     'Itaka Library Bar',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Itaka Library Bar'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/25/1a/c2/c3/caption.jpg?w=1100&h=1100&s=1',
+    '/images/entity_images/objects/bdda05b771423598579a3cc5.jpg',
     'Itaka Library Bar',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Itaka Library Bar'),
     NOW()),
 (
-    'https://mindtrip.ai/cdn-cgi/image/format=webp,w=1200/https://tcdn.mindtrip.ai/images/798363/1rq4szz.png',
+    '/images/entity_images/objects/7f728401ee277a65b3ef2c5e.jpg',
     'Blue Cat Art Cafe',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Blue Cat Art Cafe'),
     NOW()),
 (
-    'https://tcdn.mindtrip.ai/images/747083/1n9kw5.png',
+    '/images/entity_images/objects/f9e32e827c1d586b1add84d5.jpg',
     'Blue Cat Art Cafe',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Blue Cat Art Cafe'),
     NOW()),
 (
-    'https://tcdn.mindtrip.ai/images/394367/c11xpk.png',
+    '/images/entity_images/objects/ea51520b8a7256f6e4e1fdc8.jpg',
     'Blue Cat Art Cafe',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Blue Cat Art Cafe'),
     NOW()),
 (
-    'https://foodbook.me/storage/restaurants/20/3MS5CmzbG6fJ3ajX2oo0LUWEn7PeN1UgFLbfjiFs.jpg',
+    '/images/entity_images/objects/e383903ee594b398ca5530b5.jpg',
     'Old Town Pub Kotor',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Old Town Pub Kotor'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2d/e4/5f/1f/caption.jpg?w=1200&h=1200&s=1',
+    '/images/entity_images/objects/ef05696bc51ef606c0ad174c.jpg',
     'Old Town Pub Kotor',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Old Town Pub Kotor'),
     NOW()),
 (
-    'https://images.squarespace-cdn.com/content/v1/596e2b8a1b631b9f6334825a/1567726475894-NY4O946RKJ0JDC2P45B1/image-asset.jpeg',
+    '/images/entity_images/objects/2ffeab89e57f5cb761440f08.jpg',
     'Old Town Pub Kotor',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Old Town Pub Kotor'),
     NOW()),
 (
-    'https://budvanocu.gumlet.io/p1fu6eam1n1h3s1rk1pkj1c735pf7.png?width=1200',
+    '/images/entity_images/objects/e05dfb06211e19014c30b9fe.jpg',
     'Medusa',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Medusa'),
     NOW()),
 (
-    'https://users.minmedia.me/media/p1fu6eam1o13bf8i19t794i1u9cd.png',
+    '/images/entity_images/objects/cf4152c347c78baf3537bf1b.jpg',
     'Medusa',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Medusa'),
     NOW()),
 (
-    'https://budvanocu.gumlet.io/p1fu6eam1njn01ubo5u11rlmn19.png?width=1200',
+    '/images/entity_images/objects/67fc44b3515d933bda5a6870.jpg',
     'Medusa',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Medusa'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2d/b5/b3/b3/caption.jpg?w=1000&h=1000&s=1',
+    '/images/entity_images/objects/e0032f31d6db728747047046.jpg',
     'Strix Bar',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Strix Bar'),
     NOW()),
 (
-    'https://media.timeout.com/images/105495655/image.jpg',
+    '/images/entity_images/objects/62bec3add8bcc35b55561dc0.jpg',
     'Strix Bar',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Strix Bar'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2c/2f/b7/21/caption.jpg?w=1200&h=1200&s=1',
+    '/images/entity_images/objects/ac62ec8faf3abaf4e46f6016.jpg',
     'Strix Bar',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Strix Bar'),
     NOW()),
 (
-    'https://cafe.hardrock.com/podgorica/files/5470/9990250_ImageLargeWidth.jpg',
+    '/images/entity_images/objects/b4a1adf5115d4c045e8e2077.jpg',
     'Hard Rock Cafe Podgorica',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hard Rock Cafe Podgorica'),
     NOW()),
 (
-    'https://investitor.me/wp-content/uploads/2022/07/HRC_Podgorica_Exterior_Night_2056.jpeg',
+    '/images/entity_images/objects/ca361aecfd8b387cba0e6442.jpg',
     'Hard Rock Cafe Podgorica',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hard Rock Cafe Podgorica'),
     NOW()),
 (
-    'https://pbs.twimg.com/media/FycgdAQWYAAlciD.jpg',
+    '/images/entity_images/objects/28c21a6a9e397fbc00cc2fb5.jpg',
     'Hard Rock Cafe Podgorica',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hard Rock Cafe Podgorica'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/2/2c/Vladin_Dom_%28Dom_Rz%C4%85dowy%29_w_Cetinje_01.jpg',
+    '/images/entity_images/objects/87b7771ff96cfa0befbd1f51.jpg',
     'Narodni muzej Crne Gore',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Narodni muzej Crne Gore'),
     NOW()),
 (
-    'https://www.cdm.me/wp-content/uploads/2019/08/Umjetnicki-muzej.jpg',
+    '/images/entity_images/objects/edd5df9e9235e09896bdb6a1.jpg',
     'Narodni muzej Crne Gore',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Narodni muzej Crne Gore'),
     NOW()),
 (
-    'https://pbs.twimg.com/media/F0_YVrvX0AAMxUl.jpg',
+    '/images/entity_images/objects/16b596a4c36bc03efe2bd68b.jpg',
     'Narodni muzej Crne Gore',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Narodni muzej Crne Gore'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/f/fe/Kotor_-_Pomorski_muzej.jpg',
+    '/images/entity_images/objects/857216091e3a6d50474e9621.jpg',
     'Pomorski muzej Crne Gore',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pomorski muzej Crne Gore'),
     NOW()),
 (
-    'https://bookaweb.s3.eu-central-1.amazonaws.com/media/29594/pomorski-muzej-4.jpg',
+    '/images/entity_images/objects/5fa428482e91de76d9181251.jpg',
     'Pomorski muzej Crne Gore',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pomorski muzej Crne Gore'),
     NOW()),
 (
-    'https://bokanews.me/wp-content/uploads/2017/03/DSC_1024_resize.jpg',
+    '/images/entity_images/objects/56077d026d5a7de6178b6115.jpg',
     'Pomorski muzej Crne Gore',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pomorski muzej Crne Gore'),
     NOW()),
 (
-    'https://sharemontenegro.me/wp-content/uploads/2020/03/fo-1280x728.jpg',
+    '/images/entity_images/objects/cf883f1e2d137ba4f11be618.jpg',
     'Muzej kralja Nikole',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej kralja Nikole'),
     NOW()),
 (
-    'https://wevotravel.com/wp-content/uploads/2023/04/1-1-1-1.jpg',
+    '/images/entity_images/objects/a60184081d530feb8b05521c.jpg',
     'Muzej kralja Nikole',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej kralja Nikole'),
     NOW()),
 (
-    'https://narodnimuzej.me/wp-content/uploads/2021/01/Dvor-kralja-Nikole-slicica.jpg',
+    '/images/entity_images/objects/864036805e691f5a8f28b842.jpg',
     'Muzej kralja Nikole',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej kralja Nikole'),
     NOW()),
 (
-    'https://podgorica.travel/wp-content/uploads/2024/04/A11A9034-1-scaled.jpg',
+    '/images/entity_images/objects/410cb0adaa0a76298c7c6eaa.jpg',
     'Prirodnjački muzej Crne Gore',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Prirodnjački muzej Crne Gore'),
     NOW()),
 (
-    'https://pmcg.co.me/wp-content/uploads/2023/04/NOVA1.png',
+    '/images/entity_images/objects/0990e704687bcd40ed9a00ee.jpg',
     'Prirodnjački muzej Crne Gore',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Prirodnjački muzej Crne Gore'),
     NOW()),
 (
-    'https://podgorica.travel/wp-content/uploads/2024/04/A11A9032-scaled.jpg',
+    '/images/entity_images/objects/46a6832639ffcc4b22eb36ef.jpg',
     'Prirodnjački muzej Crne Gore',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Prirodnjački muzej Crne Gore'),
     NOW()),
 (
-    'https://muzejikotor.me/wp-content/uploads/2023/05/IMG_5692-1-scaled.jpg',
+    '/images/entity_images/objects/ab4d2ff6af2d0f369481ce50.jpg',
     'Muzej grada Perasta',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej grada Perasta'),
     NOW()),
 (
-    'https://bokanews.me/wp-content/uploads/2014/11/Perast-muzej_resize.jpg',
+    '/images/entity_images/objects/049def651394eac34325f902.jpg',
     'Muzej grada Perasta',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej grada Perasta'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2026/03/01/16/5709363_muzej-perast128_share.jpg',
+    '/images/entity_images/objects/e194d412f32098d8bd8b30a4.jpg',
     'Muzej grada Perasta',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej grada Perasta'),
     NOW()),
 (
-    'https://www.big-cee.com/wp-content/uploads/2022/10/big-podgorica-featured.webp',
+    '/images/entity_images/objects/805d0de272a685a636c8abec.jpg',
     'Big Fešn Podgorica',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Big Fešn Podgorica'),
     NOW()),
 (
-    'https://montenegro.org/wp-content/uploads/2023/05/312048262_790846772025647_8199514003964736491_n.jpg',
+    '/images/entity_images/objects/666040e630b81b0877d4eada.jpg',
     'Big Fešn Podgorica',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Big Fešn Podgorica'),
     NOW()),
 (
-    'https://www.novineniksica.me/wp-content/uploads/2022/09/BIG_night.jpg',
+    '/images/entity_images/objects/49188b68c0ee6946f5996a86.jpg',
     'Big Fešn Podgorica',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Big Fešn Podgorica'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/8/86/Podgorica_Mall_of_Montenegro_and_Ramada_Hotel_IMG_1297.JPG',
+    '/images/entity_images/objects/6c8810a30638248d54adcc78.jpg',
     'Mall of Montenegro',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mall of Montenegro'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/10/07/8b/7f/photo1jpg.jpg?w=1200&h=-1&s=1',
+    '/images/entity_images/objects/a2286eff5ab3a0e895825f71.jpg',
     'Mall of Montenegro',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mall of Montenegro'),
     NOW()),
 (
-    'https://mars-architects.com/wp-content/uploads/2025/07/Mall-of-Montenegro-06-scaled.jpg',
+    '/images/entity_images/objects/4e84e97727a27e40216bfe5c.jpg',
     'Mall of Montenegro',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mall of Montenegro'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/0c/92/05/b8/frontage.jpg?w=1200&h=1200&s=1',
+    '/images/entity_images/objects/d61c0ec3b55ed6efe2e0be6f.jpg',
     'Kamelija Shopping Center',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kamelija Shopping Center'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/29/4c/5a/2c/caption.jpg?w=1200&h=1200&s=1',
+    '/images/entity_images/objects/45403969997468f67ab6cf4c.jpg',
     'Kamelija Shopping Center',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kamelija Shopping Center'),
     NOW()),
 (
-    'https://medievaladventures.me/wp-content/uploads/2018/03/29216564_1800007913410308_4024370994708742144_o.jpg',
+    '/images/entity_images/objects/46e75ed2802c6751e2867f6f.jpg',
     'Kamelija Shopping Center',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kamelija Shopping Center'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/17/a2/70/47/city-mall.jpg?w=1200&h=1200&s=1',
+    '/images/entity_images/objects/72c72fcbe8b358b40f339d3b.jpg',
     'City Mall',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'City Mall'),
     NOW()),
 (
-    'https://wevotravel.com/wp-content/uploads/2023/04/City-Mall-01-1.jpg',
+    '/images/entity_images/objects/3f3507a2c53aefe47611d8d3.jpg',
     'City Mall',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'City Mall'),
     NOW()),
 (
-    'https://media-cdn.tripadvisor.com/media/photo-m/1280/17/a2/70/49/city-mall.jpg',
+    '/images/entity_images/objects/5bdb94edb76314e9bb9da60c.jpg',
     'City Mall',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'City Mall'),
     NOW()),
 (
-    'https://media.evendo.com/locations-resized/ShoppingImages/1920x466/b68271dd-3f9c-4a9f-93ee-d2fc7b69d8f2',
+    '/images/entity_images/objects/a94395695e227881bd3b69a7.jpg',
     'Central Mall Bar',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Central Mall Bar'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Bar%2C_Montenegro_-_city_centre_2.jpg/1280px-Bar%2C_Montenegro_-_city_centre_2.jpg',
+    '/images/entity_images/objects/64b2442f3bf6b70737ef47ae.jpg',
     'Central Mall Bar',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Central Mall Bar'),
     NOW()),
 (
-    'https://photos.wikimapia.org/p/00/01/78/71/85_big.jpg',
+    '/images/entity_images/objects/e61d93738ce4ccb302696fce.jpg',
     'Central Mall Bar',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Central Mall Bar'),
     NOW()),
 (
-    'https://ik.imagekit.io/megamallbudva/67bdb8a267f21_468107908_18046730549043216_4428087423747130551_n.jpg',
+    '/images/entity_images/objects/ab07ef63e36dd219e48d4737.jpg',
     'Mega Mall Budva',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mega Mall Budva'),
     NOW()),
 (
-    'https://ik.imagekit.io/megamallbudva/676babb73d8ec_20241217_133356.jpg',
+    '/images/entity_images/objects/2fc1b60f115b230b3bc2d76f.jpg',
     'Mega Mall Budva',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mega Mall Budva'),
     NOW()),
 (
-    'https://ik.imagekit.io/megamallbudva/680a6f5a488c2_20250424_1903_Prvomajska%20Ilustracija_remix_01jsmbz1c8fv1akpwkt5zget3h.png',
+    '/images/entity_images/objects/7b7d20e4585e9c03c0ba1456.jpg',
     'Mega Mall Budva',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mega Mall Budva'),
     NOW()),
 (
-    'https://lh4.googleusercontent.com/proxy/6oAHJOCHk3Q5fZeuVMAFLktYDQBXB1k7HPK9sAEDP5e-lYhCuD2ZD317wPDiEsYjOIWwYOH179kh48UfeABCxVzZY1IUK1Zq819tLuF8Uc4vOIS5rtTLKaXotYCKgv9xrMfARhO7WTy_K2K3_ytn_LvES7ET66E4LaUpyQFyfTUsGGtwrdk',
+    '/images/entity_images/objects/2628c85e29c82e09816fec4c.jpg',
     'TC HDL Laković Nikšić',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'TC HDL Laković Nikšić'),
     NOW()),
 (
-    'https://lh4.googleusercontent.com/proxy/bIwqDRnQCvs2Rd1gYOeYLP4nxhUzUpiuY4whYq0lKoXUo7HRkpLgoE-SKJXpreOJiJMNu_MqsyqsArmj24b28jPFk5k5hTaoUZPfEixN6NrtQStkTHlWGTIpGsWz9e6dZd79Hfj0Yea_cJaTLTnJ_7HbIeo9iFoh_-Y8k_glCs4FJuVI4XM',
+    '/images/entity_images/objects/430d9144913a7d33c91fe1d3.jpg',
     'TC HDL Laković Nikšić',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'TC HDL Laković Nikšić'),
     NOW()),
 (
-    'https://www.ekapija.com/thumbs/trzni_centar_261115_tw1024.jpg',
+    '/images/entity_images/objects/e01611117f17945df5557a65.jpg',
     'TC HDL Laković Nikšić',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'TC HDL Laković Nikšić'),
     NOW()),
 (
-    'https://svetistefan-realestate.com/wp-content/uploads/2024/05/hdl_lakovici.jpg',
+    '/images/entity_images/objects/6a874748896095123befcb16.jpg',
     'Laković Kotor',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Laković Kotor'),
     NOW()),
 (
-    'https://aspirano.s3.eu-central-1.amazonaws.com/media/media/1884/apoteka-benu-hdl-radanovici_1395273907.jpg',
+    '/images/entity_images/objects/08fe5fed1f5e50cfb89c2b95.jpg',
     'Laković Kotor',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Laković Kotor'),
     NOW()),
 (
-    'https://maplz.com/media/image/commercial-premises-in-the-hdl-lakovici-shopping-center-1.jpg',
+    '/images/entity_images/objects/46b63d703dac81dca359c7ca.jpg',
     'Laković Kotor',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Laković Kotor'),
     NOW()),
 (
-    'https://celebic.com/wp-content/uploads/2019/07/DJI_0147-copy-1.jpg',
+    '/images/entity_images/objects/7e6d9992074389f58835a1e4.jpg',
     'Butiko Shopping Center',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Butiko Shopping Center'),
     NOW()),
 (
-    'https://gracija.me/wp-content/uploads/2019/07/DJI_0018.jpg',
+    '/images/entity_images/objects/e9bb8b3ff566aad657ae5c33.jpg',
     'Butiko Shopping Center',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Butiko Shopping Center'),
     NOW()),
 (
-    'https://celebic.com/wp-content/uploads/2019/07/IMG_7147-HDR-copy.jpg',
+    '/images/entity_images/objects/76910ae327f3d829501cf476.jpg',
     'Butiko Shopping Center',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Butiko Shopping Center'),
     NOW()),
 (
-    'https://commons.wikimedia.org/wiki/Special:FilePath/Royaloak%20shopping%20mall%20.jpg',
+    '/images/entity_images/objects/063975f61b167a19e600d0d9.jpg',
     'HDL Novi Mall',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'HDL Novi Mall'),
     NOW()),
 (
-    'https://commons.wikimedia.org/wiki/Special:FilePath/Shopping%20Mall%20%28geograph%202381745%29.jpg',
-    'HDL Novi Mall',
-    false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'HDL Novi Mall'),
-    NOW()),
-(
-    'https://commons.wikimedia.org/wiki/Special:FilePath/Shopping%20Mall%20%284472066145%29.jpg',
-    'HDL Novi Mall',
-    false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'HDL Novi Mall'),
-    NOW()),
-(
-    'https://www.vijesti.me/data/images/2023/04/05/13/5479963_kolekcije-solidarne-buducnosti-muzej-moderne-i-savremene-umjetnosti-koroska_share.jpg',
+    '/images/entity_images/objects/c23878c363f5dd2a84e7cba4.jpg',
     'Galerija Muzeja savremene umjetnosti Crne Gore',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Muzeja savremene umjetnosti Crne Gore'),
     NOW()),
 (
-    'https://media.gov.me/media/gov/2023/10/17/1697529617toovsp6qyahlevbi.jpg',
+    '/images/entity_images/objects/5c411bbbe371238acc556adb.jpg',
     'Galerija Muzeja savremene umjetnosti Crne Gore',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Muzeja savremene umjetnosti Crne Gore'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2022/11/15/16/5449763_dvorac-csucg_share.jpg',
+    '/images/entity_images/objects/e36a7208fc9c7102d3bf8f79.jpg',
     'Galerija Muzeja savremene umjetnosti Crne Gore',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Muzeja savremene umjetnosti Crne Gore'),
     NOW()),
 (
-    'https://portonovi.com/storage/app/media/webp/seedo/pizana-art-gallery/pizana-04.webp',
+    '/images/entity_images/objects/4c2e93c56d4d2b97f22056f2.jpg',
     'Galerija Pizana',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Pizana'),
     NOW()),
 (
-    'https://www.spottedbylocals.com/wp-content/uploads/2024/10/Gallery-Pizana-1-scaled.jpg',
+    '/images/entity_images/objects/72a4d9d1f8837a7e82a4f89e.jpg',
     'Galerija Pizana',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Pizana'),
     NOW()),
 (
-    'https://portonovi.com/storage/app/uploads/public/66b/07f/4c7/66b07f4c7aa08019862801.webp',
+    '/images/entity_images/objects/37acd68e97b5614f37dc3f9b.jpg',
     'Galerija Pizana',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Pizana'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2022/12/26/15/5459573_320673919-578454017454978-4369255730523475141-n_share.jpg',
+    '/images/entity_images/objects/2f1fa4b60131d8943cef621f.jpg',
     'Galerija Velimir A. Leković',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Velimir A. Leković'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2025/08/20/13/5666347_oaf200zw_share.jpg',
+    '/images/entity_images/objects/8fb0307da133d6825c632794.jpg',
     'Galerija Velimir A. Leković',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Velimir A. Leković'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2025/07/08/15/5658001_har_share.jpg',
+    '/images/entity_images/objects/04e75e5460af9dd894e577e4.jpg',
     'Galerija Velimir A. Leković',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Velimir A. Leković'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/19/51/f6/55/villa-ljubanovic.jpg?w=1200&h=1200&s=1',
+    '/images/entity_images/objects/33aaebc253ad9fa0b90ea562.jpg',
     'Villa Ljubanović',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Villa Ljubanović'),
     NOW()),
 (
-    'https://images.trvl-media.com/lodging/90000000/89650000/89641200/89641129/5d68dc1a.jpg?impolicy=fcrop&w=1200&h=800&quality=medium',
+    '/images/entity_images/objects/78da5b7ef5001f0fb6f90424.jpg',
     'Villa Ljubanović',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Villa Ljubanović'),
     NOW()),
 (
-    'https://www.ljubanovic.com/uploads/6409e33eca94a.jpg',
+    '/images/entity_images/objects/2c911abad18a4bda7dad799a.jpg',
     'Villa Ljubanović',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Villa Ljubanović'),
     NOW()),
 (
-    'https://cf.bstatic.com/xdata/images/hotel/max1024x768/841139372.jpg?k=9eac4270322fa8656a945aeac5ef75de33aaebc3ebd703caba8c5109f22230a0&o=',
+    '/images/entity_images/objects/4fa62fafe1862dd09a598b2c.jpg',
     'Guesthouse Žmukić',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Guesthouse Žmukić'),
     NOW()),
 (
-    'https://a0.muscache.com/im/pictures/c3e4ae61-fdcc-406b-87dc-ed031c1a284b.jpg',
+    '/images/entity_images/objects/eb5e58aad0c1853812d9be3c.jpg',
     'Guesthouse Žmukić',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Guesthouse Žmukić'),
     NOW()),
 (
-    'https://a0.muscache.com/im/pictures/99f78802-f048-4245-b6a6-72de33631acb.jpg',
+    '/images/entity_images/objects/a3f233331ceed71a3082b0e4.jpg',
     'Guesthouse Žmukić',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Guesthouse Žmukić'),
     NOW()),
 (
-    'https://cf.bstatic.com/xdata/images/hotel/max1024x768/654530649.jpg?k=d96bb9b96d7fd00b0cd4717907fe95bc73906cc0bc0e468e1fdafea3e110c34e&o=',
+    '/images/entity_images/objects/bec39a6d708e5a75a1e3c63c.jpg',
     'Guesthouse Plima',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Guesthouse Plima'),
     NOW()),
 (
-    'https://cf.bstatic.com/xdata/images/hotel/max1024x768/654529487.jpg?k=b16596f228bc2d0301e77b6a532bbdd5c62d4da5331930e81e919c7ef4c73086&o=',
+    '/images/entity_images/objects/94c98b0c801a1eff8b3c7231.jpg',
     'Guesthouse Plima',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Guesthouse Plima'),
     NOW()),
 (
-    'https://cf.bstatic.com/xdata/images/hotel/max1024x768/39373244.jpg?k=1995016da60cfd27f17e56a1d8a449bc2a28ef91349c6bd1734afa72cce141b8&o=',
+    '/images/entity_images/objects/be8edaf1e93149e8592ad2a5.jpg',
     'Guesthouse Plima',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Guesthouse Plima'),
     NOW()),
 (
-    'https://static.cupid.travel/hotels/266854609.jpg',
+    '/images/entity_images/objects/8866cd1d216db0c7d71d1b05.jpg',
     'Pansion Vuković Žabljak',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pansion Vuković Žabljak'),
     NOW()),
 (
-    'https://cf.bstatic.com/xdata/images/hotel/max1024x768/19849596.jpg?k=3673239add680895bdab952a7ce6fb540613a78b1d925ee136d110074a4858d0&o=',
+    '/images/entity_images/objects/b410f5f4ecb2d924d1442993.jpg',
     'Pansion Vuković Žabljak',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pansion Vuković Žabljak'),
     NOW()),
 (
-    'https://static.cupid.travel/hotels/319007791.jpg',
+    '/images/entity_images/objects/87c545fb159d69efd15b808d.jpg',
     'Pansion Vuković Žabljak',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pansion Vuković Žabljak'),
     NOW()),
 (
-    'https://a0.muscache.com/im/pictures/7b7a07f9-6b8a-40b2-b649-bc853a9f61b9.jpg',
+    '/images/entity_images/objects/ddf6806ebc30f48e67689ffa.jpg',
     'Etno Selo Montenegro',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Etno Selo Montenegro'),
     NOW()),
 (
-    'https://images.trvl-media.com/lodging/36000000/35250000/35246200/35246165/26808daf.jpg?impolicy=fcrop&w=1200&h=800&quality=medium',
+    '/images/entity_images/objects/2d4ae45c3e439b2ea72ca556.jpg',
     'Etno Selo Montenegro',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Etno Selo Montenegro'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/24/f2/8c/62/etno-selo-montenegro.jpg?w=1200&h=1200&s=1',
+    '/images/entity_images/objects/1adea326e37d5906c43ccf09.jpg',
     'Etno Selo Montenegro',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Etno Selo Montenegro'),
     NOW()),
 (
-    'https://cf.bstatic.com/xdata/images/hotel/max1024x768/331394513.jpg?k=ed82728f733820cf613b767e4f765fceede1661d167818f19c17dcc3645992df&o=',
+    '/images/entity_images/objects/1ae6d1c9d074669221df1e12.jpg',
     'Etno Selo Izlazak',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Etno Selo Izlazak'),
     NOW()),
 (
-    'https://cf.bstatic.com/xdata/images/hotel/max1024x768/331395072.jpg?k=feebad86f6cbea9e0e1f29912e89913b50a6e0d7921eeee05c0904be642f87e5&o=',
+    '/images/entity_images/objects/8e7a326ec30eebb85e1ba9b1.jpg',
     'Etno Selo Izlazak',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Etno Selo Izlazak'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/0f/f8/3d/c3/etno-selo-izlazak-pluzine.jpg?w=1200&h=1200&s=1',
+    '/images/entity_images/objects/0b333381dcbdf0fb8b65aef6.jpg',
     'Etno Selo Izlazak',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Etno Selo Izlazak'),
     NOW()),
 (
-    'https://a0.muscache.com/im/pictures/hosting/Hosting-U3RheVN1cHBseUxpc3Rpbmc6MTA1NjUyMTQ3ODE4ODgxNDM2MQ==/original/2bea6286-2299-41e0-802d-197c5f0f7e45.jpeg',
+    '/images/entity_images/objects/fadc2526174e24a20099a0a5.jpg',
     'Etno Selo Komarnica',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Etno Selo Komarnica'),
     NOW()),
 (
-    'https://cf.bstatic.com/xdata/images/hotel/max1024x768/572431056.jpg?k=05f40f6b3c224c8ccf36f1071bd4077ba0121321e91e2cdc3f8a33cd9db84872&o=',
+    '/images/entity_images/objects/f45b3d78f9730e2a57490790.jpg',
     'Etno Selo Komarnica',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Etno Selo Komarnica'),
     NOW()),
 (
-    'https://cf.bstatic.com/xdata/images/hotel/max1024x768/830844207.jpg?k=7f3317c0272952d0119e9a839919597ce6545b914492c0ce13041e629266a02d&o=',
+    '/images/entity_images/objects/3272989030d55651c7e19904.jpg',
     'Etno Selo Komarnica',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Etno Selo Komarnica'),
     NOW()),
 (
-    'https://caffemontenegro.me/images/2022/planta%C5%BEe/cover.jpg',
+    '/images/entity_images/objects/093a0d39a037d43292be1005.jpg',
     'Vinarija Plantaže 13 Jul',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Vinarija Plantaže 13 Jul'),
     NOW()),
 (
-    'https://winestyle.rs/wp-content/uploads/2021/11/Vinski-Putopis-13.-Jul-Plantaze-img-7.jpg',
+    '/images/entity_images/objects/a339b94043d066bc3a213800.jpg',
     'Vinarija Plantaže 13 Jul',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Vinarija Plantaže 13 Jul'),
     NOW()),
 (
-    'https://stari.plantaze.com/wp-content/uploads/2019/05/Sipcanik-05-1920x710.jpg',
+    '/images/entity_images/objects/99a39f40acab32fa3242c3fc.jpg',
     'Vinarija Plantaže 13 Jul',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Vinarija Plantaže 13 Jul'),
     NOW()),
 (
-    'https://lipovacwines.com/images/2022/12/03/vinarija-mne.jpg',
+    '/images/entity_images/objects/9ef0c4f13f2844e3f7f8dd72.jpg',
     'Vinarija Lipovac',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Vinarija Lipovac'),
     NOW()),
 (
-    'https://lipovacwines.com/images/2022/12/03/3.jpg',
+    '/images/entity_images/objects/56cfde14fe50baaec4231547.jpg',
     'Vinarija Lipovac',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Vinarija Lipovac'),
     NOW()),
 (
-    'https://lipovacwines.com/images/2022/12/06/1-1.jpg',
+    '/images/entity_images/objects/cab2ee995d1a4f38cdbd7fc5.jpg',
     'Vinarija Lipovac',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Vinarija Lipovac'),
     NOW()),
 (
-    'https://tymrazem.pl/wp-content/uploads/2023/02/IMG_6218.jpg',
+    '/images/entity_images/objects/0fa69074aee26d27d3821a55.jpg',
     'Cem winery and vineyard',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Cem winery and vineyard'),
     NOW()),
 (
-    'https://coinventmediastorage.blob.core.windows.net/media-storage-container/gphoto_ChIJ8QHQGQDrTRMRvyh1bfSR2xw_2.jpg',
+    '/images/entity_images/objects/31757449c5ca7fc636126d48.jpg',
     'Cem winery and vineyard',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Cem winery and vineyard'),
     NOW()),
 (
-    'https://tymrazem.pl/wp-content/uploads/2023/02/IMG_6314.jpg',
+    '/images/entity_images/objects/07834130d29b0476c1552799.jpg',
     'Cem winery and vineyard',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Cem winery and vineyard'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/08/9d/fe/a8/winery-masanovic.jpg?w=1200&h=-1&s=1',
+    '/images/entity_images/objects/01ece52baa0f67ba7763c99b.jpg',
     'Winery Mašanović',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Winery Mašanović'),
     NOW()),
 (
-    'https://wineofmontenegro.com/wp-content/uploads/2024/11/wine-tasting-room-Masanovic-winery.jpg',
+    '/images/entity_images/objects/89aaa637c72af042d3180413.jpg',
     'Winery Mašanović',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Winery Mašanović'),
     NOW()),
 (
-    'https://wineofmontenegro.com/wp-content/uploads/2024/11/Crmnica-wine-Krin-barrique-Masanovic-winery.jpg',
+    '/images/entity_images/objects/4e0b30816799537267ec38ef.jpg',
     'Winery Mašanović',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Winery Mašanović'),
     NOW()),
 (
-    'https://cdn.prod.website-files.com/628ba2ca6ae2f8e75697f7e4/65eeece820b1b3b54cc6ca4b_Lazure%20Hotel%20Savina%20Winery%20Experience_1.webp',
+    '/images/entity_images/objects/31b6a4d1a0aca97e5280b63f.jpg',
     'Vinarija Savina',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Vinarija Savina'),
     NOW()),
 (
-    'https://wineofmontenegro.com/wp-content/uploads/2024/11/Coastal-Montenegro-wines-from-Savina-winery.jpg',
+    '/images/entity_images/objects/02069e783a33b83d48edf3fb.jpg',
     'Vinarija Savina',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Vinarija Savina'),
     NOW()),
 (
-    'https://castelsavina.me/wp-content/uploads/2014/05/photo-11_opt-e1399640996139.jpg',
-    'Vinarija Savina',
-    false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Vinarija Savina'),
-    NOW()),
-(
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/15/8b/b3/ed/the-best-view-of-the.jpg?w=1200&h=1200&s=1',
+    '/images/entity_images/objects/cbcd38df68dec8d6faa0e859.jpg',
     'Aqua Park Budva',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Aqua Park Budva'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2023/05/13/14/5488491_akva-foto-segej-zabijako_share.jpg',
+    '/images/entity_images/objects/cded5a9b730d994ac4b73de1.jpg',
     'Aqua Park Budva',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Aqua Park Budva'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/29/97/77/06/caption.jpg?w=1100&h=1100&s=1',
+    '/images/entity_images/objects/30fd63ab9b2becdd17bda3b4.jpg',
     'Aqua Park Budva',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Aqua Park Budva'),
     NOW()),
 (
-    'https://mcdn.pro/data/objects/images/28630/aqua-park-01-zwogqr-l-xchn0s.jpg',
+    '/images/entity_images/objects/cd01ec741ea439f6b90c8c2b.jpg',
     'Aqua Park Mediteran',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Aqua Park Mediteran'),
     NOW()),
 (
-    'https://mcdn.pro/data/objects/images/28630/aqua-park-05-f4o6zu-l-et5jzp.jpg',
+    '/images/entity_images/objects/31c0e648c5bd5c01c92c87bb.jpg',
     'Aqua Park Mediteran',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Aqua Park Mediteran'),
     NOW()),
 (
-    'https://kidpassage.com/images/activity/akvapark-mediteran/aquapark-mediteran_1022510291.jpg',
+    '/images/entity_images/objects/3fee118cd249de82ae53ff03.jpg',
     'Aqua Park Mediteran',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Aqua Park Mediteran'),
     NOW()),
 (
-    'https://www.imanje-knjaz.me/files/offer/thumb/1733817722-BI4_6175%20copy.jpg',
+    '/images/entity_images/objects/8d32ac28863ec709a8fff5c8.jpg',
     'Aqua Park Imanje Knjaz',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Aqua Park Imanje Knjaz'),
     NOW()),
 (
-    'https://www.imanje-knjaz.me/files/offer/thumb/1733817740-BI4_6020%20copy.jpg',
+    '/images/entity_images/objects/6286b0ec5ead32993f73666d.jpg',
     'Aqua Park Imanje Knjaz',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Aqua Park Imanje Knjaz'),
     NOW()),
 (
-    'https://www.imanje-knjaz.me/theme/images/aqua-offer1.jpg',
+    '/images/entity_images/objects/2dff499985175efa7cc8fc41.jpg',
     'Aqua Park Imanje Knjaz',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Aqua Park Imanje Knjaz'),
     NOW()),
 (
-    'https://mindtrip.ai/cdn-cgi/image/format=webp,w=1200/https://images.mindtrip.ai/attractions/06d5/d316/72a9/bac3/e5a7/4a66/a0ad/8bb6',
+    '/images/entity_images/objects/9c2eccce8ddcdfa75f171d79.jpg',
     'Mini Zoo Vrt Podgorica',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mini Zoo Vrt Podgorica'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2019/02/26/00/4228254_20190226120240_5c7525b2b789683b9121f181jpeg_share.jpg',
+    '/images/entity_images/objects/39026ed4b36c677d22c97f72.jpg',
     'Mini Zoo Vrt Podgorica',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mini Zoo Vrt Podgorica'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/28/fe/ee/ad/caption.jpg?w=1200&h=1200&s=1',
+    '/images/entity_images/objects/a08d6d7c233b9e27b655478c.jpg',
     'Mini Zoo Vrt Podgorica',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mini Zoo Vrt Podgorica'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2022/12/04/07/5454633_copy-of-copy-of-image2-credit-asi_share.jpg',
+    '/images/entity_images/objects/8099e3e398f181f9ba657786.jpg',
     'Zoo Sad',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zoo Sad'),
     NOW()),
 (
-    'https://caffemontenegro.me/images/slider/prihvatiliste/4.jpg',
+    '/images/entity_images/objects/ba7bc0e440c7cf72151650d3.jpg',
     'Zoo Sad',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zoo Sad'),
     NOW()),
 (
-    'https://sharemontenegro.me/wp-content/uploads/2019/01/unnamed-3-1024x768.jpg',
+    '/images/entity_images/objects/dc1448089b2cb1751999879c.jpg',
     'Zoo Sad',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zoo Sad'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2019/02/20/00/3546016_20190220060232_5c6ce70db789684e9f1769f1jpeg_share.jpg',
+    '/images/entity_images/objects/fe5a47358dc500c3a5f843ca.jpg',
     'Park Mačaka',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Park Mačaka'),
     NOW()),
 (
-    'https://mindtrip.ai/attractions/03fa/0775/1e45/0d13/5705/4287/26bb/f793',
-    'Park Mačaka',
-    false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Park Mačaka'),
-    NOW()),
-(
-    'https://gosailmontenegro.com/wp-content/uploads/2025/01/cat-and-a-view-of-kotor-v0-hb8umanfsbdb1.jpg',
-    'Park Mačaka',
-    false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Park Mačaka'),
-    NOW()),
-(
-    'https://aquariumboka.ucg.ac.me/wp-content/uploads/2021/05/Akvarijum-tankovi.jpg',
+    '/images/entity_images/objects/d0da4d2f1616ee83c13ab560.jpg',
     'Akvarijum Boka',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Akvarijum Boka'),
     NOW()),
 (
-    'https://sharemontenegro.me/wp-content/uploads/2021/09/Akvarijum-Boka.jpg',
+    '/images/entity_images/objects/cac77493af14833da4c3a7c2.jpg',
     'Akvarijum Boka',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Akvarijum Boka'),
     NOW()),
 (
-    'https://sharemontenegro.me/wp-content/uploads/2021/09/Akvarijum-Boka-savr%C5%A1en-izlet-.jpg',
+    '/images/entity_images/objects/7421ff27c41d1592ed48c14b.jpg',
     'Akvarijum Boka',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Akvarijum Boka'),
     NOW()),
 (
-    'https://mnemagazin.me/wp-content/uploads/2019/06/Igralište-sajt.jpg',
+    '/images/entity_images/objects/c5ba82f5d6ae0ad621ddc8c4.jpg',
     'Igralište Njegošev park',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Njegošev park'),
     NOW()),
 (
-    'https://media.pobjeda.me/media/1623408831-pct-Igralište-3.jpg',
-    'Igralište Njegošev park',
-    false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Njegošev park'),
-    NOW()),
-(
-    'https://sportskiobjekti.podgorica.me/wp-content/uploads/2025/06/DJI_0794.jpg',
-    'Igralište Njegošev park',
-    false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Njegošev park'),
-    NOW()),
-(
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/1a/f6/61/e6/welcome-to-the-new-adventure.jpg?w=1200&h=-1&s=1',
+    '/images/entity_images/objects/cfc3c2c85e307f4787562dff.jpg',
     'Igralište Gorica Park',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Gorica Park'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/14/45/00/c1/photo1jpg.jpg?w=1200&h=-1&s=1',
+    '/images/entity_images/objects/8649ad1f506271fe416ad0cc.jpg',
     'Igralište Gorica Park',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Gorica Park'),
     NOW()),
 (
-    'https://wevotravel.com/wp-content/uploads/2023/04/IMG_2615-1.jpg',
+    '/images/entity_images/objects/d4b95e44d32ba538213f34fc.jpg',
     'Igralište Gorica Park',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Gorica Park'),
     NOW()),
 (
-    'https://agencijapanorama.rs/wp-content/uploads/ws-form/2/dropzonejs/61/Slovenska-Plaza-Lux-Budva-Crna-Gora-7.jpg',
+    '/images/entity_images/objects/41e3ff3b89d54168d6f5e211.jpg',
     'Igralište Slovenska plaža',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Slovenska plaža'),
     NOW()),
 (
-    'https://startravelnis.rs/wp-content/uploads/2022/02/budva-slovenska-plaza-3-16.jpg',
+    '/images/entity_images/objects/654f8183bd771cd9ea481368.jpg',
     'Igralište Slovenska plaža',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Slovenska plaža'),
     NOW()),
 (
-    'https://www.hercegnovi.me/images/stories/15072022/02.jpg',
+    '/images/entity_images/objects/1daf49c874c175cf087d7f05.jpg',
     'Dječije Igralište Park Nezavisnosti',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dječije Igralište Park Nezavisnosti'),
     NOW()),
 (
-    'https://rthn.co.me/wp-content/uploads/2022/10/Dogadjaj-Najbolji-smo-domacini-a-Herceg-%E2%80%93-Novi-grad-tvoj-i-moj.jpg',
+    '/images/entity_images/objects/ca26d78b4bb0dbb6a8ba5416.jpg',
     'Dječije Igralište Park Nezavisnosti',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dječije Igralište Park Nezavisnosti'),
     NOW()),
 (
-    'https://www.hercegnovi.travel/storage/app/public/project-image/1700744811.jpg',
+    '/images/entity_images/objects/2a4778d92cb41c569d7932c9.jpg',
     'Dječije Igralište Park Nezavisnosti',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dječije Igralište Park Nezavisnosti'),
     NOW()),
 (
-    'https://www.kotor.me/files/images/1745583583-WhatsApp%20slika%202025-04-25%20u%2013.48.33_5cb55a84.jpg',
+    '/images/entity_images/objects/39c717ef4ae9e8ed2973cdad.jpg',
     'Igralište Centar Kotor',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Centar Kotor'),
     NOW()),
 (
-    'https://radiokotor.info/files/images/1745591172-1745583581-Foto-9.jpg',
+    '/images/entity_images/objects/fc01589ce76ac87ae3f5e482.jpg',
     'Igralište Centar Kotor',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Centar Kotor'),
     NOW()),
 (
-    'https://www.kotor.me/files/images/1745583582-Foto-8.JPG',
+    '/images/entity_images/objects/f607070e965c4e601e057cda.jpg',
     'Igralište Centar Kotor',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Centar Kotor'),
     NOW()),
 (
-    'https://www.cdm.me/wp-content/uploads/2021/11/tolosi.jpg',
+    '/images/entity_images/objects/370fd3dddaa846cf74ab49a4.jpg',
     'Igralište Tološi',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Tološi'),
     NOW()),
 (
-    'https://www.antenam.net/uploads/6/e/d/6ed7fb080c86bde2fff21d4f6a56a30b.jpg',
+    '/images/entity_images/objects/7405625aa47d60c40f05ffd0.jpg',
     'Igralište Tološi',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Tološi'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2020/09/11/13/5248883_1253767_share.jpg',
+    '/images/entity_images/objects/96e10f142359904cb7503197.jpg',
     'Igralište Tološi',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Tološi'),
     NOW()),    
 (
-    'https://www.vijesti.me/data/images/2022/07/01/10/5421393_djecije-Igralište_ls.jpg',
+    '/images/entity_images/objects/a3a94afb8589ef7e658bcb2a.jpg',
     'Igralište Kolašin',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Kolašin'),
     NOW()),
 (
-    'https://rtcg.me/upload//media/2022/7/17/21/48/184/1214620/resize/1214622/1660762115845_1068x900',
+    '/images/entity_images/objects/6bd8ffb2105693b2a0468881.jpg',
     'Igralište Kolašin',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Kolašin'),
     NOW()),    
 (
-    'https://www.vijesti.me/data/images/2021/09/30/10/5364413_juce-na-trgu-vukmana-kruscica_ls.jpg',
+    '/images/entity_images/objects/196f07eb22bcd3f6eef911a6.jpg',
     'Igralište Kolašin',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Kolašin'),
     NOW()),
 (
-    'https://rthn.co.me/wp-content/uploads/2023/04/Igralište-Igalo.jpg',
-    'Igralište Igalo',
-    true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Igalo'),
-    NOW()),
-(
-    'https://bookaweb.s3.eu-central-1.amazonaws.com/media/28555/omladinski-park-igalo.jpg',
+    '/images/entity_images/objects/ee6a2b2bdd072169d28075dc.jpg',
     'Igralište Igalo',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Igalo'),
     NOW()),
 (
-    'https://biznisuregionu.com/wp-content/uploads/2025/11/soso-Milan-Petrovic-Novi-Sad.jpg',
+    '/images/entity_images/objects/86edd2f312c32dd705b3b629.jpg',
+    'Igralište Igalo',
+    true,
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Igalo'),
+    NOW()),
+(
+    '/images/entity_images/objects/3cee84970e2529451b2e8b2a.jpg',
     'Igralište Igalo',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Igalo'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2022/08/02/12/5428098_viber-image-20220802-122227576_share.jpg',
+    '/images/entity_images/objects/aa1ac9d3bfa494b48203d103.jpg',
     'Igralište Park 13 Jul',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Park 13 Jul'),
     NOW()),
 (
-    'https://www.antenam.net/uploads/8/5/b/85b64f91c8fd6579abc311e0f9c193ea.jpg',
+    '/images/entity_images/objects/09d17a82f010bc53c76d43b7.jpg',
     'Igralište Park 13 Jul',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Park 13 Jul'),
     NOW()),
 (
-    'https://www.cdm.me/wp-content/uploads/2021/06/pct_Igralište_4.jpg',
-    'Igralište Park 13 Jul',
-    false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Park 13 Jul'),
-    NOW()),
-(
-    'https://rtnk.me/wp-content/uploads/2024/10/novo-Igralište-u-kosovskoj-ulici-rtnk.jpg',
+    '/images/entity_images/objects/da534d70b516e72ec3b03950.jpg',
     'Igralište Nikšić',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Nikšić'),
     NOW()),
 (
-    'https://rtnk.me/wp-content/uploads/2023/09/Igralište-kod-Desetke-rtnk-1.jpg',
+    '/images/entity_images/objects/565bc7fcf9a28d9a5a1f13e4.jpg',
     'Igralište Nikšić',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Nikšić'),
     NOW()),
 (
-    'https://rtnk.me/wp-content/uploads/2023/10/Igralište-stara-varos-rtnk.jpg',
+    '/images/entity_images/objects/d5260cb5c5b39352bf4a6479.jpg',
     'Igralište Nikšić',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Nikšić'),
     NOW()),
 (
-    'https://opstinativat.me/wp-content/uploads/2022/09/43918C30-2DF0-4A92-AE32-5EC0E3C7407C-scaled.jpeg',
+    '/images/entity_images/objects/b6c48ee6ec139cb8c604b033.jpg',
     'Dječje igralište kod vozića',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dječje igralište kod vozića'),
     NOW()),
 (
-    'https://bokanews.me/wp-content/uploads/2025/02/Novo-Igralište-i-teren_resize.jpg',
-    'Dječje igralište kod vozića',
-    false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dječje igralište kod vozića'),
-    NOW()),
-(
-    'https://radiotivat.com/wp-content/uploads/2026/03/ostvj-Igralište.jpg',
-    'Dječje igralište kod vozića',
-    false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dječje igralište kod vozića'),
-    NOW()),
-(
-    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQf19k1RmCSIEtzZCfqdwGP9IpbmHvjOCBbWw&s',
+    '/images/entity_images/objects/7e5587767638756152144e29.jpg',
     'Igralište Bar Šetalište',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Bar Šetalište'),
     NOW()),
 (
-    'https://www.putovanja.info/forum/uploads/monthly_2021_06/IMG_20190808_131116_1067x800.jpg.b12464c970ea513a45e21184ec346b5d.jpg',
+    '/images/entity_images/objects/6842cd4920c0fdc8e39386fe.jpg',
     'Igralište Bar Šetalište',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Bar Šetalište'),
     NOW()),
 (
-    'https://barinfo.me/wp-content/uploads/2024/07/Igralište-1-2407-70ea.jpg',
-    'Igralište Bar Šetalište',
-    false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Bar Šetalište'),
-    NOW()),
-(
-    'https://radiotitograd.me/wp-content/uploads/2025/08/obnovljeno-Igralište-NPD-scaled.jpg',
+    '/images/entity_images/objects/187724b38accde4b46c59746.jpg',
     'Igralište Crno jezero',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Crno jezero'),
     NOW()),
 (
-    'https://nparkovi.me/storage/images/news/1754288130.jpg',
+    '/images/entity_images/objects/40f06bc77bc74d0bbe448266.jpg',
     'Igralište Crno jezero',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Crno jezero'),
     NOW()),
 (
-    'https://nparkovi.me/storage/images/news/1754288098_68904fe2db78c.jpg',
-    'Igralište Crno jezero',
-    false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Crno jezero'),
-    NOW()),
-(
-    'https://cf.bstatic.com/xdata/images/hotel/max1024x768/85068015.jpg?k=ba5ce5ed5d58026ba4f9f44c50ea9d3be236284e517d523545df24219c77e6b2&o=',
+    '/images/entity_images/objects/752e95f021e7f86d76abaa89.jpg',
     'Igralište Miločer Park',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Miločer Park'),
     NOW()),
 (
-    'https://cf.bstatic.com/xdata/images/hotel/max1024x768/85068008.jpg?k=808052ece3d899557c778f973c0ecafd0042e569658f91e15a88edfbef5395d5&o=',
+    '/images/entity_images/objects/d39936073bdf01a384507892.jpg',
     'Igralište Miločer Park',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Miločer Park'),
     NOW()),
 (
-    'https://commons.wikimedia.org/wiki/Special:FilePath/Park%20%28children%27s%20playground%29.jpg',
-    'Igralište Lovćen National Park',
+    '/images/entity_images/objects/a232335ef665e5b8b5a4d1ec.jpg',
+    'Igralište Lovćen',
     true,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Lovćen National Park'),
+    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Lovćen'),
     NOW()),
 (
-    'https://commons.wikimedia.org/wiki/Special:FilePath/Lovćen%20view%20Montenegro%20june%202021%20%289%29.jpg',
-    'Igralište Lovćen National Park',
-    false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Lovćen National Park'),
-    NOW()),
-(
-    'https://commons.wikimedia.org/wiki/Special:FilePath/Lovćen%20view%20Montenegro%20june%202021%20%288%29.jpg',
-    'Igralište Lovćen National Park',
-    false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Lovćen National Park'),
-    NOW()),
-(
-    'https://commons.wikimedia.org/wiki/Special:FilePath/Indoor%20playground%20%288129595643%29.jpg',
+    '/images/entity_images/objects/76fca5f99b2a01abf957f24b.jpg',
     'Dječija igraonica Igalo',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dječija igraonica Igalo'),
     NOW()),
 (
-    'https://commons.wikimedia.org/wiki/Special:FilePath/USSRC%20indoor%20playground.JPG',
-    'Dječija igraonica Igalo',
-    false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dječija igraonica Igalo'),
-    NOW()),
-(
-    'https://commons.wikimedia.org/wiki/Special:FilePath/Playroom%2C%20Viking%20Grace%2C%2020230604%20-%2016.jpg',
-    'Dječija igraonica Igalo',
-    false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dječija igraonica Igalo'),
-    NOW()),
-(
-    'https://cnp.me/wp-content/uploads/2019/01/eksterijer-12-18-2.jpg',
+    '/images/entity_images/objects/410371cffd97e357496b22b4.jpg',
     'Crnogorsko narodno pozorište',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Crnogorsko narodno pozorište'),
     NOW()),
 (
-    'https://cnp.me/wp-content/uploads/2016/12/CNP-Crnogorsko-narodno-Pozorište-9.jpg',
-    'Crnogorsko narodno pozorište',
-    false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Crnogorsko narodno pozorište'),
-    NOW()),
-(
-    'https://www.narodnoPozorište.rs/media/images/news/6396/gallery/eri-moja-cnp-7.jpg',
-    'Crnogorsko narodno pozorište',
-    false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Crnogorsko narodno pozorište'),
-    NOW()),
-(
-    'https://upload.wikimedia.org/wikipedia/commons/a/a3/2023_Cetinje_theatre.jpg',
+    '/images/entity_images/objects/467f42d2ad180422f60ce575.jpg',
     'Zetski dom',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zetski dom'),
     NOW()),
 (
-    'https://zetskidom.me/wp-content/uploads/2021/08/IMG-a1ac87d79e65defce4acd00c669ec8eb-V.jpg',
+    '/images/entity_images/objects/8be444a4cf76d6fecc1c1fac.jpg',
     'Zetski dom',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zetski dom'),
     NOW()),
 (
-    'https://zetskidom.me/wp-content/uploads/2026/01/1000140981-scaled.jpg',
+    '/images/entity_images/objects/947456a68deb206a142b0c78.jpg',
     'Zetski dom',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zetski dom'),
     NOW()),
 (
-    'https://rtnk.me/wp-content/uploads/2024/06/niksicko-Pozorište-rtnk-1200x676-1.webp',
+    '/images/entity_images/objects/9f85c18415f4ec3a4e26efa2.jpg'
     'Nikšićko pozorište',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Nikšićko pozorište'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2019/02/16/00/2930291_20190216050232_5c6792e3b789684e9f0515b6jpeg_share.jpg',
+    '/images/entity_images/objects/3aa6aa86e097fb0544b546b3.jpg',
     'Nikšićko pozorište',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Nikšićko pozorište'),
     NOW()),
 (
-    'https://kossev.info/wp-content/uploads/2025/10/violina-daire-1.jpg',
-    'Nikšićko pozorište',
-    false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Nikšićko pozorište'),
-    NOW()),
-(
-    'https://me.ekapija.com/thumbs169/dvorana_park_herceg_novi_1_170224_tw1024.jpg',
+    '/images/entity_images/objects/54fc9034fbdbccc58e09e9da.jpg',
     'Dvorana Park Herceg Novi',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dvorana Park Herceg Novi'),
     NOW()),
 (
-    'https://www.dekadas.rs/slike/prva1.jpg',
+    '/images/entity_images/objects/a9abae082469367a32669478.jpg',
     'Dvorana Park Herceg Novi',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dvorana Park Herceg Novi'),
     NOW()),
 (
-    'https://elektrovat.net/wp-content/uploads/2022/11/viber_image_2022-10-28_08-25-49-079.webp',
+    '/images/entity_images/objects/b751274b88c392cfde217af9.jpg',
     'Dvorana Park Herceg Novi',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dvorana Park Herceg Novi'),
     NOW()),
 (
-    'https://kckotor.me/wp-content/uploads/2020/04/DSC_0492-1024x683.jpg',
+    '/images/entity_images/objects/4cbaa854b8820a1fdb1cabc7.jpg',
     'Kulturni centar Kotor - scena',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kulturni centar Kotor - scena'),
     NOW()),
 (
-    'https://www.kotor.me/files/images/1579191876-dsc0554.jpg',
+    '/images/entity_images/objects/2044884b68d59f49dc7bce76.jpg',
     'Kulturni centar Kotor - scena',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kulturni centar Kotor - scena'),
     NOW()),
 (
-    'https://www.kotor.me/files/images/1588930288-IMG-f47455b3c7d70fd0b441a23307856215-V%20(1)-bez%20teksta.jpg',
+    '/images/entity_images/objects/3fb7de3035abedae84135c28.jpg',
     'Kulturni centar Kotor - scena',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kulturni centar Kotor - scena'),
     NOW()),
 (
-    'https://gradteatar.me/wp-content/uploads/2025/11/dobra-stara-vremena-19.11-11.jpg',
+    '/images/entity_images/objects/985884354a2416e1140da9d7.jpg',
     'Javna ustanova Grad Teatar',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Javna ustanova Grad Teatar'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2023/06/24/12/5498555_2343540_share.jpg',
+    '/images/entity_images/objects/abbe165c7303cd237dd3d444.jpg',
     'Javna ustanova Grad Teatar',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Javna ustanova Grad Teatar'),
     NOW()),
 (
-    'https://gradteatar.me/wp-content/uploads/2023/11/bravo-za-klovna-3.jpg',
+    '/images/entity_images/objects/6101ee4532732b20fec2fb2c.jpg',
     'Javna ustanova Grad Teatar',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Javna ustanova Grad Teatar'),
     NOW()),
 (
-    'https://barinfo.me/wp-content/uploads/2025/07/ljetnja-pozornica-nova.jpg',
+    '/images/entity_images/objects/6a7f5f89d2fa1e7e9cddce20.jpg',
     'Dom kulture Bar - pozornica',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom kulture Bar - pozornica'),
     NOW()),
 (
-    'https://www.gradnja.me/storage/posts/1752413044slavko-leki%C4%87.jpeg',
+    '/images/entity_images/objects/1521a97b4b56e29af57e2206.jpg',
     'Dom kulture Bar - pozornica',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom kulture Bar - pozornica'),
     NOW()),
 (
-    'https://www.gradnja.me/storage/posts/1752413705slavko-leki%C4%87.jpeg',
+    '/images/entity_images/objects/638203c91c4010859c89596e.jpg',
     'Dom kulture Bar - pozornica',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom kulture Bar - pozornica'),
     NOW()),
 (
-    'https://czktivat.me/wp-content/uploads/2025/07/Velika-Sala-3.jpg',
+    '/images/entity_images/objects/041a82f24e546683283a80fc.jpg',
     'Tivat Centar za kulturu',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Tivat Centar za kulturu'),
     NOW()),
 (
-    'https://czktivat.me/wp-content/uploads/2025/12/DSC1723-scaled.jpg',
+    '/images/entity_images/objects/adb03c4409d7d8974ca8421d.jpg',
     'Tivat Centar za kulturu',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Tivat Centar za kulturu'),
     NOW()),
 (
-    'https://www.radiodux.me/sites/default/files/2026/20-04-2026-otvoren-festival-ruta-tivat-predstavom-celava-pjevacica/7q9b3203.jpg',
+    '/images/entity_images/objects/5876faf510501baddcc5d9af.jpg',
     'Tivat Centar za kulturu',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Tivat Centar za kulturu'),
     NOW()),
 (
-    'https://czktivat.me/wp-content/uploads/2016/03/7146838.jpg',
+    '/images/entity_images/objects/5dc6398e905e744dc0c6c3d1.jpg',
     'Ljetnja Pozornica Tivat',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Ljetnja Pozornica Tivat'),
     NOW()),
 (
-    'https://czktivat.me/wp-content/uploads/2025/07/Ljetnja-Pozornica-6.jpg',
+    '/images/entity_images/objects/5560cd8aee797c35e52ac482.jpg',
     'Ljetnja Pozornica Tivat',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Ljetnja Pozornica Tivat'),
     NOW()),
 (
-    'https://radiotivat.com/wp-content/uploads/2025/07/viber_image_2025-07-04_10-11-44-078.jpg',
+    '/images/entity_images/objects/bda8a420dd0515df4b48a095.jpg',
     'Ljetnja Pozornica Tivat',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Ljetnja Pozornica Tivat'),
     NOW()),
 (
-    'https://res.cloudinary.com/dt5z2gs3c/image/upload/v1760477333/dom-oilpainting_pn04mc.jpg',
+    '/images/entity_images/objects/b55b4d6548e2db2d8206adf9.jpg',
     'Dom kulture Kolašin',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom kulture Kolašin'),
     NOW()),
 (
-    'https://kossev.info/wp-content/uploads/2019/04/Dom-Kulture-Stari-Kola%C5%A1in-krupni-plan-1024x768.jpg',
+    '/images/entity_images/objects/0028e99e493b814461221060.jpg',
     'Dom kulture Kolašin',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom kulture Kolašin'),
     NOW()),
 (
-    'https://i.ytimg.com/vi/D6J49YPa_Ns/maxresdefault.jpg',
+    '/images/entity_images/objects/d15abda93b6c1e7f2a4b0fda.jpg',
     'Dom kulture Kolašin',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom kulture Kolašin'),
     NOW()),
 (
-    'https://sharemontenegro.me/wp-content/uploads/2021/05/IMG_0108.jpg',
+    '/images/entity_images/objects/85ebe560eb4afb32cdbac727.jpg',
     'Manastir Morača',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Manastir Morača'),
     NOW()),
 (
-    'https://www.mojacrnagora.rs/wp-content/uploads/2021/05/drone-montenegro-manastir-moraca.jpg',
+    '/images/entity_images/objects/4facaabadd20fb62f9f38978.jpg',
     'Manastir Morača',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Manastir Morača'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/7/7c/Manastir_Moraca.jpg',
-    'Manastir Morača',
-    false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Manastir Morača'),
-    NOW()),
-(
-    'https://upload.wikimedia.org/wikipedia/commons/3/35/Monastero_di_cetinje%2C_01.JPG',
+    '/images/entity_images/objects/b6340f4b45dec066d41476f1.jpg',
     'Cetinjski manastir',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Cetinjski manastir'),
     NOW()),
 (
-    'https://svetigora.com/wp-content/uploads/2021/02/Cetinjski-manastir.jpg',
+    '/images/entity_images/objects/c1204755507aea84a19c3b81.jpg',
     'Cetinjski manastir',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Cetinjski manastir'),
     NOW()),
 (
-    'https://static.tildacdn.net/tild3633-3063-4731-b735-656262333163/WhatsApp_slika_2025-.jpg',
+    '/images/entity_images/objects/65d292a2bfad333ce40ab6d3.jpg',
     'Cetinjski manastir',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Cetinjski manastir'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/2/27/Manastir_Piva_3.jpg',
+    '/images/entity_images/objects/3da839b2afebcea2c5947d8d.jpg',
     'Manastir Piva',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Manastir Piva'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/c/c2/Manastir_Piva5.jpg',
+    '/images/entity_images/objects/2c6cfdb8a3b716df729cb6c7.jpg',
     'Manastir Piva',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Manastir Piva'),
     NOW()),
 (
-    'https://rtnk.me/wp-content/uploads/2023/08/slava-manastira-piva-eparhija-naslovna.jpg',
-    'Manastir Piva',
-    false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Manastir Piva'),
-    NOW()),
-(
-    'https://upload.wikimedia.org/wikipedia/commons/c/cf/Sports_Center_Moraca.jpg',
+    '/images/entity_images/objects/6ff96422b5175c11d9251677.jpg',
     'SC Morača',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Morača'),
     NOW()),
 (
-    'https://media.pobjeda.me/media/2024/03/03/1709505820-sc-moraca-2809-2023-dragan-mijatovic-001-19-1-i_1280x800.JPG?cacheControl=1709505822',
+    '/images/entity_images/objects/df2ff132acdf5f344201e651.jpg',
     'SC Morača',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Morača'),
     NOW()),
 (
-    'https://www.standard.co.me/wp-content/uploads/2020/07/SC-moraca.jpg',
+    '/images/entity_images/objects/0f5432351c92ed959eb6126c.jpg',
     'SC Morača',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Morača'),
     NOW()),
 (
-    'https://upload.wikimedia.org/wikipedia/commons/c/cd/Sportska_dvorana_Topolica.jpg',
+    '/images/entity_images/objects/6297be1aad325d50e94efb73.jpg',
     'SC Topolica',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Topolica'),
     NOW()),
 (
-    'https://lobsport.me/wp-content/uploads/2024/05/sc-topolica-jpg.webp',
+    '/images/entity_images/objects/4a9221e746f2e8b7037ca8dd.jpg',
     'SC Topolica',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Topolica'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2019/09/25/00/4670725_2019092516090_c4219cf306db568e72f812d8dd3743cdbb5ce1ce30da77bda38cf88e33a6e512_share.jpg',
+    '/images/entity_images/objects/8e81263b56c4e9c1c12cecb0.jpg',
     'SC Topolica',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Topolica'),
     NOW()),
 (
-    'https://egca.info/wp-content/uploads/2022/07/Venue-Niksic1-1.jpg',
+    '/images/entity_images/objects/249bdc5352f5202648783feb.jpg',
     'SC Nikšić',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Nikšić'),
     NOW()),
 (
-    'https://wevotravel.com/wp-content/uploads/2023/04/DSC7460-1.jpg',
+    '/images/entity_images/objects/a45547d59e080a351c48f2c5.jpg',
     'SC Nikšić',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Nikšić'),
     NOW()),
 (
-    'https://media.pobjeda.me/media/2022/02/23/1645610845-nk-img-5e60e2759c7e6894283a50e326403546-v-i_960x600.jpg?cacheControl=1645610859',
+    '/images/entity_images/objects/4055eb75336389af8ed7f189.jpg',
     'SC Nikšić',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Nikšić'),
     NOW()),
 (
-    'https://www.ekapija.com/thumbs/sportski_centar_igalo_1_290920_tw1024.jpg',
+    '/images/entity_images/objects/cfe636f972f3fad915b0892e.jpg',
     'SC Igalo',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Igalo'),
     NOW()),
 (
-    'https://bokanews.me/wp-content/uploads/2023/09/P9035608.jpg',
+    '/images/entity_images/objects/cb75e2271c3748bb26a38a5e.jpg',
     'SC Igalo',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Igalo'),
     NOW()),
 (
-    'https://rthn.co.me/wp-content/uploads/2024/06/Novi-perimetri-u-SC-Igalo-1-jun-2024.jpg',
+    '/images/entity_images/objects/76213cea788608cc03e2d83c.jpg',
     'SC Igalo',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Igalo'),
     NOW()),
 (
-    'https://skijalista.me/wp-content/uploads/DJI_0021.jpg',
+    '/images/entity_images/objects/0b927052e5afee8d36b58886.jpg',
     'SC Kolašin',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Kolašin'),
     NOW()),
 (
-    'https://srbijazamlade.rs/fajlovi/productitem/kolasin-1600-skijaliste_5ffefd29559fc.jpg',
+    '/images/entity_images/objects/bd66a26fb9109c2bbf08c0c0.jpg',
     'SC Kolašin',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Kolašin'),
     NOW()),
 (
-    'https://rtnk.me/wp-content/uploads/2023/07/oscg.jpg',
+    '/images/entity_images/objects/90678e7332a608d2c6c5d2ef.jpg',
     'SC Kolašin',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Kolašin'),
     NOW()),
 (
-    'https://www.avalaresort.com/photos/1/Gallery/Spa%20&%20Wellness/homepage/DSC_7301.jpg',
+    '/images/entity_images/objects/ab2c200a9a011b1f8de6392d.jpg',
     'Spa Center Avala Medical Wellness',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spa Center Avala Medical Wellness'),
     NOW()),
 (
-    'https://www.avalaresort.com/photos/1/Gallery/Spa%20&%20Wellness/homepage/Avala-27-2.jpg',
+    '/images/entity_images/objects/14ca5d0a230d091cefef605c.jpg',
     'Spa Center Avala Medical Wellness',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spa Center Avala Medical Wellness'),
     NOW()),
 (
-    'https://www.avalaresort.com/photos/1/Gallery/Spa%20&%20Wellness/Gym/avg%202025/Avala-24-2.jpg',
+    '/images/entity_images/objects/e882e9ecbc303ccafd748995.jpg',
     'Spa Center Avala Medical Wellness',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spa Center Avala Medical Wellness'),
     NOW()),
 (
-    'https://d1tfdfyb9rvaxg.cloudfront.net/chedilusticabay.com-1070583806/cms/cache/v2/64afc7d4c5820.jpg/1920x1080/fit/80/8a0e6122621764bdd3b6819e6a3b3eac.jpg',
+    '/images/entity_images/objects/d3c3527763d2dc686f84db06.jpg',
     'The Chedi Luštica Bay',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'The Chedi Luštica Bay'),
     NOW()),
 (
-    'https://d1tfdfyb9rvaxg.cloudfront.net/chedilusticabay.com-1070583806/cms/cache/v2/66210aad640cc.jpg/1920x1080/fit/80/6be62e08a98bbde8ec17bd6c96904f20.jpg',
+    '/images/entity_images/objects/3554c6b3b68641e1105423bf.jpg',
     'The Chedi Luštica Bay',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'The Chedi Luštica Bay'),
     NOW()),
 (
-    'https://www.simplyluxuryescapes.co.uk/wp-content/uploads/2025/04/The-Chedi-Lustica-Bay-Montenegro-20.jpg',
+    '/images/entity_images/objects/c964df6e839b04f8082a2a2b.jpg',
     'The Chedi Luštica Bay',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'The Chedi Luštica Bay'),
     NOW()),
 (
-    'https://radiotitograd.me/wp-content/uploads/2024/09/Vrmac-HealthWellbeing-photo-Rozana-Sazdic-7163.jpg-2-scaled.jpg',
+    '/images/entity_images/objects/094856302f50b15c1551f7cf.jpg',
     'Health & Wellbeing Retreat de Mar - Vrmac',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Health & Wellbeing Retreat de Mar - Vrmac'),
     NOW()),
 (
-    'https://europeanspamagazine.com/app/uploads/2023/11/View-from-the-pool-copy.jpg',
+    '/images/entity_images/objects/02feef7ec32f05a453812dce.jpg',
     'Health & Wellbeing Retreat de Mar - Vrmac',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Health & Wellbeing Retreat de Mar - Vrmac'),
     NOW()),
 (
-    'https://europeanspamagazine.com/app/uploads/2023/11/BKB-717-copy.jpg',
+    '/images/entity_images/objects/0b654727b256512fdbdbd4fb.jpg',
     'Health & Wellbeing Retreat de Mar - Vrmac',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Health & Wellbeing Retreat de Mar - Vrmac'),
     NOW()),
 (
-    'https://www.humahotel.me/wp-content/uploads/2023/04/IMG_8615-3desno7.jpg',
+    '/images/entity_images/objects/f3c8f1b6fa9aacc7bae9da28.jpg',
     'Shanti Wellness & Spa',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Shanti Wellness & Spa'),
     NOW()),
 (
-    'https://www.humahotel.me/wp-content/uploads/2021/06/happy-young-beautiful-couple-enjoying-head-massage-spa-scaled-e1624554987511.jpg',
+    '/images/entity_images/objects/bb1ab935b1923ba98833f3d6.jpg',
     'Shanti Wellness & Spa',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Shanti Wellness & Spa'),
     NOW()),
 (
-    'https://www.humahotel.me/wp-content/uploads/2023/04/IMG_8265-1.jpg',
+    '/images/entity_images/objects/f381259c957124c7199dcc71.jpg',
     'Shanti Wellness & Spa',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Shanti Wellness & Spa'),
     NOW()),
 (
-    'https://pijacepg.me/wp-content/uploads/2025/04/IMG_4153-1-scaled.jpeg',
+    '/images/entity_images/objects/9cb80847125410395627c4f4.jpg',
     'Tržnica Podgorica',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Tržnica Podgorica'),
     NOW()),
 (
-    'https://pijacepg.me/wp-content/uploads/2025/04/IMG_3996-scaled.jpeg',
+    '/images/entity_images/objects/926c2a81c924b28093c05ee7.jpg',
     'Tržnica Podgorica',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Tržnica Podgorica'),
     NOW()),
 (
-    'https://pijacepg.me/wp-content/uploads/2025/04/IMG_3790-2-scaled.jpeg',
+    '/images/entity_images/objects/822c421833541e7385c375ba.jpg',
     'Tržnica Podgorica',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Tržnica Podgorica'),
     NOW()),
 (
-    'https://bokanews.me/wp-content/uploads/2014/11/DSC_3999_resize.jpg',
+    '/images/entity_images/objects/d6df53130a78261918e68747.jpg',
     'Gradska pijaca Kotor',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Gradska pijaca Kotor'),
     NOW()),
 (
-    'https://bokanews.me/wp-content/uploads/2014/11/DSC_3965_resize.jpg',
+    '/images/entity_images/objects/4587229b84c934212a545f58.jpg',
     'Gradska pijaca Kotor',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Gradska pijaca Kotor'),
     NOW()),
 (
-    'https://bokanews.me/wp-content/uploads/2014/11/DSC_3969_resize.jpg',
+    '/images/entity_images/objects/5856a7294008d9d56199a135.jpg',
     'Gradska pijaca Kotor',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Gradska pijaca Kotor'),
     NOW()),
 (
-    'https://i0.wp.com/primorski.me/wp-content/uploads/2025/08/Pijaca-Budva-naslovna-scaled.jpg',
+    '/images/entity_images/objects/3d09a46914617d208118defb.jpg',
     'Pijaca Budva',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pijaca Budva'),
     NOW()),
 (
-    'https://images.myguide-cdn.com/montenegro/companies/green-market-budva/large/green-market-budva-699143.jpg',
+    '/images/entity_images/objects/852868f930603e3fd63983f8.jpg',
     'Pijaca Budva',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pijaca Budva'),
     NOW()),
 (
-    'https://mindtrip.ai/attractions/4ab5/a82b/e240/d3ad/5648/64e7/b6a0/a1e5',
-    'Pijaca Budva',
-    false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pijaca Budva'),
-    NOW()),
-(
-    'https://rtnk.me/wp-content/uploads/2024/04/pijaca-niksic-rtnk.jpg',
+    '/images/entity_images/objects/e410eca7a687f851d3626848.jpg',
     'Zelena pijaca Nikšić',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zelena pijaca Nikšić'),
     NOW()),
 (
-    'https://seljak.me/savjetuje/wp-content/uploads/2022/04/277935918_1026062591656638_1337074368930576300_n.jpg',
+    '/images/entity_images/objects/7080a5aedcd8160df588fca4.jpg',
     'Zelena pijaca Nikšić',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zelena pijaca Nikšić'),
     NOW()),
 (
-    'https://i.ytimg.com/vi/cHmWcwUxcxE/maxresdefault.jpg',
+    '/images/entity_images/objects/a9422e97b78b32509546d685.jpg',
     'Zelena pijaca Nikšić',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zelena pijaca Nikšić'),
     NOW()),
 (
-    'https://komunalnobar.me/images/pjaca.JPG',
+    '/images/entity_images/objects/aed26dc04a116349565d0174.jpg',
     'Pijaca Bar',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pijaca Bar'),
     NOW()),
 (
-    'https://images.myguide-cdn.com/montenegro/companies/green-market-stari-bar/large/green-market-stari-bar-699140.jpg',
+    '/images/entity_images/objects/59efa30d995e9d9a8baadd94.jpg',
     'Pijaca Bar',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pijaca Bar'),
     NOW()),
 (
-    'https://i0.wp.com/primorski.me/wp-content/uploads/2024/12/Riblja-pijaca-Bar-3.jpg',
+    '/images/entity_images/objects/c567edf6fa6c0c612cf7add5.jpg',
     'Pijaca Bar',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pijaca Bar'),
     NOW()),
 (
-    'https://www.ekapija.com/thumbs/pijaca_herceg_novi_201120_tw1024.jpg',
+    '/images/entity_images/objects/5988fbe54aecc0bd7e0b2361.jpg',
     'Pijaca Herceg Novi',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pijaca Herceg Novi'),
     NOW()),
 (
-    'https://investitor.me/wp-content/uploads/2024/12/green-market-herceg-novi-699146.jpg',
+    '/images/entity_images/objects/a365c53b4a04aa7db17225fb.jpg',
     'Pijaca Herceg Novi',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pijaca Herceg Novi'),
     NOW()),
 (
-    'https://www.ekapija.com/thumbs/pijaca_herceg_novi_2_201120_tw1024.jpg',
+    '/images/entity_images/objects/ae4bfd5ebbd30b35c5f83c0e.jpg',
     'Pijaca Herceg Novi',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pijaca Herceg Novi'),
     NOW()),
 (
-    'https://www.ekapija.com/thumbs/pijaca_140123_tw1024.jpg',
+    '/images/entity_images/objects/e16885e3b25cb7fa6492a7a1.jpg',
     'Pijaca Tivat',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pijaca Tivat'),
     NOW()),
 (
-    'https://sharemontenegro.me/wp-content/uploads/2021/08/11111111.jpg',
+    '/images/entity_images/objects/15fe7518039414d5da9ff9ad.jpg',
     'Pijaca Tivat',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pijaca Tivat'),
     NOW()),
 (
-    'https://radiotivat.com/wp-content/uploads/2022/06/2016-07-21-Pijaca-domacih-proizvoda.webp',
+    '/images/entity_images/objects/37da09606985a9b92ced06f8.jpg',
     'Pijaca Tivat',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pijaca Tivat'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2019/02/17/00/3061351_20190217000240_5c689febb789684e9f0a07fbjpeg_share.jpg',
+    '/images/entity_images/objects/a97dba74cab10e6b28cad425.jpg',
     'Zelena pijaca Cetinje',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zelena pijaca Cetinje'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2021/08/15/19/5356691_12101905-pijaca-cetinje_share.jpg',
+    '/images/entity_images/objects/32e847f2886fedfc143bf993.jpg',
     'Zelena pijaca Cetinje',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zelena pijaca Cetinje'),
     NOW()),
 (
-    'https://me.ekapija.com/thumbs169/cetinjska_pijaca_291124_tw1024.jpg',
+    '/images/entity_images/objects/086655d83ab41abdc18862e8.jpg',
     'Zelena pijaca Cetinje',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zelena pijaca Cetinje'),
     NOW()),
 (
-    'https://mne.ul-info.com/wp-content/uploads/2020/03/Pazari.jpg',
+    '/images/entity_images/objects/5d63ac4fa59e4e906a8567f9.jpg',
     'Pijaca Ulcinj',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pijaca Ulcinj'),
     NOW()),
 (
-    'https://mne.ul-info.com/wp-content/uploads/2020/04/Pijaca-Trego.jpg',
+    '/images/entity_images/objects/7aba680eea591dceea092f69.jpg',
     'Pijaca Ulcinj',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pijaca Ulcinj'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2020/08/30/19/5245067_1713302_share.jpg',
+    '/images/entity_images/objects/ba7fb5e4d2643d0675839527.jpg',
     'Pijaca Ulcinj',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pijaca Ulcinj'),
     NOW()),
 (
-    'https://bokanews.me/wp-content/uploads/2015/01/riba-ostala-u-autu-jer-nema-pijace_resize.jpg',
+    '/images/entity_images/objects/3db1953c3aad42ca1356901a.jpg',
     'Riblja Pijaca Tivat',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Riblja Pijaca Tivat'),
     NOW()),
 (
-    'https://scontent.fbeg7-2.fna.fbcdn.net/v/t39.30808-6/502622072_1463692371657941_7287224198373513296_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=e06c5d&_nc_ohc=09igSWvDHHMQ7kNvwF5p88J&_nc_oc=AdpJFCf1vrY8kQYnMZxUVjlBK8aLFA5lXWldv-KQwDZXCuyR7ba3NLi6Cu8P4aQuWZk&_nc_zt=23&_nc_ht=scontent.fbeg7-2.fna&_nc_gid=xgO_hby8cQ6WwjmQa7GERA&_nc_ss=7b2a8&oh=00_Af3BClcOq50XWQ78x4k12mZtqcPVkU4pYzoj6m-BbMWdTQ&oe=69F2C35E',
-    'Riblja Pijaca Tivat',
-    false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'Riblja Pijaca Tivat'),
-    NOW()),
-(
-    'https://content.radnik.me/images%2F2025%2F03%2F05%2FL9VBdjgXI0aasMFb-PQ7VQ%2Fw-1280%2Fkotorska%20suvenirnica%20cover.webp',
+    '/images/entity_images/objects/634243f3de53fc18ae92e34f.jpg',
     'Kotorska Suvenirnica',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kotorska Suvenirnica'),
     NOW()),
 (
-    'https://lh3.googleusercontent.com/p/AF1QipO3l5O33mFx8vWgcrG1iMYX2VPDfp5NY2l-zUVT=s1600-w1024',
+    '/images/entity_images/objects/2b43d17e6f6e13b869bde2c0.jpg',
     'Kotorska Suvenirnica',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kotorska Suvenirnica'),
     NOW()),
 (
-    'https://static.vecteezy.com/system/resources/previews/042/518/878/large_2x/kotor-montenegro-25-december-2022-little-girl-stands-near-a-showcase-with-souvenirs-inscription-kotorska-suvenirnica-free-photo.jpg',
+    '/images/entity_images/objects/ac7a7665932b9d9e3f8e6a17.jpg',
     'Kotorska Suvenirnica',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kotorska Suvenirnica'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/23/69/64/96/sea-style-serving-desk.jpg?w=1200&h=-1&s=1',
+    '/images/entity_images/objects/1ad319a6d17241a1ca593ec4.jpg',
     'By The Sea Handmade',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'By The Sea Handmade'),
     NOW()),
 (
-    'https://scontent.fbeg7-2.fna.fbcdn.net/v/t39.30808-6/475981555_1149454826668661_912770419630957985_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=06a7ca&_nc_ohc=H3x2qa7DSV4Q7kNvwGwiSUK&_nc_oc=AdqigTTSDEFZXly4lwyuswAKKiJCb55Z75qZU3KkK7xeftxVdX4TBb8kECJ8I42ZPXE&_nc_zt=23&_nc_ht=scontent.fbeg7-2.fna&_nc_gid=4tafE7b5OaFQTDK7oTM70Q&_nc_ss=7b2a8&oh=00_Af1i2Q3OJ8AeH5pAF88a8ySwQ-XJMvWHpT90EaS_0RE8yg&oe=69F2D908',
-    'By The Sea Handmade',
-    false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'By The Sea Handmade'),
-    NOW()),
-(
-    'https://scontent.fbeg7-2.fna.fbcdn.net/v/t39.30808-6/475850645_1149454833335327_8305708708332480824_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=06a7ca&_nc_ohc=HvNZb_pTcMEQ7kNvwFiuvsB&_nc_oc=AdovjTjwmQGXsxjpc9KWGo4w4JZkolnFrYapfMIhc3dmOD7q_EmOIioBT0Dj0ulWtWM&_nc_zt=23&_nc_ht=scontent.fbeg7-2.fna&_nc_gid=TVNjynFbeVtSX9yC8l9-mw&_nc_ss=7b2a8&oh=00_Af2rSB0RhrVaQ297LTywswGN_YT4r1asH_qtESsP-KxBjQ&oe=69F2F828',
-    'By The Sea Handmade',
-    false,
-    (SELECT "Id" FROM "Objects" WHERE "Name" = 'By The Sea Handmade'),
-    NOW()),
-(
-    'https://thumbs.dreamstime.com/b/kotor-montenegro-may-display-souvenir-shop-historic-part-city-165732284.jpg',
+    '/images/entity_images/objects/a28874ca43d6d25589b2e326.jpg',
     'Souvenir Shop Montenegro',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Souvenir Shop Montenegro'),
     NOW()),
 (
-    'https://media02.stockfood.com/largepreviews/MjIxNDA2MjM3Nw==/71421367-Souvenirs-in-the-old-town-of-Kotor-Montenegro-Europe.jpg',
+    '/images/entity_images/objects/63fe581204823b727786414a.jpg',
     'Souvenir Shop Montenegro',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Souvenir Shop Montenegro'),
     NOW()),
 (
-    'https://lh3.googleusercontent.com/p/AF1QipOFaESpFFbKYXp1lRCHWoLEMxp7Ss0xovy5Sq_o=w800-h1420-k-no',
+    '/images/entity_images/objects/408f91a585b05b5f206aad7f.jpg',
     'Souvenir Shop XY',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Souvenir Shop XY'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2019/02/09/00/1900783_20190209010252_5c5e24e3b789689e85bff52bjpeg_share.jpg',
+    '/images/entity_images/objects/4c9b9f1ad82e3ae9d2a24d06.jpg',
     'Souvenir Shop XY',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Souvenir Shop XY'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2f/fd/a0/47/caption.jpg?w=1200&h=1200&s=1',
+    '/images/entity_images/objects/01759bb9fe2c8760bbf43f98.jpg',
     'Mnemories',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mnemories'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2f/fd/a0/45/caption.jpg?w=1200&h=1200&s=1',
+    '/images/entity_images/objects/6fdeddb334cd8cc6f7703a74.jpg',
     'Mnemories',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mnemories'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2f/fd/a0/44/caption.jpg?w=1200&h=1200&s=1',
+    '/images/entity_images/objects/c78e43e8197486e57aa35aca.jpg',
     'Mnemories',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mnemories'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/0c/c3/66/ab/20160830-113357-hdr-largejpg.jpg?w=1200&h=-1&s=1',
+    '/images/entity_images/objects/21f57b6ca810d63c30ac2d2f.jpg',
     'Promenada Krupac',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Promenada Krupac'),
     NOW()),
 (
-    'https://dynamic-media-cdn.tripadvisor.com/media/photo-o/1d/34/45/93/krupac-lake.jpg?w=1100&h=1100&s=1',
+    '/images/entity_images/objects/6c645529d9c5ade0e7b83878.jpg',
     'Promenada Krupac',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Promenada Krupac'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2022/06/16/18/5418202_plaza-sve-veca-jezero-sve-manje-krupac_share.jpg',
+    '/images/entity_images/objects/a090ffb2bdc82daddca9ca3c.jpg',
     'Promenada Krupac',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Promenada Krupac'),
     NOW()),
 (
-    'https://www.kccg.me/wp-content/uploads/2025/04/DJI-0139.jpg',
+    '/images/entity_images/objects/cf2948cd1234fb3765925e77.jpg',
     'Klinički centar Crne Gore',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Klinički centar Crne Gore'),
     NOW()),
 (
-    'https://www.kccg.me/wp-content/uploads/2021/03/Zastave-na-pola-koplja-na-ulazu-KCCG.jpg',
+    '/images/entity_images/objects/3680fdf1dc0f49264ae2ff0d.jpg',
     'Klinički centar Crne Gore',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Klinički centar Crne Gore'),
     NOW()),
 (
-    'https://www.ekapija.com/thumbs169/klinicki_centar_crne_gore_190223_tw1024.jpg',
+    '/images/entity_images/objects/91a42b93842d5f7ac67e680c.jpg',
     'Klinički centar Crne Gore',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Klinički centar Crne Gore'),
     NOW()),
 (
-    'https://bolnica-nk.com/wp-content/uploads/2022/11/glavni-2.jpg',
+    '/images/entity_images/objects/391f4f6c86d76df8dc19f6c9.jpg',
     'Opšta bolnica Nikšić',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opšta bolnica Nikšić'),
     NOW()),
 (
-    'https://rtnk.me/wp-content/uploads/2023/05/bolnica-1.jpg',
+    '/images/entity_images/objects/95e4d8fbb2af056e4efc10f5.jpg',
     'Opšta bolnica Nikšić',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opšta bolnica Nikšić'),
     NOW()),
 (
-    'https://onogost.me/wp-content/uploads/2024/04/opsta-bolnica.jpg',
+    '/images/entity_images/objects/08cc58e793e2bac782a1cb2f.jpg',
     'Opšta bolnica Nikšić',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opšta bolnica Nikšić'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2021/03/27/07/5311543_opsta-bolnica-bar_share.jpg',
+    '/images/entity_images/objects/18034b9f84827d651dce481f.jpg',
     'Opšta bolnica Bar',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opšta bolnica Bar'),
     NOW()),
 (
-    'https://www.bolnicabar.me/images/2023/IMG-1d0accf27a0bf0e0bc553cac09fc0698-V_1.jpg',
+    '/images/entity_images/objects/4c25db42b31920eb4751ab29.jpg',
     'Opšta bolnica Bar',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opšta bolnica Bar'),
     NOW()),
 (
-    'https://rtnk.me/wp-content/uploads/2023/09/bolnica-bar-pr-centar.jpg',
+    '/images/entity_images/objects/99dc4033f8f1435c9714c654.jpg',
     'Opšta bolnica Bar',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opšta bolnica Bar'),
     NOW()),
 (
-    'https://me.ekapija.com/thumbs169/opsta_bolnica_kotor_190820_tw1024.jpg',
+    '/images/entity_images/objects/c8a74fcf47effcf22b4b097a.jpg',
     'Opšta bolnica Kotor',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opšta bolnica Kotor'),
     NOW()),
 (
-    'https://bokanews.me/wp-content/uploads/2016/09/ulaz-u-novu-polikliniku_resize.jpg',
+    '/images/entity_images/objects/6bdbc652b2cbaa94c9b542e5.jpg',
     'Opšta bolnica Kotor',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opšta bolnica Kotor'),
     NOW()),
 (
-    'https://bokanews.me/wp-content/uploads/2016/09/detalj-iz-nove-poliklinike-2_resize.jpg',
+    '/images/entity_images/objects/c8cf1c8f5e381d13f5ab69d1.jpg',
     'Opšta bolnica Kotor',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opšta bolnica Kotor'),
     NOW()),
 (
-    'https://media.pobjeda.me/media/2026/04/24/1777052914-bolnica-danilo-prvi-cetinje-0904-2026-dragan-mijatovic-1-i_1280x800.jpeg?cacheControl=1777052915',
+    '/images/entity_images/objects/1605697105e9af3da564df2a.jpg',
     'Opšta bolnica Danilo Prvi Cetinje',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opšta bolnica Danilo Prvi Cetinje'),
     NOW()),
 (
-    'https://me.ekapija.com/thumbs169/bolnica_danilo_prvi_cetinje_050323_tw1024.jpg',
+    '/images/entity_images/objects/bc9571f5bbbcf5eef89631eb.jpg',
     'Opšta bolnica Danilo Prvi Cetinje',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opšta bolnica Danilo Prvi Cetinje'),
     NOW()),
 (
-    'https://www.gradnja.rs/wp-content/uploads/2023/11/bolnica-danilo-1-cetinje.jpg',
+    '/images/entity_images/objects/46b6c64b536900482b4203e2.jpg',
     'Opšta bolnica Danilo Prvi Cetinje',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opšta bolnica Danilo Prvi Cetinje'),
     NOW()),
 (
-    'https://radiotivat.com/wp-content/uploads/2021/11/DOM-ZDRAVLJA.webp',
+    '/images/entity_images/objects/923ea712a0c9dd788d50a1c7.jpg',
     'Dom zdravlja Tivat',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Tivat'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2021/11/10/10/5371993_dom-zdravlja-tivat_share.jpg',
+    '/images/entity_images/objects/f675bd0406f69baad79f07a5.jpg',
     'Dom zdravlja Tivat',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Tivat'),
     NOW()),
 (
-    'https://mondo.me/Picture/669405/Social/jpeg/358331684_187231180850040_6288158882867065455_n.jpg?ts=2023-07-31T13:06:31',
+    '/images/entity_images/objects/fe0097392574bcbd2e99ee22.jpg',
     'Dom zdravlja Tivat',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Tivat'),
     NOW()),
 (
-    'https://domzdravljahn.me/wp-content/uploads/2016/06/dom-zdravlja-hn.jpg',
+    '/images/entity_images/objects/d73a14e49f2a576d9eb08a47.jpg',
     'Dom zdravlja Herceg Novi',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Herceg Novi'),
     NOW()),
 (
-    'https://domzdravljahn.me/wp-content/uploads/2016/06/dom-zdravlja-obavjestenja.jpg',
+    '/images/entity_images/objects/9474edc82ed75475ef92ab8a.jpg',
     'Dom zdravlja Herceg Novi',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Herceg Novi'),
     NOW()),
 (
-    'https://domzdravljahn.me/wp-content/uploads/2017/10/Dom-Zdravlja-Herceg-Novi-06.jpg',
+    '/images/entity_images/objects/93295162d7a25f98ffbf7280.jpg',
     'Dom zdravlja Herceg Novi',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Herceg Novi'),
     NOW()),
 (
-    'https://ba.ekapija.com/thumbs169/dom_zdravlja_bar_070624_tw1024.jpg',
+    '/images/entity_images/objects/a905a068470b765c984f405f.jpg',
     'Dom zdravlja Bar',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Bar'),
     NOW()),
 (
-    'https://i0.wp.com/primorski.me/wp-content/uploads/2022/07/dom-zdravlja-bar-foto-dz-bar.jpg',
+    '/images/entity_images/objects/b35df633bfcc6de5954faac1.jpg',
     'Dom zdravlja Bar',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Bar'),
     NOW()),
 (
-    'https://i0.wp.com/primorski.me/wp-content/uploads/2022/09/dom-zdravlja-bar-4.jpg?fit=1600%2C1200&ssl=1',
+    '/images/entity_images/objects/54be580c4b6e53645ca1b1d8.jpg',
     'Dom zdravlja Bar',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Bar'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2021/07/22/08/5351161_zdravstvena-stanica-u-pluzinama_share.jpg',
+    '/images/entity_images/objects/2804c87cebc81bac13bc1589.jpg',
     'Zdravstvena stanica Plužine',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zdravstvena stanica Plužine'),
     NOW()),
 (
-    'https://www.antenam.net/uploads/0/9/3/0937dd1305acef12ed6bf380eea2160a.JPG',
+    '/images/entity_images/objects/2e3ee9c9f5138d4844ed96ef.jpg',
     'Zdravstvena stanica Plužine',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zdravstvena stanica Plužine'),
     NOW()),
 (
-    'https://radiotitograd.me/wp-content/uploads/2021/07/pluzine.jpg',
+    '/images/entity_images/objects/19e3c44806a0bc3ba6c83df1.jpg',
     'Zdravstvena stanica Plužine',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zdravstvena stanica Plužine'),
     NOW()),
 (
-    'https://www.ekapija.com/thumbs169/dom_zdravlja_plav_190220_tw1024.jpg',
+    '/images/entity_images/objects/8d77c8bff5d19015a6412e8c.jpg',
     'Dom zdravlja Plav',
     true,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Plav'),
     NOW()),
 (
-    'https://www.dzplav.me/slike%20plav/4a%20Snijeg%202012%20god/Slika%205.JPG',
+    '/images/entity_images/objects/21135e23e5281345ca9eac42.jpg',
     'Dom zdravlja Plav',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Plav'),
     NOW()),
 (
-    'https://www.vijesti.me/data/images/2019/02/02/00/833466_20190202040240_5c551168b7896801fa6e65c1jpeg_ls.jpg',
+    '/images/entity_images/objects/25144f2f25a226ce906e079c.jpg',
     'Dom zdravlja Plav',
     false,
     (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Plav'),
@@ -11679,157 +11283,157 @@ VALUES
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ActivityId", "CreatedAt")
 VALUES
 (
-    'https://infinityadventure.me/wp-content/uploads/2023/12/durmitor-planinarenje.png',
+    '/images/entity_images/activities/b6e3de92e7d9493aeb83bb3b.jpg',
     'Planinarenje na Durmitoru',
     true,
     (SELECT "Id" FROM "Activities" WHERE "Name" = 'Planinarenje na Durmitoru'),
     NOW()),
 (
-    'https://durmitoradventure.com/static/4b5891e1e968e8f1d6d4708e4c7be588/df7b5/hero_Hiking_1900x1267_e5b7b9b462.jpg',
+    '/images/entity_images/activities/57a1862cbc1dd029d917571b.jpg',
     'Planinarenje na Durmitoru',
     false,
     (SELECT "Id" FROM "Activities" WHERE "Name" = 'Planinarenje na Durmitoru'),
     NOW()),
 (
-    'https://explore-serbia.rs/wp-content/uploads/2022/09/Durmitor-Bobotov-Kuk-1.jpg',
+    '/images/entity_images/activities/4297d3a37601a5c8a03e6ff3.jpg',
     'Planinarenje na Durmitoru',
     false,
     (SELECT "Id" FROM "Activities" WHERE "Name" = 'Planinarenje na Durmitoru'),
     NOW()),
 (
-    'https://explore-serbia.rs/wp-content/uploads/2022/09/Durmitor-Bobotov-Kuk-2.jpg',
+    '/images/entity_images/activities/68e85588bb42836a5d54e1c1.jpg',
     'Planinarenje na Durmitoru',
     false,
     (SELECT "Id" FROM "Activities" WHERE "Name" = 'Planinarenje na Durmitoru'),
     NOW()),
 (
-    'https://www.montenegrofortravellers.com/sites/default/files/styles/monte1140x550/public/place/top_hill_budva_nochnoy_klub_top_hill_v_budve.jpg?itok=zTr34xsE',
+    '/images/entity_images/activities/fc2ac7c4b4d7e4d67cd9603e.jpg',
     'Noćni provod Budva',
     true,
     (SELECT "Id" FROM "Activities" WHERE "Name" = 'Noćni provod Budva'),
     NOW()),
 (
-    'https://apartments-sofija.com/wp-content/uploads/budva-party-apartments-1.jpg',
+    '/images/entity_images/activities/c81971f9c28b0574ebf2d69a.jpg',
     'Noćni provod Budva',
     false,
     (SELECT "Id" FROM "Activities" WHERE "Name" = 'Noćni provod Budva'),
     NOW()),
 (
-    'https://www.budvanocu.com/getimage.php?img=p18rspcf3312ih5uk1uf4eb99bm1.jpg&w=600',
+    '/images/entity_images/activities/9144b05d0ac86b85789ab456.jpg',
     'Noćni provod Budva',
     false,
     (SELECT "Id" FROM "Activities" WHERE "Name" = 'Noćni provod Budva'),
     NOW()),
 (
-    'https://balkanfun.travel/sites/default/files/inline-images/nocni-klub-plesanje.jpg',
+    '/images/entity_images/activities/6301b600619c85b59511a971.jpg',
     'Noćni provod Budva',
     false,
     (SELECT "Id" FROM "Activities" WHERE "Name" = 'Noćni provod Budva'),
     NOW()),
 (
-    'https://www.hrana-pice-price.com/wp-content/uploads/2019/04/prawn-2370680_1920.jpg',
+    '/images/entity_images/activities/bb11764a72f9c02a4fbed641.jpg',
     'Degustacija morskih specijaliteta',
     true,
     (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija morskih specijaliteta'),
     NOW()),
 (
-    'https://citymagazine.danas.rs/wp-content/uploads/2024/09/shutterstock_454387750.jpg.webp',
+    '/images/entity_images/activities/97601ae175266e9855f13225.jpg',
     'Degustacija morskih specijaliteta',
     false,
     (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija morskih specijaliteta'),
     NOW()),
 (
-    'https://www.bevanda.co.rs/images/w2.jpg',
+    '/images/entity_images/activities/6796cde2e3ef29a656f0a16a.jpg',
     'Degustacija morskih specijaliteta',
     false,
     (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija morskih specijaliteta'),
     NOW()),
 (
-    'https://bonapeti.rs/files/1200x800/midi-skaridi-seafood33.webp',
+    '/images/entity_images/activities/145f1f9ca35c383086b57eee.jpg',
     'Degustacija morskih specijaliteta',
     false,
     (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija morskih specijaliteta'),
     NOW()),
 (
-    'https://cdn.getyourguide.com/img/tour/b462479da72df66db77e9a7154f272c7ba1b86fe125727996216cb2ad1a398fc.jpg/99.jpg',
+    '/images/entity_images/activities/140cb16e2edf02ded9e00e67.jpg',
     'Šetnja starim gradom Kotora',
     true,
     (SELECT "Id" FROM "Activities" WHERE "Name" = 'Šetnja starim gradom Kotora'),
     NOW()),
 (
-    'https://monteonline.org/wp-content/uploads/2023/01/oldtownkotor05.jpg',
+    '/images/entity_images/activities/1c894d45e9e434e2dac4bc80.jpg',
     'Šetnja starim gradom Kotora',
     false,
     (SELECT "Id" FROM "Activities" WHERE "Name" = 'Šetnja starim gradom Kotora'),
     NOW()),
 (
-    'https://kofer.info/wp-content/uploads/2020/03/shutterstock_1703935768-1000x600.jpg',
+    '/images/entity_images/activities/89286c2e7444a1949f9fb555.jpg',
     'Šetnja starim gradom Kotora',
     false,
     (SELECT "Id" FROM "Activities" WHERE "Name" = 'Šetnja starim gradom Kotora'),
     NOW()),
 (
-    'https://respectacar.com/storage/blog/c5cf293f-db96-4743-9f6c-6ad90f46846b/kotor-old-town.jpg',
+    '/images/entity_images/activities/ad726989260f139f76373643.jpg',
     'Šetnja starim gradom Kotora',
     false,
     (SELECT "Id" FROM "Activities" WHERE "Name" = 'Šetnja starim gradom Kotora'),
     NOW()),
 (
-    'https://skadarlakeboatcruise.com/wp-content/uploads/1111.jpg',
+    '/images/entity_images/activities/3054c40ff8340ca9a9b7294b.jpg',
     'Vožnja čamcem Skadarsko jezero',
     true,
     (SELECT "Id" FROM "Activities" WHERE "Name" = 'Vožnja čamcem Skadarsko jezero'),
     NOW()),
 (
-    'https://skadarlakeboatcruise.com/wp-content/uploads/5-27.jpg',
+    '/images/entity_images/activities/e8f61a594d212d3597078fc7.jpg',
     'Vožnja čamcem Skadarsko jezero',
     false,
     (SELECT "Id" FROM "Activities" WHERE "Name" = 'Vožnja čamcem Skadarsko jezero'),
     NOW()),
 (
-    'https://static.wixstatic.com/media/a86f42_6eedbde07bcf4db293648d5a455d2646~mv2_d_5184_3456_s_4_2.jpg/v1/fill/w_862,h_1104,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/a86f42_6eedbde07bcf4db293648d5a455d2646~mv2_d_5184_3456_s_4_2.jpg',
+    '/images/entity_images/activities/76a6a4f1c50d749329160478.jpg',
     'Vožnja čamcem Skadarsko jezero',
     false,
     (SELECT "Id" FROM "Activities" WHERE "Name" = 'Vožnja čamcem Skadarsko jezero'),
     NOW()),
 (
-    'https://visitskadarlake.com/wp-content/uploads/2025/10/WhatsApp-Image-2025-10-17-at-14.28.22_58e34723.jpg',
+    '/images/entity_images/activities/33d753155c936c5561befb1e.jpg',
     'Vožnja čamcem Skadarsko jezero',
     false,
     (SELECT "Id" FROM "Activities" WHERE "Name" = 'Vožnja čamcem Skadarsko jezero'),
     NOW()),
 (
-    'https://skadarlakeboatcruise.com/wp-content/uploads/7-7.jpg',
+    '/images/entity_images/activities/6bc647a605a2e21c5bc7f90b.jpg',
     'Vožnja čamcem Skadarsko jezero',
     false,
     (SELECT "Id" FROM "Activities" WHERE "Name" = 'Vožnja čamcem Skadarsko jezero'),
     NOW()),
 (
-    'https://www.kolasin.com/img/hero/hero-3.jpg',
+    '/images/entity_images/activities/58013d285acc2b1bb239a16d.jpg',
     'Skijanje Kolašin',
     true,
     (SELECT "Id" FROM "Activities" WHERE "Name" = 'Skijanje Kolašin'),
     NOW()),
 (
-    'https://skijalista.me/wp-content/uploads/DJI_0410-Copy.jpg',
+    '/images/entity_images/activities/2fd2be1cd30e39d6274ca69d.jpg',
     'Skijanje Kolašin',
     false,
     (SELECT "Id" FROM "Activities" WHERE "Name" = 'Skijanje Kolašin'),
     NOW()),
 (
-    'https://skijalista.me/wp-content/uploads/Kolasin-1600-11-scaled.jpg',
+    '/images/entity_images/activities/ceb7c560baefa6c0fa0297d2.jpg',
     'Skijanje Kolašin',
     false,
     (SELECT "Id" FROM "Activities" WHERE "Name" = 'Skijanje Kolašin'),
     NOW()),
 (
-    'https://sharemontenegro.me/wp-content/uploads/2026/01/vikend-kolasin-1450.jpg',
+    '/images/entity_images/activities/bfd5b05149cdbf783581dfd4.jpg',
     'Skijanje Kolašin',
     false,
     (SELECT "Id" FROM "Activities" WHERE "Name" = 'Skijanje Kolašin'),
     NOW()),
 (
-    'https://i0.wp.com/primorski.me/wp-content/uploads/2026/02/Kolasin-1450-1.jpg?fit=1920%2C1080&ssl=1',
+    '/images/entity_images/activities/da328324c7ec446129993cf6.jpg',
     'Skijanje Kolašin',
     false,
     (SELECT "Id" FROM "Activities" WHERE "Name" = 'Skijanje Kolašin'),
@@ -12279,22 +11883,20 @@ VALUES
 -- 14.8 IMAGES - DESTINATIONS
 WITH source("Url", "AltText", "IsMain", "DestinationName") AS (
     VALUES
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Barcelona%20Skyline.jpg', 'Barcelona', true, 'Barcelona'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/La%20Barceloneta.jpg', 'Barcelona', false, 'Barcelona'),
-    ('https://www.putujuciranac.com/wp-content/uploads/2025/01/IMG_1235.jpg', 'Madrid', true, 'Madrid'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Gran%20Via%2C%20Madrid%20-%20007.jpg', 'Madrid', false, 'Madrid'),
-    ('https://img.nh-hotels.net/8yYbq/aGoV8/original/Valencia_CAC.jpg?output-quality=70&resize=*:*&background-color=white', 'Valencia', true, 'Valencia'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Valencia%20skyline%20sunset%20%284262234180%29.jpg', 'Valencia', false, 'Valencia'),
-    ('https://res.klook.com/image/upload/fl_lossy.progressive,q_60/Mobile/City/tgt87tiezpat1en4zwn3.jpg', 'Seville', true, 'Seville'),
-    ('https://www.travelandleisure.com/thmb/3KMVOlslbj0M3DL_QOBKn5O2TWU=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/TAL-granada-spain-LSTWALKEURO0924-bff8601ebd834c5da9e26bc5ac1b73d7.jpg', 'Granada', true, 'Granada'),
-    ('https://malagatickets.tours/wp-content/uploads/2025/09/visit-malaga.jpg', 'Malaga', true, 'Malaga'),
-    ('https://content.r9cdn.net/rimg/dimg/d7/6d/bf09ef37-city-22202-164d2243c9c.jpg?width=1366&height=768&xhint=1091&yhint=727&crop=true', 'Bilbao', true, 'Bilbao'),
-    ('https://www.visitspain.info/en/wp-content/uploads/sites/162/zaragoza-aerial-hd.jpg', 'Zaragoza', true, 'Zaragoza'),
-    ('https://content.r9cdn.net/rimg/dimg/b5/a3/14497dee-city-4940-1732d466ee5.jpg?width=1366&height=768&xhint=3598&yhint=1723&crop=true', 'Cordoba', true, 'Cordoba'),
-    ('https://images.trvl-media.com/place/5150/f2fce1a9-7635-4c64-a293-9aad5499c84a.jpg', 'Toledo', true, 'Toledo'),
-    ('https://www.cataloniahotels.com/es/guia-de-viajes/wp-content/uploads/2025/09/AdobeStock_329547899-1536x1024.jpeg', 'Salamanca', true, 'Salamanca'),
-    ('https://www.msccruises.fi/-/media/global-contents/destinations/ports/spain/ibiza/cruise-to-ibiza-spain.jpg?bc=transparent&as=1&mh=1395&mw=2460&hash=D57E6120DFBA325560A769B44338B6C2', 'Ibiza', true, 'Ibiza'),
-    ('https://www.serneholtestate.com/wp-content/uploads/2025/08/Palma-de-Mallorca-1.webp', 'Mallorca', true, 'Mallorca')
+    ('/images/entity_images/destinations/11c66579406b50aec9ffd6cf.jpg', 'Barcelona', true, 'Barcelona'),
+    ('/images/entity_images/destinations/84db58ba123770798f78ad29.jpg', 'Madrid', true, 'Madrid'),
+    ('/images/entity_images/destinations/6abdd174ec53584e3d281e36.jpg', 'Valencia', true, 'Valencia'),
+    ('/images/entity_images/destinations/df7a116fffaecc8857706ce6.jpg', 'Valencia', false, 'Valencia'),
+    ('/images/entity_images/destinations/bb172b3cb4b3f4e28326433b.jpg', 'Seville', true, 'Seville'),
+    ('/images/entity_images/destinations/11584d1a06a474e66d5ef87e.jpg', 'Granada', true, 'Granada'),
+    ('/images/entity_images/destinations/0a944fd9bff62e427e8c1d3f.jpg', 'Malaga', true, 'Malaga'),
+    ('/images/entity_images/destinations/5660182597c1fec7513fba03.jpg', 'Bilbao', true, 'Bilbao'),
+    ('/images/entity_images/destinations/1b63dd30ed7d28ea767bd9bc.jpg', 'Zaragoza', true, 'Zaragoza'),
+    ('/images/entity_images/destinations/e663179f2fd1439da23d0b06.jpg', 'Cordoba', true, 'Cordoba'),
+    ('/images/entity_images/destinations/e8f603cc0865aa7759ce7414.jpg', 'Toledo', true, 'Toledo'),
+    ('/images/entity_images/destinations/b6acf150b7706b2b8c20dff0.jpg', 'Salamanca', true, 'Salamanca'),
+    ('/images/entity_images/destinations/fea31a24660dbf0e420749a2.jpg', 'Ibiza', true, 'Ibiza'),
+    ('/images/entity_images/destinations/a9597b4d202b185aa85ac89c.jpg', 'Mallorca', true, 'Mallorca')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "DestinationId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", d."Id", NOW()
@@ -12304,10 +11906,10 @@ JOIN "Destinations" d ON d."Name" = s."DestinationName";
 -- 14.9 IMAGES - LOCALITIES
 WITH source("Url", "AltText", "IsMain", "LocalityName") AS (
     VALUES
-    ('https://touringbee.com/wp-content/uploads/barcelonat1_promo_3-scaled.jpg', 'Gothic Quarter Barcelona', true, 'Gothic Quarter Barcelona'),
-    ('https://ecotuktuk.com/wp-content/uploads/sites/5706/2025/08/Gemini_Generated_Image_gvx1kbgvx1kbgvx1.webp?w=1200&zoom=2', 'Barceloneta Beach', true, 'Barceloneta Beach'),
-    ('https://upload.wikimedia.org/wikipedia/commons/9/92/Gran_V%C3%ADa_%28Madrid%29_1.jpg', 'Gran Via Madrid', true, 'Gran Via Madrid'),
-    ('https://cd1.taquilla.com/data/images/t/83/ciudad-de-las-artes-y-las-ciencias.webp', 'Ciudad de las Artes Valencia', true, 'Ciudad de las Artes Valencia')
+    ('/images/entity_images/localities/a450904f30a8c476075ede15.jpg', 'Gothic Quarter Barcelona', true, 'Gothic Quarter Barcelona'),
+    ('/images/entity_images/localities/70d0099309b09fb672082752.jpg', 'Barceloneta Beach', true, 'Barceloneta Beach'),
+    ('/images/entity_images/localities/e19d0747678f8f4f99b77c3a.jpg', 'Gran Via Madrid', true, 'Gran Via Madrid'),
+    ('/images/entity_images/localities/a15c1fda4f6215c1a5b1c212.jpg', 'Ciudad de las Artes Valencia', true, 'Ciudad de las Artes Valencia')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "LocalityId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", l."Id", NOW()
@@ -12317,16 +11919,14 @@ JOIN "Localities" l ON l."Name" = s."LocalityName";
 -- 14.10 IMAGES - OBJECTS
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://cf.bstatic.com/xdata/images/hotel/max1024x768/535440360.jpg?k=27c08e20c16d7f2d1065955e0d5861d90debc09c5fe1399d3bbc85257ac3bb5b&o=', 'Hotel Casa Batllo Suites', true, 'Hotel Casa Batllo Suites'),
-    ('https://www.iconichouses.org/foto/houses/Casa-Batllo.jpg', 'Hotel Casa Batllo Suites', false, 'Hotel Casa Batllo Suites'),
-    ('https://la-alcoba.com/wp-content/uploads/2026/01/restaurantes-barrio-gotico-la-alcoba-azul-gotico.jpg', 'Tapas House Gothic', true, 'Tapas House Gothic'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Gothic%20Quarter%2C%20Barcelona%20%2821%29%20%2830446599463%29.jpg', 'Tapas House Gothic', false, 'Tapas House Gothic'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/La%20Barceloneta.jpg', 'Barceloneta Sunset Bar', true, 'Barceloneta Sunset Bar'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/La%20Barceloneta.jpg', 'Barceloneta Sunset Bar', false, 'Barceloneta Sunset Bar'),
-    ('https://cf.bstatic.com/xdata/images/hotel/max1024x768/477327824.jpg?k=9d1a0881e09b63c66a1721d76a2ad81964705e28623029c05e3c679c81e93f54&o=', 'Hotel Gran Via Palace', true, 'Hotel Gran Via Palace'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Gran%20Via%2C%20Madrid%20-%20007.jpg', 'Hotel Gran Via Palace', false, 'Hotel Gran Via Palace'),
-    ('https://www.visitvalencia.com/sites/default/files/crm-images/GALERIA_Restaurante%20Oc%C3%A9anos_3.JPEG', 'Oceanic Bistro Valencia', true, 'Oceanic Bistro Valencia'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Valencia%20skyline%20sunset%20%284262234180%29.jpg', 'Oceanic Bistro Valencia', false, 'Oceanic Bistro Valencia')
+    ('/images/entity_images/objects/989af26ddada79924afdbc32.jpg', 'Hotel Casa Batllo Suites', true, 'Hotel Casa Batllo Suites'),
+    ('/images/entity_images/objects/f62e02a8d4d81db41c620c2b.jpg', 'Hotel Casa Batllo Suites', false, 'Hotel Casa Batllo Suites'),
+    ('/images/entity_images/objects/3161612f22aa33fa56914146.jpg', 'Tapas House Gothic', true, 'Tapas House Gothic'),
+    ('/images/entity_images/objects/9184170fdb29323bb1d98057.jpg', 'Tapas House Gothic', false, 'Tapas House Gothic'),
+    ('/images/entity_images/objects/b6be96e20d58cf2ce47a9a84.jpg', 'Barceloneta Sunset Bar', true, 'Barceloneta Sunset Bar'),
+    ('/images/entity_images/objects/efbb16b750d89babc53f9833.jpg', 'Hotel Gran Via Palace', true, 'Hotel Gran Via Palace'),
+    ('/images/entity_images/objects/8437d13e031332912f2b9dd1.jpg', 'Oceanic Bistro Valencia', true, 'Oceanic Bistro Valencia'),
+    ('/images/entity_images/objects/8437d13e031332912f2b9dd1.jpg', 'Oceanic Bistro Valencia', false, 'Oceanic Bistro Valencia')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
@@ -12336,10 +11936,10 @@ JOIN "Objects" o ON o."Name" = s."ObjectName";
 -- 14.11 IMAGES - EVENTS
 WITH source("Url", "AltText", "IsMain", "EventName") AS (
     VALUES
-    ('https://pro.static.holabarcelonablog.tmb.cat/s3fs-public/2023-07/kevin-horvat-Nd8h38tRIlc-unsplash%20%281%29.jpg', 'Barcelona Summer Lights', true, 'Barcelona Summer Lights'),
-    ('https://images.stockcake.com/public/4/9/2/4922823d-f031-4c33-b084-8e391f73dc0c_large/beach-dj-sunset-stockcake.jpg', 'Barceloneta Sunset Session', true, 'Barceloneta Sunset Session'),
-    ('https://www.nextbestplan.ai/blog/2026_01_madrid_holy_week/pics/1.jpg', 'Madrid Culture Week', true, 'Madrid Culture Week'),
-    ('https://www.visitvalencia.com/sites/default/files/media/media-images/images/world_paella_day.jpg', 'Valencia Paella Fest', true, 'Valencia Paella Fest')
+    ('/images/entity_images/events/42dce9bc30b144787f10ae50.jpg', 'Barcelona Summer Lights', true, 'Barcelona Summer Lights'),
+    ('/images/entity_images/events/bbea02ce3d4952dc38b0bafc.jpg', 'Barceloneta Sunset Session', true, 'Barceloneta Sunset Session'),
+    ('/images/entity_images/events/e8511f07fdf5548e5754f806.jpg', 'Madrid Culture Week', true, 'Madrid Culture Week'),
+    ('/images/entity_images/events/d9a3e96bf705e36c1bad09fb.jpg', 'Valencia Paella Fest', true, 'Valencia Paella Fest')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "EventId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", e."Id", NOW()
@@ -12349,10 +11949,10 @@ JOIN "Events" e ON e."Name" = s."EventName";
 -- 14.12 IMAGES - ACTIVITIES
 WITH source("Url", "AltText", "IsMain", "ActivityName") AS (
     VALUES
-    ('https://cdn.kimkim.com/files/a/images/ea290e92902be7d2b48e336c8992b656222ac9d4/big-cfb56794580673509c866e93a5cb74cf.jpg', 'Gothic Tapas Walk', true, 'Gothic Tapas Walk'),
-    ('https://www.barcelonasailboats.com/wp-content/uploads/2023/05/sunset-tour.jpg', 'Barceloneta Sunset Ride', true, 'Barceloneta Sunset Ride'),
-    ('https://images.ctfassets.net/qsacxguwrklb/4xN9Ud0QAB6tx34OnWqabG/7ae3065dc3f76858d3adb703ba11d12e/018_Walks_Madrid_In_a_Day_2024_0228__1_.jpg', 'Madrid Architecture Walk', true, 'Madrid Architecture Walk'),
-    ('https://www.visitvalencia.com/sites/default/files/styles/full_width_gallery_desktop/public/media/media-images/images/banner-paella3.jpg?itok=fyxNuH-6', 'Valencia Paella Experience', true, 'Valencia Paella Experience')
+    ('/images/entity_images/activities/e8181046c523b639d1f7eae7.jpg', 'Gothic Tapas Walk', true, 'Gothic Tapas Walk'),
+    ('/images/entity_images/activities/af71990993515ddda83c0f42.jpg', 'Barceloneta Sunset Ride', true, 'Barceloneta Sunset Ride'),
+    ('/images/entity_images/activities/bb6bd7c704bf0a3fce69f138.jpg', 'Madrid Architecture Walk', true, 'Madrid Architecture Walk'),
+    ('/images/entity_images/activities/d3c221db6fd833d33dc0bf14.jpg', 'Valencia Paella Experience', true, 'Valencia Paella Experience')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ActivityId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", a."Id", NOW()
@@ -12843,7 +12443,7 @@ VALUES
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Zlatibor'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Centar grada'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'milica.admin.serbia@spirego.com'), NOW()),
-('Tornik Viewpoint', 'Vidikovac i širi prostor Tornika, odličan za panorame, kratke pauze i aktivnosti na otvorenom.',
+('Tornik vidikovac', 'Vidikovac i širi prostor Tornika, odličan za panorame, kratke pauze i aktivnosti na otvorenom.',
  ST_SetSRID(ST_MakePoint(19.6409, 43.6945), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Zlatibor'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Vidikovac'),
@@ -13011,7 +12611,7 @@ VALUES
 ('Zlatibor Panorama Ride', 'Lagano iskustvo kretanja kroz centralni deo Zlatibora i dalje prema vidikovcima, namenjeno gostima koji žele mirniji tempo i dobar pogled.',
  ST_SetSRID(ST_MakePoint(19.6660, 43.7030), 4326), 18.00, 130, true,
  (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Razgledanje'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Tornik Viewpoint'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Tornik vidikovac'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Zlatibor'),
  NULL,
  1,
@@ -13126,32 +12726,32 @@ VALUES
 -- 15.7 ITALIJA + SRBIJA IMAGES - DESTINACIJE
 WITH source("Url", "AltText", "IsMain", "DestinationName") AS (
     VALUES
-    ('https://i0.wp.com/media1.lepojeziveti.com/2018/04/vitorrio-emanuelle-panorama.jpg', 'Rome', true, 'Rome'),
-    ('https://globusnis.rs/wp-content/uploads/2021/10/Venecija-7.jpg', 'Venice', true, 'Venice'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Florence%20Duomo.jpg', 'Florence', true, 'Florence'),
-    ('https://upload.wikimedia.org/wikipedia/commons/c/c3/Milan_skyline_skyscrapers_of_Porta_Nuova_business_district_%28cropped%29.jpg', 'Milan', true, 'Milan'),
-    ('https://www.christiesrealestate.com/resizer/v2/Q3IJO5D2JNAAXOSSQRAYB7QRMI.jpg?auth=e5a620e3c1801a0cda31a292e7171a8ba7a4e84ccca51beab8a2923d7775e808', 'Naples', true, 'Naples'),
-    ('https://engelsbergideas.com/wp-content/uploads/2025/08/Turin-Italy-1.jpg', 'Turin', true, 'Turin'),
-    ('https://upload.wikimedia.org/wikipedia/commons/b/bb/Panorama_di_Verona.jpg', 'Verona', true, 'Verona'),
-    ('https://upload.wikimedia.org/wikipedia/commons/b/bc/Bologna-SanPetronioPiazzaMaggiore1.jpg', 'Bologna', true, 'Bologna'),
-    ('https://upload.wikimedia.org/wikipedia/commons/d/d3/Italy_-_Pisa.jpg', 'Pisa', true, 'Pisa'),
-    ('https://content.r9cdn.net/rimg/dimg/48/ff/ef42ba47-city-6888-16d17bc986f.jpg?width=1366&height=768&xhint=1739&yhint=1348&crop=true', 'Genoa', true, 'Genoa'),
-    ('https://i.natgeofe.com/n/543132f8-4728-4381-b35b-09bd262f88c1/GettyImages-1427282403.jpg?w=2880&h=1774', 'Sicily', true, 'Sicily'),
-    ('https://cdn.sanity.io/images/nxpteyfv/goguides/f0024f4dacbcd414760aaa445593c84e7b730685-1600x1066.jpg', 'Capri', true, 'Capri'),
-    ('https://hips.hearstapps.com/hmg-prod/images/the-town-of-varenna-on-lake-como-royalty-free-image-1690925689.jpg', 'Lake Como', true, 'Lake Como'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Kalemegdan%2C%20Belgrade.jpg', 'Beograd', true, 'Beograd'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Novi%20Sad%20-%20Trg%20Slobode.JPG', 'Novi Sad', true, 'Novi Sad'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Zlatibor-panorama.jpg', 'Zlatibor', true, 'Zlatibor'),
-    ('https://upload.wikimedia.org/wikipedia/commons/2/24/Panorama_Nisa.JPG', 'Niš', true, 'Niš'),
-    ('https://upload.wikimedia.org/wikipedia/commons/9/92/View_on_the_city_of_Kragujevac.jpg?utm_source=en.wikivoyage.org&utm_campaign=index&utm_content=original', 'Kragujevac', true, 'Kragujevac'),
-    ('https://upload.wikimedia.org/wikipedia/commons/f/fe/View_of_Subotica_2_%282024%29.jpg', 'Subotica', true, 'Subotica'),
-    ('https://upload.wikimedia.org/wikipedia/commons/4/4c/Pan%C4%8Di%C4%87ev_vrh_during_winter.jpg', 'Kopaonik', true, 'Kopaonik'),
-    ('https://upload.wikimedia.org/wikipedia/commons/8/82/Tarski_pejza%C5%BE%2C_jezero_Spaji%C4%87i%2C_Nacionalni_park_Tara.jpg', 'Tara', true, 'Tara'),
-    ('https://upload.wikimedia.org/wikipedia/commons/7/77/Veliki_Kazan.jpg', 'Đerdap', true, 'Đerdap'),
-    ('https://kompaskazesrbija.rs/wp-content/uploads/2020/06/vrnjacka-banja-slike-scaled.jpg', 'Vrnjačka Banja', true, 'Vrnjačka Banja'),
-    ('https://upload.wikimedia.org/wikipedia/commons/6/6e/Palic_panorama.jpg', 'Palić', true, 'Palić'),
-    ('https://upload.wikimedia.org/wikipedia/commons/0/03/Uvac_River_and_Eagle.jpg', 'Uvac', true, 'Uvac'),
-    ('https://www.turizamuzica.org.rs/wp-content/uploads/2025/11/mg-sl1.jpg', 'Mokra Gora', true, 'Mokra Gora')
+    ('/images/entity_images/destinations/fa5a9f0a5d1c2443fe7748fb.jpg', 'Rome', true, 'Rome'),
+    ('/images/entity_images/destinations/7f7adf641db38e38106d3904.jpg', 'Venice', true, 'Venice'),
+    ('/images/entity_images/destinations/ac24cb4bd87831b6e8f8bc2f.jpg', 'Florence', true, 'Florence'),
+    ('/images/entity_images/destinations/3b59072c5d1a3a57ab79de89.jpg', 'Milan', true, 'Milan'),
+    ('/images/entity_images/destinations/f921c63d0da684b3c81365c8.jpg', 'Naples', true, 'Naples'),
+    ('/images/entity_images/destinations/8b241beeeb2a8a9b82993816.jpg', 'Turin', true, 'Turin'),
+    ('/images/entity_images/destinations/ec76c4fa029b22e0c2c3ef7e.jpg', 'Verona', true, 'Verona'),
+    ('/images/entity_images/destinations/67bebdb64372457326f4d592.jpg', 'Bologna', true, 'Bologna'),
+    ('/images/entity_images/destinations/f442cadb5bc1d86f77091e2c.jpg', 'Pisa', true, 'Pisa'),
+    ('/images/entity_images/destinations/3a71dd1c1b6ab29ecfa8db55.jpg', 'Genoa', true, 'Genoa'),
+    ('/images/entity_images/destinations/84f324cbe9d898850b9e3584.jpg', 'Sicily', true, 'Sicily'),
+    ('/images/entity_images/destinations/cffc8dd96153d97f97435404.jpg', 'Capri', true, 'Capri'),
+    ('/images/entity_images/destinations/d2f5ffe73d493ee94330640e.jpg', 'Lake Como', true, 'Lake Como'),
+    ('/images/entity_images/destinations/846f73204d350e7eb36fbc07.jpg', 'Beograd', true, 'Beograd'),
+    ('/images/entity_images/destinations/e7e6697ea66fbb2d3e24df3c.jpg', 'Novi Sad', true, 'Novi Sad'),
+    ('/images/entity_images/destinations/379497f302c2af5bfb2a5f6e.jpg', 'Zlatibor', true, 'Zlatibor'),
+    ('/images/entity_images/destinations/be8ba44da674cb4b7f6f722d.jpg', 'Niš', true, 'Niš'),
+    ('/images/entity_images/destinations/c90dff0ec6028c0e8529a61a.jpg', 'Kragujevac', true, 'Kragujevac'),
+    ('/images/entity_images/destinations/616ca30948d3c6032703d445.jpg', 'Subotica', true, 'Subotica'),
+    ('/images/entity_images/destinations/eef63ba4343a3002f983eb43.jpg', 'Kopaonik', true, 'Kopaonik'),
+    ('/images/entity_images/destinations/8dc4452932b00dd33ffcd75d.jpg', 'Tara', true, 'Tara'),
+    ('/images/entity_images/destinations/665281bf047ca44fc3a132b1.jpg', 'Đerdap', true, 'Đerdap'),
+    ('/images/entity_images/destinations/4b50a7284070eefc83ae9cb4.jpg', 'Vrnjačka Banja', true, 'Vrnjačka Banja'),
+    ('/images/entity_images/destinations/b37f0a9b1aa6ae27f236da1e.jpg', 'Palić', true, 'Palić'),
+    ('/images/entity_images/destinations/1af59371a16d6ef2d564f402.jpg', 'Uvac', true, 'Uvac'),
+    ('/images/entity_images/destinations/6c92000b1113b89bacc4b50e.jpg', 'Mokra Gora', true, 'Mokra Gora')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "DestinationId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", d."Id", NOW()
@@ -13161,18 +12761,18 @@ JOIN "Destinations" d ON d."Name" = s."DestinationName";
 -- 15.8 ITALIJA + SRBIJA IMAGES - LOKALITETI
 WITH source("Url", "AltText", "IsMain", "LocalityName") AS (
     VALUES
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Roma%20Trastevere.jpg', 'Trastevere Rome', true, 'Trastevere Rome'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Colosseum%20%28Rome%29.jpg', 'Colosseum District', true, 'Colosseum District'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Piazza%20San%20Marco%2C%20Venice.jpg', 'San Marco Venice', true, 'San Marco Venice'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Venice%20Grand%20Canal.JPG', 'Grand Canal Venice', true, 'Grand Canal Venice'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Florence%20Duomo.jpg', 'Duomo Florence', true, 'Duomo Florence'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Ponte%20vecchio.jpg', 'Ponte Vecchio Florence', true, 'Ponte Vecchio Florence'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Terazije%20Belgrade.jpg', 'Terazije Beograd', true, 'Terazije Beograd'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Kalemegdan%2C%20Belgrade.jpg', 'Kalemegdan Beograd', true, 'Kalemegdan Beograd'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Novi%20Sad%20-%20Trg%20Slobode.JPG', 'Trg Slobode Novi Sad', true, 'Trg Slobode Novi Sad'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Petrovaradin.jpg', 'Petrovaradin Fortress', true, 'Petrovaradin Fortress'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Zlatibor-panorama.jpg', 'Kraljev Trg Zlatibor', true, 'Kraljev Trg Zlatibor'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Planina%20Zlatibor.JPG', 'Tornik Viewpoint', true, 'Tornik Viewpoint')
+    ('/images/entity_images/localities/ff5af9328cdf890019a8576d.jpg', 'Trastevere Rome', true, 'Trastevere Rome'),
+    ('/images/entity_images/localities/994cc8aa7baf72a9c944488f.jpg', 'Colosseum District', true, 'Colosseum District'),
+    ('/images/entity_images/localities/48dedbd7d3e7567644f5e8d6.jpg', 'San Marco Venice', true, 'San Marco Venice'),
+    ('/images/entity_images/localities/682567bb95e061fa852ad97d.jpg', 'Grand Canal Venice', true, 'Grand Canal Venice'),
+    ('/images/entity_images/localities/318925c3035459bf6d5a05f1.jpg', 'Duomo Florence', true, 'Duomo Florence'),
+    ('/images/entity_images/localities/0578305e5e652b828a1d86ca.jpg', 'Ponte Vecchio Florence', true, 'Ponte Vecchio Florence'),
+    ('/images/entity_images/localities/330ca301f0a3f1578903391f.jpg', 'Terazije Beograd', true, 'Terazije Beograd'),
+    ('/images/entity_images/localities/40762ad940cab993b5790ead.jpg', 'Kalemegdan Beograd', true, 'Kalemegdan Beograd'),
+    ('/images/entity_images/localities/41154c9623a1893e3c2b0c96.jpg', 'Trg Slobode Novi Sad', true, 'Trg Slobode Novi Sad'),
+    ('/images/entity_images/localities/6aae7ededba94fa355c07300.jpg', 'Petrovaradin Fortress', true, 'Petrovaradin Fortress'),
+    ('/images/entity_images/localities/654f2e929e80c1cc1903e676.jpg', 'Kraljev Trg Zlatibor', true, 'Kraljev Trg Zlatibor'),
+    ('/images/entity_images/localities/21b1c7f41deabd338ffe5d86.jpg', 'Tornik vidikovac', true, 'Tornik vidikovac')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "LocalityId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", l."Id", NOW()
@@ -13182,18 +12782,18 @@ JOIN "Localities" l ON l."Name" = s."LocalityName";
 -- 15.9 ITALIJA + SRBIJA IMAGES - OBJEKTI
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://cf.bstatic.com/xdata/images/hotel/max1024x768/64107180.jpg?k=bc957e3f08024b859b56f18c46f222dba97653e5e23037d1c6f51ac4971252d8&o=', 'Hotel Artemide Rome', true, 'Hotel Artemide Rome'),
-    ('https://www.booknbook.it/storage/public/restaurants/1615-rione-13/profile/gallery/rione-13-esterno-1200x800-e1516009287545.jpeg', 'Rione 13 Trastevere', true, 'Rione 13 Trastevere'),
-    ('https://lirp.cdn-website.com/163c9646/dms3rep/multi/opt/028-1920w.JPG', 'Hotel Canaletto Venice', true, 'Hotel Canaletto Venice'),
-    ('https://www.bistrotdevenise.com/images/contents/home/large/romantic-menu.jpg', 'Bistrot de Venise', true, 'Bistrot de Venise'),
-    ('https://www.hoteldavanzati.it/static/8edc6b4facf8f65c057a2e6e3fdc4777/0304f/7af89282-2f72-4fe4-a722-724c9c8bec69.jpg', 'Hotel Davanzati Florence', true, 'Hotel Davanzati Florence'),
-    ('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2c/8d/cf/04/caption.jpg?w=900&h=500&s=1', 'La Loggia Firenze', true, 'La Loggia Firenze'),
-    ('https://hotelmoskva.rs/image632.png', 'Hotel Moskva Beograd', true, 'Hotel Moskva Beograd'),
-    ('https://media-cdn.tripadvisor.com/media/photo-m/1280/1b/dc/68/7b/restaurant-garden.jpg', 'Restoran Frans Beograd', true, 'Restoran Frans Beograd'),
-    ('https://hotelpupin.rs/wp-content/uploads/2021/07/kotakt-1-min.jpeg', 'Hotel Pupin Novi Sad', true, 'Hotel Pupin Novi Sad'),
-    ('https://novisad.travel/wp-content/uploads/2020/06/Restoran-kalem-3_compressed.jpg', 'Kalem by Zak Novi Sad', true, 'Kalem by Zak Novi Sad'),
-    ('https://www.hotelzlatibor-resort.com/wp-content/uploads/2024/07/VIP-SPA.jpg', 'Hotel Zlatibor Mountain Resort', true, 'Hotel Zlatibor Mountain Resort'),
-    ('https://www.hotelzlatibor-resort.com/wp-content/uploads/2022/02/20220206-DMC02995.jpg', 'Lobby Bar Zlatibor', true, 'Lobby Bar Zlatibor')
+    ('/images/entity_images/objects/6d280720e8237ec681702b6f.jpg', 'Hotel Artemide Rome', true, 'Hotel Artemide Rome'),
+    ('/images/entity_images/objects/7e107d5eaa7f41926a988971.jpg', 'Rione 13 Trastevere', true, 'Rione 13 Trastevere'),
+    ('/images/entity_images/objects/6d62572a6b4c1425fa5597fb.jpg', 'Hotel Canaletto Venice', true, 'Hotel Canaletto Venice'),
+    ('/images/entity_images/objects/42fbd5d5aaf28a69f1e24614.jpg', 'Bistrot de Venise', true, 'Bistrot de Venise'),
+    ('/images/entity_images/objects/de16edd9ee1fabc119badcce.jpg', 'Hotel Davanzati Florence', true, 'Hotel Davanzati Florence'),
+    ('/images/entity_images/objects/3529e516c20412bb20cce080.jpg', 'La Loggia Firenze', true, 'La Loggia Firenze'),
+    ('/images/entity_images/objects/fe42ef9ec4e7bf78d0b05af1.jpg', 'Hotel Moskva Beograd', true, 'Hotel Moskva Beograd'),
+    ('/images/entity_images/objects/428b32072aa11388104ff1ed.jpg', 'Restoran Frans Beograd', true, 'Restoran Frans Beograd'),
+    ('/images/entity_images/objects/d969d2c2e658b1dfe2675adf.jpg', 'Hotel Pupin Novi Sad', true, 'Hotel Pupin Novi Sad'),
+    ('/images/entity_images/objects/4a28e6be58b34698d45115dd.jpg', 'Kalem by Zak Novi Sad', true, 'Kalem by Zak Novi Sad'),
+    ('/images/entity_images/objects/efe130987e7f4ea6b22053bf.jpg', 'Hotel Zlatibor Mountain Resort', true, 'Hotel Zlatibor Mountain Resort'),
+    ('/images/entity_images/objects/355eb0f4ed73af61251f5024.jpg', 'Lobby Bar Zlatibor', true, 'Lobby Bar Zlatibor')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
@@ -13203,12 +12803,12 @@ JOIN "Objects" o ON o."Name" = s."ObjectName";
 -- 15.10 ITALIJA + SRBIJA IMAGES - EVENTI
 WITH source("Url", "AltText", "IsMain", "EventName") AS (
     VALUES
-    ('https://youlocalrome.com/wp-content/uploads/2022/02/best-districts-to-go-out-in-rome-scaled.jpg', 'Rome Piazza Music Evening', true, 'Rome Piazza Music Evening'),
-    ('https://eawdlkutxnpxiurdpomt.supabase.co/storage/v1/object/public/images/blog/blog-1cbf5542-f113-4d98-95d9-6509187058ea.jpg', 'Venice Lagoon Taste Week', true, 'Venice Lagoon Taste Week'),
-    ('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2f/09/fb/b9/caption.jpg?w=1200&h=-1&s=1&cx=1920&cy=1080&chk=v1_13fcf1e2b85f4dd701fd', 'Florence Artisan Evenings', true, 'Florence Artisan Evenings'),
-    ('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2f/23/4b/97/caption.jpg?w=800&h=800&s=1', 'Belgrade Coffee and Jazz Night', true, 'Belgrade Coffee and Jazz Night'),
-    ('https://imageproxy.wolt.com/assets/676bc988a6a85f526b473891', 'Novi Sad Gourmet Weekend', true, 'Novi Sad Gourmet Weekend'),
-    ('https://www.hotelzlatibor-resort.com/wp-content/uploads/2023/10/ruj7.jpg', 'Zlatibor Mountain Taste Days', true, 'Zlatibor Mountain Taste Days')
+    ('/images/entity_images/events/d41624f39bc8de90a77440ab.jpg', 'Rome Piazza Music Evening', true, 'Rome Piazza Music Evening'),
+    ('/images/entity_images/events/d18936138c19486fa39d8300.jpg', 'Venice Lagoon Taste Week', true, 'Venice Lagoon Taste Week'),
+    ('/images/entity_images/events/1a49ccdea47987feb144ca57.jpg', 'Florence Artisan Evenings', true, 'Florence Artisan Evenings'),
+    ('/images/entity_images/events/c0df51c6bd2ead27947f6519.jpg', 'Belgrade Coffee and Jazz Night', true, 'Belgrade Coffee and Jazz Night'),
+    ('/images/entity_images/events/18764eb2e5cf790d704e5dad.jpg', 'Novi Sad Gourmet Weekend', true, 'Novi Sad Gourmet Weekend'),
+    ('/images/entity_images/events/6889a7d37d11dfcd459c7353.jpg', 'Zlatibor Mountain Taste Days', true, 'Zlatibor Mountain Taste Days')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "EventId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", e."Id", NOW()
@@ -13218,12 +12818,12 @@ JOIN "Events" e ON e."Name" = s."EventName";
 -- 15.11 ITALIJA + SRBIJA IMAGES - AKTIVNOSTI
 WITH source("Url", "AltText", "IsMain", "ActivityName") AS (
     VALUES
-    ('https://cdn.tourcms.com/a/6659/475/1/default.jpg', 'Trastevere Food Walk', true, 'Trastevere Food Walk'),
-    ('https://www.vivovenetia.com/wp-content/uploads/2019/01/gondola-night.jpg', 'Grand Canal Evening Walk', true, 'Grand Canal Evening Walk'),
-    ('https://www.visittuscany.com/shared/make/immagini/tramonti-firenze_q6G.jpeg?__scale=w:1920,h:1000,t:2,q:85', 'Florence Sunset View Walk', true, 'Florence Sunset View Walk'),
-    ('https://upload.wikimedia.org/wikipedia/commons/5/5f/%D0%9A%D0%B0%D0%BB%D0%B5%D0%BC%D0%B5%D0%B3%D0%B4%D0%B0%D0%BD%2C_%D1%81%D0%BF%D0%BE%D0%BC%D0%B5%D0%BD%D0%B8%D0%BA_%D0%9F%D0%BE%D0%B1%D1%98%D0%B5%D0%B4%D0%BD%D0%B8%D0%BA%2C_%D0%91%D0%B8%D0%BE%D0%B3%D1%80%D0%B0%D0%B4.jpg', 'Šetnja uz zalazak Sunca Beogradskom tvrđavom', true, 'Šetnja uz zalazak Sunca Beogradskom tvrđavom'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Petrovaradin.jpg', 'Obilazak Petrovaradinske tvrđave', true, 'Obilazak Petrovaradinske tvrđave'),
-    ('https://commons.wikimedia.org/wiki/Special:FilePath/Planina%20Zlatibor.JPG', 'Zlatibor Panorama Ride', true, 'Zlatibor Panorama Ride')
+    ('/images/entity_images/activities/6c4634328edc5a3f01b1d6b4.jpg', 'Trastevere Food Walk', true, 'Trastevere Food Walk'),
+    ('/images/entity_images/activities/9342dd3b1b7d9d000d31e8e3.jpg', 'Grand Canal Evening Walk', true, 'Grand Canal Evening Walk'),
+    ('/images/entity_images/activities/4219f757841eecda318a55eb.jpg', 'Florence Sunset View Walk', true, 'Florence Sunset View Walk'),
+    ('/images/entity_images/activities/d7d5bfece717a252f2e42f1f.jpg', 'Šetnja uz zalazak Sunca Beogradskom tvrđavom', true, 'Šetnja uz zalazak Sunca Beogradskom tvrđavom'),
+    ('/images/entity_images/activities/6aae7ededba94fa355c07300.jpg', 'Obilazak Petrovaradinske tvrđave', true, 'Obilazak Petrovaradinske tvrđave'),
+    ('/images/entity_images/activities/bc1bfd183b8ec83268c87414.jpg', 'Zlatibor Panorama Ride', true, 'Zlatibor Panorama Ride')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ActivityId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", a."Id", NOW()
@@ -13794,37 +13394,37 @@ VALUES
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "LocalityId", "CreatedAt")
 VALUES
 
-('https://zdravopancevo.rs/wp-content/uploads/2024/11/IMG_20240313_122751-1-scaled.jpg', 'Centar Kragujevca', true,
+('/images/entity_images/localities/dcbb3e449a9d11a6ce6c874c.jpg', 'Centar Kragujevca', true,
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Kragujevca'), NOW()),
 
-('https://www.spomenpark.rs/wp-content/uploads/2022/08/Spomenik-streljanim-djacima-i-profesorima.jpg', 'Šumarice', true,
+('/images/entity_images/localities/c79de324d7877d9de69c460a.jpg', 'Šumarice', true,
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Šumarice'), NOW()),
 
-('https://upload.wikimedia.org/wikipedia/commons/2/29/Jezero_Bubanj.JPG', 'Bubanjsko jezero', true,
+('/images/entity_images/localities/2710ed025b8b393122d4f95e.jpg', 'Bubanjsko jezero', true,
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Bubanjsko jezero'), NOW()),
 
-('https://itinari-images.s3.eu-west-1.amazonaws.com/activity/images/original/74f9cd38-aa68-4dd0-b5a0-b6fe12e9776f-knez.jpg', 'Knez Mihailova', true,
+('/images/entity_images/localities/531dbebd6f521ba4f85fa18e.jpg', 'Knez Mihailova', true,
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Knez Mihailova'), NOW()),
 
-('https://beobuild.rs/shared/the-dorcol-residence-3d-eksterijer-120126-01.jpg', 'Dorćol', true,
+('/images/entity_images/localities/8b9debb2e6b208cb85499002.jpg', 'Dorćol', true,
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Dorćol'), NOW()),
 
-('https://static.beograd.rs/api/v3/images/63469?ts=2024-07-05T16:17:29', 'Skadarlija', true,
+('/images/entity_images/localities/5cafcb1d556f4ae6bf05b85e.jpg', 'Skadarlija', true,
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Skadarlija'), NOW()),
 
-('https://beogradskiizlet.com/wp-content/uploads/2026/03/nova-platforma-ada-ciganlija-savsko-jezero.jpg', 'Ada Ciganlija', true,
+('/images/entity_images/localities/c0697c6fabaa3ea87c9db0eb.jpg', 'Ada Ciganlija', true,
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Ada Ciganlija'), NOW()),
 
-('https://bookaweb.s3.eu-central-1.amazonaws.com/media/47945/zemun-kej-beograd.jpg', 'Zemun Kej', true,
+('/images/entity_images/localities/3fe63d2517d4fa9fea9c803e.jpg', 'Zemun Kej', true,
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Zemun Kej'), NOW()),
 
-('https://cityexpert.rs/blog/sites/default/files/slika/blokovi-novog-beograda.jpg', 'Novi Beograd', true,
+('/images/entity_images/localities/9c42d770e19d678446330d5c.jpg', 'Novi Beograd', true,
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Novi Beograd'), NOW()),
 
-('https://s3.eu-central-1.amazonaws.com/apartmani-u-beogradu/uploads/firms/697/sr/main/tasmajdan-park-znamenitosti-beograd-palilula.jpg', 'Tašmajdan', true,
+('/images/entity_images/localities/4da74cee2a47bd060ade88d2.jpg', 'Tašmajdan', true,
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Tašmajdan'), NOW()),
 
-('https://www.belgradewaterfront.com/static/uploads/2025/05/2Savski-trg-aerial-shot-1_14__.jpg', 'Savski trg', true,
+('/images/entity_images/localities/203e128959f29ef019fc3fca.jpg', 'Savski trg', true,
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Savski trg'), NOW());
 
  ---KRAGUJEVAC OBJEKTI
@@ -14338,14 +13938,14 @@ VALUES
 
 WITH source("Url", "AltText", "IsMain", "LocalityName") AS (
     VALUES
-    ('https://www.ni.rs/wp-content/uploads/2021/10/DJI_00934-scaled.jpg', 'Centar Niša', true, 'Centar Niša'),
-    ('https://www.ni.rs/wp-content/uploads/2021/11/SC-Cair-1.jpg', 'Čair', true, 'Čair'),
-    ('https://upload.wikimedia.org/wikipedia/commons/8/84/Nis_Kicevo.jpgd', 'Kičevo', true, 'Kičevo'),
-    ('https://upload.wikimedia.org/wikipedia/commons/6/69/3_Aces.JPG', 'Durlan', true, 'Durlan'),
-    ('https://glasjuga.rs/wp-content/uploads/2024/01/nis-trosarina-vreme.jpg', 'Trošarina', true, 'Trošarina'),
-    ('https://www.zim-rentacar.com/assets/img/pages/zim-rent-a-car-stari-grad.jpg', 'Stari grad', true, 'Stari grad'),
-    ('https://serbia.com/wp-content/uploads/2025/04/Kosancicev_Venac_Beograd_PKIC_6-1-1280x853.jpg', 'Kosančićev venac', true, 'Kosančićev venac'),
-    ('https://upload.wikimedia.org/wikipedia/commons/4/47/Belgrade_Waterfront_%28%D0%91%D0%B5%D0%BE%D0%B3%D1%80%D0%B0%D0%B4_%D0%BD%D0%B0_%D0%B2%D0%BE%D0%B4%D0%B8%29.jpg', 'Beograd na vodi', true, 'Beograd na vodi')
+    ('/images/entity_images/localities/49d930ee339755355a4e24c3.jpg', 'Centar Niša', true, 'Centar Niša'),
+    ('/images/entity_images/localities/eefbd160202abcfc246eb5a2.jpg', 'Čair', true, 'Čair'),
+    ('/images/entity_images/localities/883aae7cb7e9ba221e5c2d32.jpg', 'Kičevo', true, 'Kičevo'),
+    ('/images/entity_images/localities/83c6d9a94cd8af1b93067f4d.jpg', 'Durlan', true, 'Durlan'),
+    ('/images/entity_images/localities/b42ba843054f28afd4be1216.jpg', 'Trošarina', true, 'Trošarina'),
+    ('/images/entity_images/localities/765619bdca976213c451247b.jpg', 'Stari grad', true, 'Stari grad'),
+    ('/images/entity_images/localities/f227255ce75bbcd00a41da00.jpg', 'Kosančićev venac', true, 'Kosančićev venac'),
+    ('/images/entity_images/localities/277c3f3988032937c94a3250.jpg', 'Beograd na vodi', true, 'Beograd na vodi')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "LocalityId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", l."Id", NOW()
@@ -14356,29 +13956,29 @@ JOIN "Localities" l ON l."Name" = s."LocalityName";
 
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://www.restoranjezero.rs/wp-content/uploads/2018/08/000_3458.jpg', 'Kafana Stara Srbija', true, 'Kafana Stara Srbija'),
-    ('https://tipo.rs/wp-content/uploads/2025/06/mademoiselle-8.jpg', 'Kafić Mademoiselle', true, 'Kafić Mademoiselle'),
-    ('https://n1info.rs/wp-content/uploads/2023/05/27/1685176164-thumbnail_SBB-halapokrivena-zastavom-1200x800.jpg', 'Hala Jezero', true, 'Hala Jezero'),
-    ('https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Narodna_biblioteka_Vuk_Karad%C5%BEi%C4%87_Kragujevac_01.jpg/3840px-Narodna_biblioteka_Vuk_Karad%C5%BEi%C4%87_Kragujevac_01.jpg', 'Narodna biblioteka Vuk Karadžić', true, 'Narodna biblioteka Vuk Karadžić'),
-    ('https://i0.wp.com/blueprint.rs/exdes/wp-content/uploads/2015/07/Kragujevac_001.jpg?fit=1200%2C782&ssl=1', 'Muzej 21. oktobar', true, 'Muzej "21. oktobar"'),
-    ('https://upload.wikimedia.org/wikipedia/commons/6/65/Akvarijum_Kragujevac_01.jpg', 'Akvarijum PMF', true, 'Akvarijum PMF'),
+    ('/images/entity_images/objects/55ff4b35936c40ed5ad0f81f.jpg', 'Kafana Stara Srbija', true, 'Kafana Stara Srbija'),
+    ('/images/entity_images/objects/b3742f346e53002382d8a76d.jpg', 'Kafić Mademoiselle', true, 'Kafić Mademoiselle'),
+    ('/images/entity_images/objects/9df934dc461b401564e1e6db.jpg', 'Hala Jezero', true, 'Hala Jezero'),
+    ('/images/entity_images/objects/e2bbfeac3a52cc1c1c632a2c.jpg', 'Narodna biblioteka Vuk Karadžić', true, 'Narodna biblioteka Vuk Karadžić'),
+    ('/images/entity_images/objects/ee8e2e512f3442f7eb355b94.jpg', 'Muzej 21. oktobar', true, 'Muzej "21. oktobar"'),
+    ('/images/entity_images/objects/2585c3f471eae2d74a92fbfa.jpg', 'Akvarijum PMF', true, 'Akvarijum PMF'),
 
-    ('https://mareraproperties.com/wp-content/uploads/2025/04/forum-large-scaled.jpg', 'Forum Shopping Centar', true, 'Forum Shopping Centar'),
-    ('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/17/de/4a/8e/crystal-ice.jpg?w=1200&h=1200&s=1', 'Hotel Crystal Ice', true, 'Hotel Crystal Ice'),
-    ('https://glasjuga.rs/wp-content/uploads/2024/11/petar-livnica-2.jpeg', 'Noćni klub Livnica', true, 'Noćni klub Livnica'),
-    ('https://bookaweb.s3.eu-central-1.amazonaws.com/media/88652/IMG_20231114_144125.jpg', 'Relax Apartmani', true, 'Relax Apartmani'),
-    ('https://static.goto-where.com/114175-albums-1.jpg', 'Restoran Paris Lux', true, 'Restoran Paris Lux'),
+    ('/images/entity_images/objects/151e1a3557510a6050d1394b.jpg', 'Forum Shopping Centar', true, 'Forum Shopping Centar'),
+    ('/images/entity_images/objects/66d266117689c186e228136b.jpg', 'Hotel Crystal Ice', true, 'Hotel Crystal Ice'),
+    ('/images/entity_images/objects/7e6b181767da0cb96c18e5c2.jpg', 'Noćni klub Livnica', true, 'Noćni klub Livnica'),
+    ('/images/entity_images/objects/72d9587b0977d3492b287354.jpg', 'Relax Apartmani', true, 'Relax Apartmani'),
+    ('/images/entity_images/objects/b716ab21ff7b45f503dcd6c2.jpg', 'Restoran Paris Lux', true, 'Restoran Paris Lux'),
 
-    ('https://www.metropolpalace.com/wp-content/uploads/2023/02/metropol-palace-slider-4.webp', 'Metropol Palace', true, 'Metropol Palace'),
-    ('https://www.ludikamen.rs/storage/uploads/vendors/2840/gallery/Lorenzo-kakalamba-prostor-za-proslave-restoran-beograd-3_0.52857700%201719557038.JPG', 'Restoran Lorenzo & Kakalamba', true, 'Restoran Lorenzo & Kakalamba'),
-    ('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2a/65/87/a8/caption.jpg?w=1100&h=1100&s=1', 'Kafeterija Magazin 1907', true, 'Kafeterija Magazin 1907'),
-    ('https://upload.wikimedia.org/wikipedia/commons/3/36/National_Museum_of_Serbia_%28DSC04612%29.jpg', 'Narodni muzej Srbije', true, 'Narodni muzej Srbije'),
-    ('https://beogradskiizlet.com/wp-content/uploads/2021/05/1619266043373.jpg', 'Narodno pozorište', true, 'Narodno pozorište'),
-    ('https://www.galerijabelgrade.com/_next/image?url=%2F_next%2Fstatic%2Fmedia%2FaboutHero.7375dbfc.webp&w=3840&q=75', 'Galerija Belgrade', true, 'Galerija Belgrade'),
-    ('https://mcf.rs/upload/Gallery/Images/2021-10/ASI_2998-2.jpeg', 'Cineplexx Ušće', true, 'Cineplexx Ušće'),
-    ('https://www.beogradnocu.com/wp-content/uploads/2016/05/Splav-Freestyler-enterijer4.jpg', 'Freestyler', true, 'Freestyler'),
-    ('https://greenwall-plus.rs/wp-content/uploads/2021/01/Saruna3.png', 'Saruna Wellness Skyline', true, 'Saruna Wellness Skyline'),
-    ('https://beogradskiizlet.com/wp-content/uploads/2023/05/IMG_20210627_115349.jpg', 'Blaznavac', true, 'Blaznavac')
+    ('/images/entity_images/objects/aa261e4db08a3c85b33d3fca.jpg', 'Metropol Palace', true, 'Metropol Palace'),
+    ('/images/entity_images/objects/f34677224a00c74ab5d42907.jpg', 'Restoran Lorenzo & Kakalamba', true, 'Restoran Lorenzo & Kakalamba'),
+    ('/images/entity_images/objects/839510da4dbb4042609ef1ec.jpg', 'Kafeterija Magazin 1907', true, 'Kafeterija Magazin 1907'),
+    ('/images/entity_images/objects/b9f901b60b71ef7a6ef64291.jpg', 'Narodni muzej Srbije', true, 'Narodni muzej Srbije'),
+    ('/images/entity_images/objects/1c52616ac5d859d92a96188b.jpg', 'Narodno pozorište', true, 'Narodno pozorište'),
+    ('/images/entity_images/objects/28d0179a2b1906785a61b2e3.jpg', 'Galerija Belgrade', true, 'Galerija Belgrade'),
+    ('/images/entity_images/objects/685200c330910c63790bd601.jpg', 'Cineplexx Ušće', true, 'Cineplexx Ušće'),
+    ('/images/entity_images/objects/96e581bd6f7248c8b190af7e.jpg', 'Freestyler', true, 'Freestyler'),
+    ('/images/entity_images/objects/ea63bf655c35c34078709d84.jpg', 'Saruna Wellness Skyline', true, 'Saruna Wellness Skyline'),
+    ('/images/entity_images/objects/64ee34c9c31a6a754fe3fc84.jpg', 'Blaznavac', true, 'Blaznavac')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
@@ -17032,7 +16632,7 @@ true, 'Approved',
 (SELECT "Id" FROM "Users" WHERE "Email" = 'jelena.creator@spirego.com'),
 NOW(), NOW());
 
--- TORNIK VIEWPOINT NOVI OBJEKTI
+-- Tornik vidikovac NOVI OBJEKTI
 
 INSERT INTO "Objects"
 ("Name", "Description", "Address", "PhoneNumber", "Website", "MenuUrl", "CuisineType", "WorkingHours", "Price", "Amenities", "Geolocation", "AverageRating", "ReviewCount",
@@ -17053,7 +16653,7 @@ ST_SetSRID(ST_MakePoint(19.6412, 43.6543), 4326),
 0, 0,
 'Approved', true,
 (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Sportski centar'),
-(SELECT "Id" FROM "Localities" WHERE "Name" = 'Tornik Viewpoint'),
+(SELECT "Id" FROM "Localities" WHERE "Name" = 'Tornik vidikovac'),
 (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Zlatibor'),
 (SELECT "Id" FROM "Users" WHERE "Email" = 'jelena.creator@spirego.com'),
 (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.zlatibor@spirego.com'),
@@ -17072,7 +16672,7 @@ ST_SetSRID(ST_MakePoint(19.6462, 43.6699), 4326),
 0, 0,
 'Approved', true,
 (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Sportski centar'),
-(SELECT "Id" FROM "Localities" WHERE "Name" = 'Tornik Viewpoint'),
+(SELECT "Id" FROM "Localities" WHERE "Name" = 'Tornik vidikovac'),
 (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Zlatibor'),
 (SELECT "Id" FROM "Users" WHERE "Email" = 'jelena.creator@spirego.com'),
 (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.zlatibor@spirego.com'),
@@ -17091,13 +16691,13 @@ ST_SetSRID(ST_MakePoint(19.6465, 43.6693), 4326),
 0, 0,
 'Approved', true,
 (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Sportski centar'),
-(SELECT "Id" FROM "Localities" WHERE "Name" = 'Tornik Viewpoint'),
+(SELECT "Id" FROM "Localities" WHERE "Name" = 'Tornik vidikovac'),
 (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Zlatibor'),
 (SELECT "Id" FROM "Users" WHERE "Email" = 'jelena.creator@spirego.com'),
 (SELECT "Id" FROM "Users" WHERE "Email" = 'manager.zlatibor@spirego.com'),
 NOW(), NOW(), NOW());
 
--- TORNIK VIEWPOINT AKTIVNOSTI
+-- Tornik vidikovac AKTIVNOSTI
 
 INSERT INTO "Activities"
 ("Name", "Description", "Geolocation", "Price", "DurationMinutes", "IsActive",
@@ -17109,7 +16709,7 @@ VALUES
 ST_SetSRID(ST_MakePoint(19.6398, 43.6541), 4326),
 0.00, 45, true,
 (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Razgledanje'),
-(SELECT "Id" FROM "Localities" WHERE "Name" = 'Tornik Viewpoint'),
+(SELECT "Id" FROM "Localities" WHERE "Name" = 'Tornik vidikovac'),
 (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Zlatibor'),
 (SELECT "Id" FROM "Objects" WHERE "Name" = 'Gold Gondola Tornik stanica'),
 1,
@@ -17120,7 +16720,7 @@ NOW(), NOW()),
 ST_SetSRID(ST_MakePoint(19.6468, 43.6691), 4326),
 20.00, 30, true,
 (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Sport'),
-(SELECT "Id" FROM "Localities" WHERE "Name" = 'Tornik Viewpoint'),
+(SELECT "Id" FROM "Localities" WHERE "Name" = 'Tornik vidikovac'),
 (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Zlatibor'),
 (SELECT "Id" FROM "Objects" WHERE "Name" = 'Avantura park Tornik'),
 1,
@@ -17131,14 +16731,14 @@ NOW(), NOW()),
 ST_SetSRID(ST_MakePoint(19.6378, 43.6547), 4326),
 0.00, 60, true,
 (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Fotografisanje'),
-(SELECT "Id" FROM "Localities" WHERE "Name" = 'Tornik Viewpoint'),
+(SELECT "Id" FROM "Localities" WHERE "Name" = 'Tornik vidikovac'),
 (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Zlatibor'),
 NULL,
 1,
 (SELECT "Id" FROM "Users" WHERE "Email" = 'jelena.creator@spirego.com'),
 NOW(), NOW());
 
--- TORNIK VIEWPOINT DOGAĐAJI
+-- Tornik vidikovac DOGAĐAJI
 
 INSERT INTO "Events"
 ("Name", "Description", "Geolocation", "StartDate", "EndDate", "Price",
@@ -17153,7 +16753,7 @@ ST_SetSRID(ST_MakePoint(19.6400, 43.6541), 4326),
 5.00, 
 true, 'Approved',
 (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Festival'),
-(SELECT "Id" FROM "Localities" WHERE "Name" = 'Tornik Viewpoint'),
+(SELECT "Id" FROM "Localities" WHERE "Name" = 'Tornik vidikovac'),
 (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Zlatibor'),
 (SELECT "Id" FROM "Objects" WHERE "Name" = 'Gold Gondola Tornik stanica'),
 (SELECT "Id" FROM "Users" WHERE "Email" = 'jelena.creator@spirego.com'),
@@ -17166,7 +16766,7 @@ ST_SetSRID(ST_MakePoint(19.6408, 43.6542), 4326),
 10.00, 
 true, 'Approved',
 (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'DJ veče'),
-(SELECT "Id" FROM "Localities" WHERE "Name" = 'Tornik Viewpoint'),
+(SELECT "Id" FROM "Localities" WHERE "Name" = 'Tornik vidikovac'),
 (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Zlatibor'),
 (SELECT "Id" FROM "Objects" WHERE "Name" = 'Gold Gondola Tornik stanica'),
 (SELECT "Id" FROM "Users" WHERE "Email" = 'jelena.creator@spirego.com'),
@@ -17179,7 +16779,7 @@ ST_SetSRID(ST_MakePoint(19.4647, 43.6693), 4326),
 0.00, 
 true, 'Approved',
 (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Sportski događaj'),
-(SELECT "Id" FROM "Localities" WHERE "Name" = 'Tornik Viewpoint'),
+(SELECT "Id" FROM "Localities" WHERE "Name" = 'Tornik vidikovac'),
 (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Zlatibor'),
 (SELECT "Id" FROM "Objects" WHERE "Name" = 'Avantura park Tornik'),
 (SELECT "Id" FROM "Users" WHERE "Email" = 'jelena.creator@spirego.com'),
@@ -18376,85 +17976,85 @@ NOW(), NOW());
 -- IMAGES - OBJEKTI
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://www.ekapija.com/thumbs/Pozorište_na_terazijama_u_beogradu_120223_tw1024.jpg', 'Pozorište na Terazijama', true, 'Pozorište na Terazijama'),
-    ('https://www.beogradnocu.com/wp-content/uploads/2014/10/bgnocu-61.jpg', 'Kasina by Community', true, 'Kasina by Community'),
-    ('https://hotelmoskva.rs/image398.png', 'Poslastičarnica Moskva', true, 'Poslastičarnica Moskva'),
-    ('https://upload.wikimedia.org/wikipedia/commons/8/8c/%D0%91%D0%B8%D0%BE%D1%81%D0%BA%D0%BE%D0%BF_%E2%80%9E%D0%91%D0%B0%D0%BB%D0%BA%D0%B0%D0%BD%E2%80%9C_2012-09-17_17-37-14.jpg', 'Bioskop Balkan', true, 'Bioskop Balkan'),
-    ('https://upload.wikimedia.org/wikipedia/commons/5/56/20230422.Blick_von_der_Festung.Belgrad.-021.jpg', 'Donji grad Kalemegdan', true, 'Donji grad Kalemegdan'),
-    ('https://static.beograd.rs/api/v3/images/66673?ts=2024-11-01T16:40:05', 'Vojni muzej', true, 'Vojni muzej'),
-    ('https://static.beograd.rs/api/v3/images/63859?ts=2024-07-22T16:40:06', 'Kula Nebojša', true, 'Kula Nebojša'),
-    ('https://www.beogradskaTvrđava.co.rs/wp-content/uploads/2021/01/Rimski-bunar-scaled.jpg', 'Rimski bunar', true, 'Rimski bunar'),
-    ('https://www.ekapija.com/thumbs169/kulturni_centar_beograda_070223_tw1024.jpg', 'Kulturni centar Beograda', true, 'Kulturni centar Beograda'),
-    ('https://upload.wikimedia.org/wikipedia/commons/3/37/Konak_kneginje_Ljubice%2C_Bgd.JPG', 'Konak kneginje Ljubice', true, 'Konak kneginje Ljubice'),
-    ('https://upload.wikimedia.org/wikipedia/commons/2/2f/%D0%A1%D0%B0%D0%B1%D0%BE%D1%80%D0%BD%D0%B0_%D1%86%D1%80%D0%BA%D0%B2%D0%B0_%D1%83_%D0%91%D0%B5%D0%BE%D0%B3%D1%80%D0%B0%D0%B4%D1%83_%28Belgrade_Cathedral_Church%2C_Serbia%29.jpg', 'Saborna crkva Svetog Arhangela Mihaila', true, 'Saborna crkva Svetog Arhangela Mihaila'),
-    ('https://static.beograd.rs/api/v3/images/84801?ts=2025-11-06T12:27:32', 'Muzej primenjene umetnosti', true, 'Muzej primenjene umetnosti'),
-    ('https://crystalhotel.rs/wp-content/uploads/2024/05/Sava-Promenada-a.jpeg', 'Sava Promenada', true, 'Sava Promenada'),
-    ('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/30/d4/a6/e9/caption.jpg?w=1200&h=1200&s=1', 'St. Regis Belgrade', true, 'St. Regis Belgrade'),
-    ('https://www.belgradewaterfront.com/static/uploads/zivot-u-prirodi-min.jpg', 'Savski park', true, 'Savski park'),
-    ('https://zeptermuzej.rs/wp-content/uploads/2021/08/zepter-zgrada.jpg', 'Zepter Museum', true, 'Zepter Museum'),
-    ('https://prestige.co.rs/wp-content/uploads/sanu6.jpg', 'Galerija SANU', true, 'Galerija SANU'),
-    ('https://gradjevinar.rs/wp-content/uploads/2020/11/GOETHE_INSTITUT_0015_DSC_0102.jpg', 'Goethe-Institut Srbija', true, 'Goethe-Institut Srbija'),
-    ('https://upload.wikimedia.org/wikipedia/commons/1/1c/TC_Raji%C4%87eva_01.jpg', 'Rajićeva Shopping Center', true, 'Rajićeva Shopping Center'),
-    ('https://storage.googleapis.com/bidstorage/bristol/xxxl-273.webp', 'Dorćol Platz', true, 'Dorćol Platz'),
-    ('https://bizlife.rs/wp-content/uploads/2023/10/Silosi-iz-drona.jpg', 'Silosi Beograd', true, 'Silosi Beograd'),
-    ('https://muzejnt.rs/wp-content/uploads/2022/12/123%D1%9A%D1%81.jpg', 'Muzej nauke i tehnike', true, 'Muzej nauke i tehnike'),
-    ('https://www.oblakodermagazin.rs/wp-content/uploads/2023/02/Zdravko-Dulovic-51.jpg', 'Baza kulturnih zbivanja', true, 'Baza kulturnih zbivanja'),
-    ('https://trisesira.rs/wp-content/uploads/2023/10/kontakt-header.webp', 'Tri šešira', true, 'Tri šešira'),
-    ('https://stillinbelgrade.com/wp-content/uploads/2017/06/rsz__vmp8096.jpg', 'Dva Jelena', true, 'Dva Jelena'),
-    ('https://static.beograd.rs/api/v3/images/86924?ts=2026-03-20T10:22:03', 'Kuća Đure Jakšića', true, 'Kuća Đure Jakšića'),
-    ('https://www.decijeigraonice.net/uploads/playgrounds/galleries/avanatura-park/25463b5b94d3bb98175037ec0e74accf.jpeg', 'Adventure Park Ada Ciganlija', true, 'Adventure Park Ada Ciganlija'),
-    ('https://billboard.co.rs/wp-content/uploads/2019/10/aqua_ski_caffe_02.jpg', 'Aqua Ski Ada', true, 'Aqua Ski Ada'),
-    ('https://beogradskiizlet.com/wp-content/uploads/2023/08/IMG_20230813_154135.jpg', 'Galino Beach Bar Ada', true, 'Galino Beach Bar Ada'),
-    ('https://beogradskiizlet.com/wp-content/uploads/2021/05/Ada.jpg', 'Park Ada Ciganlija', true, 'Park Ada Ciganlija'),
-    ('https://static.beograd.rs/api/v3/images/63142?ts=2024-06-28T13:31:49', 'JP Ada Ciganlija', true, 'JP Ada Ciganlija'),
-    ('https://upload.wikimedia.org/wikipedia/commons/1/17/Kej_oslobo%C4%91enja_%281%29.JPG', 'Kej Oslobođenja', true, 'Kej Oslobođenja'),
-    ('https://upload.wikimedia.org/wikipedia/commons/a/a6/Restaurant_Venecija_in_Zemun_2431.jpg', 'Venecija Restaurant', true, 'Venecija Restaurant'),
-    ('https://www.nautica.rs/wp-content/uploads/2019/12/Goga-Yachting-Club-marina-iz-vazduha-07.jpg', 'Zemun Marina', true, 'Zemun Marina'),
-    ('https://reka.co.rs/wp-content/uploads/2015/07/81.jpg', 'Restoran Reka', true, 'Restoran Reka'),
-    ('https://upload.wikimedia.org/wikipedia/commons/0/03/%C5%A0tark_Arena.jpg', 'Štark Arena', true, 'Štark Arena'),
-    ('https://pentageco.rs/storage/app/public/projects-image/1729364122.jpg', 'Sava Centar', true, 'Sava Centar'),
-    ('https://www.kudaveceras.rs/images/news/1585001245-usce-2.jpg', 'UŠĆE Shopping Center', true, 'UŠĆE Shopping Center'),
-    ('https://beogradskiizlet.com/wp-content/uploads/2026/03/aleja-mira-park-prijateljstva-usce-beograd.jpg', 'Ušće park', true, 'Ušće park'),
-    ('https://static.beograd.rs/api/v3/images/63457?ts=2024-07-05T15:48:56', 'Tašmajdanski park', true, 'Tašmajdanski park'),
-    ('https://upload.wikimedia.org/wikipedia/commons/a/ad/%D0%A1%D0%B2%D1%98%D0%B5%D1%82%D0%BB%D0%BE%D0%BF%D0%B8%D1%81_%D0%B2%D0%B0%D1%9A%D1%81%D0%BA%D0%BE%D0%B3_%D0%BF%D0%BB%D0%B8%D0%B2%D0%B0%D0%BB%D0%B8%D1%88%D1%82%D0%B0_%D0%A2%D0%B0%D1%88%D0%BC%D0%B0%D1%98%D0%B4%D0%B0%D0%BD%2C_%D0%91%D0%B8%D0%BE%D0%B3%D1%80%D0%B0%D0%B46.jpg?utm_source=sr.wikipedia.org&utm_campaign=index&utm_content=original', 'Tašmajdan bazeni', true, 'Tašmajdan bazeni'),
-    ('https://tasmajdan.rs/wp-content/uploads/2022/12/DSC_6772aS-scaled.jpg', 'Stadion Tašmajdan', true, 'Stadion Tašmajdan'),
-    ('https://static.beograd.rs/api/v3/images/64534?ts=2024-08-20T15:01:29', 'Spomenik Stefanu Nemanji', true, 'Spomenik Stefanu Nemanji'),
-    ('https://www.planplus.rs/Image/Poi/176572', 'Stara železnička stanica Beograd', true, 'Stara železnička stanica Beograd'),
-    ('https://www.hotel-beograd.rs/images/home/homebanner.jpg', 'Hotel Beograd', true, 'Hotel Beograd'),
-    ('https://upload.wikimedia.org/wikipedia/commons/2/22/Serbia-0296_-_Serbian_National_Theatre.jpg', 'Srpsko narodno pozorište Novi Sad', true, 'Srpsko narodno pozorište Novi Sad'),
-    ('https://novisad.travel/wp-content/uploads/2019/01/DSC_5120_Muzej_Vojvodine_compressed.jpg', 'Muzej Vojvodine', true, 'Muzej Vojvodine'),
-    ('https://novisad.travel/wp-content/uploads/2019/01/Crkva-Sv.-Georgija-35_compressed.jpg', 'Saborna crkva Svetog Đorđa', true, 'Saborna crkva Svetog Đorđa'),
-    ('https://novisad.travel/wp-content/uploads/2017/03/petrovaradin-Tvrđava-baner.jpg', 'Sat kula Petrovaradin', true, 'Sat kula Petrovaradin'),
-    ('https://bookaweb.s3.eu-central-1.amazonaws.com/media/23923/City_museum_in_Petrovaradin-%282%29.jpg', 'Muzej grada Novog Sada', true, 'Muzej grada Novog Sada'),
-    ('https://atelje61.org.rs/wp-content/uploads/2023/02/galerija.jpg', 'Atelje 61', true, 'Atelje 61'),
-    ('https://goldgondola.rs/storage/media/Gold%20gondola%20milioniti%20putnik%20(1).jpeg', 'Gold Gondola Zlatibor', true, 'Gold Gondola Zlatibor'),
-    ('https://monahm.com/wp-content/uploads/2023/04/mona_plaza_zlatibor_1-scaled.jpg', 'Hotel Mona Plaza Zlatibor', true, 'Hotel Mona Plaza Zlatibor'),
-    ('https://www.vestizssmestaj.rs/wp-content/uploads/2024/08/Pozorište-na-otvorenom-u-okviru-Miholjskih-susreta-sela-u-Tripkovi-3.jpg', 'Kraljev trg letnja pozornica', true, 'Kraljev trg letnja pozornica'),
-    ('https://goldgondola.rs/storage/media/GoldGondola_Novembar_Sneg-40-medium.jpeg', 'Gold Gondola Tornik stanica', true, 'Gold Gondola Tornik stanica'),
-    ('https://www.vilabaroviczlatibor.com/media/actual/gb-actual-vilabarovic/ski-centar-tornik-4011.jpg', 'Tornik Ski Center', true, 'Tornik Ski Center'),
-    ('https://avanturazlatibor.com/wp-content/uploads/2018/11/n3.2.jpg', 'Avantura park Tornik', true, 'Avantura park Tornik'),
-    ('https://img.atlasobscura.com/Hmo936F0jobDCoH2ZIVLeFZjURozHoGLV7qXwUva0hc/rt:fit/w:1200/q:80/sm:1/scp:1/ar:1/aHR0cHM6Ly9hdGxh/cy1kZXYuczMuYW1h/em9uYXdzLmNvbS91/cGxvYWRzL3BsYWNl/X2ltYWdlcy80ODQ4/YzY0Ny0xNGY0LTQ2/NmYtOTI5ZC0zNGFm/YTZmZjhhZGQxMGRj/MzFmOThiNjBhODA5/ZjNfMjAxNTA0MDkx/MzA4NDQuanBn.jpg', 'Knežev Arsenal', true, 'Knežev Arsenal'),
-    ('https://upload.wikimedia.org/wikipedia/commons/0/05/Teatar_%D0%9Aragujevac.jpg', 'Knjaževsko-srpski teatar', true, 'Knjaževsko-srpski teatar'),
-    ('https://www.restoranjezero.rs/wp-content/uploads/2018/08/000_3483.jpg', 'Kafana Paligorić', true, 'Kafana Paligorić'),
-    ('https://upload.wikimedia.org/wikipedia/commons/2/21/Da.se.ne.zaboravi.jpg', 'Peto tri', true, 'Peto tri'),
-    ('https://sumadijasajam.rs/wp-content/uploads/2021/05/IMG_5594.jpg', 'Šumadija sajam', true, 'Šumadija sajam'),
-    ('https://cdn.prod.website-files.com/669a3584970ccdb8940e6b1c/66b6029e2cd3e0620a8ddaa2_DJI_0060.jpg', 'Delta Park Kragujevac', true, 'Delta Park Kragujevac'),
-    ('https://narodnimuzejnis.rs/wp-content/uploads/2020/01/sinagoga-scaled.jpg', 'Narodni muzej Niša', true, 'Narodni muzej Niša'),
-    ('https://avatars.mds.yandex.net/get-altay/1974402/2a0000016b60832be724375b44257720fc3c/orig', 'Kafana Meze', true, 'Kafana Meze'),
-    ('https://www.ni.rs/wp-content/uploads/2021/11/SC-Cair-1.jpg', 'SC Čair', true, 'SC Čair'),
-    ('https://upload.wikimedia.org/wikipedia/commons/thumb/9/95/Wiki.Ni%C5%A1_foto_Park_%C4%8Cair_%28Ni%C5%A1%29_22.jpg/1280px-Wiki.Ni%C5%A1_foto_Park_%C4%8Cair_%28Ni%C5%A1%29_22.jpg', 'Čairski park', true, 'Čairski park'),
-    ('https://www.stadiumguide.com/wp-content/uploads/cair1.jpg', 'Stadion Čair', true, 'Stadion Čair'),
-    ('https://scontent.fbeg7-2.fna.fbcdn.net/v/t51.82787-15/681026081_17892776592462168_9217028470489749292_n.jpg?_nc_cat=103&ccb=1-7&_nc_sid=127cfc&_nc_ohc=QVRE0gA4XI8Q7kNvwEUf_44&_nc_oc=AdrIrfrzqjDVyiO4yWp2MbcKNXufnyZJRZ7P1-sQESbJT3juzmxplFEKLW5ssrQ_EgQ&_nc_zt=23&_nc_ht=scontent.fbeg7-2.fna&_nc_gid=PEwwhDM_5QqrVbNA9jhKJA&_nc_ss=7b289&oh=00_Af5caFyDCM4Eo-wvezpzrDBTvM3IcLzZAjgT4D5qMQ21Kg&oe=6A0F6EB2', 'Restoran MaPlatz', true, 'Restoran MaPlatz'),
-    ('https://www.biznisgroup.com/wp-content/uploads/2019/07/242256580_114255150992028_8406081996167052087_n-min.jpg', 'Sportski Centar Železnička Stanica', true, 'Sportski Centar Železnička Stanica'),
-    ('https://naissus.info/wp-content/uploads/2022/04/buvljak.jpg', 'OTC Niš', true, 'OTC Niš'),
-    ('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/29/b5/81/d5/caption.jpg?w=1200&h=1200&s=1', 'Restoran Etno Kuća', true, 'Restoran Etno Kuća'),
-    ('https://gastrotrazilica.com/wp-content/uploads/2024/12/orac.png', 'Restoran Orač', true, 'Restoran Orač'),
-    ('https://www.ekapija.com/thumbs/sala_dvorana_280715_tw1024.jpg', 'Sportska hala Miroslav Antić', true, 'Sportska hala Miroslav Antić'),
-    ('https://www.juznevesti.com/wp-content/uploads/2020/03/05/119875/sindjelic-foto-citalac.jpg.webp', 'Spomenik Stevanu Sinđeliću', true, 'Spomenik Stevanu Sinđeliću'),
-    ('https://narodnimuzejnis.rs/wp-content/uploads/2020/01/cele-kula-scaled.jpg', 'Ćele Kula', true, 'Ćele Kula'),
-    ('https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Wiki.Ni%C5%A1_foto_Crkva_Sv._Vasilija_Ostro%C5%A1kog_%28Ni%C5%A1%29_855.jpg/1280px-Wiki.Ni%C5%A1_foto_Crkva_Sv._Vasilija_Ostro%C5%A1kog_%28Ni%C5%A1%29_855.jpg', 'Crkva Svetog Vasilija Ostroškog', true, 'Crkva Svetog Vasilija Ostroškog'),
-    ('https://s3proxygw.cineplexx.at/cms-live/asset/_default_upload_bucket/image%20%282%29_3.jpg', 'Cineplexx Niš', true, 'Cineplexx Niš'),
-    ('https://www.ekapija.com/thumbs/pijaca_140123_tw1024.jpg', 'Kvantaška pijaca Niš', true, 'Kvantaška pijaca Niš')
+    ('/images/entity_images/objects/dc06c11207e18ba4d9a61370.jpg', 'Pozorište na Terazijama', true, 'Pozorište na Terazijama'),
+    ('/images/entity_images/objects/bd0901533a63a96b5ae4ba7e.jpg', 'Kasina by Community', true, 'Kasina by Community'),
+    ('/images/entity_images/objects/70e5638632fb5e8dc195a95d.jpg', 'Poslastičarnica Moskva', true, 'Poslastičarnica Moskva'),
+    ('/images/entity_images/objects/c2fabe775bc1fef4d555b794.jpg', 'Bioskop Balkan', true, 'Bioskop Balkan'),
+    ('/images/entity_images/objects/7ca2072051eaeab54f6e5c0b.jpg', 'Donji grad Kalemegdan', true, 'Donji grad Kalemegdan'),
+    ('/images/entity_images/objects/d540f950b7ea5af8af9ee5ed.jpg', 'Vojni muzej', true, 'Vojni muzej'),
+    ('/images/entity_images/objects/4854a1b2db5219a60c0a5133.jpg', 'Kula Nebojša', true, 'Kula Nebojša'),
+    ('/images/entity_images/objects/dbb4b5a905f97e79cd70c748.jpg', 'Rimski bunar', true, 'Rimski bunar'),
+    ('/images/entity_images/objects/dd8ffbc576a6c30a4250ec75.jpg', 'Kulturni centar Beograda', true, 'Kulturni centar Beograda'),
+    ('/images/entity_images/objects/5295c245a95b91492e8dd89e.jpg', 'Konak kneginje Ljubice', true, 'Konak kneginje Ljubice'),
+    ('/images/entity_images/objects/da41a7daf0c186df632a16b7.jpg', 'Saborna crkva Svetog Arhangela Mihaila', true, 'Saborna crkva Svetog Arhangela Mihaila'),
+    ('/images/entity_images/objects/1b0953e7d83ab4484aa47ee4.jpg', 'Muzej primenjene umetnosti', true, 'Muzej primenjene umetnosti'),
+    ('/images/entity_images/objects/f841b9c234412c57a41e801f.jpg', 'Sava Promenada', true, 'Sava Promenada'),
+    ('/images/entity_images/objects/d857cff21d3472edde23b58e.jpg', 'St. Regis Belgrade', true, 'St. Regis Belgrade'),
+    ('/images/entity_images/objects/4635747c3ca34834626be1da.jpg', 'Savski park', true, 'Savski park'),
+    ('/images/entity_images/objects/8edc1dfc45b4e8f6dcfc7ccf.jpg', 'Zepter Museum', true, 'Zepter Museum'),
+    ('/images/entity_images/objects/4affbf4d4f6f974cdee9fa31.jpg', 'Galerija SANU', true, 'Galerija SANU'),
+    ('/images/entity_images/objects/b0ab0d383d124ea50a9e8fda.jpg', 'Goethe-Institut Srbija', true, 'Goethe-Institut Srbija'),
+    ('/images/entity_images/objects/86445155576ebd6def2f0726.jpg', 'Rajićeva Shopping Center', true, 'Rajićeva Shopping Center'),
+    ('/images/entity_images/objects/5502c585364dfd3ee290fa06.jpg', 'Dorćol Platz', true, 'Dorćol Platz'),
+    ('/images/entity_images/objects/497e261e359e10a2669f84c5.jpg', 'Silosi Beograd', true, 'Silosi Beograd'),
+    ('/images/entity_images/objects/be6359785e1da8492e9914f9.jpg', 'Muzej nauke i tehnike', true, 'Muzej nauke i tehnike'),
+    ('/images/entity_images/objects/576811eddecb26bd5d7e0047.jpg', 'Baza kulturnih zbivanja', true, 'Baza kulturnih zbivanja'),
+    ('/images/entity_images/objects/207469e4894ff70ff41a8544.jpg', 'Tri šešira', true, 'Tri šešira'),
+    ('/images/entity_images/objects/99a6cd27530b4007115bbdd3.jpg', 'Dva Jelena', true, 'Dva Jelena'),
+    ('/images/entity_images/objects/1fe2bf21dc4773f7e1447bd7.jpg', 'Kuća Đure Jakšića', true, 'Kuća Đure Jakšića'),
+    ('/images/entity_images/objects/b82af94b6eb83ceb1cbfba97.jpg', 'Adventure Park Ada Ciganlija', true, 'Adventure Park Ada Ciganlija'),
+    ('/images/entity_images/objects/2cff8b79a45e5ed7d0afe1a4.jpg', 'Aqua Ski Ada', true, 'Aqua Ski Ada'),
+    ('/images/entity_images/objects/5fd659a6ea78472d66e0697c.jpg', 'Galino Beach Bar Ada', true, 'Galino Beach Bar Ada'),
+    ('/images/entity_images/objects/3fa27354decffeb42ebb057f.jpg', 'Park Ada Ciganlija', true, 'Park Ada Ciganlija'),
+    ('/images/entity_images/objects/395df1be05617bfb0c45a061.jpg', 'JP Ada Ciganlija', true, 'JP Ada Ciganlija'),
+    ('/images/entity_images/objects/3fe63d2517d4fa9fea9c803e.jpg', 'Kej Oslobođenja', true, 'Kej Oslobođenja'),
+    ('/images/entity_images/objects/3c70a7e89678008512d98986.jpg', 'Venecija Restaurant', true, 'Venecija Restaurant'),
+    ('/images/entity_images/objects/5c34dffcd744a1ee041f67b3.jpg', 'Zemun Marina', true, 'Zemun Marina'),
+    ('/images/entity_images/objects/44f96b953d0aaf3c0b3e0d7f.jpg', 'Restoran Reka', true, 'Restoran Reka'),
+    ('/images/entity_images/objects/3bff1b514837372efad8d757.jpg', 'Štark Arena', true, 'Štark Arena'),
+    ('/images/entity_images/objects/050452e67e4a0ed74ee638f6.jpg', 'Sava Centar', true, 'Sava Centar'),
+    ('/images/entity_images/objects/1ea92deb2fe381b720a318cb.jpg', 'UŠĆE Shopping Center', true, 'UŠĆE Shopping Center'),
+    ('/images/entity_images/objects/548a1a721e7930807dc0cc6b.jpg', 'Ušće park', true, 'Ušće park'),
+    ('/images/entity_images/objects/bb3735ff492ce37669bcc3ae.jpg', 'Tašmajdanski park', true, 'Tašmajdanski park'),
+    ('/images/entity_images/objects/511db3abb559b46a68e91652.jpg', 'Tašmajdan bazeni', true, 'Tašmajdan bazeni'),
+    ('/images/entity_images/objects/5f0246e837c61dffa6e1d756.jpg', 'Stadion Tašmajdan', true, 'Stadion Tašmajdan'),
+    ('/images/entity_images/objects/87bf2d0dd5ae27fc72d7ca57.jpg', 'Spomenik Stefanu Nemanji', true, 'Spomenik Stefanu Nemanji'),
+    ('/images/entity_images/objects/89a40d6e94fd26f2ac881bc5.jpg', 'Stara železnička stanica Beograd', true, 'Stara železnička stanica Beograd'),
+    ('/images/entity_images/objects/e65e865498c97a673283a778.jpg', 'Hotel Beograd', true, 'Hotel Beograd'),
+    ('/images/entity_images/objects/9e87f584aeba1f332de867a5.jpg', 'Srpsko narodno pozorište Novi Sad', true, 'Srpsko narodno pozorište Novi Sad'),
+    ('/images/entity_images/objects/c6770eaf1fbd74e438526f4c.jpg', 'Muzej Vojvodine', true, 'Muzej Vojvodine'),
+    ('/images/entity_images/objects/dfe6d83dd950c49441f822e7.jpg', 'Saborna crkva Svetog Đorđa', true, 'Saborna crkva Svetog Đorđa'),
+    ('/images/entity_images/objects/ac8fe04a26e0f5761800fbe8.jpg', 'Sat kula Petrovaradin', true, 'Sat kula Petrovaradin'),
+    ('/images/entity_images/objects/8e91ef2700c5a3c0de6594f6.jpg', 'Muzej grada Novog Sada', true, 'Muzej grada Novog Sada'),
+    ('/images/entity_images/objects/72cd6f35bf62f7e77bc63856.jpg', 'Atelje 61', true, 'Atelje 61'),
+    ('/images/entity_images/objects/aa27efdc81fd8f35a559a882.jpg', 'Gold Gondola Zlatibor', true, 'Gold Gondola Zlatibor'),
+    ('/images/entity_images/objects/500b5d9c9092554cab0db311.jpg', 'Hotel Mona Plaza Zlatibor', true, 'Hotel Mona Plaza Zlatibor'),
+    ('/images/entity_images/objects/ef56553c908dd031f3e75b09.jpg', 'Kraljev trg letnja pozornica', true, 'Kraljev trg letnja pozornica'),
+    ('/images/entity_images/objects/a16b88e7f75e85b9955ea3b3.jpg', 'Gold Gondola Tornik stanica', true, 'Gold Gondola Tornik stanica'),
+    ('/images/entity_images/objects/841faf4b299ba6d85d6676ac.jpg', 'Tornik Ski Center', true, 'Tornik Ski Center'),
+    ('/images/entity_images/objects/06e7d4b98672b38e3f730fa0.jpg', 'Avantura park Tornik', true, 'Avantura park Tornik'),
+    ('/images/entity_images/objects/61539f70208bdd64e4481a53.jpg', 'Knežev Arsenal', true, 'Knežev Arsenal'),
+    ('/images/entity_images/objects/52dcdca29fed2d268fc668ff.jpg', 'Knjaževsko-srpski teatar', true, 'Knjaževsko-srpski teatar'),
+    ('/images/entity_images/objects/d505bf5165657e233d116b4e.jpg', 'Kafana Paligorić', true, 'Kafana Paligorić'),
+    ('/images/entity_images/objects/5fb661e4db0d4ed528c14f63.jpg', 'Peto tri', true, 'Peto tri'),
+    ('/images/entity_images/objects/f89e260233bb32da311628d0.jpg', 'Šumadija sajam', true, 'Šumadija sajam'),
+    ('/images/entity_images/objects/faa22b65be49d48a9de8feb5.jpg', 'Delta Park Kragujevac', true, 'Delta Park Kragujevac'),
+    ('/images/entity_images/objects/3faaee183c6629d7186da331.jpg', 'Narodni muzej Niša', true, 'Narodni muzej Niša'),
+    ('/images/entity_images/objects/8e22548af48793cac140abc3.jpg', 'Kafana Meze', true, 'Kafana Meze'),
+    ('/images/entity_images/objects/eefbd160202abcfc246eb5a2.jpg', 'SC Čair', true, 'SC Čair'),
+    ('/images/entity_images/objects/080b52c6cea9b3427da39f7c.jpg', 'Čairski park', true, 'Čairski park'),
+    ('/images/entity_images/objects/438857bfe3bfa4bd6deed5cc.jpg', 'Stadion Čair', true, 'Stadion Čair'),
+    ('/images/entity_images/objects/9b996545a0de15f862cafa49.jpg', 'Restoran MaPlatz', true, 'Restoran MaPlatz'),
+    ('/images/entity_images/objects/b71695e2ebfc6330d4a780e1.jpg', 'Sportski Centar Železnička Stanica', true, 'Sportski Centar Železnička Stanica'),
+    ('/images/entity_images/objects/c9ad8f7ec3e446fe7910c058.jpg', 'OTC Niš', true, 'OTC Niš'),
+    ('/images/entity_images/objects/ff3e78aeead2d1e2b2354709.jpg', 'Restoran Etno Kuća', true, 'Restoran Etno Kuća'),
+    ('/images/entity_images/objects/748de6c2f5538717c4be8dc3.jpg', 'Restoran Orač', true, 'Restoran Orač'),
+    ('/images/entity_images/objects/778e2b28c78e8831d7da6308.jpg', 'Sportska hala Miroslav Antić', true, 'Sportska hala Miroslav Antić'),
+    ('/images/entity_images/objects/87dc3221e1c3fcf5786a1ae3.jpg', 'Spomenik Stevanu Sinđeliću', true, 'Spomenik Stevanu Sinđeliću'),
+    ('/images/entity_images/objects/e07a3a42d084c9de75f177ca.jpg', 'Ćele Kula', true, 'Ćele Kula'),
+    ('/images/entity_images/objects/bbe76c396c0935a08d5f797d.jpg', 'Crkva Svetog Vasilija Ostroškog', true, 'Crkva Svetog Vasilija Ostroškog'),
+    ('/images/entity_images/objects/bf282ff4432735471c35aa63.jpg', 'Cineplexx Niš', true, 'Cineplexx Niš'),
+    ('/images/entity_images/objects/e16885e3b25cb7fa6492a7a1.jpg', 'Kvantaška pijaca Niš', true, 'Kvantaška pijaca Niš')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
@@ -18464,81 +18064,81 @@ JOIN "Objects" o ON o."Name" = s."ObjectName";
 -- IMAGES - AKTIVNOSTI
 WITH source("Url", "AltText", "IsMain", "ActivityName") AS (
     VALUES
-    ('https://images.trvl-media.com/place/6118044/9b6c8f25-1456-4427-b5a1-8f265ca1851d.jpg', 'Walking Tour Knez Mihailova & Terazije', true, 'Walking Tour Knez Mihailova & Terazije'),
-    ('https://hotelmoskva.rs/image517.png', 'Coffee Break at Hotel Moskva', true, 'Coffee Break at Hotel Moskva'),
-    ('https://www.danas.rs/wp-content/uploads/2023/05/Vece-mjuzikla-na-Terazijama-1-1-e1684684832612.jpg', 'Musical Night at Pozorište na Terazijama', true, 'Musical Night at Pozorište na Terazijama'),
-    ('https://serbiatravelservice.com/images/Belgrade%20fortress%20izlet%205/p1h3k5s3fo1o0ethi1df2c3uu934.jpg', 'Belgrade Fortress Guided Tour', true, 'Belgrade Fortress Guided Tour'),
-    ('https://www.balkanhistory.org/uploads/3/9/5/5/39556225/musem-outdoors_orig.jpg', 'Military Museum Visit', true, 'Military Museum Visit'),
-    ('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2a/7b/8c/35/caption.jpg?w=1200&h=1200&s=1', 'Nebojša Tower & Lower Town Walk', true, 'Nebojša Tower & Lower Town Walk'),
-    ('https://beogradskiizlet.com/wp-content/uploads/2026/01/20260102_174757.jpg', 'Obilazak Narodnog muzeja', true, 'Obilazak Narodnog muzeja'),
-    ('https://www.narodnoPozorište.rs/media/images/news/5853/gallery/sif_0565.jpg', 'National Theatre Evening', true, 'National Theatre Evening'),
-    ('https://www.kcb.org.rs/meta-content/uploads/2024/04/ph-vladimir-opsenica-KCB-otvaranja-Buducnost-ispocetka-Nemanja-Nikolic-DSC_5170-kcb.jpg', 'KCB Exhibition Visit', true, 'KCB Exhibition Visit'),
-    ('https://beogradskiizlet.com/wp-content/uploads/2023/04/IMG_20230429_140759.jpg', 'Konak kneginje Ljubice Museum Visit', true, 'Konak kneginje Ljubice Museum Visit'),
-    ('https://serbia.com/wp-content/uploads/2025/04/44917237982_7243f11060_k-1280x853.jpg', 'Kosančićev Venac Heritage Walk', true, 'Kosančićev Venac Heritage Walk'),
-    ('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/29/cc/46/90/caption.jpg?w=1200&h=1200&s=1', 'Museum of Applied Arts Visit', true, 'Museum of Applied Arts Visit'),
-    ('https://beogradskiizlet.com/wp-content/uploads/2023/05/IMG_20230507_164034.jpg', 'Šetnja Savskom promenadom', true, 'Šetnja Savskom promenadom'),
-    ('https://www.gradnja.rs/wp-content/uploads/2020/10/galerija-beograd-03.jpg', 'Kupovina u Galeriji Belgrade', true, 'Kupovina u Galeriji Belgrade'),
-    ('https://rute.bicikli.hr/wp-content/uploads/2024/05/ID240511-_DSC1776.jpg', 'Vožnja bicikla uz Savu', true, 'Vožnja bicikla uz Savu'),
-    ('https://24sedam.rs/data/images/2021-07-01/66426_knez-mihailova-2.jpg', 'Šetnja Knez Mihailovom', true, 'Šetnja Knez Mihailovom'),
-    ('https://kaleidoskop-media.com/images/post-gallery/vizuelneumetnosti_3449_69647_full.jpg', 'Obilazak Zepter muzeja', true, 'Obilazak Zepter muzeja'),
-    ('https://luxapartmanibeograd.com/wp-content/uploads/2021/02/beograd-knez-mihailova.jpg', 'Kupovina u Knez Mihailovoj', true, 'Kupovina u Knez Mihailovoj'),
-    ('https://muzejnt.rs/wp-content/uploads/2022/12/2B5A5316.jpg', 'Obilazak Muzeja nauke i tehnike', true, 'Obilazak Muzeja nauke i tehnike'),
-    ('https://beogradskiizlet.com/wp-content/uploads/2023/05/IMG_20230507_181801.jpg', 'Šetnja Dorćolom i Dunavskim kejom', true, 'Šetnja Dorćolom i Dunavskim kejom'),
-    ('https://www.diplomacyandcommerce.rs/wp-content/uploads/2024/10/Foto-Silosi_c.rs_.jpg', 'Obilazak Silosa Beograd', true, 'Obilazak Silosa Beograd'),
-    ('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/17/55/d7/ba/cwhq0ulw8aaaiho-largejpg.jpg?w=1200&h=-1&s=1', 'Šetnja Skadarlijom', true, 'Šetnja Skadarlijom'),
-    ('https://www.restoranibeograd.com/storage/news/interior/505/dva_jelena_tamburasi.jpg', 'Veče u Skadarliji uz tamburaše', true, 'Veče u Skadarliji uz tamburaše'),
-    ('https://www.cover.rs/wp-content/uploads/2025/10/tradicionalna-srpska-vecera.webp', 'Tradicionalna srpska večera u Skadarliji', true, 'Tradicionalna srpska večera u Skadarliji'),
-    ('https://assets.zyrosite.com/cdn-cgi/image/format=auto,w=1920,fit=crop/Yg21KO6B6ZS6xjBO/20230709_142046-m2Wb0LxykJC17lWz.jpg', 'Vožnja bicikla oko Ade', true, 'Vožnja bicikla oko Ade'),
-    ('https://www.atastars.rs/wp-content/uploads/2017/06/Neboj%C5%A1a-Gruji%C4%87-Marko-Novakovi%C4%87-Stefan-Veki%C4%87-i-Vladimir-Torubarov-kajak-Beograd.jpg', 'Kajak na Adi Ciganliji', true, 'Kajak na Adi Ciganliji'),
-    ('https://beogradskiizlet.com/wp-content/uploads/2021/06/P1120632.jpg', 'Skijanje na vodi na Adi', true, 'Skijanje na vodi na Adi'),
-    ('https://beogradskiizlet.com/wp-content/uploads/2021/08/P1090422.jpg', 'Šetnja Zemunskim kejom', true, 'Šetnja Zemunskim kejom'),
-    ('https://fajlovi.bos4.tours/uploads/2018/04/images/tour_387/Plovidba%20Dunavom%20i%20Savom.jpg', 'Vožnja brodom Dunavom', true, 'Vožnja brodom Dunavom'),
-    ('https://www.restoranvenecija.com/wp-content/uploads/2024/09/DZO_1041-scaled.jpg', 'Večera uz Dunav u Zemunu', true, 'Večera uz Dunav u Zemunu'),
-    ('https://beogradskiizlet.com/wp-content/uploads/2021/12/Novi-Beograd-Savski-kej.jpg', 'Šetnja Savskim kejom', true, 'Šetnja Savskim kejom'),
-    ('https://bizlife.rs/wp-content/uploads/2022/07/USCE-SC-redner-i-3.jpg', 'Kupovina u UŠĆE Shopping Center', true, 'Kupovina u UŠĆE Shopping Center'),
-    ('https://serbia.un.org/sites/default/files/styles/featured_image/public/2023-06/080_JDR03782_0.jpg?itok=eUN6OiY5', 'Rekreativni biciklizam Novi Beograd', true, 'Rekreativni biciklizam Novi Beograd'),
-    ('https://beogradskiizlet.com/wp-content/uploads/2023/05/IMG_20230527_142509.jpg', 'Šetnja Tašmajdanskim parkom', true, 'Šetnja Tašmajdanskim parkom'),
-    ('https://tasmajdan.rs/wp-content/uploads/2025/06/usavrsi_plivanje.webp', 'Plivanje na Tašmajdanu', true, 'Plivanje na Tašmajdanu'),
-    ('https://static.kurir.rs/Thumbnail/2083288/jpeg/888.jpg?ts=2024-09-09T11:47:13', 'Večernji koncert na Tašmajdanu', true, 'Večernji koncert na Tašmajdanu'),
-    ('https://beogradskiizlet.com/wp-content/uploads/2021/08/IMG_20210430_122131.jpg', 'Obilazak Savskog trga', true, 'Obilazak Savskog trga'),
-    ('https://static.dw.com/image/56368269_605.webp', 'Fotografisanje kod spomenika Stefanu Nemanji', true, 'Fotografisanje kod spomenika Stefanu Nemanji'),
-    ('https://www.nedeljnik.rs/wp-content/uploads/2020/01/IMG_20200113_092646.jpg', 'Istorijski obilazak stare železničke stanice', true, 'Istorijski obilazak stare železničke stanice'),
-    ('https://novisad.travel/wp-content/uploads/2025/08/11_centar_grada_novi_sad-scaled.jpg', 'Razgledanje Trga Slobode', true, 'Razgledanje Trga Slobode'),
-    ('https://novisad.travel/wp-content/uploads/2025/08/IMG_8012_centar_grada_novi_sad-scaled.jpg', 'Fotografisanje centra Novog Sada', true, 'Fotografisanje centra Novog Sada'),
-    ('https://i0.wp.com/gdeposrbiji.rs/wp-content/uploads/2026/02/Narodne-nosnje-iz-izlozene-u-stalnoj-postavci-Muzeja-Vojvodine.webp?fit=2560%2C1440&ssl=1', 'Obilazak Muzeja Vojvodine', true, 'Obilazak Muzeja Vojvodine'),
-    ('https://forum.bjbikers.com/uploads/monthly_2017_05/_F7A0460vib.jpg.96fe24f5ae310520fde3d3993fe32de4.jpg', 'Obilazak podzemnih vojnih tunela', true, 'Obilazak podzemnih vojnih tunela'),
-    ('https://upload.wikimedia.org/wikipedia/commons/4/44/%D0%A1%D0%B0%D0%B0%D1%82-%D0%BA%D1%83%D0%BB%D0%B0-%D0%9D%D0%BE%D0%B2%D0%B8-%D0%A1%D0%B0%D0%B4.jpg', 'Fotografisanje kod Sat kule', true, 'Fotografisanje kod Sat kule'),
-    ('https://server.nyaralashorvatorszagban.com/uploads/original/461cdd0f02da667745963e97537515a0.webp', 'Razgledanje tvrđave uz pogled na Dunav', true, 'Razgledanje tvrđave uz pogled na Dunav'),
-    ('https://ocdn.eu/pulscms/MDA_/6bb4c74f89eeeeabce839678516b8efd.jpg', 'Vožnja Gold gondolom', true, 'Vožnja Gold gondolom'),
-    ('https://lepotesrbije.alo.rs/upload/thumb/2026/4/6/16/25/718/130110/17754652761718268147_zlatibor-koliko-kosta-jedan-dan-anketa-fotorina.webp', 'Šetnja Kraljevim trgom', true, 'Šetnja Kraljevim trgom'),
-    ('https://www.monazlatibor.com/files/images/2025/6/30/IX1A4663_VSCO.JPG', 'Spa & wellness experience Zlatibor', true, 'Spa & wellness experience Zlatibor'),
-    ('https://trkzlatibor.rs/image466.png', 'Panoramsko razgledanje Tornika', true, 'Panoramsko razgledanje Tornika'),
-    ('https://avanturazlatibor.com/wp-content/uploads/2018/11/zip.jpg', 'Vožnja zipline-om Tornik', true, 'Vožnja zipline-om Tornik'),
-    ('https://srpskainfo.com/wp-content/uploads/2025/11/1000019062-scaled.jpg', 'Planinsko fotografisanje pri zalasku sunca', true, 'Planinsko fotografisanje pri zalasku sunca'),
-    ('https://kragujevac.ls.gov.rs/extimages/sr/191/main_38.jpg', 'Razgledanje centra Kragujevca', true, 'Razgledanje centra Kragujevca'),
-    ('https://upload.wikimedia.org/wikipedia/commons/4/4f/TeatarJoe.jpg', 'Obilazak Knjaževsko-srpskog teatra', true, 'Obilazak Knjaževsko-srpskog teatra'),
-    ('https://scontent.fbeg7-2.fna.fbcdn.net/v/t51.82787-15/687780884_17918199888359972_7758904814290474596_n.jpg?_nc_cat=103&ccb=1-7&_nc_sid=127cfc&_nc_ohc=EIiYIZXZy7kQ7kNvwFKyOEb&_nc_oc=AdrJ-9VKcz1_RevtRXhJlgMMcAgx85t1cQ9LadLQw4XDcjiWYKRi0JyPMD93GzoRv8g&_nc_zt=23&_nc_ht=scontent.fbeg7-2.fna&_nc_gid=kmm227h9aG1Wce3hOAKTrw&_nc_ss=7b289&oh=00_Af67ArsUVuPt31WbFKMZp3TXopXbAZrfKiRJqIT9_fF3_Q&oe=6A0FA37D', 'Večera uz živu muziku u kafani Paligorić', true, 'Večera uz živu muziku u kafani Paligorić'),
-    ('https://www.spomenpark.rs/wp-content/uploads/2022/08/Spomenik-streljanim-djacima-i-profesorima.jpg', 'Memorijalni obilazak Šumarica', true, 'Memorijalni obilazak Šumarica'),
-    ('https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/%C5%A0umarice.JPG/3840px-%C5%A0umarice.JPG', 'Fotografisanje memorijalnog parka', true, 'Fotografisanje memorijalnog parka'),
-    ('https://gtokg.org.rs/wp-content/uploads/2020/07/IMG_8567podmetnutonebo.jpg', 'Razgledanje Spomen-parka Šumarice', true, 'Razgledanje Spomen-parka Šumarice'),
-    ('https://www.ekapija.com/thumbs169/jezero_bubanj_090711_tw1024.gif', 'Šetnja na Bubnju', true, 'Šetnja na Bubnju'),
-    ('https://dab2bee.blob.core.windows.net/uploads/Uploads/Pictures/Delta%20Park%20KG/0G1A9025-HDR.jpg', 'Shopping u Delta Parku', true, 'Shopping u Delta Parku'),
-    ('https://rtk.co.rs/wp-content/uploads/2021/06/jezero-Bubanj.jpg', 'Rekreacija na Bubnju', true, 'Rekreacija na Bubnju'),
-    ('https://narodnimuzejnis.rs/wp-content/uploads/2020/01/esoslajd2.jpg', 'Obilazak Narodnog muzeja Niša', true, 'Obilazak Narodnog muzeja Niša'),
-    ('https://imageproxy.wolt.com/assets/67fd0436ff803e27f0486fce', 'Ručak u Kafani Meze', true, 'Ručak u Kafani Meze'),
-    ('https://naissus.info/wp-content/uploads/2024/12/Forum-shopping-centar.jpg', 'Shopping u Forum Shopping Centru', true, 'Shopping u Forum Shopping Centru'),
-    ('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/16/c7/15/af/park-cair-entrance.jpg?w=1200&h=1200&s=1', 'Rekreacija u Čairskom parku', true, 'Rekreacija u Čairskom parku'),
-    ('https://www.juznevesti.com/wp-content/uploads/2020/03/20/120718/VVV-1591.jpg.webp', 'Šetnja kroz Čairski park', true, 'Šetnja kroz Čairski park'),
-    ('https://scontent.fbeg7-2.fna.fbcdn.net/v/t39.30808-6/680214089_1404726974985525_8495888158711111690_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=127cfc&_nc_ohc=Hu_-EK4ilSQQ7kNvwGvZByt&_nc_oc=AdriyyLywLqHqaw2T7qqt7YKntZ5QkG0URegX3ge_z_6X-B7UXLIbiZ4LThp4_oiAjE&_nc_zt=23&_nc_ht=scontent.fbeg7-2.fna&_nc_gid=KA6Ky4tD48lm6OuHLDjmQw&_nc_ss=7b289&oh=00_Af528bIlZEWqVv1MR5ZelNo40BksEEBvuidVf1mVC7q7UA&oe=6A0F8BFF', 'Trening u SC Čair', true, 'Trening u SC Čair'),
-    ('https://imageproxy.wolt.com/assets/683ffa8010dcc9d77bec000a', 'Ručak u restoranu MaPlatz', true, 'Ručak u restoranu MaPlatz'),
-    ('https://www.biznisgroup.com/wp-content/uploads/2019/07/244599975_118261980591345_1080333092768396072_n-min.jpg', 'Rekreacija u Sportskom Centru Železnička Stanica', true, 'Rekreacija u Sportskom Centru Železnička Stanica'),
-    ('https://naissus.info/wp-content/uploads/2022/04/buvljak.jpg', 'Kupovina u OTC Niš', true, 'Kupovina u OTC Niš'),
-   ('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/28/79/fb/e4/kafana-biser-is-1-ask.jpg?w=1100&h=1100&s=1', 'Ručak u restoranu Etno Kuća', true, 'Ručak u restoranu Etno Kuća'),
-    ('https://imageproxy.wolt.com/menu/menu-images/6357afc00ca36c8b0c011599/34e0fb14-544c-11ed-8dbf-c6fc1a79d047_jagnjetina_pod_sacem.jpeg', 'Roštilj u restoranu Orač', true, 'Roštilj u restoranu Orač'),
-    ('https://api.niskevesti.rs/uploads/imported/2025/03/mika-antic-mv.jpeg', 'Rekreacija u hali Miroslav Antić', true, 'Rekreacija u hali Miroslav Antić'),
-    ('https://www.decijigrad.rs/wp-content/uploads/2023/04/kula.jpg', 'Obilazak Ćele Kule', true, 'Obilazak Ćele Kule'),
-    ('https://gradskiportal018.rs/wp-content/uploads/2019/07/Cineplexx-Srbija.jpg', 'Filmsko veče u Cineplexx Niš', true, 'Filmsko veče u Cineplexx Niš'),
-    ('https://n1info.rs/media/images/1632898334-shutterstock_587067020.width-1200.jpg', 'Kupovina na Kvantaškoj pijaci', true, 'Kupovina na Kvantaškoj pijaci')
+    ('/images/entity_images/activities/ff6b1faf2a50f1956235a1ab.jpg', 'Walking Tour Knez Mihailova & Terazije', true, 'Walking Tour Knez Mihailova & Terazije'),
+    ('/images/entity_images/activities/0bbf6429226d52cee3650b06.jpg', 'Coffee Break at Hotel Moskva', true, 'Coffee Break at Hotel Moskva'),
+    ('/images/entity_images/activities/3b2c94bee2539c24e7c74b86.jpg', 'Musical Night at Pozorište na Terazijama', true, 'Musical Night at Pozorište na Terazijama'),
+    ('/images/entity_images/activities/26439a5562829cd940df6ce4.jpg', 'Belgrade Fortress Guided Tour', true, 'Belgrade Fortress Guided Tour'),
+    ('/images/entity_images/activities/c4a9900bec6d209d31e2ebe4.jpg', 'Military Museum Visit', true, 'Military Museum Visit'),
+    ('/images/entity_images/activities/63e4fbb722b623bb79f8bd6f.jpg', 'Nebojša Tower & Lower Town Walk', true, 'Nebojša Tower & Lower Town Walk'),
+    ('/images/entity_images/activities/a742e2b51cdd93117bed6dc6.jpg', 'Obilazak Narodnog muzeja', true, 'Obilazak Narodnog muzeja'),
+    ('/images/entity_images/activities/430056a65047800542cf7271.jpg', 'National Theatre Evening', true, 'National Theatre Evening'),
+    ('/images/entity_images/activities/fe1147d6712fea801c1e276e.jpg', 'KCB Exhibition Visit', true, 'KCB Exhibition Visit'),
+    ('/images/entity_images/activities/ee63c3daed2792f6335e9d48.jpg', 'Konak kneginje Ljubice Museum Visit', true, 'Konak kneginje Ljubice Museum Visit'),
+    ('/images/entity_images/activities/8842180f82dbf5925e7ab179.jpg', 'Kosančićev Venac Heritage Walk', true, 'Kosančićev Venac Heritage Walk'),
+    ('/images/entity_images/activities/94fe2024b5457c517c885e1f.jpg', 'Museum of Applied Arts Visit', true, 'Museum of Applied Arts Visit'),
+    ('/images/entity_images/activities/80328cce331252994da248f4.jpg', 'Šetnja Savskom promenadom', true, 'Šetnja Savskom promenadom'),
+    ('/images/entity_images/activities/20f24dac16a5f5a5e226030a.jpg', 'Kupovina u Galeriji Belgrade', true, 'Kupovina u Galeriji Belgrade'),
+    ('/images/entity_images/activities/9885bd605f069506b16477b1.jpg', 'Vožnja bicikla uz Savu', true, 'Vožnja bicikla uz Savu'),
+    ('/images/entity_images/activities/7e0cba2794fd4a9149989de3.jpg', 'Šetnja Knez Mihailovom', true, 'Šetnja Knez Mihailovom'),
+    ('/images/entity_images/activities/27ae677d759ace47f65d342d.jpg', 'Obilazak Zepter muzeja', true, 'Obilazak Zepter muzeja'),
+    ('/images/entity_images/activities/ab2131624cabef9deb4fcfeb.jpg', 'Kupovina u Knez Mihailovoj', true, 'Kupovina u Knez Mihailovoj'),
+    ('/images/entity_images/activities/b98f1eba4ae0b6f8fa7d5da7.jpg', 'Obilazak Muzeja nauke i tehnike', true, 'Obilazak Muzeja nauke i tehnike'),
+    ('/images/entity_images/activities/c0279f90152a63486be8c8b0.jpg', 'Šetnja Dorćolom i Dunavskim kejom', true, 'Šetnja Dorćolom i Dunavskim kejom'),
+    ('/images/entity_images/activities/c16aab6c3b4af56057bcd60e.jpg', 'Obilazak Silosa Beograd', true, 'Obilazak Silosa Beograd'),
+    ('/images/entity_images/activities/01a828cda22e950aceac6271.jpg', 'Šetnja Skadarlijom', true, 'Šetnja Skadarlijom'),
+    ('/images/entity_images/activities/d404754a474b1924855b00f0.jpg', 'Veče u Skadarliji uz tamburaše', true, 'Veče u Skadarliji uz tamburaše'),
+    ('/images/entity_images/activities/c833ab5e6b45ce50bb0f87f0.jpg', 'Tradicionalna srpska večera u Skadarliji', true, 'Tradicionalna srpska večera u Skadarliji'),
+    ('/images/entity_images/activities/05ad0d3b21ce8d942ee350aa.jpg', 'Vožnja bicikla oko Ade', true, 'Vožnja bicikla oko Ade'),
+    ('/images/entity_images/activities/f1f3f4729740592832f6b9f0.jpg', 'Kajak na Adi Ciganliji', true, 'Kajak na Adi Ciganliji'),
+    ('/images/entity_images/activities/6b1ede968f6f7a59844ba478.jpg', 'Skijanje na vodi na Adi', true, 'Skijanje na vodi na Adi'),
+    ('/images/entity_images/activities/eab51e203d52c785a3c4ddf5.jpg', 'Šetnja Zemunskim kejom', true, 'Šetnja Zemunskim kejom'),
+    ('/images/entity_images/activities/2a48dc9d49c7a4a792b8f795.jpg', 'Vožnja brodom Dunavom', true, 'Vožnja brodom Dunavom'),
+    ('/images/entity_images/activities/2cf9bc8f09beb38f559aa4d1.jpg', 'Večera uz Dunav u Zemunu', true, 'Večera uz Dunav u Zemunu'),
+    ('/images/entity_images/activities/22ee16dcb22de8562b46ea54.jpg', 'Šetnja Savskim kejom', true, 'Šetnja Savskim kejom'),
+    ('/images/entity_images/activities/b6632ee59fef91a7bb30dc1f.jpg', 'Kupovina u UŠĆE Shopping Center', true, 'Kupovina u UŠĆE Shopping Center'),
+    ('/images/entity_images/activities/9f20f87354af90d71d46069a.jpg', 'Rekreativni biciklizam Novi Beograd', true, 'Rekreativni biciklizam Novi Beograd'),
+    ('/images/entity_images/activities/851df203a51cad3d4575ea8a.jpg', 'Šetnja Tašmajdanskim parkom', true, 'Šetnja Tašmajdanskim parkom'),
+    ('/images/entity_images/activities/6cc19c3c3f085d70377b632c.jpg', 'Plivanje na Tašmajdanu', true, 'Plivanje na Tašmajdanu'),
+    ('/images/entity_images/activities/5c17d6dc3f9733089849316b.jpg', 'Večernji koncert na Tašmajdanu', true, 'Večernji koncert na Tašmajdanu'),
+    ('/images/entity_images/activities/a7309411873d6ea779a98e6d.jpg', 'Obilazak Savskog trga', true, 'Obilazak Savskog trga'),
+    ('/images/entity_images/activities/9b554ad29fce3c1c5f2cf9c9.jpg', 'Fotografisanje kod spomenika Stefanu Nemanji', true, 'Fotografisanje kod spomenika Stefanu Nemanji'),
+    ('/images/entity_images/activities/761b1a932a9388bffa92814f.jpg', 'Istorijski obilazak stare železničke stanice', true, 'Istorijski obilazak stare železničke stanice'),
+    ('/images/entity_images/activities/03f51760a7c89bca936857fe.jpg', 'Razgledanje Trga Slobode', true, 'Razgledanje Trga Slobode'),
+    ('/images/entity_images/activities/77d69575dbcbdb1cdec4a082.jpg', 'Fotografisanje centra Novog Sada', true, 'Fotografisanje centra Novog Sada'),
+    ('/images/entity_images/activities/49cf083f34365e8b9a5c4b6d.jpg', 'Obilazak Muzeja Vojvodine', true, 'Obilazak Muzeja Vojvodine'),
+    ('/images/entity_images/activities/8c2036028ec9f2a788eaafae.jpg', 'Obilazak podzemnih vojnih tunela', true, 'Obilazak podzemnih vojnih tunela'),
+    ('/images/entity_images/activities/a7aa3e8be552d74c7e02bd1f.jpg', 'Fotografisanje kod Sat kule', true, 'Fotografisanje kod Sat kule'),
+    ('/images/entity_images/activities/1e1f5095292e76d078df922e.jpg', 'Razgledanje tvrđave uz pogled na Dunav', true, 'Razgledanje tvrđave uz pogled na Dunav'),
+    ('/images/entity_images/activities/bea257b8e272496a2308c5a3.jpg', 'Vožnja Gold gondolom', true, 'Vožnja Gold gondolom'),
+    ('/images/entity_images/activities/3708b141635a0f2f7b2f145d.jpg', 'Šetnja Kraljevim trgom', true, 'Šetnja Kraljevim trgom'),
+    ('/images/entity_images/activities/6877e3b0423374daf2009960.jpg', 'Spa & wellness experience Zlatibor', true, 'Spa & wellness experience Zlatibor'),
+    ('/images/entity_images/activities/4111a4224180602186df5743.jpg', 'Panoramsko razgledanje Tornika', true, 'Panoramsko razgledanje Tornika'),
+    ('/images/entity_images/activities/d7b4aca142cfe25c6c39104a.jpg', 'Vožnja zipline-om Tornik', true, 'Vožnja zipline-om Tornik'),
+    ('/images/entity_images/activities/c8ae4abc0682a1600d32b5b2.jpg', 'Planinsko fotografisanje pri zalasku sunca', true, 'Planinsko fotografisanje pri zalasku sunca'),
+    ('/images/entity_images/activities/ded8241bf6ed9c139a134f25.jpg', 'Razgledanje centra Kragujevca', true, 'Razgledanje centra Kragujevca'),
+    ('/images/entity_images/activities/f7aba500ce19cc54eea85f43.jpg', 'Obilazak Knjaževsko-srpskog teatra', true, 'Obilazak Knjaževsko-srpskog teatra'),
+    ('/images/entity_images/activities/d505bf5165657e233d116b4e.jpg', 'Večera uz živu muziku u kafani Paligorić', true, 'Večera uz živu muziku u kafani Paligorić'),
+    ('/images/entity_images/activities/c79de324d7877d9de69c460a.jpg', 'Memorijalni obilazak Šumarica', true, 'Memorijalni obilazak Šumarica'),
+    ('/images/entity_images/activities/dc00d11f3d96e663d8222b34.jpg', 'Fotografisanje memorijalnog parka', true, 'Fotografisanje memorijalnog parka'),
+    ('/images/entity_images/activities/3260c1514b6ed59871e23870.jpg', 'Razgledanje Spomen-parka Šumarice', true, 'Razgledanje Spomen-parka Šumarice'),
+    ('/images/entity_images/activities/64cae51dbeb2dc6a8ae2a781.jpg', 'Šetnja na Bubnju', true, 'Šetnja na Bubnju'),
+    ('/images/entity_images/activities/cb6e6d83087e99d145bd5167.jpg', 'Shopping u Delta Parku', true, 'Shopping u Delta Parku'),
+    ('/images/entity_images/activities/92ab7a820298f6fb75e2da65.jpg', 'Rekreacija na Bubnju', true, 'Rekreacija na Bubnju'),
+    ('/images/entity_images/activities/dbb2016d0fb20bf7cc97a326.jpg', 'Obilazak Narodnog muzeja Niša', true, 'Obilazak Narodnog muzeja Niša'),
+    ('/images/entity_images/activities/6112ceff5886cc3ab70ea9ce.jpg', 'Ručak u Kafani Meze', true, 'Ručak u Kafani Meze'),
+    ('/images/entity_images/activities/616443bc916feeee38b41f57.jpg', 'Shopping u Forum Shopping Centru', true, 'Shopping u Forum Shopping Centru'),
+    ('/images/entity_images/activities/14f13695f869859e1f49607f.jpg', 'Rekreacija u Čairskom parku', true, 'Rekreacija u Čairskom parku'),
+    ('/images/entity_images/activities/0fee13a0d96e9db65ee59de3.jpg', 'Šetnja kroz Čairski park', true, 'Šetnja kroz Čairski park'),
+    ('/images/entity_images/activities/5f3c635eece0924de7e97c6d.jpg', 'Trening u SC Čair', true, 'Trening u SC Čair'),
+    ('/images/entity_images/activities/9b996545a0de15f862cafa49.jpg', 'Ručak u restoranu MaPlatz', true, 'Ručak u restoranu MaPlatz'),
+    ('/images/entity_images/activities/ae88fbb3b31c63ed06c96993.jpg', 'Rekreacija u Sportskom Centru Železnička Stanica', true, 'Rekreacija u Sportskom Centru Železnička Stanica'),
+    ('/images/entity_images/activities/c9ad8f7ec3e446fe7910c058.jpg', 'Kupovina u OTC Niš', true, 'Kupovina u OTC Niš'),
+   ('/images/entity_images/activities/4d8c0c616fc46f2e270fc8b0.jpg', 'Ručak u restoranu Etno Kuća', true, 'Ručak u restoranu Etno Kuća'),
+    ('/images/entity_images/activities/2369e9161e2a79c15a6f8f1e.jpg', 'Roštilj u restoranu Orač', true, 'Roštilj u restoranu Orač'),
+    ('/images/entity_images/activities/7e5ce70e927a37d299e8b27a.jpg', 'Rekreacija u hali Miroslav Antić', true, 'Rekreacija u hali Miroslav Antić'),
+    ('/images/entity_images/activities/f52306b0d7c7904a6af798bd.jpg', 'Obilazak Ćele Kule', true, 'Obilazak Ćele Kule'),
+    ('/images/entity_images/activities/a1b82e072dc82e8e2b0a775e.jpg', 'Filmsko veče u Cineplexx Niš', true, 'Filmsko veče u Cineplexx Niš'),
+    ('/images/entity_images/activities/29e8a07f0dbd4c88a6b329cf.jpg', 'Kupovina na Kvantaškoj pijaci', true, 'Kupovina na Kvantaškoj pijaci')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ActivityId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", a."Id", NOW()
@@ -18548,82 +18148,82 @@ JOIN "Activities" a ON a."Name" = s."ActivityName";
 -- IMAGES - DOGAĐAJI
 WITH source("Url", "AltText", "IsMain", "EventName") AS (
     VALUES
-    ('https://www.euronews.rs/data/images/2026-04-09/407811_img-6893-dusko-vukic_orig.JPG', 'Beogradski festival igre - Veče na Terazijama', true, 'Beogradski festival igre - Veče na Terazijama'),
-    ('https://static.beograd.rs/api/v3/images/85799?ts=2025-12-30T13:04:32', 'Beogradska zima - Moskva Winter Evening', true, 'Beogradska zima - Moskva Winter Evening'),
-    ('https://ocdn.eu/pulscms/MDA_/428c7d3cf8ca0dc99961eee280090065.jpg', 'Festival autorskog filma - Balkan Screening', true, 'Festival autorskog filma - Balkan Screening'),
-    ('https://assets.efinity.rs/images/71147ec5-0c7c-4131-a807-0bfd744a6f9c.webp', 'Moby Live at Kalemegdan', true, 'Moby Live at Kalemegdan'),
-    ('https://bizlife.rs/wp-content/uploads/2024/09/Slika-2-scaled.jpg', 'Balkan Food Festival', true, 'Balkan Food Festival'),
-    ('https://assets.efinity.rs/images/4030fb9a-c3ca-49d8-a000-483221f5a719.webp', 'Nick Cave & The Bad Seeds Live at Kalemegdan', true, 'Nick Cave & The Bad Seeds Live at Kalemegdan'),
-    ('https://www.arh.bg.ac.rs/wp-content/uploads/2026/04/SK_33_A_31291.jpg', 'Arhitektura jugoslovenskog modernizma, Beograd: 7 + 1', true, 'Arhitektura jugoslovenskog modernizma, Beograd: 7 + 1'),
-    ('https://www.journal.rs/wp-content/uploads/2026/01/Bitef-teatar-1-scaled.jpg', 'BITEF 2026', true, 'BITEF 2026'),
-    ('https://belgradefilmfestival.rs/wp-content/uploads/2026/02/Model-nagrade-Beogradska-lasta_foto-Tanja-Drobnjak-1-1024x682.jpg', 'Belgrade Film Festival 2027', true, 'Belgrade Film Festival 2027'),
-    ('https://srpskikompas.rs/wp-content/uploads/2026/03/tan2026-03-2320431423-5-scaled.jpg', 'Noć muzičkih fenjera - Jazz pod zvezdama', true, 'Noć muzičkih fenjera - Jazz pod zvezdama'),
-    ('https://www.euronews.rs/data/images/2026-04-17/409700_tan2026-04-1718151359-7_f.jpg?t=1776443411', 'Noć muzičkih fenjera - Filmska muzika', true, 'Noć muzičkih fenjera - Filmska muzika'),
-    ('https://mpu.rs/wp-content/uploads/2025/03/Izložba-italijanskog-dizajna-foto-Dragana-Udovicic-263-scaled-1350x900.jpg', 'Izložba dizajna u muzeju primenjene umetnosti', true, 'Izložba dizajna u muzeju primenjene umetnosti'),
-    ('https://www.belgradewaterfront.com/static/uploads/2024/12/vatromet-kula-beograd_-scaled.jpg', 'Novogodišnji koncert Beograd na vodi', true, 'Novogodišnji koncert Beograd na vodi'),
-    ('https://ocdn.eu/pulscms/MDA_/a71fa763747f125cabf026d53bfc8a3d.jpg', 'Open Air Cinema na Savskoj promenadi', true, 'Open Air Cinema na Savskoj promenadi'),
-    ('https://www.belgradewaterfront.com/static/uploads/Rendering_batch_1-residence-residence_Sky_collection3F_37F_outdoor_10k.jpg', 'Rooftop Sunset Night at St. Regis', true, 'Rooftop Sunset Night at St. Regis'),
-    ('https://www.gradnja.rs/wp-content/uploads/2022/04/SANU-galerija-velikani-srpskog-graditeljstva-sara-pilipovic-naslovna.jpg', 'Izložba savremene umetnosti u Galeriji SANU', true, 'Izložba savremene umetnosti u Galeriji SANU'),
-    ('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/07/f5/48/5f/goethe-insitut-knez-mihailova.jpg?w=900&h=500&s=1', 'Filmsko veče u Goethe-Institutu', true, 'Filmsko veče u Goethe-Institutu'),
-    ('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2a/97/70/9b/caption.jpg?w=1200&h=-1&s=1', 'Rajićeva Summer Shopping Days', true, 'Rajićeva Summer Shopping Days'),
-    ('https://images.urbanbug.net/1764105294618-cloud-sesson-248-luton-2025-11-28-original', 'Cloud Session', true, 'Cloud Session'),
-    ('https://www.nedeljnik.rs/wp-content/uploads/2023/08/Mural-Domovina-se-brani-lepotom.jpg', 'Silosi Art Weekend', true, 'Silosi Art Weekend'),
-    ('https://beogradskiizlet.com/wp-content/uploads/2022/11/IMG_20221113_132434.jpg', 'Noć muzeja u Muzeju nauke i tehnike', true, 'Noć muzeja u Muzeju nauke i tehnike'),
-    ('https://www.restoranibeograd.com/storage/restaurant/interior/4/restoran_tri_sesira_25.jpg', 'Skadarlijsko veče tamburaša', true, 'Skadarlijsko veče tamburaša'),
-    ('https://photos.eventlin.com/1218/boem_bar_skadarlija_basta.jpg', 'Dani boemske kulture', true, 'Dani boemske kulture'),
-    ('https://www.restoranibeograd.com/storage/restaurant/interior/19/restoran_dva_jelena_31.jpg', 'Poezija u Skadarliji', true, 'Poezija u Skadarliji'),
-    ('https://www.ekapija.com/thumbs/beer_fest_1_200819_tw1024.jpg', 'Beer Garden Festival', true, 'Beer Garden Festival'),
-    ('https://rzsport.gov.rs/wp-content/uploads/2024/09/7s.jpg', 'Nacionalni sajam sporta', true, 'Nacionalni sajam sporta'),
-    ('https://i0.wp.com/flatnchop.com/wp-content/uploads/2023/07/flatnchop-2-25.jpg?ssl=1', 'Wakeboard Summer Challenge', true, 'Wakeboard Summer Challenge'),
-    ('https://beogradskiizlet.com/wp-content/uploads/2023/04/Zemunski-kej-2.jpg', 'Dani Dunava u Zemunu', true, 'Dani Dunava u Zemunu'),
-    ('https://muzikanti.rs/img/tamburasi-za-proslave-hero-slika.webp', 'Veče tamburaša uz Dunav', true, 'Veče tamburaša uz Dunav'),
-    ('https://ocdn.eu/pulscms-transforms/1/-rMktkpTURBXy9kNGQ0NDJmMmQxZjg2YTYzMDU4Y2NmZTNiNjAyYmI3Zi5qcGeRkwXNBLDNA4Q', 'Zemunska regata', true, 'Zemunska regata'),
-    ('https://www.guzva.rs/_next/image?url=https%3A%2F%2Fguzva-public.s3.amazonaws.com%2FMusic%2FQmX5lw8StoQ.webp&w=3840&q=75', 'Music Week u Ušće parku', true, 'Music Week u Ušće parku'),
-    ('https://cordmagazine.com/wp-content/uploads/2025/10/Konferencija-MPC-Echo-Sava-Centar-2025-4.jpg', 'Konferencija u Sava Centru', true, 'Konferencija u Sava Centru'),
-    ('https://citymagazine.danas.rs/wp-content/uploads/2025/04/DSC03815-e1745483574834.jpg.webp', 'Stand-up veče u Sava Centru', true, 'Stand-up veče u Sava Centru'),
-    ('https://xdn.tf.rs/2025/05/12/marko-edge-6.jpg', 'Street Food Festival Tašmajdan', true, 'Street Food Festival Tašmajdan'),
-    ('https://scontent.fbeg7-2.fna.fbcdn.net/v/t39.30808-6/698473640_122097740175318646_6736122964197735345_n.jpg?stp=dst-jpg_s960x960_tt6&_nc_cat=101&ccb=1-7&_nc_sid=75d36f&_nc_ohc=U3xvyAyyBCwQ7kNvwHZGOnW&_nc_oc=Adrh1jweQiwoKmW063IklaGPsd_SR-v-GqfF-8sX9UM3Ucze8HDb134bZTIQhEkjGSo&_nc_zt=23&_nc_ht=scontent.fbeg7-2.fna&_nc_gid=hEn9fIstwRxK0pjETISejw&_nc_ss=7b289&oh=00_Af7MS1qjHH98269vBz1qiRNWphIozlGiN9r4MX4p5WCALA&oe=6A0F864C', 'Ćana koncert na Tašmajdanu', true, 'Ćana koncert na Tašmajdanu'),
-    ('https://tasmajdan.rs/wp-content/uploads/2025/05/Trofej.webp', 'Trofej Tašmajdana 2026', true, 'Trofej Tašmajdana 2026'),
-    ('https://www.euronews.rs/data/images/2024-12-19/296682_rs418789-tan2024-01-0100455257-3_orig.jpg', 'Beogradski novogodišnji koncert na Savskom trgu', true, 'Beogradski novogodišnji koncert na Savskom trgu'),
-    ('https://ocdn.eu/images/pulscms/NTc7MDA_/c62fea82efbcf0157d130a1ee73b60a9.jpg', 'Dani železnice Beograd', true, 'Dani železnice Beograd'),
-    ('https://www.hotelzepter.rs/wp-content/uploads/2025/09/Zepter-Hotel-Beograd-Smartlife-Restoran-Jazz-and-Dance-1600x1200px.png', 'Veče gradske muzike u Hotelu Beograd', true, 'Veče gradske muzike u Hotelu Beograd'),
-    ('https://www.snp.org.rs/wp-content/uploads/2023/11/travijata-7-2.jpg', 'Opera Night u SNP-u', true, 'Opera Night u SNP-u'),
-    ('https://visitdistrikt.rs/media/2020/11/Muzej-Vojvodine-V.VelickovicSep29.012-1.jpg', 'Noć muzeja u Muzeju Vojvodine', true, 'Noć muzeja u Muzeju Vojvodine'),
-    ('https://static.rtv.rs/slike/2019/04/28/liturgija-uskrs-vaskrs-saborna-crkva.jpg', 'Božićni koncert u Sabornoj crkvi', true, 'Božićni koncert u Sabornoj crkvi'),
-    ('https://www.serbia.travel/wp-content/uploads/2025/01/1-aca-2022-festival-ulicnih-sviraca-scaled-0-1280x768-1.jpg', 'Festival uličnih svirača', true, 'Festival uličnih svirača'),
-    ('https://muzejirade.wordpress.com/wp-content/uploads/2014/02/dsc_03081.jpg', 'Noć muzeja u Muzeju grada Novog Sada', true, 'Noć muzeja u Muzeju grada Novog Sada'),
-    ('https://novisad.travel/wp-content/uploads/2023/02/Ture-dan-Grada-ACA_4392-scaled.jpg', 'Dani umetnosti Petrovaradina', true, 'Dani umetnosti Petrovaradina'),
-    ('https://uzickarepublikapress.rs/wp-content/uploads/Svi-trubaci.jpg', 'Koncert trubača na Kraljevom trgu', true, 'Koncert trubača na Kraljevom trgu'),
-    ('https://ik.imagekit.io/agroweb/zlatibor-sajam-2024.jpg?updatedAt=1748899017549', 'Sajam domaćih proizvoda Zlatibor', true, 'Sajam domaćih proizvoda Zlatibor'),
-    ('https://www.radioluna.info/wp-content/uploads/2026/01/9371767255623572.jpg', 'Zlatibor Summer Music Evening', true, 'Zlatibor Summer Music Evening'),
-    ('https://goldgondola.rs/storage/media/001-0QJ-medium.jpeg', 'Zlatibor Open Air Cinema', true, 'Zlatibor Open Air Cinema'),
-    ('https://goldgondola.rs/storage/media/gg-tornik-sunset-sips-05313-1-2_nWu8BxO4-medium-3.jpeg', 'Sunset DJ Session Tornik', true, 'Sunset DJ Session Tornik'),
-    ('https://img.truvvle.com/?src=aHR0cHM6Ly9pbWFnZXMuaGl2ZS5ibG9nL3AvNXM0ZHpSd25WYnpHWTVzc25DRTR3WHprZUFFWHlWdGdrMUFwUVR3SE1UcDZ5NVB2RW8xeWVubjk4bUNwVHNSUUJNVnFmdndUdEpHMURlVDNWelUyakg5b0dYeE1Ga0R1ZnFFWFBIS3MySFRBeWd1SmJvWGJ3cXdnVmhqWEtjRThhRnZRbzNVR2lpZERTYzN1ZnlnZzFpd3VkTXl2RFpvZW1Md0d6NmkvP2Zvcm1hdD1tYXRjaCZtb2RlPWZpdA&width=3840', 'Tornik Summer Adventure Day', true, 'Tornik Summer Adventure Day'),
-    ('https://www.danas.rs/wp-content/uploads/2026/03/594967165_1380028943511663_7510757280301052494_n.jpg', 'Arsenal Fest 2026', true, 'Arsenal Fest 2026'),
-    ('https://www.joakimvujic.com/images/2026/04/27/mati-joakimovi-dani.jpg', 'Dani pozorišta Kragujevac', true, 'Dani pozorišta Kragujevac'),
-    ('https://grand.nova.rs/wp-content/uploads/2024/05/ACO-PEJOVIC-ZGS-SNIMANJE-29052024-FOTO-MUNJA-42_ok.jpg.webp', 'Aco Pejović live u kafani Paligorić', true, 'Aco Pejović live u kafani Paligorić'),
-    ('https://www.gdeputovati.rs/img/upload/mid/2212/veliki-ikolski-ias-2.jpg', 'Veliki školski čas', true, 'Veliki školski čas'),
-    ('https://www.spomenpark.rs/wp-content/uploads/2024/12/salon-antiratne-karikature.webp', 'Noć muzeja - 21. oktobar', true, 'Noć muzeja - 21. oktobar'),
-    ('https://rtk.co.rs/wp-content/uploads/2026/02/muzej-21.-oktobar.jpg', 'Izložba ratne fotografije', true, 'Izložba ratne fotografije'),
-    ('https://sumadijasajam.rs/wp-content/uploads/2024/04/otv12.jpg', 'Sajam hortikulture Kragujevac', true, 'Sajam hortikulture Kragujevac'),
-    ('https://sumadijasajam.rs/wp-content/uploads/2022/05/png_20220514_152501_0000.jpg', 'Sajam knjiga Kragujevac', true, 'Sajam knjiga Kragujevac'),
-    ('https://fiesta-event.rs/wp-content/uploads/2025/12/magla-bend-1.webp', 'Magla bend u Hali Jezero', true, 'Magla bend u Hali Jezero'),
-    ('https://vinsketure.rs/wp-content/gallery/rujevica/Rujevica11.jpg?t=1461529801', 'Dani otvorenih podruma Šumadije', true, 'Dani otvorenih podruma Šumadije'),
-    ('https://upload.wikimedia.org/wikipedia/commons/5/54/Narodni_muzej_Ni%C5%A1_27.jpg', 'Noć muzeja u Narodnom muzeju Niša', true, 'Noć muzeja u Narodnom muzeju Niša'),
-    ('https://www.niscafe.com/v2/wp-content/uploads/2021/04/kafana-meze.jpg', 'Veče niške muzike u Kafani Meze', true, 'Veče niške muzike u Kafani Meze'),
-    ('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/0d/0a/ee/ed/outside.jpg?w=1200&h=-1&s=1', 'Forum Shopping Weekend Niš', true, 'Forum Shopping Weekend Niš'),
-    ('https://sajam.rs/wp-content/uploads/sport2019_9851.jpg', 'Sajam sporta Čair', true, 'Sajam sporta Čair'),
-    ('https://gradskiportal018.rs/wp-content/uploads/2025/01/Atmosvera-u-hali-cair-pred-sam-koncert-Tanje-Savic.jpg', 'Letnji koncert u Čairu', true, 'Letnji koncert u Čairu'),
-    ('https://odgovor.org.rs/wp-content/uploads/2026/02/ChatGPT-Image-13.-%D1%84%D0%B5%D0%B1-2026.-19_30_48.png', 'Noćni basket turnir Čair', true, 'Noćni basket turnir Čair'),
-    ('https://www.guzva.rs/_next/image?url=https%3A%2F%2Fguzva-public.s3.amazonaws.com%2FMusic%2FzorgErvL_Fs.webp&w=3840&q=75', 'Chudo Festival 2026', true, 'Chudo Festival 2026'),
-    ('https://scontent.fbeg7-2.fna.fbcdn.net/v/t51.82787-15/626271170_17881350696462168_3130122843010749102_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=127cfc&_nc_ohc=i_V4VZ-yOosQ7kNvwFmbVHu&_nc_oc=AdpgWAbldIqHDcdTA80uISHUjw95ySdzlzRQ2WIt0dwaHeWoANmS-NscjItVn9_Emyg&_nc_zt=23&_nc_ht=scontent.fbeg7-2.fna&_nc_gid=glT9hKs_Xl6101WUILdf9Q&_nc_ss=7b289&oh=00_Af5iEeV-ANKMi4s_LMMc95Zg9fP7rP-0sWSCB2jqzSpNvA&oe=6A0FB8E3', 'Street food & craft night u MaPlatzu', true, 'Street food & craft night u MaPlatzu'),
-    ('https://unijastudenatafona.org/wp-content/uploads/2023/01/Untitled-1-01-min-scaled.jpg', 'Humanitarni sportski dan Kičevo', true, 'Humanitarni sportski dan Kičevo'),
-    ('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/29/b5/81/d5/caption.jpg?w=1200&h=1200&s=1', 'Etno veče u restoranu Etno Kuća', true, 'Etno veče u restoranu Etno Kuća'),
-    ('https://gradskiportal018.rs/wp-content/uploads/2023/07/received_3456901991192635.jpeg', 'Turnir rekreativaca Durlan', true, 'Turnir rekreativaca Durlan'),
-    ('https://www.juznevesti.com/wp-content/uploads/2020/03/05/119875/sindjelic-foto-citalac.jpg.webp', 'Istorijski čas kod spomenika Stevanu Sinđeliću', true, 'Istorijski čas kod spomenika Stevanu Sinđeliću'),
-    ('https://bookaweb.s3.eu-central-1.amazonaws.com/media/32314/cele-kula.jpg', 'Istorijski čas kod Ćele Kule', true, 'Istorijski čas kod Ćele Kule'),
-    ('https://www.atastars.rs/wp-content/uploads/2016/11/Cineplexx-Nis-svecano-otvaranje-5.jpg', 'Premijerno filmsko veče u Cineplexx Niš', true, 'Premijerno filmsko veče u Cineplexx Niš'),
-    ('https://www.ekapija.com/thumbs/pijaca_140123_tw1024.jpg', 'Pijačni dan na Kvantaškoj pijaci', true, 'Pijačni dan na Kvantaškoj pijaci')
+    ('/images/entity_images/events/5a2b8ecb3932618eb960046c.jpg', 'Beogradski festival igre - Veče na Terazijama', true, 'Beogradski festival igre - Veče na Terazijama'),
+    ('/images/entity_images/events/31f1ada52284abdbd52e505b.jpg', 'Beogradska zima - Moskva Winter Evening', true, 'Beogradska zima - Moskva Winter Evening'),
+    ('/images/entity_images/events/ac87943bf54c362632ed3852.jpg', 'Festival autorskog filma - Balkan Screening', true, 'Festival autorskog filma - Balkan Screening'),
+    ('/images/entity_images/events/c60c8b20a8f391d89b52a6c8.jpg', 'Moby Live at Kalemegdan', true, 'Moby Live at Kalemegdan'),
+    ('/images/entity_images/events/42a5ff7533ff145b41b48844.jpg', 'Balkan Food Festival', true, 'Balkan Food Festival'),
+    ('/images/entity_images/events/d7398dd2a4486266771def53.jpg', 'Nick Cave & The Bad Seeds Live at Kalemegdan', true, 'Nick Cave & The Bad Seeds Live at Kalemegdan'),
+    ('/images/entity_images/events/64531ae4905667187f0a4819.jpg', 'Arhitektura jugoslovenskog modernizma, Beograd: 7 + 1', true, 'Arhitektura jugoslovenskog modernizma, Beograd: 7 + 1'),
+    ('/images/entity_images/events/6f339824cda252347dbc8177.jpg', 'BITEF 2026', true, 'BITEF 2026'),
+    ('/images/entity_images/events/fa3b7d888204c9e4cbad99fa.jpg', 'Belgrade Film Festival 2027', true, 'Belgrade Film Festival 2027'),
+    ('/images/entity_images/events/06a45c7b021ad8b75347aa3a.jpg', 'Noć muzičkih fenjera - Jazz pod zvezdama', true, 'Noć muzičkih fenjera - Jazz pod zvezdama'),
+    ('/images/entity_images/events/339fe734abc26cfed8b24c13.jpg', 'Noć muzičkih fenjera - Filmska muzika', true, 'Noć muzičkih fenjera - Filmska muzika'),
+    ('/images/entity_images/events/a4f15f74649fc3a204ede919.jpg', 'Izložba dizajna u muzeju primenjene umetnosti', true, 'Izložba dizajna u muzeju primenjene umetnosti'),
+    ('/images/entity_images/events/5bdbbf13079147b4d4722cc5.jpg', 'Novogodišnji koncert Beograd na vodi', true, 'Novogodišnji koncert Beograd na vodi'),
+    ('/images/entity_images/events/0c3f5ada310ab364e40f89c0.jpg', 'Open Air Cinema na Savskoj promenadi', true, 'Open Air Cinema na Savskoj promenadi'),
+    ('/images/entity_images/events/f290b264aabf7b061c7939ae.jpg', 'Rooftop Sunset Night at St. Regis', true, 'Rooftop Sunset Night at St. Regis'),
+    ('/images/entity_images/events/5cecbdf21cccbf14981c7c58.jpg', 'Izložba savremene umetnosti u Galeriji SANU', true, 'Izložba savremene umetnosti u Galeriji SANU'),
+    ('/images/entity_images/events/1fc5004693425e40caea65e8.jpg', 'Filmsko veče u Goethe-Institutu', true, 'Filmsko veče u Goethe-Institutu'),
+    ('/images/entity_images/events/069e053d1cde1ba3cce73722.jpg', 'Rajićeva Summer Shopping Days', true, 'Rajićeva Summer Shopping Days'),
+    ('/images/entity_images/events/4173287f5628fb16fb740f3e.jpg', 'Cloud Session', true, 'Cloud Session'),
+    ('/images/entity_images/events/c4353ca50ca18db0ff78914e.jpg', 'Silosi Art Weekend', true, 'Silosi Art Weekend'),
+    ('/images/entity_images/events/f6a89cc5ee8c12aa7c2cedd2.jpg', 'Noć muzeja u Muzeju nauke i tehnike', true, 'Noć muzeja u Muzeju nauke i tehnike'),
+    ('/images/entity_images/events/e8da7ff8f7f7470367ffa811.jpg', 'Skadarlijsko veče tamburaša', true, 'Skadarlijsko veče tamburaša'),
+    ('/images/entity_images/events/a0c99396b2a7d7c115331fad.jpg', 'Dani boemske kulture', true, 'Dani boemske kulture'),
+    ('/images/entity_images/events/3af6d6e1ce542da44175d411.jpg', 'Poezija u Skadarliji', true, 'Poezija u Skadarliji'),
+    ('/images/entity_images/events/f507958ed124b6a76c089ee6.jpg', 'Beer Garden Festival', true, 'Beer Garden Festival'),
+    ('/images/entity_images/events/bb991c8d67b11e7077385c7b.jpg', 'Nacionalni sajam sporta', true, 'Nacionalni sajam sporta'),
+    ('/images/entity_images/events/750ab87b4f7a6635374a6ee3.jpg', 'Wakeboard Summer Challenge', true, 'Wakeboard Summer Challenge'),
+    ('/images/entity_images/events/a063aff80b6e6f7cfa93e864.jpg', 'Dani Dunava u Zemunu', true, 'Dani Dunava u Zemunu'),
+    ('/images/entity_images/events/e2f82710cc384a1afadbee61.jpg', 'Veče tamburaša uz Dunav', true, 'Veče tamburaša uz Dunav'),
+    ('/images/entity_images/events/7132791ffdd300b1f0d3af60.jpg', 'Zemunska regata', true, 'Zemunska regata'),
+    ('/images/entity_images/events/b340ca0d2d05d337136389d7.jpg', 'Music Week u Ušće parku', true, 'Music Week u Ušće parku'),
+    ('/images/entity_images/events/53ea19b709526ef95728567b.jpg', 'Konferencija u Sava Centru', true, 'Konferencija u Sava Centru'),
+    ('/images/entity_images/events/81309b6743d68e33b71ed33f.jpg', 'Stand-up veče u Sava Centru', true, 'Stand-up veče u Sava Centru'),
+    ('/images/entity_images/events/8d3f57b1b5b3e406bc989f79.jpg', 'Street Food Festival Tašmajdan', true, 'Street Food Festival Tašmajdan'),
+    ('/images/entity_images/events/ab9f8a6d37e0f088f21317b2.jpg', 'Ćana koncert na Tašmajdanu', true, 'Ćana koncert na Tašmajdanu'),
+    ('/images/entity_images/events/5adeadc3aaad86e7fd7fda10.jpg', 'Trofej Tašmajdana 2026', true, 'Trofej Tašmajdana 2026'),
+    ('/images/entity_images/events/2a56d4ad2a0586c2ed314d0a.jpg', 'Beogradski novogodišnji koncert na Savskom trgu', true, 'Beogradski novogodišnji koncert na Savskom trgu'),
+    ('/images/entity_images/events/1277592a33bd651d24a2b73d.jpg', 'Dani železnice Beograd', true, 'Dani železnice Beograd'),
+    ('/images/entity_images/events/5d3a9d5e94c56c8972d810fd.jpg', 'Veče gradske muzike u Hotelu Beograd', true, 'Veče gradske muzike u Hotelu Beograd'),
+    ('/images/entity_images/events/ba86b3da80becce411a1260d.jpg', 'Opera Night u SNP-u', true, 'Opera Night u SNP-u'),
+    ('/images/entity_images/events/33ce736269d7115508614d73.jpg', 'Noć muzeja u Muzeju Vojvodine', true, 'Noć muzeja u Muzeju Vojvodine'),
+    ('/images/entity_images/events/e7933bd200ecafc56fcd6516.jpg', 'Božićni koncert u Sabornoj crkvi', true, 'Božićni koncert u Sabornoj crkvi'),
+    ('/images/entity_images/events/8457dbd43f47e73ad4b87cad.jpg', 'Festival uličnih svirača', true, 'Festival uličnih svirača'),
+    ('/images/entity_images/events/a72cd12289286414544c2694.jpg', 'Noć muzeja u Muzeju grada Novog Sada', true, 'Noć muzeja u Muzeju grada Novog Sada'),
+    ('/images/entity_images/events/e8f0eafe9ef6cc3e79e07555.jpg', 'Dani umetnosti Petrovaradina', true, 'Dani umetnosti Petrovaradina'),
+    ('/images/entity_images/events/7c482b8f6fe00e9b3b535efe.jpg', 'Koncert trubača na Kraljevom trgu', true, 'Koncert trubača na Kraljevom trgu'),
+    ('/images/entity_images/events/eb5313fe6b7bd6061cecd597.jpg', 'Sajam domaćih proizvoda Zlatibor', true, 'Sajam domaćih proizvoda Zlatibor'),
+    ('/images/entity_images/events/1aa3b5debe331976e45808cc.jpg', 'Zlatibor Summer Music Evening', true, 'Zlatibor Summer Music Evening'),
+    ('/images/entity_images/events/99c582aaf1163f56b931ed78.jpg', 'Zlatibor Open Air Cinema', true, 'Zlatibor Open Air Cinema'),
+    ('/images/entity_images/events/a9823610b19179198692e7e7.jpg', 'Sunset DJ Session Tornik', true, 'Sunset DJ Session Tornik'),
+    ('/images/entity_images/events/b9006a3d912cfb7331bc7315.jpg', 'Tornik Summer Adventure Day', true, 'Tornik Summer Adventure Day'),
+    ('/images/entity_images/events/77bf1709ca78578508715981.jpg', 'Arsenal Fest 2026', true, 'Arsenal Fest 2026'),
+    ('/images/entity_images/events/aa323f7d078973ecf3c211df.jpg', 'Dani pozorišta Kragujevac', true, 'Dani pozorišta Kragujevac'),
+    ('/images/entity_images/events/f3d7a452671235236405c7a3.jpg', 'Aco Pejović live u kafani Paligorić', true, 'Aco Pejović live u kafani Paligorić'),
+    ('/images/entity_images/events/abcbdc088bae180852fccc42.jpg', 'Veliki školski čas', true, 'Veliki školski čas'),
+    ('/images/entity_images/events/06f9a3b904f7ca5ea7a16787.jpg', 'Noć muzeja - 21. oktobar', true, 'Noć muzeja - 21. oktobar'),
+    ('/images/entity_images/events/a114038f572f938b05d318a6.jpg', 'Izložba ratne fotografije', true, 'Izložba ratne fotografije'),
+    ('/images/entity_images/events/8f9192559e655e454ba67dde.jpg', 'Sajam hortikulture Kragujevac', true, 'Sajam hortikulture Kragujevac'),
+    ('/images/entity_images/events/a89432494bc45741c425c2a7.jpg', 'Sajam knjiga Kragujevac', true, 'Sajam knjiga Kragujevac'),
+    ('/images/entity_images/events/e4c8c8c1d6bd369e995fe347.jpg', 'Magla bend u Hali Jezero', true, 'Magla bend u Hali Jezero'),
+    ('/images/entity_images/events/77e027eb3825d354c74b28c4.jpg', 'Dani otvorenih podruma Šumadije', true, 'Dani otvorenih podruma Šumadije'),
+    ('/images/entity_images/events/d18995570b5b8eeb178fee8c.jpg', 'Noć muzeja u Narodnom muzeju Niša', true, 'Noć muzeja u Narodnom muzeju Niša'),
+    ('/images/entity_images/events/d234795705eb98f8558d531f.jpg', 'Veče niške muzike u Kafani Meze', true, 'Veče niške muzike u Kafani Meze'),
+    ('/images/entity_images/events/ccb6d4d70e940c906a044bb7.jpg', 'Forum Shopping Weekend Niš', true, 'Forum Shopping Weekend Niš'),
+    ('/images/entity_images/events/e8dc4e26403c4a2e864b70a0.jpg', 'Sajam sporta Čair', true, 'Sajam sporta Čair'),
+    ('/images/entity_images/events/e2a3e0ffa16bbec2629d71c4.jpg', 'Letnji koncert u Čairu', true, 'Letnji koncert u Čairu'),
+    ('/images/entity_images/events/67596157ac5179f58bbce85e.jpg', 'Noćni basket turnir Čair', true, 'Noćni basket turnir Čair'),
+    ('/images/entity_images/events/ef6728f4220cfa355214f4a7.jpg', 'Chudo Festival 2026', true, 'Chudo Festival 2026'),
+    ('/images/entity_images/events/5537be4caeef299b7a8eddd5.jpg', 'Street food & craft night u MaPlatzu', true, 'Street food & craft night u MaPlatzu'),
+    ('/images/entity_images/events/141a91dec0f018fe0b7abe22.jpg', 'Humanitarni sportski dan Kičevo', true, 'Humanitarni sportski dan Kičevo'),
+    ('/images/entity_images/events/ff3e78aeead2d1e2b2354709.jpg', 'Etno veče u restoranu Etno Kuća', true, 'Etno veče u restoranu Etno Kuća'),
+    ('/images/entity_images/events/d46ddc8d3e890d3d47d5e160.jpg', 'Turnir rekreativaca Durlan', true, 'Turnir rekreativaca Durlan'),
+    ('/images/entity_images/events/87dc3221e1c3fcf5786a1ae3.jpg', 'Istorijski čas kod spomenika Stevanu Sinđeliću', true, 'Istorijski čas kod spomenika Stevanu Sinđeliću'),
+    ('/images/entity_images/events/6a96a9e5bb708756709ef0fc.jpg', 'Istorijski čas kod Ćele Kule', true, 'Istorijski čas kod Ćele Kule'),
+    ('/images/entity_images/events/b8eac8ccc25ffd4758406e20.jpg', 'Premijerno filmsko veče u Cineplexx Niš', true, 'Premijerno filmsko veče u Cineplexx Niš'),
+    ('/images/entity_images/events/e16885e3b25cb7fa6492a7a1.jpg', 'Pijačni dan na Kvantaškoj pijaci', true, 'Pijačni dan na Kvantaškoj pijaci')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "EventId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", e."Id", NOW()
@@ -19888,11 +19488,11 @@ VALUES
 -- DJERDAP IMAGES - LOKALITETI
 WITH source("Url", "AltText", "IsMain", "LocalityName") AS (
     VALUES
-    ('https://toom.rs/wp-content/uploads/Donji-Milanovac-Hero.webp', 'Donji Milanovac', true, 'Donji Milanovac'),
-    ('https://upload.wikimedia.org/wikipedia/commons/5/51/Lepenski_Vir_%282%29.JPG?utm_source=sr.wikipedia.org&utm_campaign=index&utm_content=original', 'Lepenski Vir', true, 'Lepenski Vir'),
-    ('https://upload.wikimedia.org/wikipedia/commons/1/1d/%D0%A2%D0%B5%D0%BA%D0%B8%D1%98%D0%B0_%28%D0%A1%D1%80%D0%B1%D0%B8%D1%98%D0%B0%29_-_Tekija_%28Serbia%29.jpg', 'Tekija', true, 'Tekija'),
-    ('https://www.filminserbia.com/wp-content/uploads/2015/05/Vidikovac-Plo%C4%8De-02-min.jpg', 'Vidikovac Ploče', true, 'Vidikovac Ploče'),
-    ('https://vesti.321srbija.rs/wp-content/uploads/2024/11/djerdap-1.jpg', 'Đerdapska klisura', true, 'Đerdapska klisura')
+    ('/images/entity_images/localities/6355803d14cf192bf28c1e0a.jpg', 'Donji Milanovac', true, 'Donji Milanovac'),
+    ('/images/entity_images/localities/e0e4f8121ba51f738910af47.jpg', 'Lepenski Vir', true, 'Lepenski Vir'),
+    ('/images/entity_images/localities/ff6ab5c5ff4063b2bac7fcb3.jpg', 'Tekija', true, 'Tekija'),
+    ('/images/entity_images/localities/61ba65b0bb67f0ff7ec41758.jpg', 'Vidikovac Ploče', true, 'Vidikovac Ploče'),
+    ('/images/entity_images/localities/c56b8c61e45b642489977198.jpg', 'Đerdapska klisura', true, 'Đerdapska klisura')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "LocalityId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", l."Id", NOW()
@@ -19903,9 +19503,9 @@ JOIN "Localities" l ON l."Name" = s."LocalityName";
 -- DJERDAP IMAGES - OBJEKTI
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://www.filminserbia.com/wp-content/uploads/2015/05/Hotel-Lepenski-vir-04-min-1280x720.jpg', 'Hotel Lepenski Vir', true, 'Hotel Lepenski Vir'),
-    ('https://upload.wikimedia.org/wikipedia/commons/1/13/Wiki.%C4%90erdLepenski_Virap_II_Lepenski_Vir_450.jpg', 'Muzej Lepenski Vir', true, 'Muzej Lepenski Vir'),
-    ('https://tekijarestoran.com/images/4m.png', 'Restoran Joca Tekija', true, 'Restoran Joca Tekija')
+    ('/images/entity_images/objects/bb66f69197d57c6c9cfcd3b7.jpg', 'Hotel Lepenski Vir', true, 'Hotel Lepenski Vir'),
+    ('/images/entity_images/objects/421800a1d9304020306949e1.jpg', 'Muzej Lepenski Vir', true, 'Muzej Lepenski Vir'),
+    ('/images/entity_images/objects/f52f5bc551b7a7e857b08945.jpg', 'Restoran Joca Tekija', true, 'Restoran Joca Tekija')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
@@ -19916,10 +19516,10 @@ JOIN "Objects" o ON o."Name" = s."ObjectName";
 -- DJERDAP IMAGES - AKTIVNOSTI
 WITH source("Url", "AltText", "IsMain", "ActivityName") AS (
     VALUES
-    ('https://rituali.rs/wp-content/webp-express/webp-images/uploads/2022/03/slika-1-Djerdapska-klisura-kajakom-1.jpg.webp', 'Kajak tura Đerdapskom klisurom', true, 'Kajak tura Đerdapskom klisurom'),
-    ('https://andrijanacojic.com/wp-content/uploads/2021/03/IMG_5456-scaled.jpg', 'Planinarenje do vidikovca Ploče', true, 'Planinarenje do vidikovca Ploče'),
-    ('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEj27vUEV4iE3R_cUR1OKUQrIlnSq8GuwAEgahAXSf2td33pUeGw8mibv_cs3I9E20V2aOn01Tt5smL98R-7WisIuLymfkztIz7sV-6UaBy2Gj7gczF0JCtTvAWp3UOE7MtsSePdM0D4ZsI/s1600/DSCF0237.JPG', 'Foto safari Divlji Đerdap', true, 'Foto safari Divlji Đerdap'),
-    ('https://inspiracijadunav.rs/wp-content/uploads/2023/06/djerdap-kazani-3.jpg', 'Biciklistička ruta Dunavskom magistralom', true, 'Biciklistička ruta Dunavskom magistralom')
+    ('/images/entity_images/activities/4e5ea5ecb1268abf47fff091.jpg', 'Kajak tura Đerdapskom klisurom', true, 'Kajak tura Đerdapskom klisurom'),
+    ('/images/entity_images/activities/2bae6b964867c29a3d80f076.jpg', 'Planinarenje do vidikovca Ploče', true, 'Planinarenje do vidikovca Ploče'),
+    ('/images/entity_images/activities/dfea76397afe6e50c3efb13b.jpg', 'Foto safari Divlji Đerdap', true, 'Foto safari Divlji Đerdap'),
+    ('/images/entity_images/activities/42b6f5a9afa4379d4f2f4033.jpg', 'Biciklistička ruta Dunavskom magistralom', true, 'Biciklistička ruta Dunavskom magistralom')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ActivityId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", a."Id", NOW()
@@ -19930,10 +19530,10 @@ JOIN "Activities" a ON a."Name" = s."ActivityName";
 -- DJERDAP IMAGES - DOGADJAJI
 WITH source("Url", "AltText", "IsMain", "EventName") AS (
     VALUES
-    ('https://www.serbia.travel/wp-content/uploads/2024/11/00-kultura-arheologija-muzej-Lepenski-Vir.jpg', 'Dani evropske baštine - Lepenski Vir', true, 'Dani evropske baštine - Lepenski Vir'),
-    ('https://www.filminserbia.com/wp-content/uploads/2015/05/Hotel-Lepenski-vir-12-min-1280x720.jpg', 'Đerdap kulturno veče', true, 'Đerdap kulturno veče'),
-    ('https://tekijarestoran.com/images/meni/6.jpg', 'Dani dunavske ribe u Tekiji', true, 'Dani dunavske ribe u Tekiji'),
-    ('https://www.narodnimuzej.rs/wp-content/uploads/2022/03/Header-1.jpg', 'Radionica praistorijske umetnosti Lepenskog Vira', true, 'Radionica praistorijske umetnosti Lepenskog Vira')
+    ('/images/entity_images/events/a308cd6237dcca3407f20f6d.jpg', 'Dani evropske baštine - Lepenski Vir', true, 'Dani evropske baštine - Lepenski Vir'),
+    ('/images/entity_images/events/0b7e50ab4aab033e2bd4fece.jpg', 'Đerdap kulturno veče', true, 'Đerdap kulturno veče'),
+    ('/images/entity_images/events/be3747aa2266a48c409b81c4.jpg', 'Dani dunavske ribe u Tekiji', true, 'Dani dunavske ribe u Tekiji'),
+    ('/images/entity_images/events/11c1f090b311ef727a0b99e1.jpg', 'Radionica praistorijske umetnosti Lepenskog Vira', true, 'Radionica praistorijske umetnosti Lepenskog Vira')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "EventId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", e."Id", NOW()
@@ -20157,10 +19757,10 @@ VALUES
  -- KOPAONIK IMAGES - LOKALITETI
 WITH source("Url", "AltText", "IsMain", "LocalityName") AS (
     VALUES
-    ('https://piano-travel.rs/wp-content/uploads/2020/06/APARTMANI-KONACI-KOPAONIK-1.jpg', 'Konaci Kopaonik', true, 'Konaci'),
-    ('https://images.gorskihotel.com/1601116392/desktop/gallery-large/1631kopaonik-5.jpg', 'Pančićev vrh', true, 'Pančićev vrh'),
-    ('https://apartmanidunjakopaonik.rs/img/blog/blog_2/Skijanje_Kopaonik.webp', 'Sunčana dolina', true, 'Sunčana dolina'),
-    ('https://www.infokop.net/images/stories/info/graditeljske%20vrednosti/NS09.jpg', 'Nebeske stolice', true, 'Nebeske stolice')
+    ('/images/entity_images/localities/df4faeae6b0d85c5e2c337d3.jpg', 'Konaci Kopaonik', true, 'Konaci'),
+    ('/images/entity_images/localities/199948f8caa7224837816fc4.jpg', 'Pančićev vrh', true, 'Pančićev vrh'),
+    ('/images/entity_images/localities/d5efa854bef978c30fef1b13.jpg', 'Sunčana dolina', true, 'Sunčana dolina'),
+    ('/images/entity_images/localities/5acf2699224e1e2dae2ce9d3.jpg', 'Nebeske stolice', true, 'Nebeske stolice')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "LocalityId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", l."Id", NOW()
@@ -20171,10 +19771,10 @@ JOIN "Localities" l ON l."Name" = s."LocalityName";
 -- KOPAONIK IMAGES - OBJEKTI
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://www.grandkopaonik.com/wp-content/uploads/2021/09/kopaonik-3.jpg', 'Hotel Grand Kopaonik', true, 'Hotel Grand Kopaonik'),
-    ('https://upload.wikimedia.org/wikipedia/commons/b/bd/4b%2C_Brze%C4%87e%2C_Serbia_-_panoramio.jpg', 'Kopaonik Ski Centar', true, 'Kopaonik Ski Centar'),
-    ('https://salaskopaonik.rs/wp-content/uploads/salaskopaonik_1679085061_3060709787629187248_56375208186-min.jpg', 'Restoran Salaš Kopaonik', true, 'Restoran Salaš Kopaonik'),
-    ('https://bancor.travel/wp-content/uploads/2023/08/gorski-hotel-spa-hotel-bancor-2-scaled.jpg', 'Hotel Gorski & Spa', true, 'Hotel Gorski & Spa')
+    ('/images/entity_images/objects/18f467c9c9848138a08c3617.jpg', 'Hotel Grand Kopaonik', true, 'Hotel Grand Kopaonik'),
+    ('/images/entity_images/objects/9958622506ba856edba96786.jpg', 'Kopaonik Ski Centar', true, 'Kopaonik Ski Centar'),
+    ('/images/entity_images/objects/e22ac273772f17efab98a24a.jpg', 'Restoran Salaš Kopaonik', true, 'Restoran Salaš Kopaonik'),
+    ('/images/entity_images/objects/4de9d9c0ab859000f2ee349b.jpg', 'Hotel Gorski & Spa', true, 'Hotel Gorski & Spa')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
@@ -20185,10 +19785,10 @@ JOIN "Objects" o ON o."Name" = s."ObjectName";
 -- KOPAONIK IMAGES - AKTIVNOSTI
 WITH source("Url", "AltText", "IsMain", "ActivityName") AS (
     VALUES
-    ('https://adventure-serbia.com/wp-content/uploads/2019/03/bgd-safari-ture.jpg', 'Ski safari Kopaonik', true, 'Ski safari Kopaonik'),
-    ('https://www.svetputovanja.info/wp-content/uploads/2022/07/kopaonik-setnja-do-pancicevog-vrha.jpg', 'Hiking do Pančićevog vrha', true, 'Hiking do Pančićevog vrha'),
-    ('https://kezmanmountainhouses.com/wp-content/uploads/2024/08/21_07_16-eBikeKopaonik-action-2.jpg', 'Mountain bike ruta Kopaonik', true, 'Mountain bike ruta Kopaonik'),
-    ('https://www.gdeputovati.rs/img/upload/mid/2208/nebeske-stolice-3-2.jpg', 'Foto tura Vidikovci Kopaonika', true, 'Foto tura Vidikovci Kopaonika')
+    ('/images/entity_images/activities/dcde0d0479014d98ee8abff6.jpg', 'Ski safari Kopaonik', true, 'Ski safari Kopaonik'),
+    ('/images/entity_images/activities/adf340f0dde136eba3475635.jpg', 'Hiking do Pančićevog vrha', true, 'Hiking do Pančićevog vrha'),
+    ('/images/entity_images/activities/c1d4b68110d599ea2f03cc36.jpg', 'Mountain bike ruta Kopaonik', true, 'Mountain bike ruta Kopaonik'),
+    ('/images/entity_images/activities/42561157cebce6667b66d4e7.jpg', 'Foto tura Vidikovci Kopaonika', true, 'Foto tura Vidikovci Kopaonika')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ActivityId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", a."Id", NOW()
@@ -20199,10 +19799,10 @@ JOIN "Activities" a ON a."Name" = s."ActivityName";
 -- KOPAONIK IMAGES - DOGADJAJI
 WITH source("Url", "AltText", "IsMain", "EventName") AS (
     VALUES
-    ('https://hopnakop.rs/wp-content/uploads/2016/12/Ski-opening-Kopaonik.5.jpg', 'Kopaonik Ski Opening', true, 'Kopaonik Ski Opening'),
-    ('https://www.kopaonikapartman.rs/wp-content/uploads/2024/12/Gde-jesti-na-Kopaoniku-Najbolji-restorani.jpg', 'Dani planinske hrane Kopaonika', true, 'Dani planinske hrane Kopaonika'),
-    ('https://www.grandkopaonik.com/wp-content/uploads/2023/03/Kopaonik-Music-Week-HIghlights48-1.jpg', 'Kopaonik Music Weekend', true, 'Kopaonik Music Weekend'),
-    ('https://images.gorskihotel.com/1639691872/desktop/pages-top/2511dsc08523.jpg', 'Wellness & Spa vikend', true, 'Wellness & Spa vikend')
+    ('/images/entity_images/events/a85b002074a7b79ab74560ee.jpg', 'Kopaonik Ski Opening', true, 'Kopaonik Ski Opening'),
+    ('/images/entity_images/events/4bd3f0cdee44f2bff01f4fd7.jpg', 'Dani planinske hrane Kopaonika', true, 'Dani planinske hrane Kopaonika'),
+    ('/images/entity_images/events/4681d8a374f3ab49ae9b9843.jpg', 'Kopaonik Music Weekend', true, 'Kopaonik Music Weekend'),
+    ('/images/entity_images/events/dac28762857fe7f125124bfe.jpg', 'Wellness & Spa vikend', true, 'Wellness & Spa vikend')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "EventId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", e."Id", NOW()
@@ -20416,11 +20016,11 @@ VALUES
 -- MOKRA GORA IMAGES - LOKALITETI
 WITH source("Url", "AltText", "IsMain", "LocalityName") AS (
     VALUES
-    ('https://upload.wikimedia.org/wikipedia/commons/c/c7/Drvengrad.jpg', 'Drvengrad', true, 'Drvengrad'),
-    ('https://upload.wikimedia.org/wikipedia/commons/0/0b/Mokra_Gora%2C_%C5%A0arganska_osmica_076.jpg', 'Šargan Vitasi', true, 'Šargan Vitasi'),
-    ('https://www.zeleznicesrbije.com/wp-content/uploads/2017/03/Jatare-nocu.jpg', 'Jatare', true, 'Jatare'),
-    ('https://ocdn.eu/pulscms-transforms/1/Cc0ktkpTURBXy9mYTUzMzQyMjE2MThiMzE5YTEwZDExNmY1MTkwODVhMi5qcGeRkwXNBLDNA4Q', 'Iver', true, 'Iver'),
-    ('https://upload.wikimedia.org/wikipedia/commons/b/b6/BeleVode%2C_Mokra_Gora_028.jpg', 'Bela Voda Mokra Gora', true, 'Bela Voda Mokra Gora')
+    ('/images/entity_images/localities/5fa82e9786fd2e7284262305.jpg', 'Drvengrad', true, 'Drvengrad'),
+    ('/images/entity_images/localities/ef32dfcb003829f8dcb78bc0.jpg', 'Šargan Vitasi', true, 'Šargan Vitasi'),
+    ('/images/entity_images/localities/bc7de981e397f3d06b3720ee.jpg', 'Jatare', true, 'Jatare'),
+    ('/images/entity_images/localities/986dfee673657bf56c7e296c.jpg', 'Iver', true, 'Iver'),
+    ('/images/entity_images/localities/4bab2ca49bb17d077d8a42f9.jpg', 'Bela Voda Mokra Gora', true, 'Bela Voda Mokra Gora')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "LocalityId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", l."Id", NOW()
@@ -20431,10 +20031,10 @@ JOIN "Localities" l ON l."Name" = s."LocalityName";
 -- MOKRA GORA IMAGES - OBJEKTI
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://www.panacomp.net/wp-content/uploads/2015/11/featured-Mecavnik-3.jpg', 'Mećavnik Drvengrad', true, 'Mećavnik Drvengrad'),
-    ('https://www.planplus.rs/Image/Poi/175548', 'Železnička stanica Mokra Gora', true, 'Železnička stanica Mokra Gora'),
-    ('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/19/b9/cd/07/photo1jpg.jpg?w=1200&h=1200&s=1', 'Restoran Lotika Drvengrad', true, 'Restoran Lotika Drvengrad'),
-    ('https://udruzenjemokrogoraca.rs/wp-content/uploads/2025/12/iver.jpg', 'Ski centar Iver', true, 'Ski centar Iver')
+    ('/images/entity_images/objects/d09255484fd1944365c088a6.jpg', 'Mećavnik Drvengrad', true, 'Mećavnik Drvengrad'),
+    ('/images/entity_images/objects/bbd9bdc901c9e2ba8b967720.jpg', 'Železnička stanica Mokra Gora', true, 'Železnička stanica Mokra Gora'),
+    ('/images/entity_images/objects/fb445255b09611dde7e5dc54.jpg', 'Restoran Lotika Drvengrad', true, 'Restoran Lotika Drvengrad'),
+    ('/images/entity_images/objects/90b9bdc4fd900e6d37621b9a.jpg', 'Ski centar Iver', true, 'Ski centar Iver')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
@@ -20445,10 +20045,10 @@ JOIN "Objects" o ON o."Name" = s."ObjectName";
 -- MOKRA GORA IMAGES - AKTIVNOSTI
 WITH source("Url", "AltText", "IsMain", "ActivityName") AS (
     VALUES
-    ('https://www.b92.net/data/images/2024-08-02/51034_shutterstock-1401165539_pl.jpg', 'Vožnja Šarganskom osmicom', true, 'Vožnja Šarganskom osmicom'),
-    ('https://mayaktours.com/home/wp-content/uploads/2021/07/zlatibor-drvengrad-1251254854-scaled.jpg', 'Obilazak Drvengrada', true, 'Obilazak Drvengrada'),
-    ('https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Mokra_Gora_Jatare_station.JPG/1280px-Mokra_Gora_Jatare_station.JPG', 'Planinarenje do vidikovca Jatare', true, 'Planinarenje do vidikovca Jatare'),
-    ('https://www.parkprirodemokragora.org/index.php/o-parku/fotografije/image?view=image&format=raw&type=orig&id=332', 'Skijanje na Iveru', true, 'Skijanje na Iveru')
+    ('/images/entity_images/activities/b6acba341cc309d36ea1e865.jpg', 'Vožnja Šarganskom osmicom', true, 'Vožnja Šarganskom osmicom'),
+    ('/images/entity_images/activities/b5be4f9f3edc8164189d9177.jpg', 'Obilazak Drvengrada', true, 'Obilazak Drvengrada'),
+    ('/images/entity_images/activities/2272bbd7020c39c76ffcd8d8.jpg', 'Planinarenje do vidikovca Jatare', true, 'Planinarenje do vidikovca Jatare'),
+    ('/images/entity_images/activities/34b6f2943564cd33d0791d5f.jpg', 'Skijanje na Iveru', true, 'Skijanje na Iveru')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ActivityId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", a."Id", NOW()
@@ -20459,10 +20059,10 @@ JOIN "Activities" a ON a."Name" = s."ActivityName";
 -- MOKRA GORA IMAGES - DOGADJAJI
 WITH source("Url", "AltText", "IsMain", "EventName") AS (
     VALUES
-    ('https://srpskainfo.com/wp-content/uploads/2023/01/kustendorf-otvaranje-.jpg', 'Kustendorf Film and Music Festival', true, 'Kustendorf Film and Music Festival'),
-    ('https://upload.wikimedia.org/wikipedia/commons/e/eb/%D0%AD%D0%BC%D0%B8%D1%80_%D0%9A%D1%83%D1%81%D1%82%D1%83%D1%80%D0%B8%D1%86%D0%B0.png', 'Kustendorf Classic', true, 'Kustendorf Classic'),
-    ('https://upload.wikimedia.org/wikipedia/commons/0/0a/Sarganska_osmica_1.jpg', 'Dan Šarganske osmice', true, 'Dan Šarganske osmice'),
-    ('https://cdn.telegraf.tv/encoded/2023/01/20/437ce88740/images/2001bikovic-border.jpg', 'Zimski dani Ivera', true, 'Zimski dani Ivera')
+    ('/images/entity_images/events/4a436c190bda22f94429ba35.jpg', 'Kustendorf Film and Music Festival', true, 'Kustendorf Film and Music Festival'),
+    ('/images/entity_images/events/c3fc055178bf65e286061375.jpg', 'Kustendorf Classic', true, 'Kustendorf Classic'),
+    ('/images/entity_images/events/8355a4a1ad3bbe687b6648f8.jpg', 'Dan Šarganske osmice', true, 'Dan Šarganske osmice'),
+    ('/images/entity_images/events/3ea9fe81887c9b8fcf14e545.jpg', 'Zimski dani Ivera', true, 'Zimski dani Ivera')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "EventId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", e."Id", NOW()
@@ -20697,8 +20297,8 @@ VALUES
 -- PALIC IMAGES - LOKALITETI
 WITH source("Url", "AltText", "IsMain", "LocalityName") AS (
     VALUES
-    ('https://jovanaradojev.com/wp-content/uploads/2021/09/palic_1920x1080_1.jpg', 'Palić plaža', true, 'Palić plaža'),
-    ('https://metcomgradnja.com/wp-content/uploads/2025/07/palic-novogradnja.webp', 'Centar Palića', true, 'Centar Palića')
+    ('/images/entity_images/localities/d2f3066e3e386473bb3782ff.jpg', 'Palić plaža', true, 'Palić plaža'),
+    ('/images/entity_images/localities/4d91bab8c766e97f3ebabc63.jpg', 'Centar Palića', true, 'Centar Palića')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "LocalityId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", l."Id", NOW()
@@ -20709,11 +20309,11 @@ JOIN "Localities" l ON l."Name" = s."LocalityName";
 -- PALIC IMAGES - OBJEKTI
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://upload.wikimedia.org/wikipedia/commons/9/90/Pali%C4%87ko_jezero_-_ZOO_-_panoramio.jpg', 'Zoo vrt Palić', true, 'Zoo vrt Palić'),
-    ('https://visitsubotica.rs/wp-content/uploads/2019/10/Velika-terasa-1.jpg', 'Velika terasa Palić', true, 'Velika terasa Palić'),
-    ('https://bravotours.rs/wp-content/uploads/2020/05/hotel-prezident-palicko-jezero-odmor-srbija-0.jpg', 'Hotel Prezident Palić', true, 'Hotel Prezident Palić'),
-    ('https://visitpalic.rs/wp-content/uploads/2019/09/Vinarija-Zvonko-Bogdan-1.jpg', 'Vinarija Zvonko Bogdan', true, 'Vinarija Zvonko Bogdan'),
-    ('https://park-palic.rs/wp-content/uploads/2025/08/Letnja-pozornica2.jpg', 'Letnja pozornica Palić', true, 'Letnja pozornica Palić')
+    ('/images/entity_images/objects/573454296343f3e87cf98a05.jpg', 'Zoo vrt Palić', true, 'Zoo vrt Palić'),
+    ('/images/entity_images/objects/7e0dc88b391408afe765a64c.jpg', 'Velika terasa Palić', true, 'Velika terasa Palić'),
+    ('/images/entity_images/objects/40dda897a4c6dbe29dc7cd6a.jpg', 'Hotel Prezident Palić', true, 'Hotel Prezident Palić'),
+    ('/images/entity_images/objects/4e3c98124803ae6d711d26c5.jpg', 'Vinarija Zvonko Bogdan', true, 'Vinarija Zvonko Bogdan'),
+    ('/images/entity_images/objects/690c298c5feaf0a848ed673a.jpg', 'Letnja pozornica Palić', true, 'Letnja pozornica Palić')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
@@ -20724,10 +20324,10 @@ JOIN "Objects" o ON o."Name" = s."ObjectName";
 -- PALIC IMAGES - AKTIVNOSTI
 WITH source("Url", "AltText", "IsMain", "ActivityName") AS (
     VALUES
-    ('https://visitpalic.rs/wp-content/uploads/2019/07/PEDALINE-scaled.jpg', 'Vožnja pedalina po Paliću', true, 'Vožnja pedalina po Paliću'),
-    ('https://scontent.fbeg5-1.fna.fbcdn.net/v/t39.30808-6/687025596_1533814048751282_4353682524986670197_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=833d8c&_nc_ohc=5O_17smd4vsQ7kNvwHiM1bh&_nc_oc=AdpNUktEoF0nqILoMBtNYWQzK1kPsuIFZdahEyVjZPjMRLrVe0O_1ABRrLIms3IPvE8&_nc_zt=23&_nc_ht=scontent.fbeg5-1.fna&_nc_gid=x46zVPzBp80sid295Q17cQ&_nc_ss=7b289&oh=00_Af5oYG6DZOJXv_G65O_JAPU5u2ErxPxZqnitNdrDiVU3Pw&oe=6A11458D', 'Biciklistička ruta oko jezera', true, 'Biciklistička ruta oko jezera'),
-    ('https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/Velika_terasa_Pali%C4%87.jpg/3840px-Velika_terasa_Pali%C4%87.jpg', 'Obilazak Velike terase', true, 'Obilazak Velike terase'),
-    ('https://park-palic.rs/wp-content/uploads/2025/06/482012067_1262586012095563_4382958010422987041_n-1200x800.jpg', 'Degustacija vina Palića', true, 'Degustacija vina Palića')
+    ('/images/entity_images/activities/93d925ae868da7c329d9f592.jpg', 'Vožnja pedalina po Paliću', true, 'Vožnja pedalina po Paliću'),
+    ('/images/entity_images/activities/12193808e4b1690de961bac5.jpg', 'Biciklistička ruta oko jezera', true, 'Biciklistička ruta oko jezera'),
+    ('/images/entity_images/activities/3dda9fb7e0aa32076ba6496d.jpg', 'Obilazak Velike terase', true, 'Obilazak Velike terase'),
+    ('/images/entity_images/activities/36ba7847296359cc5364c26b.jpg', 'Degustacija vina Palića', true, 'Degustacija vina Palića')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ActivityId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", a."Id", NOW()
@@ -20738,10 +20338,10 @@ JOIN "Activities" a ON a."Name" = s."ActivityName";
 -- PALIC IMAGES - DOGADJAJI
 WITH source("Url", "AltText", "IsMain", "EventName") AS (
     VALUES
-    ('https://palicfilmfestival.com/uploads/images/20200721/image_126608978.jpg', 'Palić European Film Festival', true, 'Palić European Film Festival'),
-    ('https://ocdn.eu/pulscms/MDA_/5b610b8dd05d46ee90bb20d8dc4137dc.jpg', 'Berbanski dani Palića', true, 'Berbanski dani Palića'),
-    ('https://pannonrtv.com/sites/default/files/2024-07/20240711-palics-nyarhangolo-csikkoncert8.jpg', 'Letnji koncert na Paliću', true, 'Letnji koncert na Paliću'),
-    ('https://hotelpalicresort.rs/wp-content/uploads/2017/05/Webp.net-resizeimage-5.jpg', 'Wine & Spa Weekend Palić', true, 'Wine & Spa Weekend Palić')
+    ('/images/entity_images/events/f1541dcb8d40d8cf0618a9bf.jpg', 'Palić European Film Festival', true, 'Palić European Film Festival'),
+    ('/images/entity_images/events/7d575cbb70e625deaf873d85.jpg', 'Berbanski dani Palića', true, 'Berbanski dani Palića'),
+    ('/images/entity_images/events/2a7aaf07cb41b82f6daa9e5f.jpg', 'Letnji koncert na Paliću', true, 'Letnji koncert na Paliću'),
+    ('/images/entity_images/events/a98439d1d48d6d5067589def.jpg', 'Wine & Spa Weekend Palić', true, 'Wine & Spa Weekend Palić')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "EventId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", e."Id", NOW()
@@ -21060,8 +20660,8 @@ VALUES
  -- SUBOTICA IMAGES - LOKALITETI
 WITH source("Url", "AltText", "IsMain", "LocalityName") AS (
     VALUES
-    ('https://www.subotica.com/pub-photo/thumb/fullsize/2023/03/29/78387/SUBOTICAcom_29Mar.2023_Subotica_3469019.jpg?v=1778331393', 'Centar Subotice', true, 'Centar Subotice'),
-    ('https://upload.wikimedia.org/wikipedia/commons/b/b8/KelebijaCatholicChurch.JPG', 'Kelebija', true, 'Kelebija')
+    ('/images/entity_images/localities/49c8a82d1605172277e3df44.jpg', 'Centar Subotice', true, 'Centar Subotice'),
+    ('/images/entity_images/localities/c408824d15df1f69365f6aab.jpg', 'Kelebija', true, 'Kelebija')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "LocalityId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", l."Id", NOW()
@@ -21072,11 +20672,11 @@ JOIN "Localities" l ON l."Name" = s."LocalityName";
 -- SUBOTICA IMAGES - OBJEKTI
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/%D0%93%D1%80%D0%B0%D0%B4%D1%81%D0%BA%D0%B0_%D0%BA%D1%83%D1%9B%D0%B0_%D1%83_%D0%A1%D1%83%D0%B1%D0%BE%D1%82%D0%B8%D1%86%D0%B8_-_%D1%86%D0%B5%D0%BD%D1%82%D1%80%D0%B0%D0%BB%D0%BD%D0%B8_%D0%B4%D0%B5%D1%82%D0%B0%D1%99%D0%BD%D0%B8_%D0%BF%D1%80%D0%B8%D0%BA%D0%B0%D0%B7.jpg/1280px-%D0%93%D1%80%D0%B0%D0%B4%D1%81%D0%BA%D0%B0_%D0%BA%D1%83%D1%9B%D0%B0_%D1%83_%D0%A1%D1%83%D0%B1%D0%BE%D1%82%D0%B8%D1%86%D0%B8_-_%D1%86%D0%B5%D0%BD%D1%82%D1%80%D0%B0%D0%BB%D0%BD%D0%B8_%D0%B4%D0%B5%D1%82%D0%B0%D1%99%D0%BD%D0%B8_%D0%BF%D1%80%D0%B8%D0%BA%D0%B0%D0%B7.jpg', 'Gradska kuća Subotica', true, 'Gradska kuća Subotica'),
-    ('https://suteatar.org/img/Subotica-Narodno-Pozorište.jpg', 'Narodno pozorište Subotica', true, 'Narodno pozorište Subotica'),
-    ('https://ergelakelebija.rs/wp-content/uploads/2024/09/SUBOTICAcom_23Apr.2024_Kelebija_4079329.jpg', 'Ergela Kelebija', true, 'Ergela Kelebija'),
-    ('https://villanyiborvidek.hu/wp-content/gallery/sauska/1_sauska-boraszat-terasz.png', 'Vinarija Kasza Boraszat', true, 'Vinarija Kasza Boraszat'),
-    ('https://upload.wikimedia.org/wikipedia/commons/9/9e/Wiki.Vojvodina_VII_Subotica_4599_03.jpg', 'Sinagoga Subotica', true, 'Sinagoga Subotica')
+    ('/images/entity_images/objects/7bb0d6038716804b5d95d526.jpg', 'Gradska kuća Subotica', true, 'Gradska kuća Subotica'),
+    ('/images/entity_images/objects/65e210c80455e47559689187.jpg', 'Narodno pozorište Subotica', true, 'Narodno pozorište Subotica'),
+    ('/images/entity_images/objects/b4ed782fa198cfd1f835e224.jpg', 'Ergela Kelebija', true, 'Ergela Kelebija'),
+    ('/images/entity_images/objects/353d1e1c9bda18f2336e3435.jpg', 'Vinarija Kasza Boraszat', true, 'Vinarija Kasza Boraszat'),
+    ('/images/entity_images/objects/aad8fe45bb653ad80b9b260b.jpg', 'Sinagoga Subotica', true, 'Sinagoga Subotica')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
@@ -21087,10 +20687,10 @@ JOIN "Objects" o ON o."Name" = s."ObjectName";
 -- SUBOTICA IMAGES - AKTIVNOSTI
 WITH source("Url", "AltText", "IsMain", "ActivityName") AS (
     VALUES
-    ('https://accordingtokristina.com/wp-content/uploads/2020/08/Pogled-na-gradsku-kucu-u-Subotici-%C2%A9-According-to-Kristina-1440x964.jpg', 'Obilazak secesijske arhitekture', true, 'Obilazak secesijske arhitekture'),
-    ('https://ergelakelebija.rs/wp-content/uploads/slider/cache/07ef158948eed2a29f05cc20a4593c7f/Jahacki-kamp.jpg', 'Jahanje na Ergeli Kelebija', true, 'Jahanje na Ergeli Kelebija'),
-    ('https://www.vinoifino.rs/_img/finder2/images/decanter%20red.jpg', 'Degustacija vina severa Bačke', true, 'Degustacija vina severa Bačke'),
-    ('https://ocdn.eu/pulscms-transforms/1/CKAktkpTURBXy8xMjMwMGUzODEzNGJjMDZjZDcwNDdmMjlhZGZmYTY2NS5qcGeRkwXNBLDNAqM', 'Foto tura Subotice', true, 'Foto tura Subotice')
+    ('/images/entity_images/activities/5216a3112192534380f6e7c8.jpg', 'Obilazak secesijske arhitekture', true, 'Obilazak secesijske arhitekture'),
+    ('/images/entity_images/activities/2ed116f02093fa1a65bcd30c.jpg', 'Jahanje na Ergeli Kelebija', true, 'Jahanje na Ergeli Kelebija'),
+    ('/images/entity_images/activities/8d0ad56df1e8056b8dabc6cb.jpg', 'Degustacija vina severa Bačke', true, 'Degustacija vina severa Bačke'),
+    ('/images/entity_images/activities/413699f4856df4af202eba84.jpg', 'Foto tura Subotice', true, 'Foto tura Subotice')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ActivityId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", a."Id", NOW()
@@ -21101,10 +20701,10 @@ JOIN "Activities" a ON a."Name" = s."ActivityName";
 -- SUBOTICA IMAGES - DOGADJAJI
 WITH source("Url", "AltText", "IsMain", "EventName") AS (
     VALUES
-    ('https://www.serbia.travel/wp-content/uploads/2025/02/%D0%B8%D0%BD%D1%82%D0%B5%D1%80%D0%B5%D1%82%D0%BD%D0%BE-scaled.jpg', 'Interetno Festival', true, 'Interetno Festival'),
-    ('https://www.zkvh.org.rs/storage/app/media/images/stories/Foto_za_HR/Foto_br_956/du%C5%BEijanca.jpg', 'Dužijanca', true, 'Dužijanca'),
-    ('https://www.k1info.rs/data/images/2022-07-05/1365_filmski-festival-palic_f.jpg', 'Festival evropskog filma Palić - Subotica program', true, 'Festival evropskog filma Palić - Subotica program'),
-    ('https://ergelakelebija.rs/wp-content/uploads/2025/07/AIP_8670-scaled.jpg', 'Dani konjičkog sporta Kelebija', true, 'Dani konjičkog sporta Kelebija')
+    ('/images/entity_images/events/738158b7c2ccfd9c747c380f.jpg', 'Interetno Festival', true, 'Interetno Festival'),
+    ('/images/entity_images/events/7f3e65ff4d7bca515b8635d7.jpg', 'Dužijanca', true, 'Dužijanca'),
+    ('/images/entity_images/events/6a17338ca8d9cb885084d4a4.jpg', 'Festival evropskog filma Palić - Subotica program', true, 'Festival evropskog filma Palić - Subotica program'),
+    ('/images/entity_images/events/62931cfb1b1b328fe01763db.jpg', 'Dani konjičkog sporta Kelebija', true, 'Dani konjičkog sporta Kelebija')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "EventId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", e."Id", NOW()
@@ -21473,10 +21073,10 @@ VALUES
 -- TARA IMAGES - LOKALITETI
 WITH source("Url", "AltText", "IsMain", "LocalityName") AS (
     VALUES
-    ('https://taratravel.rs/wp-content/uploads/2022/05/Mitrovac-na-Tari-1.jpg', 'Mitrovac na Tari', true, 'Mitrovac na Tari'),
-    ('https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Peru%C4%87ac_and_the_Drina_river_-_%D0%9F%D0%B5%D1%80%D1%83%D1%9B%D0%B0%D1%86_%D0%B8_%D0%94%D1%80%D0%B8%D0%BD%D0%B0.JPG/1280px-Peru%C4%87ac_and_the_Drina_river_-_%D0%9F%D0%B5%D1%80%D1%83%D1%9B%D0%B0%D1%86_%D0%B8_%D0%94%D1%80%D0%B8%D0%BD%D0%B0.JPG', 'Perućac', true, 'Perućac'),
-    ('https://upload.wikimedia.org/wikipedia/sr/3/31/Banjskastena01.JPG', 'Banjska stena', true, 'Banjska stena'),
-    ('https://server.nyaralashorvatorszagban.com/uploads/original/6b25f1da21fa044d9060f0cebdfbf103.webp', 'Kaluđerske Bare', true, 'Kaluđerske Bare')
+    ('/images/entity_images/localities/2b49e8642d0d209aac3fe882.jpg', 'Mitrovac na Tari', true, 'Mitrovac na Tari'),
+    ('/images/entity_images/localities/726cb3475a9fbae844e8090c.jpg', 'Perućac', true, 'Perućac'),
+    ('/images/entity_images/localities/92a01b971484b7f32d0e6aa0.jpg', 'Banjska stena', true, 'Banjska stena'),
+    ('/images/entity_images/localities/e58f7ff40dbce000965967ec.jpg', 'Kaluđerske Bare', true, 'Kaluđerske Bare')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "LocalityId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", l."Id", NOW()
@@ -21487,12 +21087,12 @@ JOIN "Localities" l ON l."Name" = s."LocalityName";
 -- TARA IMAGES - OBJEKTI
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://pbs.twimg.com/media/DPEcIy7X4AAm64D.jpg', 'Hotel Omorika Tara', true, 'Hotel Omorika Tara'),
-    ('https://restoranvrelo.rs/wp-content/uploads/2024/06/02_Zepter-Restoran-Vrelo_Perucac.jpg', 'Restoran Vrelo Perućac', true, 'Restoran Vrelo Perućac'),
-    ('https://upload.wikimedia.org/wikipedia/commons/9/9d/Kalu%C4%91erske_Bare%2C_planinarski_dom_002.jpg', 'Planinarski dom Kaluđerske Bare', true, 'Planinarski dom Kaluđerske Bare'),
-    ('https://scontent.fbeg5-1.fna.fbcdn.net/v/t39.30808-6/486426335_642985412032120_5998961820596289004_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=127cfc&_nc_ohc=bpcFT27j9GQQ7kNvwH8dOdd&_nc_oc=AdqGQkjyOGew-wQ--RaSPHlbMT9l1FYYt-BHzBZGdLoxkwWUW7F0ozOdF2FGm1fOf-s&_nc_zt=23&_nc_ht=scontent.fbeg5-1.fna&_nc_gid=pReyUZqkqm4COYoXPtqQbQ&_nc_ss=7b289&oh=00_Af6STl38g1RdTJHL2gdQU_RY4mv4bBLtzvxxAU6HjWNrhg&oe=6A12073F', 'Izazov Tare škola skijanja', true, 'Izazov Tare škola skijanja'),
-    ('https://cf.bstatic.com/xdata/images/hotel/max1024x768/552261775.jpg?k=ae92ab562ef0ff99a18a732bbb0c47c7f0753194c93999c66728ba1f9d6dd1e5&o=', 'Restoran Kod Goluba', true, 'Restoran Kod Goluba'),
-    ('https://odmorika.rs/wp-content/uploads/2021/05/odmorika-turisticke-atrakcije-manastir-raca-12-1200x800.jpg', 'Manastir Rača', true, 'Manastir Rača')
+    ('/images/entity_images/objects/6b5c3734b07c20167e3c8bd1.jpg', 'Hotel Omorika Tara', true, 'Hotel Omorika Tara'),
+    ('/images/entity_images/objects/6a6ebfc975fdd884394a241c.jpg', 'Restoran Vrelo Perućac', true, 'Restoran Vrelo Perućac'),
+    ('/images/entity_images/objects/e38eaac8eda8b326bac7d3bb.jpg', 'Planinarski dom Kaluđerske Bare', true, 'Planinarski dom Kaluđerske Bare'),
+    ('/images/entity_images/objects/8563a1a6f320d648af89f86a.jpg', 'Izazov Tare škola skijanja', true, 'Izazov Tare škola skijanja'),
+    ('/images/entity_images/objects/4e60d36dbba9b634a81a337a.jpg', 'Restoran Kod Goluba', true, 'Restoran Kod Goluba'),
+    ('/images/entity_images/objects/942138bdf7cc2c7fc6dad7f2.jpg', 'Manastir Rača', true, 'Manastir Rača')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
@@ -21503,10 +21103,10 @@ JOIN "Objects" o ON o."Name" = s."ObjectName";
 -- TARA IMAGES - AKTIVNOSTI
 WITH source("Url", "AltText", "IsMain", "ActivityName") AS (
     VALUES
-    ('https://bookaweb.s3.eu-central-1.amazonaws.com/media/33020/banjska-stena-1.jpg', 'Obilazak Banjske stene', true, 'Obilazak Banjske stene'),
-    ('https://srbijazamlade.rs/fajlovi/productitem/img-6476_65fc22fb7542d.jpg', 'Rafting Drinom Perućac', true, 'Rafting Drinom Perućac'),
-    ('https://kurta-tara.com/wp-content/uploads/2024/06/Skijanje-na-Tari-Ski-skola-Tarski-vuk-6.jpg', 'Škola skijanja na Tari', true, 'Škola skijanja na Tari'),
-    ('https://vojvodinauzivo.rs/wp-content/uploads/2022/06/Tan2022-6-8_10754938_6-scaled.jpg', 'Foto safari Tara', true, 'Foto safari Tara')
+    ('/images/entity_images/activities/44699a644a7f6517c0cba730.jpg', 'Obilazak Banjske stene', true, 'Obilazak Banjske stene'),
+    ('/images/entity_images/activities/162c90611f4f2155ff40a670.jpg', 'Rafting Drinom Perućac', true, 'Rafting Drinom Perućac'),
+    ('/images/entity_images/activities/867439e337fdad066af36ed7.jpg', 'Škola skijanja na Tari', true, 'Škola skijanja na Tari'),
+    ('/images/entity_images/activities/110aa6e20c52d6a7f6177c78.jpg', 'Foto safari Tara', true, 'Foto safari Tara')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ActivityId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", a."Id", NOW()
@@ -21517,10 +21117,10 @@ JOIN "Activities" a ON a."Name" = s."ActivityName";
 -- TARA IMAGES - DOGADJAJI
 WITH source("Url", "AltText", "IsMain", "EventName") AS (
     VALUES
-    ('https://taraultratrail.rs/wp-content/uploads/2019/11/Tara-Ultra-Trail-2021-113751-BB-01610.jpg', 'Tara Ultra Trail', true, 'Tara Ultra Trail'),
-    ('https://www.raftingtara.com/files/bg-headers/rafting-tara-bg-header-jelovnik-1.jpg', 'Dani domaće kuhinje Tare', true, 'Dani domaće kuhinje Tare'),
-    ('https://regata.rs/wp-content/uploads/2021/06/Drinska-regata-16.jpg', 'Drinska regata Perućac', true, 'Drinska regata Perućac'),
-    ('https://www.b92.net/data/images/2025-01-10/97593_shutterstock-2253667393_orig.jpg', 'Dani skijanja na Tari', true, 'Dani skijanja na Tari')
+    ('/images/entity_images/events/c4a5d316fe90a208322096e6.jpg', 'Tara Ultra Trail', true, 'Tara Ultra Trail'),
+    ('/images/entity_images/events/fca2c77ae6da1a6b34ec6372.jpg', 'Dani domaće kuhinje Tare', true, 'Dani domaće kuhinje Tare'),
+    ('/images/entity_images/events/4b8d5e8105523e6ccb435736.jpg', 'Drinska regata Perućac', true, 'Drinska regata Perućac'),
+    ('/images/entity_images/events/4f04626e63e16b5a975ddb33.jpg', 'Dani skijanja na Tari', true, 'Dani skijanja na Tari')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "EventId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", e."Id", NOW()
@@ -21832,9 +21432,9 @@ VALUES
  -- UVAC IMAGES - LOKALITETI
 WITH source("Url", "AltText", "IsMain", "LocalityName") AS (
     VALUES
-    ('https://upload.wikimedia.org/wikipedia/commons/0/03/Uvac_River_and_Eagle.jpg', 'Meandri Uvca', true, 'Meandri Uvca'),
-    ('https://static.zlatarinfo.rs/images/2022-08-20/susa-i-kilovati-piju-jezero-brana-he-uva-1661012705_5134.jpg', 'Brana Uvac', true, 'Brana Uvac'),
-    ('https://www.uvac.org.rs/assets/img/galleries/photos/pecina-3.jpg', 'Ledena pećina', true, 'Ledena pećina')
+    ('/images/entity_images/localities/2ef7f538fdb6e7c9e408d93d.jpg', 'Meandri Uvca', true, 'Meandri Uvca'),
+    ('/images/entity_images/localities/6dc270fd55fcd3585b705c78.jpg', 'Brana Uvac', true, 'Brana Uvac'),
+    ('/images/entity_images/localities/2949bc3d9424234e7082408a.jpg', 'Ledena pećina', true, 'Ledena pećina')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "LocalityId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", l."Id", NOW()
@@ -21845,9 +21445,9 @@ JOIN "Localities" l ON l."Name" = s."LocalityName";
 -- UVAC IMAGES - OBJEKTI
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://staticeupravozato.mondo.rs/api/v3/images/9348?ts=2025-07-15T11:05:51', 'Hidroelektrana Uvac', true, 'Hidroelektrana Uvac'),
-    ('https://putujemo.org/wp-content/uploads/2017/05/DSC_0036_3714033-4500x3000.jpg', 'Kamp Uvac', true, 'Kamp Uvac'),
-    ('https://planinablog.wordpress.com/wp-content/uploads/2015/01/img_2055.jpg', 'Viseći most preko Uvca', true, 'Viseći most preko Uvca')
+    ('/images/entity_images/objects/cca7f6aa279602b7147981d5.jpg', 'Hidroelektrana Uvac', true, 'Hidroelektrana Uvac'),
+    ('/images/entity_images/objects/ec39347d4ea4d9e22655398e.jpg', 'Kamp Uvac', true, 'Kamp Uvac'),
+    ('/images/entity_images/objects/b8e9e3ec3641639d39754eca.jpg', 'Viseći most preko Uvca', true, 'Viseći most preko Uvca')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
@@ -21858,10 +21458,10 @@ JOIN "Objects" o ON o."Name" = s."ObjectName";
 -- UVAC IMAGES - AKTIVNOSTI
 WITH source("Url", "AltText", "IsMain", "ActivityName") AS (
     VALUES
-    ('https://mojazapadnasrbija.rs/wp-content/uploads/2026/01/Da-li-je-krstarenje-Uvcem-bezbedno-za-decu-i-starije-osobe.jpg', 'Vožnja čamcem kroz meandre Uvca', true, 'Vožnja čamcem kroz meandre Uvca'),
-    ('https://novipazar.travel/wp-content/uploads/2022/03/novi-pazar-uvac-.jpg', 'Foto tura Meandri Uvca', true, 'Foto tura Meandri Uvca'),
-    ('https://www.zlatiboradventure.com/wp-content/uploads/2016/12/uvac_pecina_2.jpg', 'Obilazak Ledene pećine', true, 'Obilazak Ledene pećine'),
-    ('https://www.uvac.org.rs/assets/img/galleries/photos/ribarstvo-3-min.jpg', 'Pecanje na Sjeničkom jezeru', true, 'Pecanje na Sjeničkom jezeru')
+    ('/images/entity_images/activities/55fafe3e579866d36766102f.jpg', 'Vožnja čamcem kroz meandre Uvca', true, 'Vožnja čamcem kroz meandre Uvca'),
+    ('/images/entity_images/activities/4502daf5f651437d010ef9c8.jpg', 'Foto tura Meandri Uvca', true, 'Foto tura Meandri Uvca'),
+    ('/images/entity_images/activities/89576e5d11bf70c522137de1.jpg', 'Obilazak Ledene pećine', true, 'Obilazak Ledene pećine'),
+    ('/images/entity_images/activities/5c135b972f0880ba0034a7b6.jpg', 'Pecanje na Sjeničkom jezeru', true, 'Pecanje na Sjeničkom jezeru')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ActivityId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", a."Id", NOW()
@@ -21872,10 +21472,10 @@ JOIN "Activities" a ON a."Name" = s."ActivityName";
 -- UVAC IMAGES - DOGADJAJI
 WITH source("Url", "AltText", "IsMain", "EventName") AS (
     VALUES
-    ('https://www.juznevesti.com/wp-content/uploads/2015/02/18/46105/Beloglavi-sup-S-Preradovic.jpg.webp', 'Dani beloglavog supa', true, 'Dani beloglavog supa'),
-    ('https://www.zlatiboradventure.com/wp-content/uploads/2016/12/uvac_kajak_wildserbia4.jpg', 'Uvac Kajak Vikend', true, 'Uvac Kajak Vikend'),
-    ('https://ocdn.eu/pulscms-transforms/1/nOGk9kpTURBXy84NGFlZTU3OTEwNzYwM2FjZjcxZTM1Yjc1ZWY4MjQ2YS5qcGeRkwLNBYIA3gABoTAF', 'Uvac Outdoor Vikend', true, 'Uvac Outdoor Vikend'),
-    ('https://fajlovi.bos4.tours/uploads/images/albums/uploads/2313.jpg', 'Pešačka tura Meandri Uvca', true, 'Pešačka tura Meandri Uvca')
+    ('/images/entity_images/events/1c936d943cae8790d1c89923.jpg', 'Dani beloglavog supa', true, 'Dani beloglavog supa'),
+    ('/images/entity_images/events/db5454e62ebd8ba8dc04fb7a.jpg', 'Uvac Kajak Vikend', true, 'Uvac Kajak Vikend'),
+    ('/images/entity_images/events/235b6dd71a0efc7147280ec4.jpg', 'Uvac Outdoor Vikend', true, 'Uvac Outdoor Vikend'),
+    ('/images/entity_images/events/05f22ecd72b610953d189014.jpg', 'Pešačka tura Meandri Uvca', true, 'Pešačka tura Meandri Uvca')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "EventId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", e."Id", NOW()
@@ -22147,10 +21747,10 @@ VALUES
 -- VRNJACKA BANJA IMAGES - LOKALITETI
 WITH source("Url", "AltText", "IsMain", "LocalityName") AS (
     VALUES
-    ('https://www.ledmrezasrbije.rs/wp-content/uploads/2024/06/1.jpg', 'Vrnjačka Banja Centar', true, 'Vrnjačka Banja Centar'),
-    ('https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/Reka_Vrnjacka_Banja.jpg/1280px-Reka_Vrnjacka_Banja.jpg', 'Vrnjci', true, 'Vrnjci'),
-    ('https://fajlovi.bos4.tours/uploads/2019/02/images/tour_587/PARK%20(1).jpg', 'Park šetalište Vrnjačka Banja', true, 'Park šetalište Vrnjačka Banja'),
-    ('https://upload.wikimedia.org/wikipedia/commons/5/5f/Vrnja%C4%8Dka_Banja%2C_japanski_vrt_-_panoramio.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original', 'Japanski vrt Vrnjačka Banja', true, 'Japanski vrt Vrnjačka Banja')
+    ('/images/entity_images/localities/cc6a1fe45c3f68956b2e4b71.jpg', 'Vrnjačka Banja Centar', true, 'Vrnjačka Banja Centar'),
+    ('/images/entity_images/localities/a5c4954f0c4f8b2e1eb993fc.jpg', 'Vrnjci', true, 'Vrnjci'),
+    ('/images/entity_images/localities/e781426269c17b30391ee951.jpg', 'Park šetalište Vrnjačka Banja', true, 'Park šetalište Vrnjačka Banja'),
+    ('/images/entity_images/localities/ddb4d800e83325e478323417.jpg', 'Japanski vrt Vrnjačka Banja', true, 'Japanski vrt Vrnjačka Banja')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "LocalityId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", l."Id", NOW()
@@ -22161,10 +21761,10 @@ JOIN "Localities" l ON l."Name" = s."LocalityName";
 -- VRNJACKA BANJA IMAGES - OBJEKTI
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://www.gdeputovati.rs/img/upload/mid/2309/amfiteatar-bata-stojkovic-3-1.jpg', 'Letnja pozornica Vrnjačka Banja', true, 'Letnja pozornica Vrnjačka Banja'),
-    ('https://zoovrtvrnjci.com/wp-content/uploads/2025/04/1-zoo-vrt-vrnjci-(3)x.jpg', 'Zoo vrt Vrnjci', true, 'Zoo vrt Vrnjci'),
-    ('https://upload.wikimedia.org/wikipedia/commons/2/26/Most_Ljubavi_overview.jpg', 'Most ljubavi', true, 'Most ljubavi'),
-    ('https://dpv.rs/wp-content/uploads/2024/08/aqua-park-raj.jpg', 'Akva park Raj', true, 'Akva park Raj')
+    ('/images/entity_images/objects/9de9ab31d327e28fe25190df.jpg', 'Letnja pozornica Vrnjačka Banja', true, 'Letnja pozornica Vrnjačka Banja'),
+    ('/images/entity_images/objects/2dd04ab73d067c725e89dc77.jpg', 'Zoo vrt Vrnjci', true, 'Zoo vrt Vrnjci'),
+    ('/images/entity_images/objects/031c29ca435eede62cfb1400.jpg', 'Most ljubavi', true, 'Most ljubavi'),
+    ('/images/entity_images/objects/df60b639388d3a12c79d857e.jpg', 'Akva park Raj', true, 'Akva park Raj')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
@@ -22175,10 +21775,10 @@ JOIN "Objects" o ON o."Name" = s."ObjectName";
 -- VRNJACKA BANJA IMAGES - AKTIVNOSTI
 WITH source("Url", "AltText", "IsMain", "ActivityName") AS (
     VALUES
-    ('https://www.vrnjackabanjasmestaj.rs/storage/images/others/28/thumbnails/large/promenada_vrnjacka_banja_najpoznatije_Šetaliste_u_banji_8193.webp', 'Šetnja banjskim parkom', true, 'Šetnja banjskim parkom'),
-    ('https://xdn.tf.rs/2023/10/03/most-ljubavi-foto-nikola-tomic-11.jpg', 'Fotografisanje na Mostu ljubavi', true, 'Fotografisanje na Mostu ljubavi'),
-    ('https://www.vrnjackabanjasmestaj.rs/storage/images/others/12/thumbnails/large/zoo_vrt_vrnjci_zivotinjsko_carstvo_nadomak_vrnjacke_banje_4042.webp', 'Obilazak Zoo vrta Vrnjci', true, 'Obilazak Zoo vrta Vrnjci'),
-    ('https://scontent.fbeg5-1.fna.fbcdn.net/v/t39.30808-6/471756330_581375891284527_7826515570535564637_n.jpg?_nc_cat=103&ccb=1-7&_nc_sid=833d8c&_nc_ohc=-JDHg8DKCxYQ7kNvwFmyRxv&_nc_oc=AdoEdX-8CMpW6TkC48ZbTBhOZRF8kyzP3Ok8J6n08O7ZoGLH23AKRwaWTyxXvRKuUVo&_nc_zt=23&_nc_ht=scontent.fbeg5-1.fna&_nc_gid=7JHIRssBq0UJXjNLxI-0AQ&_nc_ss=7b289&oh=00_Af5weSZIgot2kSIJsdTp-0yFbow1j24gDRcUeFhb53fyYw&oe=6A121936', 'Letnje kupanje u Akva parku Raj', true, 'Letnje kupanje u Akva parku Raj')
+    ('/images/entity_images/activities/2e385efc10cc53842b916cb8.jpg', 'Šetnja banjskim parkom', true, 'Šetnja banjskim parkom'),
+    ('/images/entity_images/activities/14337f8af86dcbf19ce2e691.jpg', 'Fotografisanje na Mostu ljubavi', true, 'Fotografisanje na Mostu ljubavi'),
+    ('/images/entity_images/activities/c52cea4be406c5f51a3d3465.jpg', 'Obilazak Zoo vrta Vrnjci', true, 'Obilazak Zoo vrta Vrnjci'),
+    ('/images/entity_images/activities/095b5b6fc5d332532f37f7ff.jpg', 'Letnje kupanje u Akva parku Raj', true, 'Letnje kupanje u Akva parku Raj')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ActivityId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", a."Id", NOW()
@@ -22189,10 +21789,10 @@ JOIN "Activities" a ON a."Name" = s."ActivityName";
 -- VRNJACKA BANJA IMAGES - DOGADJAJI
 WITH source("Url", "AltText", "IsMain", "EventName") AS (
     VALUES
-    ('https://vrnjackabanja.co.rs/wp-content/uploads/2022/02/MMP_1097-scaled.jpg', 'Vrnjački karneval', true, 'Vrnjački karneval'),
-    ('https://lovefest.rs/wp-content/uploads/2022/06/Lovefest_1-scaled.jpg', 'Love Fest', true, 'Love Fest'),
-    ('https://screenfest.org.rs/home/wp-content/uploads/2024/08/Zatvaranje48-v.jpg', 'Festival filmskog scenarija', true, 'Festival filmskog scenarija'),
-    ('https://www.vino.rs/media/k2/items/cache/ea07c44fce5201f213c8f2fc9531aa83_XL.jpg', 'Vrnjački festival vina', true, 'Vrnjački festival vina')
+    ('/images/entity_images/events/21f0c12f7c3928afe4de6332.jpg', 'Vrnjački karneval', true, 'Vrnjački karneval'),
+    ('/images/entity_images/events/d4afc8e62565d281a207bcc6.jpg', 'Love Fest', true, 'Love Fest'),
+    ('/images/entity_images/events/cdeaa65e0e504d3dc4257b28.jpg', 'Festival filmskog scenarija', true, 'Festival filmskog scenarija'),
+    ('/images/entity_images/events/931a14d9abf2ae59deda97b8.jpg', 'Vrnjački festival vina', true, 'Vrnjački festival vina')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "EventId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", e."Id", NOW()
@@ -22294,9 +21894,9 @@ VALUES
 
  WITH source("Url", "AltText", "IsMain", "LocalityName") AS (
     VALUES
-    ('https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Veliki_park_u_Kragujevcu_29.jpg/1920px-Veliki_park_u_Kragujevcu_29.jpg', 'Veliki park', true, 'Veliki park'),
-    ('https://ritamgrada.rs/kragujevac/wp-content/uploads/2025/05/Stabla-trg-VP.jpg', 'Trg Radomira Putnika', true, 'Trg Radomira Putnika'),
-    ('https://www.danas.rs/wp-content/uploads/2023/04/01-Centar-Kragujevca-Pesacka-zona-scaled.jpg', 'Pešačka zona Kragujevac', true, 'Pešačka zona Kragujevac')
+    ('/images/entity_images/localities/671f8c6b53d125a2c206fa43.jpg', 'Veliki park', true, 'Veliki park'),
+    ('/images/entity_images/localities/d846408cc9a67b8851033ef3.jpg', 'Trg Radomira Putnika', true, 'Trg Radomira Putnika'),
+    ('/images/entity_images/localities/ca13fe23938a3e7a6cdb7497.jpg', 'Pešačka zona Kragujevac', true, 'Pešačka zona Kragujevac')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "LocalityId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", l."Id", NOW()
@@ -22402,10 +22002,10 @@ VALUES
  -- TERAZIJE BEOGRAD IMAGES - OBJEKTI
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://muzejiluzija.rs/wp-content/uploads/2021/11/about-1.jpg', 'Muzej iluzija Beograd', true, 'Muzej iluzija Beograd'),
-    ('https://upload.wikimedia.org/wikipedia/commons/4/48/Trg-Nikole-Pa%C5%A1i%C4%87a-2025-03-03.jpg', 'MTS dvorana', true, 'MTS dvorana'),
-    ('https://beogradskiizlet.com/wp-content/uploads/2021/06/IMG_20210430_114053.jpg', 'Stari dvor', true, 'Stari dvor'),
-    ('https://upload.wikimedia.org/wikipedia/commons/4/43/Atelje_212%2C_Beograd.jpg', 'Atelje 212', true, 'Atelje 212')
+    ('/images/entity_images/objects/9ee6f43d07a60fb8cb45b510.jpg', 'Muzej iluzija Beograd', true, 'Muzej iluzija Beograd'),
+    ('/images/entity_images/objects/b377be09c4e840f41f1d1845.jpg', 'MTS dvorana', true, 'MTS dvorana'),
+    ('/images/entity_images/objects/fb6c6b08fa54c1841dce3074.jpg', 'Stari dvor', true, 'Stari dvor'),
+    ('/images/entity_images/objects/c8f64c9610aab7583ffced6d.jpg', 'Atelje 212', true, 'Atelje 212')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
@@ -22585,10 +22185,10 @@ VALUES
  -- KALEMEGDAN BEOGRAD IMAGES - OBJEKTI
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://www.beogradskaTvrđava.co.rs/wp-content/uploads/2020/12/Spomenik-Pobednik-scaled.jpg', 'Pobednik', true, 'Pobednik'),
-    ('https://www.b92.net/data/images/2025-12-12/194715_shutterstock-1801395445_orig.jpg', 'Beogradski zoološki vrt', true, 'Beogradski zoološki vrt'),
-    ('https://images.squarespace-cdn.com/content/v1/61cab996dd187128f5152384/1ad0c5a0-da8b-43b4-b15d-7b09e4bee17a/Zappa+Baza+K-Event+Kpop+Petak+17.11.23.-2.jpg', 'Zappa Baza', true, 'Zappa Baza'),
-    ('https://upload.wikimedia.org/wikipedia/commons/a/a7/Ru%C5%BEica_church%2C_Belgrade%2C_Serbia.jpg', 'Crkva Ružica', true, 'Crkva Ružica')
+    ('/images/entity_images/objects/cf5009263e155c81ae255cdf.jpg', 'Pobednik', true, 'Pobednik'),
+    ('/images/entity_images/objects/d1f2af4e78c085be5a606f9b.jpg', 'Beogradski zoološki vrt', true, 'Beogradski zoološki vrt'),
+    ('/images/entity_images/objects/fa88d9174995d38620a28375.jpg', 'Zappa Baza', true, 'Zappa Baza'),
+    ('/images/entity_images/objects/20cef50f32527b2aba678352.jpg', 'Crkva Ružica', true, 'Crkva Ružica')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
@@ -22761,10 +22361,10 @@ VALUES
  -- KNEZ MIHAILOVA IMAGES - OBJEKTI
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://envoybelgrade.rs-hotels.net/data/Photos/OriginalPhoto/17206/1720609/1720609066/photo-envoy-hotel-belgrade-1.JPEG', 'Envoy Hotel Beograd', true, 'Envoy Hotel Beograd'),
-    ('https://konobaakustik.rs/wp-content/uploads/2023/07/RMP_2937-1-scaled.jpg', 'Konoba Akustik Stari Beograd', true, 'Konoba Akustik Stari Beograd'),
-    ('https://bgb.rs/wp-content/uploads/2021/07/BGB-cvetna.jpg', 'Biblioteka grada Beograda', true, 'Biblioteka grada Beograda'),
-    ('https://monument.rs/wp-content/uploads/2024/07/Monument-BIG-Shopping-Centar-Beograd.jpg', 'Monument restoran Beograd', true, 'Monument restoran Beograd')
+    ('/images/entity_images/objects/cc8e9d8e0e47c4e34c3065ae.jpg', 'Envoy Hotel Beograd', true, 'Envoy Hotel Beograd'),
+    ('/images/entity_images/objects/0cb787b62623fd6257767aa9.jpg', 'Konoba Akustik Stari Beograd', true, 'Konoba Akustik Stari Beograd'),
+    ('/images/entity_images/objects/5b7539e76da95adf3d01b603.jpg', 'Biblioteka grada Beograda', true, 'Biblioteka grada Beograda'),
+    ('/images/entity_images/objects/6323dbd3886385bfa1ab5f0e.jpg', 'Monument restoran Beograd', true, 'Monument restoran Beograd')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
@@ -22944,10 +22544,10 @@ VALUES
 -- DORĆOL IMAGES - OBJEKTI
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://tutinpress.rs/wp-content/uploads/2020/12/mosk-2790395_1280.jpg', 'Bajrakli džamija', true, 'Bajrakli džamija'),
-    ('https://upload.wikimedia.org/wikipedia/commons/9/9d/Sava_port_Belgrade.jpg', 'Luka Beograd', true, 'Luka Beograd'),
-    ('https://www.datocms-assets.com/50265/1663879744-bz6_3554-tinified.jpg', 'Docker pivara', true, 'Docker pivara'),
-    ('https://savcic.rs/wp-content/uploads/2023/02/cevapi-savcic-1.jpg', 'Ćevabdžinica Šaurma Savić Dorćol', true, 'Ćevabdžinica Šaurma Savić Dorćol')
+    ('/images/entity_images/objects/1c0f552f5e734c8ebd62ebe0.jpg', 'Bajrakli džamija', true, 'Bajrakli džamija'),
+    ('/images/entity_images/objects/4f7a656437da9aa6544bdcf5.jpg', 'Luka Beograd', true, 'Luka Beograd'),
+    ('/images/entity_images/objects/d18a97f70eb1a55f1eef4777.jpg', 'Docker pivara', true, 'Docker pivara'),
+    ('/images/entity_images/objects/9cb00f9bb7edbe48afd2df40.jpg', 'Ćevabdžinica Šaurma Savić Dorćol', true, 'Ćevabdžinica Šaurma Savić Dorćol')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
@@ -23120,10 +22720,10 @@ VALUES
  -- SKADARLIJA IMAGES - OBJEKTI
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://bynder.onthebeach.co.uk/cdn-cgi/image/width=1400,quality=80,fit=cover,format=auto/m/57a5d8033393157c/original/Hotel-Bohemian-Garni-Serbia-Belgrade-General-view-4.jpg', 'Hotel Bohemian Garni', true, 'Hotel Bohemian Garni'),
-    ('https://www.restoranzavicaj.rs/wp-content/uploads/2022/02/skadarlija-09.jpg', 'Restoran Zavičaj Skadarlija', true, 'Restoran Zavičaj Skadarlija'),
-    ('https://cf.bstatic.com/xdata/images/hotel/max1024x768/406588751.jpg?k=477e4164f65895f5b2b060737a13b41ebe6ad3a448c10b97b6e4345451088ec5&o=', 'Bukoleon Apartment', true, 'Bukoleon Apartment'),
-    ('https://www.restoranibeograd.com/storage/restaurant/interior/183/restoran_velika_skadarlija_3.jpg', 'Restoran Velika Skadarlija', true, 'Restoran Velika Skadarlija')
+    ('/images/entity_images/objects/7d87b62b29ba93550446da69.jpg', 'Hotel Bohemian Garni', true, 'Hotel Bohemian Garni'),
+    ('/images/entity_images/objects/81b68d801c2f30415f0fc360.jpg', 'Restoran Zavičaj Skadarlija', true, 'Restoran Zavičaj Skadarlija'),
+    ('/images/entity_images/objects/70d21fc61c01906e2aeacaa0.jpg', 'Bukoleon Apartment', true, 'Bukoleon Apartment'),
+    ('/images/entity_images/objects/0aa5f41958bcf5b9422d3698.jpg', 'Restoran Velika Skadarlija', true, 'Restoran Velika Skadarlija')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
@@ -23296,10 +22896,10 @@ VALUES
  -- ADA CIGANLIJA IMAGES - OBJEKTI
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://beogradskiizlet.com/wp-content/uploads/2023/05/IMG_20220626_142241.jpg', 'Klub Ada Međica', true, 'Klub Ada Međica'),
-    ('https://www.adamall.com/wp-content/uploads/2021/12/3840x2160-scaled.jpg', 'Ada Mall', true, 'Ada Mall'),
-    ('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/0f/4e/9d/2e/photo0jpg.jpg?w=1200&h=-1&s=1', 'Marina Ada Ciganlija', true, 'Marina Ada Ciganlija'),
-    ('https://scontent.fbeg5-1.fna.fbcdn.net/v/t1.6435-9/118984978_3277662788986279_4156795140428925013_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=3a1ebe&_nc_ohc=OvwpYKuqDt0Q7kNvwGMSFUz&_nc_oc=AdrRSzwoBqWLgv5pIyeWu_r0k7FL5UoyQiSXMjwFalvPBrzGSuBoqN3G3szeaVFgt7g&_nc_zt=23&_nc_ht=scontent.fbeg5-1.fna&_nc_gid=7dxv9WsIByKFlN3tPkf57Q&_nc_ss=7b289&oh=00_Af5c7Mgl0yzlb6yt6KknKs2pgBUOeXJ8UUXawBHWB1WMWg&oe=6A33F176', 'Na kraj sveta kafić', true, 'Na kraj sveta kafić')
+    ('/images/entity_images/objects/d80feeb1326688c2be019b71.jpg', 'Klub Ada Međica', true, 'Klub Ada Međica'),
+    ('/images/entity_images/objects/4d250f7685fdad4401debf4b.jpg', 'Ada Mall', true, 'Ada Mall'),
+    ('/images/entity_images/objects/805b361cc37257a9f4731559.jpg', 'Marina Ada Ciganlija', true, 'Marina Ada Ciganlija'),
+    ('/images/entity_images/objects/64213070f53e4d11b702c79f.jpg', 'Na kraj sveta kafić', true, 'Na kraj sveta kafić')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
@@ -23472,10 +23072,10 @@ VALUES
  -- ZEMUN KEJ IMAGES - OBJEKTI
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://xdn.tf.rs/2019/07/25/2019-07-19-lido-11.jpg', 'Plaža Lido', true, 'Plaža Lido'),
-    ('https://lemonchili.rs/images/lemon-chili-o-nama.jpeg', 'Restoran Lemon Chili', true, 'Restoran Lemon Chili'),
-    ('https://gabbiano.rs/img/galerije/gabbiano/vencanja/gabbiano-vencanja-006.jpg', 'Restoran Gabbiano', true, 'Restoran Gabbiano'),
-    ('https://upload.wikimedia.org/wikipedia/commons/0/04/%D0%9A%D1%83%D0%BB%D0%B0_%D0%A1%D0%B8%D0%B1%D0%B8%D1%9A%D0%B0%D0%BD%D0%B8%D0%BD_%D0%88%D0%B0%D0%BD%D0%BA%D0%B0_%28%D0%93%D0%B0%D1%80%D0%B4%D0%BE%D1%88_%D0%9A%D1%83%D0%BB%D0%B0%2C_%D0%91%D0%B5%D0%BE%D0%B3%D1%80%D0%B0%D0%B4%3B_Gardo%C5%A1_Tower_in_Belgrade%29.jpg', 'Kula Gardoš', true, 'Kula Gardoš')
+    ('/images/entity_images/objects/2b76705b76a7e7ee01a95119.jpg', 'Plaža Lido', true, 'Plaža Lido'),
+    ('/images/entity_images/objects/a4e4d9a7ebd8005e71a582a6.jpg', 'Restoran Lemon Chili', true, 'Restoran Lemon Chili'),
+    ('/images/entity_images/objects/e9678f01cf8e6b4ca6a36059.jpg', 'Restoran Gabbiano', true, 'Restoran Gabbiano'),
+    ('/images/entity_images/objects/117ef4ae1fc18a610cb25ed7.jpg', 'Kula Gardoš', true, 'Kula Gardoš')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
@@ -23648,10 +23248,10 @@ VALUES
  -- NOVI BEOGRAD IMAGES - OBJEKTI
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://beogradskiizlet.com/wp-content/uploads/2023/07/IMG_20230709_180513.jpg', 'Akva Park Hollywoodland', true, 'Akva Park Hollywoodland'),
-    ('https://dollybell.rs/images/d6c0549d7ded2473c7bb44b99d0abae8.jpeg', 'Dolly Bell Java', true, 'Dolly Bell Java'),
-    ('https://www.deltacity.rs/wp-content/uploads/2022/02/DC-slika1.jpg', 'TC Delta City', true, 'TC Delta City'),
-    ('https://prod-saint-gobain-rs.mac3.content.saint-gobain.io/sites/mac3.saint-gobain.rs/files/2025-07/10_Serbia_residential_west-65-tower-belgrade-serbia-scaled.jpg', 'West 65 Mall', true, 'West 65 Mall')
+    ('/images/entity_images/objects/b48178ec34fd370fabea6ce7.jpg', 'Akva Park Hollywoodland', true, 'Akva Park Hollywoodland'),
+    ('/images/entity_images/objects/72fa01595c3e2d88da9a0c86.jpg', 'Dolly Bell Java', true, 'Dolly Bell Java'),
+    ('/images/entity_images/objects/46d56b04ff85bbfad3aadcfd.jpg', 'TC Delta City', true, 'TC Delta City'),
+    ('/images/entity_images/objects/a0bac4c5b11f0dacdd8a9251.jpg', 'West 65 Mall', true, 'West 65 Mall')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
@@ -23824,10 +23424,10 @@ VALUES
  -- TAŠMAJDAN IMAGES - OBJEKTI
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://s3.eu-central-1.amazonaws.com/apartmani-u-beogradu/uploads/firms/16/sr/main/madera-restorani-beograd-palilula.jpg', 'Restoran Madera', true, 'Restoran Madera'),
-    ('https://beogradskiizlet.com/wp-content/uploads/2023/05/IMG_20230422_150637.jpg', 'Restoran St. Marks Place', true, 'Restoran St. Marks Place'),
-    ('https://upload.wikimedia.org/wikipedia/commons/b/bd/De%C4%8Dji_kulturni_centar_Beograd_%282%29_03.jpg?utm_source=sr.wikipedia.org&utm_campaign=index&utm_content=original', 'Dečji kulturni centar Beograd', true, 'Dečji kulturni centar Beograd'),
-    ('https://www.beogradnocu.com/wp-content/uploads/2017/03/Klub-Tash-Machine-enterijer4.jpg', 'TAŠ Pub', true, 'TAŠ Pub')
+    ('/images/entity_images/objects/3877a566c8962ea7b4bf0f0d.jpg', 'Restoran Madera', true, 'Restoran Madera'),
+    ('/images/entity_images/objects/153262c8ead55b23b7eecbe6.jpg', 'Restoran St. Marks Place', true, 'Restoran St. Marks Place'),
+    ('/images/entity_images/objects/770ac40af5269087b888a031.jpg', 'Dečji kulturni centar Beograd', true, 'Dečji kulturni centar Beograd'),
+    ('/images/entity_images/objects/889e111a4d5b4339e392777d.jpg', 'TAŠ Pub', true, 'TAŠ Pub')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
@@ -24000,10 +23600,10 @@ VALUES
 -- SAVSKI TRG IMAGES - OBJEKTI
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://www.gdecemo.rs/uploads/2017/01/gal_1483354252_e996_f.jpg', 'Mr. Stefan Braun', true, 'Mr. Stefan Braun'),
-    ('https://www.novagodinabeograd.rs/wp-content/uploads/2019/08/old_london_pub_5.jpg', 'Old London Pub', true, 'Old London Pub'),
-    ('https://downtownbelgradehostel.com/wp/wp-content/uploads/2021/03/46.jpg', 'Downtown Hostel', true, 'Downtown Hostel'),
-    ('https://beobuild.rs/shared/190908-palata-pravde-01.jpg', 'Palata pravde', true, 'Palata pravde')
+    ('/images/entity_images/objects/a8f12425bee86535b7ab3cf3.jpg', 'Mr. Stefan Braun', true, 'Mr. Stefan Braun'),
+    ('/images/entity_images/objects/4517fe66642df6e500fbc41a.jpg', 'Old London Pub', true, 'Old London Pub'),
+    ('/images/entity_images/objects/7b73323f6ab2a22695d4960c.jpg', 'Downtown Hostel', true, 'Downtown Hostel'),
+    ('/images/entity_images/objects/a15b1cad5d2aca675710d86e.jpg', 'Palata pravde', true, 'Palata pravde')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
@@ -24176,10 +23776,10 @@ VALUES
  -- TERAZIJE BEOGRAD IMAGES - OBJEKTI
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://www.hotelsinbelgrad.com/data/Photos/OriginalPhoto/17194/1719468/1719468196/zepter-hotel-belgrade-member-of-zepter-hotels-belgrade-photo-9.JPEG', 'Hotel Zepter Beograd', true, 'Hotel Zepter Beograd'),
-    ('https://beogradskiizlet.com/wp-content/uploads/2023/05/IMG_20210702_184802.jpg', 'Gradska pivnica Terazije', true, 'Gradska pivnica Terazije'),
-    ('https://www.masina.rs/wp-content/uploads/2023/11/zvezda.jpg', 'Bioskop Zvezda', true, 'Bioskop Zvezda'),
-    ('https://lumierehotelbelgrade.com/wp-content/uploads/2025/07/R74A0383-scaled.jpg', 'Lumiere Hotel Beograd', true, 'Lumiere Hotel Beograd')
+    ('/images/entity_images/objects/65ad55638a817a768706ab04.jpg', 'Hotel Zepter Beograd', true, 'Hotel Zepter Beograd'),
+    ('/images/entity_images/objects/514ca6eb6e4c2f897d72f146.jpg', 'Gradska pivnica Terazije', true, 'Gradska pivnica Terazije'),
+    ('/images/entity_images/objects/602c86d3079de706ea061372.jpg', 'Bioskop Zvezda', true, 'Bioskop Zvezda'),
+    ('/images/entity_images/objects/49f999da6e25212e072595f3.jpg', 'Lumiere Hotel Beograd', true, 'Lumiere Hotel Beograd')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
@@ -24352,10 +23952,10 @@ VALUES
  -- KOSANČIĆEV VENAC IMAGES - OBJEKTI
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://cf.bstatic.com/xdata/images/hotel/max1024x768/99746232.jpg?k=1b332d350c9fcfdb05a690ca82648023866a3326d2d3cbb17b87404bf607cf7d&o=', 'Balkan Soul Hostel', true, 'Balkan Soul Hostel'),
-    ('https://me.ekapija.com/thumbs169/narodna_banka_srbije_070323_tw1024.jpg', 'Narodna banka Srbije - Centar za posetioce', true, 'Narodna banka Srbije - Centar za posetioce'),
-    ('https://www.kafanasfrj.rs/images/foto/15/1v.jpg', 'Kafana SFRJ', true, 'Kafana SFRJ'),
-    ('https://www.znakpitanja.rs/wp-content/uploads/2020/02/Znak-pitanja-0017_smanjeno.jpg', 'Kafana Znak pitanja', true, 'Kafana Znak pitanja')
+    ('/images/entity_images/objects/7a9115ede5b4cce5fa4dfc4c.jpg', 'Balkan Soul Hostel', true, 'Balkan Soul Hostel'),
+    ('/images/entity_images/objects/3101d511cae5916416196661.jpg', 'Narodna banka Srbije - Centar za posetioce', true, 'Narodna banka Srbije - Centar za posetioce'),
+    ('/images/entity_images/objects/911aa3343e754c95f3b9283d.jpg', 'Kafana SFRJ', true, 'Kafana SFRJ'),
+    ('/images/entity_images/objects/fae62301d8d081dfba9cd7be.jpg', 'Kafana Znak pitanja', true, 'Kafana Znak pitanja')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
@@ -24528,10 +24128,10 @@ VALUES
  -- BEOGRAD NA VODI IMAGES - OBJEKTI
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://www.belgradewaterfront.com/static/uploads/galerija-feel-1K9A9481.jpg', 'Buda Bar Beograd', true, 'Buda Bar Beograd'),
-    ('https://vogueadria.com/wp-content/uploads/2024/04/KCGrad_15godina-7.jpg', 'KC Grad', true, 'KC Grad'),
-    ('https://upload.wikimedia.org/wikipedia/commons/6/68/%D0%91%D0%B5%D0%BE%D0%B3%D1%80%D0%B0%D0%B4%D1%81%D0%BA%D0%B8_%D1%81%D0%B0%D1%98%D0%B0%D0%BC_%D0%A5%D0%B0%D0%BB%D0%B0_1%2C_%D0%91%D0%B5%D0%BE%D0%B3%D1%80%D0%B0%D0%B4_%28Belgrade_Fair_%E2%80%93_Hall_1%2C_Serbia%29.jpg', 'Beogradski sajam', true, 'Beogradski sajam'),
-    ('https://media-cdn.tripadvisor.com/media/photo-m/1280/18/6c/a4/a7/savanova.jpg', 'Savanova', true, 'Savanova')
+    ('/images/entity_images/objects/1f1c8c5a3d036e6d892d0686.jpg', 'Buda Bar Beograd', true, 'Buda Bar Beograd'),
+    ('/images/entity_images/objects/efc1543e754e39677179a16c.jpg', 'KC Grad', true, 'KC Grad'),
+    ('/images/entity_images/objects/fb414513bc06d983f9ebe355.jpg', 'Beogradski sajam', true, 'Beogradski sajam'),
+    ('/images/entity_images/objects/13c33cf1f04dcb9aa8638aa4.jpg', 'Savanova', true, 'Savanova')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
@@ -24706,9 +24306,9 @@ VALUES
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
     ('placehohttps://ilovenovisad.com/wp-content/uploads/2016/04/Katolicka-crkva-Ime-Marijino-Novi-Sad-Katedrala.jpglder', 'Rimokatolička crkva Svetog Imena Marije', true, 'Rimokatolička crkva Svetog Imena Marije'),
-    ('https://upload.wikimedia.org/wikipedia/commons/6/66/Gallery_of_Matica_Srpska_building.jpg', 'Galerija Matice srpske', true, 'Galerija Matice srpske'),
-    ('https://gastrotrazilica.com/wp-content/uploads/2024/12/salas345.png', 'Restoran Lazin Salaš', true, 'Restoran Lazin Salaš'),
-    ('https://novisad.travel/wp-content/uploads/2022/02/Arena-cineplex-Dusan-Pujic-naslovna-scaled.jpg', 'Bioskop Arena Cineplexx', true, 'Bioskop Arena Cineplexx')
+    ('/images/entity_images/objects/87dab074d3abf0179abd395e.jpg', 'Galerija Matice srpske', true, 'Galerija Matice srpske'),
+    ('/images/entity_images/objects/00c4a079dd2cad601a8694ae.jpg', 'Restoran Lazin Salaš', true, 'Restoran Lazin Salaš'),
+    ('/images/entity_images/objects/131f4dd22eb3e646691522a6.jpg', 'Bioskop Arena Cineplexx', true, 'Bioskop Arena Cineplexx')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
@@ -24881,10 +24481,10 @@ VALUES
  -- PETROVARADIN FORTRESS IMAGES - OBJEKTI
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://www.mod.gov.rs/multimedia/fotogalerija/foto/kovid_bolnica_ns_3_1630579140.jpg', 'Nova opšta bolnica Novi Sad', true, 'Nova opšta bolnica Novi Sad'),
-    ('https://hotel-garni-bella.visitaserbia.com/data/Photos/OriginalPhoto/16606/1660616/1660616352/garni-hotel-bella-petrovaradin-photo-13.JPEG', 'Garni Hotel Bella', true, 'Garni Hotel Bella'),
-    ('https://novisad.travel/wp-content/uploads/2023/10/DSC_8935_Carda-Saran_compressed-scaled.jpg', 'Restoran Čarda Šaran', true, 'Restoran Čarda Šaran'),
-    ('https://cdn.hkm.hr/2019/08/Crkva-Gospe-Snje%C5%BEne-foto-tekije.com_-1.jpg', 'Svetište Gospe Tekijske', true, 'Svetište Gospe Tekijske')
+    ('/images/entity_images/objects/572d196ae853067fbba248a9.jpg', 'Nova opšta bolnica Novi Sad', true, 'Nova opšta bolnica Novi Sad'),
+    ('/images/entity_images/objects/233062626ff87d8bf9b8df2d.jpg', 'Garni Hotel Bella', true, 'Garni Hotel Bella'),
+    ('/images/entity_images/objects/4c0b4c6b64063101fdcd7015.jpg', 'Restoran Čarda Šaran', true, 'Restoran Čarda Šaran'),
+    ('/images/entity_images/objects/be7974c61ffd9f9d55640ef6.jpg', 'Svetište Gospe Tekijske', true, 'Svetište Gospe Tekijske')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
@@ -25184,16 +24784,16 @@ VALUES
  -- NOVI SAD CENTAR GRADA IMAGES - OBJEKTI
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://live.staticflickr.com/7824/46366134455_74b899a37c_h.jpg', 'Limanska pijaca', true, 'Limanska pijaca'),
-    ('https://duol.eu/storage/app/media/references/thumb/1920x900.crop/hattrickn1.jpg', 'Sportski centar Hettrick', true, 'Sportski centar Hettrick'),
-    ('https://gradskeinfo.rs/wp-content/uploads/2023/04/DSC09998-1.jpg', 'Restoran Dizni', true, 'Restoran Dizni'),
-    ('https://glovo.dhmedia.io/image/stores-glovo/stores/c639eeddeb49b9cc35eff9c4bc55fc936acd8fde07de06d3a6b6a531630a3d52?t=W3sicmVzaXplIjp7Im1vZGUiOiJmaXQiLCJ3aWR0aCI6MTI4MCwiaGVpZ2h0IjoxMjB9fSx7IndlYnAiOnsicSI6ImxvdyJ9fV0=', 'Sabbiadoro', true, 'Sabbiadoro'),
-    ('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/32/8d/46/1b/caption.jpg?w=1200&h=1200&s=1', 'Sheraton Novi Sad', true, 'Sheraton Novi Sad'),
-    ('https://www.decijeigraonice.net/uploads/playgrounds/galleries/adrenalin-park-zemlja-cuda/05bced5df151cfa86aa4b21c9b458f96.jpeg', 'Adrenalin Park Zemlja Čuda', true, 'Adrenalin Park Zemlja Čuda'),
-    ('https://poslovniimeniksrbije.rs/wp-content/uploads/2021/08/Konjicki-klub-Saint-George-Petrovaradin-9.jpg', 'Konjički klub Saint George', true, 'Konjički klub Saint George'),
-    ('https://macchiatogiro.com/wp-content/uploads/2025/02/Prozor-66-scaled.jpg', 'Macchiato Giro', true, 'Macchiato Giro'),
-    ('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/25/40/10/39/gin-tonic.jpg?w=1200&h=1200&s=1', 'Fišer Kafe Bar', true, 'Fišer Kafe Bar'),
-    ('https://media-cdn.tripadvisor.com/media/photo-m/1280/2b/8a/3b/9b/the-interior-boasts-a.jpg', 'Taurus', true, 'Taurus')
+    ('/images/entity_images/objects/496b617ed7ae91c02d8fa34b.jpg', 'Limanska pijaca', true, 'Limanska pijaca'),
+    ('/images/entity_images/objects/6962e94f240cc2d1e14d4638.jpg', 'Sportski centar Hettrick', true, 'Sportski centar Hettrick'),
+    ('/images/entity_images/objects/110147c919508053c111d69a.jpg', 'Restoran Dizni', true, 'Restoran Dizni'),
+    ('/images/entity_images/objects/86a52409316d5b489d65b205.jpg', 'Sabbiadoro', true, 'Sabbiadoro'),
+    ('/images/entity_images/objects/8b9f0cbc82bf0b240aaf8020.jpg', 'Sheraton Novi Sad', true, 'Sheraton Novi Sad'),
+    ('/images/entity_images/objects/2275fabc68f74e55dd6d057a.jpg', 'Adrenalin Park Zemlja Čuda', true, 'Adrenalin Park Zemlja Čuda'),
+    ('/images/entity_images/objects/7b46c74007f0742449dc9fc3.jpg', 'Konjički klub Saint George', true, 'Konjički klub Saint George'),
+    ('/images/entity_images/objects/6dee9ba64f08aa5bcb5b2bd9.jpg', 'Macchiato Giro', true, 'Macchiato Giro'),
+    ('/images/entity_images/objects/442a3d92d96835df82026ea4.jpg', 'Fišer Kafe Bar', true, 'Fišer Kafe Bar'),
+    ('/images/entity_images/objects/d0b7885acaefb8b5151c02eb.jpg', 'Taurus', true, 'Taurus')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
@@ -25607,8 +25207,8 @@ VALUES
 -- LIMANSKI PARK IMAGES - LOKALITET
 WITH source("Url", "AltText", "IsMain", "LocalityName") AS (
     VALUES
-    ('https://novisad.travel/wp-content/uploads/2018/12/DJI_0020_limanski_park_compressed.jpg', 'Limanski park Novi Sad', true, 'Limanski park'),
-    ('https://gradskeinfo.rs/wp-content/uploads/2023/03/novi-sad-centar-grada-atina.jpg', 'Novi Sad Centar Grada', true, 'Novi Sad Centar Grada')
+    ('/images/entity_images/localities/04e41dcc657c767107ebba64.jpg', 'Limanski park Novi Sad', true, 'Limanski park'),
+    ('/images/entity_images/localities/80da097ad503d7a2c6dd72b1.jpg', 'Novi Sad Centar Grada', true, 'Novi Sad Centar Grada')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "LocalityId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", l."Id", NOW()
@@ -25618,16 +25218,16 @@ JOIN "Localities" l ON l."Name" = s."LocalityName";
 -- LIMANSKI PARK IMAGES - OBJEKTI
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://visitdistrikt.rs/media/2024/02/Kreativni-distrikt-43-scaled.jpg', 'SKCNS Fabrika', true, 'SKCNS Fabrika'),
-    ('https://www.ekapija.com/thumbs/deciji_park_071017_tw1024.jpg', 'Dečije igralište Limanski park', true, 'Dečije igralište Limanski park'),
-    ('https://subafondacija.com/wp-content/uploads/2023/06/23062023-Suba-Plato-08.jpg', 'Plato Mitra Subotića Sube', true, 'Plato Mitra Subotića Sube'),
-    ('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/32/e0/53/88/restoran.jpg', 'Trica Pica', true, 'Trica Pica'),
-    ('https://novaekonomija.rs/wp-content/uploads/2024/12/poslovni-centar-novi-sad-2-e1742217168101.jpg', 'Fontana kod NIS-a', true, 'Fontana kod NIS-a'),
-    ('https://gradski.online/wp-content/uploads/2026/02/Stadion-FK-Indeks-Novi-Sad-Dacko-Igralište.jpg', 'Đačko igralište', true, 'Đačko igralište'),
-    ('https://www.fbgcdn.com/pictures/a30d01b6-32fc-4cb7-8284-436047db3da8.jpg', 'Ni Hao', true, 'Ni Hao'),
-    ('https://img05.restaurantguru.com/r0df-interior-Club-Sonja.jpg', 'Klub Sonja', true, 'Klub Sonja'),
-    ('https://media-cdn.tripadvisor.com/media/photo-m/1280/17/6e/21/ae/carolija-kafe-nepusacki.jpg', 'Čarolija Kafe', true, 'Čarolija Kafe'),
-    ('https://scontent.fbeg5-1.fna.fbcdn.net/v/t1.6435-9/106527216_1461481844053848_2311864430361005028_n.jpg?_nc_cat=109&ccb=1-7&_nc_sid=0b6b33&_nc_ohc=PJphBRP__BYQ7kNvwGavnrr&_nc_oc=AdrEKwOfPKxAs85ID0dYDQImiqIX2KoelR4mO_4vcW7XX650MmtrFDqs31t2VLxywhU&_nc_zt=23&_nc_ht=scontent.fbeg5-1.fna&_nc_gid=ellp6bO9PCHSmayjGbKgNg&_nc_ss=7b289&oh=00_Af4CAJufsW3qc3VN1opR1-xWfDDfk8o_g0Z3sW-5eRugsw&oe=6A33F6BB', 'Biciklana', true, 'Biciklana')
+    ('/images/entity_images/objects/e8af9df3c58777a5aa301598.jpg', 'SKCNS Fabrika', true, 'SKCNS Fabrika'),
+    ('/images/entity_images/objects/47c93a7238c0b0db2f9d21fc.jpg', 'Dečije igralište Limanski park', true, 'Dečije igralište Limanski park'),
+    ('/images/entity_images/objects/42f5879800f6be589dc85c42.jpg', 'Plato Mitra Subotića Sube', true, 'Plato Mitra Subotića Sube'),
+    ('/images/entity_images/objects/7fb0ef1f7cc9a7ea783a54a8.jpg', 'Trica Pica', true, 'Trica Pica'),
+    ('/images/entity_images/objects/fe12a729d7dc549d26b3f8a6.jpg', 'Fontana kod NIS-a', true, 'Fontana kod NIS-a'),
+    ('/images/entity_images/objects/3e67f268f30e00a59ecae070.jpg', 'Đačko igralište', true, 'Đačko igralište'),
+    ('/images/entity_images/objects/ca7e06e7e2d9a70ed101deb0.jpg', 'Ni Hao', true, 'Ni Hao'),
+    ('/images/entity_images/objects/ba532f15701cac7591ee8ded.jpg', 'Klub Sonja', true, 'Klub Sonja'),
+    ('/images/entity_images/objects/fe1cd5bfdd00397669e8da27.jpg', 'Čarolija Kafe', true, 'Čarolija Kafe'),
+    ('/images/entity_images/objects/cd53efbe99dce0318cf0da2e.jpg', 'Biciklana', true, 'Biciklana')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
@@ -25914,10 +25514,10 @@ VALUES
 -- KRALJEV TRG ZLATIBOR IMAGES - OBJEKTI
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://www.hotelzlatibor-resort.com/wp-content/uploads/2022/03/3Y9A6000.jpg', 'Hotel Zlatibor', true, 'Hotel Zlatibor'),
-    ('https://srbijavesti.rs/wp-content/uploads/2025/01/decije-dom-zdravlja-1440x1080.jpg', 'Dom zdravlja Zlatibor', true, 'Dom zdravlja Zlatibor'),
-    ('https://www.381info.com/paketi/6943/1.jpg', 'Konoba Akustik', true, 'Konoba Akustik'),
-    ('https://fkzlatibor.rs/wp-content/uploads/2026/04/meta-stadion-Svajcarija.png', 'Stadion Švajcarija', true, 'Stadion Švajcarija')
+    ('/images/entity_images/objects/64dda71fe2d863bdda55dd64.jpg', 'Hotel Zlatibor', true, 'Hotel Zlatibor'),
+    ('/images/entity_images/objects/4830341159a81042c9294134.jpg', 'Dom zdravlja Zlatibor', true, 'Dom zdravlja Zlatibor'),
+    ('/images/entity_images/objects/3b04b38b64f93ff8fe6ba2cc.jpg', 'Konoba Akustik', true, 'Konoba Akustik'),
+    ('/images/entity_images/objects/227c71b89a3c8c6954903d72.jpg', 'Stadion Švajcarija', true, 'Stadion Švajcarija')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
@@ -26002,7 +25602,7 @@ VALUES
  'Baš lepo mesto za trening i šetnju u blizini centra Zlatibora.',
  NOW());
 
--- TORNIK VIEWPOINT - OBJEKTI
+-- Tornik vidikovac - OBJEKTI
 INSERT INTO "Objects"
 ("Name", "Description", "Address", "PhoneNumber", "Website", "MenuUrl", "CuisineType",
  "WorkingHours", "Price", "Amenities", "Geolocation", "AverageRating", "ReviewCount",
@@ -26023,7 +25623,7 @@ VALUES
  0, 0,
  'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bar'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Tornik Viewpoint'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Tornik vidikovac'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Zlatibor'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'jelena.creator@spirego.com'),
  (SELECT "ManagedByUserId" FROM "Destinations" WHERE "Name" = 'Zlatibor'),
@@ -26042,7 +25642,7 @@ VALUES
  0, 0,
  'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Apartman'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Tornik Viewpoint'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Tornik vidikovac'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Zlatibor'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'jelena.creator@spirego.com'),
  (SELECT "ManagedByUserId" FROM "Destinations" WHERE "Name" = 'Zlatibor'),
@@ -26061,25 +25661,25 @@ VALUES
  0, 0,
  'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Kafić'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Tornik Viewpoint'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Tornik vidikovac'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Zlatibor'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'jelena.creator@spirego.com'),
  (SELECT "ManagedByUserId" FROM "Destinations" WHERE "Name" = 'Zlatibor'),
  NOW(), NOW(), NOW());
 
- -- TORNIK VIEWPOINT IMAGES - OBJEKTI
+ -- Tornik vidikovac IMAGES - OBJEKTI
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://www.gondola.rs/images/gondola-zlatibor-restoran.jpg', 'Gold Gondola Bar', true, 'Gold Gondola Bar'),
-    ('https://img.halooglasi.com/slike/oglasi/Thumbs/211109/l/vila-zlatiborska-idila-5425637213145-71797922432.jpg', 'Vila Zlatiborska Idila', true, 'Vila Zlatiborska Idila'),
-    ('https://img.restaurantguru.com/r9c7-design-Vizitor-caffe.jpg', 'Vizitor Caffee Berg', true, 'Vizitor Caffee Berg')
+    ('/images/entity_images/objects/285fd921eb662a88d744922e.jpg', 'Gold Gondola Bar', true, 'Gold Gondola Bar'),
+    ('/images/entity_images/objects/d7d9a3c3b94f52ce38600137.jpg', 'Vila Zlatiborska Idila', true, 'Vila Zlatiborska Idila'),
+    ('/images/entity_images/objects/a8af07898c7160e3779f8c8f.jpg', 'Vizitor Caffee Berg', true, 'Vizitor Caffee Berg')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
 FROM source s
 JOIN "Objects" o ON o."Name" = s."ObjectName";
 
--- TORNIK VIEWPOINT RECENZIJE - OBJEKTI
+-- Tornik vidikovac RECENZIJE - OBJEKTI
 INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "CreatedAt")
 VALUES
 
@@ -26157,7 +25757,7 @@ VALUES
  -- NIŠKA TVRĐAVA IMAGES - LOKALITET
 WITH source("Url", "AltText", "IsMain", "LocalityName") AS (
     VALUES
-    ('https://www.serbia.travel/wp-content/uploads/2024/11/1400x800-Niska-Tvrđava-autor-Shutterstock.jpg', 'Niška tvrđava', true, 'Niška Tvrđava')
+    ('/images/entity_images/localities/a7e4a1db49a5e0a5d4925173.jpg', 'Niška tvrđava', true, 'Niška Tvrđava')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "LocalityId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", l."Id", NOW()
@@ -26365,16 +25965,16 @@ VALUES
  -- NIŠKA TVRĐAVA IMAGES - OBJEKTI
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://visitnis.org/wp-content/uploads/2021/09/Koncentracioni-logor-iz-II-sv-rata.jpg', 'Nacistički koncentracioni logor Crveni Krst', true, 'Nacistički koncentracioni logor Crveni Krst'),
-    ('https://scontent.fbeg5-1.fna.fbcdn.net/v/t39.30808-6/468323447_1108623474598773_5585162519864366924_n.jpg?_nc_cat=109&ccb=1-7&_nc_sid=cc71e4&_nc_ohc=sgxm5wV2-t8Q7kNvwHEQ0Mv&_nc_oc=AdquFvD7Xmkfp40OYZ5ws5TtuI0q4VvpVwGBHgTRTIlsjY8WI-1BuOzzfvDoPvVYbRw&_nc_zt=23&_nc_ht=scontent.fbeg5-1.fna&_nc_gid=zyxD8KAxIE__W-n5B-iGKg&_nc_ss=7b289&oh=00_Af6Mw0SllapOZSgzMSx_egtqlojacEVmupQaC_itRYQG3A&oe=6A125C5D', 'Restoran Aleksića Tvrđava', true, 'Restoran Aleksića Tvrđava'),
-    ('https://upload.wikimedia.org/wikipedia/commons/d/d6/GSLU_Ni%C5%A1%2C_Salon_77.JPG', 'Galerija Salon 77', true, 'Galerija Salon 77'),
-    ('https://static.dw.com/image/56164838_1006.webp', 'Stambol kapija', true, 'Stambol kapija'),
-    ('https://gradskiportal018.rs/wp-content/uploads/2025/08/Gradska-basta.jpg', 'Gradska bašta', true, 'Gradska bašta'),
-    ('https://upload.wikimedia.org/wikipedia/commons/0/06/Niska_Tvrđava_ostaci_kapije1.jpg', 'Vidin kapija', true, 'Vidin kapija'),
-    ('https://upload.wikimedia.org/wikipedia/commons/7/79/Niska_Tvrđava_ostaci_kapije2.jpg', 'Vodena kapija', true, 'Vodena kapija'),
-    ('https://upload.wikimedia.org/wikipedia/commons/c/c8/Spomen_kosturnica_u%C4%8Desnicima_Topli%C4%8Dkog_ustanka_u_Ni%C5%A1u.jpg', 'Spomen kosturnica streljanim Srbima', true, 'Spomen kosturnica streljanim Srbima'),
-    ('https://glasjuga.rs/wp-content/uploads/2023/11/letnja-pozornica.jpg', 'Letnja pozornica', true, 'Letnja pozornica'),
-    ('https://www.juznevesti.com/wp-content/uploads/2019/05/17/106351/Novi-ulaz-Tvrdjavska-pijaca-Nis1-foto-JKP-Tržnica-Nis.jpg.webp', 'Zelena pijaca', true, 'Zelena pijaca')
+    ('/images/entity_images/objects/8406aac366957f110288e19f.jpg', 'Nacistički koncentracioni logor Crveni Krst', true, 'Nacistički koncentracioni logor Crveni Krst'),
+    ('/images/entity_images/objects/77e3345ce8611ab0840b65c7.jpg', 'Restoran Aleksića Tvrđava', true, 'Restoran Aleksića Tvrđava'),
+    ('/images/entity_images/objects/3893870aad7b2883a68e8168.jpg', 'Galerija Salon 77', true, 'Galerija Salon 77'),
+    ('/images/entity_images/objects/3bc29776b7839f682c14146b.jpg', 'Stambol kapija', true, 'Stambol kapija'),
+    ('/images/entity_images/objects/b66e9a1cd83c5942d9461f02.jpg', 'Gradska bašta', true, 'Gradska bašta'),
+    ('/images/entity_images/objects/6064fd5aa8545c057e8bc2bd.jpg', 'Vidin kapija', true, 'Vidin kapija'),
+    ('/images/entity_images/objects/f9a89092e59a3357fdb8621e.jpg', 'Vodena kapija', true, 'Vodena kapija'),
+    ('/images/entity_images/objects/f4045e5f8f1622692a872831.jpg', 'Spomen kosturnica streljanim Srbima', true, 'Spomen kosturnica streljanim Srbima'),
+    ('/images/entity_images/objects/67490f1871fdd430ca6f6846.jpg', 'Letnja pozornica', true, 'Letnja pozornica'),
+    ('/images/entity_images/objects/d0b9214499b98418e10e64b4.jpg', 'Zelena pijaca', true, 'Zelena pijaca')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
@@ -26508,10 +26108,10 @@ VALUES
  -- CENTAR NIŠA IMAGES - OBJEKTI
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Kafana_Ni%C5%A1lijska_mehana.IMG_1686.jpg/1280px-Kafana_Ni%C5%A1lijska_mehana.IMG_1686.jpg', 'Nišlijska Mehana', true, 'Nišlijska Mehana'),
-    ('https://centroprojekt-doo.com/wp-content/uploads/2021/05/delta-planet-nis.png', 'Delta Planet Niš', true, 'Delta Planet Niš'),
-    ('https://www.ininfo.rs/wp-content/uploads/2023/02/Nis-Dom-Vojske-1280x960.jpg', 'Dom Vojske Srbije', true, 'Dom Vojske Srbije'),
-    ('https://visitnis.org/wp-content/uploads/2021/09/oficirski-dom-nis.jpg', 'Oficirski dom', true, 'Oficirski dom')
+    ('/images/entity_images/objects/0986b5fa849d18a2172c790c.jpg', 'Nišlijska Mehana', true, 'Nišlijska Mehana'),
+    ('/images/entity_images/objects/94a1b241595baa9d1f4ed72c.jpg', 'Delta Planet Niš', true, 'Delta Planet Niš'),
+    ('/images/entity_images/objects/53e7664c46674de5293631ea.jpg', 'Dom Vojske Srbije', true, 'Dom Vojske Srbije'),
+    ('/images/entity_images/objects/c63baa968ee65c118c085c31.jpg', 'Oficirski dom', true, 'Oficirski dom')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
@@ -26684,10 +26284,10 @@ VALUES
  -- ČAIR IMAGES - OBJEKTI
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://scontent.fbeg5-1.fna.fbcdn.net/v/t39.30808-6/510016784_9979652405479437_6767357518483245045_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=833d8c&_nc_ohc=l52iWw9ocS8Q7kNvwFCDOWG&_nc_oc=AdoYFXhMg0iCq1GiC7IR1jSPRuEDnCHYZkCruuEEWq8liKVp4Auw7IM6xZHWWFY8cQM&_nc_zt=23&_nc_ht=scontent.fbeg5-1.fna&_nc_gid=JyZIuQMEvLtW4rpebxYjzQ&_nc_ss=7b289&oh=00_Af49XCP-Alsc8ivdryp4XND0d5TZ02QeOjFGZpSvPjVmtg&oe=6A129689', 'Čairski Rock and Sports Caffe', true, 'Čairski Rock and Sports Caffe'),
-    ('https://www.ekapija.com/thumbs/akvapark_040920_tw1024.jpg', 'Akva park Niš', true, 'Akva park Niš'),
-    ('https://upload.wikimedia.org/wikipedia/commons/0/0e/Clinical_Centre_Ni%C5%A1.jpg', 'Gradska bolnica', true, 'Gradska bolnica'),
-    ('https://gradskiportal018.rs/wp-content/uploads/2024/09/Pozorište-lutaka-Nis.jpg', 'Pozorište lutaka Niš', true, 'Pozorište lutaka Niš')
+    ('/images/entity_images/objects/5517982ac683f54e5db43bd5.jpg', 'Čairski Rock and Sports Caffe', true, 'Čairski Rock and Sports Caffe'),
+    ('/images/entity_images/objects/c5e6204e6dfecb01d2ab583e.jpg', 'Akva park Niš', true, 'Akva park Niš'),
+    ('/images/entity_images/objects/38ee3d5fc799edfe15d8b269.jpg', 'Gradska bolnica', true, 'Gradska bolnica'),
+    ('/images/entity_images/objects/6a650be6eca3cd388187d45d.jpg', 'Pozorište lutaka Niš', true, 'Pozorište lutaka Niš')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
@@ -26840,9 +26440,9 @@ VALUES
  -- KIČEVO IMAGES - OBJEKTI
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://kafanazvrk.rs/storage/hero/hmVVsjDnMwl55sRxaAtiVpXWZLpSeGpHdEKqcMf2.jpg', 'Zvrk', true, 'Zvrk'),
-    ('https://princ.rs/wp-content/uploads/2019/11/f32650240-scaled.jpg', 'Restoran Princ', true, 'Restoran Princ'),
-    ('https://scontent.fbeg5-1.fna.fbcdn.net/v/t39.30808-6/482024854_1150936493399602_1084581568613542950_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=127cfc&_nc_ohc=eHwILp9gicwQ7kNvwHqSnEt&_nc_oc=Adq7LtybANruM0QF0oKNiohaYguirsdPb0t6DYAEZ7BoYFywDHAEeAOFy_gw84eKQVA&_nc_zt=23&_nc_ht=scontent.fbeg5-1.fna&_nc_gid=fmXrmKnw8Iv0eC9FHXr5bg&_nc_ss=7b289&oh=00_Af7oNnjCfGKyrz7didgUGkN6yMMSOjfBQmtKbYA35x9nVA&oe=6A1273D0', 'Easy Cafe', true, 'Easy Cafe')
+    ('/images/entity_images/objects/94f4933dec9cb03a6f615a3b.jpg', 'Zvrk', true, 'Zvrk'),
+    ('/images/entity_images/objects/8235dae04547a8ac7218d00f.jpg', 'Restoran Princ', true, 'Restoran Princ'),
+    ('/images/entity_images/objects/a5507c36ea1d3ce184ba4df0.jpg', 'Easy Cafe', true, 'Easy Cafe')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
@@ -26969,10 +26569,10 @@ VALUES
 -- DURLAN IMAGES - OBJEKTI
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://megafon.co/wp-content/uploads/2018/06/VPB-Vre%C5%BEina-Foto-Komanda-Garnizona-Nis.jpg', 'Vojni bazen Vrežina', true, 'Vojni bazen Vrežina'),
-    ('https://suggesteat.com/images/blog/kuvano-hero.webp', 'Roštiljnica Golub', true, 'Roštiljnica Golub'),
-    ('https://static.where-e.com/Serbia/Ni/Guest-Accommodation-Todor_a10c0025dc313568a10a890704db9217.jpg', 'Guest Accommodation Todor', true, 'Guest Accommodation Todor'),
-    ('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/12/38/77/c4/ministarstvo-beer-bar.jpg', 'Beer Point Niš', true, 'Beer Point Niš')
+    ('/images/entity_images/objects/fd1051f657e06ae5c30891d0.jpg', 'Vojni bazen Vrežina', true, 'Vojni bazen Vrežina'),
+    ('/images/entity_images/objects/bc2b4b35a37e8a72002a37f4.jpg', 'Roštiljnica Golub', true, 'Roštiljnica Golub'),
+    ('/images/entity_images/objects/59134c31cbe852b5d298d62f.jpg', 'Guest Accommodation Todor', true, 'Guest Accommodation Todor'),
+    ('/images/entity_images/objects/05f9c0b84065c429ff6cde7e.jpg', 'Beer Point Niš', true, 'Beer Point Niš')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
@@ -27132,10 +26732,10 @@ VALUES
  -- TROŠARINA IMAGES - OBJEKTI
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://cdn.cpi-europe.com/uploads/production/602b986b5851a4f31d39b6b0/sr_nis_spotlight.png', 'STOP SHOP Niš', true, 'STOP SHOP Niš'),
-    ('https://visitnis.org/wp-content/uploads/2021/09/medijana-nis.jpg', 'Medijana - Carska palata Konstantina Velikog', true, 'Medijana - Carska palata Konstantina Velikog'),
-    ('https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Wiki.Ni%C5%A1_foto_Crkva_Vaskrsenja_Hristovog_%28Ni%C5%A1%29_1626_14.jpg/1280px-Wiki.Ni%C5%A1_foto_Crkva_Vaskrsenja_Hristovog_%28Ni%C5%A1%29_1626_14.jpg', 'Crkva Vaskrsenja Hristovog', true, 'Crkva Vaskrsenja Hristovog'),
-    ('https://dagiplus.rs/wp-content/uploads/2025/01/RS-001.jpg', 'Kafana Dagi Plus', true, 'Kafana Dagi Plus')
+    ('/images/entity_images/objects/4bc16c9dc7ae1f0adb7cc8d1.jpg', 'STOP SHOP Niš', true, 'STOP SHOP Niš'),
+    ('/images/entity_images/objects/a077c54024b4e3f4ca84d904.jpg', 'Medijana - Carska palata Konstantina Velikog', true, 'Medijana - Carska palata Konstantina Velikog'),
+    ('/images/entity_images/objects/63b3c0773fa392dedae21b75.jpg', 'Crkva Vaskrsenja Hristovog', true, 'Crkva Vaskrsenja Hristovog'),
+    ('/images/entity_images/objects/c056ff9b8b54a652ceae31fd.jpg', 'Kafana Dagi Plus', true, 'Kafana Dagi Plus')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
@@ -27308,10 +26908,10 @@ VALUES
  -- CENTAR KRAGUJEVCA IMAGES - OBJEKTI
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://upload.wikimedia.org/wikipedia/commons/a/af/Narodni_muzej_%C5%A0umadije_u_Kragujevcu_06.jpg', 'Narodni muzej Šumadije', true, 'Narodni muzej Šumadije'),
-    ('https://www.ekapija.com/thumbs169/hram_svete_trojice_stara_crkva_kragujevac_131024_tw1024.jpg', 'Hram Svete Trojice', true, 'Hram Svete Trojice'),
-    ('https://www.kulturnonasledje.com/images/saborna_crkva_kragujevac_2x.jpg?crc=4101020143', 'Svetouspenska saborna crkva', true, 'Svetouspenska saborna crkva'),
-    ('https://www.srce-sweets.co.rs/wp-content/uploads/2015/07/animacija-01.jpg', 'Srce poslastičarnica', true, 'Srce poslastičarnica')
+    ('/images/entity_images/objects/38d359e4e9c6b118642e31e4.jpg', 'Narodni muzej Šumadije', true, 'Narodni muzej Šumadije'),
+    ('/images/entity_images/objects/84704c165e6502be1051f438.jpg', 'Hram Svete Trojice', true, 'Hram Svete Trojice'),
+    ('/images/entity_images/objects/cef95dcb9f813ddf72f75c8a.jpg', 'Svetouspenska saborna crkva', true, 'Svetouspenska saborna crkva'),
+    ('/images/entity_images/objects/3ee1a6294408a0e9364b1747.jpg', 'Srce poslastičarnica', true, 'Srce poslastičarnica')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
@@ -27471,10 +27071,10 @@ VALUES
  -- ŠUMARICE IMAGES - OBJEKTI
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://gtokg.org.rs/wp-content/uploads/2021/03/IMG_2542.jpg', 'Botanička bašta Kragujevac', true, 'Botanička bašta Kragujevac'),
-    ('https://scontent.fbeg5-1.fna.fbcdn.net/v/t39.30808-6/471191695_1245597839815254_7089828596326890333_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=cc71e4&_nc_ohc=I4jsa0R_GIEQ7kNvwET5Kls&_nc_oc=AdoqwcObREhbA0_g8p4gvlTuc5cwzlMlT9rCbVwYFidImKkH6n7R5Nwtizhs9yFDVXU&_nc_zt=23&_nc_ht=scontent.fbeg5-1.fna&_nc_gid=GVfES1fwKNVPXqgtp2p1Yg&_nc_ss=7b289&oh=00_Af7-6VL_VTT8VZbXZgydByu20pIcUMb-cbYjNb5HrYJdwQ&oe=6A137239', 'Hotel Šumarice', true, 'Hotel Šumarice'),
-    ('https://scontent.fbeg5-1.fna.fbcdn.net/v/t39.30808-6/491402354_2467710253576328_1199090508847695604_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=cc71e4&_nc_ohc=vaGuJwtZBXgQ7kNvwFT4yAj&_nc_oc=AdoX5cx_H2HgHWyzvdRcmUAfLQ6mVN39YP5mYx7dJgCMTxMzm4khfQmmcXjFjR8wH1A&_nc_zt=23&_nc_ht=scontent.fbeg5-1.fna&_nc_gid=8y53gs8pD7BHlRdi37_zRQ&_nc_ss=7b289&oh=00_Af4krnlhRkcpymYZwnNsLFysLVvtfQhfLw4uWFTFh3w6gg&oe=6A135F04', 'Oranica Woodland', true, 'Oranica Woodland'),
-    ('https://upload.wikimedia.org/wikipedia/commons/7/7b/Wiki_%C5%A0umadija_XI_%C5%A0umarice_Memorial_Park_440.jpg', 'Put 1300 kaplara', true, 'Put 1300 kaplara')
+    ('/images/entity_images/objects/32b60a7d0e4fac0ee1fd58c3.jpg', 'Botanička bašta Kragujevac', true, 'Botanička bašta Kragujevac'),
+    ('/images/entity_images/objects/f337756b6f1ac0f03f406870.jpg', 'Hotel Šumarice', true, 'Hotel Šumarice'),
+    ('/images/entity_images/objects/2bab7c93a9562ef34f74538f.jpg', 'Oranica Woodland', true, 'Oranica Woodland'),
+    ('/images/entity_images/objects/39e858ff84bcd8b02d4ad289.jpg', 'Put 1300 kaplara', true, 'Put 1300 kaplara')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
@@ -27628,9 +27228,9 @@ VALUES
  -- BUBANJSKO JEZERO IMAGES - OBJEKTI
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://www.turistickiklub.com/upload/hoteli/1712140208_DvoristeKg.jpg', 'Restoran Dvorište', true, 'Restoran Dvorište'),
-    ('https://www.b92.net/data/images/2024-04-26/21664_bs_orig.jpg', 'NIS Petrol Bubanj', true, 'NIS Petrol Bubanj'),
-    ('https://ocdn.eu/pulscms/MDA_/e1687911abe6f3c2bd20b0642046768c.jpg', 'Knez Petrol Bubanj', true, 'Knez Petrol Bubanj')
+    ('/images/entity_images/objects/aa4913943753d13768c07121.jpg', 'Restoran Dvorište', true, 'Restoran Dvorište'),
+    ('/images/entity_images/objects/12012a438de638f8c1167fe1.jpg', 'NIS Petrol Bubanj', true, 'NIS Petrol Bubanj'),
+    ('/images/entity_images/objects/9e007e9acb65dccbc2a4dad2.jpg', 'Knez Petrol Bubanj', true, 'Knez Petrol Bubanj')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
@@ -27898,16 +27498,16 @@ VALUES
  -- VELIKI PARK IMAGES - OBJEKTI
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://lh5.googleusercontent.com/p/AF1QipM778DxRQG_ZigCLkW_toOWmspi3PuS_Ea5CUT-=w1630-h920-k-no', 'Kafić Ozon', true, 'Kafić Ozon'),
-    ('https://rtk.co.rs/wp-content/uploads/2024/10/Stadion-Cika-Daca-radovi.jpg', 'Stadion Čika Dača', true, 'Stadion Čika Dača'),
-    ('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2b/60/3e/9c/caption.jpg?w=1200&h=1200&s=1', 'Ambassador House', true, 'Ambassador House'),
-    ('https://crowncafferestaurant.rs/wp-content/uploads/2022/08/CROWN-RESTAURANT-croped-2.jpg', 'Crown Caffe & Restaurant', true, 'Crown Caffe & Restaurant'),
-    ('https://scontent.fbeg5-1.fna.fbcdn.net/v/t39.30808-6/488618193_1214857520647789_6640680338181770702_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=127cfc&_nc_ohc=bn-_5RaLkIwQ7kNvwFbUlji&_nc_oc=Adr-C9YgmoHm6QwZACMwS6M4E5xu8BkFehIXcQKwJQav6PSU0x5_LcB0KrvRaamWe68&_nc_zt=23&_nc_ht=scontent.fbeg5-1.fna&_nc_gid=YWlTkwvdohLeOFvM_BjigQ&_nc_ss=7b289&oh=00_Af5C8fSdAEF1dztSPWzzgn_59VGrm9CHX19wl6ukVcmHDw&oe=6A137D81', 'Gringo', true, 'Gringo'),
-    ('https://www.kvkradnicki.com/wp-content/uploads/2018/04/otvoreni-bazen.jpg', 'Otvoreni bazeni Kragujevac', true, 'Otvoreni bazeni Kragujevac'),
-    ('https://www.bazenikragujevac.com/wp-content/uploads/2019/08/bazenikragujevac10.jpg', 'Zatvoreni bazeni Kragujevac', true, 'Zatvoreni bazeni Kragujevac'),
-    ('https://kudanaklopu.com/storage/app/uploads/public/5e7/66c/cb6/5e766ccb6c783769167558.jpg.webp', 'Neptun', true, 'Neptun'),
-    ('https://img05.restaurantguru.com/rac7-Zlo-i-Naopako-kafe-i-koktel-bar-bartender.jpg', 'Zlo i naopako', true, 'Zlo i naopako'),
-    ('https://upload.wikimedia.org/wikipedia/commons/a/a8/Studentski_kulturni_centar_Kragujevac_04.jpg', 'SKC Kragujevac', true, 'SKC Kragujevac')
+    ('/images/entity_images/objects/8f38e187c96303390c88608d.jpg', 'Kafić Ozon', true, 'Kafić Ozon'),
+    ('/images/entity_images/objects/392a978d7b476542d1714e0f.jpg', 'Stadion Čika Dača', true, 'Stadion Čika Dača'),
+    ('/images/entity_images/objects/353cf8283e7882cac88b491b.jpg', 'Ambassador House', true, 'Ambassador House'),
+    ('/images/entity_images/objects/c5a999f4c2fac9fe204d1426.jpg', 'Crown Caffe & Restaurant', true, 'Crown Caffe & Restaurant'),
+    ('/images/entity_images/objects/ea7c6a34a1f762d014ef152c.jpg', 'Gringo', true, 'Gringo'),
+    ('/images/entity_images/objects/456f81f3204ffc88fc800414.jpg', 'Otvoreni bazeni Kragujevac', true, 'Otvoreni bazeni Kragujevac'),
+    ('/images/entity_images/objects/12c9d777b14e6e0e70dd2bde.jpg', 'Zatvoreni bazeni Kragujevac', true, 'Zatvoreni bazeni Kragujevac'),
+    ('/images/entity_images/objects/e044cc3ee2f15702b0c7b025.jpg', 'Neptun', true, 'Neptun'),
+    ('/images/entity_images/objects/eff8e44fb1feda87f70fcd60.jpg', 'Zlo i naopako', true, 'Zlo i naopako'),
+    ('/images/entity_images/objects/907991b13fd8f6af579c568f.jpg', 'SKC Kragujevac', true, 'SKC Kragujevac')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
@@ -28269,16 +27869,16 @@ VALUES
  -- TRG RADOMIRA PUTNIKA IMAGES - OBJEKTI
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://kudanaklopu.com/storage/app/uploads/public/5e7/66e/f69/5e766ef6960ac475848052.jpg.webp', 'Restoran Vega', true, 'Restoran Vega'),
-    ('https://www.danas.rs/wp-content/uploads/2026/05/05-Panoramski-tocak-u-centru-Kragujevca.jpg', 'Panoramski točak Kragujevac', true, 'Panoramski točak Kragujevac'),
-    ('https://lh3.googleusercontent.com/p/AF1QipMVbMKc9IQMQp58lI29Z_dis5nm1f7Krnk3KQvV=w1024-k', 'Radnički shopping centar', true, 'Radnički shopping centar'),
-    ('https://img3.restaurantguru.com/rbb3-Gastro-Bar-Giulietta-interior-2025-06.jpg', 'Giulietta', true, 'Giulietta'),
-    ('https://scontent.fbeg5-1.fna.fbcdn.net/v/t39.30808-6/479258303_1137523894830675_1898073874632612113_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=cc71e4&_nc_ohc=aiU-Yj_gQ3AQ7kNvwE6M93f&_nc_oc=Ado38F2XvT1iX6WGr8ty1NApuBZd58M34rgtsebL4a0h4EiOHZJnq9sjWF7L8y3j2F4&_nc_zt=23&_nc_ht=scontent.fbeg5-1.fna&_nc_gid=SR4FlJ2BkEsSg-xU3zQZ-w&_nc_ss=7b289&oh=00_Af51iVsSR4Ll4mXRQNowE_C2S-N1tXjxo-OW0yCWTjnOOw&oe=6A136B72', 'Sputnik 1957', true, 'Sputnik 1957'),
-    ('https://caffeforum.rs/design/caffe-forum-index-slider-01.jpg', 'Caffe Forum', true, 'Caffe Forum'),
-    ('https://scontent.fbeg5-1.fna.fbcdn.net/v/t39.30808-6/482239650_3955053451445900_1719427955748803764_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=cc71e4&_nc_ohc=l4XIPiH5D64Q7kNvwGTq639&_nc_oc=AdoTHefU9QhUwnNaOCLQSWJzUwes5v5nIQa7rRt5_UYPLSvar5hy550T7Q5QX8Pw4hg&_nc_zt=23&_nc_ht=scontent.fbeg5-1.fna&_nc_gid=YGO_NEyuArPoP0ttYjFWOw&_nc_ss=7b289&oh=00_Af4kaR-zasr-C8Pz1cn5ROpejLWFhHsD2GLLyFVE7ZY1sQ&oe=6A137431', 'Plato', true, 'Plato'),
-    ('https://img3.restaurantguru.com/r9cd-Deep-Jazz-Caffe-interior-2025-06.jpg', 'Deep Jazz Caffe', true, 'Deep Jazz Caffe'),
-    ('https://www.vecernji.hr/media/img/aa/15/d1f4906b4631a77908e0.jpeg', 'KGGroove', true, 'KGGroove'),
-    ('https://cafebarrestoran.rs/wp-content/uploads/2022/08/buena-vista-kragujevac.jpg', 'Buena Vista', true, 'Buena Vista')
+    ('/images/entity_images/objects/fb81d73cf3f24cc8222616af.jpg', 'Restoran Vega', true, 'Restoran Vega'),
+    ('/images/entity_images/objects/fec3537321483fc6b12d2703.jpg', 'Panoramski točak Kragujevac', true, 'Panoramski točak Kragujevac'),
+    ('/images/entity_images/objects/2b35211cbb1bef7cf86b8a2e.jpg', 'Radnički shopping centar', true, 'Radnički shopping centar'),
+    ('/images/entity_images/objects/ad52511308317e0f81a0e707.jpg', 'Giulietta', true, 'Giulietta'),
+    ('/images/entity_images/objects/ba64d397ec39d2879b35f042.jpg', 'Sputnik 1957', true, 'Sputnik 1957'),
+    ('/images/entity_images/objects/0530a8b39c8a0f1b70ac38cd.jpg', 'Caffe Forum', true, 'Caffe Forum'),
+    ('/images/entity_images/objects/b29bf991cc966a10147841f1.jpg', 'Plato', true, 'Plato'),
+    ('/images/entity_images/objects/5f63aa6c7b8248e3371ab2e1.jpg', 'Deep Jazz Caffe', true, 'Deep Jazz Caffe'),
+    ('/images/entity_images/objects/58bdccd41d4e86a41385dc7e.jpg', 'KGGroove', true, 'KGGroove'),
+    ('/images/entity_images/objects/105a810b48ed19ae9add4f60.jpg', 'Buena Vista', true, 'Buena Vista')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
@@ -28574,13 +28174,13 @@ VALUES
  -- PEŠAČKA ZONA KRAGUJEVAC IMAGES - OBJEKTI
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://hotelkragujevac.com/wp-content/uploads/2023/12/images-09-1.jpg', 'Hotel Kragujevac', true, 'Hotel Kragujevac'),
-    ('https://hotelkragujevac.com/wp-content/uploads/2023/12/20200516_100418.jpg', 'Panorama restoran', true, 'Panorama restoran'),
-    ('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/16/e0/28/ba/photo0jpg.jpg?w=1200&h=1200&s=1', 'Palačinkarnica Peron', true, 'Palačinkarnica Peron'),
-    ('https://scontent.fbeg5-1.fna.fbcdn.net/v/t1.6435-9/90174932_2657662314516657_7861755305376350208_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=833d8c&_nc_ohc=jcwLBECvMZMQ7kNvwEE1QxL&_nc_oc=AdpUpdP5iCnUvvsOFpbqktNGYDm93MDmvmDYiPrfgu-tjZAUNW9LgsxDOy-3K-C0kFQ&_nc_zt=23&_nc_ht=scontent.fbeg5-1.fna&_nc_gid=-QiwBNXm0JX9CLv1OvB4Zw&_nc_ss=7b289&oh=00_Af4GwOtDirWWE9amqBI4BfxMM3R_L_RMci2c0aphowbtUQ&oe=6A350195', 'Azimut Caffee', true, 'Azimut Caffee'),
-    ('https://glovo.dhmedia.io/image/stores-glovo/stores/2b66e9c8c5bb9c81dabda4cbda5333e454b82db009f652b57b5a643bf8bb42d1?t=W3sicmVzaXplIjp7Im1vZGUiOiJmaXQiLCJ3aWR0aCI6MTI4MCwiaGVpZ2h0IjoxMjB9fSx7IndlYnAiOnsicSI6ImxvdyJ9fV0=', 'Angel & Devil', true, 'Angel & Devil'),
-    ('https://lh3.googleusercontent.com/p/AF1QipMG7XFVZ1MSXhv7todb5REmXrqUexiucJgX7Eep=w1024-k', 'Triptih', true, 'Triptih'),
-    ('https://www.infokg.rs/files/cafeteria_staklenik.jpg', 'Cafeteria', true, 'Cafeteria')
+    ('/images/entity_images/objects/4193f86e8e62f784d3991f48.jpg', 'Hotel Kragujevac', true, 'Hotel Kragujevac'),
+    ('/images/entity_images/objects/58f64ee1a552740000dc570f.jpg', 'Panorama restoran', true, 'Panorama restoran'),
+    ('/images/entity_images/objects/c663a73459b509b3d49597d9.jpg', 'Palačinkarnica Peron', true, 'Palačinkarnica Peron'),
+    ('/images/entity_images/objects/ef86bbbcbdcfd0fac948d1cd.jpg', 'Azimut Caffee', true, 'Azimut Caffee'),
+    ('/images/entity_images/objects/3fcd5233dc090d35c3f932a2.jpg', 'Angel & Devil', true, 'Angel & Devil'),
+    ('/images/entity_images/objects/419d43ed69bb2495f6f398a3.jpg', 'Triptih', true, 'Triptih'),
+    ('/images/entity_images/objects/878cdf7938af438df8a04cdc.jpg', 'Cafeteria', true, 'Cafeteria')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
@@ -28780,10 +28380,10 @@ VALUES
  -- CENTAR SUBOTICE IMAGES - OBJEKTI
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://www.subotica.com/pub-photo/thumb/fullsize/2022/05/21/77474/SUBOTICAcom_21Maj2022_GradskihipodromBacka_2984315.jpg?v=1771598264', 'Hipodrom Subotica', true, 'Hipodrom Subotica'),
-    ('https://upload.wikimedia.org/wikipedia/commons/5/56/Pa%C5%82ac_Rajhla_%28Galeria_Sztuki_Wsp%C3%B3%C5%82czesnej%29_w_Suboticy.jpg', 'Rajhl Palata', true, 'Rajhl Palata'),
-    ('https://upload.wikimedia.org/wikipedia/commons/e/e6/Ku%C4%87a_na_Trgu_Sinagoge_br._3_u_Subotici.jpg', 'Gradski muzej Subotica', true, 'Gradski muzej Subotica'),
-    ('https://bookaweb.s3.eu-central-1.amazonaws.com/media/24959/katedrala-sv-tereze-avilske-2.jpg', 'Katedrala Svete Terezije Avilske', true, 'Katedrala Svete Terezije Avilske')
+    ('/images/entity_images/objects/cfed79b157b5ae689b757746.jpg', 'Hipodrom Subotica', true, 'Hipodrom Subotica'),
+    ('/images/entity_images/objects/fc7ca81099b69e6cec39be7b.jpg', 'Rajhl Palata', true, 'Rajhl Palata'),
+    ('/images/entity_images/objects/0620b43585f6e25e0bd5c8ae.jpg', 'Gradski muzej Subotica', true, 'Gradski muzej Subotica'),
+    ('/images/entity_images/objects/5fb70fc95ad6b40c15ea52a2.jpg', 'Katedrala Svete Terezije Avilske', true, 'Katedrala Svete Terezije Avilske')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
@@ -28925,9 +28525,9 @@ VALUES
  -- KELEBIJA IMAGES - OBJEKTI
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://s1.wklcdn.com/image_270/8126682/75585928/49430572Master.jpg', 'Majdan Kelebija', true, 'Majdan Kelebija'),
-    ('https://www.ekoserbia.com/uploads/resources/11315/8ld_6730-fenlarge.jpg?lm=79FFCA557F5FCE990FD2336C12413934', 'EKO Kelebija', true, 'EKO Kelebija'),
-    ('https://tosmomi.rs/wp-content/uploads/2023/01/KNO_3782-HDR-scaled.jpg', 'Crkva Svetog Arhiđakona Stefana', true, 'Crkva Svetog Arhiđakona Stefana')
+    ('/images/entity_images/objects/d22f8ed65f3ba81e5237bdfc.jpg', 'Majdan Kelebija', true, 'Majdan Kelebija'),
+    ('/images/entity_images/objects/f3080d12a2fb0d2a8d067a33.jpg', 'EKO Kelebija', true, 'EKO Kelebija'),
+    ('/images/entity_images/objects/c62530c74ae253dadba22c84.jpg', 'Crkva Svetog Arhiđakona Stefana', true, 'Crkva Svetog Arhiđakona Stefana')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
@@ -29184,8 +28784,8 @@ VALUES
 
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEi2v5LEFsAb3lDr-d6Haf9VmxBXKC9zhfO6ZBYXgrzS-fgXwXwdGPOCjNjZjZyMZZSSbt9WZcM-GIfUI6bR8ZTMfNszZbHp4vGbTc9O9WVr3bjlLtH-KhgjYsb0lXvIFo7Oqqw835Gm2JAA2CDC-C6CIL4n7d5i7uwn_HWGPe9c47iOQnzqEcDqgxkOug/s1600/20190426_161908.jpg', 'Spomenik poginulim deminerima', true, 'Spomenik poginulim deminerima'),
-    ('https://www.infokop.net/images/stories/info/graditeljske%20vrednosti/obelisk2.jpg', 'Obelisk Suvo Rudište', true, 'Obelisk Suvo Rudište')
+    ('/images/entity_images/objects/29c97dc0369e3306698ffee8.jpg', 'Spomenik poginulim deminerima', true, 'Spomenik poginulim deminerima'),
+    ('/images/entity_images/objects/57cb85fffb161960cb032a5f.jpg', 'Obelisk Suvo Rudište', true, 'Obelisk Suvo Rudište')
 )
 
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
@@ -29234,10 +28834,10 @@ VALUES
 
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://www.infokop.net/images/stories/vesti/2020/leto/ambulanta.jpg', 'Ambulanta Kopaonik', true, 'Ambulanta Kopaonik'),
-    ('https://cf.bstatic.com/xdata/images/hotel/max1024x768/273414684.jpg?k=e1287c919c4ee8e66bfe127bdb55c24be73ffde2396541fa320749247e1d927c&o=', 'Župa apartmani', true, 'Župa apartmani'),
-    ('https://www.kopaoniksmestaj.rs/storage/images/accommodations/www.kopaoniksmestaj.rs/34/thumbnails/large/apartments_kop_konaci_and_angella_5577.jpg', 'Angella Kop Konaci', true, 'Angella Kop Konaci'),
-    ('https://www.infokop.net/images/stories/ugostitelji/maglic/B1.jpg', 'Restoran Bar Maglič', true, 'Restoran Bar Maglič')
+    ('/images/entity_images/objects/cd2acff0bad9bbb216dc3c4e.jpg', 'Ambulanta Kopaonik', true, 'Ambulanta Kopaonik'),
+    ('/images/entity_images/objects/ea64eb537ec1da7ef482c6ea.jpg', 'Župa apartmani', true, 'Župa apartmani'),
+    ('/images/entity_images/objects/690a7a295a96f33cfb337f52.jpg', 'Angella Kop Konaci', true, 'Angella Kop Konaci'),
+    ('/images/entity_images/objects/f5588a4052406751ebe9032e.jpg', 'Restoran Bar Maglič', true, 'Restoran Bar Maglič')
 )
 
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
@@ -29450,16 +29050,16 @@ VALUES
 
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://vila-runolist.visitaserbia.com/data/Photos/OriginalPhoto/520/52095/52095719/vila-runolist-kopaonik-photo-60.JPEG', 'Vila Runolist', true, 'Vila Runolist'),
-    ('https://www.svetputovanja.info/wp-content/uploads/2021/02/suncani-breg-welnes-and-spa-26.jpg', 'Suncani Breg Resort & Spa', true, 'Suncani Breg Resort & Spa'),
-    ('https://booknstay.eu/storage/accommodation_images/336/3.jpg', 'Vila Popara', true, 'Vila Popara'),
-    ('https://www.infokop.net/images/stories/vesti/2020/leto/vila-trag-lm-25.jpg', 'Vila Trag', true, 'Vila Trag'),
-    ('https://m.infokop.net/full_thmb/ugostitelji.pub-kopaonik.new1.3.jpg', 'Pub Zodiac', true, 'Pub Zodiac'),
-    ('https://agencijapanorama.rs/wp-content/uploads/2023/10/hotel-apart-zoned-kopaonik.jpg', 'Apart & Spa Zoned', true, 'Apart & Spa Zoned'),
-    ('https://www.kostovac.com/wp-content/uploads/2021/12/1-3.jpg', 'Kostovac Boutique Apartments', true, 'Kostovac Boutique Apartments'),
-    ('https://cf.bstatic.com/xdata/images/hotel/max1024x768/619443298.jpg?k=4220a5e6983b23cce9feef52bd32fee6117c971235ba07c708102e8615d1a241&o=', 'Noma restoran', true, 'Noma restoran'),
-    ('https://cf.bstatic.com/xdata/images/hotel/max1024x768/412453536.jpg?k=b0e87f152dc191cb21a2b95672901071b34fc7facfa167df56336ebcc83e9b30&o=', 'President Kop', true, 'President Kop'),
-    ('https://scontent.fbeg5-1.fna.fbcdn.net/v/t1.6435-9/186507972_4158977610848174_1409376532283900680_n.jpg?_nc_cat=103&ccb=1-7&_nc_sid=3a1ebe&_nc_ohc=yVb88Cqc_aIQ7kNvwGvxiqF&_nc_oc=AdpqQSSKwM3geIGYiWCUwsXSHvQ5yKVy6PPnPfGVaR7V1-W5jI7GVkWmvXbvmEqIH58&_nc_zt=23&_nc_ht=scontent.fbeg5-1.fna&_nc_gid=I2Mq1DMZCCw0VpXlqg-PmA&_nc_ss=7b289&oh=00_Af7W9CEQUAOH4GwqysxgdbdRO8ALNNKs9GIK3JQq0dXQBw&oe=6A353E8E', 'Crkva svetog velikomučenika Dimitrija', true, 'Crkva svetog velikomučenika Dimitrija')
+    ('/images/entity_images/objects/ba64a54f7e14be6f98ae9be2.jpg', 'Vila Runolist', true, 'Vila Runolist'),
+    ('/images/entity_images/objects/46ee44aac09c3d87a9c24ffa.jpg', 'Suncani Breg Resort & Spa', true, 'Suncani Breg Resort & Spa'),
+    ('/images/entity_images/objects/c00694ecf0a1ee28f9dab3b7.jpg', 'Vila Popara', true, 'Vila Popara'),
+    ('/images/entity_images/objects/75bd1f78c2d9dc53625a773a.jpg', 'Vila Trag', true, 'Vila Trag'),
+    ('/images/entity_images/objects/ce9d3954dc9f3197628071d5.jpg', 'Pub Zodiac', true, 'Pub Zodiac'),
+    ('/images/entity_images/objects/fb7b1716f63ce44247365831.jpg', 'Apart & Spa Zoned', true, 'Apart & Spa Zoned'),
+    ('/images/entity_images/objects/0e2da3d911edaa797d26b75b.jpg', 'Kostovac Boutique Apartments', true, 'Kostovac Boutique Apartments'),
+    ('/images/entity_images/objects/4ce2fdb264caa91edaef0c86.jpg', 'Noma restoran', true, 'Noma restoran'),
+    ('/images/entity_images/objects/c2cf3d3df11a9c89b9ff75c3.jpg', 'President Kop', true, 'President Kop'),
+    ('/images/entity_images/objects/93748eb09ba3ec584129f508.jpg', 'Crkva svetog velikomučenika Dimitrija', true, 'Crkva svetog velikomučenika Dimitrija')
 )
 
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
@@ -29670,8 +29270,8 @@ VALUES
 
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/%D0%A6%D1%80%D0%BA%D0%B2%D0%B0_%D0%A1%D0%B2._%D0%88%D0%BE%D0%B2%D0%B0%D0%BD%D0%B0_%D0%9A%D1%80%D1%81%D1%82%D0%B8%D1%82%D0%B5%D1%99%D0%B0_%D1%83_%D0%A0%D0%B0%D1%82%D0%B8%D0%BD%D0%B8.jpg/1280px-%D0%A6%D1%80%D0%BA%D0%B2%D0%B0_%D0%A1%D0%B2._%D0%88%D0%BE%D0%B2%D0%B0%D0%BD%D0%B0_%D0%9A%D1%80%D1%81%D1%82%D0%B8%D1%82%D0%B5%D1%99%D0%B0_%D1%83_%D0%A0%D0%B0%D1%82%D0%B8%D0%BD%D0%B8.jpg', 'Crkva svetog Jovana Krstitelja', true, 'Crkva svetog Jovana Krstitelja'),
-    ('https://www.infokop.net/images/stories/info/graditeljske%20vrednosti/jelovarnik/jelovarnik103.jpg', 'Vodopad Jelovarnik', true, 'Vodopad Jelovarnik')
+    ('/images/entity_images/objects/c2b6dc849b571d0bb697b4cc.jpg', 'Crkva svetog Jovana Krstitelja', true, 'Crkva svetog Jovana Krstitelja'),
+    ('/images/entity_images/objects/f73f9df86267d14d532b4723.jpg', 'Vodopad Jelovarnik', true, 'Vodopad Jelovarnik')
 )
 
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
@@ -29795,10 +29395,10 @@ VALUES
 
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://img.restaurantguru.com/re63-Kacara-interior-2022-09-4.jpg', 'Restoran Kačara', true, 'Restoran Kačara'),
-    ('https://lbcdn.airpaz.com/hotelimages/3418716/vila-malisevac-mitrovac-c76ab1e55adc0248c33ae074769310c4.jpg', 'Mitrovački konak', true, 'Mitrovački konak'),
-    ('https://cf.bstatic.com/xdata/images/hotel/max1024x768/262283235.jpg?k=7c52a6d79968497b5bb6f4f7521f0ea129a129cfb14a37065415b875787188e8&o=', 'Apartmani Sunčani Breg', true, 'Apartmani Sunčani Breg'),
-    ('https://scontent.fbeg5-1.fna.fbcdn.net/v/t39.30808-6/653713393_1360390512787671_6094613322915121574_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=127cfc&_nc_ohc=yvbDW0EDdR0Q7kNvwFYuqLU&_nc_oc=AdqGXQuOTGQHRdFurnG_23amNQsmJJryqxL-pHqQVfY_0toKg0wBHjXIkx5i5ngscXw&_nc_zt=23&_nc_ht=scontent.fbeg5-1.fna&_nc_gid=o-03xl3TDDiSVERx0C7OsQ&_nc_ss=7b289&oh=00_Af49H9YZ7dusDmjV16a7sd8N-rc9QpmAwLaHGLWazSTcrQ&oe=6A139199', 'Vila Kod Dila', true, 'Vila Kod Dila')
+    ('/images/entity_images/objects/c327af6794e9953dabea8e1e.jpg', 'Restoran Kačara', true, 'Restoran Kačara'),
+    ('/images/entity_images/objects/a2c052d8f85edf1ee9961f07.jpg', 'Mitrovački konak', true, 'Mitrovački konak'),
+    ('/images/entity_images/objects/eae9e197739c715d1daee253.jpg', 'Apartmani Sunčani Breg', true, 'Apartmani Sunčani Breg'),
+    ('/images/entity_images/objects/4e86bcc26cf33590f2c6e91a.jpg', 'Vila Kod Dila', true, 'Vila Kod Dila')
 )
 
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
@@ -29934,10 +29534,10 @@ VALUES
 
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://topsmestaj.com/wp-content/uploads/2020/05/Vikendica-Drinska-Vila-13.webp', 'Vikendica Drinska vila', true, 'Vikendica Drinska vila'),
-    ('https://topsmestaj.com/wp-content/uploads/2024/02/Splavovi-Horizont-Perucac-18.webp', 'Hotel Jezero Perućac', true, 'Hotel Jezero Perućac'),
-    ('https://upload.wikimedia.org/wikipedia/commons/5/5d/Mramorje_2012_6.JPG', 'Mramorje', true, 'Mramorje'),
-    ('https://www.drinskaprica.rs/uploads/galerija/8/8.jpg', 'Drinska priča', true, 'Drinska priča')
+    ('/images/entity_images/objects/6c85f860a83a31eaa8abc157.jpg', 'Vikendica Drinska vila', true, 'Vikendica Drinska vila'),
+    ('/images/entity_images/objects/58009936ecf549d6538fab74.jpg', 'Hotel Jezero Perućac', true, 'Hotel Jezero Perućac'),
+    ('/images/entity_images/objects/744815a04c95e4730911903b.jpg', 'Mramorje', true, 'Mramorje'),
+    ('/images/entity_images/objects/e08423c32e75ed820e6cf8eb.jpg', 'Drinska priča', true, 'Drinska priča')
 )
 
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
@@ -30057,9 +29657,9 @@ VALUES
 
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://topsmestaj.com/wp-content/uploads/2024/11/Carobna-koliba-Tara-7.webp', 'Dren Banjska Stena', true, 'Dren Banjska Stena'),
-    ('https://topsmestaj.com/wp-content/uploads/2024/11/Carobna-koliba-Tara-23.webp', 'Logs Cabins Banjska Stena', true, 'Logs Cabins Banjska Stena'),
-    ('https://www.reklamirajtese.rs/wp-content/uploads/2023/07/koliba-na-bregu-tara-1.jpg', 'Tilia Cottage', true, 'Tilia Cottage')
+    ('/images/entity_images/objects/27e4bcd0f76417aef909df34.jpg', 'Dren Banjska Stena', true, 'Dren Banjska Stena'),
+    ('/images/entity_images/objects/f986bf4b3995748882ab0718.jpg', 'Logs Cabins Banjska Stena', true, 'Logs Cabins Banjska Stena'),
+    ('/images/entity_images/objects/45b93f8fa54bbc1648cbaa60.jpg', 'Tilia Cottage', true, 'Tilia Cottage')
 )
 
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
@@ -30189,10 +29789,10 @@ VALUES
 
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://static.goto-where.com/135865-albums-1.jpg', 'Restoran Jeremičak', true, 'Restoran Jeremičak'),
-    ('https://lh4.googleusercontent.com/proxy/1ttL8sYM8ZorgP5uGkbGZwiF0H89WfbeoDNL-G24Z8u2s0ZY5vf0FUveq4Pa6J6sSEabAxJFjAaC3fssOP9elmtfJq8J1z0', 'Hotel Javor', true, 'Hotel Javor'),
-    ('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/0d/7a/25/ac/photo1jpg.jpg?w=1200&h=-1&s=1', 'Konak Sova', true, 'Konak Sova'),
-    ('https://kurta-tara.com/wp-content/uploads/2024/06/Restoran-Kurta-5-1.jpg', 'Kafana Kurta', true, 'Kafana Kurta')
+    ('/images/entity_images/objects/aa7d60b784354e9005a61a2c.jpg', 'Restoran Jeremičak', true, 'Restoran Jeremičak'),
+    ('/images/entity_images/objects/1147f8694f1e7401dfb26a24.jpg', 'Hotel Javor', true, 'Hotel Javor'),
+    ('/images/entity_images/objects/559a788388f0ca4a79f1a027.jpg', 'Konak Sova', true, 'Konak Sova'),
+    ('/images/entity_images/objects/d57ba45283431be5da279c06.jpg', 'Kafana Kurta', true, 'Kafana Kurta')
 )
 
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
@@ -30329,10 +29929,10 @@ VALUES
 
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://scontent.fbeg5-1.fna.fbcdn.net/v/t39.30808-6/650727564_5210798015811440_399095105690595766_n.jpg?stp=cp6_dst-jpg_tt6&_nc_cat=108&ccb=1-7&_nc_sid=aa7b47&_nc_ohc=mF2ZXfoqZRMQ7kNvwEWwO4Q&_nc_oc=Ado8a4VtLBYcmFaFWiA0OqkwhIQmRTJxXCZKYu71rKQE8TuOIN9uBqW20LoNHfE4GQ8&_nc_zt=23&_nc_ht=scontent.fbeg5-1.fna&_nc_gid=bgPvg7q2PNRIZ1MfpG0BOA&_nc_ss=7b289&oh=00_Af64Js_sAL_w9tM82fn5KJqI63saK47Hc7OUJVErZ8RQIw&oe=6A139570', 'Kafe bar Teuta', true, 'Kafe bar Teuta'),
-    ('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/14/1a/bb/2a/lepenska-ribica.jpg?w=1200&h=1200&s=1', 'Lepenska ribica', true, 'Lepenska ribica'),
-    ('https://ocdn.eu/images/pulscms/YjA7MDA_/e31751d3e1717adab0108cd13ddeafcc.jpg', 'Mamut', true, 'Mamut'),
-    ('https://www.ekapija.com/thumbs169/crkva_svetog_nikole_donji_milanovac_140525_tw1024.jpg', 'Crkva svetog Nikole', true, 'Crkva svetog Nikole')
+    ('/images/entity_images/objects/f119bf2f04454ecdbb5809f4.jpg', 'Kafe bar Teuta', true, 'Kafe bar Teuta'),
+    ('/images/entity_images/objects/efe5edbfdf5236389a985d70.jpg', 'Lepenska ribica', true, 'Lepenska ribica'),
+    ('/images/entity_images/objects/c7a90f9503b801a4bca79383.jpg', 'Mamut', true, 'Mamut'),
+    ('/images/entity_images/objects/c861de038144efb980e4c68c.jpg', 'Crkva svetog Nikole', true, 'Crkva svetog Nikole')
 )
 
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
@@ -30453,9 +30053,9 @@ VALUES
 
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://www.moja-delatnost.rs/Image/IndexFile?name=Najboljirestoranpore%C4%8DkarekaDonjiMilanovac.jpg', 'Restoran Mosna', true, 'Restoran Mosna'),
-    ('https://biseridunavaidjerdapa.rs/wp-content/uploads/2019/08/Trajanova-tabla.jpg', 'Trajanova tabla', true, 'Trajanova tabla'),
-    ('https://www.381info.com/paketi/10427/2.jpg', 'Restoran Panorama', true, 'Restoran Panorama')
+    ('/images/entity_images/objects/58ad400414cee581aef82fbd.jpg', 'Restoran Mosna', true, 'Restoran Mosna'),
+    ('/images/entity_images/objects/7da93859a4274b4fda2bbcd9.jpg', 'Trajanova tabla', true, 'Trajanova tabla'),
+    ('/images/entity_images/objects/cad91157f56a5596e66fa406.jpg', 'Restoran Panorama', true, 'Restoran Panorama')
 )
 
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
@@ -30545,8 +30145,8 @@ VALUES
 
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://inspiracijadunav.rs/wp-content/uploads/2023/08/kladovo-he-djerdap-1.jpg', 'Hidroelektrana Đerdap', true, 'Hidroelektrana Đerdap'),
-    ('https://pbs.twimg.com/media/EeCHmwMXYAIVinS.jpg', 'Titov spomen park', true, 'Titov spomen park')
+    ('/images/entity_images/objects/cd1015acc77fae1c74325c7b.jpg', 'Hidroelektrana Đerdap', true, 'Hidroelektrana Đerdap'),
+    ('/images/entity_images/objects/b7ee0c62a79188874dff4468.jpg', 'Titov spomen park', true, 'Titov spomen park')
 )
 
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
@@ -30665,10 +30265,10 @@ VALUES
 
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Specijalna_bolnica_%22Merkur%22%2C_Vrnja%C4%8Dka_Banja.jpg/1280px-Specijalna_bolnica_%22Merkur%22%2C_Vrnja%C4%8Dka_Banja.jpg', 'Merkur Vrnjačka Banja', true, 'Merkur Vrnjačka Banja'),
-    ('https://www.ekapija.com/thumbs169/vinarija_grabak_1_090816_tw1024.jpg', 'Vinarija i bazeni Grabak', true, 'Vinarija i bazeni Grabak'),
-    ('https://www.jumbo.rs/wp-content/uploads/2021/05/Hotel-Solaris-Resort-Vranjcka-Banja-Jumbo-Travel-hotel-spolja.jpg', 'Hotel Solaris', true, 'Hotel Solaris'),
-    ('https://img.restaurantguru.com/r462-Dobra-klopa-design-2023-12.jpg', 'Dobra klopa', true, 'Dobra klopa')
+    ('/images/entity_images/objects/2c975a457f82f0ce89f4c17e.jpg', 'Merkur Vrnjačka Banja', true, 'Merkur Vrnjačka Banja'),
+    ('/images/entity_images/objects/5522524253cd93d6077e1ccc.jpg', 'Vinarija i bazeni Grabak', true, 'Vinarija i bazeni Grabak'),
+    ('/images/entity_images/objects/7da439ea853516cd5a824b53.jpg', 'Hotel Solaris', true, 'Hotel Solaris'),
+    ('/images/entity_images/objects/a79a6bdced2c7ddfd3dca89d.jpg', 'Dobra klopa', true, 'Dobra klopa')
 )
 
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
@@ -30749,7 +30349,7 @@ VALUES
  (SELECT "ManagedByUserId" FROM "Destinations" WHERE "Name" = 'Vrnjačka Banja'),
  NOW(), NOW(), NOW()),
 
-('Kod Koce',
+('Kod Koče',
  'Kafana u Vrnjcima sa domaćom hranom, jednostavnim ambijentom i opuštenom atmosferom za lokalne goste i turiste.',
  'Vrnjci bb, Vrnjačka Banja',
  '0653322991',
@@ -30791,9 +30391,9 @@ VALUES
 
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://borba-online.rs/wp-content/uploads/2023/04/Foto-Saran-1.jpg', 'Restoran Šaran Inn', true, 'Restoran Šaran Inn'),
-    ('https://scontent.fbeg5-1.fna.fbcdn.net/v/t39.30808-6/475157893_1138240874436570_1211743166768440500_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=bd9a62&_nc_ohc=6LwFbMogjgwQ7kNvwEDqZMw&_nc_oc=AdrTtAiVfZssJsfDwTPld3EUeJEIhWQrt4wzncXitIWpJZEvKcjiSh5mBDwmRdTV8z0&_nc_zt=23&_nc_ht=scontent.fbeg5-1.fna&_nc_gid=IkB3GkPByI684zIOOO31vA&_nc_ss=7b289&oh=00_Af7MpDYaQa161Qqu0l06pyPLcbWDZ9aVAMU7JBjP3ajCyA&oe=6A1392B9', 'Kod Koce', true, 'Kod Koce'),
-    ('https://i0.wp.com/gdeposrbiji.rs/wp-content/uploads/2025/03/Hrana-u-restoranu-u-Vrnjackoj-Banji.webp?fit=1920%2C1280&ssl=1', 'Restoran Orao', true, 'Restoran Orao')
+    ('/images/entity_images/objects/a80714f0772dc1940d3280ec.jpg', 'Restoran Šaran Inn', true, 'Restoran Šaran Inn'),
+    ('/images/entity_images/objects/9c11fde21e3ba69aa4d647c7.jpg', 'Kod Koče', true, 'Kod Koče'),
+    ('/images/entity_images/objects/811afe1b59371d7252168c7d.jpg', 'Restoran Orao', true, 'Restoran Orao')
 )
 
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
@@ -30817,13 +30417,13 @@ VALUES
  4, 'Dobar restoran sa korektnom uslugom. Porcije su bile sasvim solidne.', 'Approved', NOW()),
 
 
--- Kod Koce
+-- Kod Koče
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'teodora.serbia.tourist@spirego.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kod Koce'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kod Koče'),
  4, 'Prava domaća kafana sa jednostavnom, ali ukusnom hranom.', 'Approved', NOW()),
 
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'kristina.serbia.tourist@spirego.com'),
- (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kod Koce'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kod Koče'),
  2, 'Hrana je bila u redu, ali je usluga bila dosta spora tog dana.', 'Approved', NOW()),
 
 
@@ -30919,10 +30519,10 @@ VALUES
 
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://www.ekapija.com/thumbs169/rimski_izvor_vrnjacka_banja_011024_tw1024.jpg', 'Rimski izvor', true, 'Rimski izvor'),
-    ('https://upload.wikimedia.org/wikipedia/commons/6/67/Dvorac_Belimarkovi%C4%87a_3.jpg', 'Zamak Belimarković', true, 'Zamak Belimarković'),
-    ('https://img05.restaurantguru.ru/r5f1-Kafeterija-Vrnjacka-Banja-interior.jpg', 'Kafeterija Vrnjačka Banja', true, 'Kafeterija Vrnjačka Banja'),
-    ('https://www.vrnjackabanjaapartmani.rs/images/vila-savka/big/01.jpg', 'Kafe bar Vila i Savka', true, 'Kafe bar Vila i Savka')
+    ('/images/entity_images/objects/88af4ca7237b91f53394d52f.jpg', 'Rimski izvor', true, 'Rimski izvor'),
+    ('/images/entity_images/objects/60db449d3faf221414306152.jpg', 'Zamak Belimarković', true, 'Zamak Belimarković'),
+    ('/images/entity_images/objects/36054454cb01c4b1a6728f2b.jpg', 'Kafeterija Vrnjačka Banja', true, 'Kafeterija Vrnjačka Banja'),
+    ('/images/entity_images/objects/0e25eb4ba87f53604b14435a.jpg', 'Kafe bar Vila i Savka', true, 'Kafe bar Vila i Savka')
 )
 
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
@@ -31045,9 +30645,9 @@ VALUES
 
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://scontent.fbeg5-1.fna.fbcdn.net/v/t39.30808-6/476622917_1151320326993479_2282068917211097800_n.jpg?_nc_cat=102&ccb=1-7&_nc_sid=cc71e4&_nc_ohc=QZP3yP_hDTkQ7kNvwFBOz_s&_nc_oc=Adp0xJIQrOdml5aU47WEgqVek-vilhc851fdfQ3PL9WgX0tXl1SfPbklHDxb75dNLvo&_nc_zt=23&_nc_ht=scontent.fbeg5-1.fna&_nc_gid=0Hf-FUBcm4uLuvqc6avadw&_nc_ss=7b289&oh=00_Af6vFrMSK_I98rjzG2dsv-oHk75zNsejjCRH8-3-hTXsGQ&oe=6A13B38F', 'NN Picerija', true, 'NN Picerija'),
-    ('https://walter.rs/wp-content/uploads/2024/04/slika-2.webp', 'Walter Vrnjačka Banja', true, 'Walter Vrnjačka Banja'),
-    ('https://www.vrnjackabanjasmestaj.rs/storage/images/others/2/thumbnails/large/restoran_tri_golubice_6113.webp', 'Tri golubice', true, 'Tri golubice')
+    ('/images/entity_images/objects/05e72ea607f9b35f981ce33b.jpg', 'NN Picerija', true, 'NN Picerija'),
+    ('/images/entity_images/objects/9c6cbdda3debe9453512b325.jpg', 'Walter Vrnjačka Banja', true, 'Walter Vrnjačka Banja'),
+    ('/images/entity_images/objects/2e151b31a0bba045190a66a5.jpg', 'Tri golubice', true, 'Tri golubice')
 )
 
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
@@ -31193,16 +30793,16 @@ VALUES
 
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://vojvodina.travel/wp-content/uploads/2026/02/riblja-carda-palic-1.jpg', 'Riblja čarda', true, 'Riblja čarda'),
-    ('https://img.restaurantguru.com/ra9a-photo-Tropski-Bar-Palic-Resort-2021-08-31221.jpg', 'Tropski bar Palić', true, 'Tropski bar Palić'),
-    ('https://visitpalic.rs/wp-content/uploads/2019/07/52.-terasa-scaled.jpg', 'Kafić Terasa', true, 'Kafić Terasa'),
-    ('https://scontent.fbeg5-1.fna.fbcdn.net/v/t1.6435-9/43333379_2049245445113648_2713761183168462848_n.jpg?_nc_cat=106&ccb=1-7&_nc_sid=cc71e4&_nc_ohc=wcUCmNsYsg8Q7kNvwEv3-SV&_nc_oc=Adq446z0Wblv_qyCBBo6UNpSZ_an_SiInwINzis0otlWyzJlcQV7BJuY1IxSRspghWQ&_nc_zt=23&_nc_ht=scontent.fbeg5-1.fna&_nc_gid=aXgLG14c7VO6h1HvzuTvHw&_nc_ss=7b289&oh=00_Af40n6UGNvsAeWAeyN8C1zeWa7aB7d0x2xW-srC166f2Jg&oe=6A355147', 'Kapetanski rit', true, 'Kapetanski rit'),
-    ('https://visitpalic.rs/wp-content/uploads/2019/12/Plaza-Bar-Palic%CC%81-7.jpg', 'Caffe Plaža Bar Palić', true, 'Caffe Plaža Bar Palić'),
-    ('https://topsmestaj.com/wp-content/uploads/2025/03/Vila-Harizma-Palic-2.webp', 'Vila Harizma Palić', true, 'Vila Harizma Palić'),
-    ('https://cf.bstatic.com/xdata/images/hotel/max1024x768/74311720.jpg?k=f3230f725b1a5f2bebea1f08980865cd05ecf4a84e62c3ebb99f9919b3145cfa&o=', 'Viska Boška Palić', true, 'Viska Boška Palić'),
-    ('https://vinarijapetra.com/wp-content/uploads/2023/10/view_01.jpg', 'Vinarija Petra', true, 'Vinarija Petra'),
-    ('https://visitsubotica.rs/wp-content/uploads/2019/07/SUBOTICAcom_25Maj2019_SalasDjordjevic_1307557-1.jpg', 'Salaš Đorđević', true, 'Salaš Đorđević'),
-    ('https://www.vilamasa.rs/wp-content/uploads/2021/05/178936574_2000335793466801_4349905364092730095_n1.jpg', 'Palić Vila Maša', true, 'Palić Vila Maša')
+    ('/images/entity_images/objects/ec3650b950109d744bcc5da4.jpg', 'Riblja čarda', true, 'Riblja čarda'),
+    ('/images/entity_images/objects/5e1ba661435c758385d46df3.jpg', 'Tropski bar Palić', true, 'Tropski bar Palić'),
+    ('/images/entity_images/objects/d8cd5dfe30a4f8d8745fa7ab.jpg', 'Kafić Terasa', true, 'Kafić Terasa'),
+    ('/images/entity_images/objects/a3bd7b8418ce116820c189e9.jpg', 'Kapetanski rit', true, 'Kapetanski rit'),
+    ('/images/entity_images/objects/c30d92a3e615d2c4f93dd2db.jpg', 'Caffe Plaža Bar Palić', true, 'Caffe Plaža Bar Palić'),
+    ('/images/entity_images/objects/7cd6528cb8e004f50eb11ed0.jpg', 'Vila Harizma Palić', true, 'Vila Harizma Palić'),
+    ('/images/entity_images/objects/d2e2e9c7f353e92bcea5fe95.jpg', 'Viska Boška Palić', true, 'Viska Boška Palić'),
+    ('/images/entity_images/objects/7fd04738eafba4114e64efad.jpg', 'Vinarija Petra', true, 'Vinarija Petra'),
+    ('/images/entity_images/objects/61b411a062e659fdbbf5fdf3.jpg', 'Salaš Đorđević', true, 'Salaš Đorđević'),
+    ('/images/entity_images/objects/641c2a97ce964b480238b6e3.jpg', 'Palić Vila Maša', true, 'Palić Vila Maša')
 )
 
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
@@ -31310,9 +30910,9 @@ VALUES
 
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://paligopalata.rs/wp-content/uploads/2024/04/restoran-prostor-2-2048x1365-1.jpg', 'Paligo Palata', true, 'Paligo Palata'),
-    ('https://cf.bstatic.com/xdata/images/hotel/max1024x768/449097222.jpg?k=fa40bac79878d7a1febdbe3c3a752fbfc334053539017149f9b0e707e5453d57&o=', 'Jelen Salaš', true, 'Jelen Salaš'),
-    ('https://cf.bstatic.com/xdata/images/hotel/max1024x768/503129427.jpg?k=469175e99dfee7327b038a61003d344dd65731aa35aab9ad8468c83238a57d08&o=', 'Vila Cvijanović Palić', true, 'Vila Cvijanović Palić')
+    ('/images/entity_images/objects/8b3e5894d6c161fd1eb8d4b7.jpg', 'Paligo Palata', true, 'Paligo Palata'),
+    ('/images/entity_images/objects/239b508ef3967565ec27de4f.jpg', 'Jelen Salaš', true, 'Jelen Salaš'),
+    ('/images/entity_images/objects/7e12fc5a33e1d3531629a5f2.jpg', 'Vila Cvijanović Palić', true, 'Vila Cvijanović Palić')
 )
 
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
@@ -31422,9 +31022,9 @@ VALUES
 
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://cf.bstatic.com/xdata/images/hotel/max1024x768/546860563.jpg?k=c20911c686c5f5959aa934787dd02c6a4cbe1489578b5b251ea6b5d48ec8fa0d&o=', 'Etno selo Molitva', true, 'Etno selo Molitva'),
-    ('https://e-usluga.rs/wp-content/uploads/2025/06/Restoran-tradicionalne-kuhinje-Sjenica-Uvac-5.jpg', 'Restoran Molitva', true, 'Restoran Molitva'),
-    ('https://a0.muscache.com/im/pictures/d6f23e65-1693-40c4-882e-2bb0a64848f4.jpg', 'Apartmani Stari Jasen', true, 'Apartmani Stari Jasen')
+    ('/images/entity_images/objects/c393f9b0a2abd6294748a441.jpg', 'Etno selo Molitva', true, 'Etno selo Molitva'),
+    ('/images/entity_images/objects/6103b9e3d04194710f46364b.jpg', 'Restoran Molitva', true, 'Restoran Molitva'),
+    ('/images/entity_images/objects/1d95b122700c01d466e01573.jpg', 'Apartmani Stari Jasen', true, 'Apartmani Stari Jasen')
 )
 
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
@@ -31536,9 +31136,9 @@ VALUES
 
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://neva-sobe-sa-pogledom-na-planine-holiday-home.visitaserbia.com/data/Photos/OriginalPhoto/10016/1001610/1001610771/neva-sobe-sa-pogledom-na-planine-mokra-gora-photo-23.JPEG', 'Neva apartmani', true, 'Neva apartmani'),
-    ('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/18/f0/d3/b9/interior.jpg?w=1200&h=1200&s=1', 'Restoran Viskonti', true, 'Restoran Viskonti'),
-    ('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/19/b9/cd/07/photo1jpg.jpg?w=1200&h=1200&s=1', 'Restoran Lotika', true, 'Restoran Lotika')
+    ('/images/entity_images/objects/eddde71512b306c1a8d4afcb.jpg', 'Neva apartmani', true, 'Neva apartmani'),
+    ('/images/entity_images/objects/38aa23f1374a93c7d4e5a460.jpg', 'Restoran Viskonti', true, 'Restoran Viskonti'),
+    ('/images/entity_images/objects/fb445255b09611dde7e5dc54.jpg', 'Restoran Lotika', true, 'Restoran Lotika')
 )
 
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
@@ -31647,9 +31247,9 @@ VALUES
 
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://cf.bstatic.com/xdata/images/hotel/max1024x768/685800367.jpg?k=c798ee5999daa3f37d7438eb4f9bb25b52545a48c54760f59bda02246eb8a290&o=', 'Kremna Koncept', true, 'Kremna Koncept'),
-    ('https://bookaweb.s3.eu-central-1.amazonaws.com/media/29880/kremna-4.jpg', 'Etno selo Tarabića kolibe', true, 'Etno selo Tarabića kolibe'),
-    ('https://upload.wikimedia.org/wikipedia/commons/e/e5/Kremna%2C_crkva_001.jpg', 'Crkva svetog Georgija Kremna', true, 'Crkva svetog Georgija Kremna')
+    ('/images/entity_images/objects/c5e4a91b3a7bb9d01df5f86c.jpg', 'Kremna Koncept', true, 'Kremna Koncept'),
+    ('/images/entity_images/objects/444a5b55dae769d74dbfa9a6.jpg', 'Etno selo Tarabića kolibe', true, 'Etno selo Tarabića kolibe'),
+    ('/images/entity_images/objects/60a4c2d2785e5ea7e75b6b24.jpg', 'Crkva svetog Georgija Kremna', true, 'Crkva svetog Georgija Kremna')
 )
 
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
@@ -31794,11 +31394,11 @@ VALUES
 
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://img0.oastatic.com/img2/610299251/max/variant.jpg', 'Restoran Jatare', true, 'Restoran Jatare'),
-    ('https://topsmestaj.com/wp-content/uploads/2024/01/Vikendica-Oaza-Mokra-Gora-27.webp', 'Oaza Mokra Gora', true, 'Oaza Mokra Gora'),
-    ('https://www.021.rs/images/14527c224ae347ef978a2f8d5f586ca7/65895807cf450-IMG_0666.jpg', 'Spomenik parna lokomotiva', true, 'Spomenik parna lokomotiva'),
-    ('https://upload.wikimedia.org/wikipedia/commons/0/05/Mokra_Gora%2C_%C5%A0arganska_osmica_120.jpg', 'Golubici Station', true, 'Golubici Station'),
-    ('https://vacation-home-nana.visitaserbia.com/data/Photos/OriginalPhoto/5171/517165/517165785/vacation-home-nana-mokra-gora-photo-4.JPEG', 'Vacation Home Nana', true, 'Vacation Home Nana')
+    ('/images/entity_images/objects/e024c4a2b8b7bc5004918d39.jpg', 'Restoran Jatare', true, 'Restoran Jatare'),
+    ('/images/entity_images/objects/a2a291077b5adc0b5f2a227a.jpg', 'Oaza Mokra Gora', true, 'Oaza Mokra Gora'),
+    ('/images/entity_images/objects/53e6a2a45342d0820a29f7e4.jpg', 'Spomenik parna lokomotiva', true, 'Spomenik parna lokomotiva'),
+    ('/images/entity_images/objects/036b899a5ea0d77d76b5fb38.jpg', 'Golubici Station', true, 'Golubici Station'),
+    ('/images/entity_images/objects/7e7c172e3a03176c6565ddcc.jpg', 'Vacation Home Nana', true, 'Vacation Home Nana')
 )
 
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
@@ -31927,9 +31527,9 @@ VALUES
 
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://cf.bstatic.com/xdata/images/hotel/max1024x768/847315300.jpg?k=8337e4a90dd4ce89cf9f6d3c9433d519cf308f7c5aea6b6d92a0cf896001d885&o=', 'Hotel Iver', true, 'Hotel Iver'),
-    ('https://cf.bstatic.com/xdata/images/hotel/max1024x768/297112859.jpg?k=f6378993ec09011c2a1d9e17865494b94c6cc9f32f858ed1b44e348e17b18f3e&o=', 'Čarobni breg', true, 'Čarobni breg'),
-    ('https://scontent.fbeg5-1.fna.fbcdn.net/v/t39.30808-6/490715238_1213070277490229_8573258316545971288_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=127cfc&_nc_ohc=lGhG_kAOihgQ7kNvwFXwB4W&_nc_oc=AdpltTvVTjqytfSmxY4XXFWxmS7xVKT0CqROUhSilc4wEwr_tuomUc_zDJUNaVUbTm4&_nc_zt=23&_nc_ht=scontent.fbeg5-1.fna&_nc_gid=ziuPjBRG2-LBLIOjii-o-A&_nc_ss=7b289&oh=00_Af6x1jFtrjWJhg9VPxnpZ8sndGtU81Yv0BwrCQjfNBqEwA&oe=6A13A11B', 'Ranković vikendica', true, 'Ranković vikendica')
+    ('/images/entity_images/objects/d75ed8926d896c8a849d9c15.jpg', 'Hotel Iver', true, 'Hotel Iver'),
+    ('/images/entity_images/objects/44805c5ed9e7fae20f484b2d.jpg', 'Čarobni breg', true, 'Čarobni breg'),
+    ('/images/entity_images/objects/ee67e03da7a13314ce7e6963.jpg', 'Ranković vikendica', true, 'Ranković vikendica')
 )
 
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
@@ -32093,12 +31693,12 @@ VALUES
 
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://cf.bstatic.com/xdata/images/hotel/max1024x768/159144742.jpg?k=4b8a87b16a6e38acab013adf77edf9b5c72cc5c2a95ae9d0d891a7ecfc160cab&o=', 'Apartments DM', true, 'Apartments DM'),
-    ('https://cf.bstatic.com/xdata/images/hotel/max1024x768/554559958.jpg?k=f52e7b53aad05c96dbc20e2b75380ba4d0877185517b127337e2a3d1cba58633&o=', 'Apartman Koja', true, 'Apartman Koja'),
-    ('https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/BeleVode%2C_Mokra_Gora_028.jpg/1280px-BeleVode%2C_Mokra_Gora_028.jpg', 'Vodenica', true, 'Vodenica'),
-    ('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/17/a6/cd/75/apartments-milev.jpg?w=1200&h=1200&s=1', 'Apartments Milev', true, 'Apartments Milev'),
-    ('https://mokragorainfo.com/wp-content/uploads/2025/12/Vila.Sofija.photo_.07.2025.jpg', 'Vila Mokrogorka', true, 'Vila Mokrogorka'),
-    ('https://img.restaurantguru.com/red3-view-kafana-slozhna-braca-2021-09-328335.jpg', 'Kafana Složna braća', true, 'Kafana Složna braća')
+    ('/images/entity_images/objects/213f1fb11d0693607b43caa5.jpg', 'Apartments DM', true, 'Apartments DM'),
+    ('/images/entity_images/objects/fb60b9b07c26060fa9563995.jpg', 'Apartman Koja', true, 'Apartman Koja'),
+    ('/images/entity_images/objects/6768af0f721492184e8a9b53.jpg', 'Vodenica', true, 'Vodenica'),
+    ('/images/entity_images/objects/a13a8dc355417f7d5c648274.jpg', 'Apartments Milev', true, 'Apartments Milev'),
+    ('/images/entity_images/objects/4b86dae6e7d774325c3e7602.jpg', 'Vila Mokrogorka', true, 'Vila Mokrogorka'),
+    ('/images/entity_images/objects/072838b152fda8e698a385ff.jpg', 'Kafana Složna braća', true, 'Kafana Složna braća')
 )
 
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
@@ -32374,16 +31974,16 @@ VALUES
 
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://www.kcv.rs/wp-content/uploads/2023/07/4-scaled.jpg', 'Univerzitetski klinički centar Vojvodine', true, 'Univerzitetski klinički centar Vojvodine'),
-    ('https://upload.wikimedia.org/wikipedia/commons/3/30/KCS_1.jpg', 'Univerzitetski klinički centar Srbije', true, 'Univerzitetski klinički centar Srbije'),
-    ('https://upload.wikimedia.org/wikipedia/commons/b/b2/Clinical_Centre_of_Kragujevac_2020.jpg', 'Univerzitetski klinički centar Kragujevac', true, 'Univerzitetski klinički centar Kragujevac'),
-    ('https://www.lovalova.rs/wp-content/uploads/2025/08/20250801_144528-1950x1050.jpg', 'Opšta bolnica Subotica', true, 'Opšta bolnica Subotica'),
-    ('https://kcnis.rs//content/uploads/2026/01/kc-nis-misija.jpg', 'Univerzitetski klinički centar Niš', true, 'Univerzitetski klinički centar Niš'),
-    ('https://scontent.fbeg7-2.fna.fbcdn.net/v/t39.30808-6/470198113_556587463909020_1110295699908209539_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=cc71e4&_nc_ohc=gxEbDrpDTCwQ7kNvwFtszBp&_nc_oc=AdpZhQCf-4XxAWcuFnnUHRdTKrPr7MqzNfPmda42IYEHBTECxmmxSyhs74iaShXMCPQ&_nc_zt=23&_nc_ht=scontent.fbeg7-2.fna&_nc_gid=rf33qekL2VjEuy3BpsqOOw&_nc_ss=7b289&oh=00_Af6Y9oDHQ6WwlJPRtBD57M8beR95CXke0-65WvQrouSDog&oe=6A172C22', 'Dom zdravlja Dr Veroljub Cakić', true, 'Dom zdravlja Dr Veroljub Cakić'),
-    ('https://upload.wikimedia.org/wikipedia/commons/1/19/Dom_zdravlja_dr_Nikola_D%C5%BEami%C4%87_u_Vrnja%C4%8Dkoj_Banji.jpg', 'Dom zdravlja Dr Nikola Džamić', true, 'Dom zdravlja Dr Nikola Džamić'),
-    ('https://www.subotica.com/pub-photo/thumb/fullsize/2026/01/23/81231/SUBOTICAcom_23Jan.2026_AmbulantaPalic_5779268.jpg?v=1779215021', 'Dom zdravlja Palić', true, 'Dom zdravlja Palić'),
-    ('https://www.infopress.rs/wp-content/uploads/2020/07/Cigota-7.jpg', 'Čigota', true, 'Čigota'),
-    ('https://serbianama.info/wp-content/uploads/2024/04/Ambulanta-Kremna-2-scaled.jpg', 'Zdravstvena stanica Kremna', true, 'Zdravstvena stanica Kremna')
+    ('/images/entity_images/objects/22e88f9a11f6aee27a79138d.jpg', 'Univerzitetski klinički centar Vojvodine', true, 'Univerzitetski klinički centar Vojvodine'),
+    ('/images/entity_images/objects/4964f8466e288d17346d2251.jpg', 'Univerzitetski klinički centar Srbije', true, 'Univerzitetski klinički centar Srbije'),
+    ('/images/entity_images/objects/b5b45ee3016963b777ec1bc0.jpg', 'Univerzitetski klinički centar Kragujevac', true, 'Univerzitetski klinički centar Kragujevac'),
+    ('/images/entity_images/objects/6778eb9831f8f3f0d16148cf.jpg', 'Opšta bolnica Subotica', true, 'Opšta bolnica Subotica'),
+    ('/images/entity_images/objects/aa8eaef3e9e7b30d11521066.jpg', 'Univerzitetski klinički centar Niš', true, 'Univerzitetski klinički centar Niš'),
+    ('/images/entity_images/objects/de197baf1bb24afefdff5e22.jpg', 'Dom zdravlja Dr Veroljub Cakić', true, 'Dom zdravlja Dr Veroljub Cakić'),
+    ('/images/entity_images/objects/106f9b832bc968ac2c6591e5.jpg', 'Dom zdravlja Dr Nikola Džamić', true, 'Dom zdravlja Dr Nikola Džamić'),
+    ('/images/entity_images/objects/d1776b53183e4697269c4a9b.jpg', 'Dom zdravlja Palić', true, 'Dom zdravlja Palić'),
+    ('/images/entity_images/objects/06a5e03a58014a599342b036.jpg', 'Čigota', true, 'Čigota'),
+    ('/images/entity_images/objects/98c20a3be4c2111811f5e555.jpg', 'Zdravstvena stanica Kremna', true, 'Zdravstvena stanica Kremna')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
@@ -32822,14 +32422,14 @@ VALUES
  -- IMAGES - BENZINSKE PUMPE
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
-    ('https://scontent.fbeg7-2.fna.fbcdn.net/v/t1.6435-9/87385196_513283179611986_3756326621250846720_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=127cfc&_nc_ohc=WQcfNHxMNYQQ7kNvwE3aHUk&_nc_oc=AdqAH6xvX-ZlKLvXLfZCtT0Ruo8LMQvpVR4JXhHtIZkHoYICuSdceCQe3x13Hbc1eww&_nc_zt=23&_nc_ht=scontent.fbeg7-2.fna&_nc_gid=FKQBUZ64vJP3JuaH6getbg&_nc_ss=7b289&oh=00_Af7GC0JhywVUNjJQ53f8ta0VCjvSTn8C_i8p2e0f2E8HLg&oe=6A3A6F07', 'Petrol BS Blok 41', true, 'Petrol BS Blok 41'),
-    ('https://scontent.fbeg7-2.fna.fbcdn.net/v/t39.30808-6/617568215_1313471357481665_4104755259407549243_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=127cfc&_nc_ohc=ubkpqwWQ3-cQ7kNvwH6pN3I&_nc_oc=AdrECPXNlq1e7HweTLzJIcbw2aFCCyHYxnnQsZQzp83vWG4Yzc5F3HeynOgkYpk26gQ&_nc_zt=23&_nc_ht=scontent.fbeg7-2.fna&_nc_gid=f85uycmLXwdmPbZNRkvFPw&_nc_ss=7b289&oh=00_Af4fzTXw6ASrB5PONw_ItvqqeH7peCxV5Uo5bIp6huQTOA&oe=6A18D8A2', 'NIS Petrol BS Novi Sad 11', true, 'NIS Petrol BS Novi Sad 11'),
-    ('https://fastly.4sqi.net/img/general/original/37009906_tMQWPZF9a3l6Sn54k-Pys0pTLTZ7kLdo1oFc7OcOL04.jpg', 'Gazprom Petrol Zlatibor', true, 'Gazprom Petrol Zlatibor'),
-    ('https://newsmaxbalkans.com/data/images/2026-04-30/80238_tan2026-04-3014485471-0_orig.jpg', 'NIS Petrol Durlan', true, 'NIS Petrol Durlan'),
-    ('https://www.glassumadije.rs/wp-content/uploads/2021/07/Selova-pumpa-1-1024x768.jpg', 'Shell Kragujevac', true, 'Shell Kragujevac'),
-    ('https://boom93.rs/image/cache/extra-large/files/images/1654162384.803?crop=true', 'NIS Petrol Donji Milanovac', true, 'NIS Petrol Donji Milanovac'),
-    ('https://smartes.rs/wp-content/uploads/2025/01/NIS-pumpa-2-scaled.jpeg', 'Gazprom Petrol Vrnjačka Banja', true, 'Gazprom Petrol Vrnjačka Banja'),
-    ('https://novaekonomija.rs/wp-content/uploads/2023/02/OMV-Pumpa-e1703579055696.jpg', 'OMV Palić', true, 'OMV Palić')
+    ('/images/entity_images/objects/6327fddab97d9e9c854232d8.jpg', 'Petrol BS Blok 41', true, 'Petrol BS Blok 41'),
+    ('/images/entity_images/objects/654da15f0995b9f375b61a12.jpg', 'NIS Petrol BS Novi Sad 11', true, 'NIS Petrol BS Novi Sad 11'),
+    ('/images/entity_images/objects/848ad8a939bf6f1d9cc8cfc5.jpg', 'Gazprom Petrol Zlatibor', true, 'Gazprom Petrol Zlatibor'),
+    ('/images/entity_images/objects/0d377440628c89a0fea695a1.jpg', 'NIS Petrol Durlan', true, 'NIS Petrol Durlan'),
+    ('/images/entity_images/objects/399f163f6fa16b4c8c3550ab.jpg', 'Shell Kragujevac', true, 'Shell Kragujevac'),
+    ('/images/entity_images/objects/6a01fbcbee0ee794f972b487.jpg', 'NIS Petrol Donji Milanovac', true, 'NIS Petrol Donji Milanovac'),
+    ('/images/entity_images/objects/c1de50ef4b93a3dc29e24cff.jpg', 'Gazprom Petrol Vrnjačka Banja', true, 'Gazprom Petrol Vrnjačka Banja'),
+    ('/images/entity_images/objects/44e8561de4a58b79e15e587f.jpg', 'OMV Palić', true, 'OMV Palić')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", o."Id", NOW()
@@ -33277,16 +32877,16 @@ VALUES
 WITH source("Url", "AltText", "IsMain", "ObjectName") AS (
     VALUES
 
-    ('https://assets.hyatt.com/content/dam/hyatt/hyattdam/images/2019/09/24/1052/Hyatt-Regency-Belgrade-P501-Exterior.jpg/Hyatt-Regency-Belgrade-P501-Exterior.4x3.jpg', 'Hyatt Regency Belgrade', true, 'Hyatt Regency Belgrade'),
-    ('https://www.big-cee.com/wp-content/uploads/2025/05/big-fashion-novi-sad.jpg', 'BIG Fashion Liman', true, 'BIG Fashion Liman'),
-    ('https://infoera.rs/wp-content/uploads/2025/06/IMG_20250614_130150_044149-scaled.jpg', 'Pijaca Zlatibor', true, 'Pijaca Zlatibor'),
-    ('https://www.juznevesti.com/wp-content/uploads/2012/03/05/11105/05032012358.jpg', 'Durlanska pijaca', true, 'Durlanska pijaca'),
-    ('https://www.big-cee.com/wp-content/uploads/2022/10/big-fashion-kg.jpg', 'BIG Fashion Kragujevac', true, 'BIG Fashion Kragujevac'),
-    ('https://cf.bstatic.com/xdata/images/hotel/max1024x768/310612265.jpg?k=c9e1482b9393119b286f65a4b4e525386e68b0c24cdfb1ed5bbed38d858f7d55&o=', 'JAT Apartmani Kopaonik', true, 'JAT Apartmani Kopaonik'),
-    ('https://investeastserbia.com/images/investicije/majdanpek/hostel-trajan/hostel-trajan-04.jpg', 'Hostel Trajan', true, 'Hostel Trajan'),
-    ('https://cf.bstatic.com/xdata/images/hotel/max1024x768/620225706.jpg?k=cf3bc580a2f9163028bdac31b8d72ca77668c31b31d8de6958fbebb02653ca97&o=', 'Brvnara Miris Bora', true, 'Brvnara Miris Bora'),
-    ('https://www.vrnjackabanjasmestaj.rs/storage/images/accommodations/www.vrnjackabanjasmestaj.rs/471/thumbnails/large/vila_splendor_5335.webp', 'Vila Splendor', true, 'Vila Splendor'),
-    ('http://www.subotickaTržnica.rs/news/Noc%20SU%20pijaca%202017%20(2).jpg', 'Subotičke pijace', true, 'Subotičke pijace')
+    ('/images/entity_images/objects/0bc8511360a0539a8c6a5d0b.jpg', 'Hyatt Regency Belgrade', true, 'Hyatt Regency Belgrade'),
+    ('/images/entity_images/objects/fa608e755749ba575c784a4c.jpg', 'BIG Fashion Liman', true, 'BIG Fashion Liman'),
+    ('/images/entity_images/objects/e05166a44beff78a8f3f6360.jpg', 'Pijaca Zlatibor', true, 'Pijaca Zlatibor'),
+    ('/images/entity_images/objects/9a0e55009c79cb2c1c4779ed.jpg', 'Durlanska pijaca', true, 'Durlanska pijaca'),
+    ('/images/entity_images/objects/9366dbac8a25420483715720.jpg', 'BIG Fashion Kragujevac', true, 'BIG Fashion Kragujevac'),
+    ('/images/entity_images/objects/7dbbf0a1b09ae2fd42a880ca.jpg', 'JAT Apartmani Kopaonik', true, 'JAT Apartmani Kopaonik'),
+    ('/images/entity_images/objects/243b101d76098a8b852f55ec.jpg', 'Hostel Trajan', true, 'Hostel Trajan'),
+    ('/images/entity_images/objects/75bbddd111d6c319b1c9e487.jpg', 'Brvnara Miris Bora', true, 'Brvnara Miris Bora'),
+    ('/images/entity_images/objects/194330c04371b2488223ac72.jpg', 'Vila Splendor', true, 'Vila Splendor'),
+    ('/images/entity_images/objects/93b95f88f45e1efba592abd3.jpg', 'Subotičke pijace', true, 'Subotičke pijace')
 
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
@@ -33605,38 +33205,38 @@ JOIN "Users" u ON u."Email" = s."CreatorEmail";
 -- GLAVNE SLIKE ZA DODATNE DOGAĐAJE
 WITH source("Url", "AltText", "IsMain", "EventName") AS (
     VALUES
-    ('https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&w=1200&q=80', 'Podgorica gradski derbi', true, 'Podgorica gradski derbi'),
-    ('https://images.unsplash.com/photo-1503095396549-807759245b35?auto=format&fit=crop&w=1200&q=80', 'Veče savremene drame Podgorica', true, 'Veče savremene drame Podgorica'),
-    ('https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=80', 'Morača Summer Fest', true, 'Morača Summer Fest'),
-    ('https://images.unsplash.com/photo-1545987796-200677ee1011?auto=format&fit=crop&w=1200&q=80', 'Izložba mlade crnogorske scene', true, 'Izložba mlade crnogorske scene'),
-    ('https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=1200&q=80', 'Akustični nastup na Ribnici', true, 'Akustični nastup na Ribnici'),
-    ('https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1200&q=80', 'Okupljanje ljubitelja putovanja', true, 'Okupljanje ljubitelja putovanja'),
-    ('https://images.unsplash.com/photo-1528698827591-e19ccd7bc23d?auto=format&fit=crop&w=1200&q=80', 'Sajam domaćih proizvoda Podgorica', true, 'Sajam domaćih proizvoda Podgorica'),
-    ('https://images.unsplash.com/photo-1519861531473-9200262188bf?auto=format&fit=crop&w=1200&q=80', 'Podgorica basket challenge', true, 'Podgorica basket challenge'),
-    ('https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&w=1200&q=80', 'Konferencija digitalni turizam CG', true, 'Konferencija digitalni turizam CG'),
-    ('https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=1200&q=80', 'Radionica fotografije Podgorica', true, 'Radionica fotografije Podgorica'),
-    ('https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80', 'Seminar održivog ugostiteljstva', true, 'Seminar održivog ugostiteljstva'),
-    ('https://images.unsplash.com/photo-1556911220-bff31c812dba?auto=format&fit=crop&w=1200&q=80', 'Takmičenje mladih kuvara CG', true, 'Takmičenje mladih kuvara CG'),
-    ('https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&w=1200&q=80', 'Proslava dana grada Podgorica', true, 'Proslava dana grada Podgorica'),
-    ('https://images.unsplash.com/photo-1527224857830-43a7acc85260?auto=format&fit=crop&w=1200&q=80', 'Stand-up veče Podgorica', true, 'Stand-up veče Podgorica'),
-    ('https://images.unsplash.com/photo-1571266028243-d220c9c3c7d8?auto=format&fit=crop&w=1200&q=80', 'DJ veče na obali Morače', true, 'DJ veče na obali Morače'),
-    ('https://images.unsplash.com/photo-1517927033932-b3d18e61fb3a?auto=format&fit=crop&w=1200&q=80', 'Turnir u malom fudbalu Podgorica', true, 'Turnir u malom fudbalu Podgorica'),
-    ('https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&w=1200&q=80', 'Beogradski večiti susret', true, 'Beogradski večiti susret'),
-    ('https://images.unsplash.com/photo-1503095396549-807759245b35?auto=format&fit=crop&w=1200&q=80', 'Predstava na Dorćolu', true, 'Predstava na Dorćolu'),
-    ('https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=80', 'Sava Street Festival', true, 'Sava Street Festival'),
-    ('https://images.unsplash.com/photo-1545987796-200677ee1011?auto=format&fit=crop&w=1200&q=80', 'Izložba Novi pogledi Beograda', true, 'Izložba Novi pogledi Beograda'),
-    ('https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=1200&q=80', 'Nastup jazz kvarteta', true, 'Nastup jazz kvarteta'),
-    ('https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1200&q=80', 'Okupljanje ljubitelja Dunava', true, 'Okupljanje ljubitelja Dunava'),
-    ('https://images.unsplash.com/photo-1528698827591-e19ccd7bc23d?auto=format&fit=crop&w=1200&q=80', 'Sajam knjiga na otvorenom', true, 'Sajam knjiga na otvorenom'),
-    ('https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&w=1200&q=80', 'Ada sportski dan', true, 'Ada sportski dan'),
-    ('https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&w=1200&q=80', 'Konferencija pametni gradovi Beograd', true, 'Konferencija pametni gradovi Beograd'),
-    ('https://images.unsplash.com/photo-1499781350541-7783f6c6a0c8?auto=format&fit=crop&w=1200&q=80', 'Radionica street art Beograd', true, 'Radionica street art Beograd'),
-    ('https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=1200&q=80', 'Seminar hotelskog marketinga', true, 'Seminar hotelskog marketinga'),
-    ('https://images.unsplash.com/photo-1511920170033-f8396924c348?auto=format&fit=crop&w=1200&q=80', 'Takmičenje barista Beograd', true, 'Takmičenje barista Beograd'),
-    ('https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&w=1200&q=80', 'Proslava beogradskog leta', true, 'Proslava beogradskog leta'),
-    ('https://images.unsplash.com/photo-1527224857830-43a7acc85260?auto=format&fit=crop&w=1200&q=80', 'Stand-up noć na Vračaru', true, 'Stand-up noć na Vračaru'),
-    ('https://images.unsplash.com/photo-1571266028243-d220c9c3c7d8?auto=format&fit=crop&w=1200&q=80', 'DJ veče Beton hala', true, 'DJ veče Beton hala'),
-    ('https://images.unsplash.com/photo-1519861531473-9200262188bf?auto=format&fit=crop&w=1200&q=80', 'Turnir u basketu Beograd', true, 'Turnir u basketu Beograd')
+    ('/images/entity_images/events/3f7929f7a0cc374c0b2559f2.jpg', 'Podgorica gradski derbi', true, 'Podgorica gradski derbi'),
+    ('/images/entity_images/events/89dad700477d6846a2b748a1.jpg', 'Veče savremene drame Podgorica', true, 'Veče savremene drame Podgorica'),
+    ('/images/entity_images/events/b95998c0bb04bf1909122aeb.jpg', 'Morača Summer Fest', true, 'Morača Summer Fest'),
+    ('/images/entity_images/events/3f5e800dee4a5a78622ae0c5.jpg', 'Izložba mlade crnogorske scene', true, 'Izložba mlade crnogorske scene'),
+    ('/images/entity_images/events/7ff92622763aadca63ef2437.jpg', 'Akustični nastup na Ribnici', true, 'Akustični nastup na Ribnici'),
+    ('/images/entity_images/events/1fcf4b071fd2772f41547a41.jpg', 'Okupljanje ljubitelja putovanja', true, 'Okupljanje ljubitelja putovanja'),
+    ('/images/entity_images/events/85d8de632ef1a364f2fc4720.jpg', 'Sajam domaćih proizvoda Podgorica', true, 'Sajam domaćih proizvoda Podgorica'),
+    ('/images/entity_images/events/90256d907eca539d10d6c9b8.jpg', 'Podgorica basket challenge', true, 'Podgorica basket challenge'),
+    ('/images/entity_images/events/971a584c8eb469655995d96b.jpg', 'Konferencija digitalni turizam CG', true, 'Konferencija digitalni turizam CG'),
+    ('/images/entity_images/events/0dffb38b3d85509377e9431c.jpg', 'Radionica fotografije Podgorica', true, 'Radionica fotografije Podgorica'),
+    ('/images/entity_images/events/7e3e16ed20e39db626bddcfc.jpg', 'Seminar održivog ugostiteljstva', true, 'Seminar održivog ugostiteljstva'),
+    ('/images/entity_images/events/bee9baca8f3dbeeed3a54358.jpg', 'Takmičenje mladih kuvara CG', true, 'Takmičenje mladih kuvara CG'),
+    ('/images/entity_images/events/b5cc3a60504ae024709ec075.jpg', 'Proslava dana grada Podgorica', true, 'Proslava dana grada Podgorica'),
+    ('/images/entity_images/events/f37dd9c09214df7fc5578f94.jpg', 'Stand-up veče Podgorica', true, 'Stand-up veče Podgorica'),
+    ('/images/entity_images/events/81ccb3a17115cf5a9f602d4b.jpg', 'DJ veče na obali Morače', true, 'DJ veče na obali Morače'),
+    ('/images/entity_images/events/8aec82086a8f7ecf968f7768.jpg', 'Turnir u malom fudbalu Podgorica', true, 'Turnir u malom fudbalu Podgorica'),
+    ('/images/entity_images/events/145bc6ec3d29066ba11629bc.jpg', 'Beogradski večiti susret', true, 'Beogradski večiti susret'),
+    ('/images/entity_images/events/c31b5bb72ff0c6f2482f1809.jpg', 'Predstava na Dorćolu', true, 'Predstava na Dorćolu'),
+    ('/images/entity_images/events/fcd9d1ecacc795a755d6168a.jpg', 'Sava Street Festival', true, 'Sava Street Festival'),
+    ('/images/entity_images/events/aee7c55074a18f487a0b0e42.jpg', 'Izložba Novi pogledi Beograda', true, 'Izložba Novi pogledi Beograda'),
+    ('/images/entity_images/events/7ff92622763aadca63ef2437.jpg', 'Nastup jazz kvarteta', true, 'Nastup jazz kvarteta'),
+    ('/images/entity_images/events/1dec37a3ce8304bd37fdbd73.jpg', 'Okupljanje ljubitelja Dunava', true, 'Okupljanje ljubitelja Dunava'),
+    ('/images/entity_images/events/781d2fb037ce34b064a85996.jpg', 'Sajam knjiga na otvorenom', true, 'Sajam knjiga na otvorenom'),
+    ('/images/entity_images/events/04dfe3ed51b76568c484cb16.jpg', 'Ada sportski dan', true, 'Ada sportski dan'),
+    ('/images/entity_images/events/6f6145093bb1600702275ad8.jpg', 'Konferencija pametni gradovi Beograd', true, 'Konferencija pametni gradovi Beograd'),
+    ('/images/entity_images/events/a97adcda2aefe675be05adbb.jpg', 'Radionica street art Beograd', true, 'Radionica street art Beograd'),
+    ('/images/entity_images/events/7e3e16ed20e39db626bddcfc.jpg', 'Seminar hotelskog marketinga', true, 'Seminar hotelskog marketinga'),
+    ('/images/entity_images/events/513a89acff7cea8e51eca0ed.jpg', 'Takmičenje barista Beograd', true, 'Takmičenje barista Beograd'),
+    ('/images/entity_images/events/b5cc3a60504ae024709ec075.jpg', 'Proslava beogradskog leta', true, 'Proslava beogradskog leta'),
+    ('/images/entity_images/events/f37dd9c09214df7fc5578f94.jpg', 'Stand-up noć na Vračaru', true, 'Stand-up noć na Vračaru'),
+    ('/images/entity_images/events/ba1cfba1f938f47f2c659fda.jpg', 'DJ veče Beton hala', true, 'DJ veče Beton hala'),
+    ('/images/entity_images/events/2f5e72e44e64bf1d19664cfb.jpg', 'Turnir u basketu Beograd', true, 'Turnir u basketu Beograd')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "EventId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", e."Id", NOW()
@@ -33897,14 +33497,14 @@ WHERE l."DestinationId" = d."Id"
 
 WITH source("Url", "AltText", "IsMain", "DestinationName") AS (
     VALUES
-    ('https://www.barcelo.com/guia-turismo/wp-content/uploads/que-visitar-en-alicante.jpg', 'Alicante', true, 'Alicante'),
-    ('https://media.cntraveller.com/photos/64d0bac38fda363db57f28db/16:9/w_2560%2Cc_limit/san%2520sebastian-GettyImages-1151937563.jpeg', 'San Sebastian', true, 'San Sebastian'),
-    ('https://upload.wikimedia.org/wikipedia/commons/c/cd/Girona_des_de_l_aire_edited.jpg', 'Girona', true, 'Girona'),
-    ('https://thesibarist.com/wp-content/uploads/2023/06/FOTOS-CADIZ-CIUDAD-6-scaled.jpeg', 'Cadiz', true, 'Cadiz'),
-    ('https://images.trvl-media.com/place/2320/51f40880-4546-4006-aae8-f9c8aca9b3f1.jpg', 'Murcia', true, 'Murcia'),
-    ('https://images.trvl-media.com/place/553248621532487516/b50c7586-0b09-4372-a487-385e9d757c64.jpg', 'Santander', true, 'Santander'),
-    ('https://www.holidayhypermarket.co.uk/wp-content/uploads/2016/03/HH-Header-18-Amazing-Facts-Tenerife-shutterstock_2530038071-1920x1080-1.jpg', 'Tenerife', true, 'Tenerife'),
-    ('https://upload.wikimedia.org/wikipedia/commons/a/a1/Santiago_Cathedral_2021_-_west_panorama.jpg', 'Santiago de Compostela', true, 'Santiago de Compostela')
+    ('/images/entity_images/destinations/05c43d4076958449bc45800b.jpg', 'Alicante', true, 'Alicante'),
+    ('/images/entity_images/destinations/b01aad0b2a16481732f62922.jpg', 'San Sebastian', true, 'San Sebastian'),
+    ('/images/entity_images/destinations/1931ef5089f94531cbf85866.jpg', 'Girona', true, 'Girona'),
+    ('/images/entity_images/destinations/a6aaa33ffddbb276ff14409f.jpg', 'Cadiz', true, 'Cadiz'),
+    ('/images/entity_images/destinations/0a6094008fee8e8f0c57cffb.jpg', 'Murcia', true, 'Murcia'),
+    ('/images/entity_images/destinations/da82020544a8aa043ba31c70.jpg', 'Santander', true, 'Santander'),
+    ('/images/entity_images/destinations/d90464ef9774f423dd70c48b.jpg', 'Tenerife', true, 'Tenerife'),
+    ('/images/entity_images/destinations/8d6e8970a40b712db40d84a5.jpg', 'Santiago de Compostela', true, 'Santiago de Compostela')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "DestinationId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", d."Id", NOW()
@@ -33913,30 +33513,30 @@ JOIN "Destinations" d ON d."Name" = s."DestinationName";
 
 WITH source("Url", "AltText", "IsMain", "LocalityName") AS (
     VALUES
-    ('https://alicanteturismo.com/wp-content/uploads/2024/06/Explanada-de-espana.jpg', 'Explanada Alicante', true, 'Explanada Alicante'),
-    ('https://upload.wikimedia.org/wikipedia/commons/2/20/Playa_del_Postiguet_4.jpg', 'Playa del Postiguet', true, 'Playa del Postiguet'),
-    ('https://alicante.vectalia.es/wp-content/uploads/sites/2/2022/02/Imagen-Castillo-1.jpg', 'Castillo Santa Barbara Alicante', true, 'Castillo Santa Barbara Alicante'),
-    ('https://upload.wikimedia.org/wikipedia/commons/d/da/Kontxa_bay.jpg', 'La Concha San Sebastian', true, 'La Concha San Sebastian'),
-    ('https://sansebastianturismoa.eus/wp-content/uploads/2025/04/konstituzio-plaza-plaza-de-la-constitucin_25469190985_o-min.webp', 'Parte Vieja San Sebastian', true, 'Parte Vieja San Sebastian'),
-    ('https://www.monteigueldo.es/temas/igeldo/img/slider/parque-atracciones-monte-igueldo-diversion-ninos-mayores.jpg', 'Monte Igueldo', true, 'Monte Igueldo'),
-    ('https://media.cntraveler.com/photos/5a8c863fe9c49e2e4d80a496/master/pass/Barri-Vell__2018_Forc%CC%A7a-Vella-des-de-la-muralla_Roger-Colom.jpg', 'Barri Vell Girona', true, 'Barri Vell Girona'),
-    ('https://upload.wikimedia.org/wikipedia/commons/1/11/Girona_river-street.jpeg', 'Onyar Riverside Girona', true, 'Onyar Riverside Girona'),
-    ('https://upload.wikimedia.org/wikipedia/commons/1/1c/Girona_Cathedral_2020.jpg', 'Girona Cathedral Quarter', true, 'Girona Cathedral Quarter'),
-    ('https://upload.wikimedia.org/wikipedia/commons/3/35/Playa_de_la_Caleta%2C_C%C3%A1diz%2C_Espa%C3%B1a%2C_2015-12-08%2C_DD_53.JPG', 'La Caleta Cadiz', true, 'La Caleta Cadiz'),
-    ('https://loveincstatic.blob.core.windows.net/loveexploring/IMAGES/Cadiz/Cadiz-street-restaurant-cafes-where-to-eat-spain.jpg', 'Old Town Cadiz', true, 'Old Town Cadiz'),
-    ('https://media01.stockfood.com/largepreviews/MjIwNTM1NDA3NA==/71140454-Cityscape-of-Cadiz-baroque-cathedral-Paseo-Campo-del-Sur-twilight-Andalucia-Spain.jpg', 'Paseo Campo del Sur', true, 'Paseo Campo del Sur'),
-    ('https://www.mergili.at/worldimages/_data/i/upload/2020/03/02/20200302231110-d2c66155-me.jpg', 'Plaza Belluga Murcia', true, 'Plaza Belluga Murcia'),
-    ('https://ourworldforyou.com/wp-content/uploads/2024/02/Glorieta-de-Espana-explore-spain-historic-murcia-things-to-see-in-murcia-visit-spain-visit-murcia-places-to-visit-in-spain-best-cities-in-spain-V5.jpg', 'Murcia Old Town', true, 'Murcia Old Town'),
-    ('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/0e/b5/3f/fc/murcia-riverside-view.jpg?w=1200&h=-1&s=1', 'Rio Segura Murcia', true, 'Rio Segura Murcia'),
-    ('https://images.trvl-media.com/place/6121563/d94895d6-d666-4568-9ac0-96d09caba7d7.jpg', 'El Sardinero Santander', true, 'El Sardinero Santander'),
-    ('https://cdn.sanity.io/images/zi3g9jaq/production/0cd8fab2aa8f8feeeb717ab59b534685f78789a6-1400x768.jpg', 'Centro Botin Santander', true, 'Centro Botin Santander'),
-    ('https://images.trvl-media.com/place/6358901/29831250-21db-47d3-9b67-1779ae14ce9e.jpg', 'Peninsula Magdalena', true, 'Peninsula Magdalena'),
-    ('https://richiperez.com/wp-content/uploads/2024/09/que-ver-en-costa-adeje-tenerife.jpg', 'Costa Adeje Tenerife', true, 'Costa Adeje Tenerife'),
-    ('https://questtraveladventures.com/sites/default/files/media_hero_images/Tenerife-Teide---Header.jpg', 'Teide Viewpoint Tenerife', true, 'Teide Viewpoint Tenerife'),
-    ('https://upload.wikimedia.org/wikipedia/commons/c/c6/At_Palmetum_de_Santa_Cruz_de_Tenerife_2022_028.jpg', 'Santa Cruz Tenerife Center', true, 'Santa Cruz Tenerife Center'),
-    ('https://www.fundacionjacobea.org/wp-content/uploads/2018/08/IMG_3728.jpg', 'Obradoiro Santiago', true, 'Obradoiro Santiago'),
-    ('https://images.ctfassets.net/wv75stsetqy3/2ylyjrVi4hOdesnPq6gp4t/c9efa83a9d4b033c76deb39df0939305/istock-1011982760_optimized.jpg?q=60&fit=fill&fm=webp', 'Old Town Santiago', true, 'Old Town Santiago'),
-    ('https://cdn.tsunamipanel.com/100594/media/galleries/1920/parque-alameda-santiago-paseo-leones.jpg', 'Alameda Santiago', true, 'Alameda Santiago')
+    ('/images/entity_images/localities/78bcd84e0300c6156fe799e7.jpg', 'Explanada Alicante', true, 'Explanada Alicante'),
+    ('/images/entity_images/localities/6bac6ed573873495ef39876d.jpg', 'Playa del Postiguet', true, 'Playa del Postiguet'),
+    ('/images/entity_images/localities/0281d3b7dbff6ad4e230f1ae.jpg', 'Castillo Santa Barbara Alicante', true, 'Castillo Santa Barbara Alicante'),
+    ('/images/entity_images/localities/539eb7ced3a0e4fcee9e209d.jpg', 'La Concha San Sebastian', true, 'La Concha San Sebastian'),
+    ('/images/entity_images/localities/41555d7d4e36e89c5a94993b.jpg', 'Parte Vieja San Sebastian', true, 'Parte Vieja San Sebastian'),
+    ('/images/entity_images/localities/755e56fa339622cc79b2db92.jpg', 'Monte Igueldo', true, 'Monte Igueldo'),
+    ('/images/entity_images/localities/51244370cdc535ebc8b65212.jpg', 'Barri Vell Girona', true, 'Barri Vell Girona'),
+    ('/images/entity_images/localities/35b48e7ca9d6453e046bc2ce.jpg', 'Onyar Riverside Girona', true, 'Onyar Riverside Girona'),
+    ('/images/entity_images/localities/3b525e499c694cd376b33ea6.jpg', 'Girona Cathedral Quarter', true, 'Girona Cathedral Quarter'),
+    ('/images/entity_images/localities/60bc150bda72b84d64096857.jpg', 'La Caleta Cadiz', true, 'La Caleta Cadiz'),
+    ('/images/entity_images/localities/ca20eb2b3613b9d07c16878c.jpg', 'Old Town Cadiz', true, 'Old Town Cadiz'),
+    ('/images/entity_images/localities/c21f51363eab059d58ebf531.jpg', 'Paseo Campo del Sur', true, 'Paseo Campo del Sur'),
+    ('/images/entity_images/localities/dfc61d1c5f50dc3fa5898adf.jpg', 'Plaza Belluga Murcia', true, 'Plaza Belluga Murcia'),
+    ('/images/entity_images/localities/0b2d822aef57956fe36b0a23.jpg', 'Murcia Old Town', true, 'Murcia Old Town'),
+    ('/images/entity_images/localities/363893a3f699cf7f98c6e190.jpg', 'Rio Segura Murcia', true, 'Rio Segura Murcia'),
+    ('/images/entity_images/localities/20daf842efa705b4ae244b8b.jpg', 'El Sardinero Santander', true, 'El Sardinero Santander'),
+    ('/images/entity_images/localities/b1b4f8a8c6c837e42b5f55cd.jpg', 'Centro Botin Santander', true, 'Centro Botin Santander'),
+    ('/images/entity_images/localities/0d5ac596b4023af1003dc9b1.jpg', 'Peninsula Magdalena', true, 'Peninsula Magdalena'),
+    ('/images/entity_images/localities/c420351f13952d3f8d662f1c.jpg', 'Costa Adeje Tenerife', true, 'Costa Adeje Tenerife'),
+    ('/images/entity_images/localities/e99df53865ce2dad23c3eed6.jpg', 'Teide Viewpoint Tenerife', true, 'Teide Viewpoint Tenerife'),
+    ('/images/entity_images/localities/d5901f6be95d8a1526aa237e.jpg', 'Santa Cruz Tenerife Center', true, 'Santa Cruz Tenerife Center'),
+    ('/images/entity_images/localities/fb64974f59ca5a116bbc95f4.jpg', 'Obradoiro Santiago', true, 'Obradoiro Santiago'),
+    ('/images/entity_images/localities/71e88f63c21b96690cd67f27.jpg', 'Old Town Santiago', true, 'Old Town Santiago'),
+    ('/images/entity_images/localities/9c68199cf5b57d56f1ff9faa.jpg', 'Alameda Santiago', true, 'Alameda Santiago')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "LocalityId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", l."Id", NOW()
@@ -34146,188 +33746,183 @@ INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 VALUES
 -- ═══ ALICANTE ═══
 -- Hotel Mirador Alicante: luksuzni hotelski lobi (Angelina Kusznirewicz)
-('https://images.unsplash.com/photo-1720540244592-b4124532b318?auto=format&fit=crop&w=1920&h=1080&q=80', 'Hotel Mirador Alicante', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Mirador Alicante'), NOW()),
+('/images/entity_images/objects/c42a7c6d0361bf04e699e53d.jpg', 'Hotel Mirador Alicante', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Mirador Alicante'), NOW()),
 
 -- Arrocería Costa Blanca: španska hrana/tapas (CHUTTERSNAP)
-('https://images.unsplash.com/photo-1515669097368-22e68427d265?auto=format&fit=crop&w=1920&h=1080&q=80', 'Arrocería Costa Blanca', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Arrocería Costa Blanca'), NOW()),
+('/images/entity_images/objects/e2eb0f77a1bba1aee38283a6.jpg', 'Arrocería Costa Blanca', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Arrocería Costa Blanca'), NOW()),
 
 -- Galerija Santa Barbara: muzej/galerija enterijer (Dannie Jing)
-('https://images.unsplash.com/photo-1531243269054-5ebf6f34081e?auto=format&fit=crop&w=1920&h=1080&q=80', 'Galerija Santa Barbara', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Santa Barbara'), NOW()),
+('/images/entity_images/objects/10a4689e9a3482ad8b822303.jpg', 'Galerija Santa Barbara', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Santa Barbara'), NOW()),
 
 -- Plaza Mar Alicante: shopping mall sa eskalatorima (Viktor SOLOMONIK)
-('https://images.unsplash.com/photo-1726159496287-596e93ca635b?auto=format&fit=crop&w=1920&h=1080&q=80', 'Plaza Mar Alicante', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Plaza Mar Alicante'), NOW()),
+('/images/entity_images/objects/ff8877e3558009a13ada1e3a.jpg', 'Plaza Mar Alicante', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Plaza Mar Alicante'), NOW()),
 
 -- Hospital Costa Alicante: bolnica eksterijer (National Cancer Institute)
-('https://api.immoabroad.com/uploads/ba44be9a94428c5503a9d63cae74870c.jpg', 'Hospital Costa Alicante', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Costa Alicante'), NOW()),
+('/images/entity_images/objects/3830df50623ee31d4516425b.jpg', 'Hospital Costa Alicante', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Costa Alicante'), NOW()),
 
 -- Repsol Postiguet Alicante: benzinska pumpa (Tim Mossholder)
-('https://www.grupoglem.com/wp-content/uploads/2017/07/RIESMA-10-1024x576-1.jpg', 'Repsol Postiguet Alicante', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol Postiguet Alicante'), NOW()),
+('/images/entity_images/objects/4aed3654e88bb46dab0fbe8a.jpg', 'Repsol Postiguet Alicante', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol Postiguet Alicante'), NOW()),
 
 -- Boutique Suveniri Explanada: suvenirnica/shop ulica (Joseph Corl)
-('https://images.unsplash.com/photo-1693835826680-82abb277bf7e?auto=format&fit=crop&w=1920&h=1080&q=80', 'Boutique Suveniri Explanada', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Boutique Suveniri Explanada'), NOW()),
+('/images/entity_images/objects/7999f03b4a8aa5fbcadca8fc.jpg', 'Boutique Suveniri Explanada', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Boutique Suveniri Explanada'), NOW()),
 
 -- Klinika Vista Med Alicante: bolnica/klinika (Acton Crawford)
-('https://urvistahermosainternational.com/en/wp-content/uploads/sites/2/2018/12/hla-vistahermosa-best-private-hospital.jpg', 'Klinika Vista Med Alicante', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Klinika Vista Med Alicante'), NOW()),
+('/images/entity_images/objects/35e2f02add7025f13796fbec.jpg', 'Klinika Vista Med Alicante', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Klinika Vista Med Alicante'), NOW()),
 
 -- Cepsa Castillo Alicante: benzinska pumpa noć (Patrick Tomasso)
-('https://images.unsplash.com/photo-1545262810-77515befe149?auto=format&fit=crop&w=1920&h=1080&q=80&sat=-10', 'Cepsa Castillo Alicante', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Cepsa Castillo Alicante'), NOW()),
+('/images/entity_images/objects/d00b456263a310ac0ad418dc.jpg', 'Cepsa Castillo Alicante', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Cepsa Castillo Alicante'), NOW()),
 
 -- ═══ SAN SEBASTIAN ═══
 -- Pansion La Concha Residence: pansion/guest house (photo-1675409145919)
-('https://images.unsplash.com/photo-1675409145919-277c0fc2aa7d?auto=format&fit=crop&w=1920&h=1080&q=80', 'Pansion La Concha Residence', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pansion La Concha Residence'), NOW()),
+('/images/entity_images/objects/0c48c0c38def8a3c4ce28745.jpg', 'Pansion La Concha Residence', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pansion La Concha Residence'), NOW()),
 
 -- Pintxos Parte Vieja: pintxos bar (Agent J, Unsplash tapas)
-('https://images.unsplash.com/photo-1534790566855-4cb788d389ec?auto=format&fit=crop&w=1920&h=1080&q=80', 'Pintxos Parte Vieja', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pintxos Parte Vieja'), NOW()),
+('/images/entity_images/objects/983202437fa1f1ca5f37ae70.jpg', 'Pintxos Parte Vieja', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pintxos Parte Vieja'), NOW()),
 
 -- Galerija Atlantik Donostia: art galerija enterijer (aiden patrissi)
-('https://ekainartelanak.com/themes/euscommerce/assets/img/modules/appagebuilder/images/galeria_ekain_arte_lanak_.jpg', 'Galerija Atlantik Donostia', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Atlantik Donostia'), NOW()),
+('/images/entity_images/objects/1233bf0731be4a565e904c22.jpg', 'Galerija Atlantik Donostia', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Atlantik Donostia'), NOW()),
 
 -- Mercado Kursaal San Sebastian: tržnica (Adrien Olichon)
-('https://images.unsplash.com/photo-1588964895597-cfccd6e2dbf9?auto=format&fit=crop&w=1920&h=1080&q=80', 'Mercado Kursaal San Sebastian', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercado Kursaal San Sebastian'), NOW()),
+('/images/entity_images/objects/31793aa8b3ba0b9f9f4b7d5c.jpg', 'Mercado Kursaal San Sebastian', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercado Kursaal San Sebastian'), NOW()),
 
 -- Hospital Donostia Center: bolnica eksterijer (National Cancer Institute)
-('https://www.idom.com/wp-content/uploads/2019/02/Cancer_Center_01_Project_Management_Idom_jmbielsa.jpg', 'Hospital Donostia Center', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Donostia Center'), NOW()),
+('/images/entity_images/objects/5f5f622a8cc68258867a9456.jpg', 'Hospital Donostia Center', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Donostia Center'), NOW()),
 
 -- Repsol La Concha: benzinska pumpa
-('https://www.repsol.com/content/dam/aplicaciones/catalogo-componentes-assets/images-files/estacion-servicio-foster-anochecer.jpg', 'Repsol La Concha', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol La Concha'), NOW()),
+('/images/entity_images/objects/d7823272e048d0d1fc497dea.jpg', 'Repsol La Concha', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol La Concha'), NOW()),
 
 -- Suveniri Parte Vieja: suvenirnica ulica (Hans-Jürgen Weinhardt)
-('https://zaharrean.eus/wp-content/uploads/2021/07/IMG_1412.jpg', 'Suveniri Parte Vieja', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suveniri Parte Vieja'), NOW()),
+('/images/entity_images/objects/15bd5b218294835026b04422.jpg', 'Suveniri Parte Vieja', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suveniri Parte Vieja'), NOW()),
 
 -- Poliklinika Zurriola San Sebastian: klinika moderna zgrada (Onur Can Elma)
-('https://centromedicozurriola.imq.es/hubfs/Centro-Medico-Quirurgico-IMQ_Zurriola.jpg', 'Poliklinika Zurriola San Sebastian', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Poliklinika Zurriola San Sebastian'), NOW()),
+('/images/entity_images/objects/7f855e0ff206e0cf591a4960.jpg', 'Poliklinika Zurriola San Sebastian', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Poliklinika Zurriola San Sebastian'), NOW()),
 
 -- Cepsa Igueldo Drive: benzinska pumpa
-('https://www.moeveglobal.com/stfls/corporativo/FICHEROS/estacion-servicio-cepsa.jpg', 'Cepsa Igueldo Drive', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Cepsa Igueldo Drive'), NOW()),
+('/images/entity_images/objects/96a6c582788fa2a1e83d6086.jpg', 'Cepsa Igueldo Drive', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Cepsa Igueldo Drive'), NOW()),
 
 -- ═══ GIRONA ═══
 -- Apartmani Onyar Rooms: apartman/guesthouse cozy (photo-1675409145919)
-('https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=1920&h=1080&q=80', 'Apartmani Onyar Rooms', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartmani Onyar Rooms'), NOW()),
+('/images/entity_images/objects/2cbffcb5c42e21e098099a55.jpg', 'Apartmani Onyar Rooms', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartmani Onyar Rooms'), NOW()),
 
 -- Restoran Barri Vell Girona: restoran enterijer (Filipp Romanovski)
-('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2c/2d/68/8f/caption.jpg?w=900&h=-1&s=1', 'Restoran Barri Vell Girona', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Barri Vell Girona'), NOW()),
+('/images/entity_images/objects/908ab8971dbcde1c4dd63d12.jpg', 'Restoran Barri Vell Girona', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Barri Vell Girona'), NOW()),
 
 -- Muzej Mostova Girona: muzej enterijer (Claudio Testa)
-('https://images.unsplash.com/photo-1491156855053-9cdff72c7f85?auto=format&fit=crop&w=1920&h=1080&q=80', 'Muzej Mostova Girona', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Mostova Girona'), NOW()),
+('/images/entity_images/objects/4c5495d457be9e46dffc31cb.jpg', 'Muzej Mostova Girona', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Mostova Girona'), NOW()),
 
 -- Girona Market Hall: tržnica (Simon Karemann)
-('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/23/71/4b/54/caption.jpg?w=1200&h=1200&s=1', 'Girona Market Hall', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Girona Market Hall'), NOW()),
+('/images/entity_images/objects/f8ab99ec27981de3be5b4f1d.jpg', 'Girona Market Hall', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Girona Market Hall'), NOW()),
 
 -- Hospital Girona Nord: bolnica eksterijer (Acton Crawford)
-('https://images.unsplash.com/photo-1626315869436-d6781ba69d6e?auto=format&fit=crop&w=1920&h=1080&q=80&sat=-5', 'Hospital Girona Nord', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Girona Nord'), NOW()),
+('/images/entity_images/objects/5ff0e0c1211a865d617e5661.jpg', 'Hospital Girona Nord', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Girona Nord'), NOW()),
 
 -- Repsol Girona Riverside: benzinska pumpa
-('https://www.repsol.com/content/dam/repsol-corporate/es/productos-y-servicios/trabajadores-estacion-servicio-noche.jpg', 'Repsol Girona Riverside', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol Girona Riverside'), NOW()),
+('/images/entity_images/objects/a8e0c257d7cd137b7906e4ba.jpg', 'Repsol Girona Riverside', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol Girona Riverside'), NOW()),
 
 -- Suvenirnica Katedrala Girona: shop/butik
-('https://s3-media0.fl.yelpcdn.com/bphoto/WLS2IttSS45h5F89HWG4NA/1000s.jpg', 'Suvenirnica Katedrala Girona', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Katedrala Girona'), NOW()),
+('/images/entity_images/objects/f33a8c0a8d6ce002834bb198.jpg', 'Suvenirnica Katedrala Girona', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Katedrala Girona'), NOW()),
 
 -- ═══ KADIZ ═══
 -- Hotel La Caleta Cadiz: hotel uz more (Roberto Nickson)
-('https://images.unsplash.com/photo-1445019980597-93fa8acb246c?auto=format&fit=crop&w=1920&h=1080&q=80', 'Hotel La Caleta Cadiz', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel La Caleta Cadiz'), NOW()),
+('/images/entity_images/objects/d318a8edfdaa4538af100670.jpg', 'Hotel La Caleta Cadiz', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel La Caleta Cadiz'), NOW()),
 
 -- Taverna Campo del Sur: seafood restoran (Nacho Carretero Molero)
-('https://i.autoreserve.com/thumb/1600x1600/restaurant_image/image/063/232/168/63232168/06a9632c-06db-40a2-9792-c3168becc5f6(2).jpg?format=webp', 'Taverna Campo del Sur', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Taverna Campo del Sur'), NOW()),
+('/images/entity_images/objects/c6b4242e0ae220096fcf1a38.jpg', 'Taverna Campo del Sur', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Taverna Campo del Sur'), NOW()),
 
 -- Muzej Atlantika Cadiz: muzej enterijer (Adrien Olichon)
-('https://images.unsplash.com/photo-1518998053901-5348d3961a04?auto=format&fit=crop&w=1920&h=1080&q=80', 'Muzej Atlantika Cadiz', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Atlantika Cadiz'), NOW()),
+('/images/entity_images/objects/343900efe7144a4bf105d341.jpg', 'Muzej Atlantika Cadiz', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Atlantika Cadiz'), NOW()),
 
 -- Mercado del Puerto Cadiz: tržnica sa ribom (Simon Karemann)
-('https://d2mqpxndxh0mbq.cloudfront.net/uploads/s1/21/58/40/6/mercado-de-abasto-cadiz-pescado-17.jpeg', 'Mercado del Puerto Cadiz', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercado del Puerto Cadiz'), NOW()),
+('/images/entity_images/objects/41ed3d079141152cf14e62dd.jpg', 'Mercado del Puerto Cadiz', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercado del Puerto Cadiz'), NOW()),
 
 -- Hospital Bahia Cadiz: bolnica (National Cancer Institute)
-('https://www.viamedsalud.com/wp-content/uploads/2024/11/hospital-cadiz-fachada.jpg', 'Hospital Bahia Cadiz', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Bahia Cadiz'), NOW()),
+('/images/entity_images/objects/3e8353b076cfb69ef26103d0.jpg', 'Hospital Bahia Cadiz', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Bahia Cadiz'), NOW()),
 
 -- Cepsa La Caleta Cadiz: benzinska pumpa
-('https://www.moeve.es/en/near-you/statics/store/00/01/04/97/PARTOO_IMAGE_SYNC_7c612327-482a-4a18-b4bf-76bc1882dc23.webp', 'Cepsa La Caleta Cadiz', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Cepsa La Caleta Cadiz'), NOW()),
+('/images/entity_images/objects/17c917597777cb755228644b.jpg', 'Cepsa La Caleta Cadiz', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Cepsa La Caleta Cadiz'), NOW()),
 
 -- Suvenirnica Stari Kadiz: suvenirnica ulica (Alberto Frías, bela arhitektura Kadiza)
-('https://www.mojnovisad.com/files/news/2/5/6/29256/29256-f1.jpg', 'Suvenirnica Stari Kadiz', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Stari Kadiz'), NOW()),
+('/images/entity_images/objects/f1da37e3c6743ac5baaf5554.jpg', 'Suvenirnica Stari Kadiz', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Stari Kadiz'), NOW()),
 
 -- ═══ MURSIJA ═══
 -- Hotel Belluga Murcia: hotel lobi (Angelina Kusznirewicz, drugačiji kadar)
-('https://z.cdrst.com/foto/hotel-sf/1aa4/granderesp/hotel-hq-la-galeria-habitacion-13b6de63.jpg', 'Hotel Belluga Murcia', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Belluga Murcia'), NOW()),
+('/images/entity_images/objects/485f6a0ab7f78c02b00c81e6.jpg', 'Hotel Belluga Murcia', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Belluga Murcia'), NOW()),
 
 -- Segura Tapas Murcia: tapas hrana (Alyona Yankovska)
-('https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=1920&h=1080&q=80', 'Segura Tapas Murcia', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Segura Tapas Murcia'), NOW()),
+('/images/entity_images/objects/5a3d8fe0b387fbe0aefe02cd.jpg', 'Segura Tapas Murcia', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Segura Tapas Murcia'), NOW()),
 
 -- Murcia Wellness Patio: spa/wellness (Li Yang)
-('https://images.unsplash.com/photo-1529290130-4ca3753253ae?auto=format&fit=crop&w=1920&h=1080&q=80', 'Murcia Wellness Patio', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Murcia Wellness Patio'), NOW()),
+('/images/entity_images/objects/0a898f49baba18d03df38e36.jpg', 'Murcia Wellness Patio', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Murcia Wellness Patio'), NOW()),
 
 -- Centro Comercial Murcia Luz: shopping mall (Joshua Rawson-Harris)
-('https://www.lightecture.com/wp-content/uploads/2021/01/Centro-Comercial-Thader-iluminacion-Daniela-Viloria-12.jpg', 'Centro Comercial Murcia Luz', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Centro Comercial Murcia Luz'), NOW()),
+('/images/entity_images/objects/d31ab7c86e93144350de0ab8.jpg', 'Centro Comercial Murcia Luz', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Centro Comercial Murcia Luz'), NOW()),
 
 -- Hospital Segura Murcia: bolnica (National Cancer Institute)
-('https://images.unsplash.com/photo-1586773860383-dab5f3bc1bcc?auto=format&fit=crop&w=1920&h=1080&q=80&sat=-5', 'Hospital Segura Murcia', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Segura Murcia'), NOW()),
+('/images/entity_images/objects/2c99c57655e6baee08cd7f46.jpg', 'Hospital Segura Murcia', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Segura Murcia'), NOW()),
 
 -- Repsol Murcia Centro: benzinska pumpa
-('https://www.repsol.com/content/dam/repsol-corporate/es/productos-y-servicios/surtidor-estacion-servicio-repsol-nuevo.jpg', 'Repsol Murcia Centro', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol Murcia Centro'), NOW()),
+('/images/entity_images/objects/36bf5d6a59c2e7579563c2cc.jpg', 'Repsol Murcia Centro', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol Murcia Centro'), NOW()),
 
 -- Suvenirnica Plaza Belluga: butik/shop
-('https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&w=1920&h=1080&q=80&sat=5', 'Suvenirnica Plaza Belluga', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Plaza Belluga'), NOW()),
+('/images/entity_images/objects/8dd84d67a745298fe9e937cc.jpg', 'Suvenirnica Plaza Belluga', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Plaza Belluga'), NOW()),
 
 -- ═══ SANTANDER ═══
 -- Pansion Sardinero Plaza: pansion soba (photo-1631049307264)
-('https://images.unsplash.com/photo-1631049307264-da0ec9d70304?auto=format&fit=crop&w=1920&h=1080&q=80&sat=5', 'Pansion Sardinero Plaza', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pansion Sardinero Plaza'), NOW()),
+('/images/entity_images/objects/0402da6458adac1ef403e008.jpg', 'Pansion Sardinero Plaza', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pansion Sardinero Plaza'), NOW()),
 
 -- Restaurante Botin Norte: restoran sa morskim specijalitetima (Jay Wennington)
-('https://images.squarespace-cdn.com/content/v1/5c5885000cf57dd8a2c2b293/1631810031825-JX4PU3QREVGLI498IOWL/IMG_2641.jpg', 'Restaurante Botin Norte', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restaurante Botin Norte'), NOW()),
+('/images/entity_images/objects/770053e14db73c8889fa50f7.jpg', 'Restaurante Botin Norte', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restaurante Botin Norte'), NOW()),
 
 -- Galerija Costa Cantabrica: art galerija (Alexander Rodionov)
-('https://www.santander.com/content/dam/santander-com/es/contenido-paginas/sala-de-comunicaci%C3%B3n/notas-de-prensa/2021/12/im-2021-12-02-santander-despliega-una-lona-en-la-fachada-del-espacio-pereda-con-replicas-de-las-obras-de-la-coleccion-banco-santander-galeria-2.jpeg', 'Galerija Costa Cantabrica', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Costa Cantabrica'), NOW()),
+('/images/entity_images/objects/eb2f58d4f4c8dae9853ee29a.jpg', 'Galerija Costa Cantabrica', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Costa Cantabrica'), NOW()),
 
 -- Mercado Sardinero Santander: tržnica (Geraldine Lewa)
-('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/19/e6/e2/2f/photo6jpg.jpg?w=1200&h=1200&s=1', 'Mercado Sardinero Santander', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercado Sardinero Santander'), NOW()),
+('/images/entity_images/objects/9b08108bd7f089ebb5c76924.jpg', 'Mercado Sardinero Santander', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercado Sardinero Santander'), NOW()),
 
 -- Hospital Cantabrico Santander: bolnica (Acton Crawford)
-('https://upload.wikimedia.org/wikipedia/commons/a/af/Hospitallaredo.jpg', 'Hospital Cantabrico Santander', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Cantabrico Santander'), NOW()),
+('/images/entity_images/objects/018ecda69d0dc80dc397fad8.jpg', 'Hospital Cantabrico Santander', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Cantabrico Santander'), NOW()),
 
 -- Repsol Sardinero Santander: benzinska pumpa
-('https://cdn-3.expansion.mx/dims4/default/a5139db/2147483647/strip/true/crop/1200x673+0+0/resize/1200x673!/quality/90/?url=https%3A%2F%2Fcdn-3.expansion.mx%2F80%2F19%2F067a924f478a84ec7be0fc93135c%2Frepsolfb.jpg', 'Repsol Sardinero Santander', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol Sardinero Santander'), NOW()),
+('/images/entity_images/objects/d0727f1b172ba55a1122f482.jpg', 'Repsol Sardinero Santander', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol Sardinero Santander'), NOW()),
 
 -- Suveniri Magdalena: suvenirnica
-('https://media-cdn.tripadvisor.com/media/photo-s/1b/e7/63/ae/mayan-masks-at-the-friday.jpg', 'Suveniri Magdalena', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suveniri Magdalena'), NOW()),
+('/images/entity_images/objects/44d16269b5b87428e7244bde.jpg', 'Suveniri Magdalena', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suveniri Magdalena'), NOW()),
 
 -- ═══ TENERIFE ═══
 -- Resort Costa Adeje Blue: resort bazen sa palmama (Cory Bjork)
-('https://images.unsplash.com/photo-1623718649591-311775a30c43?auto=format&fit=crop&w=1920&h=1080&q=80', 'Resort Costa Adeje Blue', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Resort Costa Adeje Blue'), NOW()),
+('/images/entity_images/objects/ca499bb060109629cc892f7b.jpg', 'Resort Costa Adeje Blue', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Resort Costa Adeje Blue'), NOW()),
 
 -- Restaurante Volcán y Mar: restoran uz more (Manuel Moreno)
-('https://www.atlanticohoy.com/uploads/s1/34/65/66/8/diseno-sin-titulo-2025-07-14t125347-487.webp', 'Restaurante Volcán y Mar', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restaurante Volcán y Mar'), NOW()),
+('/images/entity_images/objects/0b8a46c8fcaa6549e4d37f5c.jpg', 'Restaurante Volcán y Mar', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restaurante Volcán y Mar'), NOW()),
 
 -- Teide Outdoor Spa: spa/wellness bazen (Roberto Nickson)
-('https://swedishhottub.com/wp-content/uploads/2023/04/Pacific-mork-svenska-badtunnor-1.jpg', 'Teide Outdoor Spa', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Teide Outdoor Spa'), NOW()),
+('/images/entity_images/objects/522a7fa19bcefaf0d574a149.jpg', 'Teide Outdoor Spa', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Teide Outdoor Spa'), NOW()),
 
 -- Centro Comercial Adeje Sun: shopping mall (shopping mall sa eskalatorima)
-('https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?auto=format&fit=crop&w=1920&h=1080&q=80&sat=5', 'Centro Comercial Adeje Sun', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Centro Comercial Adeje Sun'), NOW()),
+('/images/entity_images/objects/7921726266575aafa005f1d6.jpg', 'Centro Comercial Adeje Sun', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Centro Comercial Adeje Sun'), NOW()),
 
 -- Hospital Tenerife Sur: bolnica (National Cancer Institute)
-('https://images.unsplash.com/photo-1586773860418-d37222d8fce3?auto=format&fit=crop&w=1920&h=1080&q=80&hue=10', 'Hospital Tenerife Sur', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Tenerife Sur'), NOW()),
+('/images/entity_images/objects/df1bfb0cf5521c0449cf6d67.jpg', 'Hospital Tenerife Sur', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Tenerife Sur'), NOW()),
 
 -- Cepsa Costa Adeje: benzinska pumpa
-('https://lh3.googleusercontent.com/gps-cs-s/APNQkAEJ67QcbYWf44RBNm7DNjGkw2B3aM3i2sHoH1sDdHIXkz07KKngZuSXnw48eVpXXZJGGO8Sk7Ahagt-1IrrV05N7vc1gyxHYtkHduLV3cy1OwFhGqY0NIFGZ6Apy7SLuY2r23rU=s1360-w1360-h1020-rw', 'Cepsa Costa Adeje', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Cepsa Costa Adeje'), NOW()),
+('/images/entity_images/objects/0e92faeaabc82749a72653fe.jpg', 'Cepsa Costa Adeje', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Cepsa Costa Adeje'), NOW()),
 
 -- Surf Shop Tenerife: surf shop/prodavnica (Dean Milenkovic, Alicante shop ulica)
-('https://godzillasurfshop.es/cdn/shop/files/shopgodzilla7.jpg?v=1722344939&width=3840', 'Surf Shop Tenerife', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Surf Shop Tenerife'), NOW()),
+('/images/entity_images/objects/2ceee9d492844655107ed962.jpg', 'Surf Shop Tenerife', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Surf Shop Tenerife'), NOW()),
 
 -- ═══ SANTIAGO DE COMPOSTELA ═══
--- Hotel Obradoiro Suites: hotel lobi (Rod Long)
-('https://images.unsplash.com/photo-1582719508461-905c673771fd?auto=format&fit=crop&w=1920&h=1080&q=80', 'Hotel Obradoiro Suites', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Obradoiro Suites'), NOW()),
+('/images/entity_images/objects/12838e969f99ffafb3b8e247.jpg', 'Hotel Obradoiro Suites', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Obradoiro Suites'), NOW()),
 
--- Casa Gallega Santiago: galicijska kuhinja/restoran (Andrea Huls Pareja)
-('https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=1920&h=1080&q=80&sat=5', 'Casa Gallega Santiago', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Casa Gallega Santiago'), NOW()),
+('/images/entity_images/objects/3e6b05291a4215522b57ab96.jpg', 'Casa Gallega Santiago', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Casa Gallega Santiago'), NOW()),
 
--- Muzej Hodočasnika Santiago: muzej (Adrien Olichon, muzej enterijer)
-('https://museos.xunta.gal/sites/default/files/field/image/_aec1675.jpg', 'Muzej Hodočasnika Santiago', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Hodočasnika Santiago'), NOW()),
+('/images/entity_images/objects/f3c6131b3c56ba50bb230395.jpg', 'Muzej Hodočasnika Santiago', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Hodočasnika Santiago'), NOW()),
 
--- Mercado Compostela Central: tržnica
-('https://www.turismo.gal/osdam/filestore/8/5/4/0/3_b387700af375e0f/85403scr_09e429228df3451.jpg', 'Mercado Compostela Central', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercado Compostela Central'), NOW()),
+('/images/entity_images/objects/c40428fc4d9c0d42e45bd6f7.jpg', 'Mercado Compostela Central', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercado Compostela Central'), NOW()),
 
--- Hospital Santiago Centro: bolnica
-('https://upload.wikimedia.org/wikipedia/commons/0/04/Hospital_San_Juan_de_Dios%2C_Santiago%2C_2017-08-27.jpg', 'Hospital Santiago Centro', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Santiago Centro'), NOW()),
+('/images/entity_images/objects/900a83626956e003038bbb29.jpg', 'Hospital Santiago Centro', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Santiago Centro'), NOW()),
 
 -- Repsol Alameda Santiago: benzinska pumpa
-('https://www.paxinasgalegas.es/imagenes/galuresa-meixonfrio-repsol_img27827t0m0w1600h800.jpg', 'Repsol Alameda Santiago', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol Alameda Santiago'), NOW());
+('/images/entity_images/objects/40b7ec943d4a09350a14d7ce.jpg', 'Repsol Alameda Santiago', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol Alameda Santiago'), NOW());
 -- 16.5 DODATNI DOGAĐAJI ZA NOVE DESTINACIJE U ŠPANIJI
 WITH source("Name", "Description", "Lng", "Lat", "StartDate", "EndDate", "Price", "MaxVisitors", "EventTypeName", "LocalityName", "DestinationName", "ObjectName", "CreatorEmail", "ManagerEmail") AS (
     VALUES
@@ -34374,14 +33969,14 @@ LEFT JOIN "Objects" o ON o."Name" = s."ObjectName";
 
 WITH source("Url", "AltText", "IsMain", "EventName") AS (
     VALUES
-    ('https://alicante-smarthotel.com/wp-content/uploads/2026/03/paella-1024x600.jpg', 'Alicante Mediteranski vikend', true, 'Alicante Mediteranski vikend'),
-    ('https://www.journal.hr/wp-content/uploads/2024/09/pintxos_iStock-988644192-1080x721.jpg', 'Noć pintxosa u San Sebastianu', true, 'Noć pintxosa u San Sebastianu'),
-    ('https://i0.wp.com/media1.lepojeziveti.com/2024/02/Girona-katedrala-stepeniste.jpg', 'Dani starih zidina Girone', true, 'Dani starih zidina Girone'),
-    ('https://beachsoccer.com/wp-content/uploads/2023/03/cadiz-1.jpg', 'Kadiz obalski sportski dan', true, 'Kadiz obalski sportski dan'),
-    ('https://images.unsplash.com/photo-1505373877841-8d25f7d46678?auto=format&fit=crop&w=1400&q=80', 'Murcia gastro forum', true, 'Murcia gastro forum'),
-    ('https://sajam.net/storage/news/a5WtDqA6QZ1UAq08Q6eB2yG52sqjHDq0M4ONzLkC.jpg', 'Sajam severnih ukusa Santandera', true, 'Sajam severnih ukusa Santandera'),
-    ('https://static.myeasol.net/rails/active_storage/representations/proxy/eyJfcmFpbHMiOnsiZGF0YSI6IjIwMTI0YzdkLTNlNmMtNDcxMi05M2I4LTU2ZjBhMjc5ZTUwNyIsInB1ciI6ImJsb2JfaWQifX0=--8d722de2dd3855185bdc9f26e226426970c05727/eyJfcmFpbHMiOnsiZGF0YSI6eyJmb3JtYXQiOiJqcGciLCJyZXNpemVfdG9fbGltaXQiOlsxOTIwLG51bGxdLCJzYXZlciI6eyJzdHJpcCI6dHJ1ZSwicXVhbGl0eSI6ODV9fSwicHVyIjoidmFyaWF0aW9uIn19--d7b849811809c7fffbb030edf0f6b75c59522433/240927TrickTenerifeXanaduLANTY076.jpg', 'Tenerife noć vulkana i ritma', true, 'Tenerife noć vulkana i ritma'),
-    ('https://santiagoways.com/wp-content/uploads/2017/12/parties-santiago-compostela.jpg', 'Veče hodočasnika u Santjagu', true, 'Veče hodočasnika u Santjagu')
+    ('/images/entity_images/events/9c971a23f7d579ce20035adc.jpg', 'Alicante Mediteranski vikend', true, 'Alicante Mediteranski vikend'),
+    ('/images/entity_images/events/55abab87884bb01e11f8ea7b.jpg', 'Noć pintxosa u San Sebastianu', true, 'Noć pintxosa u San Sebastianu'),
+    ('/images/entity_images/events/9aaf368c4babf577d2d52e1c.jpg', 'Dani starih zidina Girone', true, 'Dani starih zidina Girone'),
+    ('/images/entity_images/events/678ed247706fb83fba8e4c69.jpg', 'Kadiz obalski sportski dan', true, 'Kadiz obalski sportski dan'),
+    ('/images/entity_images/events/69b800ed1f69a527daf41b72.jpg', 'Murcia gastro forum', true, 'Murcia gastro forum'),
+    ('/images/entity_images/events/09537b70bcf24a1facf8db4b.jpg', 'Sajam severnih ukusa Santandera', true, 'Sajam severnih ukusa Santandera'),
+    ('/images/entity_images/events/e9ea7ef87a4ca362fb04aa2a.jpg', 'Tenerife noć vulkana i ritma', true, 'Tenerife noć vulkana i ritma'),
+    ('/images/entity_images/events/5920a4f538ba18cf5e662655.jpg', 'Veče hodočasnika u Santjagu', true, 'Veče hodočasnika u Santjagu')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "EventId", "CreatedAt")
 SELECT
@@ -34640,28 +34235,28 @@ VALUES
 WITH source("Url", "DestinationName", "IsMain", "AltText") AS (
     VALUES
     -- Bari: Lungomare/luka Barija (reisetopia, stvarna fotka Barija uz more)
-    ('https://images.unsplash.com/photo-1611238763458-0de1027136cf?auto=format&fit=crop&w=1400&q=80', 'Bari', true, 'Bari'),
+    ('/images/entity_images/destinations/f51c8c36f669ae4cdf17d891.jpg', 'Bari', true, 'Bari'),
 
     -- Palermo: ulica Palerma sa katedralom (Cristina Gottardi)
-    ('https://images.unsplash.com/photo-1541777490254-a50eb9045486?auto=format&fit=crop&w=1400&q=80', 'Palermo', true, 'Palermo'),
+    ('/images/entity_images/destinations/e4518f110f12afb189176f8e.jpg', 'Palermo', true, 'Palermo'),
 
     -- Trieste: Piazza Unita d'Italia uz more (Daniele Bucciarelli)
-    ('https://images.unsplash.com/photo-1586172486224-6b48bd7b9682?auto=format&fit=crop&w=1400&q=80', 'Trieste', true, 'Trieste'),
+    ('/images/entity_images/destinations/54211aee70590cd000f76130.jpg', 'Trieste', true, 'Trieste'),
 
     -- Matera: Sassi di Matera pećinska naselja (Luca Micheli)
-    ('https://images.unsplash.com/photo-1528214096798-37891d32174c?auto=format&fit=crop&w=1400&q=80', 'Matera', true, 'Matera'),
+    ('/images/entity_images/destinations/bd857c4683c93c3e9455beaa.jpg', 'Matera', true, 'Matera'),
 
     -- Sorrento: pogled na grad i zaliv (aes, Unsplash)
-    ('https://images.unsplash.com/photo-1666380982418-0effa6190210?auto=format&fit=crop&w=1400&q=80', 'Sorrento', true, 'Sorrento'),
+    ('/images/entity_images/destinations/321c54a2e850fc3317a71f66.jpg', 'Sorrento', true, 'Sorrento'),
 
     -- Lecce: barokna arhitektura Lečea (Freysteinn G. Jonsson)
-    ('https://images.unsplash.com/photo-1680938166156-07a91b54745e?auto=format&fit=crop&w=1400&q=80', 'Lecce', true, 'Lecce'),
+    ('/images/entity_images/destinations/1053ce9e7da8e9cf8a1ea3b4.jpg', 'Lecce', true, 'Lecce'),
 
     -- Parma: Piazza Duomo sa katedralom i baptisterijom (Bernard Hermant)
-    ('https://images.unsplash.com/photo-1603034318372-547281a7eacf?auto=format&fit=crop&w=1400&q=80', 'Parma', true, 'Parma'),
+    ('/images/entity_images/destinations/18da4e594a9915fc66873056.jpg', 'Parma', true, 'Parma'),
 
     -- Sardinija: tirkizno more Costa Smeralda (Chloe Frost-Smith)
-    ('https://gotripzi.com/cdn-cgi/image/onerror=redirect,width=1440,height=1080,format=webp/_astro/sardinia-it-hero.Cga8OrnP.webp', 'Sardinija', true, 'Sardinija')
+    ('/images/entity_images/destinations/41db8612f1eafbb42c4b2ab3.jpg', 'Sardinija', true, 'Sardinija')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "DestinationId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", d."Id", NOW()
@@ -34671,76 +34266,76 @@ JOIN "Destinations" d ON d."Name" = s."DestinationName";
 WITH source("Url", "LocalityName", "IsMain", "AltText") AS (
     VALUES
     -- Bari Vecchia: uske ulice starog Barija (Giulia Gasperini)
-    ('https://images.unsplash.com/photo-1536782025326-3b006b059aa7?auto=format&fit=crop&w=1400&q=80', 'Bari Vecchia', true, 'Bari Vecchia'),
+    ('/images/entity_images/localities/a5b26de45a0dd46437ce839e.jpg', 'Bari Vecchia', true, 'Bari Vecchia'),
 
     -- Lungomare Bari: obalna šetnica Barija (reisetopia)
-    ('https://images.unsplash.com/photo-1611238763458-0de1027136cf?auto=format&fit=crop&w=1400&q=80', 'Lungomare Bari', true, 'Lungomare Bari'),
+    ('/images/entity_images/localities/f51c8c36f669ae4cdf17d891.jpg', 'Lungomare Bari', true, 'Lungomare Bari'),
 
     -- Basilica San Nicola: romanička bazilika u Bariju (Dan Rooney)
-    ('https://upload.wikimedia.org/wikipedia/commons/c/c3/Bari_BW_2016-10-19_13-35-11_stitch.jpg', 'Basilica San Nicola Bari', true, 'Basilica San Nicola Bari'),
+    ('/images/entity_images/localities/53a5ca421c5ace51488a1e23.jpg', 'Basilica San Nicola Bari', true, 'Basilica San Nicola Bari'),
 
     -- Quattro Canti Palermo: barokni trg Palerma (Cristina Gottardi)
-    ('https://images.unsplash.com/photo-1541777490254-a50eb9045486?auto=format&fit=crop&w=1400&q=80', 'Quattro Canti Palermo', true, 'Quattro Canti Palermo'),
+    ('/images/entity_images/localities/e4518f110f12afb189176f8e.jpg', 'Quattro Canti Palermo', true, 'Quattro Canti Palermo'),
 
     -- Mercato Ballaro: ulica Palerma sa restoranima (Eric)
-    ('https://images.unsplash.com/photo-1723316830226-4986a93ebb0b?auto=format&fit=crop&w=1400&q=80', 'Mercato Ballaro Palermo', true, 'Mercato Ballaro Palermo'),
+    ('/images/entity_images/localities/e399500a6c505e5caf58be05.jpg', 'Mercato Ballaro Palermo', true, 'Mercato Ballaro Palermo'),
 
     -- Mondello Palermo: uska mediteranska ulica Palerma (Stepan Dudycha)
-    ('https://www.sicilia.info/wp-content/uploads/sites/91/mondello-hd.jpg', 'Mondello Palermo', true, 'Mondello Palermo'),
+    ('/images/entity_images/localities/c02d91857a57bffb814aa555.jpg', 'Mondello Palermo', true, 'Mondello Palermo'),
 
     -- Piazza Unita Trieste: bela piazza uz Jadran (Daniele Bucciarelli)
-    ('https://images.unsplash.com/photo-1586172486224-6b48bd7b9682?auto=format&fit=crop&w=1400&q=80', 'Piazza Unita Trieste', true, 'Piazza Unita Trieste'),
+    ('/images/entity_images/localities/54211aee70590cd000f76130.jpg', 'Piazza Unita Trieste', true, 'Piazza Unita Trieste'),
 
     -- Canal Grande Trieste: kanal sa palazima (Daniel Seßler)
-    ('https://images.unsplash.com/photo-1676706980757-e3b5d6c16321?auto=format&fit=crop&w=1400&q=80', 'Canal Grande Trieste', true, 'Canal Grande Trieste'),
+    ('/images/entity_images/localities/5b00e76ff7c8e78c8968e4fe.jpg', 'Canal Grande Trieste', true, 'Canal Grande Trieste'),
 
     -- Miramare Trieste: zamak uz more (Arno Senoner)
-    ('https://images.unsplash.com/photo-1623878991610-7416bc4e8c6f?auto=format&fit=crop&w=1400&q=80', 'Miramare Trieste', true, 'Miramare Trieste'),
+    ('/images/entity_images/localities/c4b6e2ad64812cb5878dd545.jpg', 'Miramare Trieste', true, 'Miramare Trieste'),
 
     -- Sassi di Matera: pećinska naselja Matere (Luca Micheli)
-    ('https://images.unsplash.com/photo-1528214096798-37891d32174c?auto=format&fit=crop&w=1400&q=80', 'Sassi di Matera', true, 'Sassi di Matera'),
+    ('/images/entity_images/localities/bd857c4683c93c3e9455beaa.jpg', 'Sassi di Matera', true, 'Sassi di Matera'),
 
     -- Belvedere Murgia Matera: panorama Matere sa suprotne strane kanjona (Sebastian, Unsplash)
-    ('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/05/5a/f9/3e/belvedere-sassi-da-murgia.jpg?w=1200&h=900&s=1', 'Belvedere Murgia Matera', true, 'Belvedere Murgia Matera'),
+    ('/images/entity_images/localities/58ac18a661aa702ee359a826.jpg', 'Belvedere Murgia Matera', true, 'Belvedere Murgia Matera'),
 
     -- Piazza Duomo Matera: katedrala Matere (Teodor Kuduschiev, Unsplash)
-    ('https://upload.wikimedia.org/wikipedia/commons/8/8c/Matera_-_View_from_Piazza_Duomo_-_3.jpg', 'Piazza Duomo Matera', true, 'Piazza Duomo Matera'),
+    ('/images/entity_images/localities/34c7792fd70c30215521622a.jpg', 'Piazza Duomo Matera', true, 'Piazza Duomo Matera'),
 
     -- Marina Grande Sorrento: stara ribarska luka Sorenta (Nick Fewings)
-    ('https://www.visitcampania.info/wp-content/uploads/2025/06/sorrento_spiaggia_marina_grande_04.jpg', 'Marina Grande Sorrento', true, 'Marina Grande Sorrento'),
+    ('/images/entity_images/localities/a0088a851678040453a027e9.jpg', 'Marina Grande Sorrento', true, 'Marina Grande Sorrento'),
 
     -- Corso Italia Sorrento: grad sa zaljevom u pozadini (Keszthelyi Timi)
-    ('https://images.unsplash.com/photo-1658409731324-35e12090ad10?auto=format&fit=crop&w=1400&q=80', 'Corso Italia Sorrento', true, 'Corso Italia Sorrento'),
+    ('/images/entity_images/localities/43dee8c27af2c2cdfe73f41c.jpg', 'Corso Italia Sorrento', true, 'Corso Italia Sorrento'),
 
     -- Villa Comunale Sorrento: pogled na grad i obalu (aes)
-    ('https://images.unsplash.com/photo-1666380982418-0effa6190210?auto=format&fit=crop&w=1400&q=80', 'Villa Comunale Sorrento', true, 'Villa Comunale Sorrento'),
+    ('/images/entity_images/localities/321c54a2e850fc3317a71f66.jpg', 'Villa Comunale Sorrento', true, 'Villa Comunale Sorrento'),
 
     -- Piazza Sant'Oronzo Lecce: centralni trg sa rimskim amfiteatrom (Luca)
-    ('https://images.unsplash.com/photo-1707234197821-9773c730cf08?auto=format&fit=crop&w=1400&q=80', 'Piazza Sant''Oronzo Lecce', true, 'Piazza Sant''Oronzo Lecce'),
+    ('/images/entity_images/localities/2ab1e257af29111a55cbcea5.jpg', 'Piazza Sant''Oronzo Lecce', true, 'Piazza Sant''Oronzo Lecce'),
 
     -- Centro Storico Lecce: barokna kamena arhitektura (Freysteinn G. Jonsson)
-    ('https://images.unsplash.com/photo-1680938166156-07a91b54745e?auto=format&fit=crop&w=1400&q=80', 'Centro Storico Lecce', true, 'Centro Storico Lecce'),
+    ('/images/entity_images/localities/1053ce9e7da8e9cf8a1ea3b4.jpg', 'Centro Storico Lecce', true, 'Centro Storico Lecce'),
 
     -- Porta Napoli Lecce: panorama Lečea (Adrien Brun)
-    ('https://images.unsplash.com/photo-1682347641333-b9080bfe7af3?auto=format&fit=crop&w=1400&q=80', 'Porta Napoli Lecce', true, 'Porta Napoli Lecce'),
+    ('/images/entity_images/localities/67748a86393df913a66c0e25.jpg', 'Porta Napoli Lecce', true, 'Porta Napoli Lecce'),
 
     -- Piazza Duomo Parma: katedrala i baptisterija u Parmi (Bernard Hermant)
-    ('https://images.unsplash.com/photo-1603034318372-547281a7eacf?auto=format&fit=crop&w=1400&q=80', 'Piazza Duomo Parma', true, 'Piazza Duomo Parma'),
+    ('/images/entity_images/localities/18da4e594a9915fc66873056.jpg', 'Piazza Duomo Parma', true, 'Piazza Duomo Parma'),
 
     -- Parco Ducale Parma: park sa Palazzo Ducale (Lorenzo Bignami, Unsplash)
-    ('https://a.travel-assets.com/findyours-php/viewfinder/images/res40/16000/16582-share-image.jpg', 'Parco Ducale Parma', true, 'Parco Ducale Parma'),
+    ('/images/entity_images/localities/27958553dc5b8273afe401f6.jpg', 'Parco Ducale Parma', true, 'Parco Ducale Parma'),
 
     -- Oltretorrente Parma: šareni borgo Parme (Antonio Sessa)
-    ('https://images.unsplash.com/photo-1601480772033-4c0c23c438a3?auto=format&fit=crop&w=1400&q=80', 'Oltretorrente Parma', true, 'Oltretorrente Parma'),
+    ('/images/entity_images/localities/25399d553a297ce5912683d7.jpg', 'Oltretorrente Parma', true, 'Oltretorrente Parma'),
 
     -- Costa Smeralda Sardinija: tirkizno more (Massimo Virgilio, Unsplash)
-    ('https://luxurylondon.co.uk/wp-content/uploads/2022/08/costa-smeralda-xl-hd.jpg', 'Costa Smeralda Sardinija', true, 'Costa Smeralda Sardinija'),
+    ('/images/entity_images/localities/d62adff4348ffbfe94921a79.jpg', 'Costa Smeralda Sardinija', true, 'Costa Smeralda Sardinija'),
 
     -- Cagliari Marina Sardinija: luka Kaljarija (Fadi Al Shami, Unsplash)
-    ('http://oidu.it/wp-content/uploads/2024/10/laura-lugaresi-PKXG1AdMzaI-unsplash-1024x683.jpg', 'Cagliari Marina Sardinija', true, 'Cagliari Marina Sardinija'),
+    ('/images/entity_images/localities/b3877b0f8bc2e1b1d16804a5.jpg', 'Cagliari Marina Sardinija', true, 'Cagliari Marina Sardinija'),
 
     -- Golfo Orosei Sardinija: dramatičan planinski zaliv (Ivan Ragozin, Unsplash)
-    ('https://images.unsplash.com/photo-1493558103817-58b2924bce98?auto=format&fit=crop&w=1400&q=80', 'Golfo Orosei Sardinija', true, 'Golfo Orosei Sardinija')
+    ('/images/entity_images/localities/e52afd528a01db14182a6c25.jpg', 'Golfo Orosei Sardinija', true, 'Golfo Orosei Sardinija')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "LocalityId", "CreatedAt")
 SELECT s."Url", s."AltText", s."IsMain", l."Id", NOW()
@@ -34793,14 +34388,14 @@ LEFT JOIN "Objects" o ON o."Name" = s."ObjectName";
 
 WITH source("Url", "AltText", "IsMain", "EventName") AS (
     VALUES
-    ('https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&w=1400&q=80', 'Bari veče fokače', true, 'Bari veče fokače'),
-    ('https://www.justsicily.it/JS/wp-content/uploads/2023/09/js-palermo-notte-10.jpg', 'Palermo noć pijaca', true, 'Palermo noć pijaca'),
-    ('https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=1400&q=80', 'Trieste morske priče', true, 'Trieste morske priče'),
-    ('https://res.cloudinary.com/enchanting/q_70,f_auto,w_999,h_667,c_fit/exodus-web/2021/12/sassi_at_night.jpg', 'Matera svetla u kamenu', true, 'Matera svetla u kamenu'),
-    ('https://nextstop-italy.com/wp-content/uploads/2020/03/Sorrento_2.jpg', 'Sorrento veče limuna', true, 'Sorrento veče limuna'),
-    ('https://images.unsplash.com/photo-1527224857830-43a7acc85260?auto=format&fit=crop&w=1400&q=80', 'Stand-up pod baroknim svetlima Lečea', true, 'Stand-up pod baroknim svetlima Lečea'),
-    ('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2a/a1/44/f8/una-serta.jpg?w=900&h=-1&s=1', 'Parma gurmanski susret', true, 'Parma gurmanski susret'),
-    ('https://www.paralympic.org/sites/default/files/2025-12/Starten%202...jpg', 'Regata zaliva Sardinije', true, 'Regata zaliva Sardinije')
+    ('/images/entity_images/events/f69df9c5d784b96b3da59f94.jpg', 'Bari veče fokače', true, 'Bari veče fokače'),
+    ('/images/entity_images/events/bb4c229fb30196fcbda4bb1f.jpg', 'Palermo noć pijaca', true, 'Palermo noć pijaca'),
+    ('/images/entity_images/events/552d5cd8f95b389323d35c49.jpg', 'Trieste morske priče', true, 'Trieste morske priče'),
+    ('/images/entity_images/events/8a2c4f9db26629b5c98f15e7.jpg', 'Matera svetla u kamenu', true, 'Matera svetla u kamenu'),
+    ('/images/entity_images/events/bdb61ba6575ec4f98455905b.jpg', 'Sorrento veče limuna', true, 'Sorrento veče limuna'),
+    ('/images/entity_images/events/14634ef2b90c73121eca871f.jpg', 'Stand-up pod baroknim svetlima Lečea', true, 'Stand-up pod baroknim svetlima Lečea'),
+    ('/images/entity_images/events/849efcca8a05247c558fd098.jpg', 'Parma gurmanski susret', true, 'Parma gurmanski susret'),
+    ('/images/entity_images/events/037af6419e98960a7396879f.jpg', 'Regata zaliva Sardinije', true, 'Regata zaliva Sardinije')
 )
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "EventId", "CreatedAt")
 SELECT
@@ -34905,107 +34500,101 @@ INSERT INTO "Images" ("Url", "AltText", "IsMain", "ActivityId", "CreatedAt")
 VALUES
 -- ALICANTE
 -- Jutarnje plivanje Postiguet: plaža Postiguet sa tvrđavom (Dean Milenkovic)
-('https://www.visitspain.info/en/wp-content/uploads/sites/162/playa-postiguet-alicante-hd.jpg', 'Jutarnje plivanje Postiguet', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Jutarnje plivanje Postiguet'), NOW()),
+('/images/entity_images/activities/6bac6ed573873495ef39876d.jpg', 'Jutarnje plivanje Postiguet', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Jutarnje plivanje Postiguet'), NOW()),
 
 -- Šetnja do tvrđave Santa Barbara: pogled na grad sa tvrđave (Dean Milenkovic)
-('https://www.gpsmycity.com/img/gd/3883.jpg', 'Šetnja do tvrđave Santa Barbara', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Šetnja do tvrđave Santa Barbara'), NOW()),
+('/images/entity_images/activities/8df7392779319055829fea9a.jpg', 'Šetnja do tvrđave Santa Barbara', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Šetnja do tvrđave Santa Barbara'), NOW()),
 
 -- Degustacija pirinčanih ukusa Alicantea: uska ulica Alicantea sa loncima (Joseph Corl)
-('https://media-cdn2.greatbritishchefs.com/media/0ntnzsp3/arroz-alicante-2.whqc_735x1102q80.jpg', 'Degustacija pirinčanih ukusa Alicantea', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija pirinčanih ukusa Alicantea'), NOW()),
+('/images/entity_images/activities/23a24aa42caa9ba1caa6f6e7.jpg', 'Degustacija pirinčanih ukusa Alicantea', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija pirinčanih ukusa Alicantea'), NOW()),
 
 -- Kupovina na Explanadi Alicante: Explanada sa palmama (Andres Q, Unsplash photo-1680537732240)
-('https://murciatoday.com/images/articles/22416_la-explanada-de-espaa-in-alicante_4_gallery_large.jpg', 'Kupovina na Explanadi Alicante', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Kupovina na Explanadi Alicante'), NOW()),
+('/images/entity_images/activities/ab30080bf2d91325a4e9d143.jpg', 'Kupovina na Explanadi Alicante', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Kupovina na Explanadi Alicante'), NOW()),
 
 -- SAN SEBASTIAN
 -- Kupanje u zalivu La Concha: panorama zaliva La Concha (Pierre Archi)
-('https://www.lasalaplazahotel.com/assets/themes/1/img/blog/playa-de-la-concha-san-sebastian.webp', 'Kupanje u zalivu La Concha', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Kupanje u zalivu La Concha'), NOW()),
+('/images/entity_images/activities/677275869c32caa56705b674.jpg', 'Kupanje u zalivu La Concha', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Kupanje u zalivu La Concha'), NOW()),
 
 -- Pintxos veče u Parte Vieji: ulica Parte Vieja (Hans-Jürgen Weinhardt)
-('https://www.sehacecaminoalandar.com/wp-content/uploads/Pintxos-de-Donostia-Parte-Vieja-chalo84.jpg', 'Pintxos veče u Parte Vieji', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Pintxos veče u Parte Vieji'), NOW()),
+('/images/entity_images/activities/b17b4fbf97b26584d3d56bb4.jpg', 'Pintxos veče u Parte Vieji', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Pintxos veče u Parte Vieji'), NOW()),
 
 -- Fotografisanje Monte Iguelda: pogled na Donostiju sa mora (Lucian Alexe)
-('https://turismovasco.com/wp-content/uploads/2017/12/Se%C3%B1ora-sacando-fotos-desde-el-Monte-Igeldo-1024x603.jpg', 'Fotografisanje Monte Iguelda', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Fotografisanje Monte Iguelda'), NOW()),
+('/images/entity_images/activities/2403a20e833c86498ae3317a.jpg', 'Fotografisanje Monte Iguelda', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Fotografisanje Monte Iguelda'), NOW()),
 
 -- Biciklistički krug uz obalu Donostije: isla Santa Clara i panorama (ultrash ricco)
-('https://klasikoa.eus/wp-content/uploads/2025/07/DSS-KLASIKOA4.jpg', 'Biciklistički krug uz obalu Donostije', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Biciklistički krug uz obalu Donostije'), NOW()),
+('/images/entity_images/activities/97a1b5e4da931af360bab491.jpg', 'Biciklistički krug uz obalu Donostije', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Biciklistički krug uz obalu Donostije'), NOW()),
 
 -- GIRONA
 -- Foto tura kroz Barri Vell: Stari grad Girone sa zidinama (Enric Domas)
-('https://images.unsplash.com/photo-1657983060174-ce54947f9001?auto=format&fit=crop&w=1920&h=1080&q=80', 'Foto tura kroz Barri Vell', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Foto tura kroz Barri Vell'), NOW()),
+('/images/entity_images/activities/fa488ae79c3d88eef78b9490.jpg', 'Foto tura kroz Barri Vell', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Foto tura kroz Barri Vell'), NOW()),
 
 -- Razgledanje katedrale i starih ulica: šarene kuće uz Onyar reku (Lucas Gallone)
-('https://barcelonahacks.com/wp-content/uploads/2024/07/barcelona-cathedral-evening.jpg', 'Razgledanje katedrale i starih ulica', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Razgledanje katedrale i starih ulica'), NOW()),
+('/images/entity_images/activities/d010f87bcb0e1bf3f6b90168.jpg', 'Razgledanje katedrale i starih ulica', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Razgledanje katedrale i starih ulica'), NOW()),
 
 -- Kupovina lokalnih proizvoda u Đironi: Stari grad Girone (Enric Domas)
-('https://www.marketingderby.co.uk/app/uploads/2025/11/Derbion-Stock-2023-117-1-scaled.jpg', 'Kupovina lokalnih proizvoda u Đironi', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Kupovina lokalnih proizvoda u Đironi'), NOW()),
+('/images/entity_images/activities/89d3a3a24ae34538d3b2c50d.jpg', 'Kupovina lokalnih proizvoda u Đironi', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Kupovina lokalnih proizvoda u Đironi'), NOW()),
 
 -- Večernja šetnja uz Onjar: reka Onyar sa šarenim fasadama (Lucas Gallone)
-('https://imagedelivery.net/xtVVrgn04XP6bhrBt0jaJQ/24e963e6-99a0-409c-7d20-d0c025378c00/public', 'Večernja šetnja uz Onjar', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Večernja šetnja uz Onjar'), NOW()),
+('/images/entity_images/activities/1dfb71d5193140e6d9c8bdc9.jpg', 'Večernja šetnja uz Onjar', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Večernja šetnja uz Onjar'), NOW()),
 
 -- KADIZ
 -- Plivanje na La Caleti: plaža i grad Kadiza (Jordi Vich Navarro)
-('https://irp.cdn-website.com/acacba11/dms3rep/multi/WS-Spain-Calella-01-Sports-Abroad.jpg', 'Plivanje na La Caleti', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Plivanje na La Caleti'), NOW()),
+('/images/entity_images/activities/6738ac302d475521f7984fac.jpg', 'Plivanje na La Caleti', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Plivanje na La Caleti'), NOW()),
 
 -- Vožnja čamcem uz zidine Kadiza: bele zgrade uz more (Mitchell Orr)
-('https://www.codecasayachts.com/wp-content/uploads/2016/03/m.y.-Gazzella-navigation.jpg', 'Vožnja čamcem uz zidine Kadiza', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Vožnja čamcem uz zidine Kadiza'), NOW()),
+('/images/entity_images/activities/619df691542bd5ff6e849632.jpg', 'Vožnja čamcem uz zidine Kadiza', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Vožnja čamcem uz zidine Kadiza'), NOW()),
 
 -- Degustacija morskih zalogaja Kadiza: belo zvono katedrale Kadiza (Alberto Frías)
-('https://jordonsseafood.com.au/wp-content/uploads/2022/02/Chef-Selection-5-Course-Degustation-Menu-Jordons-Seafood1200.jpg', 'Degustacija morskih zalogaja Kadiza', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija morskih zalogaja Kadiza'), NOW()),
+('/images/entity_images/activities/b2fd2bf982f7d4da3328cc2c.jpg', 'Degustacija morskih zalogaja Kadiza', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija morskih zalogaja Kadiza'), NOW()),
 
 -- Noćni provod uz obalu Kadiza: panorama Kadiza sa katedralom (photo-1576509896799)
-('https://kodiakcompasssuites.com/wp-content/uploads/sites/81/2019/12/GettyImages-1089324286.jpg', 'Noćni provod uz obalu Kadiza', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Noćni provod uz obalu Kadiza'), NOW()),
+('/images/entity_images/activities/655e730decab2aedf2f36fe8.jpg', 'Noćni provod uz obalu Kadiza', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Noćni provod uz obalu Kadiza'), NOW()),
 
 -- MURSIJA
 -- Joga uz Seguru: reka Segura i park u Mursiji (Cantabria priroda)
-('https://www.junglexperiences.com/wp-content/uploads/2023/02/yoga-3.png', 'Joga uz Seguru', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Joga uz Seguru'), NOW()),
+('/images/entity_images/activities/bb8ccb2481788380d6437827.jpg', 'Joga uz Seguru', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Joga uz Seguru'), NOW()),
 
 -- Kupovina u centru Mursije: uska ulica španskog grada
-('https://www.turismodemurcia.es/images/traperia-plateria/calle-traperia-murcia.jpg', 'Kupovina u centru Mursije', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Kupovina u centru Mursije'), NOW()),
+('/images/entity_images/activities/69af82b6aad39f025fe0aae4.jpg', 'Kupovina u centru Mursije', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Kupovina u centru Mursije'), NOW()),
 
 -- Razgledanje trga Beljuga: katedrala Mursije (photo-1576509896799 alt)
-('https://mappingspain.com/wp-content/uploads/2025/09/Cardinal-Belluga-Square-1024x683.jpg', 'Razgledanje trga Beljuga', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Razgledanje trga Beljuga'), NOW()),
+('/images/entity_images/activities/bdd18e5ad116fff826a178d8.jpg', 'Razgledanje trga Beljuga', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Razgledanje trga Beljuga'), NOW()),
 
 -- Spa popodne u Mursiji: wellness/bazen
-('https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1920&h=1080&q=80', 'Spa popodne u Mursiji', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Spa popodne u Mursiji'), NOW()),
+('/images/entity_images/activities/3ae72ee387ebec303d43109d.jpg', 'Spa popodne u Mursiji', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Spa popodne u Mursiji'), NOW()),
 
 -- SANTANDER
 -- Plivanje na El Sardineru: plaža Santandera (Getty Images / Unsplash)
-('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/18/5b/6a/ab/segunda-playa-del-sardinero.jpg?w=1200&h=-1&s=1', 'Plivanje na El Sardineru', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Plivanje na El Sardineru'), NOW()),
+('/images/entity_images/activities/cd87e751eb4f92eb3e64e6cc.jpg', 'Plivanje na El Sardineru', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Plivanje na El Sardineru'), NOW()),
 
 -- Kajak uz obalu Santandera: kajak na moru
-('https://www.standupsantander.com/gallery_gen/ea3760a59ed849b279ed724faaca878c.jpg', 'Kajak uz obalu Santandera', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Kajak uz obalu Santandera'), NOW()),
+('/images/entity_images/activities/a14ef5e011ac8bbe80093982.jpg', 'Kajak uz obalu Santandera', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Kajak uz obalu Santandera'), NOW()),
 
 -- Fotografisanje ostrva Magdalena: panorama Santandera i plaže El Sardinero (Getty Images)
-('https://images.unsplash.com/photo-1572253713401-959386ab7c58?auto=format&fit=crop&w=1920&h=1080&q=80&sat=5', 'Fotografisanje ostrva Magdalena', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Fotografisanje ostrva Magdalena'), NOW()),
+('/images/entity_images/activities/b55a7551ca58b5f256edb21a.jpg', 'Fotografisanje ostrva Magdalena', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Fotografisanje ostrva Magdalena'), NOW()),
 
 -- Degustacija severnjačke kuhinje Santandera: restoran uz more
-('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?auto=format&fit=crop&w=1920&h=1080&q=80', 'Degustacija severnjačke kuhinje Santandera', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija severnjačke kuhinje Santandera'), NOW()),
+('/images/entity_images/activities/7d93ad15b0fab2e68aac217e.jpg', 'Degustacija severnjačke kuhinje Santandera', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija severnjačke kuhinje Santandera'), NOW()),
 
 -- TENERIFE
 -- Ronjenje u Costa Adeji: tirkizno more Kanarskih ostrva (Hendrik Cornelissen)
-('https://checkyeti.imgix.net/images/prod/products/28598/DiveTravelSubTenerife-gallery-2-1', 'Ronjenje u Costa Adeji', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Ronjenje u Costa Adeji'), NOW()),
+('/images/entity_images/activities/2d2fb7c02e8fba33e06a5cfa.jpg', 'Ronjenje u Costa Adeji', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Ronjenje u Costa Adeji'), NOW()),
 
--- Paraglajding iznad juga Tenerifa: planine i obala Tenerifa
-('https://www.airsportstenerife.com/wp-content/uploads/2020/10/home-slide-small.jpg', 'Paraglajding iznad juga Tenerifa', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Paraglajding iznad juga Tenerifa'), NOW()),
+('/images/entity_images/activities/87887929112a761c05e61634.jpg', 'Paraglajding iznad juga Tenerifa', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Paraglajding iznad juga Tenerifa'), NOW()),
 
--- Planinarenje ka Teide vidikovcu: vulkan Teide (photo iz og pretrage)
-('https://blog.volcanoteide.com/hubfs/Blog/Imagenes%20posts/Contenidos%20subir%20al%20pico/Obtener%20permiso/EN/Getting-Mount-Teide-permit.jpg', 'Planinarenje ka Teide vidikovcu', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Planinarenje ka Teide vidikovcu'), NOW()),
+('/images/entity_images/activities/5c8caf8a327b0396b7c9ac0c.jpg', 'Planinarenje ka Teide vidikovcu', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Planinarenje ka Teide vidikovcu'), NOW()),
 
--- Noćni provod Costa Adeje: noćni grad Tenerifa
-('https://boatpartytickets.com/wp-content/uploads/2023/11/cocktails-bar-1024x682.jpg', 'Noćni provod Costa Adeje', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Noćni provod Costa Adeje'), NOW()),
+('/images/entity_images/activities/2afe4bb9cc8458270e4eebdc.jpg', 'Noćni provod Costa Adeje', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Noćni provod Costa Adeje'), NOW()),
 
 -- SANTIAGO DE COMPOSTELA
--- Razgledanje istorijskog jezgra Santijaga: katedrala Santijaga (Victoriano Izquierdo)
-('https://images-blog.visitchile.com/uploads/814845eb.jpg', 'Razgledanje istorijskog jezgra Santijaga', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Razgledanje istorijskog jezgra Santijaga'), NOW()),
+('/images/entity_images/activities/3cec2ed4e8da865d5cd3fe6e.jpg', 'Razgledanje istorijskog jezgra Santijaga', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Razgledanje istorijskog jezgra Santijaga'), NOW()),
 
--- Degustacija galisijske kuhinje: restoran/hrana
-('https://www.absolutviajes.com/wp-content/uploads/2020/05/gastronomia-de-galicia.png', 'Degustacija galisijske kuhinje', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija galisijske kuhinje'), NOW()),
+('/images/entity_images/activities/f2bef1f850d68a3ed1c638f2.jpg', 'Degustacija galisijske kuhinje', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija galisijske kuhinje'), NOW()),
 
--- Kupovina na pijaci Kompostele: pijaca/tržnica
-('https://murciatoday.com/images/articles/22400_alicante-summer-artisan-fair-in-paseo-de-la-explanada_5_gallery_large.jpg', 'Kupovina na pijaci Kompostele', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Kupovina na pijaci Kompostele'), NOW()),
+('/images/entity_images/activities/be17515dd3049257e5258bba.jpg', 'Kupovina na pijaci Kompostele', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Kupovina na pijaci Kompostele'), NOW()),
 
--- Jutarnja šetnja kroz Alamedu: panorama Santijaga sa krovova (Filipp Romanovski)
-('https://xdn.eklinika.rs/2023/05/28/Shutterstock_1778863982.jpg', 'Jutarnja šetnja kroz Alamedu', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Jutarnja šetnja kroz Alamedu'), NOW());
+('/images/entity_images/activities/46bd6e6badbeb2e8c20c1a01.jpg', 'Jutarnja šetnja kroz Alamedu', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Jutarnja šetnja kroz Alamedu'), NOW());
+
 -- 16.4 ITALY EXPANSION - OBJECTS, REVIEWS, ACTIVITIES
 WITH source("Name", "Description", "Address", "PhoneNumber", "Price", "ObjectTypeName", "LocalityName", "DestinationName", "CreatorEmail", "ManagerEmail", "Profile", "Lng", "Lat") AS (
     VALUES
@@ -35207,66 +34796,66 @@ SELECT 1;
 
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ObjectId", "CreatedAt")
 VALUES
-('https://www.hotels-apulia.com/data/Photos/OriginalPhoto/17172/1717297/1717297066.JPEG', 'Hotel Lungomare Bari', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Lungomare Bari'), NOW()),
-('https://static.gamberorosso.it/2023/11/bari.jpg', 'Trattoria Bari Vecchia', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Trattoria Bari Vecchia'), NOW()),
-('https://upload.wikimedia.org/wikipedia/commons/a/af/%22Die_Basilika_San_Nicola_ist_auch_heute_noch_ein_bedeutendes_Pilgerziel%22_01.jpg', 'Galerija Svetog Nikole Bari', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Svetog Nikole Bari'), NOW()),
-('https://www.baartgallery.com/wp-content/uploads/2022/08/PHOTO-2022-08-04-18-08-11.jpg', 'Centro Bari Galleria', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Centro Bari Galleria'), NOW()),
-('https://www.casalucihealthcare.com/wp-content/uploads/2024/04/casaluci-healthcare-policlinico-di-bari-2.jpg', 'Hospital Adriatico Bari', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Adriatico Bari'), NOW()),
-('https://www.bp.com/content/dam/bp/business-sites/en/global/air-bp/images/news-and-views/newsletter/2023/Bari%20Palese%20Airport.jpg', 'Repsol Lungomare Bari', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol Lungomare Bari'), NOW()),
-('https://www.wycieczkomania.pl/wp-content/uploads/2021/12/IMG_20211206_104833.jpg', 'Suvenirnica Bari Vecchia', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Bari Vecchia'), NOW()),
-('https://mcarchitecture.al/wp-content/uploads/2025/08/Dco-Clinic-Bari-9.jpg', 'Klinika San Nicola Bari', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Klinika San Nicola Bari'), NOW()),
-('https://assets.q8.be/f/318005/bc2bff8477/man-leaning-blue-car-q8-fuel-station-shop-cwa.jpeg/m/3840x0/filters:format(webp)', 'Q8 Porto Bari', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Q8 Porto Bari'), NOW()),
-('https://cf.bstatic.com/xdata/images/hotel/max1024x768/785166012.jpg?k=c08aecfa8b0aa2d073a3601704d58f68f0b214e6ccaf36b5b3adff926ac1735b&o=', 'Hotel Quattro Canti Palermo', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Quattro Canti Palermo'), NOW()),
-('https://siciliasecrets.com/wp-content/uploads/2023/11/Osteria-Ballaro-Sicilia-Secrets953.jpg', 'Osteria Ballaro Palermo', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Osteria Ballaro Palermo'), NOW()),
-('https://www.exoticca.com/wp-content/uploads/2025/10/Norman-Palace-Palermo.jpeg', 'Muzej Normanske Palate Palermo', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Normanske Palate Palermo'), NOW()),
-('https://images.trvl-media.com/place/6167281/38b7821e-0f2c-4c99-a844-e58226e67fef.jpg', 'Mercato Palermo Centrale', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercato Palermo Centrale'), NOW()),
-('https://revistahospitalaria.org/wp-content/uploads/2023/08/Clinica-Palermo-2.jpg', 'Hospital Palermo Centro', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Palermo Centro'), NOW()),
-('https://www.palermotoday.it/~media/horizontal-hi/69558079199545/distributore-eni-mondello-via-venere-2.jpg', 'Eni Mondello Palermo', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Eni Mondello Palermo'), NOW()),
-('https://www.cooltourismical.com/wp-content/uploads/2021/08/Palermo-Jewelry-Store-Sicilian-Souvenirs-Shop.jpg', 'Suvenirnica Ballaro Palermo', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Ballaro Palermo'), NOW()),
-('https://himetop.wdfiles.com/local--files/the-paolo-giaccone-general-hospital/The%20Paolo%20Giaccone%20General%20Hospital%20%281%29.JPG', 'Poliklinika Mondello Palermo', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Poliklinika Mondello Palermo'), NOW()),
-('https://elsamex.com/wp-content/uploads/2021/06/q8-scaled.jpg', 'Q8 Foro Italico Palermo', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Q8 Foro Italico Palermo'), NOW()),
-('https://x3jh6o6w.cdn.imgeng.in/assets/uploads/DESTINATIONS_2017/2048X1363/trieste/savoia-excelsior-palace-destination-luoghi-salienti-trieste.jpg?imgeng=/w_1440', 'Hotel Piazza Unita Trieste', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Piazza Unita Trieste'), NOW()),
-('https://images.trvl-media.com/place/553248621562150834/4fa07f37-4c8c-4bd5-8bf2-5dad51a9b4c0.jpg', 'Ristorante Canal Grande Trieste', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Ristorante Canal Grande Trieste'), NOW()),
-('https://emorje.com/wp-content/uploads/2025/02/20250118_125921-1024x768.jpg', 'Muzej Morskog Trsta', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Morskog Trsta'), NOW()),
-('https://www.lamiatrieste.com/wp-content/uploads/2016/10/Mercato-Coperto-Trieste-007-1920x1277.jpg', 'Mercato Canal Grande Trieste', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercato Canal Grande Trieste'), NOW()),
-('https://shadow.doctorsinitaly.com/cdn/shop/files/trieste-program-doctors-in-italy-1.webp?v=1770221167&width=3840', 'Hospital Porto Trieste', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Porto Trieste'), NOW()),
-('https://www.reuters.com/resizer/v2/KZLOET4H45PADBVTFRLLH4JRRQ.jpg?auth=756ae339d85b0bf571d712c8a31b71e6bddab3a2efc68fbab13ab9c650b4790b&width=1920&quality=80', 'Eni Miramare Trieste', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Eni Miramare Trieste'), NOW()),
-('https://images.ilpiccolo.it/view/acePublic/alias/contentid/0283cc9b-75b7-4e30-8a79-87af677a2ec1/0/magneti-souvenir.webp?f=16%3A9&w=840', 'Suvenirnica Piazza Unita', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Piazza Unita'), NOW()),
-('https://globetrender.com/wp-content/uploads/2024/11/Ang.Mag-39-scaled.jpg', 'Apartmani Sassi Matera', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartmani Sassi Matera'), NOW()),
-('https://www.sangiovanniosteria.com/public/images/head/osteria-sangiovanni.jpg', 'Osteria Kamena Matera', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Osteria Kamena Matera'), NOW()),
-('https://www.moom.bio/wp-content/uploads/2016/02/DSC5305.jpg', 'Muzej Pecinskih Kuca Matera', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Pecinskih Kuca Matera'), NOW()),
-('https://images.winalist.com/blog/wp-content/uploads/2025/07/08095202/adobestock-235170277-1500x1000.jpeg', 'Bottega Sassi Matera', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Bottega Sassi Matera'), NOW()),
-('https://bizlife.rs/wp-content/uploads/2022/01/operation-g97f5eaa23_1920.jpg', 'Dom zdravlja Gravina Matera', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Gravina Matera'), NOW()),
-('https://assets.q8.be/f/318005/d5fa634788/q8-fuel-station-shop-aerial-cwa.jpeg/m/3840x0/filters:format(webp)', 'Q8 Murgia Matera', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Q8 Murgia Matera'), NOW()),
-('https://www.italyscapes.com/wp-content/uploads/2024/10/7924_piazza-vittorio-veneto-1.jpg', 'Tržnica Piazza Matera', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Tržnica Piazza Matera'), NOW()),
-('https://cf.bstatic.com/xdata/images/hotel/max1024x768/515309712.jpg?k=97631020c2356267021f83e30d67ca1bf1c744622c689d7bf72615d7e57521f9&o=', 'Pansion Marina Grande Sorrento', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pansion Marina Grande Sorrento'), NOW()),
-('https://www.ilcaposuites.com/blog/images/delizia-al-limone-sorrento.jpg', 'Limone Bistro Sorrento', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Limone Bistro Sorrento'), NOW()),
-('https://msub.org.rs/wp-content/uploads/2020/07/MSUB-Zgrada.jpg', 'Muzej Obale Sorrenta', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Obale Sorrenta'), NOW()),
-('https://images.trvl-media.com/place/6184681/ecaee4b1-c743-4cf0-ae1c-c44f8e60e22e.jpg', 'Galleria Corso Sorrento', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galleria Corso Sorrento'), NOW()),
-('https://cdn.positanonews.it/photogallery_new/images/2020/03/ospedale-di-sorrento-3275613.jpg', 'Hospital Costiera Sorrento', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Costiera Sorrento'), NOW()),
-('https://mominitaly.com/wp-content/uploads/2021/08/autogrill_in_italy-1024x768.jpg', 'Eni Marina Grande Sorrento', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Eni Marina Grande Sorrento'), NOW()),
-('https://liveinitalymag.com/wp-content/uploads/2025/09/Sorrento-e-scaled.jpg', 'Suvenirnica Villa Sorrento', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Villa Sorrento'), NOW()),
-('https://cf.bstatic.com/xdata/images/hotel/max1024x768/670878712.jpg?k=541cae614c274af41a015e19ef7d61a6e995869a19caa522fa421d2d2470ec06&o=', 'Hotel Barocco Lecce', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Barocco Lecce'), NOW()),
-('https://cdn.thefork.com/tf-lab/image/upload/w_1080,c_fill,q_auto,f_auto/restaurant/0ebf1668-f674-4c61-b582-e027f6c1c19f/d49be92f-6c1c-4d4d-93ac-affb2c807621.jpg', 'Trattoria Sant''Oronzo Lecce', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Trattoria Sant''Oronzo Lecce'), NOW()),
-('https://cdn0.matrimonio.com/vendor/2105/3_2/960/jpg/1000025196_2_52105-171645959630309.jpeg', 'Galerija Lecce Pietra', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Lecce Pietra'), NOW()),
-('https://www.sabrinabarbante.com/wp-content/uploads/2022/07/lecce-mercato-via-bari.jpg', 'Mercato Salento Lecce', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercato Salento Lecce'), NOW()),
-('https://www.gvmnet.it/getmedia/e7532637-322a-4c16-8971-6a29fb3c91e1/Esterno_Citta_di_Lecce_Hospital?ext=.jpg&width=1920', 'Klinika Lecce Centro', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Klinika Lecce Centro'), NOW()),
-('https://static.where-e.com/Italy/Q8-Service-Station_6db4903935ac5e89b3586daf4341d6ac.jpg', 'Q8 Porta Napoli Lecce', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Q8 Porta Napoli Lecce'), NOW()),
-('https://kristatheexplorer.com/wp-content/uploads/2025/02/IMG_2486-edited.jpg', 'Suvenirnica Barokni Lecce', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Barokni Lecce'), NOW()),
-('https://cf.bstatic.com/xdata/images/hotel/max1024x768/584148011.jpg?k=08f83f06ac4b69adf2d8bae77fb76491b811c573b2369667c400ed4894b590ec&o=', 'Apartmani Parma Duomo', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartmani Parma Duomo'), NOW()),
-('https://parmawelcome.it/wp-content/uploads/2025/02/Sale-Meeting-NH-Parma-4-700x400.jpg', 'Osteria Ducale Parma', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Osteria Ducale Parma'), NOW()),
-('https://www.coopculture.it/shared/coopculture/immagini/casa_della_musica.jpg', 'Muzej Parma Musica', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Parma Musica'), NOW()),
-('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/2c/78/f2/cf/caption.jpg?w=1200&h=1200&s=1', 'Parma Galleria Centrale', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Parma Galleria Centrale'), NOW()),
-('https://www.ilrestodelcarlino.it/image-service/view/acePublic/alias/contentid/MTJkMjE5YzAtODQzMC00/3/larcispedale-santa-maria-nuova-di-reggio-emilia-si-posiziona-al-14esimo-posto-della-classifica-nazionale.jpg', 'Hospital Emilia Parma', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Emilia Parma'), NOW()),
-('https://cdn.glassrpske.com/slika/2012/03/750x500/20120314202926_73448.jpg', 'Eni Oltretorrente Parma', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Eni Oltretorrente Parma'), NOW()),
-('https://media-cdn.tripadvisor.com/media/photo-m/1280/2a/c2/43/82/interno.jpg', 'Mercato Parma Gourmet', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercato Parma Gourmet'), NOW()),
-('https://cf.bstatic.com/xdata/images/hotel/max1024x768/507849382.jpg?k=84f9a56555cef2e71ecffdd4a853c40a249cc193636f469b3f63fc05cf8ba59c&o=', 'Hotel Costa Smeralda', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Costa Smeralda'), NOW()),
-('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/30/3b/ab/a7/tavoli-esterni-e-mise.jpg', 'Trattoria Golfo Orosei', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Trattoria Golfo Orosei'), NOW()),
-('https://www.italybyevents.com/wp-content/uploads/2021/08/Nuragica-Sardegna.jpg', 'Muzej Nuraga Sardinija', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Nuraga Sardinija'), NOW()),
-('https://cdn.prod.website-files.com/622e9d400842f1a80d806fd4/65620d8575db541f49779482__MG_6815%20%C2%A9Federico%20Vanno%20Liquid%20Barrel.webp', 'Surf Shop Sardinija', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Surf Shop Sardinija'), NOW()),
-('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTbRwSSlv9qgOWlRSzF0Cuw0Evd0D37xczocw&s', 'Poliklinika Cagliari Marina', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Poliklinika Cagliari Marina'), NOW()),
-('https://cloudfront-us-east-2.images.arcpublishing.com/reuters/5TXF7BRWLBNAFJJJQ2YC37RVV4.jpg', 'Repsol Costa Smeralda', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol Costa Smeralda'), NOW()),
-('https://www.fortevillageresort.com/wp-content/uploads/2023/06/thalasso_ME.jpg', 'Sardinia Sea Spa', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Sardinia Sea Spa'), NOW());
+('/images/entity_images/objects/363ebcac70a58511c396e778.jpg', 'Hotel Lungomare Bari', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Lungomare Bari'), NOW()),
+('/images/entity_images/objects/384bc481e5b085b83d0a7e9d.jpg', 'Trattoria Bari Vecchia', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Trattoria Bari Vecchia'), NOW()),
+('/images/entity_images/objects/8dad152a7c991380b953b14e.jpg', 'Galerija Svetog Nikole Bari', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Svetog Nikole Bari'), NOW()),
+('/images/entity_images/objects/ab814fd55dcd7e65a4e1a7a1.jpg', 'Centro Bari Galleria', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Centro Bari Galleria'), NOW()),
+('/images/entity_images/objects/5cd988e7c687f48267702311.jpg', 'Hospital Adriatico Bari', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Adriatico Bari'), NOW()),
+('/images/entity_images/objects/10a1026fa31e56928adac152.jpg', 'Repsol Lungomare Bari', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol Lungomare Bari'), NOW()),
+('/images/entity_images/objects/cab629ed5d1351c227b66902.jpg', 'Suvenirnica Bari Vecchia', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Bari Vecchia'), NOW()),
+('/images/entity_images/objects/a2a2d9b1d3d63c3ee230bf13.jpg', 'Klinika San Nicola Bari', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Klinika San Nicola Bari'), NOW()),
+('/images/entity_images/objects/a768cb5d57abc48a6f8951da.jpg', 'Q8 Porto Bari', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Q8 Porto Bari'), NOW()),
+('/images/entity_images/objects/48e689772ab245ccad74fab4.jpg', 'Hotel Quattro Canti Palermo', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Quattro Canti Palermo'), NOW()),
+('/images/entity_images/objects/ce8f3b01ab0f14889b603219.jpg', 'Osteria Ballaro Palermo', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Osteria Ballaro Palermo'), NOW()),
+('/images/entity_images/objects/e08a4825de11a07d38cb2859.jpg', 'Muzej Normanske Palate Palermo', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Normanske Palate Palermo'), NOW()),
+('/images/entity_images/objects/a81ac117b2dc030669f79958.jpg', 'Mercato Palermo Centrale', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercato Palermo Centrale'), NOW()),
+('/images/entity_images/objects/95cf2c7c4afe45bd92afd85d.jpg', 'Hospital Palermo Centro', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Palermo Centro'), NOW()),
+('/images/entity_images/objects/097621a45f4caa20594cc0f9.jpg', 'Eni Mondello Palermo', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Eni Mondello Palermo'), NOW()),
+('/images/entity_images/objects/0dcdebff239bad3deb77db3d.jpg', 'Suvenirnica Ballaro Palermo', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Ballaro Palermo'), NOW()),
+('/images/entity_images/objects/91e68664d3feeb03ef6f17d2.jpg', 'Poliklinika Mondello Palermo', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Poliklinika Mondello Palermo'), NOW()),
+('/images/entity_images/objects/7caf5cfa5b6c82ce66a08541.jpg', 'Q8 Foro Italico Palermo', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Q8 Foro Italico Palermo'), NOW()),
+('/images/entity_images/objects/7f7484782fc847b9afdc221f.jpg', 'Hotel Piazza Unita Trieste', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Piazza Unita Trieste'), NOW()),
+('/images/entity_images/objects/9fef98e59a81c8524108c1a2.jpg', 'Ristorante Canal Grande Trieste', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Ristorante Canal Grande Trieste'), NOW()),
+('/images/entity_images/objects/e2bfc706447b74bf950e1c59.jpg', 'Muzej Morskog Trsta', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Morskog Trsta'), NOW()),
+('/images/entity_images/objects/44a33681d1934c7f0057277e.jpg', 'Mercato Canal Grande Trieste', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercato Canal Grande Trieste'), NOW()),
+('/images/entity_images/objects/e6a0a005b3193fe94bcc1d2b.jpg', 'Hospital Porto Trieste', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Porto Trieste'), NOW()),
+('/images/entity_images/objects/c67b0b06c67da4170ea17972.jpg', 'Eni Miramare Trieste', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Eni Miramare Trieste'), NOW()),
+('/images/entity_images/objects/ddb5b8234ce275f118560acd.jpg', 'Suvenirnica Piazza Unita', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Piazza Unita'), NOW()),
+('/images/entity_images/objects/4ab870fb49aa348e33249642.jpg', 'Apartmani Sassi Matera', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartmani Sassi Matera'), NOW()),
+('/images/entity_images/objects/6ee6ffe2968e16ed953e5a56.jpg', 'Osteria Kamena Matera', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Osteria Kamena Matera'), NOW()),
+('/images/entity_images/objects/804acbce3fef57e83b0426f8.jpg', 'Muzej Pecinskih Kuca Matera', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Pecinskih Kuca Matera'), NOW()),
+('/images/entity_images/objects/13f23d83adb26bb28125de62.jpg', 'Bottega Sassi Matera', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Bottega Sassi Matera'), NOW()),
+('/images/entity_images/objects/a377a28f05f89efe02e984d9.jpg', 'Dom zdravlja Gravina Matera', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Gravina Matera'), NOW()),
+('/images/entity_images/objects/5df40e0ce0631dd38588eee8.jpg', 'Q8 Murgia Matera', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Q8 Murgia Matera'), NOW()),
+('/images/entity_images/objects/b39d9080f09c78746ed47bc6.jpg', 'Tržnica Piazza Matera', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Tržnica Piazza Matera'), NOW()),
+('/images/entity_images/objects/368d70b9d5a4ed89ae49e143.jpg', 'Pansion Marina Grande Sorrento', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pansion Marina Grande Sorrento'), NOW()),
+('/images/entity_images/objects/2977a175428f4ced1933baa2.jpg', 'Limone Bistro Sorrento', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Limone Bistro Sorrento'), NOW()),
+('/images/entity_images/objects/084456239fb1cb45ed5c4216.jpg', 'Muzej Obale Sorrenta', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Obale Sorrenta'), NOW()),
+('/images/entity_images/objects/c4e97b19eb2aef9d15d7a1c1.jpg', 'Galleria Corso Sorrento', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galleria Corso Sorrento'), NOW()),
+('/images/entity_images/objects/66744552379a489bf8803456.jpg', 'Hospital Costiera Sorrento', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Costiera Sorrento'), NOW()),
+('/images/entity_images/objects/0300e8e007f74feaf26e9632.jpg', 'Eni Marina Grande Sorrento', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Eni Marina Grande Sorrento'), NOW()),
+('/images/entity_images/objects/733d171055214a8ec9097571.jpg', 'Suvenirnica Villa Sorrento', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Villa Sorrento'), NOW()),
+('/images/entity_images/objects/b2cfcc36e4255c2ddd5bee7a.jpg', 'Hotel Barocco Lecce', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Barocco Lecce'), NOW()),
+('/images/entity_images/objects/8f2ffd92e0b741a08015ab4f.jpg', 'Trattoria Sant''Oronzo Lecce', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Trattoria Sant''Oronzo Lecce'), NOW()),
+('/images/entity_images/objects/57e2432c891e40e42cec27c6.jpg', 'Galerija Lecce Pietra', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Lecce Pietra'), NOW()),
+('/images/entity_images/objects/f5a792f97994459175370ddb.jpg', 'Mercato Salento Lecce', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercato Salento Lecce'), NOW()),
+('/images/entity_images/objects/5ac6b60929d5c3716fa6538c.jpg', 'Klinika Lecce Centro', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Klinika Lecce Centro'), NOW()),
+('/images/entity_images/objects/bf938f61e3156ab0e74692d4.jpg', 'Q8 Porta Napoli Lecce', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Q8 Porta Napoli Lecce'), NOW()),
+('/images/entity_images/objects/7cc7b2d68244148fd3690fd1.jpg', 'Suvenirnica Barokni Lecce', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Suvenirnica Barokni Lecce'), NOW()),
+('/images/entity_images/objects/628be393f686002759e4de99.jpg', 'Apartmani Parma Duomo', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartmani Parma Duomo'), NOW()),
+('/images/entity_images/objects/bac0fd704b813454dd9e5863.jpg', 'Osteria Ducale Parma', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Osteria Ducale Parma'), NOW()),
+('/images/entity_images/objects/f7e84f36b47ef5185e70c43e.jpg', 'Muzej Parma Musica', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Parma Musica'), NOW()),
+('/images/entity_images/objects/87624455b8aad3ac788c8402.jpg', 'Parma Galleria Centrale', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Parma Galleria Centrale'), NOW()),
+('/images/entity_images/objects/58f68cc297cb5c87c25ac196.jpg', 'Hospital Emilia Parma', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hospital Emilia Parma'), NOW()),
+('/images/entity_images/objects/9ebaab96e082211342b0f965.jpg', 'Eni Oltretorrente Parma', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Eni Oltretorrente Parma'), NOW()),
+('/images/entity_images/objects/293950482c397b05aa11ecfd.jpg', 'Mercato Parma Gourmet', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mercato Parma Gourmet'), NOW()),
+('/images/entity_images/objects/823ab29d64a11ee74159138f.jpg', 'Hotel Costa Smeralda', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Costa Smeralda'), NOW()),
+('/images/entity_images/objects/b3d41a732fd0ef3ed5b6d2a5.jpg', 'Trattoria Golfo Orosei', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Trattoria Golfo Orosei'), NOW()),
+('/images/entity_images/objects/bd2e5e4f2826853fa5d6e4e8.jpg', 'Muzej Nuraga Sardinija', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej Nuraga Sardinija'), NOW()),
+('/images/entity_images/objects/280bbc79526b1b51e485ad72.jpg', 'Surf Shop Sardinija', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Surf Shop Sardinija'), NOW()),
+('/images/entity_images/objects/74107d0e2fe08019098601b0.jpg', 'Poliklinika Cagliari Marina', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Poliklinika Cagliari Marina'), NOW()),
+('/images/entity_images/objects/47d6b126b2ab4e35510670ec.jpg', 'Repsol Costa Smeralda', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Repsol Costa Smeralda'), NOW()),
+('/images/entity_images/objects/5d1e3e391ec48c22af6e502c.jpg', 'Sardinia Sea Spa', true, (SELECT "Id" FROM "Objects" WHERE "Name" = 'Sardinia Sea Spa'), NOW());
 
 WITH source("Name", "Description", "Lng", "Lat", "Price", "DurationMinutes", "ActivityTypeName", "LocalityName", "DestinationName", "ObjectName", "CreatorEmail", "Profile") AS (
     VALUES
@@ -35359,49 +34948,49 @@ SELECT 1;
 INSERT INTO "Images" ("Url", "AltText", "IsMain", "ActivityId", "CreatedAt")
 VALUES
 -- BARI
-('https://img3.oastatic.com/img2/81651409/max/variant.webp', 'Jutarnje plivanje Lungomare Bari', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Jutarnje plivanje Lungomare Bari'), NOW()),
-('https://cdn.prod.website-files.com/63d5037cf3546dcb07a1db25/6460200ec147b29d6aaba878_642218134bf3fe263b1e0bc5_cristian-macovei-H5TnNMIcAkM-unsplash.jpeg', 'Razgledanje Bari Vecchie', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Razgledanje Bari Vecchie'), NOW()),
-('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1920&h=1080&fit=crop', 'Degustacija fokace u Bariju', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija fokace u Bariju'), NOW()),
-('https://www.kupi.com/kland-storage/images/670x0/30x30/attractions/it/bari/maximall-bari-santa-caterina/c3eb58db-2a81-4a0b-9816-267c0b1fe827.webp', 'Kupovina u Centro Bari Galleriji', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Kupovina u Centro Bari Galleriji'), NOW()),
+('/images/entity_images/activities/268610a5e8f33392b92b568b.jpg', 'Jutarnje plivanje Lungomare Bari', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Jutarnje plivanje Lungomare Bari'), NOW()),
+('/images/entity_images/activities/c7c2738f450de673f02cb6c8.jpg', 'Razgledanje Bari Vecchie', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Razgledanje Bari Vecchie'), NOW()),
+('/images/entity_images/activities/3a87ef9b42d8041527690b9a.jpg', 'Degustacija fokace u Bariju', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija fokace u Bariju'), NOW()),
+('/images/entity_images/activities/e133a3d9f4ff85377aa322bb.jpg', 'Kupovina u Centro Bari Galleriji', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Kupovina u Centro Bari Galleriji'), NOW()),
 
 -- PALERMO
-('https://images.unsplash.com/photo-1523531294919-4bcd7c65e216?w=1920&h=1080&fit=crop', 'Fotografisanje Quattro Cantija', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Fotografisanje Quattro Cantija'), NOW()),
-('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1920&h=1080&fit=crop', 'Degustacija sicilijanske ulične hrane', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija sicilijanske ulične hrane'), NOW()),
-('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1920&h=1080&fit=crop&sig=mondello', 'Kupanje u Mondellu', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Kupanje u Mondellu'), NOW()),
-('https://images.unsplash.com/photo-1519214605650-76a613ee3245?w=1920&h=1080&fit=crop', 'Noćni provod u Palermu', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Noćni provod u Palermu'), NOW()),
+('/images/entity_images/activities/fd4ed4f53817841d9e18a68c.jpg', 'Fotografisanje Quattro Cantija', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Fotografisanje Quattro Cantija'), NOW()),
+('/images/entity_images/activities/f19de315bb4f95a38d60e2af.jpg', 'Degustacija sicilijanske ulične hrane', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija sicilijanske ulične hrane'), NOW()),
+('/images/entity_images/activities/ee51ffef150b0547f2c42b25.jpg', 'Kupanje u Mondellu', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Kupanje u Mondellu'), NOW()),
+('/images/entity_images/activities/7ad85e47eea10093c40d6937.jpg', 'Noćni provod u Palermu', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Noćni provod u Palermu'), NOW()),
 
 -- TRST
-('https://cdn.bubblyliving.com/wp-content/uploads/2025/08/20250501_162557_2-1170x658.webp', 'Biciklistički krug uz Kanal Grande', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Biciklistički krug uz Kanal Grande'), NOW()),
-('https://www.turismofvg.it/proxyvfs.axd/image_hd/r85041/18734-jpeg?v=100939&ext=.jpeg', 'Razgledanje Piazza Unita', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Razgledanje Piazza Unita'), NOW()),
-('https://travelsonpoint.com/wp-content/uploads/2024/02/dreamstime_l_212445048-1024x683.jpg', 'Poseta restoranu uz kanal u Trstu', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Poseta restoranu uz kanal u Trstu'), NOW()),
-('https://jistra.com/wp-content/uploads/2018/07/9-1-scaled.jpg', 'Kajak ispod Miramarea', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Kajak ispod Miramarea'), NOW()),
+('/images/entity_images/activities/d8fb0b7d61cd7e5ee0c73da0.jpg', 'Biciklistički krug uz Kanal Grande', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Biciklistički krug uz Kanal Grande'), NOW()),
+('/images/entity_images/activities/a78de81119affdead3f0d52b.jpg', 'Razgledanje Piazza Unita', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Razgledanje Piazza Unita'), NOW()),
+('/images/entity_images/activities/fae18153a2b55f291e755927.jpg', 'Poseta restoranu uz kanal u Trstu', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Poseta restoranu uz kanal u Trstu'), NOW()),
+('/images/entity_images/activities/52da3030ab7c21c1404c223a.jpg', 'Kajak ispod Miramarea', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Kajak ispod Miramarea'), NOW()),
 
 -- MATERA
-('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1920&h=1080&fit=crop', 'Foto tura kroz Sassi', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Foto tura kroz Sassi'), NOW()),
-('https://dynamic-media-cdn.tripadvisor.com/media/photo-o/05/63/a3/37/belvedere.jpg?w=1200&h=-1&s=1', 'Pešačenje do Belvederea Murgije', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Pešačenje do Belvederea Murgije'), NOW()),
-('https://travelinculture.com/wp-content/uploads/2022/03/Rome-Piazza-Navona-kirkandmimi-wide-960-50.jpg', 'Razgledanje Piazza Duomo Matere', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Razgledanje Piazza Duomo Matere'), NOW()),
-('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&h=1080&fit=crop', 'Joga sa pogledom na Sassi', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Joga sa pogledom na Sassi'), NOW()),
+('/images/entity_images/activities/2d8691cfc8842786fb2efec0.jpg', 'Foto tura kroz Sassi', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Foto tura kroz Sassi'), NOW()),
+('/images/entity_images/activities/c2a212f20b0fddefec7b16a3.jpg', 'Pešačenje do Belvederea Murgije', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Pešačenje do Belvederea Murgije'), NOW()),
+('/images/entity_images/activities/9578dc7e399372c9aa32f7b1.jpg', 'Razgledanje Piazza Duomo Matere', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Razgledanje Piazza Duomo Matere'), NOW()),
+('/images/entity_images/activities/09b647ad35b3a72d61c7ca3e.jpg', 'Joga sa pogledom na Sassi', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Joga sa pogledom na Sassi'), NOW()),
 
 -- SORRENTO
-('https://www.losmundosdeceli.com/wp-content/uploads/2018/08/kayak-gruta-marina-gargano-campi-1080x640.jpg', 'Vožnja čamcem ispod Sorenta', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Vožnja čamcem ispod Sorenta'), NOW()),
-('https://images.unsplash.com/photo-1565958011703-44f9829ba187?w=1920&h=1080&fit=crop', 'Degustacija limunskih deserata Sorenta', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija limunskih deserata Sorenta'), NOW()),
-('https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?w=1920&h=1080&fit=crop', 'Kupovina duž Corso Italie', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Kupovina duž Corso Italie'), NOW()),
-('https://www.visitcampania.info/wp-content/uploads/2025/06/sorrento_spiaggia_marina_grande_06.jpg', 'Plivanje kod Marine Grande', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Plivanje kod Marine Grande'), NOW()),
+('/images/entity_images/activities/cb366d46196b924b39238e4e.jpg', 'Vožnja čamcem ispod Sorenta', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Vožnja čamcem ispod Sorenta'), NOW()),
+('/images/entity_images/activities/4bea83268002efc908b4c867.jpg', 'Degustacija limunskih deserata Sorenta', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija limunskih deserata Sorenta'), NOW()),
+('/images/entity_images/activities/42ded2a6170eb47332bf47b3.jpg', 'Kupovina duž Corso Italie', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Kupovina duž Corso Italie'), NOW()),
+('/images/entity_images/activities/c4490b86d67dd57e32dbd92c.jpg', 'Plivanje kod Marine Grande', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Plivanje kod Marine Grande'), NOW()),
 
 -- LEČEA
-('https://images.unsplash.com/photo-1467269204594-9661b134dd2b?w=1920&h=1080&fit=crop', 'Razgledanje baroknog Lečea', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Razgledanje baroknog Lečea'), NOW()),
-('https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=1920&h=1080&fit=crop&sig=lecce', 'Kupovina u istorijskom jezgru Lečea', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Kupovina u istorijskom jezgru Lečea'), NOW()),
-('https://images.unsplash.com/photo-1467269204594-9661b134dd2b?w=1920&h=1080&fit=crop&sig=gold', 'Fotografisanje zlatnog kamena Lečea', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Fotografisanje zlatnog kamena Lečea'), NOW()),
-('https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=1920&h=1080&fit=crop', 'Degustacija vina Salenta', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija vina Salenta'), NOW()),
+('/images/entity_images/activities/817fbe4a415bf5abbce330f0.jpg', 'Razgledanje baroknog Lečea', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Razgledanje baroknog Lečea'), NOW()),
+('/images/entity_images/activities/89e22a91afcb00ddeff2a82d.jpg', 'Kupovina u istorijskom jezgru Lečea', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Kupovina u istorijskom jezgru Lečea'), NOW()),
+('/images/entity_images/activities/681c9529b75edcaef766f004.jpg', 'Fotografisanje zlatnog kamena Lečea', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Fotografisanje zlatnog kamena Lečea'), NOW()),
+('/images/entity_images/activities/e4a8bc5be9c2b9f7329030f3.jpg', 'Degustacija vina Salenta', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija vina Salenta'), NOW()),
 
 -- PARMA
-('https://images.unsplash.com/photo-1452195100486-9cc805987862?w=1920&h=1080&fit=crop', 'Degustacija parmezana i pršute', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija parmezana i pršute'), NOW()),
-('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1920&h=1080&fit=crop&sig=parma', 'Poseta restoranu u Parmi', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Poseta restoranu u Parmi'), NOW()),
-('https://d2fg1aan4gy9m1.cloudfront.net/ert/images/6903/conversions/Parma%2C-%C3%89tape-Parma-by-Tour-de-France-edizione-2024%2C-ph.-Extragiro%2C-CC-BY-NC-ND-4.0-webp.webp', 'Biciklom kroz Parco Ducale', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Biciklom kroz Parco Ducale'), NOW()),
-('https://i.pinimg.com/736x/7c/6a/da/7c6ada7d787dc7187899aa4261a3dbe9.jpg', 'Kupovina gurmanskih proizvoda u Parmi', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Kupovina gurmanskih proizvoda u Parmi'), NOW()),
+('/images/entity_images/activities/7b93dc1179f010c5823ade2f.jpg', 'Degustacija parmezana i pršute', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Degustacija parmezana i pršute'), NOW()),
+('/images/entity_images/activities/4aba94a6de87abc453a0ad6f.jpg', 'Poseta restoranu u Parmi', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Poseta restoranu u Parmi'), NOW()),
+('/images/entity_images/activities/88141adf3b634e8d5d5f392a.jpg', 'Biciklom kroz Parco Ducale', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Biciklom kroz Parco Ducale'), NOW()),
+('/images/entity_images/activities/6a6c7ef9149ee5eaf1f8d076.jpg', 'Kupovina gurmanskih proizvoda u Parmi', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Kupovina gurmanskih proizvoda u Parmi'), NOW()),
 
 -- SARDINIJA
-('https://images.unsplash.com/photo-1544551763-77ef2d0cfc6c?w=1920&h=1080&fit=crop', 'Ronjenje uz Costa Smeraldu', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Ronjenje uz Costa Smeraldu'), NOW()),
-('https://www.solobagaglioamano.com/wp-content/uploads/2022/09/about2.jpg', 'Vožnja čamcem kroz Golfo Orosei', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Vožnja čamcem kroz Golfo Orosei'), NOW()),
-('https://www.openwaterswimming.com/wp-content/uploads/2021/12/sardinia.jpg', 'Plivanje u tirkiznim uvalama Sardinije', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Plivanje u tirkiznim uvalama Sardinije'), NOW()),
-('https://www.sardiniaexploring.com/wp-content/uploads/Sardinia-Exploring-Sardegna-Trekking-Golfo-Orosei-Bacu-Padente.jpg', 'Planinarenje iznad zaliva Orosei', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Planinarenje iznad zaliva Orosei'), NOW());
+('/images/entity_images/activities/1072f2c3f38b7de27866b0c3.jpg', 'Ronjenje uz Costa Smeraldu', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Ronjenje uz Costa Smeraldu'), NOW()),
+('/images/entity_images/activities/da32fa1254a420ab25b62eb5.jpg', 'Vožnja čamcem kroz Golfo Orosei', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Vožnja čamcem kroz Golfo Orosei'), NOW()),
+('/images/entity_images/activities/cbbb47e52f59d14d7dd03171.jpg', 'Plivanje u tirkiznim uvalama Sardinije', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Plivanje u tirkiznim uvalama Sardinije'), NOW()),
+('/images/entity_images/activities/1b1bdf786b44a0ad930dcd51.jpg', 'Planinarenje iznad zaliva Orosei', true, (SELECT "Id" FROM "Activities" WHERE "Name" = 'Planinarenje iznad zaliva Orosei'), NOW());

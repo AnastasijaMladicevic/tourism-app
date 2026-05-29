@@ -14,6 +14,8 @@ obj/
 Debug/
 Release/
 
+src/backend/TuristickiVodic/TuristickiVodic.API/wwwroot/images/entity_images/
+
 sandbox/Marija/books-app/backend/BookTrackerBackend/BookTrackerBackend/bin/Debug
 sandbox/Mihajlo/Backend/Net_Bekend_ucenje/bin/Debug
 

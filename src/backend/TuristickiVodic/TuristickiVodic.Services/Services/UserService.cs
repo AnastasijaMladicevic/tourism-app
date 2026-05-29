@@ -690,13 +690,21 @@ namespace TuristickiVodic.Services
 
         public async Task<bool> DeleteAsync(int id)
         {
-            var user = await _context.Users.FindAsync(id);
+            var user = await _context.Users
+                .Include(u => u.ManagedDestination)
+                .FirstOrDefaultAsync(u => u.Id == id);
 
             if (user == null)
                 return false;
 
             if (user.ManagedDestinationId.HasValue)
-                throw new InvalidOperationException("Manager who is assigned to a destination cannot be deleted until another manager is assigned.");
+            {
+                var destinationName = user.ManagedDestination?.Name?.Trim();
+                throw new InvalidOperationException(
+                    string.IsNullOrWhiteSpace(destinationName)
+                        ? "Manager who is assigned to a destination cannot be deleted until another manager is assigned."
+                        : $"Manager for destination '{destinationName}' cannot be deleted until another manager is assigned.");
+            }
 
             await RevokeRefreshTokenAsync(user.Id);
 
@@ -1324,10 +1332,21 @@ namespace TuristickiVodic.Services
         {
             await ReleaseExpiredBansAsync();
 
-            var user = await _context.Users.FindAsync(userId);
+            var user = await _context.Users
+                .Include(u => u.ManagedDestination)
+                .FirstOrDefaultAsync(u => u.Id == userId);
 
             if (user == null)
                 return false;
+
+            if (!isActive && user.ManagedDestinationId.HasValue)
+            {
+                var destinationName = user.ManagedDestination?.Name?.Trim();
+                throw new InvalidOperationException(
+                    string.IsNullOrWhiteSpace(destinationName)
+                        ? "A destination manager cannot be deactivated until another manager is assigned."
+                        : $"Manager for destination '{destinationName}' cannot be deactivated until another manager is assigned.");
+            }
 
             user.IsActive = isActive;
 

@@ -448,6 +448,8 @@ namespace TuristickiVodic.Services.Services
                 .Include(e => e.Destination)
                     .ThenInclude(d => d.Region)
                 .Include(e => e.Object)
+                .Include(e => e.CreatedBy)
+                .Include(e => e.ApprovedBy)
                 .Include(e => e.Images)
                 .FirstOrDefaultAsync(e => e.Id == id);
 
@@ -477,6 +479,8 @@ namespace TuristickiVodic.Services.Services
                 .Include(e => e.Destination)
                     .ThenInclude(d => d.Region)
                 .Include(e => e.Object)
+                .Include(e => e.CreatedBy)
+                .Include(e => e.ApprovedBy)
                 .Include(e => e.Images)
                 .FirstOrDefaultAsync(e => e.Id == id && e.CreatedByUserId == userId);
 
@@ -499,6 +503,8 @@ namespace TuristickiVodic.Services.Services
                 .Include(e => e.Destination)
                     .ThenInclude(d => d.Region)
                 .Include(e => e.Object)
+                .Include(e => e.CreatedBy)
+                .Include(e => e.ApprovedBy)
                 .Include(e => e.Images)
                 .FirstOrDefaultAsync(e => e.Id == id);
 
@@ -950,6 +956,8 @@ namespace TuristickiVodic.Services.Services
                 .Include(e => e.Destination)
                     .ThenInclude(d => d.Region)
                 .Include(e => e.Object)
+                .Include(e => e.CreatedBy)
+                .Include(e => e.ApprovedBy)
                 .Include(e => e.Images)
                 .FirstAsync(e => e.Id == id);
         }

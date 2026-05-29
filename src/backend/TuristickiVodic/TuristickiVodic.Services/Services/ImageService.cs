@@ -23,6 +23,7 @@ namespace TuristickiVodic.Services.Services
         private const int MaxWidthPx = 1200;
         // Kvalitet JPEG kompresije (0-100). 75 daje ~150-250KB za tipičnu sliku.
         private const int JpegQuality = 75;
+        private const int MaxImagesPerEntity = 8;
 
         public ImageService(AppDbContext context, IMapper mapper, IWebHostEnvironment environment)
         {
@@ -382,6 +383,9 @@ namespace TuristickiVodic.Services.Services
                 (activityId.HasValue && i.ActivityId == activityId) ||
                 (eventId.HasValue && i.EventId == eventId));
 
+            if (existingCount >= MaxImagesPerEntity)
+                throw new InvalidOperationException($"An entity can have at most {MaxImagesPerEntity} images.");
+
             if (existingCount == 0 && !isMain)
                 throw new InvalidOperationException("First image for an entity must be set as main.");
 
@@ -470,6 +474,7 @@ namespace TuristickiVodic.Services.Services
         {
             var locality = await _context.Localities.Include(l => l.Destination).FirstOrDefaultAsync(l => l.Id == localityId);
             if (locality == null) throw new KeyNotFoundException($"Locality with id {localityId} not found.");
+            if (roleName == "Admin") return;
             if (roleName != "Manager") throw new UnauthorizedAccessException("Only responsible manager can manage locality images.");
             if (locality.Destination == null || locality.Destination.ManagedByUserId != userId)
                 throw new UnauthorizedAccessException("You are not the responsible manager for this locality's destination.");

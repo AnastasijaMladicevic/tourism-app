@@ -11,11 +11,11 @@
         <h1 class="page-title">{{ form.name.trim() || 'New destination' }}</h1>
       </div>
       <div class="title-actions">
-        <button type="button" class="btn btn-ghost btn-with-icon" (click)="onSaveDraft()" [disabled]="isSubmitting || isLoadingDestination || isEditBlocked">
+        <button type="button" class="btn btn-ghost btn-with-icon" (click)="onSaveDraft()" [disabled]="isSubmitting || isLoadingDestination || isEditBlocked || !selectedManager">
           <span class="material-symbols-outlined">save</span>
           Save draft
         </button>
-        <button type="button" class="btn btn-primary btn-with-icon" (click)="onSubmit()" [disabled]="isSubmitting || isLoadingDestination || isEditBlocked">
+        <button type="button" class="btn btn-primary btn-with-icon" (click)="onSubmit()" [disabled]="isSubmitting || isLoadingDestination || isEditBlocked || !selectedManager">
           <span class="material-symbols-outlined">check_circle</span>
           {{ isSubmitting ? 'Saving…' : isEditMode ? 'Save changes' : 'Create destination' }}
         </button>
@@ -54,13 +54,11 @@
               </p>
             </div>
           </div>
-          @if (!isEditMode) {
-            <label class="btn btn-ghost btn-sm upload-all-label">
-              <span class="material-symbols-outlined">upload</span>
-              Upload all
-              <input type="file" accept="image/*" multiple class="sr-only" (change)="onGalleryFilesSelected($event)" />
-            </label>
-          }
+          <label class="btn btn-ghost btn-sm upload-all-label">
+            <span class="material-symbols-outlined">upload</span>
+            Upload all
+            <input type="file" accept="image/*" multiple class="sr-only" (change)="onGalleryFilesSelected($event)" />
+          </label>
         </div>
 
         @if (isEditMode) {
@@ -97,6 +95,34 @@
               }
             </div>
           }
+
+          @if (imagePreviews.length) {
+            <div class="server-gallery-grid">
+              @for (src of imagePreviews; track $index) {
+                <div class="server-gallery-card">
+                  <img [src]="src" alt="Destination image preview" />
+                  <div class="server-gallery-actions">
+                    <button
+                      type="button"
+                      class="btn btn-chip"
+                      [class.btn-chip-primary]="$index === primaryPreviewImageIndex"
+                      [disabled]="$index === primaryPreviewImageIndex"
+                      (click)="setPrimaryPreviewImage($index)"
+                    >
+                      {{ $index === primaryPreviewImageIndex ? 'Primary on Save' : 'Set Primary on Save' }}
+                    </button>
+                    <button
+                      type="button"
+                      class="btn btn-chip btn-chip-danger"
+                      (click)="removeGalleryImage($index)"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          }
         } @else {
           <label class="drop-zone">
             <span class="material-symbols-outlined drop-icon">add_photo_alternate</span>
@@ -104,7 +130,7 @@
             <span class="drop-hint">Click or drag files here</span>
             <input type="file" accept="image/*" multiple class="sr-only" (change)="onGalleryFilesSelected($event)" />
           </label>
-          <p class="fine-print">Recommended aspect ratio 16:9. Maximum file size 5MB per image (validated on upload later).</p>
+          <p class="fine-print">Recommended aspect ratio 16:9. Maximum 8 images per destination.</p>
 
           @if (imagePreviews.length) {
             <div class="server-gallery-grid">
@@ -321,8 +347,8 @@
         <div class="panel-head">
           <span class="panel-icon material-symbols-outlined">group</span>
           <div>
-            <h2 class="panel-title">Manager</h2>
-            <p class="panel-sub">Manager in charge of the destination.</p>
+            <h2 class="panel-title">Manager *</h2>
+            <p class="panel-sub">Every destination must always have an assigned manager.</p>
           </div>
         </div>
         <div class="manager-combo" #managerCombo>
@@ -411,7 +437,7 @@
           } @else {
             <div class="empty-managers">
               <span class="material-symbols-outlined">person_add</span>
-              <p>No managers assigned yet.</p>
+              <p>Select a manager before you can save this destination.</p>
             </div>
           }
         </div>

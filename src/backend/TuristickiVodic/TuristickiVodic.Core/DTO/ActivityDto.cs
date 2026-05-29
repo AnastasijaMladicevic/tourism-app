@@ -46,10 +46,12 @@ namespace TuristickiVodic.Core.DTO
         public string? ObjectName { get; set; }
 
         public int CreatedByUserId { get; set; }
+        public string? CreatedByFullName { get; set; }
 
         public string Status { get; set; } = string.Empty;
 
         public int? ApprovedByUserId { get; set; }
+        public string? ApprovedByFullName { get; set; }
 
         public DateTime? ApprovedAt { get; set; }
 

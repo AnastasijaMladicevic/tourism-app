@@ -188,6 +188,12 @@ namespace TuristickiVodic.Services.Mappings
                         null))
                 .ForMember(dest => dest.ObjectName,
                     opt => opt.MapFrom(src => src.Object != null ? src.Object.Name : null))
+                .ForMember(dest => dest.CreatedByFullName,
+                    opt => opt.MapFrom(src =>
+                        src.CreatedBy != null ? (src.CreatedBy.FirstName + " " + src.CreatedBy.LastName) : null))
+                .ForMember(dest => dest.ApprovedByFullName,
+                    opt => opt.MapFrom(src =>
+                        src.ApprovedBy != null ? (src.ApprovedBy.FirstName + " " + src.ApprovedBy.LastName) : null))
                 .ForMember(dest => dest.DistanceMeters,
                     opt => opt.Ignore())
                 .ForMember(dest => dest.HasPendingDeletionRequest,
@@ -227,6 +233,12 @@ namespace TuristickiVodic.Services.Mappings
                         null))
                 .ForMember(dest => dest.ObjectName,
                     opt => opt.MapFrom(src => src.Object != null ? src.Object.Name : null))
+                .ForMember(dest => dest.CreatedByFullName,
+                    opt => opt.MapFrom(src =>
+                        src.CreatedBy != null ? (src.CreatedBy.FirstName + " " + src.CreatedBy.LastName) : null))
+                .ForMember(dest => dest.ApprovedByFullName,
+                    opt => opt.MapFrom(src =>
+                        src.ApprovedBy != null ? (src.ApprovedBy.FirstName + " " + src.ApprovedBy.LastName) : null))
                 .ForMember(dest => dest.DistanceMeters,
                     opt => opt.Ignore())
                 .ForMember(dest => dest.HasPendingDeletionRequest,
@@ -312,6 +324,9 @@ namespace TuristickiVodic.Services.Mappings
                     opt => opt.MapFrom(src => src.ObjectType != null ? src.ObjectType.Name : string.Empty))
                 .ForMember(dest => dest.LocalityName,
                     opt => opt.MapFrom(src => src.Locality != null ? src.Locality.Name : string.Empty))
+                .ForMember(dest => dest.CreatedByFullName,
+                    opt => opt.MapFrom(src =>
+                        src.CreatedBy != null ? (src.CreatedBy.FirstName + " " + src.CreatedBy.LastName) : null))
                 .ForMember(dest => dest.DistanceMeters,
                     opt => opt.Ignore())
                 .ForMember(dest => dest.HasPendingDeletionRequest,

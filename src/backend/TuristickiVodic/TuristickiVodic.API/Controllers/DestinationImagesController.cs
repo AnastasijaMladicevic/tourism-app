@@ -51,6 +51,7 @@ namespace TuristickiVodic.API.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Admin")]
+        [Consumes("multipart/form-data")]
         public async Task<IActionResult> Add(int destinationId, [FromForm] AddImageDto dto)
         {
             if (!ModelState.IsValid)

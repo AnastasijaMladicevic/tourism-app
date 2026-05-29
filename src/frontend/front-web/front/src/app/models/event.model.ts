@@ -23,6 +23,9 @@ export interface EventDto {
   createdAt?: Date | string;
   updatedAt?: Date | string;
   createdByUserId?: number;
+  createdByFullName?: string;
+  approvedByUserId?: number;
+  approvedByFullName?: string;
   rejectionReason?: string;
 }
 
