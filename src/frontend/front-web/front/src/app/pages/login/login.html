@@ -56,7 +56,7 @@
               Keep me logged in for 30 days
             </label>
 
-            <a href="#">Forgot?</a>
+            <button class="forgot-btn" type="button" (click)="goToForgotPassword()">Forgot?</button>
           </div>
 
           <button class="btn" type="submit" [disabled]="form.invalid || isLoading">

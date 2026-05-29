@@ -465,10 +465,6 @@
     padding: 18px;
   }
 
-  .manager-dashboard .page-head h1 {
-    font-size: 24px;
-  }
-
   .manager-dashboard .dashboard-grid {
     grid-template-columns: 1fr;
   }

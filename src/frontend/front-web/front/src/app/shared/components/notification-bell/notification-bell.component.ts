@@ -4,20 +4,16 @@ import { Router } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NotificationsService, NotificationDto } from '../../../services/notifications.service';
 import { AuthService } from '../../../services/auth.service';
-import { TranslationService } from '../../../services/translation.service';
-import { TranslatePipe } from '../../pipes/translate.pipe';
-
 @Component({
   selector: 'app-notification-bell',
   standalone: true,
-  imports: [CommonModule, TranslatePipe],
+  imports: [CommonModule],
   templateUrl: './notification-bell.component.html',
   styleUrl: './notification-bell.component.css',
 })
 export class NotificationBellComponent implements OnInit {
   private readonly notificationsService = inject(NotificationsService);
   private readonly authService = inject(AuthService);
-  private readonly translationService = inject(TranslationService);
   private readonly router = inject(Router);
   private readonly host = inject(ElementRef<HTMLElement>);
   private readonly destroyRef = inject(DestroyRef);
@@ -137,34 +133,34 @@ export class NotificationBellComponent implements OnInit {
 
   protected formatRelativeTime(value?: string | null): string {
     if (!value) {
-      return this.translationService.translate('layout.justNow');
+      return 'Just now';
     }
 
     const date = new Date(value);
     if (Number.isNaN(date.getTime())) {
-      return this.translationService.translate('layout.justNow');
+      return 'Just now';
     }
 
     const diffMs = Date.now() - date.getTime();
     const diffMinutes = Math.max(0, Math.round(diffMs / 60000));
     if (diffMinutes < 1) {
-      return this.translationService.translate('layout.justNow');
+      return 'Just now';
     }
     if (diffMinutes < 60) {
-      return this.translationService.translate('layout.minutesAgo', { count: diffMinutes });
+      return `${diffMinutes}m ago`;
     }
 
     const diffHours = Math.round(diffMinutes / 60);
     if (diffHours < 24) {
-      return this.translationService.translate('layout.hoursAgo', { count: diffHours });
+      return `${diffHours}h ago`;
     }
 
     const diffDays = Math.round(diffHours / 24);
     if (diffDays < 7) {
-      return this.translationService.translate('layout.daysAgo', { count: diffDays });
+      return `${diffDays}d ago`;
     }
 
-    return new Intl.DateTimeFormat(this.translationService.currentLocale(), {
+    return new Intl.DateTimeFormat('en-US', {
       month: 'short',
       day: 'numeric',
       year: 'numeric',

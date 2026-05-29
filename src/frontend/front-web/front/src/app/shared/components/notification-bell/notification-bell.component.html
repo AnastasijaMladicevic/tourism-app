@@ -2,8 +2,8 @@
   <button
     class="icon-btn bell-btn"
     type="button"
-    [attr.title]="'layout.notifications' | translate"
-    [attr.aria-label]="'layout.notifications' | translate"
+    title="Notifications"
+    aria-label="Notifications"
     [attr.aria-expanded]="isOpen()"
     (click)="togglePanel()">
     <svg width="18" height="18" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -16,15 +16,15 @@
   <section class="notification-panel" *ngIf="isOpen()">
     <header class="panel-header">
       <div>
-        <h3>{{ 'layout.notifications' | translate }}</h3>
-        <p>{{ unreadCount() }} {{ 'layout.unread' | translate }}</p>
+        <h3>Notifications</h3>
+        <p>{{ unreadCount() }} unread</p>
       </div>
       <button
         class="panel-action"
         type="button"
         [disabled]="!hasUnread() || isMarkingAll()"
         (click)="markAllAsRead($event)">
-        {{ 'layout.markAllRead' | translate }}
+        Mark all read
       </button>
     </header>
 
@@ -46,14 +46,14 @@
       </button>
 
       <div class="empty-state" *ngIf="!notifications().length">
-        <strong>{{ 'layout.allCaughtUp' | translate }}</strong>
-        <p>{{ 'layout.noNotifications' | translate }}</p>
+        <strong>All caught up</strong>
+        <p>No notifications yet.</p>
       </div>
     </div>
 
     <ng-template #loadingState>
       <div class="empty-state empty-state--loading">
-        <strong>{{ 'layout.loadingNotifications' | translate }}</strong>
+        <strong>Loading notifications…</strong>
       </div>
     </ng-template>
   </section>

@@ -15,7 +15,7 @@ export type TeamMemberRole = 'manager' | 'admin';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './create-team-member.component.html',
-  styleUrls: ['./create-team-member.component.css']
+  styleUrls: ['./create-team-member.component.css', '../shared/admin-page-title.css']
 })
 export class CreateTeamMemberComponent {
   private readonly router = inject(Router);

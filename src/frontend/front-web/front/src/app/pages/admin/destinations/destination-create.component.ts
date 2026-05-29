@@ -45,7 +45,7 @@ import { MapComponent as SharedMapComponent } from '../../../shared/components/m
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink, SharedMapComponent],
   templateUrl: './destination-create.component.html',
-  styleUrls: ['./destination-create.component.css']
+  styleUrls: ['./destination-create.component.css', '../shared/admin-page-title.css']
 })
 export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
   private readonly destinationService = inject(DestinationService);

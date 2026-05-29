@@ -1,7 +1,6 @@
 <section class="manager-events-page manager-list-page">
   <header class="page-head">
     <div>
-      <p class="breadcrumbs">Dashboard <span>></span> Events</p>
       <h1>Events</h1>
       <p class="page-subtitle">Total: {{ eventsCountLabel }}</p>
     </div>
@@ -236,10 +235,16 @@
       @if (selectedEvent) {
         <p class="detail-sheet-label">Selected event</p>
         <div class="activity-hero">
-          <div
-            class="hero-media"
-            [style.background-image]="'url(' + getDetailBanner(selectedEvent) + ')'"
-          >
+          <div class="hero-media" [class.has-slides]="heroImageUrls.length > 0">
+            <div class="hero-media-slides" aria-hidden="true">
+              @for (url of heroImageUrls; track trackByHeroImage($index, url); let i = $index) {
+                <div
+                  class="hero-media-slide"
+                  [class.is-active]="i === currentHeroImageIndex"
+                  [ngStyle]="getHeroSlideStyle(url)"
+                ></div>
+              }
+            </div>
             <span class="hero-badge">{{ getCategoryLabel(selectedEvent) }}</span>
           </div>
 

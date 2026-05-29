@@ -32,7 +32,11 @@ type WorkingDayKey = 'pon' | 'uto' | 'sre' | 'cet' | 'pet' | 'sub' | 'ned';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterModule, SharedMapComponent],
   templateUrl: './object-create.component.html',
-  styleUrl: './object-create.component.css'
+  styleUrls: [
+    './object-create.component.css',
+    '../../../admin/shared/admin-page-title.css',
+    '../../shared/cc-list-page-header.css'
+  ]
 })
 export class ObjectCreateComponent implements OnInit, OnDestroy {
   private readonly fb = inject(FormBuilder);

@@ -25,7 +25,7 @@ import { ReviewDto, ReviewQueryParams, ReviewService } from '../../../services/r
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './reviews.component.html',
-  styleUrls: ['./reviews.component.css']
+  styleUrls: ['./reviews.component.css', '../../admin/shared/admin-page-title.css']
 })
 export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
   private readonly reviewService = inject(ReviewService);

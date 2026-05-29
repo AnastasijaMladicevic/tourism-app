@@ -7,6 +7,7 @@ import { EventImageDto, EventService } from '../../../services/event.service';
 import { EventDto, EventQueryDto } from '../../../models/event.model';
 import { buildEventQueryDto, EventFilterState } from '../../../models/event-filters.model';
 import { MapComponent as SharedMapComponent } from '../../../shared/components/map/map';
+import { HERO_IMAGE_ROTATION_INTERVAL_MS } from '../../../shared/constants/hero-image-rotation';
 
 interface EventInsightCard {
   label: string;
@@ -27,8 +28,11 @@ interface EventScheduleRow {
   templateUrl: './events.component.html',
   styleUrls: [
     './events.component.css',
+    '../../admin/shared/admin-page-title.css',
     '../shared/cc-list-page-header.css',
-    '../shared/cc-page-stats-scroll.css'
+    '../shared/cc-list-detail-layout.css',
+    '../shared/cc-page-stats-scroll.css',
+    '../shared/cc-stat-cards.css'
   ]
 })
 export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
@@ -36,7 +40,6 @@ export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
 
-  private static readonly HERO_ROTATION_INTERVAL_MS = 8000;
   private static readonly DEFAULT_BANNER_URL = '/assets/pozadina.png';
 
   Math = Math;
@@ -541,7 +544,7 @@ export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
       this.currentHeroImageIndex =
         (this.currentHeroImageIndex + 1) % this.heroImageUrls.length;
       this.cdr.detectChanges();
-    }, ContentCreatorEventsComponent.HERO_ROTATION_INTERVAL_MS);
+    }, HERO_IMAGE_ROTATION_INTERVAL_MS);
   }
 
   private stopHeroImageRotation(): void {

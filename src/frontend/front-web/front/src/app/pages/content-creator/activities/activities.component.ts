@@ -5,6 +5,7 @@ import { RouterModule } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { ActivitiesService, ActivityDto, ActivityImageDto } from '../../../services/activities';
 import { MapComponent as SharedMapComponent } from '../../../shared/components/map/map';
+import { HERO_IMAGE_ROTATION_INTERVAL_MS } from '../../../shared/constants/hero-image-rotation';
 
 interface ActivityInsightCard {
   label: string;
@@ -20,15 +21,17 @@ interface ActivityInsightCard {
   templateUrl: './activities.component.html',
   styleUrls: [
     './activities.component.css',
+    '../../admin/shared/admin-page-title.css',
     '../shared/cc-list-page-header.css',
-    '../shared/cc-page-stats-scroll.css'
+    '../shared/cc-list-detail-layout.css',
+    '../shared/cc-page-stats-scroll.css',
+    '../shared/cc-stat-cards.css'
   ]
 })
 export class ContentCreatorActivitiesComponent implements OnInit, OnDestroy {
   private readonly activitiesService = inject(ActivitiesService);
   private readonly cdr = inject(ChangeDetectorRef);
 
-  private static readonly HERO_ROTATION_INTERVAL_MS = 8000;
   private static readonly DEFAULT_BANNER_URL = '/assets/pozadina.png';
 
   activities: ActivityDto[] = [];
@@ -523,7 +526,7 @@ export class ContentCreatorActivitiesComponent implements OnInit, OnDestroy {
       this.currentHeroImageIndex =
         (this.currentHeroImageIndex + 1) % this.heroImageUrls.length;
       this.cdr.detectChanges();
-    }, ContentCreatorActivitiesComponent.HERO_ROTATION_INTERVAL_MS);
+    }, HERO_IMAGE_ROTATION_INTERVAL_MS);
   }
 
   private stopHeroImageRotation(): void {

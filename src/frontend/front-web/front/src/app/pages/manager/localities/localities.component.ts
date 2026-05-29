@@ -6,6 +6,7 @@ import { FilterOption, LocalityDto, LocalityImageDto, LocalityService } from '..
 import { MapComponent as SharedMapComponent } from '../../../shared/components/map/map';
 import { DestinationService } from '../../../services/destination.service';
 import { AuthService } from '../../../services/auth.service';
+import { HERO_IMAGE_ROTATION_INTERVAL_MS } from '../../../shared/constants/hero-image-rotation';
 
 @Component({
   selector: 'app-manager-localities',
@@ -14,10 +15,14 @@ import { AuthService } from '../../../services/auth.service';
   templateUrl: './localities.component.html',
   styleUrls: [
     './localities.component.css',
+    '../../admin/shared/admin-page-title.css',
     '../shared/manager-list-page-header.css',
     '../shared/manager-list-page-responsive.css',
     '../shared/manager-cc-page-parity.css',
-    '../shared/manager-page-stats-scroll.css'
+    '../shared/manager-list-detail-layout.css',
+    '../shared/manager-page-stats-scroll.css',
+    '../shared/manager-stat-cards.css',
+    '../shared/manager-hero-slides.css'
   ]
 })
 export class ManagerLocalitiesComponent implements OnInit, OnDestroy {
@@ -26,8 +31,6 @@ export class ManagerLocalitiesComponent implements OnInit, OnDestroy {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
-
-  private static readonly HERO_ROTATION_INTERVAL_MS = 8000;
 
   localities: LocalityDto[] = [];
   selectedLocality: LocalityDto | null = null;
@@ -363,7 +366,7 @@ export class ManagerLocalitiesComponent implements OnInit, OnDestroy {
       this.currentHeroImageIndex =
         (this.currentHeroImageIndex + 1) % this.heroImageUrls.length;
       this.cdr.detectChanges();
-    }, ManagerLocalitiesComponent.HERO_ROTATION_INTERVAL_MS);
+    }, HERO_IMAGE_ROTATION_INTERVAL_MS);
   }
 
   private stopHeroImageRotation(): void {

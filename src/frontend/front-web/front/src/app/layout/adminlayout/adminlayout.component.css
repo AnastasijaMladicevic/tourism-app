@@ -170,10 +170,6 @@
   color: #111111;
 }
 
-.settings-btn {
-  width: 30px;
-}
-
 .topbar-user {
   display: flex;
   align-items: center;
@@ -181,6 +177,11 @@
   margin-left: 10px;
   padding-left: 16px;
   border-left: 1px solid #ebebeb;
+  cursor: pointer;
+}
+
+.topbar-user .user-meta,
+.topbar-user .user-avatar {
   cursor: pointer;
 }
 

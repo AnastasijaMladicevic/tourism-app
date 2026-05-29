@@ -225,85 +225,6 @@
     overflow: hidden;
 }
 
-.activities-layout {
-    display: grid;
-    grid-template-columns: minmax(0, 1.8fr) minmax(300px, 0.9fr);
-    gap: 16px;
-    align-items: start;
-    min-width: 0;
-}
-
-.main-column {
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-    min-width: 0;
-}
-
-/* Scoped to main column (matches content-creator events layout — not full page width). */
-.insights-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 14px;
-}
-
-.insight-card {
-    padding: 16px;
-}
-
-.insight-card p {
-    color: #6b7280;
-    font-size: 12px;
-    font-weight: 600;
-    margin: 0;
-}
-
-.insight-card strong {
-    display: block;
-    margin: 8px 0 4px;
-    font-size: 28px;
-    line-height: 1;
-}
-
-.insight-card span {
-    color: #6b7280;
-    font-size: 12px;
-}
-
-.insight-card[data-tone='blue'] {
-    border-color: #2563eb;
-}
-
-.insight-card[data-tone='green'] {
-    border-color: #16a34a;
-}
-
-.insight-card[data-tone='amber'] {
-    border-color: #d97706;
-}
-
-.insight-card[data-tone='blue'] strong {
-    color: #2563eb;
-}
-
-.insight-card[data-tone='green'] strong {
-    color: #16a34a;
-}
-
-.insight-card[data-tone='amber'] strong {
-    color: #d97706;
-}
-
-.detail-column {
-    position: sticky;
-    top: 80px;
-    padding: 18px;
-    display: flex;
-    flex-direction: column;
-    gap: 18px;
-    min-width: 0;
-}
-
 .activity-hero {
     display: flex;
     flex-direction: column;
@@ -779,13 +700,6 @@ tbody tr:hover,
         justify-self: stretch;
     }
 
-    .activities-layout {
-        grid-template-columns: 1fr;
-    }
-
-    .detail-column {
-        position: static;
-    }
 }
 
 @media (max-width: 920px) {

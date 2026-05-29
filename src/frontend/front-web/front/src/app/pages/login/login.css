@@ -186,11 +186,19 @@ label {
   accent-color: #4d8ef7;
 }
 
-.options a {
+.options a,
+.forgot-btn {
   font-size: 12px;
   font-weight: 600;
   color: #4d8ef7;
   text-decoration: none;
+}
+
+.forgot-btn {
+  border: none;
+  background: none;
+  padding: 0;
+  cursor: pointer;
 }
 
 .btn {

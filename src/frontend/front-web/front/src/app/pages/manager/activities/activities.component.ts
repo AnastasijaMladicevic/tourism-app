@@ -4,9 +4,15 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin } from 'rxjs';
-import { ActivitiesService, ActivityDto, ActivityTypeOption } from '../../../services/activities';
+import {
+  ActivitiesService,
+  ActivityDto,
+  ActivityImageDto,
+  ActivityTypeOption
+} from '../../../services/activities';
 import { DestinationService } from '../../../services/destination.service';
 import { MapComponent as SharedMapComponent } from '../../../shared/components/map/map';
+import { HERO_IMAGE_ROTATION_INTERVAL_MS } from '../../../shared/constants/hero-image-rotation';
 
 @Component({
   selector: 'app-manager-activities',
@@ -15,10 +21,14 @@ import { MapComponent as SharedMapComponent } from '../../../shared/components/m
   templateUrl: './activities.component.html',
   styleUrls: [
     './activities.component.css',
+    '../../admin/shared/admin-page-title.css',
     '../shared/manager-list-page-header.css',
     '../shared/manager-list-page-responsive.css',
     '../shared/manager-cc-page-parity.css',
-    '../shared/manager-page-stats-scroll.css'
+    '../shared/manager-list-detail-layout.css',
+    '../shared/manager-page-stats-scroll.css',
+    '../shared/manager-stat-cards.css',
+    '../shared/manager-hero-slides.css'
   ]
 })
 export class ManagerActivitiesComponent implements OnInit {
@@ -28,7 +38,12 @@ export class ManagerActivitiesComponent implements OnInit {
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly destroyRef = inject(DestroyRef);
 
+  private static readonly DEFAULT_BANNER_URL = '/assets/pozadina.png';
+
   activities: ActivityDto[] = [];
+  heroImageUrls: string[] = [];
+  currentHeroImageIndex = 0;
+  private heroRotationTimerId: ReturnType<typeof setInterval> | null = null;
   /** Destination name(s) the manager oversees — same source as manager Objects page. */
   managedCityLabel = '';
   isLoading = true;
@@ -74,6 +89,7 @@ export class ManagerActivitiesComponent implements OnInit {
   ];
 
   ngOnInit(): void {
+    this.destroyRef.onDestroy(() => this.stopHeroImageRotation());
     this.loadManagedCityLabel();
     this.loadActivityTypes();
     this.loadActivities();
@@ -149,15 +165,12 @@ export class ManagerActivitiesComponent implements OnInit {
           this.pageSize = response.pageSize ?? this.pageSize;
           this.totalPages = response.totalPages ?? Math.max(1, Math.ceil(this.totalCount / this.pageSize));
 
-          if (!this.selectedActivity || !this.activities.some((activity) => activity.id === this.selectedActivity?.id)) {
-            this.selectedActivity = this.activities[0] ?? null;
-          }
-
-          if (this.selectedActivity) {
-            this.loadSelectedActivityDetails(this.selectedActivity.id);
-          } else {
-            this.selectedActivityDetails = null;
-          }
+          const nextSelected =
+            !this.selectedActivity ||
+            !this.activities.some((activity) => activity.id === this.selectedActivity?.id)
+              ? this.activities[0] ?? null
+              : this.selectedActivity;
+          this.setSelectedActivity(nextSelected);
 
           this.isLoading = false;
           this.cdr.detectChanges();
@@ -167,8 +180,7 @@ export class ManagerActivitiesComponent implements OnInit {
           this.activities = [];
           this.totalCount = 0;
           this.totalPages = 1;
-          this.selectedActivity = null;
-          this.selectedActivityDetails = null;
+          this.setSelectedActivity(null);
           this.statsTotalAllStatuses = null;
           this.statsPendingCount = null;
           this.isLoading = false;
@@ -323,9 +335,117 @@ export class ManagerActivitiesComponent implements OnInit {
   }
 
   onSelectActivity(activity: ActivityDto): void {
+    this.setSelectedActivity(activity);
+  }
+
+  private setSelectedActivity(activity: ActivityDto | null): void {
+    const previousId = this.selectedActivity?.id ?? null;
     this.selectedActivity = activity;
     this.selectedActivityDetails = activity;
-    this.loadSelectedActivityDetails(activity.id);
+
+    if (!activity) {
+      this.stopHeroImageRotation();
+      this.heroImageUrls = [];
+      this.currentHeroImageIndex = 0;
+      return;
+    }
+
+    if (activity.id !== previousId) {
+      this.loadHeroImagesForSelectedActivity();
+      this.loadSelectedActivityDetails(activity.id);
+    }
+  }
+
+  private loadHeroImagesForSelectedActivity(): void {
+    this.stopHeroImageRotation();
+    this.heroImageUrls = [];
+    this.currentHeroImageIndex = 0;
+
+    const activity = this.selectedActivityDetails ?? this.selectedActivity;
+    if (!activity) {
+      return;
+    }
+
+    const fallbackUrl = this.getHeroFallbackUrl(activity);
+
+    this.activitiesService.getImages(activity.id).subscribe({
+      next: (images: ActivityImageDto[]) => {
+        const orderedUrls = (images ?? [])
+          .slice()
+          .sort((a, b) => Number(b.isMain) - Number(a.isMain))
+          .map((image) => this.normalizeImageUrl(image.url))
+          .filter((url): url is string => !!url);
+
+        this.heroImageUrls = orderedUrls.length > 0 ? orderedUrls : [fallbackUrl];
+        this.currentHeroImageIndex = 0;
+
+        if (this.heroImageUrls.length > 1) {
+          this.startHeroImageRotation();
+        }
+
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.heroImageUrls = [fallbackUrl];
+        this.currentHeroImageIndex = 0;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  private startHeroImageRotation(): void {
+    this.stopHeroImageRotation();
+
+    this.heroRotationTimerId = setInterval(() => {
+      if (this.heroImageUrls.length <= 1) {
+        return;
+      }
+
+      this.currentHeroImageIndex =
+        (this.currentHeroImageIndex + 1) % this.heroImageUrls.length;
+      this.cdr.detectChanges();
+    }, HERO_IMAGE_ROTATION_INTERVAL_MS);
+  }
+
+  private stopHeroImageRotation(): void {
+    if (this.heroRotationTimerId != null) {
+      clearInterval(this.heroRotationTimerId);
+      this.heroRotationTimerId = null;
+    }
+  }
+
+  private getHeroFallbackUrl(activity: ActivityDto | null): string {
+    if (!activity) {
+      return ManagerActivitiesComponent.DEFAULT_BANNER_URL;
+    }
+
+    const normalized = this.normalizeImageUrl(activity.mainImageUrl);
+    return normalized || ManagerActivitiesComponent.DEFAULT_BANNER_URL;
+  }
+
+  getHeroSlideStyle(url: string): Record<string, string> {
+    return { 'background-image': `url("${url}")` };
+  }
+
+  trackByHeroImage(index: number, url: string): string {
+    return `${index}-${url}`;
+  }
+
+  private normalizeImageUrl(value?: string | null): string {
+    const trimmed = value?.trim();
+    if (!trimmed) {
+      return '';
+    }
+
+    if (/^(data:|blob:|https?:\/\/|\/\/)/i.test(trimmed)) {
+      return trimmed;
+    }
+
+    try {
+      return encodeURI(new URL(trimmed, document.baseURI).href);
+    } catch {
+      return encodeURI(trimmed);
+    }
   }
 
   onReviewActivity(activity: ActivityDto): void {
@@ -417,11 +537,6 @@ export class ManagerActivitiesComponent implements OnInit {
     }
 
     return activity.destinationName || activity.localityName || activity.objectName || activity.regionName || '-';
-  }
-
-  get selectedBanner(): string {
-    const activity = this.selectedActivityDetails ?? this.selectedActivity;
-    return activity?.mainImageUrl || '/assets/pozadina.png';
   }
 
   get hasSelectedActivityCoordinates(): boolean {

@@ -3,7 +3,7 @@
     <button
       type="button"
       class="icon-btn menu-toggle"
-      [attr.aria-label]="sidebarOpen ? ('layout.closeMenu' | translate) : ('layout.openMenu' | translate)"
+      [attr.aria-label]="sidebarOpen ? 'Close menu' : 'Open menu'"
       [attr.aria-expanded]="sidebarOpen"
       (click)="toggleSidebar()"
     >
@@ -36,20 +36,6 @@
 
     <div class="topbar-right">
       <app-notification-bell></app-notification-bell>
-      <!-- TODO LINK SETTINGS PAGE -->
-      <button class="icon-btn settings-btn" [attr.title]="'layout.settings' | translate">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          height="24px"
-          viewBox="0 -960 960 960"
-          width="24px"
-          fill="currentColor"
-        >
-          <path
-            d="m370-80-16-128q-13-5-24.5-12T307-235l-119 50L78-375l103-78q-1-7-1-13.5v-27q0-6.5 1-13.5L78-585l110-190 119 50q11-8 23-15t24-12l16-128h220l16 128q13 5 24.5 12t22.5 15l119-50 110 190-103 78q1 7 1 13.5v27q0 6.5-2 13.5l103 78-110 190-118-50q-11 8-23 15t-24 12L590-80H370Zm70-80h79l14-106q31-8 57.5-23.5T639-327l99 41 39-68-86-65q5-14 7-29.5t2-31.5q0-16-2-31.5t-7-29.5l86-65-39-68-99 42q-22-23-48.5-38.5T533-694l-13-106h-79l-14 106q-31 8-57.5 23.5T321-633l-99-41-39 68 86 64q-5 15-7 30t-2 32q0 16 2 31t7 30l-86 65 39 68 99-42q22 23 48.5 38.5T427-266l13 106Zm42-180q58 0 99-41t41-99q0-58-41-99t-99-41q-59 0-99.5 41T342-480q0 58 40.5 99t99.5 41Zm-2-140Z"
-          />
-        </svg>
-      </button>
 
       <div class="topbar-user" routerLink="/content-creator/profile">
         <div class="user-meta">
@@ -77,7 +63,7 @@
 
   <div class="layout-shell">
     <aside class="sidebar" aria-label="Main navigation">
-      <p class="sidebar-section-label">{{ 'layout.mainMenu' | translate }}</p>
+      <p class="sidebar-section-label">Main Menu</p>
 
       <a class="nav-item" routerLink="/content-creator/dashboard" routerLinkActive="active" (click)="closeSidebar()">
         <svg
@@ -92,19 +78,19 @@
           <rect x="2" y="12" width="8" height="8" rx="1.5" />
           <rect x="12" y="12" width="8" height="8" rx="1.5" />
         </svg>
-        {{ 'layout.dashboard' | translate }}
+        Dashboard
       </a>
 
       <a class="nav-item" routerLink="/content-creator/objects" routerLinkActive="active" (click)="closeSidebar()">
         <span class="material-symbols-outlined">
         apartment
         </span>
-        {{ 'layout.objects' | translate }}
+        Objects
       </a>
 
       <a class="nav-item" routerLink="/content-creator/activities" routerLinkActive="active" (click)="closeSidebar()">
         <span class="material-symbols-outlined"> hiking </span>
-        {{ 'layout.activities' | translate }}
+        Activities
       </a>
 
       <a class="nav-item" routerLink="/content-creator/events" routerLinkActive="active" (click)="closeSidebar()">
@@ -120,7 +106,7 @@
           <line x1="7" y1="2" x2="7" y2="6" />
           <line x1="15" y1="2" x2="15" y2="6" />
         </svg>
-        {{ 'layout.events' | translate }}
+        Events
       </a>
 
       <a class="nav-item" routerLink="/content-creator/reviews" routerLinkActive="active" (click)="closeSidebar()">
@@ -133,7 +119,7 @@
         >
           <path d="M4 5h14v10H8l-4 3V5z" />
         </svg>
-        {{ 'layout.reviews' | translate }}
+        Reviews
       </a>
 
       <a class="nav-item" routerLink="/content-creator/map" routerLinkActive="active" (click)="closeSidebar()">
@@ -148,7 +134,7 @@
           <line x1="8" y1="2" x2="8" y2="18" />
           <line x1="14" y1="4" x2="14" y2="20" />
         </svg>
-        {{ 'layout.mapView' | translate }}
+        Map View
       </a>
 
       <a class="sidebar-logout" routerLink="/signout" (click)="closeSidebar()">
@@ -163,7 +149,7 @@
           <path d="M13 7l4 4-4 4" />
           <line x1="17" y1="11" x2="8" y2="11" />
         </svg>
-        {{ 'layout.signOut' | translate }}
+        Sign Out
       </a>
     </aside>
 

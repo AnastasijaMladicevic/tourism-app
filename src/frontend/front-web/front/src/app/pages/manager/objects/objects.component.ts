@@ -1,20 +1,19 @@
-import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { of } from 'rxjs';
 import { catchError, finalize } from 'rxjs/operators';
 import { DestinationService } from '../../../services/destination.service';
-import { FilterOption, ObjectDto, ObjectService } from '../../../services/object';
+import { FilterOption, ObjectDto, ObjectImageDto, ObjectService } from '../../../services/object';
 import { ReviewService } from '../../../services/review';
-import { TranslationService } from '../../../services/translation.service';
 import { MapComponent as SharedMapComponent } from '../../../shared/components/map/map';
-import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 import { mapReviewDtosToObjectThreads } from '../shared/manager-object-review.mapper';
 import {
   isConcerningCreatorReply,
   ManagerObjectReviewThread,
 } from '../shared/manager-object-review.mock';
+import { HERO_IMAGE_ROTATION_INTERVAL_MS } from '../../../shared/constants/hero-image-rotation';
 
 interface WorkingHoursRow {
   day: string;
@@ -25,26 +24,34 @@ interface WorkingHoursRow {
 @Component({
   selector: 'app-manager-objects',
   standalone: true,
-  imports: [CommonModule, FormsModule, SharedMapComponent, RouterLink, TranslatePipe],
+  imports: [CommonModule, FormsModule, SharedMapComponent, RouterLink],
   templateUrl: './objects.component.html',
   styleUrls: [
     './objects.component.css',
+    '../../admin/shared/admin-page-title.css',
     '../shared/manager-list-page-header.css',
     '../shared/manager-list-page-responsive.css',
     '../shared/manager-cc-page-parity.css',
-    '../shared/manager-page-stats-scroll.css'
+    '../shared/manager-list-detail-layout.css',
+    '../shared/manager-page-stats-scroll.css',
+    '../shared/manager-stat-cards.css',
+    '../shared/manager-hero-slides.css'
   ]
 })
-export class ManagerObjectsComponent implements OnInit {
+export class ManagerObjectsComponent implements OnInit, OnDestroy {
   private readonly objectService = inject(ObjectService);
   private readonly destinationService = inject(DestinationService);
   private readonly reviewService = inject(ReviewService);
-  private readonly translationService = inject(TranslationService);
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
 
+  private static readonly DEFAULT_BANNER_URL = '/assets/pozadina.png';
+
   pagedObjects: ObjectDto[] = [];
   selectedObject: ObjectDto | null = null;
+  heroImageUrls: string[] = [];
+  currentHeroImageIndex = 0;
+  private heroRotationTimerId: ReturnType<typeof setInterval> | null = null;
   selectedObjectReviews: ManagerObjectReviewThread[] = [];
   reviewsLoading = false;
   private reviewsRequestToken = 0;
@@ -72,19 +79,19 @@ export class ManagerObjectsComponent implements OnInit {
   readonly pageSizeOptions = [5, 10, 20, 50];
 
   readonly sortByOptions = [
-    { value: 'name', labelKey: 'manager.objects.sort.name' },
-    { value: 'averageRating', labelKey: 'manager.objects.sort.rating' },
-    { value: 'status', labelKey: 'manager.objects.sort.status' }
+    { value: 'name', label: 'Name' },
+    { value: 'averageRating', label: 'Rating' },
+    { value: 'status', label: 'Status' }
   ];
 
   readonly ratingOptions = [
-    { value: 'all', labelKey: 'manager.objects.rating.any' },
-    { value: '1', labelKey: 'manager.objects.rating.1' },
-    { value: '2', labelKey: 'manager.objects.rating.2' },
-    { value: '3', labelKey: 'manager.objects.rating.3' },
-    { value: '3.5', labelKey: 'manager.objects.rating.3_5' },
-    { value: '4', labelKey: 'manager.objects.rating.4' },
-    { value: '4.5', labelKey: 'manager.objects.rating.4_5' }
+    { value: 'all', label: 'Any rating' },
+    { value: '1', label: '1.0+' },
+    { value: '2', label: '2.0+' },
+    { value: '3', label: '3.0+' },
+    { value: '3.5', label: '3.5+' },
+    { value: '4', label: '4.0+' },
+    { value: '4.5', label: '4.5+' }
   ];
 
   private readonly fallbackStatusOptions: FilterOption[] = [
@@ -100,6 +107,10 @@ export class ManagerObjectsComponent implements OnInit {
     this.loadManagedCityLabel();
     this.loadFilterOptions();
     this.loadObjects();
+  }
+
+  ngOnDestroy(): void {
+    this.stopHeroImageRotation();
   }
 
   loadManagedCityLabel(): void {
@@ -153,18 +164,20 @@ export class ManagerObjectsComponent implements OnInit {
           this.pageSize = response?.pageSize ?? this.pageSize;
           this.totalPages = response?.totalPages ?? Math.max(1, Math.ceil(this.totalCount / this.pageSize));
 
-          if (!this.selectedObject || !sorted.some((item) => item.id === this.selectedObject?.id)) {
-            this.selectedObject = sorted[0] ?? null;
-          }
+          const nextSelected =
+            !this.selectedObject || !sorted.some((item) => item.id === this.selectedObject?.id)
+              ? sorted[0] ?? null
+              : this.selectedObject;
+          this.setSelectedObject(nextSelected);
 
           this.loadSelectedObjectReviews();
           this.isLoading = false;
           this.cdr.detectChanges();
         },
         error: (error) => {
-          this.errorMessage = error?.error?.message ?? this.t('manager.objects.error.load');
+          this.errorMessage = error?.error?.message ?? 'Failed to load objects';
           this.pagedObjects = [];
-          this.selectedObject = null;
+          this.setSelectedObject(null);
           this.selectedObjectReviews = [];
           this.totalCount = 0;
           this.totalPages = 1;
@@ -212,7 +225,7 @@ export class ManagerObjectsComponent implements OnInit {
     }
 
     const count = this.totalCount;
-    return this.t('manager.objects.totalCount', { count });
+    return `${count} objects`;
   }
 
   get pageStart(): number {
@@ -335,8 +348,94 @@ export class ManagerObjectsComponent implements OnInit {
   }
 
   selectObject(obj: ObjectDto): void {
-    this.selectedObject = obj;
+    this.setSelectedObject(obj);
     this.loadSelectedObjectReviews();
+  }
+
+  private setSelectedObject(object: ObjectDto | null): void {
+    const previousId = this.selectedObject?.id ?? null;
+    this.selectedObject = object;
+
+    if (!object) {
+      this.stopHeroImageRotation();
+      this.heroImageUrls = [];
+      this.currentHeroImageIndex = 0;
+      return;
+    }
+
+    if (object.id !== previousId) {
+      this.loadHeroImagesForSelectedObject();
+    }
+  }
+
+  private loadHeroImagesForSelectedObject(): void {
+    this.stopHeroImageRotation();
+    this.heroImageUrls = [];
+    this.currentHeroImageIndex = 0;
+
+    if (!this.selectedObject) {
+      return;
+    }
+
+    const fallbackUrl = this.getHeroFallbackUrl(this.selectedObject);
+
+    this.objectService.getImages(this.selectedObject.id).subscribe({
+      next: (images: ObjectImageDto[]) => {
+        const orderedUrls = (images ?? [])
+          .slice()
+          .sort((a, b) => Number(b.isMain) - Number(a.isMain))
+          .map((image) => this.normalizeImageUrl(image.url))
+          .filter((url): url is string => !!url);
+
+        this.heroImageUrls = orderedUrls.length > 0 ? orderedUrls : [fallbackUrl];
+        this.currentHeroImageIndex = 0;
+
+        if (this.heroImageUrls.length > 1) {
+          this.startHeroImageRotation();
+        }
+
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.heroImageUrls = [fallbackUrl];
+        this.currentHeroImageIndex = 0;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  private startHeroImageRotation(): void {
+    this.stopHeroImageRotation();
+
+    this.heroRotationTimerId = setInterval(() => {
+      if (this.heroImageUrls.length <= 1) {
+        return;
+      }
+
+      this.currentHeroImageIndex =
+        (this.currentHeroImageIndex + 1) % this.heroImageUrls.length;
+      this.cdr.detectChanges();
+    }, HERO_IMAGE_ROTATION_INTERVAL_MS);
+  }
+
+  private stopHeroImageRotation(): void {
+    if (this.heroRotationTimerId != null) {
+      clearInterval(this.heroRotationTimerId);
+      this.heroRotationTimerId = null;
+    }
+  }
+
+  private getHeroFallbackUrl(object: ObjectDto | null): string {
+    const normalized = this.normalizeImageUrl(object?.mainImageUrl);
+    return normalized || ManagerObjectsComponent.DEFAULT_BANNER_URL;
+  }
+
+  getHeroSlideStyle(url: string): Record<string, string> {
+    return { 'background-image': `url("${url}")` };
+  }
+
+  trackByHeroImage(index: number, url: string): string {
+    return `${index}-${url}`;
   }
 
   private loadSelectedObjectReviews(): void {
@@ -424,18 +523,9 @@ export class ManagerObjectsComponent implements OnInit {
     return { 'background-image': `url("${image}")` };
   }
 
-  getHeroStyle(): Record<string, string> {
-    const image = this.normalizeImageUrl(this.selectedObject?.mainImageUrl);
-    if (!image) {
-      return {};
-    }
-
-    return { 'background-image': `url("${image}")` };
-  }
-
   formatPrice(price?: number | null): string {
     if (price == null) {
-      return this.t('common.notAvailable');
+      return 'Not available';
     }
 
     return `$${Number(price).toFixed(2)}`;
@@ -511,7 +601,7 @@ export class ManagerObjectsComponent implements OnInit {
 
   get selectedObjectLocationLabel(): string {
     if (!this.selectedObject) {
-      return this.t('manager.objects.selectedObject');
+      return 'Selected object';
     }
 
     const location =
@@ -581,20 +671,16 @@ export class ManagerObjectsComponent implements OnInit {
     switch ((status ?? '').toLowerCase()) {
       case 'approved':
       case 'published':
-        return this.t('manager.objects.status.approved');
+        return 'Approved';
       case 'pending':
       case 'draft':
-        return this.t('manager.objects.status.pending');
+        return 'Pending';
       case 'rejected':
       case 'cancelled':
-        return this.t('manager.objects.status.rejected');
+        return 'Rejected';
       default:
-        return status ? status.charAt(0).toUpperCase() + status.slice(1).toLowerCase() : this.t('manager.objects.status.pending');
+        return status ? status.charAt(0).toUpperCase() + status.slice(1).toLowerCase() : 'Pending';
     }
-  }
-
-  private t(key: string, params?: Record<string, string | number>): string {
-    return this.translationService.translate(key, params);
   }
 
   private normalizeImageUrl(value?: string): string {

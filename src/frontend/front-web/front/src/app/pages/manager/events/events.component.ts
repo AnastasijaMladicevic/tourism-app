@@ -1,12 +1,13 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnDestroy, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { EventService } from '../../../services/event.service';
+import { EventImageDto, EventService } from '../../../services/event.service';
 import { DestinationService } from '../../../services/destination.service';
 import { EventDto, EventQueryDto } from '../../../models/event.model';
 import { buildEventQueryDto, EventFilterState } from '../../../models/event-filters.model';
 import { MapComponent as SharedMapComponent } from '../../../shared/components/map/map';
+import { HERO_IMAGE_ROTATION_INTERVAL_MS } from '../../../shared/constants/hero-image-rotation';
 
 interface EventInsightCard {
   label: string;
@@ -27,21 +28,30 @@ interface EventScheduleRow {
   templateUrl: './events.component.html',
   styleUrls: [
     './events.component.css',
+    '../../admin/shared/admin-page-title.css',
     '../shared/manager-list-page-header.css',
     '../shared/manager-list-page-responsive.css',
     '../shared/manager-cc-page-parity.css',
-    '../shared/manager-page-stats-scroll.css'
+    '../shared/manager-list-detail-layout.css',
+    '../shared/manager-page-stats-scroll.css',
+    '../shared/manager-stat-cards.css',
+    '../shared/manager-hero-slides.css'
   ]
 })
-export class ManagerEventsComponent implements OnInit {
+export class ManagerEventsComponent implements OnInit, OnDestroy {
   private readonly eventService = inject(EventService);
   private readonly destinationService = inject(DestinationService);
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
 
+  private static readonly DEFAULT_BANNER_URL = '/assets/pozadina.png';
+
   Math = Math;
 
   events: EventDto[] = [];
+  heroImageUrls: string[] = [];
+  currentHeroImageIndex = 0;
+  private heroRotationTimerId: ReturnType<typeof setInterval> | null = null;
   filteredEvents: EventDto[] = [];
   pagedEvents: EventDto[] = [];
   selectedEvent: EventDto | null = null;
@@ -72,6 +82,10 @@ export class ManagerEventsComponent implements OnInit {
   ngOnInit(): void {
     this.loadManagedDestinationLabel();
     this.loadEvents();
+  }
+
+  ngOnDestroy(): void {
+    this.stopHeroImageRotation();
   }
 
   loadManagedDestinationLabel(): void {
@@ -168,8 +182,111 @@ export class ManagerEventsComponent implements OnInit {
   }
 
   onViewEvent(event: EventDto): void {
-    this.selectedEvent = event;
+    this.setSelectedEvent(event);
     this.cdr.detectChanges();
+  }
+
+  private setSelectedEvent(event: EventDto | null): void {
+    const previousId = this.selectedEvent?.id ?? null;
+    this.selectedEvent = event;
+
+    if (!event) {
+      this.stopHeroImageRotation();
+      this.heroImageUrls = [];
+      this.currentHeroImageIndex = 0;
+      return;
+    }
+
+    if (event.id !== previousId) {
+      this.loadHeroImagesForSelectedEvent();
+    }
+  }
+
+  private loadHeroImagesForSelectedEvent(): void {
+    this.stopHeroImageRotation();
+    this.heroImageUrls = [];
+    this.currentHeroImageIndex = 0;
+
+    if (!this.selectedEvent) {
+      return;
+    }
+
+    const fallbackUrl = this.getHeroFallbackUrl(this.selectedEvent);
+
+    this.eventService.getImages(this.selectedEvent.id).subscribe({
+      next: (images: EventImageDto[]) => {
+        const orderedUrls = (images ?? [])
+          .slice()
+          .sort((a, b) => Number(b.isMain) - Number(a.isMain))
+          .map((image) => this.normalizeImageUrl(image.url))
+          .filter((url): url is string => !!url);
+
+        this.heroImageUrls = orderedUrls.length > 0 ? orderedUrls : [fallbackUrl];
+        this.currentHeroImageIndex = 0;
+
+        if (this.heroImageUrls.length > 1) {
+          this.startHeroImageRotation();
+        }
+
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.heroImageUrls = [fallbackUrl];
+        this.currentHeroImageIndex = 0;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  private startHeroImageRotation(): void {
+    this.stopHeroImageRotation();
+
+    this.heroRotationTimerId = setInterval(() => {
+      if (this.heroImageUrls.length <= 1) {
+        return;
+      }
+
+      this.currentHeroImageIndex =
+        (this.currentHeroImageIndex + 1) % this.heroImageUrls.length;
+      this.cdr.detectChanges();
+    }, HERO_IMAGE_ROTATION_INTERVAL_MS);
+  }
+
+  private stopHeroImageRotation(): void {
+    if (this.heroRotationTimerId != null) {
+      clearInterval(this.heroRotationTimerId);
+      this.heroRotationTimerId = null;
+    }
+  }
+
+  private getHeroFallbackUrl(event: EventDto | null): string {
+    const normalized = this.normalizeImageUrl(event?.mainImageUrl);
+    return normalized || ManagerEventsComponent.DEFAULT_BANNER_URL;
+  }
+
+  getHeroSlideStyle(url: string): Record<string, string> {
+    return { 'background-image': `url("${url}")` };
+  }
+
+  trackByHeroImage(index: number, url: string): string {
+    return `${index}-${url}`;
+  }
+
+  private normalizeImageUrl(value?: string | null): string {
+    const trimmed = value?.trim();
+    if (!trimmed) {
+      return '';
+    }
+
+    if (/^(data:|blob:|https?:\/\/|\/\/)/i.test(trimmed)) {
+      return trimmed;
+    }
+
+    try {
+      return encodeURI(new URL(trimmed, document.baseURI).href);
+    } catch {
+      return encodeURI(trimmed);
+    }
   }
 
   onNextPage(): void {
@@ -306,11 +423,7 @@ export class ManagerEventsComponent implements OnInit {
   }
 
   getDetailBanner(event: EventDto | null): string {
-    if (event?.mainImageUrl) {
-      return event.mainImageUrl;
-    }
-
-    return 'assets/pozadina.png';
+    return this.getHeroFallbackUrl(event);
   }
 
   getSelectedEventRejectionReason(event: EventDto | null): string {

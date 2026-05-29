@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { CreateUserDto, LoginDto, AuthResponseDto, UserDto } from '../models/user.model';
-import { TranslationService } from './translation.service';
 import { environment } from '../../environment/environment';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -11,13 +10,8 @@ export class AuthService {
   private refreshTokenKey = 'refreshToken';
   private userKey = 'user';
 
-  constructor(private http: HttpClient,private translationService: TranslationService,) {
+  constructor(private http: HttpClient) {
     this.syncStoredUserWithAuthenticatedRole();
-
-    const currentUser = this.readStoredUser();
-    if (currentUser?.language) {
-      this.translationService.setLanguage(currentUser.language);
-    }
   }
 
 
@@ -79,7 +73,6 @@ export class AuthService {
 
   setCurrentUser(user: UserDto): void {
     localStorage.setItem('user', JSON.stringify(user));
-    this.translationService.setLanguage(user.language);
     if (!user.isBanned) {
       sessionStorage.removeItem('spirego-admin-ban-message');
     }
@@ -383,7 +376,6 @@ export class AuthService {
     localStorage.setItem(this.tokenKey, response.token);
     localStorage.setItem(this.refreshTokenKey, response.refreshToken);
     localStorage.setItem(this.userKey, JSON.stringify(user));
-    this.translationService.setLanguage(user.language);
     if (response.isBanned && response.banMessage?.trim()) {
       sessionStorage.setItem('spirego-admin-ban-message', response.banMessage.trim());
     } else {

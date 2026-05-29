@@ -1,0 +1,46 @@
+/* Two-column list + detail sidebar — activities page is canonical. */
+
+.activities-layout,
+.events-layout,
+.objects-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.8fr) minmax(300px, 0.9fr);
+  gap: 16px;
+  align-items: start;
+  min-width: 0;
+}
+
+.activities-layout .main-column,
+.events-layout .main-column,
+.objects-layout .main-column {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+}
+
+.activities-layout .detail-column,
+.events-layout .detail-column,
+.objects-layout .detail-column {
+  position: sticky;
+  top: 80px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  min-width: 0;
+}
+
+@media (max-width: 1200px) {
+  .activities-layout,
+  .events-layout,
+  .objects-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .activities-layout .detail-column,
+  .events-layout .detail-column,
+  .objects-layout .detail-column {
+    position: static;
+  }
+}
