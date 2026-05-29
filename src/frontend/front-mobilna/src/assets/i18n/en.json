@@ -937,6 +937,7 @@
       "moreStops": "{{count}} more stops",
       "addStop": "Add Stop",
       "addStopPlaceholder": "Add a stop or destination...",
+      "useMyLocation": "Use my location",
       "myLocation": "My Location",
       "notSelected": "Not selected",
       "recenter": "Re-center",

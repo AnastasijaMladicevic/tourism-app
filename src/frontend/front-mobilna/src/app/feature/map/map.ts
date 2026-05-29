@@ -1684,17 +1684,10 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       return;
     }
 
-    const trackingReady = this.isTracking || this.locationTrackingService.startTracking();
-    if (!trackingReady) {
-      this.openLocationConsentPrompt();
-      return;
-    }
-
     this.closeLocationConsentPrompt();
     this.isRouteNavigationActive = true;
-    this.isNavigationAutoCenterEnabled = true;
+    this.isNavigationAutoCenterEnabled = this.isTracking;
     this.exitMapStopPicking();
-    this.shouldCenterOnNextLocation = !this.userLocation;
     this.syncRouteNavigationPageState(true);
 
     if (this.userLocation) {
@@ -1909,6 +1902,21 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       lat: this.userLocation.lat,
       lng: this.userLocation.lng,
     };
+  }
+
+  useMyLocation(): void {
+    if (!this.isTracking) {
+      this.openLocationConsentPrompt();
+      return;
+    }
+
+    const locationPoint = this.createMyLocationRoutePoint();
+    if (!locationPoint) {
+      this.openLocationConsentPrompt();
+      return;
+    }
+
+    this.appendRoutePoint(locationPoint, { disableMapPickingAfterAdd: true });
   }
 
   openAddStopPanel(): void {

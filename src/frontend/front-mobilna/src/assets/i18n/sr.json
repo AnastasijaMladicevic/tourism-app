@@ -937,6 +937,7 @@
       "moreStops": "{{count}} dodatnih stanica",
       "addStop": "Dodaj stanicu",
       "addStopPlaceholder": "Dodaj stanicu ili destinaciju...",
+      "useMyLocation": "Koristi moju lokaciju",
       "myLocation": "Moja lokacija",
       "notSelected": "Nije izabrano",
       "recenter": "Centriraj ponovo",
