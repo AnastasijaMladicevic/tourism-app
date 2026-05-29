@@ -1,4 +1,5 @@
 import { CommonModule } from '@angular/common';
+import { MatButtonModule } from '@angular/material/button';
 import {
   ChangeDetectionStrategy,
   Component,
@@ -10,9 +11,9 @@ import {
   signal,
 } from '@angular/core';
 import { Router } from '@angular/router';
-import { catchError, finalize, forkJoin, map, of } from 'rxjs';
-import { AuthService } from '../../services/auth';
+import { Subscription, catchError, finalize, forkJoin, map, of } from 'rxjs';
 import { ActiveRegionService } from '../../services/active-region';
+import { AuthService } from '../../services/auth';
 import { EventDto, EventService, EventTypeOptionDto } from '../../services/event';
 import { EventPlannerDto, EventPlannerService } from '../../services/event-planner';
 import { PlannerLocalPreferencesService } from '../../services/planner-local-preferences';
@@ -36,6 +37,7 @@ interface PreviewEventItem {
   title: string;
   location: string;
   imageUrl: string;
+  regionId?: number;
   categoryKey: PreviewCategoryKey;
   searchableCategory: string;
   startDate?: string;
@@ -48,11 +50,13 @@ interface PreviewEventItem {
 
 interface PlannerItem {
   id: number;
+  scheduleKey: string;
   eventId: number;
   title: string;
   location: string;
   priority: PlannerPriorityKey;
   sortDate: Date;
+  endDate: Date | null;
 }
 
 interface PlannerGroup {
@@ -68,8 +72,25 @@ interface UpcomingHighlightItem {
   imageUrl: string;
 }
 
+interface PlannedEventOccurrence {
+  occurrenceKey: string;
+  plannerId: number;
+  eventId: number;
+  title: string;
+  location: string;
+  imageUrl: string;
+  categoryKey: PreviewCategoryKey;
+  searchableCategory: string;
+  eventTypeName: string;
+  description: string;
+  originalStartDate?: string;
+  originalEndDate?: string;
+  resolvedStartDate: Date;
+  resolvedEndDate: Date | null;
+}
+
 interface MobilePreviewCard {
-  id: number;
+  id: string;
   eventId: number;
   title: string;
   location: string;
@@ -83,6 +104,8 @@ interface MobilePreviewCard {
   plannerId?: number;
   startDate?: string;
   endDate?: string;
+  originalStartDate?: string;
+  originalEndDate?: string;
   eventTypeName: string;
   description: string;
 }
@@ -107,6 +130,15 @@ interface PlannerRangeOption {
   label: string;
 }
 
+interface PlannerCalendarCell {
+  key: string;
+  label: number;
+  date: Date;
+  isCurrentMonth: boolean;
+  isDisabled: boolean;
+  isSelected: boolean;
+}
+
 type PlannerToolbarDropdown = 'category' | 'range' | 'cards';
 
 const FALLBACK_IMAGE_URL =
@@ -115,32 +147,36 @@ const FALLBACK_IMAGE_URL =
 @Component({
   selector: 'app-event-planner-preview',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, MatButtonModule],
   templateUrl: './event-planner-preview.component.html',
   styleUrl: './event-planner-preview.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
+  private readonly dateOnlyPattern = /^\d{4}-\d{2}-\d{2}$/;
   private readonly eventService = inject(EventService);
-  private readonly activeRegionService = inject(ActiveRegionService);
   private readonly eventPlannerService = inject(EventPlannerService);
   private readonly plannerLocalPreferences = inject(PlannerLocalPreferencesService);
+  private readonly activeRegionService = inject(ActiveRegionService);
   private readonly authService = inject(AuthService);
   private readonly routerHistory = inject(RouterHistoryService);
   private readonly router = inject(Router);
   private readonly translationService = inject(TranslationService);
-  activeMobileTab: 'events' | 'planner' = 'events';
+  activeMobileTab: 'events' | 'planner' | 'suggested' = 'events';
   protected isMobileMoreFiltersOpen = false;
   private mobileMediaQuery?: MediaQueryList;
+  private regionSubscription?: Subscription;
   private readonly mobileMediaListener = (event: MediaQueryListEvent) => {
     this.isMobileViewport.set(event.matches);
   };
 
-  protected readonly regionName = signal('Crna Gora');
   protected readonly activeChip = signal<PreviewCategoryKey>('all');
   protected readonly searchTerm = signal('');
   protected readonly selectedDateKey = signal('all');
-  protected readonly selectedRangeDays = signal(30);
+  protected readonly selectedRangeDays = signal(0);
+  protected readonly selectedCalendarDates = signal<string[]>([]);
+  protected readonly draftCalendarDates = signal<string[]>([]);
+  protected readonly calendarMonthCursor = signal(this.getStartOfMonth(new Date()));
   protected readonly cardsPerPage = signal(5);
   protected readonly currentPage = signal(1);
   protected readonly openDropdown = signal<PlannerToolbarDropdown | null>(null);
@@ -152,44 +188,72 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
   protected readonly plannerError = signal('');
   protected readonly removingPlannerId = signal<number | null>(null);
   protected readonly isMobileViewport = signal(false);
+  protected readonly activeRegionId = signal<number | null>(this.activeRegionService.getActiveRegionId());
+  protected readonly suggestionSeed = signal(this.createSuggestionSeed());
 
-  protected readonly filteredPlannerEvents = computed(() => {
+  protected readonly plannedEventOccurrences = computed<PlannedEventOccurrence[]>(() => {
     const query = this.normalizeText(this.searchTerm());
     const activeChip = this.activeChip();
 
-    return this.allEvents().filter((event) => {
-      if (!event.isAdded) {
-        return false;
-      }
+    return this.visiblePlannerItems()
+      .map<PlannedEventOccurrence | null>((plannerItem) => {
+        const relatedEvent = this.allEvents().find((event) => event.id === plannerItem.eventId);
+        if (!relatedEvent) {
+          return null;
+        }
 
-      const matchesChip = activeChip === 'all' || event.categoryKey === activeChip;
-      if (!matchesChip) {
-        return false;
-      }
+        const matchesChip = activeChip === 'all' || relatedEvent.categoryKey === activeChip;
+        if (!matchesChip) {
+          return null;
+        }
 
-      if (!query) {
-        return true;
-      }
+        if (query) {
+          const haystack = this.normalizeText(
+            [
+              relatedEvent.title,
+              relatedEvent.location,
+              relatedEvent.searchableCategory,
+              this.translateCategoryKey(relatedEvent.categoryKey),
+            ].join(' '),
+          );
 
-      const haystack = this.normalizeText(
-        [
-          event.title,
-          event.location,
-          event.searchableCategory,
-          this.translateCategoryKey(event.categoryKey),
-        ].join(' '),
-      );
+          if (!haystack.includes(query)) {
+            return null;
+          }
+        }
 
-      return haystack.includes(query);
-    });
+        return {
+          occurrenceKey: plannerItem.scheduleKey,
+          plannerId: plannerItem.id,
+          eventId: relatedEvent.id,
+          title: relatedEvent.title,
+          location: relatedEvent.location,
+          imageUrl: relatedEvent.imageUrl,
+          categoryKey: relatedEvent.categoryKey,
+          searchableCategory: relatedEvent.searchableCategory,
+        eventTypeName: relatedEvent.eventTypeName,
+        description: relatedEvent.description,
+          originalStartDate: relatedEvent.startDate ?? undefined,
+          originalEndDate: relatedEvent.endDate ?? undefined,
+          resolvedStartDate: plannerItem.sortDate,
+          resolvedEndDate: plannerItem.endDate,
+        };
+      })
+      .filter((item): item is PlannedEventOccurrence => item !== null);
   });
 
   protected readonly plannedEvents = computed(() => {
-    const sortedEvents = [...this.filteredPlannerEvents()].sort((left, right) => {
-      const leftDate = this.resolveEventSchedule(left).startDate?.getTime() ?? 0;
-      const rightDate = this.resolveEventSchedule(right).startDate?.getTime() ?? 0;
-      return leftDate - rightDate;
+    const sortedEvents = [...this.plannedEventOccurrences()].sort((left, right) => {
+      return left.resolvedStartDate.getTime() - right.resolvedStartDate.getTime();
     });
+
+    const selectedCalendarDates = this.selectedCalendarDates();
+    if (selectedCalendarDates.length) {
+      const selectedCalendarDateSet = new Set(selectedCalendarDates);
+      return sortedEvents.filter((event) =>
+        selectedCalendarDateSet.has(this.toDayKey(event.resolvedStartDate)),
+      );
+    }
 
     const selectedDateKey = this.selectedDateKey();
     const mobileFilteredEvents = sortedEvents.filter((event) => {
@@ -197,19 +261,17 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
         return true;
       }
 
-      const eventDate = this.resolveEventSchedule(event).startDate;
-      return eventDate ? this.toDayKey(eventDate) === selectedDateKey : false;
+      return this.toDayKey(event.resolvedStartDate) === selectedDateKey;
     });
 
     const eventsForRange = mobileFilteredEvents.length ? mobileFilteredEvents : sortedEvents;
-    const datedEvents = eventsForRange.filter((event) => this.resolveEventSchedule(event).startDate);
-
-    if (!datedEvents.length) {
+    if (!eventsForRange.length) {
       return eventsForRange;
     }
 
-    const firstEventDate = this.resolveEventSchedule(datedEvents[0]).startDate;
-    if (!firstEventDate) {
+    const firstEventDate = eventsForRange[0].resolvedStartDate;
+
+    if (this.selectedRangeDays() === 0) {
       return eventsForRange;
     }
 
@@ -218,12 +280,7 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
     rangeEnd.setDate(rangeEnd.getDate() + this.selectedRangeDays() - 1);
 
     const rangeFilteredEvents = eventsForRange.filter((event) => {
-      const eventDate = this.resolveEventSchedule(event).startDate;
-      if (!eventDate) {
-        return false;
-      }
-
-      const normalizedEventDate = this.getStartOfDay(eventDate);
+      const normalizedEventDate = this.getStartOfDay(event.resolvedStartDate);
       return normalizedEventDate >= rangeStart && normalizedEventDate <= rangeEnd;
     });
 
@@ -238,31 +295,31 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
   protected readonly previewCards = computed<MobilePreviewCard[]>(() => {
     const planned = this.plannedEvents();
     const totalPages = this.totalPages();
-    const currentPage = Math.min(this.currentPage(), totalPages);
-    const startIndex = (currentPage - 1) * this.cardsPerPage();
-    const source = planned.slice(startIndex, startIndex + this.cardsPerPage());
+      const currentPage = Math.min(this.currentPage(), totalPages);
+      const startIndex = (currentPage - 1) * this.cardsPerPage();
+      const source = planned.slice(startIndex, startIndex + this.cardsPerPage());
 
-    return source.map((event) => {
-      const resolvedSchedule = this.resolveEventSchedule(event);
-
+      return source.map((event) => {
       return {
-        id: event.id,
-        eventId: event.id,
+        id: event.occurrenceKey,
+        eventId: event.eventId,
         title: event.title,
         location: event.location,
-        dateLabel: this.buildDateLabel(resolvedSchedule.startDate, resolvedSchedule.endDate),
+        dateLabel: this.buildDateLabel(event.resolvedStartDate, event.resolvedEndDate),
         compactDateLabel: this.buildCompactDateLabel(
-          resolvedSchedule.startDate,
-          resolvedSchedule.endDate,
+          event.resolvedStartDate,
+          event.resolvedEndDate,
         ),
-        day: this.buildEventDayLabel(resolvedSchedule.startDate),
-        month: this.buildEventMonthLabel(resolvedSchedule.startDate),
+        day: this.buildEventDayLabel(event.resolvedStartDate),
+        month: this.buildEventMonthLabel(event.resolvedStartDate),
         imageUrl: event.imageUrl,
         categoryChip: this.translateCategoryKey(event.categoryKey),
-        isAdded: event.isAdded,
+        isAdded: true,
         plannerId: event.plannerId,
-        startDate: event.startDate,
-        endDate: event.endDate,
+        startDate: event.resolvedStartDate.toISOString(),
+        endDate: event.resolvedEndDate?.toISOString(),
+        originalStartDate: event.originalStartDate,
+        originalEndDate: event.originalEndDate,
         eventTypeName: event.eventTypeName,
         description: event.description,
       };
@@ -329,11 +386,73 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
   });
   protected readonly selectedRangeLabel = computed(() => {
     const match = this.rangeOptions().find((option) => option.value === this.selectedRangeDays());
-    return match?.label ?? this.translate('planner.preview.range7');
+    return match?.label ?? this.translate('common.all');
+  });
+  protected readonly selectedCalendarLabel = computed(() => {
+    const dates = this.selectedCalendarDates();
+    if (!dates.length) {
+      return this.translate('planner.preview.dateFilterAll');
+    }
+
+    if (dates.length === 1) {
+      const date = this.parseDate(dates[0]);
+      return date
+        ? new Intl.DateTimeFormat(this.translationService.currentLocale(), {
+            day: '2-digit',
+            month: 'short',
+          })
+            .format(date)
+            .replace('.', '')
+        : this.translate('planner.preview.dateFilterAll');
+    }
+
+    return this.translate('planner.preview.displayedDays', { count: dates.length });
   });
   protected readonly selectedCardsPerPageLabel = computed(() =>
     this.cardsPerPageLabel(this.cardsPerPage()),
   );
+  protected readonly calendarMonthLabel = computed(() =>
+    new Intl.DateTimeFormat(this.translationService.currentLocale(), {
+      month: 'long',
+      year: 'numeric',
+    }).format(this.calendarMonthCursor()),
+  );
+  protected readonly calendarWeeks = computed<PlannerCalendarCell[][]>(() => {
+    const monthStart = this.calendarMonthCursor();
+    const today = this.getStartOfDay(new Date());
+    const firstGridDate = new Date(monthStart);
+    firstGridDate.setDate(monthStart.getDate() - monthStart.getDay());
+    const selected = new Set(this.draftCalendarDates());
+    const weeks: PlannerCalendarCell[][] = [];
+
+    for (let weekIndex = 0; weekIndex < 6; weekIndex += 1) {
+      const week: PlannerCalendarCell[] = [];
+
+      for (let dayIndex = 0; dayIndex < 7; dayIndex += 1) {
+        const cellDate = new Date(firstGridDate);
+        cellDate.setDate(firstGridDate.getDate() + weekIndex * 7 + dayIndex);
+        const key = this.toDayKey(cellDate);
+        const normalizedDate = this.getStartOfDay(cellDate);
+
+        week.push({
+          key,
+          label: cellDate.getDate(),
+          date: cellDate,
+          isCurrentMonth: cellDate.getMonth() === monthStart.getMonth(),
+          isDisabled: normalizedDate < today,
+          isSelected: selected.has(key),
+        });
+      }
+
+      weeks.push(week);
+    }
+
+    return weeks;
+  });
+  protected readonly canGoToPreviousCalendarMonth = computed(() => {
+    const currentMonth = this.getStartOfMonth(new Date());
+    return this.calendarMonthCursor().getTime() > currentMonth.getTime();
+  });
 
   protected readonly visiblePlannerItems = computed(() => {
     const eventIds = new Set(this.allEvents().map((event) => event.id));
@@ -356,33 +475,62 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
   });
 
   protected readonly plannerCount = computed(() => this.visiblePlannerItems().length);
-  protected readonly upcomingHighlights = computed<UpcomingHighlightItem[]>(() =>
-    this.visiblePlannerItems()
-      .slice(0, 2)
-      .map((item) => {
-        const relatedEvent = this.allEvents().find((event) => event.id === item.eventId);
+  protected readonly suggestedHighlightCandidates = computed<UpcomingHighlightItem[]>(() => {
+    const activeRegionId = this.activeRegionId();
+    const now = new Date();
+    const suggestionSeed = this.suggestionSeed();
+    const plannedEventIds = new Set(this.allPlannerItems().map((item) => item.eventId));
 
-        return {
-          id: item.id,
-          eventId: item.eventId,
-          title: item.title,
-          subtitle: this.buildUpcomingSubtitle(item.sortDate),
-          imageUrl: relatedEvent?.imageUrl || FALLBACK_IMAGE_URL,
-        };
-      }),
-  );
-  protected readonly mobileHighlights = computed<UpcomingHighlightItem[]>(() =>
-    this.previewCards()
-      .slice(0, 2)
-      .map((item, index) => ({
+    const candidates = this.allEvents().filter((event) => {
+      const startDate = this.parseDate(event.startDate);
+      const endDate = this.parseDate(event.endDate) ?? startDate;
+
+      if (!startDate || !endDate || endDate < now) {
+        return false;
+      }
+
+      if (activeRegionId != null && event.regionId !== activeRegionId) {
+        return false;
+      }
+
+      if (plannedEventIds.has(event.id)) {
+        return false;
+      }
+
+      return true;
+    });
+
+    return [...candidates]
+      .sort((left, right) => {
+        const leftRank = this.buildSuggestionRank(left.id, activeRegionId, suggestionSeed);
+        const rightRank = this.buildSuggestionRank(right.id, activeRegionId, suggestionSeed);
+
+        if (leftRank !== rightRank) {
+          return leftRank - rightRank;
+        }
+
+        const leftStart = this.parseDate(left.startDate)?.getTime() ?? Number.MAX_SAFE_INTEGER;
+        const rightStart = this.parseDate(right.startDate)?.getTime() ?? Number.MAX_SAFE_INTEGER;
+        return leftStart - rightStart;
+      })
+      .map((event, index) => ({
         id: index + 1,
-        eventId: item.eventId,
-        title: item.title,
-        subtitle: this.buildMobileHighlightSubtitle(item.dateLabel),
-        imageUrl: item.imageUrl,
-      })),
+        eventId: event.id,
+        title: event.title,
+        subtitle: this.buildUpcomingSubtitle(
+          this.parseDate(event.startDate) ?? now,
+        ),
+        imageUrl: event.imageUrl || FALLBACK_IMAGE_URL,
+      }));
+  });
+  protected readonly suggestedHighlights = computed<UpcomingHighlightItem[]>(() =>
+    this.suggestedHighlightCandidates().slice(0, 2),
+  );
+  protected readonly mobileSuggestedHighlights = computed<UpcomingHighlightItem[]>(() =>
+    this.suggestedHighlightCandidates().slice(0, 6),
   );
   protected readonly rangeOptions = computed<PlannerRangeOption[]>(() => [
+    { value: 0, label: this.translate('common.all') },
     { value: 7, label: this.translate('planner.preview.range7') },
     { value: 14, label: this.translate('planner.preview.range14') },
     { value: 30, label: this.translate('planner.preview.range30') },
@@ -394,12 +542,16 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.initializeViewportWatcher();
+    this.regionSubscription = this.activeRegionService.activeRegionId$.subscribe((regionId) => {
+      this.activeRegionId.set(regionId);
+    });
     this.loadEvents();
     this.loadPlanner();
   }
 
   ngOnDestroy(): void {
     this.mobileMediaQuery?.removeEventListener('change', this.mobileMediaListener);
+    this.regionSubscription?.unsubscribe();
   }
 
   @HostListener('document:click')
@@ -422,7 +574,7 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
     this.resetPagination();
   }
 
-  protected setMobileTab(tab: 'events' | 'planner'): void {
+  protected setMobileTab(tab: 'events' | 'planner' | 'suggested'): void {
     this.activeMobileTab = tab;
   }
 
@@ -464,6 +616,11 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
   }
 
   protected toggleDropdown(dropdown: PlannerToolbarDropdown): void {
+    if (dropdown === 'range') {
+      this.toggleCalendarDropdown();
+      return;
+    }
+
     this.openDropdown.update((current) => (current === dropdown ? null : dropdown));
   }
 
@@ -473,6 +630,46 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
 
   protected isDropdownOpen(dropdown: PlannerToolbarDropdown): boolean {
     return this.openDropdown() === dropdown;
+  }
+
+  protected previousCalendarMonth(): void {
+    if (!this.canGoToPreviousCalendarMonth()) {
+      return;
+    }
+
+    const previousMonth = new Date(this.calendarMonthCursor());
+    previousMonth.setMonth(previousMonth.getMonth() - 1);
+    this.calendarMonthCursor.set(this.getStartOfMonth(previousMonth));
+  }
+
+  protected nextCalendarMonth(): void {
+    const nextMonth = new Date(this.calendarMonthCursor());
+    nextMonth.setMonth(nextMonth.getMonth() + 1);
+    this.calendarMonthCursor.set(this.getStartOfMonth(nextMonth));
+  }
+
+  protected toggleCalendarDate(cell: PlannerCalendarCell): void {
+    if (cell.isDisabled) {
+      return;
+    }
+
+    this.draftCalendarDates.update((current) => {
+      if (current.includes(cell.key)) {
+        return current.filter((value) => value !== cell.key);
+      }
+
+      return this.normalizeCalendarDates([...current, cell.key]);
+    });
+  }
+
+  protected clearCalendarDates(): void {
+    this.draftCalendarDates.set([]);
+  }
+
+  protected confirmCalendarDates(): void {
+    this.selectedCalendarDates.set(this.normalizeCalendarDates(this.draftCalendarDates()));
+    this.currentPage.set(1);
+    this.closeDropdown();
   }
 
   protected previousPage(): void {
@@ -510,6 +707,9 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
       return;
     }
 
+    const plannerEventId = this.resolvePlannerEventId(event);
+    const originalEvent = this.allEvents().find((item) => item.id === plannerEventId);
+    const preference = this.plannerLocalPreferences.findByPlannerId(event.plannerId);
     const resolvedSchedule = event.startDate
       ? this.plannerLocalPreferences.resolveSchedule(event.plannerId, event.startDate, event.endDate)
       : null;
@@ -517,15 +717,16 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
     void this.router.navigate(['/planner/add'], {
       state: {
         plannerId: event.plannerId,
-        eventId: event.id,
+        eventId: plannerEventId,
         title: event.title,
         location: event.location,
-        startDate: event.startDate,
-        endDate: event.endDate,
+        startDate: this.resolveOriginalStartDate(event, originalEvent),
+        endDate: this.resolveOriginalEndDate(event, originalEvent),
         type: event.eventTypeName || this.translate('planner.preview.eventTypeFallback'),
         imageUrl: event.imageUrl,
         description: event.description,
         plannedDate: resolvedSchedule ? this.toDayKey(resolvedSchedule.startDate) : undefined,
+        plannedDates: preference?.plannedDates,
         startTime: resolvedSchedule ? this.toTimeValue(resolvedSchedule.startDate) : undefined,
         returnUrl: this.router.url,
       },
@@ -659,22 +860,20 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
     this.isLoading.set(true);
     this.hasError.set(false);
 
-    const regionId = this.activeRegionService.getActiveRegionId() ?? 1;
-
     forkJoin({
       eventTypes: this.eventService.getTypes().pipe(catchError(() => of([] as EventTypeOptionDto[]))),
-      events: this.eventService.getAllItems({ regionId, sortBy: 'startDate', sortOrder: 'asc' }),
+      // Planner should preserve added events across region changes,
+      // so it must load event details without the active region constraint.
+      events: this.eventService.getAllItems(
+        { sortBy: 'startDate', sortOrder: 'asc' },
+        { bypassRegion: true },
+      ),
     }).subscribe({
       next: ({ eventTypes, events }) => {
         const typeChipMap = this.buildEventTypeChipMap(eventTypes);
         const mappedEvents = events
           .filter((event) => event.id > 0 && event.isActive !== false)
           .map((event) => this.mapEvent(event, typeChipMap));
-
-        const firstRegionName = events.find((event) => !!event.regionName)?.regionName?.trim();
-        if (firstRegionName) {
-          this.regionName.set(firstRegionName);
-        }
 
         this.allEvents.set(mappedEvents);
         this.syncEventAddedState();
@@ -709,7 +908,7 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
         sortOrder: 'asc',
       })
       .pipe(
-        map((result) => (result.items ?? []).map((item) => this.mapPlannerItem(item))),
+        map((result) => (result.items ?? []).flatMap((item) => this.mapPlannerItems(item))),
         catchError(() => {
           this.plannerError.set(this.translate('planner.loadError'));
           return of([] as PlannerItem[]);
@@ -746,6 +945,7 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
       title: event.name?.trim() || this.translate('planner.preview.eventTitleFallback'),
       location: this.buildEventLocation(event),
       imageUrl: this.buildImageUrl(event),
+      regionId: event.regionId,
       categoryKey,
       searchableCategory: eventTypeName,
       startDate: event.startDate,
@@ -756,23 +956,28 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
     };
   }
 
-  private mapPlannerItem(item: EventPlannerDto): PlannerItem {
-    const resolvedSchedule = this.plannerLocalPreferences.resolveSchedule(
+  private mapPlannerItems(item: EventPlannerDto): PlannerItem[] {
+    const resolvedSchedules = this.plannerLocalPreferences.resolveSchedules(
       item.id,
       item.startDate,
       item.endDate,
     );
-    const startDate = resolvedSchedule.startDate;
-    const notes = resolvedSchedule.notes.trim();
 
-    return {
-      id: item.id,
-      eventId: item.eventId,
-      title: item.eventName?.trim() || this.translate('planner.preview.eventTitleFallback'),
-      location: this.buildPlannerLocation(item),
-      priority: resolvedSchedule.isPriority ? 'must' : notes ? 'later' : 'maybe',
-      sortDate: startDate,
-    };
+    return resolvedSchedules.map((resolvedSchedule) => {
+      const startDate = resolvedSchedule.startDate;
+      const notes = resolvedSchedule.notes.trim();
+
+      return {
+        id: item.id,
+        scheduleKey: `${item.id}-${this.toDayKey(startDate)}-${startDate.getTime()}`,
+        eventId: item.eventId,
+        title: item.eventName?.trim() || this.translate('planner.preview.eventTitleFallback'),
+        location: this.buildPlannerLocation(item),
+        priority: resolvedSchedule.isPriority ? 'must' : notes ? 'later' : 'maybe',
+        sortDate: startDate,
+        endDate: resolvedSchedule.endDate,
+      };
+    });
   }
 
   private buildEventTypeChipMap(eventTypes: EventTypeOptionDto[]): Map<string, PreviewCategoryKey> {
@@ -955,6 +1160,18 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
     this.currentPage.set(1);
   }
 
+  private toggleCalendarDropdown(): void {
+    this.openDropdown.update((current) => {
+      if (current === 'range') {
+        return null;
+      }
+
+      this.draftCalendarDates.set([...this.selectedCalendarDates()]);
+      this.calendarMonthCursor.set(this.resolveCalendarAnchorDate());
+      return 'range';
+    });
+  }
+
   private formatPlannerGroupLabel(date: Date): string {
     return new Intl.DateTimeFormat(this.translationService.currentLocale(), {
       day: '2-digit',
@@ -988,6 +1205,28 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
 
   private buildMobileHighlightSubtitle(label: string): string {
     return label.replace(/\s*-\s*/g, ' • ');
+  }
+
+  private buildSuggestionRank(eventId: number, regionId: number | null, suggestionSeed: number): number {
+    const seed = `${regionId ?? 'all'}-${suggestionSeed}-${eventId}`;
+    let hash = 2166136261;
+
+    for (let index = 0; index < seed.length; index += 1) {
+      hash ^= seed.charCodeAt(index);
+      hash = Math.imul(hash, 16777619);
+    }
+
+    return hash >>> 0;
+  }
+
+  private createSuggestionSeed(): number {
+    if (typeof crypto !== 'undefined' && typeof crypto.getRandomValues === 'function') {
+      const values = new Uint32Array(1);
+      crypto.getRandomValues(values);
+      return values[0] ?? Date.now();
+    }
+
+    return Math.floor(Math.random() * Number.MAX_SAFE_INTEGER);
   }
 
   private buildEventDayLabel(date: Date | null): string {
@@ -1067,8 +1306,48 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
     return `${hours}:${minutes}`;
   }
 
+  private resolveCalendarAnchorDate(): Date {
+    const firstSelectedDate = this.selectedCalendarDates()[0];
+    const parsedSelectedDate = this.parseDate(firstSelectedDate);
+    return this.getStartOfMonth(parsedSelectedDate ?? new Date());
+  }
+
+  private getStartOfMonth(date: Date): Date {
+    return new Date(date.getFullYear(), date.getMonth(), 1);
+  }
+
   private getStartOfDay(date: Date): Date {
     return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  }
+
+  private normalizeCalendarDates(values: string[]): string[] {
+    return [...new Set(values)]
+      .map((value) => this.parseDate(value))
+      .filter((value): value is Date => value !== null && this.getStartOfDay(value) >= this.getStartOfDay(new Date()))
+      .map((value) => this.toDayKey(value))
+      .sort((left, right) => left.localeCompare(right));
+  }
+
+  private resolvePlannerEventId(event: PreviewEventItem | MobilePreviewCard): number {
+    return 'eventId' in event ? event.eventId : event.id;
+  }
+
+  private resolveOriginalStartDate(
+    event: PreviewEventItem | MobilePreviewCard,
+    originalEvent?: PreviewEventItem,
+  ): string | undefined {
+    return ('originalStartDate' in event ? event.originalStartDate : undefined)
+      ?? originalEvent?.startDate
+      ?? event.startDate;
+  }
+
+  private resolveOriginalEndDate(
+    event: PreviewEventItem | MobilePreviewCard,
+    originalEvent?: PreviewEventItem,
+  ): string | undefined {
+    return ('originalEndDate' in event ? event.originalEndDate : undefined)
+      ?? originalEvent?.endDate
+      ?? event.endDate;
   }
 
   private matchesAny(value: string, needles: string[]): boolean {
@@ -1099,6 +1378,18 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
   private parseDate(value?: string | null): Date | null {
     if (!value) {
       return null;
+    }
+
+    if (this.dateOnlyPattern.test(value)) {
+      const [yearRaw, monthRaw, dayRaw] = value.split('-');
+      const year = Number(yearRaw);
+      const month = Number(monthRaw);
+      const day = Number(dayRaw);
+
+      if (![year, month, day].some((part) => Number.isNaN(part))) {
+        const localDate = new Date(year, month - 1, day);
+        return Number.isNaN(localDate.getTime()) ? null : localDate;
+      }
     }
 
     const date = new Date(value);

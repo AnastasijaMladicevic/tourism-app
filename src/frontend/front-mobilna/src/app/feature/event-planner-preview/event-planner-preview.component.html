@@ -1,4 +1,7 @@
-<main class="planner-preview">
+<main
+  class="planner-preview"
+  [class.planner-preview--mobile-planner]="isMobileViewport() && activeMobileTab === 'planner'"
+>
   <header class="planner-mobile-header">
     <h1 class="planner-mobile-header__title">{{ translate('planner.title') }}</h1>
   </header>
@@ -6,7 +9,10 @@
   <div class="planner-preview__container">
     <div class="planner-preview__hero">
       <section class="hero-copy">
-        <h1>{{ translate('planner.title') }}</h1>
+        <div class="hero-copy__text">
+          <h1>{{ translate('planner.title') }}</h1>
+          <p>{{ translate('planner.preview.heroBody') }}</p>
+        </div>
       </section>
     </div>
 
@@ -39,6 +45,15 @@
             >
               <span>{{ translate('planner.preview.mobileTabs.myPlanner') }}</span>
               <span class="planner-mobile-tabs__badge">{{ plannerCount() }}</span>
+            </button>
+
+            <button
+              type="button"
+              class="planner-mobile-tabs__item"
+              [class.planner-mobile-tabs__item--active]="activeMobileTab === 'suggested'"
+              (click)="setMobileTab('suggested')"
+            >
+              <span>{{ translate('planner.preview.mobileSuggestedCta') }}</span>
             </button>
           </div>
         }
@@ -113,7 +128,7 @@
                 </div>
               </div>
 
-              <div class="planner-toolbar-panel">
+              <div class="planner-toolbar-panel planner-toolbar-panel--calendar">
                 <div class="planner-toolbar-panel__dropdown">
                   <button
                     type="button"
@@ -129,7 +144,7 @@
                         <path d="M4 10h16" />
                       </svg>
                     </span>
-                    <span class="planner-toolbar-panel__value">{{ selectedRangeLabel() }}</span>
+                    <span class="planner-toolbar-panel__value">{{ selectedCalendarLabel() }}</span>
                     <span class="planner-toolbar-panel__chevron" aria-hidden="true">
                       <svg viewBox="0 0 16 16">
                         <path d="M4 6.5 8 10l4-3.5" />
@@ -138,17 +153,86 @@
                   </button>
 
                   @if (isDropdownOpen('range')) {
-                    <div class="planner-toolbar-panel__menu" (click)="$event.stopPropagation()">
-                      @for (option of rangeOptions(); track option.value) {
-                        <button
-                          type="button"
-                          class="planner-toolbar-panel__option"
-                          [class.planner-toolbar-panel__option--active]="selectedRangeDays() === option.value"
-                          (click)="updateRangeDays(option.value.toString())"
-                        >
-                          {{ option.label }}
-                        </button>
-                      }
+                    <div
+                      class="planner-toolbar-panel__menu planner-toolbar-panel__menu--calendar"
+                      (click)="$event.stopPropagation()"
+                    >
+                      <div class="planner-calendar">
+                        <div class="planner-calendar__header">
+                          <strong>{{ calendarMonthLabel() }}</strong>
+
+                          <div class="planner-calendar__nav">
+                            <button
+                              type="button"
+                              class="planner-calendar__nav-btn"
+                              [disabled]="!canGoToPreviousCalendarMonth()"
+                              (click)="previousCalendarMonth()"
+                              [attr.aria-label]="translate('common.prev')"
+                            >
+                              <svg viewBox="0 0 16 16" aria-hidden="true">
+                                <path d="M10 3.5 5.5 8 10 12.5" />
+                              </svg>
+                            </button>
+
+                            <button
+                              type="button"
+                              class="planner-calendar__nav-btn"
+                              (click)="nextCalendarMonth()"
+                              [attr.aria-label]="translate('common.next')"
+                            >
+                              <svg viewBox="0 0 16 16" aria-hidden="true">
+                                <path d="M6 3.5 10.5 8 6 12.5" />
+                              </svg>
+                            </button>
+                          </div>
+                        </div>
+
+                        <div class="planner-calendar__weekdays">
+                          <span>Su</span>
+                          <span>Mo</span>
+                          <span>Tu</span>
+                          <span>We</span>
+                          <span>Th</span>
+                          <span>Fr</span>
+                          <span>Sa</span>
+                        </div>
+
+                        <div class="planner-calendar__grid">
+                          @for (week of calendarWeeks(); track $index) {
+                            @for (cell of week; track cell.key) {
+                              <button
+                                type="button"
+                                class="planner-calendar__day"
+                                [class.planner-calendar__day--outside]="!cell.isCurrentMonth"
+                                [class.planner-calendar__day--selected]="cell.isSelected"
+                                [class.planner-calendar__day--disabled]="cell.isDisabled"
+                                [disabled]="cell.isDisabled"
+                                (click)="toggleCalendarDate(cell)"
+                              >
+                                {{ cell.label }}
+                              </button>
+                            }
+                          }
+                        </div>
+
+                        <div class="planner-calendar__footer">
+                          <button
+                            type="button"
+                            class="planner-calendar__footer-btn planner-calendar__footer-btn--secondary"
+                            (click)="clearCalendarDates()"
+                          >
+                            Clear
+                          </button>
+
+                          <button
+                            type="button"
+                            class="planner-calendar__footer-btn planner-calendar__footer-btn--primary"
+                            (click)="confirmCalendarDates()"
+                          >
+                            {{ translate('common.confirm') }}
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   }
                 </div>
@@ -281,8 +365,8 @@
 
                       <button
                         type="button"
-                        class="planner-add-button event-card__details-button"
-                        (click)="openEventDetails(event.id)"
+                        class="event-card__details-link"
+                        (click)="openEventDetails(event.eventId)"
                       >
                         <span>{{ translate('common.details') }}</span>
                       </button>
@@ -291,67 +375,33 @@
                 </article>
               }
 
-              @if (totalPages() > 1) {
-                <nav class="planner-pagination" [attr.aria-label]="translate('planner.preview.paginationAria')">
-                  <button
-                    type="button"
-                    class="planner-pagination__button"
-                    [disabled]="currentPage() <= 1"
-                    (click)="previousPage()"
-                  >
-                    {{ translate('common.prev') }}
-                  </button>
+              <nav class="planner-pagination" [attr.aria-label]="translate('planner.preview.paginationAria')">
+                <button
+                  mat-button
+                  type="button"
+                  class="planner-pagination__button"
+                  [disabled]="currentPage() <= 1"
+                  (click)="previousPage()"
+                >
+                  {{ translate('common.prev') }}
+                </button>
 
-                  <span class="planner-pagination__status">
-                    {{ translate('common.pageOf', { current: currentPage(), total: totalPages() }) }}
-                  </span>
+                <span class="planner-pagination__status">
+                  {{ translate('common.pageOf', { current: currentPage(), total: totalPages() }) }}
+                </span>
 
-                  <button
-                    type="button"
-                    class="planner-pagination__button"
-                    [disabled]="currentPage() >= totalPages()"
-                    (click)="nextPage()"
-                  >
-                    {{ translate('common.next') }}
-                  </button>
-                </nav>
-              }
+                <button
+                  mat-button
+                  type="button"
+                  class="planner-pagination__button"
+                  [disabled]="currentPage() >= totalPages()"
+                  (click)="nextPage()"
+                >
+                  {{ translate('common.next') }}
+                </button>
+              </nav>
             }
           </div>
-
-          @if (isMobileViewport()) {
-            <section class="mobile-highlights-card">
-              <div class="mobile-highlights-card__header">
-                <span class="mobile-highlights-card__star" aria-hidden="true">
-                  <svg viewBox="0 0 24 24">
-                    <path d="M12 2 9.5 9H2l6 4.5L5.5 22 12 17.5 18.5 22 16 13.5 22 9h-7.5L12 2Z" />
-                  </svg>
-                </span>
-                <h3>{{ translate('planner.preview.highlightsTitle') }}</h3>
-              </div>
-
-              @if (mobileHighlights().length) {
-                <div class="mobile-highlights-card__list">
-                  @for (highlight of mobileHighlights(); track highlight.eventId) {
-                    <button
-                      type="button"
-                      class="mobile-highlight-row"
-                      (click)="openEventDetails(highlight.eventId)"
-                    >
-                      <img [src]="highlight.imageUrl" [alt]="highlight.title" />
-                      <div class="mobile-highlight-row__copy">
-                        <strong>{{ highlight.title }}</strong>
-                        <span>{{ highlight.subtitle }}</span>
-                      </div>
-                      <span class="mobile-highlight-row__chevron" aria-hidden="true">›</span>
-                    </button>
-                  }
-                </div>
-              } @else {
-                <p class="mobile-highlights-card__empty">{{ translate('planner.preview.highlightsEmpty') }}</p>
-              }
-            </section>
-          }
         }
 
         @if (isMobileViewport() && activeMobileTab === 'planner') {
@@ -375,7 +425,7 @@
                   <section class="planner-group">
                     <div class="planner-group__label">{{ group.label }}</div>
 
-                    @for (event of group.items; track event.id) {
+                    @for (event of group.items; track event.scheduleKey) {
                       <article class="planner-item">
                         <div class="planner-item__time">
                           <span class="planner-item__dot" aria-hidden="true"></span>
@@ -415,6 +465,40 @@
             </div>
           </section>
         }
+
+        @if (isMobileViewport() && activeMobileTab === 'suggested') {
+          <section class="mobile-highlights-card">
+            <div class="mobile-highlights-card__header">
+              <span class="mobile-highlights-card__star" aria-hidden="true">
+                <svg viewBox="0 0 24 24">
+                  <path d="M12 2 9.5 9H2l6 4.5L5.5 22 12 17.5 18.5 22 16 13.5 22 9h-7.5L12 2Z" />
+                </svg>
+              </span>
+              <h3>{{ translate('planner.preview.highlightsTitle') }}</h3>
+            </div>
+
+            @if (mobileSuggestedHighlights().length) {
+              <div class="mobile-highlights-card__list">
+                @for (highlight of mobileSuggestedHighlights(); track highlight.eventId) {
+                  <button
+                    type="button"
+                    class="mobile-highlight-row"
+                    (click)="openEventDetails(highlight.eventId)"
+                  >
+                    <img [src]="highlight.imageUrl" [alt]="highlight.title" />
+                    <div class="mobile-highlight-row__copy">
+                      <strong>{{ highlight.title }}</strong>
+                      <span>{{ highlight.subtitle }}</span>
+                    </div>
+                    <span class="mobile-highlight-row__chevron" aria-hidden="true">›</span>
+                  </button>
+                }
+              </div>
+            } @else {
+              <p class="mobile-highlights-card__empty">{{ translate('planner.preview.highlightsEmpty') }}</p>
+            }
+          </section>
+        }
       </section>
 
       <aside class="planner-preview__sidebar">
@@ -438,7 +522,7 @@
                 <section class="planner-group">
                   <div class="planner-group__label">{{ group.label }}</div>
 
-                  @for (event of group.items; track event.id) {
+                  @for (event of group.items; track event.scheduleKey) {
                     <article class="planner-item">
                       <div class="planner-item__time">
                         <span class="planner-item__dot" aria-hidden="true"></span>
@@ -488,9 +572,9 @@
             <h3>{{ translate('planner.preview.highlightsTitle') }}</h3>
           </div>
 
-          @if (upcomingHighlights().length > 0) {
+          @if (suggestedHighlights().length > 0) {
             <div class="upcoming-highlight-card__list">
-              @for (highlight of upcomingHighlights(); track highlight.id) {
+              @for (highlight of suggestedHighlights(); track highlight.id) {
                 <button
                   type="button"
                   class="upcoming-highlight-row"
