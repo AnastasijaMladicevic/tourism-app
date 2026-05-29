@@ -410,24 +410,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private async maybeOpenLocationConsentPromptOnMapEnter(): Promise<void> {
-    if (!this.authService.isLoggedIn()) {
-      return;
-    }
-
-    const currentLocation = this.locationTrackingService.getCurrentLocation();
-    if (currentLocation?.source === 'gps') {
-      this.closeLocationConsentPrompt();
-      return;
-    }
-
-    const permissionState = await this.getGeolocationPermissionState();
-    if (permissionState === 'granted') {
-      if (!this.locationTrackingService.isTrackingEnabled() || !currentLocation) {
-        this.locationTrackingService.startTracking();
-      }
-      this.closeLocationConsentPrompt();
-      this.cdr.detectChanges();
-    }
+    // GPS se ne pali automatski — korisnik mora eksplicitno da ga uključi
   }
 
   private async getGeolocationPermissionState(): Promise<PermissionState | 'unsupported'> {
