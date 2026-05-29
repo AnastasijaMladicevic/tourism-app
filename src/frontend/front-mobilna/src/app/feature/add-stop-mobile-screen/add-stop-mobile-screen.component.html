@@ -27,6 +27,16 @@
             <mat-icon>mic_none</mat-icon>
           </div>
 
+          <div class="add-stop-route-modal__my-location-row">
+            <button class="add-stop-route-modal__my-location-btn" type="button" (click)="useMyLocation()">
+              <mat-icon>my_location</mat-icon>
+              {{ 'map.routePlanner.useMyLocation' | translate }}
+            </button>
+            @if (showLocationAlreadyInRouteHint) {
+              <span class="add-stop-route-modal__location-hint">{{ 'map.routePlanner.locationAlreadyInRoute' | translate }}</span>
+            }
+          </div>
+
           <div class="add-stop-route-modal__chips">
             @for (category of categories; track category.key) {
               <button

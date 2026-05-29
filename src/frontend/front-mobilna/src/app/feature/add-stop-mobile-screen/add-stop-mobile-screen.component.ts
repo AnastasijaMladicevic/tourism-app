@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, HostBinding, HostListener, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
@@ -15,6 +15,7 @@ import {
   RouteBuilderPoint,
   RouteBuilderStateService,
 } from '../../services/route-builder-state.service';
+import { LocationTrackingService } from '../../services/location-tracking';
 import { TranslationService } from '../../services/translation.service';
 import { environment } from '../../../environment/environment';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
@@ -82,6 +83,12 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
   isSubmitting = false;
   hasMoreResults = false;
   isDesktopLayout = false;
+  showLocationAlreadyInRouteHint = false;
+
+  @HostBinding('class.add-stop-host--desktop')
+  get isDesktopHost(): boolean {
+    return this.isDesktopLayout;
+  }
 
   private readonly collapsedResultLimit = 6;
   private visibleResultLimit = this.collapsedResultLimit;
@@ -102,6 +109,7 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
     private readonly localityService: LocalityService,
     private readonly sanitizer: DomSanitizer,
     private readonly routeBuilderStateService: RouteBuilderStateService,
+    private readonly locationTrackingService: LocationTrackingService,
     private readonly translationService: TranslationService,
   ) {}
 
@@ -300,6 +308,37 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
 
   get canAddToRoute(): boolean {
     return !!this.selectedResult && this.selectedResult.lat != null && this.selectedResult.lng != null;
+  }
+
+  async useMyLocation(): Promise<void> {
+    const isTracking = this.locationTrackingService.isTrackingEnabled();
+    const location = this.locationTrackingService.getCurrentLocation();
+
+    if (!isTracking || !location) {
+      await this.navigateBackToMap({ state: { openLocationConsent: true } });
+      return;
+    }
+
+    const currentPoints = this.routeBuilderStateService.getRoutePoints();
+    const alreadyInRoute = currentPoints.some((p) => p.id === -1 && p.type === 'gps');
+    if (alreadyInRoute) {
+      this.showLocationAlreadyInRouteHint = true;
+      setTimeout(() => {
+        this.showLocationAlreadyInRouteHint = false;
+        this.cdr.detectChanges();
+      }, 2500);
+      this.cdr.detectChanges();
+      return;
+    }
+
+    this.routeBuilderStateService.prependRoutePoint({
+      id: -1,
+      name: this.translate('map.routePlanner.myLocation'),
+      type: 'gps',
+      lat: location.latitude,
+      lng: location.longitude,
+    });
+    await this.navigateBackToMap();
   }
 
   async addToRoute(): Promise<void> {

@@ -319,6 +319,9 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         this.applyTrackedLocation(this.locationTrackingService.getCurrentLocation());
         this.restoreRouteBuilderState();
         this.checkPendingLocationConsentAndApply();
+        if (state?.openLocationConsent) {
+          this.openLocationConsentPrompt();
+        }
         this.scheduleViewportStabilization();
         if (!state?.lat || !state?.lng) {
           this.focusActiveRegion();
