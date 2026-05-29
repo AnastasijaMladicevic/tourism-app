@@ -914,8 +914,8 @@
     "geoFailed": "Nije moguce dobiti vasu lokaciju.",
     "useMyLocation": "Koristi moju lokaciju",
     "locationLoading": "Trazimo lokaciju...",
-    "locationConsentTitle": "Ukljuci lokaciju da bi GPS radio",
-    "locationConsentBody": "Pracenje lokacije trenutno nije ukljuceno. Klikni ispod i otvori podesavanja da ukljucis saglasnost za pracenje lokacije.",
+    "locationConsentTitle": "Uključi lokaciju da bi GPS radio",
+    "locationConsentBody": "Praćenje lokacije trenutno nije uključeno. Klikni ispod i otvori podešavanja da uključiš saglasnost za praćenje lokacije.",
     "locationConsentAction": "Klikni ovde",
     "filters": {
       "food": "Hrana i piće",

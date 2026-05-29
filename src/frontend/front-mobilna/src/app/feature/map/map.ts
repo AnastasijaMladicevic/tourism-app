@@ -222,7 +222,12 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       if (this.shouldAppendMapClickToRoute()) {
         const point = this.getRoutePointFromItem(this.selectedItem, this.selectedType);
         if (point) {
-          this.appendRoutePoint(point);
+          const alreadyInRoute = this.routePoints.some(
+            (p) => p.id === point.id && p.type === point.type,
+          );
+          if (!alreadyInRoute) {
+            this.appendRoutePoint(point);
+          }
         }
       }
 
