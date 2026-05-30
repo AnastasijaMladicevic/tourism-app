@@ -170,65 +170,29 @@ U sistemu postoje 4 različite uloge:
 
 3. **Content Creator**	Kreira turisticki sadrzaj za destinacije koje su mu dodeljene. Podnosi sadrzaj na odobravanje menadzeru.	Dashboard, Objekti, Aktivnosti, Dogadjaji, Ocene, Mapa
 
-4. **Tourist** - Krajnji korisnik javne aplikacije. Nema pristup admin panelu. Moze ostavljati ocene i koristiti planer i favorite.
+4. **Tourist** - Krajnji korisnik aplikacije. Nema pristup admin panelu. Moze ostavljati ocene i koristiti planer i favorite.
 
 
 
 ### 5. Nalozi
 
-| header | header |
-| ------ | ------ |
-| cell | cell |
-| cell | cell |Email	Uloga	Lozinka
-| header | header |
-| ------ | ------ |
-| cell | cell |
-| cell | cell |milica.admin.serbia@spirego.com	Admin	Test1234!
-| header | header |
-| ------ | ------ |
-| cell | cell |
-| cell | cell |jelena.creator@spirego.com	Content Creator	Test1234!
-| header | header |
-| ------ | ------ |
-| cell | cell |
-| cell | cell |manager.belgrade@spirego.com	Manager	Test1234!
-| header | header |
-| ------ | ------ |
-| cell | cell |
-| cell | cell |manager.novisad@spirego.com	Manager	Test1234!
-| header | header |
-| ------ | ------ |
-| cell | cell |
-| cell | cell |manager.zlatibor@spirego.com	Manager	Test1234!
-| header | header |
-| ------ | ------ |
-| cell | cell |
-| cell | cell |lucia.admin@spirego.com	Admin	Test1234!
-| header | header |
-| ------ | ------ |
-| cell | cell |
-| cell | cell |carmen.creator@spirego.com	Content Creator	Test1234!
-| header | header |
-| ------ | ------ |
-| cell | cell |
-| cell | cell |giulia.admin@spirego.com	Admin	Test1234!
-| header | header |
-| ------ | ------ |
-| cell | cell |
-| cell | cell |lorenzo.creator@spirego.com	Content Creator	Test1234!
-| header | header |
-| ------ | ------ |
-| cell | cell |
-| cell | cell |mila@gmail.com	Tourist	Test1234!
-| header | header |
-| ------ | ------ |
-| cell | cell |
-| cell | cell |ivan@gmail.com	Tourist	Test1234!
-| header | header |
-| ------ | ------ |
-| cell | cell |
-| cell | cell |nemanja@gmail.com	Tourist	Test1234!
-| header | header |
-| ------ | ------ |
-| cell | cell |
-| cell | cell |tamara@gmail.com	Tourist	Test1234!
+**Admin**
+milica.admin.serbia@spirego.com		Test1234!
+lucia.admin@spirego.com		        Test1234!
+giulia.admin@spirego.com		      Test1234!
+
+**Manager**
+manager.belgrade@spirego.com		  Test1234!
+manager.novisad@spirego.com		    Test1234!
+manager.zlatibor@spirego.com		  Test1234!
+
+**Content Creator**
+jelena.creator@spirego.com		    Test1234!
+carmen.creator@spirego.com	 	    Test1234!
+lorenzo.creator@spirego.com	 	    Test1234!
+
+**Tourist**
+mila@gmail.com		                Test1234!
+ivan@gmail.com		                Test1234!
+nemanja@gmail.com		              Test1234!
+tamara@gmail.com		              Test1234!
