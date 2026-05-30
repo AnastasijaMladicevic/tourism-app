@@ -32,10 +32,6 @@
           <mat-icon>place</mat-icon>
         </div>
       }
-
-      <button class="fav-btn" [class.card__fav--active]="isFavorite" [disabled]="isFavoritePending(destination.id)"(click)="toggleFavorite(destination, $event)">
-        <mat-icon>{{ isFavorite ? 'favorite' : 'favorite_border' }}</mat-icon>
-      </button>
     </div>
   }
 
@@ -44,8 +40,9 @@
       <div class="card">
         <div class="title-row">
           <h1 class="title">{{ destination?.name }}</h1>
-          <button
-            class="fav-btn fav-btn--desktop"
+            <button
+            class="fav-btn"
+            type="button"
             (click)="toggleFavorite(destination, $event)"
             [class.fav-btn--active]="isFavorite"
             [disabled]="isFavoritePending(destination?.id)"
