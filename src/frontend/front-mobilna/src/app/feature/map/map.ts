@@ -1987,17 +1987,12 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   private checkPendingLocationConsentAndApply(): void {
     if (typeof sessionStorage === 'undefined') return;
     if (!sessionStorage.getItem(this.GPS_CONSENT_PENDING_KEY)) return;
-    if (!this.isTracking || !this.userLocation) return;
 
     sessionStorage.removeItem(this.GPS_CONSENT_PENDING_KEY);
 
-    const alreadyInRoute = this.routePoints.some((p) => this.isGpsRoutePoint(p));
-    if (alreadyInRoute) return;
-
-    const locationPoint = this.createMyLocationRoutePoint();
-    if (!locationPoint) return;
-
-    this.prependRoutePoint(locationPoint);
+    if (this.isTracking && this.userLocation) {
+      this.shouldCenterOnNextLocation = true;
+    }
   }
 
   openAddStopPanel(): void {
