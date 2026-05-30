@@ -85,8 +85,7 @@
 
         <div class="size-selector">
           <button class="size-selector__btn" type="button" (click)="toggleSizeDropdown()">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6h18M7 12h10M10 18h4"/></svg>
-            <span>{{ pageSize() }} {{ 'myReviews.perPage' | translate }}</span>
+            <span>{{ pageSizeLabelKey(pageSize()) | translate }}</span>
             <svg class="size-selector__chevron" [class.size-selector__chevron--open]="showSizeDropdown()" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
           </button>
           @if (showSizeDropdown()) {
@@ -98,7 +97,7 @@
                   [class.size-dropdown__item--active]="pageSize() === opt"
                   (click)="setPageSize(opt)"
                 >
-                  {{ opt }} {{ 'myReviews.perPage' | translate }}
+                {{ pageSizeLabelKey(opt) | translate }}
                 </button>
               }
             </div>
@@ -126,8 +125,6 @@
           @for (card of visibleReviews(); track trackReview($index, card)) {
             <article class="review-card">
               <div class="review-header">
-                <div class="review-thumb">{{ card.objectTypeShort }}</div>
-
                 <div class="review-title">
                   <h3>{{ card.title }}</h3>
                   <p>
@@ -139,6 +136,7 @@
                   </p>
                 </div>
 
+                <div class="meta-pill review-type-pill">{{ card.objectType }}</div>
               </div>
 
               <div class="review-meta">
@@ -165,8 +163,6 @@
               <div class="review-divider"></div>
 
               <div class="review-actions">
-                <div class="meta-pill">{{ card.objectType }}</div>
-
                 <div class="review-buttons">
                   <button class="action-btn action-btn--muted" type="button" (click)="openObject(card)">
                     <svg viewBox="0 0 24 24">
@@ -204,3 +200,24 @@
 
   </div>
 </div>
+
+
+@if (showConfirmModal()) {
+  <div class="custom-modal-backdrop" (click)="closeConfirmModal()">
+    <div class="custom-modal" (click)="$event.stopImmediatePropagation()">
+      <h3>{{ 'common.confirmation' | translate }}</h3>
+
+      <p>{{ confirmMessage() }}</p>
+
+      <div class="custom-modal-actions">
+        <button class="modal-btn modal-btn-secondary" type="button" (click)="closeConfirmModal()">
+          {{ 'common.cancel' | translate }}
+        </button>
+
+        <button class="modal-btn modal-btn-primary" type="button" (click)="confirmDeleteReview()">
+          {{ 'common.confirm' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

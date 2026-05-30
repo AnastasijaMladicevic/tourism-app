@@ -59,6 +59,9 @@ export class MyReviewsPreviewComponent implements OnInit {
   protected readonly showSizeDropdown = signal(false);
   protected readonly pageSizeOptions = [3, 5];
   protected readonly deletingId = signal<number | null>(null);
+  protected readonly showConfirmModal = signal(false);
+  protected readonly confirmMessage = signal('');
+  private pendingDeleteReview: ReviewPreviewCard | null = null;
   @ViewChild('filterRow') filterRow!: ElementRef<HTMLElement>;
 
   private isDragging = false;
@@ -137,6 +140,10 @@ export class MyReviewsPreviewComponent implements OnInit {
     const total = items.reduce((sum, item) => sum + item.rating, 0);
     return (total / items.length).toFixed(1);
   });
+
+  protected pageSizeLabelKey(value: number): string {
+    return value === 5 ? 'myReviews.cardsCountFive' : 'myReviews.cardsCountThree';
+  }
 
   protected readonly roundedAverageRating = computed(() =>
     Math.round(Number(this.averageRating()) || 0),
@@ -274,27 +281,46 @@ export class MyReviewsPreviewComponent implements OnInit {
   protected deleteReview(card: ReviewPreviewCard): void {
     if (this.deletingId() === card.id) return;
 
-    const confirmed = window.confirm(
+    this.pendingDeleteReview = card;
+    this.confirmMessage.set(
       this.translationService.translate('myReviews.deleteConfirm', { title: card.title }),
     );
-    if (!confirmed) return;
+    this.showConfirmModal.set(true);
+    document.body.style.overflow = 'hidden';
+    this.cdr.detectChanges();
+  }
+
+  protected closeConfirmModal(): void {
+    this.showConfirmModal.set(false);
+    this.confirmMessage.set('');
+    this.pendingDeleteReview = null;
+    document.body.style.overflow = 'visible';
+    this.cdr.detectChanges();
+  }
+
+  protected confirmDeleteReview(): void {
+    const card = this.pendingDeleteReview;
+    if (!card || this.deletingId() === card.id) return;
+
+    this.showConfirmModal.set(false);
+    document.body.style.overflow = 'visible';
 
     this.deletingId.set(card.id);
 
     this.reviewService.delete(card.id).subscribe({
       next: () => {
-        // Ukloni iz liste
         this.reviews.update(items => items.filter(item => item.id !== card.id));
-
+        this.pendingDeleteReview = null;
         this.deletingId.set(null);
         this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Delete review error:', err);
         alert(this.translationService.translate('myReviews.deleteError'));
+        this.pendingDeleteReview = null;
         this.deletingId.set(null);
         this.cdr.detectChanges();
-      }
+      },
     });
   }
 
