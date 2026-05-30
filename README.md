@@ -156,8 +156,9 @@ Host=localhost;Port=5434;Database=turisticka_baza;Username=techspire;Password=te
 
 
 ### 3. Adrese do aplikacija
-**Turistička:** https://
-**Admin:** http://
+**Turistička:** https://softeng.pmf.kg.ac.rs:10201
+
+**Admin:** http://softeng.pmf.kg.ac.rs:10202
 
 
 
@@ -177,21 +178,25 @@ U sistemu postoje 4 različite uloge:
 ### 5. Nalozi
 
 **Admin**
+admin@spirego.com		              Test1234!
 milica.admin.serbia@spirego.com		Test1234!
 lucia.admin@spirego.com		        Test1234!
 giulia.admin@spirego.com		      Test1234!
 
 **Manager**
+marko@spirego.com		              Test1234!
 manager.belgrade@spirego.com		  Test1234!
 manager.novisad@spirego.com		    Test1234!
 manager.zlatibor@spirego.com		  Test1234!
 
 **Content Creator**
+ana@spirego.com		                Test1234!
 jelena.creator@spirego.com		    Test1234!
 carmen.creator@spirego.com	 	    Test1234!
 lorenzo.creator@spirego.com	 	    Test1234!
 
 **Tourist**
+ana@gmail.com		                  Test1234!
 mila@gmail.com		                Test1234!
 ivan@gmail.com		                Test1234!
 nemanja@gmail.com		              Test1234!
