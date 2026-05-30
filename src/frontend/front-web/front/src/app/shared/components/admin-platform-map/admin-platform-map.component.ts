@@ -168,11 +168,14 @@ export class AdminPlatformMapComponent implements AfterViewInit, OnChanges, OnDe
     );
 
     withCoords.forEach((destination) => {
+      const markerData = this.compact
+        ? { ...destination, mapPopupVariant: 'label' }
+        : destination;
       this.mapService.addMarkerWithType(
         destination.latitude!,
         destination.longitude!,
         'destination',
-        destination,
+        markerData,
         () => this.markerSelected.emit(destination),
       );
     });

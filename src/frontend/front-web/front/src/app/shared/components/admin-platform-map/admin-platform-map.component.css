@@ -141,8 +141,13 @@
   display: none !important;
 }
 
-.admin-platform-map .leaflet-popup {
+app-admin-platform-map.admin-platform-map--full .admin-platform-map .leaflet-popup {
   display: none !important;
+}
+
+app-admin-platform-map.admin-platform-map--compact .admin-platform-map .leaflet-popup {
+  display: block !important;
+  margin-bottom: 18px !important;
 }
 
 .admin-platform-map .leaflet-popup-content-wrapper {
