@@ -992,7 +992,8 @@
         "activity": "Activity",
         "locality": "Locality"
       }
-    }
+    },
+    "getDirections": "Get Directions"
   },
   "regions": {
     "montenegro": "Montenegro",

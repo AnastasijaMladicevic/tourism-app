@@ -988,7 +988,8 @@
         "activity": "Actividad",
         "locality": "Localidad"
       }
-    }
+    },
+    "getDirections": "Cómo llegar"
   },
   "regions": {
     "montenegro": "Montenegro",

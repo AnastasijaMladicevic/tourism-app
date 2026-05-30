@@ -17,6 +17,7 @@ import * as L from 'leaflet';
 
 import { MatIconModule } from '@angular/material/icon';
 import { MapService } from '../../../services/map.service';
+import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 import { ObjectService } from '../../../services/object';
 import { EventService } from '../../../services/event.service';
 import { AuthService } from '../../../services/auth.service';
@@ -54,7 +55,7 @@ interface RoutePoint {
 @Component({
   selector: 'app-content-creator-map',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule],
+  imports: [CommonModule, FormsModule, MatIconModule, TranslatePipe],
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.css'],
   encapsulation: ViewEncapsulation.None
@@ -78,6 +79,7 @@ export class ContentCreatorMapComponent implements OnInit, AfterViewInit, OnDest
 
   selectedItem: any = null;
   selectedType = '';
+  cardStyle: Record<string, string> = {};
   userLocation: L.LatLng | null = null;
   routeStart: RoutePoint | null = null;
   routeEnd: RoutePoint | null = null;
@@ -97,6 +99,7 @@ export class ContentCreatorMapComponent implements OnInit, AfterViewInit, OnDest
       this.selectedItem = customEvent.detail.data;
       this.selectedType = customEvent.detail.type;
       this.focusSelectedMarker();
+      this.updateCardPosition();
       this.cdr.detectChanges();
     });
   };
@@ -133,6 +136,14 @@ export class ContentCreatorMapComponent implements OnInit, AfterViewInit, OnDest
     const map = this.mapService['map'];
     if (map) {
       map.on('click', () => this.closeCard());
+      map.on('move zoom', () => {
+        if (this.selectedItem) {
+          this.ngZone.run(() => {
+            this.updateCardPosition();
+            this.cdr.detectChanges();
+          });
+        }
+      });
     }
   }
 
@@ -719,6 +730,7 @@ export class ContentCreatorMapComponent implements OnInit, AfterViewInit, OnDest
   closeCard(): void {
     this.selectedItem = null;
     this.selectedType = '';
+    this.cardStyle = {};
     this.clearDirections();
 
     const activeKey = (window as any).activeMarkerKey;
@@ -771,6 +783,23 @@ export class ContentCreatorMapComponent implements OnInit, AfterViewInit, OnDest
 
   zoomOut(): void {
     (this.mapService as any)['map']?.zoomOut();
+  }
+
+  updateCardPosition(): void {
+    if (!this.selectedItem) { this.cardStyle = {}; return; }
+    const mapInst = this.mapService.getMap();
+    if (!mapInst) { this.cardStyle = {}; return; }
+    const lat = Number(this.selectedItem.latitude);
+    const lng = Number(this.selectedItem.longitude);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) { this.cardStyle = {}; return; }
+    const pt = mapInst.latLngToContainerPoint(L.latLng(lat, lng));
+    this.cardStyle = {
+      position: 'absolute',
+      top: `${pt.y + 12}px`,
+      left: `${pt.x}px`,
+      transform: 'translateX(-50%)',
+      bottom: 'auto',
+    };
   }
 
   private focusSelectedMarker(): void {

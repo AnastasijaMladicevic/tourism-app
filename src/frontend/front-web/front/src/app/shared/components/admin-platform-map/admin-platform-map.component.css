@@ -142,8 +142,7 @@
 }
 
 .admin-platform-map .leaflet-popup {
-  display: block !important;
-  margin-bottom: 18px !important;
+  display: none !important;
 }
 
 .admin-platform-map .leaflet-popup-content-wrapper {

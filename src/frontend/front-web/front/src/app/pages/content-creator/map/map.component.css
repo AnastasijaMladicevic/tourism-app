@@ -442,42 +442,22 @@
 
 .bottom-card {
   position: absolute;
-  bottom: 72px;
-  left: 16px;
-  right: 16px;
-  z-index: 100;
+  width: 280px;
+  z-index: 200;
   background: rgba(255, 255, 255, 0.98);
-  border-radius: 24px;
-  box-shadow: 0 18px 42px rgba(15, 23, 42, 0.18);
+  border-radius: 20px;
+  box-shadow: 0 18px 42px rgba(15, 23, 42, 0.22);
   overflow: hidden;
-  animation: slideUp 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  animation: cardFadeIn 0.2s ease;
 
-  @media (min-width: 600px) and (max-width: 1023px) {
-    width: 380px;
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: 72px;
-    right: auto;
-  }
-
-  @media (min-width: 1024px) {
-    width: 480px;
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: 40px;
-    right: auto;
+  @media (min-width: 600px) {
+    width: 320px;
   }
 }
 
-@keyframes slideUp {
-  from {
-    transform: translateY(30px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+@keyframes cardFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .bottom-card__close {
@@ -536,8 +516,8 @@
 .bottom-card__body {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 16px;
+  gap: 8px;
+  padding: 14px 16px 16px;
 }
 
 .bottom-card__top {

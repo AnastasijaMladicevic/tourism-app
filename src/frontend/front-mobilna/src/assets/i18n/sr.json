@@ -992,7 +992,8 @@
         "activity": "Aktivnost",
         "locality": "Mesto"
       }
-    }
+    },
+    "getDirections": "Prikaži putanju"
   },
   "regions": {
     "montenegro": "Crna Gora",

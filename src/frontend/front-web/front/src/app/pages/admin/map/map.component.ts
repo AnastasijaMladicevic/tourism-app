@@ -17,9 +17,8 @@ import * as L from 'leaflet';
 import { MatIconModule } from '@angular/material/icon';
 import { DestinationDto } from '../../../services/destination.service';
 import { MapService } from '../../../services/map.service';
-import {
-  AdminPlatformMapComponent,
-} from '../../../shared/components/admin-platform-map/admin-platform-map.component';
+import { AdminPlatformMapComponent } from '../../../shared/components/admin-platform-map/admin-platform-map.component';
+import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 
 interface SearchResult {
   id: number;
@@ -41,7 +40,7 @@ interface AdminMapDestination extends DestinationDto {
 @Component({
   selector: 'app-map',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule, AdminPlatformMapComponent],
+  imports: [CommonModule, FormsModule, MatIconModule, AdminPlatformMapComponent, TranslatePipe],
   templateUrl: './map.component.html',
   styleUrls: ['./map.component.css'],
   encapsulation: ViewEncapsulation.None,

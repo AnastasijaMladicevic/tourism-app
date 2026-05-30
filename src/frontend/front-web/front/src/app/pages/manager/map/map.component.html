@@ -65,7 +65,7 @@
   </div>
 
   @if (selectedItem) {
-    <div class="bottom-card" (click)="$event.stopPropagation()">
+    <div class="bottom-card" [ngStyle]="cardStyle" (click)="$event.stopPropagation()">
       <button class="bottom-card__close" (click)="closeCard()">
         <mat-icon>close</mat-icon>
       </button>
@@ -81,43 +81,15 @@
       </div>
 
       <div class="bottom-card__body">
-        <div class="bottom-card__top">
-          <div class="bottom-card__info">
-            <h3 class="bottom-card__name">{{ selectedItem.name }}</h3>
-            <p class="bottom-card__meta">
-              @if (getItemLocation()) {
-                <mat-icon>place</mat-icon>
-                {{ getItemLocation() }}
-              }
-            </p>
-          </div>
-          @if (selectedItem.averageRating > 0) {
-            <div class="bottom-card__rating">
-              <mat-icon>star</mat-icon>
-              {{ selectedItem.averageRating.toFixed(1) }}
-            </div>
-          }
-        </div>
-
-        <div class="bottom-card__badges">
-          @if (getWorkingStatus() !== null) {
-            <span
-              class="badge"
-              [class.badge--open]="getWorkingStatus()"
-              [class.badge--closed]="!getWorkingStatus()"
-            >
-              {{ getWorkingStatus() ? 'OPEN NOW' : 'CLOSED' }}
-            </span>
-          }
-          @if (selectedItem.distanceKm != null) {
-            <span class="badge badge--distance">
-              <mat-icon>near_me</mat-icon>{{ formatDistance(selectedItem.distanceKm) }}
-            </span>
-          }
-        </div>
-
+        <h3 class="bottom-card__name">{{ selectedItem.name }}</h3>
+        @if (getItemLocation()) {
+          <p class="bottom-card__meta">
+            <mat-icon>place</mat-icon>
+            {{ getItemLocation() }}
+          </p>
+        }
         <div class="bottom-card__actions">
-          <button class="bottom-card__btn" (click)="openDetails()">Details</button>
+          <button class="bottom-card__btn" (click)="openDetails()">{{ 'common.viewDetails' | translate }}</button>
         </div>
       </div>
     </div>
