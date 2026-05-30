@@ -118,9 +118,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.authService.getById(userData.id).subscribe({
       next: (fullUser) => {
         this.syncUserState(fullUser);
-        if (fullUser.language) {
-          this.translationService.setLanguage(fullUser.language);
-        }
       },
       error: (err) => {
         console.error('Failed to refresh profile data', err);
