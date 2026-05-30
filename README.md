@@ -124,37 +124,7 @@ Vrednosti se podešavaju u `appsettings.Production.json`. Pre build-a proveriti 
 - `Cors:AllowedOrigins`
 - `Ollama:Enabled`
 
-### 1. Backend build
-
-Iz foldera `src/backend/TuristickiVodic`:
-
-```bash
-dotnet publish .\TuristickiVodic.API\TuristickiVodic.API.csproj -c Release -o .\publish
-```
-
-Rezultat je u folderu `src/backend/TuristickiVodic/publish`.
-
-### 2. Frontend build
-
-**front-mobilna** — iz foldera `src/frontend/front-mobilna`:
-
-```bash
-npm install
-ng build --configuration production
-```
-
-Buildovani fajlovi se nalaze u `src/frontend/front-mobilna/dist/front-mobilna/browser`.
-
-**front-web** — iz foldera `src/frontend/front-web/front`:
-
-```bash
-npm install
-ng build --configuration production
-```
-
-Buildovani fajlovi se nalaze u `src/frontend/front-web/front/dist/front/browser`.
-
-### 3. Raspored frontova
+### 1. Raspored frontova
 
 Projekat ima dva Angular fronta:
 
@@ -163,29 +133,8 @@ Projekat ima dva Angular fronta:
 | `front-mobilna` | `wwwroot` backenda | 10201 |
 | `front-web` | Odvojen statički server | 10202 |
 
-`front-mobilna` se kopira u `wwwroot` objavljenog backenda:
 
-```powershell
-Copy-Item -Recurse -Force .\src\frontend\front-mobilna\dist\front-mobilna\browser\* .\src\backend\TuristickiVodic\publish\wwwroot\
-```
-
-Ovo je preporučeni pristup jer je u `environment.prod.ts` podešeno `apiUrl: '/api'`, što znači da frontend očekuje API na istom origin-u. Prednosti ovog pristupa:
-- nema CORS komplikacija
-- `/api` radi prirodno
-- slike i statički fajlovi idu sa istog servera
-- najjednostavnije za javni link i QR kodove
-
-### 4. Upload na server
-
-```bash
-# Backend + front-mobilna (iz korena projekta)
-scp -r ./src/backend/TuristickiVodic/publish/* techspire@softeng.pmf.kg.ac.rs:/home/techspire/backend/
-
-# front-web
-scp -r ./src/frontend/front-web/front/dist/front/browser/* techspire@softeng.pmf.kg.ac.rs:/home/techspire/frontend-web/
-```
-
-### 5. Baza na serveru
+### 2. Baza na serveru
 
 PostgreSQL na PMF serveru radi na portu **5434**.
 
@@ -204,70 +153,46 @@ Connection string:
 Host=localhost;Port=5434;Database=turisticka_baza;Username=techspire;Password=techspire#si2026
 ```
 
-### 6. Pokretanje na serveru
 
-Backend se pokreće u `screen` sesiji kako bi ostao aktivan i nakon prekida SSH konekcije:
 
-```bash
-screen -S backend
-cd /home/techspire/backend
-dotnet TuristickiVodic.API.dll --urls "http://0.0.0.0:10201"
-```
+### 3. Adrese do aplikacija
+**Turistička:** https://
+**Admin:** http://
 
-`front-web` se pokreće odvojeno:
 
-```bash
-screen -S frontend-web
-cd /home/techspire/frontend-web
-npx http-server . -p 10202
-```
 
-Korisne `screen` komande:
+### 4. Uloge u aplikaciji
+U sistemu postoje 4 različite uloge:
 
-```bash
-screen -ls              # lista aktivnih sesija
-screen -r backend       # povratak u backend sesiju
-screen -r frontend-web  # povratak u frontend-web sesiju
-# Ctrl + A, pa D        # odvajanje od sesije (proces ostaje aktivan)
-```
+1. **Admin** -	Najvisi nivo pristupa. Upravlja korisnicima, destinacijama, mapom i activity logom. Jedini moze kreirati nove admin/manager naloge.	Dashboard, Destinacije, Korisnici, Mapa
 
-### Javne adrese
+2. **Manager** -	Moderator sadrzaja. Odobrava objekte, aktivnosti i dogadjaje. Upravlja lokalitetima i pregledava izvestaje od content creatora.	Dashboard, Objekti, Aktivnosti, Dogadjaji, Lokaliteti, Mapa, Ocene/Odgovori, Izvestaji
 
-| Šta | URL |
-|-----|-----|
-| Backend API + front-mobilna | http://softeng.pmf.kg.ac.rs:10201 |
-| front-web | http://softeng.pmf.kg.ac.rs:10202 |
-| Swagger | http://softeng.pmf.kg.ac.rs:10201/swagger |
+3. **Content Creator**	Kreira turisticki sadrzaj za destinacije koje su mu dodeljene. Podnosi sadrzaj na odobravanje menadzeru.	Dashboard, Objekti, Aktivnosti, Dogadjaji, Ocene, Mapa
 
-### Seed podaci
+4. **Tourist** - Krajnji korisnik aplikacije. Nema pristup admin panelu. Moze ostavljati ocene i koristiti planer i favorite.
 
-Backend pri startu automatski radi migracije i seed ako je baza prazna. Ponašanje se kontroliše kroz `SeedData` sekciju u konfiguraciji:
 
-```json
-"SeedData": {
-  "ResetAndSeedOnStartup": false,
-  "SeedIfDatabaseEmpty": true,
-  "ApplyIncrementalSeedOnStartup": false,
-  "FailStartupOnSeedError": false
-}
-```
 
-### PublicApp i QR linkovi
+### 5. Nalozi
 
-`PublicApp:BaseUrl` mora biti postavljen na javni URL frontend aplikacije kako bi QR kodovi vodili na ispravnu adresu:
+**Admin**
+milica.admin.serbia@spirego.com		Test1234!
+lucia.admin@spirego.com		        Test1234!
+giulia.admin@spirego.com		      Test1234!
 
-```json
-"PublicApp": {
-  "BaseUrl": "http://softeng.pmf.kg.ac.rs:10201"
-}
-```
+**Manager**
+manager.belgrade@spirego.com		  Test1234!
+manager.novisad@spirego.com		    Test1234!
+manager.zlatibor@spirego.com		  Test1234!
 
-### AI na serveru
+**Content Creator**
+jelena.creator@spirego.com		    Test1234!
+carmen.creator@spirego.com	 	    Test1234!
+lorenzo.creator@spirego.com	 	    Test1234!
 
-Ako na serveru nema Ollama servisa, isključiti AI u produkcijskoj konfiguraciji:
-
-```json
-"Ollama": {
-  "Enabled": false
-}
-```
+**Tourist**
+mila@gmail.com		                Test1234!
+ivan@gmail.com		                Test1234!
+nemanja@gmail.com		              Test1234!
+tamara@gmail.com		              Test1234!
