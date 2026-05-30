@@ -7,6 +7,7 @@ import { ImageCropperComponent, ImageCroppedEvent } from 'ngx-image-cropper';
 import { environment } from '../../../../environment/environment';
 import { AuthService, UpdateUserDto } from '../../../services/auth.service';
 import { UserDto } from '../../../models/user.model';
+import { TranslationService } from '../../../services/translation.service';
 type PermissionItem = {
   label: string;
   detail: string;
@@ -102,6 +103,7 @@ export class ProfileComponentContentCreator implements OnInit, OnDestroy {
     private authService: AuthService,
     private router: Router,
     private cdr: ChangeDetectorRef,
+    private translationService: TranslationService,
   ) { }
 
   ngOnInit(): void {
@@ -117,6 +119,9 @@ export class ProfileComponentContentCreator implements OnInit, OnDestroy {
     this.authService.getById(userData.id).subscribe({
       next: (fullUser) => {
         this.syncUserState(fullUser);
+        if (fullUser.language) {
+          this.translationService.setLanguage(fullUser.language);
+        }
       },
       error: (err) => {
         console.error('Failed to refresh profile data', err);
@@ -271,6 +276,7 @@ export class ProfileComponentContentCreator implements OnInit, OnDestroy {
         const mergedUser = this.mergeUserState(updated);
         this.syncUserState(mergedUser);
         this.authService.setCurrentUser(mergedUser);
+        this.translationService.setLanguage(mergedUser.language);
         this.showSaveSuccess();
         window.dispatchEvent(new Event('storage'));
       },

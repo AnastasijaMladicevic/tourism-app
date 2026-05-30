@@ -4,12 +4,14 @@ import { FormsModule } from '@angular/forms';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { filter, Subscription } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
+import { DomTranslationService } from '../../services/dom-translation.service';
 import { NotificationBellComponent } from '../../shared/components/notification-bell/notification-bell.component';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-manager-layout',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, NotificationBellComponent],
+  imports: [CommonModule, FormsModule, RouterModule, NotificationBellComponent, TranslatePipe],
   templateUrl: './managerlayout.component.html',
   styleUrls: ['./managerlayout.component.css'],
 })
@@ -26,10 +28,15 @@ export class ManagerLayoutComponent implements OnInit, OnDestroy {
     avatarUrl: null,
   };
 
-  constructor(private router: Router, private authService: AuthService) {}
+  constructor(
+    private router: Router,
+    private authService: AuthService,
+    private domTranslation: DomTranslationService,
+  ) {}
 
   ngOnInit(): void {
     this.loadUser();
+    this.domTranslation.start();
     window.addEventListener('storage', this.loadUser);
     this.syncMapRoute();
     this.navSubscription = this.router.events
@@ -49,6 +56,7 @@ export class ManagerLayoutComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.domTranslation.stop();
     window.removeEventListener('storage', this.loadUser);
     this.navSubscription?.unsubscribe();
     document.body.classList.remove('manager-nav-open');
