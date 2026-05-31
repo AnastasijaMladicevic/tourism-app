@@ -93,30 +93,21 @@ button:hover {
   color: #e74c3c;
 }
 
-/* desktop verzija sakrivena po defaultu */
-.fav-btn--desktop {
+/* hero dugme sakriveno na svim rezolucijama */
+.hero .fav-btn {
   display: none;
 }
 
-@media (min-width: 900px) {
-
-  /* sakrij hero dugme */
-  .hero .fav-btn {
-    display: none;
-  }
-
-  /* prikaži desktop dugme */
-  .fav-btn--desktop {
-    display: flex;
-    position: static;
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    background: var(--surface-soft);
-    box-shadow: none;
-    margin-top: -10px;
-    margin-bottom: 5px;
-  }
+/* dugme unutar kartice vidljivo svuda */
+.fav-btn--desktop {
+  display: flex;
+  position: static;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--surface-soft);
+  box-shadow: none;
+  flex-shrink: 0;
 }
 
 .content {
@@ -993,7 +984,7 @@ button:hover {
   .fav-btn,
   .fav-btn--desktop {
     background: rgba(77, 194, 255, 0.1);
-    color: #4dc2ff;
+    color: var(--text-dark);
     border: 1px solid rgba(77, 194, 255, 0.18);
     box-shadow: none;
   }

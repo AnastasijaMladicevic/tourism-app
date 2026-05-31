@@ -108,8 +108,8 @@
       @if (qrLink) {
         <div class="card qr-card">
           <div>
-            <h2>QR kod</h2>
-            <p>Skeniraj za brzo otvaranje ove aktivnosti.</p>
+            <h2>{{ 'common.qrTitle' | translate }}</h2>
+            <p>{{ 'common.qrBody' | translate }}</p>
           </div>
           <a class="qr-mini" [href]="qrLink.targetUrl" target="_blank" rel="noopener">
             <img [src]="qrLink.qrImageUrl" [alt]="qrLink.label" />

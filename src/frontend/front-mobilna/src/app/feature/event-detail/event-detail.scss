@@ -113,27 +113,26 @@ button:hover {
   }
 }
 
-/* desktop verzija sakrivena po defaultu */
-.planner-btn--desktop {
+/* hero dugme sakriveno na svim rezolucijama */
+.hero .planner-btn {
   display: none;
+}
+
+/* dugme unutar kartice vidljivo svuda */
+.planner-btn--desktop {
+  display: flex;
+  position: static;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--surface);
+  box-shadow: none;
+  flex-shrink: 0;
 }
 
 @media (min-width: 900px) {
 
-  /* sakrij hero dugme */
-  .hero .planner-btn {
-    display: none;
-  }
-
-  /* prikaži desktop dugme */
   .planner-btn--desktop {
-    display: flex;
-    position: static;
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    background: var(--surface);
-    box-shadow: none;
     margin-top: -10px;
     margin-bottom: 5px;
   }
@@ -956,7 +955,7 @@ button:hover {
   .planner-btn,
   .planner-btn--desktop {
     background: rgba(77, 194, 255, 0.1);
-    color: #4dc2ff;
+    color: var(--text-dark);
     border: 1px solid rgba(77, 194, 255, 0.16);
     box-shadow: none;
   }
