@@ -69,6 +69,7 @@ export class DestinationsComponent implements OnInit, OnDestroy {
   private lastLanguage = 'sr';
   private searchTimeout: ReturnType<typeof setTimeout> | null = null;
   private readonly listStateKey = 'destinations-list-state';
+  private readonly returnFlagKey = 'destinations-return-from-detail';
 
 
   constructor(
@@ -127,7 +128,10 @@ export class DestinationsComponent implements OnInit, OnDestroy {
       this.cdr.detectChanges();
     });
 
-    this.restoreListState();
+    if (sessionStorage.getItem(this.returnFlagKey)) {
+      sessionStorage.removeItem(this.returnFlagKey);
+      this.restoreListState();
+    }
     void this.loadData();
     window.addEventListener('favorite-object', (event: any) => {
       const obj = event.detail;
@@ -465,6 +469,7 @@ export class DestinationsComponent implements OnInit, OnDestroy {
 
   viewDetails(destination: DestinationView): void {
     this.saveListState();
+    sessionStorage.setItem(this.returnFlagKey, 'true');
     this.router.navigate(['/destination', destination.id], {
       queryParams: { returnUrl: this.router.url }
     });

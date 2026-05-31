@@ -70,6 +70,7 @@ export class ObjectsComponent implements OnInit, OnDestroy {
   private lastLanguage = 'sr';
   private searchTimeout: ReturnType<typeof setTimeout> | null = null;
   private readonly listStateKey = 'objects-list-state';
+  private readonly returnFlagKey = 'objects-return-from-detail';
   private readonly groupedTypeMap: Record<string, string[]> = {
     'hrana i pice': ['restaurant', 'kafana'],
     pumpe: ['gas_station'],
@@ -155,9 +156,12 @@ export class ObjectsComponent implements OnInit, OnDestroy {
       this.pageTitle = this.translationService.translate('object.listTitle');
     
       this.hideTypeFilters = Boolean(type);
-    
-      this.restoreListState();
-    
+
+      if (sessionStorage.getItem(this.returnFlagKey)) {
+        sessionStorage.removeItem(this.returnFlagKey);
+        this.restoreListState();
+      }
+
       if (type) {
         this.activeFilter = type;
       }
@@ -782,6 +786,7 @@ export class ObjectsComponent implements OnInit, OnDestroy {
 
   viewDetails(obj: ObjectView): void {
     this.saveListState();
+    sessionStorage.setItem(this.returnFlagKey, 'true');
 
     this.router.navigate(['/object', obj.id], {
       queryParams: { returnUrl: this.router.url }

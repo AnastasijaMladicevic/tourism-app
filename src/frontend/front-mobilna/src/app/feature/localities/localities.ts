@@ -67,6 +67,7 @@ export class LocalitiesComponent implements OnInit, OnDestroy {
   private lastLanguage = 'sr';
   private searchTimeout: ReturnType<typeof setTimeout> | null = null;
   private readonly listStateKey = 'localities-list-state';
+  private readonly returnFlagKey = 'localities-return-from-detail';
 
   constructor(
     private readonly router: Router,
@@ -135,7 +136,10 @@ export class LocalitiesComponent implements OnInit, OnDestroy {
       this.cdr.detectChanges();
     });
 
-    this.restoreListState();
+    if (sessionStorage.getItem(this.returnFlagKey)) {
+      sessionStorage.removeItem(this.returnFlagKey);
+      this.restoreListState();
+    }
     void this.loadData();
 
     window.addEventListener('favorite-object', (event: Event & { detail?: LocalityView }) => {
@@ -282,7 +286,8 @@ export class LocalitiesComponent implements OnInit, OnDestroy {
 
   viewDetails(locality: LocalityView): void {
     this.saveListState();
-  
+    sessionStorage.setItem(this.returnFlagKey, 'true');
+
     this.router.navigate(['/locality', locality.id], {
       queryParams: {
         returnUrl: this.router.url

@@ -67,6 +67,7 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
   private lastLanguage = 'sr';
   private searchTimeout: ReturnType<typeof setTimeout> | null = null;
   private readonly listStateKey = 'activities-list-state';
+  private readonly returnFlagKey = 'activities-return-from-detail';
 
   constructor(
     private readonly router: Router,
@@ -135,7 +136,10 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
       this.cdr.detectChanges();
     });
 
-    this.restoreListState();
+    if (sessionStorage.getItem(this.returnFlagKey)) {
+      sessionStorage.removeItem(this.returnFlagKey);
+      this.restoreListState();
+    }
     void this.loadData();
 
     window.addEventListener('favorite-object', (event: Event & { detail?: ActivityView }) => {
@@ -340,7 +344,8 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
 
   viewDetails(activity: ActivityView): void {
     this.saveListState();
-  
+    sessionStorage.setItem(this.returnFlagKey, 'true');
+
     this.router.navigate(['/activity', activity.id], {
       queryParams: {
         returnUrl: this.router.url

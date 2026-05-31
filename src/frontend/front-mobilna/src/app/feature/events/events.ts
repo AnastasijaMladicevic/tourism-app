@@ -62,6 +62,7 @@ export class EventsComponent implements OnInit {
   private readonly routerHistory = inject(RouterHistoryService);
   private readonly translationService = inject(TranslationService);
   private readonly listStateKey = 'events-list-state';
+  private readonly returnFlagKey = 'events-return-from-detail';
   activeFilter = 'All';
   activeCategory: EventCategory = 'All';
   isLoading = true;
@@ -98,7 +99,10 @@ export class EventsComponent implements OnInit {
       this.cdr.detectChanges();
     });
 
-    this.restoreListState();
+    if (sessionStorage.getItem(this.returnFlagKey)) {
+      sessionStorage.removeItem(this.returnFlagKey);
+      this.restoreListState();
+    }
     this.loadEvents();
     this.loadPlanner();
 
@@ -338,7 +342,8 @@ export class EventsComponent implements OnInit {
 
   openEvent(id: number): void {
     this.saveListState();
-  
+    sessionStorage.setItem(this.returnFlagKey, 'true');
+
     this.router.navigate(['/event', id], {
       queryParams: {
         returnUrl: this.router.url
