@@ -2540,3 +2540,67 @@ button {
     }
   }
 }
+
+
+:host-context(:root[data-theme='dark']) {
+  .preview-remove-overlay {
+    background: rgba(8, 18, 26, 0.72);
+    backdrop-filter: blur(8px);
+  }
+
+  .preview-remove-dialog {
+    background: #13262e;
+    color: #eef7fb;
+    border: 1px solid rgba(148, 163, 184, 0.12);
+    box-shadow: 0 22px 55px rgba(0, 0, 0, 0.38);
+
+    h3 {
+      color: #eef7fb;
+    }
+
+    p {
+      color: #9fb0ba;
+    }
+  }
+
+  .preview-remove-dialog__icon {
+    background: rgba(255, 98, 98, 0.15);
+    color: #ff9c9c;
+    border: 1px solid rgba(255, 156, 156, 0.22);
+    box-shadow: none;
+
+    svg {
+      stroke: currentColor;
+    }
+  }
+
+  .preview-remove-dialog__btn--danger {
+    background: linear-gradient(135deg, #ff4d4f 0%, #f43f46 100%);
+    color: #ffffff;
+    box-shadow: 0 18px 34px rgba(244, 63, 70, 0.28);
+
+    svg {
+      stroke: currentColor;
+    }
+
+    &:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 22px 40px rgba(244, 63, 70, 0.34);
+    }
+  }
+
+  .preview-remove-dialog__btn--cancel {
+    background: transparent;
+    color: #9fb0ba;
+    box-shadow: none;
+
+    &:hover:not(:disabled) {
+      background: rgba(255, 255, 255, 0.04);
+      color: #eef7fb;
+    }
+  }
+
+  .preview-remove-dialog__handle {
+    background: rgba(255, 255, 255, 0.16);
+  }
+}
