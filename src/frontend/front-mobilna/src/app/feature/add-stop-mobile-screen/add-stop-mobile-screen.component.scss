@@ -165,7 +165,7 @@ body.route-add-stop-open app-floating-ai-assistant {
 .add-stop-route-modal__left {
   padding: 24px 22px 18px;
   display: grid;
-  grid-template-rows: auto auto auto minmax(0, 1fr) auto;
+  grid-template-rows: auto auto auto auto minmax(0, 1fr) auto;
   gap: 16px;
   min-height: 0;
 }
@@ -260,6 +260,53 @@ body.route-add-stop-open app-floating-ai-assistant {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+}
+
+.add-stop-route-modal__choose-map {
+  width: 100%;
+  min-height: 56px;
+  border: none;
+  border-radius: 18px;
+  background: #fbfcfd;
+  box-shadow: inset 0 0 0 1px #f0f4f8;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0 16px;
+  color: #1f2937;
+  flex-shrink: 0;
+  cursor: pointer;
+
+  > mat-icon {
+    margin-left: auto;
+    color: #9aa8b8;
+    width: 20px;
+    height: 20px;
+    font-size: 20px;
+  }
+}
+
+.add-stop-route-modal__choose-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #e5f5fe;
+  color: #168aad;
+  flex-shrink: 0;
+
+  mat-icon {
+    width: 18px;
+    height: 18px;
+    font-size: 18px;
+  }
+}
+
+.add-stop-route-modal__choose-copy {
+  font-size: 0.96rem;
+  font-weight: 700;
 }
 
 .add-stop-route-modal__section-head {
@@ -847,7 +894,7 @@ body.route-add-stop-open app-floating-ai-assistant {
 
 .add-stop-screen__recent-list {
   display: grid;
-  gap: 0;
+  gap: 4px;
   min-height: 0;
   align-content: start;
 }
@@ -865,7 +912,7 @@ body.route-add-stop-open app-floating-ai-assistant {
   grid-template-columns: 40px 1fr;
   gap: 14px;
   align-items: start;
-  padding: 11px 0;
+  padding: 11px 0 11px 8px;
   border: none;
   background: transparent;
   text-align: left;
@@ -1388,7 +1435,7 @@ body.route-add-stop-open app-floating-ai-assistant {
 
   .add-stop-route-modal__result-icon,
   .add-stop-screen__recent-icon {
-    background: rgba(77, 194, 255, 0.1);
+    background: rgba(77, 194, 255, 0.2);
     color: #4dc2ff;
   }
 
@@ -1570,11 +1617,21 @@ body.route-add-stop-open app-floating-ai-assistant {
 
   .add-stop-route-modal__search,
   .add-stop-route-modal__result,
-  .add-stop-route-modal__chip {
+  .add-stop-route-modal__chip,
+  .add-stop-route-modal__choose-map {
     background: var(--surface-soft) !important;
     color: var(--text-dark) !important;
     border-color: var(--border) !important;
     box-shadow: none !important;
+  }
+
+  .add-stop-route-modal__choose-icon {
+    background: rgba(77, 194, 255, 0.12);
+    color: #4dc2ff;
+  }
+
+  .add-stop-route-modal__choose-copy {
+    color: var(--text-dark);
   }
 
   .add-stop-route-modal__search input {

@@ -90,7 +90,7 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
     return this.isDesktopLayout;
   }
 
-  private readonly collapsedResultLimit = 6;
+  private readonly collapsedResultLimit = 4;
   private visibleResultLimit = this.collapsedResultLimit;
   private allItems: AddStopResult[] = [];
   private routePoints: RouteBuilderPoint[] = [];
@@ -707,7 +707,7 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
   private getRecentResults(): AddStopResult[] {
     return this.recentHistory
       .filter((item) => this.matchesCategory(item))
-      .slice(0, 6);
+      .slice(0, 4);
   }
 
   private refreshRelatedResultsForSelection(context?: SearchContext): void {

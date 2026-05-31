@@ -2492,6 +2492,11 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     routePoint: RoutePoint,
     options: { disableMapPickingAfterAdd?: boolean } = {},
   ): void {
+    const alreadyInRoute = this.routePoints.some(
+      (p) => p.id === routePoint.id && p.type === routePoint.type,
+    );
+    if (alreadyInRoute) return;
+
     this.openRoutePlannerForEditing();
     this.routePoints = [...this.routePoints, routePoint];
     this.routeBuilderStateService.updateRoutePoints(this.routePoints);

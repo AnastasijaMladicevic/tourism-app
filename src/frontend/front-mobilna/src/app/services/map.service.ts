@@ -94,6 +94,7 @@ export class MapService {
         attributionControl: false,
         maxBounds: this.worldBounds,
         maxBoundsViscosity: 1.0,
+        tap: false,
       }).setView([lat, lng], zoom);
 
       L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -226,7 +227,8 @@ export class MapService {
     this.markers.push(entry);
     this.markerMap.set(key, entry);
 
-    marker.on('click', () => {
+    marker.on('click', (e: L.LeafletMouseEvent) => {
+      L.DomEvent.stopPropagation(e);
       this.activateMarker(key);
       if (onClick) onClick();
     });

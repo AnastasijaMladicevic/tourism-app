@@ -49,14 +49,18 @@
               <mat-icon>my_location</mat-icon>
               {{ 'map.routePlanner.useMyLocation' | translate }}
             </button>
-            <button class="add-stop-route-modal__manual-btn" type="button" (click)="chooseOnMap()">
-              <mat-icon>place</mat-icon>
-              {{ 'map.addStop.chooseManuallyOnMap' | translate }}
-            </button>
             @if (showLocationAlreadyInRouteHint) {
               <span class="add-stop-route-modal__location-hint">{{ 'map.routePlanner.locationAlreadyInRoute' | translate }}</span>
             }
           </div>
+
+          <button class="add-stop-route-modal__choose-map" type="button" (click)="chooseOnMap()">
+            <span class="add-stop-route-modal__choose-icon">
+              <mat-icon>place</mat-icon>
+            </span>
+            <span class="add-stop-route-modal__choose-copy">{{ 'map.addStop.chooseOnMap' | translate }}</span>
+            <mat-icon>chevron_right</mat-icon>
+          </button>
 
           <div class="add-stop-route-modal__results">
             @if (shouldShowSearchResultsSection) {
