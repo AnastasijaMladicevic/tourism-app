@@ -150,7 +150,7 @@
                     <span class="material-symbols-outlined" aria-hidden="true">location_on</span>
                     {{ getActivityLocation(activity) }}
                     @if (activity.regionName) {
-                      <span class="activity-mobile-card__location-sub">· {{ activity.regionName }}</span>
+                      <span class="activity-mobile-card__location-sub">&middot; {{ activity.regionName }}</span>
                     }
                   </p>
                   <div class="activity-mobile-card__meta">
@@ -180,7 +180,7 @@
                   <th>Status</th>
                   <th>Activity Details</th>
                   <th>Type</th>
-                  <th>Location</th>
+                  <th>Destination</th>
                   <th>Duration</th>
                   <th class="col-actions">Action</th>
                 </tr>
@@ -193,7 +193,7 @@
                 >
                   <td>
                     <span class="status-chip" [ngClass]="getStatusClass(activity.status)">
-                      <span class="chip-dot">●</span>
+                      <span class="chip-dot">&#9679;</span>
                       {{ activity.status || 'Draft' }}
                     </span>
                   </td>
@@ -213,7 +213,7 @@
                   <td>
                     <div class="table-activity-cell">
                       <strong>{{ getActivityLocation(activity) }}</strong>
-                      <span>{{ activity.regionName || '—' }}</span>
+                      <span>{{ getActivityDestinationSubLabel(activity) }}</span>
                     </div>
                   </td>
                   <td>{{ formatDuration(activity.durationMinutes) }}</td>
@@ -286,7 +286,7 @@
             <p class="eyebrow">Featured activity</p>
             <h2>{{ (selectedActivityDetails ?? selectedActivity)?.name }}</h2>
             <p class="hero-meta">
-              {{ selectedLocation }} · {{ formatDuration((selectedActivityDetails ?? selectedActivity)?.durationMinutes) }}
+              {{ selectedLocation }} &middot; {{ formatDuration((selectedActivityDetails ?? selectedActivity)?.durationMinutes) }}
             </p>
             <span class="detail-status" [ngClass]="getStatusClass((selectedActivityDetails ?? selectedActivity)?.status)">
               {{ (selectedActivityDetails ?? selectedActivity)?.status || 'Draft' }}

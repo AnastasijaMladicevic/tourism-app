@@ -75,17 +75,17 @@
         <div class="insights-grid">
           <article class="insight-card card" data-tone="blue">
             <p>Total activities</p>
-            <strong>{{ statsTotalAllStatuses != null ? statsTotalAllStatuses : '—' }}</strong>
+            <strong>{{ statsTotalAllStatuses != null ? statsTotalAllStatuses : '-' }}</strong>
             <span>Matching active filters</span>
           </article>
           <article class="insight-card card" data-tone="green">
             <p>On this page</p>
-            <strong>{{ isLoading ? '—' : activities.length }}</strong>
+            <strong>{{ isLoading ? '-' : activities.length }}</strong>
             <span>Visible rows</span>
           </article>
           <article class="insight-card card" data-tone="amber">
             <p>Pending review</p>
-            <strong>{{ statsPendingCount != null ? statsPendingCount : '—' }}</strong>
+            <strong>{{ statsPendingCount != null ? statsPendingCount : '-' }}</strong>
             <span>Matching active filters</span>
           </article>
         </div>
@@ -119,7 +119,7 @@
                   </div>
                   <p class="activity-mobile-card__location">
                     <span class="material-symbols-outlined" aria-hidden="true">location_on</span>
-                    {{ getActivityLocation(activity) }}
+                    {{ getActivityLocalityLabel(activity) }}
                   </p>
                   <div class="activity-mobile-card__meta">
                     <span class="activity-mobile-card__type">{{ activity.activityTypeName || 'N/A' }}</span>
@@ -148,7 +148,7 @@
                   <th>Status</th>
                   <th>Activity Details</th>
                   <th>Type</th>
-                  <th>Location</th>
+                  <th>Locality</th>
                   <th>Duration</th>
                   <th class="col-actions">Action</th>
                 </tr>
@@ -161,7 +161,7 @@
                 >
                   <td>
                     <span class="status-chip" [ngClass]="getStatusClass(activity.status)">
-                      <span class="chip-dot">●</span>
+                      <span class="chip-dot">&#9679;</span>
                       {{ getStatusLabel(activity.status) }}
                     </span>
                   </td>
@@ -179,8 +179,8 @@
                   <td>{{ activity.activityTypeName }}</td>
                   <td>
                     <div class="table-activity-cell">
-                      <strong>{{ getActivityLocation(activity) }}</strong>
-                      <span>{{ activity.regionName || '—' }}</span>
+                      <strong>{{ getActivityLocalityLabel(activity) }}</strong>
+                      <span>{{ getActivityLocalitySubLabel(activity) }}</span>
                     </div>
                   </td>
                   <td>{{ formatDuration(activity.durationMinutes) }}</td>
@@ -248,7 +248,7 @@
             <p class="eyebrow">Featured activity</p>
             <h2>{{ (selectedActivityDetails ?? selectedActivity)?.name }}</h2>
             <p class="hero-meta">
-              {{ selectedLocation }} · {{ formatDuration((selectedActivityDetails ?? selectedActivity)?.durationMinutes) }}
+              {{ selectedLocation }} &middot; {{ formatDuration((selectedActivityDetails ?? selectedActivity)?.durationMinutes) }}
             </p>
 
             <div

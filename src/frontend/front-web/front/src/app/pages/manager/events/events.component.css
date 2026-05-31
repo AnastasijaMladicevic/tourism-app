@@ -255,6 +255,22 @@ tbody tr:hover,
 	gap: 3px;
 }
 
+.table-event-details {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+}
+
+.event-thumb {
+	width: 36px;
+	height: 36px;
+	border-radius: 10px;
+	background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+	background-size: cover;
+	background-position: center;
+	flex-shrink: 0;
+}
+
 .table-event-cell strong {
 	font-size: 14px;
 }

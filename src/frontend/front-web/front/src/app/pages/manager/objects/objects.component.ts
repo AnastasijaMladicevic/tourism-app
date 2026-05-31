@@ -56,7 +56,7 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
   reviewsLoading = false;
   private reviewsRequestToken = 0;
 
-  /** Destination name(s) the manager oversees — cities/towns (not region/country). */
+  /** Destination name(s) the manager oversees - cities/towns (not region/country). */
   managedCityLabel = '';
 
   isLoading = true;
@@ -129,11 +129,11 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
             )
           ].sort((a, b) => a.localeCompare(b));
 
-          this.managedCityLabel = cityNames.join(', ') || '—';
+          this.managedCityLabel = cityNames.join(', ') || '-';
           this.cdr.detectChanges();
         },
         error: () => {
-          this.managedCityLabel = '—';
+          this.managedCityLabel = '-';
           this.cdr.detectChanges();
         }
       });
@@ -221,7 +221,7 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
 
   get objectsCountLabel(): string {
     if (this.isLoading) {
-      return '…';
+      return '...';
     }
 
     const count = this.totalCount;
@@ -262,7 +262,7 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
     this.loadObjects();
   }
 
-  /** Pending first, then approved, then rejected — then user's secondary sort (within each status group). */
+  /** Pending first, then approved, then rejected - then user's secondary sort (within each status group). */
   private sortManagerTableRows(items: ObjectDto[]): ObjectDto[] {
     return [...items].sort((a, b) => {
       const primary = this.managerStatusRank(a.status) - this.managerStatusRank(b.status);
@@ -492,7 +492,7 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
     }
   }
 
-  /** Sidebar pill styles — matches manager Activities `.detail-status` palette. */
+  /** Sidebar pill styles - matches manager Activities .detail-status palette. */
   getObjectDetailStatusClass(status?: string): string {
     switch ((status ?? '').toLowerCase()) {
       case 'published':
@@ -543,13 +543,13 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
         return [];
       }
 
-      const dayOrder = ['pon', 'uto', 'sre', 'cet', 'čet', 'pet', 'sub', 'ned'] as const;
+      const dayOrder = ['pon', 'uto', 'sre', 'cet', '\u010det', 'pet', 'sub', 'ned'] as const;
       const dayLabels: Record<string, string> = {
         pon: 'Mon',
         uto: 'Tue',
         sre: 'Wed',
         cet: 'Thu',
-        'čet': 'Thu',
+        '\u010det': 'Thu',
         pet: 'Fri',
         sub: 'Sat',
         ned: 'Sun'
@@ -606,11 +606,11 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
 
     const location =
       this.selectedObject.localityName || this.selectedObject.destinationName || this.selectedObject.regionName;
-    return location ? `${this.selectedObject.name} · ${location}` : this.selectedObject.name;
+    return location ? `${this.selectedObject.name} - ${location}` : this.selectedObject.name;
   }
 
   destinationCellText(obj: ObjectDto): string {
-    return obj.destinationName || obj.localityName || '—';
+    return obj.localityName || obj.destinationName || '-';
   }
 
   onRowAction(obj: ObjectDto, event: Event): void {
@@ -647,7 +647,7 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
   }
 
   ratingStars(rating: number): string {
-    return '★'.repeat(rating) + '☆'.repeat(5 - rating);
+    return '\u2605'.repeat(rating) + '\u2606'.repeat(5 - rating);
   }
 
   reportCreatorQuery(thread: ManagerObjectReviewThread): Record<string, string> {

@@ -357,6 +357,10 @@ export class ContentCreatorActivitiesComponent implements OnInit, OnDestroy {
     return activity.destinationName || activity.localityName || activity.objectName || activity.regionName || '-';
   }
 
+  getActivityDestinationSubLabel(activity: ActivityDto): string {
+    return activity.localityName || activity.objectName || activity.regionName || '—';
+  }
+
   getStatusClass(status?: string): string {
     switch ((status ?? '').toLowerCase()) {
       case 'published':

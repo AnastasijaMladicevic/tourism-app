@@ -557,6 +557,62 @@ namespace TuristickiVodic.Tests.Mappings
         }
 
         [Fact]
+        public void EventToDto_KadJeLokalitetDostupanPrekoObjekta_MapiraLokalitetIDestinaciju()
+        {
+            var ev = new Event
+            {
+                Id = 11,
+                Name = "Amfiteatar Night",
+                EventTypeId = 1,
+                EventType = new EventType { Id = 1, Name = "Koncert" },
+                StartDate = new DateTime(2026, 6, 15, 21, 0, 0, DateTimeKind.Utc),
+                ObjectId = 7,
+                Object = new TouristObject
+                {
+                    Id = 7,
+                    Name = "Boutique Hotel Casa del Mare - Amfora",
+                    DestinationId = 3,
+                    Destination = new Destination
+                    {
+                        Id = 3,
+                        Name = "Podgorica",
+                        RegionId = 5,
+                        Region = new Region { Id = 5, Name = "Centralna", Code = "ME-CEN" },
+                        CreatedByUserId = 99
+                    },
+                    LocalityId = 8,
+                    Locality = new Locality
+                    {
+                        Id = 8,
+                        Name = "Orahovac",
+                        DestinationId = 3,
+                        Destination = new Destination
+                        {
+                            Id = 3,
+                            Name = "Podgorica",
+                            RegionId = 5,
+                            Region = new Region { Id = 5, Name = "Centralna", Code = "ME-CEN" },
+                            CreatedByUserId = 99
+                        }
+                    },
+                    CreatedByUserId = 10
+                },
+                CreatedByUserId = 20,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            var dto = _mapper.Map<EventDto>(ev);
+
+            dto.LocalityName.Should().Be("Orahovac");
+            dto.DestinationName.Should().Be("Podgorica");
+            dto.RegionId.Should().Be(5);
+            dto.RegionName.Should().Be("Centralna");
+            dto.RegionCode.Should().Be("ME-CEN");
+            dto.ObjectName.Should().Be("Boutique Hotel Casa del Mare - Amfora");
+        }
+
+        [Fact]
         public void EventToDto_GeolokacijaSeMapiraULongitudeILatitude()
         {
             var ev = new Event

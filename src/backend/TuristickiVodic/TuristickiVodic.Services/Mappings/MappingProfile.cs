@@ -213,23 +213,37 @@ namespace TuristickiVodic.Services.Mappings
                 .ForMember(dest => dest.EventTypeName,
                     opt => opt.MapFrom(src => src.EventType != null ? src.EventType.Name : string.Empty))
                 .ForMember(dest => dest.LocalityName,
-                    opt => opt.MapFrom(src => src.Locality != null ? src.Locality.Name : null))
+                    opt => opt.MapFrom(src =>
+                        src.Locality != null ? src.Locality.Name :
+                        src.Object != null && src.Object.Locality != null ? src.Object.Locality.Name :
+                        null))
                 .ForMember(dest => dest.DestinationName,
-                    opt => opt.MapFrom(src => src.Destination != null ? src.Destination.Name : null))
+                    opt => opt.MapFrom(src =>
+                        src.Destination != null ? src.Destination.Name :
+                        src.Locality != null && src.Locality.Destination != null ? src.Locality.Destination.Name :
+                        src.Object != null && src.Object.Destination != null ? src.Object.Destination.Name :
+                        src.Object != null && src.Object.Locality != null && src.Object.Locality.Destination != null ? src.Object.Locality.Destination.Name :
+                        null))
                 .ForMember(dest => dest.RegionId,
                     opt => opt.MapFrom(src =>
                         src.Destination != null ? src.Destination.RegionId :
                         src.Locality != null && src.Locality.Destination != null ? src.Locality.Destination.RegionId :
+                        src.Object != null && src.Object.Destination != null ? src.Object.Destination.RegionId :
+                        src.Object != null && src.Object.Locality != null && src.Object.Locality.Destination != null ? src.Object.Locality.Destination.RegionId :
                         (int?)null))
                 .ForMember(dest => dest.RegionName,
                     opt => opt.MapFrom(src =>
                         src.Destination != null && src.Destination.Region != null ? src.Destination.Region.Name :
                         src.Locality != null && src.Locality.Destination != null && src.Locality.Destination.Region != null ? src.Locality.Destination.Region.Name :
+                        src.Object != null && src.Object.Destination != null && src.Object.Destination.Region != null ? src.Object.Destination.Region.Name :
+                        src.Object != null && src.Object.Locality != null && src.Object.Locality.Destination != null && src.Object.Locality.Destination.Region != null ? src.Object.Locality.Destination.Region.Name :
                         null))
                 .ForMember(dest => dest.RegionCode,
                     opt => opt.MapFrom(src =>
                         src.Destination != null && src.Destination.Region != null ? src.Destination.Region.Code :
                         src.Locality != null && src.Locality.Destination != null && src.Locality.Destination.Region != null ? src.Locality.Destination.Region.Code :
+                        src.Object != null && src.Object.Destination != null && src.Object.Destination.Region != null ? src.Object.Destination.Region.Code :
+                        src.Object != null && src.Object.Locality != null && src.Object.Locality.Destination != null && src.Object.Locality.Destination.Region != null ? src.Object.Locality.Destination.Region.Code :
                         null))
                 .ForMember(dest => dest.ObjectName,
                     opt => opt.MapFrom(src => src.Object != null ? src.Object.Name : null))

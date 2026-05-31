@@ -365,29 +365,20 @@ export class ManagerEventsComponent implements OnInit, OnDestroy {
   }
 
   getLocationLabel(event: EventDto): string {
-    const locations = [
-      'Grand Highland Park',
-      'Clay & Co. Studio',
-      'Azure Bay Waterfront',
-      'The Blue Note Lounge',
-      'Central Exhibition Hall',
-      'Riverside Open Arena'
-    ];
-
-    return locations[(event.id - 1) % locations.length] ?? 'Central Venue';
+    return event.localityName || event.objectName || event.destinationName || '-';
   }
 
   getLocationSubLabel(event: EventDto): string {
-    const subLabels = [
-      'Summit Peaks Region',
-      'Old Town District',
-      'Coastal Haven',
-      'Metro Central',
-      'Old Town District',
-      'Green Belt'
-    ];
+    if (event.localityName) {
+      return event.destinationName || event.objectName || this.managedDestinationLabel || '—';
+    }
 
-    return subLabels[(event.id - 1) % subLabels.length] ?? 'City Center';
+    if (event.objectName) {
+      return event.destinationName || this.managedDestinationLabel || '—';
+    }
+
+    const managedLabel = this.managedDestinationLabel?.trim();
+    return managedLabel && managedLabel !== event.destinationName ? managedLabel : '—';
   }
 
   getCapacityLabel(event: EventDto): string {

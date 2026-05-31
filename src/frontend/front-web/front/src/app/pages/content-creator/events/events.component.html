@@ -138,7 +138,7 @@
                   </p>
                   <p class="event-mobile-card__location">
                     <span class="material-symbols-outlined" aria-hidden="true">location_on</span>
-                    {{ getLocationLabel(event) }}
+                    {{ getDestinationLabel(event) }}
                   </p>
                   <div class="event-mobile-card__meta">
                     <span class="event-mobile-card__type">{{ getCategoryLabel(event) }}</span>
@@ -163,7 +163,7 @@
                 <tr>
                   <th>Status</th>
                   <th>Event Details</th>
-                  <th>Location</th>
+                  <th>Destination</th>
                   <th>Category</th>
                   <th>Capacity</th>
                   <th>Action</th>
@@ -181,15 +181,18 @@
                     </span>
                   </td>
                   <td>
-                    <div class="event-cell">
-                      <strong>{{ event.name }}</strong>
-                      <span>{{ formatDate(event.startDate) }}</span>
+                    <div class="event-details-cell">
+                      <span class="event-thumb" [ngStyle]="getEventMediaStyle(event)"></span>
+                      <div class="event-cell">
+                        <strong>{{ event.name }}</strong>
+                        <span>{{ formatDate(event.startDate) }}</span>
+                      </div>
                     </div>
                   </td>
                   <td>
                     <div class="event-cell">
-                      <strong>{{ getLocationLabel(event) }}</strong>
-                      <span>Locality / destination</span>
+                      <strong>{{ getDestinationLabel(event) }}</strong>
+                      <span>{{ getDestinationLocalityLabel(event) }}</span>
                     </div>
                   </td>
                   <td>{{ getCategoryLabel(event) }}</td>

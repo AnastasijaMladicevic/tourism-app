@@ -33,6 +33,32 @@ namespace TuristickiVodic.Services.Services
             };
         }
 
+        private static IQueryable<Event> IncludeEventListRelations(IQueryable<Event> query)
+        {
+            return query
+                .Include(e => e.EventType)
+                .Include(e => e.Destination)
+                    .ThenInclude(d => d.Region)
+                .Include(e => e.Locality)
+                    .ThenInclude(l => l.Destination)
+                        .ThenInclude(d => d.Region)
+                .Include(e => e.Object)
+                    .ThenInclude(o => o.Destination)
+                        .ThenInclude(d => d.Region)
+                .Include(e => e.Object)
+                    .ThenInclude(o => o.Locality)
+                        .ThenInclude(l => l.Destination)
+                            .ThenInclude(d => d.Region)
+                .Include(e => e.Images);
+        }
+
+        private static IQueryable<Event> IncludeEventDetailRelations(IQueryable<Event> query)
+        {
+            return IncludeEventListRelations(query)
+                .Include(e => e.CreatedBy)
+                .Include(e => e.ApprovedBy);
+        }
+
         private static IQueryable<Event> ApplyEventDateFilter(
             IQueryable<Event> query,
             DateTime? date,
@@ -96,14 +122,7 @@ namespace TuristickiVodic.Services.Services
             if (query.PageSize > 100)
                 query.PageSize = 100;
 
-            var eventsQuery = _context.Events
-                .Include(e => e.EventType)
-                .Include(e => e.Destination)
-                    .ThenInclude(d => d.Region)
-                .Include(e => e.Locality)
-                    .ThenInclude(l => l.Destination)
-                        .ThenInclude(d => d.Region)
-                .Include(e => e.Images)
+            var eventsQuery = IncludeEventListRelations(_context.Events)
                 .Where(e => e.Status == ContentStatus.Approved)
                 .Where(e => e.IsActive)
                 .Where(e => e.Images.Any(i => i.IsMain))
@@ -175,15 +194,7 @@ namespace TuristickiVodic.Services.Services
             if (query.PageSize > 100)
                 query.PageSize = 100;
 
-            var eventsQuery = _context.Events
-                .Include(e => e.EventType)
-                .Include(e => e.Destination)
-                    .ThenInclude(d => d.Region)
-                .Include(e => e.Locality)
-                    .ThenInclude(l => l.Destination)
-                        .ThenInclude(d => d.Region)
-                .Include(e => e.Object)
-                .Include(e => e.Images)
+            var eventsQuery = IncludeEventListRelations(_context.Events)
                 .Where(e => e.Status == ContentStatus.Approved)
                 .Where(e => e.IsActive)
                 .Where(e => e.Geolocation != null)
@@ -281,15 +292,7 @@ namespace TuristickiVodic.Services.Services
             if (query.PageSize > 100)
                 query.PageSize = 100;
 
-            var eventsQuery = _context.Events
-                .Include(e => e.EventType)
-                .Include(e => e.Destination)
-                    .ThenInclude(d => d.Region)
-                .Include(e => e.Locality)
-                    .ThenInclude(l => l.Destination)
-                        .ThenInclude(d => d.Region)
-                .Include(e => e.Object)
-                .Include(e => e.Images)
+            var eventsQuery = IncludeEventListRelations(_context.Events)
                 .Where(e => e.CreatedByUserId == userId)
                 .AsNoTracking()
                 .AsQueryable();
@@ -370,15 +373,7 @@ namespace TuristickiVodic.Services.Services
 
             var destinationIds = await DestinationManagerHelper.GetResponsibleDestinationIdsAsync(_context, userId);
 
-            var eventsQuery = _context.Events
-                .Include(e => e.EventType)
-                .Include(e => e.Destination)
-                    .ThenInclude(d => d.Region)
-                .Include(e => e.Locality)
-                    .ThenInclude(l => l.Destination)
-                        .ThenInclude(d => d.Region)
-                .Include(e => e.Object)
-                .Include(e => e.Images)
+            var eventsQuery = IncludeEventListRelations(_context.Events)
                 .Where(e =>
                     (e.DestinationId.HasValue && destinationIds.Contains(e.DestinationId.Value)) ||
                     (!e.DestinationId.HasValue && e.Locality != null && destinationIds.Contains(e.Locality.DestinationId)))
@@ -440,17 +435,7 @@ namespace TuristickiVodic.Services.Services
 
         public async Task<EventDto?> GetByIdAsync(int id, string lang = "sr")
         {
-            var ev = await _context.Events
-                .Include(e => e.EventType)
-                .Include(e => e.Locality)
-                    .ThenInclude(l => l.Destination)
-                        .ThenInclude(d => d.Region)
-                .Include(e => e.Destination)
-                    .ThenInclude(d => d.Region)
-                .Include(e => e.Object)
-                .Include(e => e.CreatedBy)
-                .Include(e => e.ApprovedBy)
-                .Include(e => e.Images)
+            var ev = await IncludeEventDetailRelations(_context.Events)
                 .FirstOrDefaultAsync(e => e.Id == id);
 
             if (ev == null)
@@ -471,17 +456,7 @@ namespace TuristickiVodic.Services.Services
 
         public async Task<EventDto?> GetMineByIdAsync(int id, int userId, string lang = "sr")
         {
-            var ev = await _context.Events
-                .Include(e => e.EventType)
-                .Include(e => e.Locality)
-                    .ThenInclude(l => l.Destination)
-                        .ThenInclude(d => d.Region)
-                .Include(e => e.Destination)
-                    .ThenInclude(d => d.Region)
-                .Include(e => e.Object)
-                .Include(e => e.CreatedBy)
-                .Include(e => e.ApprovedBy)
-                .Include(e => e.Images)
+            var ev = await IncludeEventDetailRelations(_context.Events)
                 .FirstOrDefaultAsync(e => e.Id == id && e.CreatedByUserId == userId);
 
             if (ev == null)
@@ -495,17 +470,7 @@ namespace TuristickiVodic.Services.Services
 
         public async Task<EventDto?> GetForManagerByIdAsync(int id, int userId, string lang = "sr")
         {
-            var ev = await _context.Events
-                .Include(e => e.EventType)
-                .Include(e => e.Locality)
-                    .ThenInclude(l => l.Destination)
-                        .ThenInclude(d => d.Region)
-                .Include(e => e.Destination)
-                    .ThenInclude(d => d.Region)
-                .Include(e => e.Object)
-                .Include(e => e.CreatedBy)
-                .Include(e => e.ApprovedBy)
-                .Include(e => e.Images)
+            var ev = await IncludeEventDetailRelations(_context.Events)
                 .FirstOrDefaultAsync(e => e.Id == id);
 
             if (ev == null)
@@ -948,17 +913,7 @@ namespace TuristickiVodic.Services.Services
 
         private async Task<Event> LoadEventAsync(int id)
         {
-            return await _context.Events
-                .Include(e => e.EventType)
-                .Include(e => e.Locality)
-                    .ThenInclude(l => l.Destination)
-                        .ThenInclude(d => d.Region)
-                .Include(e => e.Destination)
-                    .ThenInclude(d => d.Region)
-                .Include(e => e.Object)
-                .Include(e => e.CreatedBy)
-                .Include(e => e.ApprovedBy)
-                .Include(e => e.Images)
+            return await IncludeEventDetailRelations(_context.Events)
                 .FirstAsync(e => e.Id == id);
         }
 
@@ -1051,14 +1006,7 @@ namespace TuristickiVodic.Services.Services
 
         public async Task<EventDto?> ToggleActiveAsync(int id, bool isActive, int userId, string roleName)
         {
-            var ev = await _context.Events
-                .Include(e => e.Locality)
-                    .ThenInclude(l => l.Destination)
-                        .ThenInclude(d => d.Region)
-                .Include(e => e.Destination)
-                    .ThenInclude(d => d.Region)
-                .Include(e => e.EventType)
-                .Include(e => e.Object)
+            var ev = await IncludeEventListRelations(_context.Events)
                 .FirstOrDefaultAsync(e => e.Id == id);
 
             if (ev == null)

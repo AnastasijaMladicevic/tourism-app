@@ -479,6 +479,14 @@ export class ManagerActivitiesComponent implements OnInit {
     return activity.destinationName || activity.localityName || activity.objectName || activity.regionName || '-';
   }
 
+  getActivityLocalityLabel(activity: ActivityDto): string {
+    return activity.localityName || activity.objectName || activity.destinationName || '-';
+  }
+
+  getActivityLocalitySubLabel(activity: ActivityDto): string {
+    return activity.destinationName || activity.regionName || this.managedCityLabel || '—';
+  }
+
   getStatusLabel(status?: string): string {
     const normalized = (status ?? '').trim().toLowerCase();
     if (normalized === 'approved') return 'Approved';

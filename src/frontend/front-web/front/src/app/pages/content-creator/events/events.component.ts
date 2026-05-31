@@ -380,6 +380,30 @@ export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
     return event.objectName || event.localityName || event.destinationName || '-';
   }
 
+  getDestinationLabel(event: EventDto): string {
+    return event.destinationName || event.localityName || event.objectName || '-';
+  }
+
+  getDestinationSubLabel(event: EventDto): string {
+    if (event.destinationName) {
+      return event.localityName || event.objectName || '—';
+    }
+
+    if (event.localityName) {
+      return event.objectName || '—';
+    }
+
+    return '—';
+  }
+
+  getDestinationLocalityLabel(event: EventDto): string {
+    if (event.localityName?.trim()) {
+      return event.localityName.trim();
+    }
+
+    return 'Glavna destinacija';
+  }
+
   getCapacityLabel(event: EventDto): string {
     if (!event.maxVisitors) {
       return '—';

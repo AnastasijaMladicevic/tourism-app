@@ -143,7 +143,7 @@
                 <tr>
                   <th>Status</th>
                   <th>Event Details</th>
-                  <th>Location</th>
+                  <th>Locality</th>
                   <th>Category</th>
                   <th>Capacity</th>
                   <th>Action</th>
@@ -162,12 +162,18 @@
                     </span>
                   </td>
                   <td>
-                    <div class="table-event-cell">
-                      <strong>{{ event.name }}</strong>
-                      <span>
-                        <span class="material-symbols-outlined tiny-icon">calendar_month</span>
-                        {{ formatDate(event.startDate) }}
-                      </span>
+                    <div class="table-event-details">
+                      <span
+                        class="event-thumb"
+                        [style.background-image]="event.mainImageUrl ? 'url(' + event.mainImageUrl + ')' : ''"
+                      ></span>
+                      <div class="table-event-cell">
+                        <strong>{{ event.name }}</strong>
+                        <span>
+                          <span class="material-symbols-outlined tiny-icon">calendar_month</span>
+                          {{ formatDate(event.startDate) }}
+                        </span>
+                      </div>
                     </div>
                   </td>
                   <td>
