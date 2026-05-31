@@ -141,6 +141,7 @@ interface PlannerCalendarCell {
 }
 
 type PlannerToolbarDropdown = 'category' | 'range' | 'cards';
+type CalendarSelectionMode = 'range' | 'individual';
 
 const FALLBACK_IMAGE_URL =
   'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=1200&q=80';
@@ -194,6 +195,7 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
   protected readonly activeRegionId = signal<number | null>(this.activeRegionService.getActiveRegionId());
   protected readonly suggestionSeed = signal(this.createSuggestionSeed());
   protected readonly calendarRangeStart = signal<string | null>(null);
+  protected readonly calendarMode = signal<CalendarSelectionMode>('range');
 
   protected readonly plannedEventOccurrences = computed<PlannedEventOccurrence[]>(() => {
     const query = this.normalizeText(this.searchTerm());
@@ -659,6 +661,15 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
       return;
     }
 
+    if (this.calendarMode() === 'individual') {
+      this.draftCalendarDates.update((dates) =>
+        dates.includes(cell.key)
+          ? dates.filter((d) => d !== cell.key)
+          : [...dates, cell.key],
+      );
+      return;
+    }
+
     const rangeStart = this.calendarRangeStart();
 
     if (!rangeStart) {
@@ -685,6 +696,16 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
     }
 
     this.draftCalendarDates.set(dates);
+    this.calendarRangeStart.set(null);
+  }
+
+  protected setCalendarMode(mode: CalendarSelectionMode): void {
+    if (this.calendarMode() === mode) {
+      return;
+    }
+
+    this.calendarMode.set(mode);
+    this.draftCalendarDates.set([]);
     this.calendarRangeStart.set(null);
   }
 

@@ -92,31 +92,80 @@
             }
           </div>
 
-          <button
-            type="button"
-            class="calendar-picker-btn"
-            (click)="openDatePicker(travelDatePicker)"
-            [attr.aria-label]="translate('addToPlanner.travelDate')"
-          >
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-              <rect x="4" y="5" width="16" height="15" rx="2" />
-              <path d="M8 3v4" />
-              <path d="M16 3v4" />
-              <path d="M4 10h16" />
-            </svg>
-          </button>
+          <div class="atp-calendar-wrap" (click)="$event.stopPropagation()">
+            <button
+              type="button"
+              class="calendar-picker-btn"
+              [class.calendar-picker-btn--open]="calendarOpen()"
+              (click)="toggleCalendar()"
+              [attr.aria-label]="translate('addToPlanner.travelDate')"
+            >
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="4" y="5" width="16" height="15" rx="2" />
+                <path d="M8 3v4" />
+                <path d="M16 3v4" />
+                <path d="M4 10h16" />
+              </svg>
+            </button>
 
-          <input
-            #travelDatePicker
-            class="calendar-picker-native-input"
-            type="date"
-            [ngModel]="travelDate()"
-            (ngModelChange)="onTravelDateChange($event)"
-            [attr.min]="minSelectableDate"
-            [attr.max]="maxSelectableDate"
-            tabindex="-1"
-            aria-hidden="true"
-          />
+            @if (calendarOpen()) {
+              <div class="atp-calendar">
+                <div class="atp-calendar__header">
+                  <strong>{{ calendarMonthLabel() }}</strong>
+                  <div class="atp-calendar__nav">
+                    <button
+                      type="button"
+                      class="atp-calendar__nav-btn"
+                      [disabled]="!canGoToPreviousCalendarMonth()"
+                      (click)="previousCalendarMonth()"
+                    >
+                      <svg viewBox="0 0 16 16" aria-hidden="true">
+                        <path d="M10 3.5 5.5 8 10 12.5" />
+                      </svg>
+                    </button>
+                    <button
+                      type="button"
+                      class="atp-calendar__nav-btn"
+                      (click)="nextCalendarMonth()"
+                    >
+                      <svg viewBox="0 0 16 16" aria-hidden="true">
+                        <path d="M6 3.5 10.5 8 6 12.5" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="atp-calendar__weekdays">
+                  <span>Ne</span><span>Po</span><span>Ut</span><span>Sr</span>
+                  <span>Če</span><span>Pe</span><span>Su</span>
+                </div>
+
+                <div class="atp-calendar__grid">
+                  @for (week of calendarWeeks(); track $index) {
+                    @for (cell of week; track cell.key) {
+                      <button
+                        type="button"
+                        class="atp-calendar__day"
+                        [class.atp-calendar__day--outside]="!cell.isCurrentMonth"
+                        [class.atp-calendar__day--selected]="cell.isSelected"
+                        [class.atp-calendar__day--disabled]="cell.isDisabled"
+                        [disabled]="cell.isDisabled"
+                        (click)="selectCalendarDate(cell)"
+                      >
+                        {{ cell.label }}
+                      </button>
+                    }
+                  }
+                </div>
+
+                <div class="atp-calendar__footer">
+                  <button type="button" class="atp-calendar__footer-btn atp-calendar__footer-btn--secondary" (click)="closeCalendar()">
+                    {{ translate('common.cancel') }}
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
         </div>
 
         <div class="field-grid field-grid--split">

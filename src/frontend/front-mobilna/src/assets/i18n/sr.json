@@ -4,6 +4,7 @@
     "loading": "Učitavanje...",
     "save": "Sačuvaj",
     "cancel": "Otkaži",
+    "clear": "Obriši",
     "remove": "Ukloni",
     "close": "Zatvori",
     "details": "Detalji",
@@ -1136,6 +1137,8 @@
     "tripWeekSuffix": "{{name}} nedelja",
     "preview": {
       "heroBody": "Organizuj putovanje po danima – dodaj događaje, postavi prioritete i prati raspored.",
+      "modeRange": "Period",
+      "modeIndividual": "Konkretni datumi",
       "mobileTabs": {
         "events": "Događaji",
         "myPlanner": "Moj planer"
@@ -1144,6 +1147,7 @@
       "searchPlaceholder": "Pretraži događaje",
       "allCategories": "Sve kategorije",
       "dateFilterAll": "Datum",
+      "displayedDays": "{{count}} dana",
       "range7": "7 dana",
       "range14": "14 dana",
       "range30": "Mesec",

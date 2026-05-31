@@ -187,14 +187,33 @@
                           </div>
                         </div>
 
+                        <div class="planner-calendar__mode-toggle">
+                          <button
+                            type="button"
+                            class="planner-calendar__mode-btn"
+                            [class.planner-calendar__mode-btn--active]="calendarMode() === 'range'"
+                            (click)="setCalendarMode('range')"
+                          >
+                            {{ translate('planner.preview.modeRange') }}
+                          </button>
+                          <button
+                            type="button"
+                            class="planner-calendar__mode-btn"
+                            [class.planner-calendar__mode-btn--active]="calendarMode() === 'individual'"
+                            (click)="setCalendarMode('individual')"
+                          >
+                            {{ translate('planner.preview.modeIndividual') }}
+                          </button>
+                        </div>
+
                         <div class="planner-calendar__weekdays">
+                          <span>Ne</span>
+                          <span>Po</span>
+                          <span>Ut</span>
+                          <span>Sr</span>
+                          <span>Če</span>
+                          <span>Pe</span>
                           <span>Su</span>
-                          <span>Mo</span>
-                          <span>Tu</span>
-                          <span>We</span>
-                          <span>Th</span>
-                          <span>Fr</span>
-                          <span>Sa</span>
                         </div>
 
                         <div class="planner-calendar__grid">
@@ -222,7 +241,7 @@
                             class="planner-calendar__footer-btn planner-calendar__footer-btn--secondary"
                             (click)="clearCalendarDates()"
                           >
-                            Clear
+                            {{ translate('common.clear') }}
                           </button>
 
                           <button

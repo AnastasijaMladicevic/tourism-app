@@ -4,6 +4,7 @@
     "loading": "Caricamento...",
     "save": "Salva",
     "cancel": "Annulla",
+    "clear": "Cancella",
     "remove": "Rimuovi",
     "close": "Chiudi",
     "details": "Dettagli",
@@ -1130,6 +1131,8 @@
     "tripWeekSuffix": "Settimana di {{name}}",
     "preview": {
       "heroBody": "Organizza il viaggio per giorni – aggiungi eventi, imposta le priorità e tieni traccia del programma.",
+      "modeRange": "Periodo",
+      "modeIndividual": "Date specifiche",
       "mobileTabs": {
         "events": "Eventi",
         "myPlanner": "Il mio pianificatore"
@@ -1138,6 +1141,7 @@
       "searchPlaceholder": "Cerca eventi",
       "allCategories": "Tutte le categorie",
       "dateFilterAll": "Data",
+      "displayedDays": "{{count}} giorni",
       "range7": "7 giorni",
       "range14": "14 giorni",
       "range30": "Mese",

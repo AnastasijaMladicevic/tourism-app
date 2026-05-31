@@ -4,6 +4,7 @@
     "loading": "Loading...",
     "save": "Save",
     "cancel": "Cancel",
+    "clear": "Clear",
     "remove": "Remove",
     "close": "Close",
     "details": "Details",
@@ -1136,6 +1137,8 @@
     "tripWeekSuffix": "{{name}} week",
     "preview": {
       "heroBody": "Organize your trip by days – add events, set priorities, and track your schedule.",
+      "modeRange": "Date range",
+      "modeIndividual": "Specific dates",
       "mobileTabs": {
         "events": "Events",
         "myPlanner": "My planner"
@@ -1144,6 +1147,7 @@
       "searchPlaceholder": "Search events",
       "allCategories": "All categories",
       "dateFilterAll": "Date",
+      "displayedDays": "{{count}} days",
       "range7": "7 days",
       "range14": "14 days",
       "range30": "Month",

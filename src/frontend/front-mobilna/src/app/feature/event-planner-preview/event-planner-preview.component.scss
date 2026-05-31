@@ -454,6 +454,35 @@
   gap: 6px;
 }
 
+.planner-calendar__mode-toggle {
+  display: flex;
+  gap: 4px;
+  background: #edf2f6;
+  border-radius: 10px;
+  padding: 3px;
+  margin-bottom: 14px;
+}
+
+.planner-calendar__mode-btn {
+  flex: 1;
+  min-height: 30px;
+  border: 0;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  background: transparent;
+  color: #5e7185;
+  transition: background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+
+  &--active {
+    background: #ffffff;
+    color: #168aad;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+}
+
 .planner-calendar__weekdays {
   margin-bottom: 8px;
 
@@ -2381,6 +2410,20 @@ button {
   .planner-toolbar-panel__menu--calendar {
     background: var(--surface-strong);
     border-color: var(--preview-border);
+  }
+
+  .planner-calendar__mode-toggle {
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .planner-calendar__mode-btn {
+    color: #7a8fa0;
+
+    &--active {
+      background: rgba(255, 255, 255, 0.12);
+      color: #4dc2ff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.22);
+    }
   }
 
   .planner-calendar__header strong,

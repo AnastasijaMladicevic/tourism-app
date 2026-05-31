@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { Component, HostListener, OnInit, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { catchError, finalize, of } from 'rxjs';
@@ -13,6 +13,15 @@ interface PlannerCalendarDay {
   label: string;
   date: number;
   isoDate: string;
+}
+
+interface AddPlannerCalendarCell {
+  key: string;
+  label: number;
+  date: Date;
+  isCurrentMonth: boolean;
+  isDisabled: boolean;
+  isSelected: boolean;
 }
 
 interface PlannerPreviewState {
@@ -77,6 +86,8 @@ export class AddToPlannerComponent implements OnInit {
   private readonly returnUrl: string | null;
   protected readonly isEditMode = signal(false);
   protected readonly editingPlannerId = signal<number | null>(null);
+  protected readonly calendarOpen = signal(false);
+  protected readonly calendarMonthCursor = signal(this.getCalendarStartOfMonth(new Date()));
   protected readonly selectedStartDateTime = computed(() => this.buildSelectedStartDate());
   protected readonly selectedEndDateTime = computed(() => this.buildSelectedEndDate());
   protected readonly canSelectMultipleDays = computed(() =>
@@ -97,6 +108,53 @@ export class AddToPlannerComponent implements OnInit {
     return this.formatFriendlyDate(selectedDates[0] ?? this.travelDate());
   });
   protected readonly conflictMessage = computed(() => this.buildConflictMessage());
+
+  protected readonly calendarMonthLabel = computed(() =>
+    new Intl.DateTimeFormat(this.translationService.currentLocale(), {
+      month: 'long',
+      year: 'numeric',
+    }).format(this.calendarMonthCursor()),
+  );
+
+  protected readonly canGoToPreviousCalendarMonth = computed(() => {
+    const today = this.getCalendarStartOfMonth(new Date());
+    return this.calendarMonthCursor().getTime() > today.getTime();
+  });
+
+  protected readonly calendarWeeks = computed<AddPlannerCalendarCell[][]>(() => {
+    const monthStart = this.calendarMonthCursor();
+    const firstGridDate = new Date(monthStart);
+    firstGridDate.setDate(monthStart.getDate() - monthStart.getDay());
+    const selectedSet = new Set(this.selectedDayIds());
+    const minDate = this.eventStartDate ? this.startOfDay(this.eventStartDate) : null;
+    const maxDate = this.eventEndDate ? this.startOfDay(this.eventEndDate) : null;
+    const weeks: AddPlannerCalendarCell[][] = [];
+
+    for (let w = 0; w < 6; w++) {
+      const week: AddPlannerCalendarCell[] = [];
+      for (let d = 0; d < 7; d++) {
+        const cellDate = new Date(firstGridDate);
+        cellDate.setDate(firstGridDate.getDate() + w * 7 + d);
+        const normalizedCell = this.startOfDay(cellDate);
+        const key = this.toDateInputValue(cellDate);
+        const isDisabled =
+          (minDate !== null && normalizedCell < minDate) ||
+          (maxDate !== null && normalizedCell > maxDate);
+
+        week.push({
+          key,
+          label: cellDate.getDate(),
+          date: cellDate,
+          isCurrentMonth: cellDate.getMonth() === monthStart.getMonth(),
+          isDisabled,
+          isSelected: selectedSet.has(key),
+        });
+      }
+      weeks.push(week);
+    }
+
+    return weeks;
+  });
   protected readonly days = computed<PlannerCalendarDay[]>(() => {
     if (this.isEventScheduleLocked && this.eventStartDate && this.eventEndDate) {
       return this.buildEventDays(this.eventStartDate, this.eventEndDate);
@@ -188,6 +246,50 @@ export class AddToPlannerComponent implements OnInit {
       .subscribe((result) => {
         this.existingPlannerItems.set(result.items ?? []);
       });
+  }
+
+  @HostListener('document:keydown.escape')
+  protected handleEscapeKey(): void {
+    this.calendarOpen.set(false);
+  }
+
+  protected toggleCalendar(): void {
+    this.calendarOpen.update((open) => {
+      if (!open) {
+        const anchor = this.parseDate(this.travelDate()) ?? this.eventStartDate ?? new Date();
+        this.calendarMonthCursor.set(this.getCalendarStartOfMonth(anchor));
+      }
+      return !open;
+    });
+  }
+
+  protected closeCalendar(): void {
+    this.calendarOpen.set(false);
+  }
+
+  protected previousCalendarMonth(): void {
+    if (!this.canGoToPreviousCalendarMonth()) return;
+    const prev = new Date(this.calendarMonthCursor());
+    prev.setMonth(prev.getMonth() - 1);
+    this.calendarMonthCursor.set(this.getCalendarStartOfMonth(prev));
+  }
+
+  protected nextCalendarMonth(): void {
+    const next = new Date(this.calendarMonthCursor());
+    next.setMonth(next.getMonth() + 1);
+    this.calendarMonthCursor.set(this.getCalendarStartOfMonth(next));
+  }
+
+  protected selectCalendarDate(cell: AddPlannerCalendarCell): void {
+    if (cell.isDisabled) return;
+    this.onTravelDateChange(cell.key);
+    if (!this.canSelectMultipleDays()) {
+      this.calendarOpen.set(false);
+    }
+  }
+
+  private getCalendarStartOfMonth(date: Date): Date {
+    return new Date(date.getFullYear(), date.getMonth(), 1);
   }
 
   protected goBack(): void {
