@@ -1532,7 +1532,10 @@ button {
   }
 
   .planner-toolbar-panel__menu--calendar {
-    width: 290px;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    width: min(290px, calc(100vw - 24px));
     padding: 0;
   }
 
