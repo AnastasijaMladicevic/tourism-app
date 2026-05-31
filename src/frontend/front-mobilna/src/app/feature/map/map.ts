@@ -2617,6 +2617,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     this.isNavigationAutoCenterEnabled = false;
+    this.mapService.resetNavigationBearing();
   }
 
   private resolveNavigationHeading(location: TrackedLocation): number {
