@@ -1133,6 +1133,7 @@
         "events": "Eventos",
         "myPlanner": "Mi planificador"
       },
+      "mobileSuggestedCta": "Sugerido",
       "searchPlaceholder": "Buscar eventos",
       "allCategories": "Todas las categorias",
       "dateFilterAll": "Fecha",

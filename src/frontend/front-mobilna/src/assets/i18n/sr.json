@@ -1139,6 +1139,7 @@
         "events": "Događaji",
         "myPlanner": "Moj planer"
       },
+      "mobileSuggestedCta": "Predloženo",
       "searchPlaceholder": "Pretraži događaje",
       "allCategories": "Sve kategorije",
       "dateFilterAll": "Datum",
