@@ -330,7 +330,7 @@
                           class="event-card__icon-btn event-card__icon-btn--danger"
                           [attr.aria-label]="translate('planner.removeFromPlanner')"
                           [disabled]="!event.plannerId || removingPlannerId() === event.plannerId"
-                          (click)="event.plannerId && removeFromPlanner(event.plannerId)"
+                          (click)="event.plannerId && requestRemoval(event.plannerId, event.title); $event.stopPropagation()"
                         >
                           <svg viewBox="0 0 24 24">
                             <path d="M4 7h16" />
@@ -447,7 +447,7 @@
                             class="icon-ghost-button icon-ghost-button--danger"
                             [attr.aria-label]="translate('common.delete')"
                             [disabled]="removingPlannerId() === event.id"
-                            (click)="removeFromPlanner(event.id)"
+                            (click)="requestRemoval(event.id, event.title); $event.stopPropagation()"
                           >
                             <svg viewBox="0 0 24 24">
                               <path d="M4 7h16" />
@@ -598,3 +598,51 @@
   </div>
 
 </main>
+
+@if (pendingRemovalId() !== null) {
+  <div class="preview-remove-overlay" (click)="cancelRemoval()">
+    <div class="preview-remove-dialog" (click)="$event.stopPropagation()">
+      <div class="preview-remove-dialog__handle" aria-hidden="true"></div>
+
+      <div class="preview-remove-dialog__icon">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M4 7h16" />
+          <path d="M9 7V4h6v3" />
+          <path d="M8 7v13h8V7" />
+          <path d="M10.5 11v5" />
+          <path d="M13.5 11v5" />
+        </svg>
+      </div>
+
+      <h3>{{ translate('planner.removeConfirmTitle') }}</h3>
+      <p>{{ translate('planner.removeConfirmBody', { title: pendingRemovalTitle() }) }}</p>
+
+      <div class="preview-remove-dialog__actions">
+        <button
+          type="button"
+          class="preview-remove-dialog__btn preview-remove-dialog__btn--danger"
+          [disabled]="removingPlannerId() !== null"
+          (click)="confirmRemoval()"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M4 7h16" />
+            <path d="M9 7V4h6v3" />
+            <path d="M8 7v13h8V7" />
+            <path d="M10.5 11v5" />
+            <path d="M13.5 11v5" />
+          </svg>
+          {{ removingPlannerId() !== null ? translate('favorites.removing') : translate('planner.removeEvent') }}
+        </button>
+
+        <button
+          type="button"
+          class="preview-remove-dialog__btn preview-remove-dialog__btn--cancel"
+          [disabled]="removingPlannerId() !== null"
+          (click)="cancelRemoval()"
+        >
+          {{ translate('common.cancel') }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

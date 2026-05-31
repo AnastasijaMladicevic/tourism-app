@@ -951,18 +951,19 @@
   inset: 0;
   z-index: 70;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
+  padding: 24px;
   background: rgba(15, 23, 42, 0.42);
   backdrop-filter: blur(8px);
 }
 
 .favorites-remove-dialog {
-  width: min(100%, 420px);
-  padding: 14px 20px 28px;
-  border-radius: 34px 34px 0 0;
+  width: min(100%, 380px);
+  padding: 28px 24px 24px;
+  border-radius: 24px;
   background: #fff;
-  box-shadow: 0 -18px 40px rgba(15, 23, 42, 0.18);
+  box-shadow: 0 20px 50px rgba(15, 23, 42, 0.22);
   text-align: center;
 
   h3 {
@@ -988,11 +989,7 @@
 }
 
 .favorites-remove-dialog__mobile-handle {
-  width: 52px;
-  height: 5px;
-  margin: 2px auto 28px;
-  border-radius: 999px;
-  background: #e5e7eb;
+  display: none;
 }
 
 .favorites-remove-dialog__icon-wrap {

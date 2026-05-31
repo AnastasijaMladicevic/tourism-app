@@ -188,6 +188,8 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
   protected readonly plannerLoading = signal(false);
   protected readonly plannerError = signal('');
   protected readonly removingPlannerId = signal<number | null>(null);
+  protected readonly pendingRemovalId = signal<number | null>(null);
+  protected readonly pendingRemovalTitle = signal('');
   protected readonly isMobileViewport = signal(false);
   protected readonly activeRegionId = signal<number | null>(this.activeRegionService.getActiveRegionId());
   protected readonly suggestionSeed = signal(this.createSuggestionSeed());
@@ -788,6 +790,24 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
         returnUrl: this.router.url,
       },
     });
+  }
+
+  protected requestRemoval(plannerId: number, title: string): void {
+    this.pendingRemovalId.set(plannerId);
+    this.pendingRemovalTitle.set(title);
+  }
+
+  protected confirmRemoval(): void {
+    const id = this.pendingRemovalId();
+    if (id == null) return;
+    this.pendingRemovalId.set(null);
+    this.pendingRemovalTitle.set('');
+    this.removeFromPlanner(id);
+  }
+
+  protected cancelRemoval(): void {
+    this.pendingRemovalId.set(null);
+    this.pendingRemovalTitle.set('');
   }
 
   protected removeFromPlanner(plannerId: number): void {

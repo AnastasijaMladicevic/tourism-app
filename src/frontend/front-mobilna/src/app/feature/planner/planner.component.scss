@@ -1058,7 +1058,6 @@
 
   .planner-stop-card,
   .planner-empty-state,
-  .planner-remove-dialog,
   .planner-mobile-nav,
   .planner-cta-card,
   .planner-highlight-card,
@@ -1067,6 +1066,13 @@
     background: var(--surface-strong);
     color: var(--text-dark);
     border-color: var(--border);
+  }
+
+  .planner-remove-dialog {
+    background: var(--surface-strong) !important;
+    color: var(--text-dark) !important;
+    border: none !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4) !important;
   }
 
   .planner-day-pill,
@@ -1142,14 +1148,26 @@
     border-bottom-color: var(--border);
   }
 
+  .planner-remove-dialog__mobile-handle {
+    display: none;
+  }
+
   .planner-remove-dialog__footer {
-    border-top-color: var(--border);
+    display: none;
+  }
+
+  .planner-remove-dialog h3 {
+    color: var(--text-dark) !important;
+  }
+
+  .planner-remove-dialog p {
+    color: var(--text-gray) !important;
   }
 
   .planner-cancel-remove-btn {
-    background: var(--surface-soft);
-    color: var(--text-dark);
-    border-color: var(--border);
+    background: transparent !important;
+    border: none !important;
+    color: var(--text-gray) !important;
   }
 
   .planner-remove-dialog__icon {

@@ -1297,6 +1297,131 @@ button {
   cursor: pointer;
 }
 
+.preview-remove-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(18, 36, 54, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: preview-overlay-in 0.2s ease;
+}
+
+.preview-remove-dialog {
+  width: 100%;
+  max-width: 360px;
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 28px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  animation: preview-dialog-in 0.25s ease;
+
+  &__handle {
+    display: none;
+  }
+
+  &__icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: rgba(239, 68, 68, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ef4444;
+
+    svg {
+      width: 24px;
+      height: 24px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+  }
+
+  h3 {
+    font-size: 17px;
+    font-weight: 700;
+    color: #1a2b3c;
+    margin: 0;
+    text-align: center;
+  }
+
+  p {
+    font-size: 14px;
+    color: #5e7185;
+    margin: 0;
+    text-align: center;
+    line-height: 1.5;
+  }
+
+  &__actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    margin-top: 4px;
+  }
+
+  &__btn {
+    width: 100%;
+    min-height: 48px;
+    border: 0;
+    border-radius: 14px;
+    font: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: opacity 0.15s ease;
+
+    svg {
+      width: 18px;
+      height: 18px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    &:disabled {
+      opacity: 0.55;
+      cursor: default;
+    }
+
+    &--danger {
+      background: #ef4444;
+      color: #ffffff;
+    }
+
+    &--cancel {
+      background: #f1f5f8;
+      color: #334453;
+    }
+  }
+}
+
+@keyframes preview-overlay-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes preview-dialog-in {
+  from { transform: scale(0.92); opacity: 0; }
+  to   { transform: scale(1);    opacity: 1; }
+}
+
 @media (max-width: 1360px) {
   .planner-preview__container {
     width: min(1440px, calc(100% - 28px));
