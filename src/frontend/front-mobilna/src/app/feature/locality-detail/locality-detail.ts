@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, forkJoin, of } from 'rxjs';
 
@@ -32,6 +32,9 @@ export class LocalityDetailComponent implements OnInit {
   errorMessage = '';
   qrLink: QrLinkDto | null = null;
 
+  titleVisible = true;
+  private titleObserver?: IntersectionObserver;
+  private observerSetup = false;
   isFavorite = false;
   favoriteId: number | null = null;
   private favoritePendingIds = new Set<number>();
@@ -47,7 +50,8 @@ export class LocalityDetailComponent implements OnInit {
     private favoriteStateService: FavoriteStateService,
     private pendingActionService: PendingActionService,
     private routerHistory: RouterHistoryService,
-    private qrLinkService: QrLinkService
+    private qrLinkService: QrLinkService,
+    private el: ElementRef
   ) { }
 
   ngOnInit(): void {
@@ -69,7 +73,26 @@ export class LocalityDetailComponent implements OnInit {
   }
   ngOnDestroy(): void {
     window.removeEventListener('focus', this.handleWindowFocus);
+    this.titleObserver?.disconnect();
   }
+
+  private setupTitleObserver(): void {
+    if (this.observerSetup) return;
+    setTimeout(() => {
+      const titleEl = this.el.nativeElement.querySelector('.title');
+      if (!titleEl) return;
+      this.observerSetup = true;
+      this.titleObserver = new IntersectionObserver(
+        ([entry]) => {
+          this.titleVisible = entry.isIntersecting;
+          this.cdr.detectChanges();
+        },
+        { rootMargin: '-55px 0px 0px 0px', threshold: 0 }
+      );
+      this.titleObserver.observe(titleEl);
+    }, 100);
+  }
+
   private loadLocality(id: number): void {
     this.isLoading = true;
 
@@ -91,6 +114,7 @@ export class LocalityDetailComponent implements OnInit {
 
         this.isLoading = false;
         this.cdr.detectChanges();
+        this.setupTitleObserver();
       },
       error: () => {
         this.errorMessage = 'Failed to load destination';

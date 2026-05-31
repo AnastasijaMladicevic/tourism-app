@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
@@ -65,6 +65,9 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
   userReview: ReviewDto | null = null;
   selectedReviewImages: File[] = [];
   reviewImagePreviews: string[] = [];
+  titleVisible = true;
+  private titleObserver?: IntersectionObserver;
+  private observerSetup = false;
   private favoritePendingIds = new Set<number>();
   private touchStartX = 0;
   private touchEndX = 0;
@@ -82,7 +85,8 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
     private routerHistory: RouterHistoryService,
     private pendingActionService: PendingActionService,
     private qrLinkService: QrLinkService,
-    private translationService: TranslationService
+    private translationService: TranslationService,
+    private el: ElementRef
   ) { }
 
   ngOnInit(): void {
@@ -141,6 +145,24 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
     this.subscriptions.unsubscribe();
     document.body.style.overflow = 'visible';
     window.removeEventListener('focus', this.handleWindowFocus);
+    this.titleObserver?.disconnect();
+  }
+
+  private setupTitleObserver(): void {
+    if (this.observerSetup) return;
+    setTimeout(() => {
+      const titleEl = this.el.nativeElement.querySelector('.title');
+      if (!titleEl) return;
+      this.observerSetup = true;
+      this.titleObserver = new IntersectionObserver(
+        ([entry]) => {
+          this.titleVisible = entry.isIntersecting;
+          this.cdr.detectChanges();
+        },
+        { rootMargin: '-55px 0px 0px 0px', threshold: 0 }
+      );
+      this.titleObserver.observe(titleEl);
+    }, 100);
   }
 
   private loadObject(id: number): void {
@@ -177,6 +199,7 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
           this.getMainImage(this.normalizeImages((normalizedObject.images || []) as ImageDto[]));
         this.syncFavoriteState();
         this.cdr.detectChanges();
+        this.setupTitleObserver();
         this.loadNearbyObjects(normalizedObject);
         const review = this.reviews.find(r => r.id === this.pendingOpenReviewId);
 

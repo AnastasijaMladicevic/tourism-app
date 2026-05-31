@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
@@ -45,6 +45,9 @@ export class EventDetailComponent implements OnInit, OnDestroy {
   showGalleryModal = false;
   currentImageIndex = 0;
 
+  titleVisible = true;
+  private titleObserver?: IntersectionObserver;
+  private observerSetup = false;
   private touchStartX = 0;
   private touchEndX = 0;
 
@@ -60,7 +63,8 @@ export class EventDetailComponent implements OnInit, OnDestroy {
     private translationService: TranslationService,
     private pendingActionService: PendingActionService,
     private routerHistory: RouterHistoryService,
-    private qrLinkService: QrLinkService
+    private qrLinkService: QrLinkService,
+    private el: ElementRef
   ) { }
 
   ngOnInit(): void {
@@ -82,7 +86,26 @@ export class EventDetailComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     window.removeEventListener('focus', this.handleWindowFocus);
+    this.titleObserver?.disconnect();
   }
+
+  private setupTitleObserver(): void {
+    if (this.observerSetup) return;
+    setTimeout(() => {
+      const titleEl = this.el.nativeElement.querySelector('.title');
+      if (!titleEl) return;
+      this.observerSetup = true;
+      this.titleObserver = new IntersectionObserver(
+        ([entry]) => {
+          this.titleVisible = entry.isIntersecting;
+          this.cdr.detectChanges();
+        },
+        { rootMargin: '-55px 0px 0px 0px', threshold: 0 }
+      );
+      this.titleObserver.observe(titleEl);
+    }, 100);
+  }
+
   private loadEvent(id: number): void {
     this.isLoading = true;
     this.errorMessage = '';
@@ -107,6 +130,7 @@ export class EventDetailComponent implements OnInit, OnDestroy {
 
         this.isLoading = false;
         this.cdr.detectChanges();
+        this.setupTitleObserver();
       },
       error: (err) => {
         console.error('Failed to load event details:', err);

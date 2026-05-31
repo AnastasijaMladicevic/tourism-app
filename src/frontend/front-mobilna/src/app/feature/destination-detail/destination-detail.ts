@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, forkJoin, of } from 'rxjs';
 
@@ -31,6 +31,9 @@ export class DestinationDetailComponent implements OnInit, OnDestroy {
   errorMessage = '';
   qrLink: QrLinkDto | null = null;
 
+  titleVisible = true;
+  private titleObserver?: IntersectionObserver;
+  private observerSetup = false;
   isFavorite = false;
   favoriteId: number | null = null;
   private favoritePendingIds = new Set<number>();
@@ -46,7 +49,8 @@ export class DestinationDetailComponent implements OnInit, OnDestroy {
     private favoriteStateService: FavoriteStateService,
     private pendingActionService: PendingActionService,
     private routerHistory: RouterHistoryService,
-    private qrLinkService: QrLinkService
+    private qrLinkService: QrLinkService,
+    private el: ElementRef
   ) { }
 
   ngOnInit(): void {
@@ -69,6 +73,7 @@ export class DestinationDetailComponent implements OnInit, OnDestroy {
         this.syncFavoriteState();
         this.isLoading = false;
         this.cdr.detectChanges();
+        this.setupTitleObserver();
       },
       error: () => {
         this.errorMessage = 'Failed to load destination';
@@ -87,6 +92,24 @@ export class DestinationDetailComponent implements OnInit, OnDestroy {
   }
   ngOnDestroy(): void {
     window.removeEventListener('focus', this.handleWindowFocus);
+    this.titleObserver?.disconnect();
+  }
+
+  private setupTitleObserver(): void {
+    if (this.observerSetup) return;
+    setTimeout(() => {
+      const titleEl = this.el.nativeElement.querySelector('.title');
+      if (!titleEl) return;
+      this.observerSetup = true;
+      this.titleObserver = new IntersectionObserver(
+        ([entry]) => {
+          this.titleVisible = entry.isIntersecting;
+          this.cdr.detectChanges();
+        },
+        { rootMargin: '-55px 0px 0px 0px', threshold: 0 }
+      );
+      this.titleObserver.observe(titleEl);
+    }, 100);
   }
   private getMainImage(): string {
     if (this.images?.length) {

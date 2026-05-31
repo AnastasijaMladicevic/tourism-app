@@ -36,6 +36,7 @@ button:hover {
   font-weight: 700;
   color: var(--emperor);
   margin: 0;
+  transition: opacity 0.15s ease;
 }
 
 .hero {
