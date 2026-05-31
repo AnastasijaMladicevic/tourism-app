@@ -6,8 +6,10 @@ namespace TuristickiVodic.Core.DTO
         public int PageSize { get; set; } = 10;
 
         public string? Search { get; set; }
+        public int? ObjectId { get; set; }
         public string? Object { get; set; }
         public string? User { get; set; }
+        public string? Ratings { get; set; }
         public int? RegionId { get; set; }
         public int? MinRating { get; set; }
         public int? MaxRating { get; set; }

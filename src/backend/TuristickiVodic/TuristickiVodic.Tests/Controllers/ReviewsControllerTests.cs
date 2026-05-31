@@ -50,6 +50,31 @@ namespace TuristickiVodic.Tests.Controllers
         }
 
         [Fact]
+        public async Task GetForCreator_VracaOkSaPagedRezultatom()
+        {
+            var mockService = new Mock<IReviewService>();
+            var paged = new PagedResultDto<ReviewDto>
+            {
+                Items =
+                {
+                    new ReviewDto { Id = 12, Text = "Odlicno", Status = "Approved" }
+                },
+                Page = 1,
+                PageSize = 8,
+                TotalCount = 1,
+                TotalPages = 1
+            };
+
+            mockService.Setup(s => s.GetForCreatorAsync(20, It.IsAny<ReviewQueryDto>())).ReturnsAsync(paged);
+
+            var controller = CreateController(mockService, FakeUserHelper.CreateUser(20, "ContentCreator"));
+            var result = await controller.GetForCreator(new ReviewQueryDto());
+
+            result.Should().BeOfType<OkObjectResult>()
+                .Which.Value.Should().BeEquivalentTo(paged);
+        }
+
+        [Fact]
         public async Task GetById_KadaPostoji_VracaOk()
         {
             var mockService = new Mock<IReviewService>();

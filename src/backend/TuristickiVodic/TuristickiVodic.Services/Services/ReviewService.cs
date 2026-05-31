@@ -89,6 +89,43 @@ namespace TuristickiVodic.Services.Services
             };
         }
 
+        public async Task<PagedResultDto<ReviewDto>> GetForCreatorAsync(int creatorUserId, ReviewQueryDto query)
+        {
+            if (query.Page < 1)
+                query.Page = 1;
+
+            if (query.PageSize < 1)
+                query.PageSize = 10;
+
+            if (query.PageSize > 100)
+                query.PageSize = 100;
+
+            var reviewsQuery = BuildReviewsQuery()
+                .Where(r => r.Object != null && r.Object.CreatedByUserId == creatorUserId);
+
+            reviewsQuery = ApplyReviewFilters(reviewsQuery, query);
+            reviewsQuery = ApplyReviewSorting(reviewsQuery, query.SortBy, query.SortOrder);
+
+            var totalCount = await reviewsQuery.CountAsync();
+
+            var reviews = await reviewsQuery
+                .Skip((query.Page - 1) * query.PageSize)
+                .Take(query.PageSize)
+                .ToListAsync();
+
+            var items = _mapper.Map<List<ReviewDto>>(reviews);
+            await ApplyTranslationsAsync(items, reviews, query.LanguageCode, createMissing: false);
+
+            return new PagedResultDto<ReviewDto>
+            {
+                Items = items,
+                Page = query.Page,
+                PageSize = query.PageSize,
+                TotalCount = totalCount,
+                TotalPages = totalCount == 0 ? 0 : (int)Math.Ceiling((double)totalCount / query.PageSize)
+            };
+        }
+
         public async Task<ReviewDto?> GetByIdAsync(int id, string? languageCode = null)
         {
             var review = await _context.Reviews
@@ -444,6 +481,11 @@ namespace TuristickiVodic.Services.Services
                         (r.User.FirstName + " " + r.User.LastName).ToLower().Contains(search))));
             }
 
+            if (query.ObjectId.HasValue)
+            {
+                reviewsQuery = reviewsQuery.Where(r => r.ObjectId == query.ObjectId.Value);
+            }
+
             if (!string.IsNullOrWhiteSpace(query.Object))
             {
                 var objectValue = query.Object.Trim().ToLower();
@@ -480,6 +522,21 @@ namespace TuristickiVodic.Services.Services
             if (query.MaxRating.HasValue)
             {
                 reviewsQuery = reviewsQuery.Where(r => r.Rating <= query.MaxRating.Value);
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.Ratings))
+            {
+                var allowedRatings = query.Ratings
+                    .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+                    .Select(value => int.TryParse(value, out var parsed) ? parsed : (int?)null)
+                    .Where(value => value.HasValue && value.Value >= 1 && value.Value <= 5)
+                    .Select(value => value!.Value)
+                    .Distinct()
+                    .ToArray();
+
+                reviewsQuery = allowedRatings.Length == 0
+                    ? reviewsQuery.Where(_ => false)
+                    : reviewsQuery.Where(r => allowedRatings.Contains(r.Rating));
             }
 
             if (query.HasResponse.HasValue)

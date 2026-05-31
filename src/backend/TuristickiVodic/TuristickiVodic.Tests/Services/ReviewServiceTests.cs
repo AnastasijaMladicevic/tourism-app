@@ -239,6 +239,104 @@ namespace TuristickiVodic.Tests.Services
         }
 
         [Fact]
+        public async Task GetForCreatorAsync_KadaSeFiltriraIPaginira_VracaSamoReviewoveSaCreatorovihObjekata()
+        {
+            using var ctx = CreateInMemoryContext(nameof(GetForCreatorAsync_KadaSeFiltriraIPaginira_VracaSamoReviewoveSaCreatorovihObjekata));
+            var (tourist, otherTourist, creator, otherCreator, approvedObject, _) = SeedBase(ctx);
+
+            var otherObject = new TouristObject
+            {
+                Id = 3,
+                Name = "Tudji muzej",
+                ObjectTypeId = approvedObject.ObjectTypeId,
+                ObjectType = approvedObject.ObjectType,
+                DestinationId = approvedObject.DestinationId,
+                Destination = approvedObject.Destination,
+                LocalityId = approvedObject.LocalityId,
+                Locality = approvedObject.Locality,
+                CreatedByUserId = otherCreator.Id,
+                CreatedBy = otherCreator,
+                Status = ContentStatus.Approved,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            ctx.Objects.Add(otherObject);
+            ctx.Reviews.AddRange(
+                new Review
+                {
+                    Id = 1,
+                    UserId = tourist.Id,
+                    User = tourist,
+                    ObjectId = approvedObject.Id,
+                    Object = approvedObject,
+                    Rating = 5,
+                    Text = "Fenomenalno iskustvo",
+                    CreatorResponse = "Hvala",
+                    Status = ContentStatus.Approved,
+                    CreatedAt = DateTime.UtcNow.AddMinutes(-15)
+                },
+                new Review
+                {
+                    Id = 2,
+                    UserId = otherTourist.Id,
+                    User = otherTourist,
+                    ObjectId = approvedObject.Id,
+                    Object = approvedObject,
+                    Rating = 3,
+                    Text = "Moze bolje",
+                    Status = ContentStatus.Pending,
+                    CreatedAt = DateTime.UtcNow.AddMinutes(-10)
+                },
+                new Review
+                {
+                    Id = 3,
+                    UserId = tourist.Id,
+                    User = tourist,
+                    ObjectId = approvedObject.Id,
+                    Object = approvedObject,
+                    Rating = 4,
+                    Text = "Vrlo prijatno",
+                    Status = ContentStatus.Approved,
+                    CreatedAt = DateTime.UtcNow.AddMinutes(-5)
+                },
+                new Review
+                {
+                    Id = 4,
+                    UserId = tourist.Id,
+                    User = tourist,
+                    ObjectId = otherObject.Id,
+                    Object = otherObject,
+                    Rating = 5,
+                    Text = "Ne treba da se vidi",
+                    Status = ContentStatus.Approved,
+                    CreatedAt = DateTime.UtcNow.AddMinutes(-1)
+                });
+            ctx.SaveChanges();
+
+            var svc = new ReviewService(ctx, CreateMapper(), new FakeTranslationService());
+
+            var result = await svc.GetForCreatorAsync(creator.Id, new ReviewQueryDto
+            {
+                ObjectId = approvedObject.Id,
+                Search = "prijatno",
+                Ratings = "4,5",
+                HasResponse = false,
+                Page = 1,
+                PageSize = 1,
+                SortBy = "createdAt",
+                SortOrder = "desc"
+            });
+
+            result.TotalCount.Should().Be(1);
+            result.TotalPages.Should().Be(1);
+            result.Items.Should().ContainSingle();
+            result.Items[0].Id.Should().Be(3);
+            result.Items[0].ObjectId.Should().Be(approvedObject.Id);
+        }
+
+        [Fact]
         public async Task CreateAsync_Tourist_KreiraApprovedRecenziju()
         {
             using var ctx = CreateInMemoryContext(nameof(CreateAsync_Tourist_KreiraApprovedRecenziju));

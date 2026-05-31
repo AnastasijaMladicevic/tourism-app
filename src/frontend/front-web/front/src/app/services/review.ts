@@ -32,8 +32,10 @@ export interface ReviewQueryParams {
   page?: number;
   pageSize?: number;
   search?: string;
+  objectId?: number;
   object?: string;
   user?: string;
+  ratings?: string;
   minRating?: number;
   maxRating?: number;
   hasResponse?: boolean;
@@ -86,6 +88,24 @@ export class ReviewService {
     return this.http
       .get<PagedResultDto<ReviewDto> | ReviewDto[]>(this.baseUrl, { params })
       .pipe(map((response) => this.normalizePagedResult(response, effectiveQuery?.page, effectiveQuery?.pageSize)));
+  }
+
+  getForCreator(
+    query?: ReviewQueryParams,
+    options?: RegionRequestOptions,
+  ): Observable<PagedResultDto<ReviewDto>> {
+    const effectiveQuery = this.activeRegionService.applySelectedRegion(query, options);
+    let params = new HttpParams();
+
+    if (effectiveQuery) {
+      Object.entries(effectiveQuery).forEach(([key, value]) => {
+        if (value != null && value !== '') {
+          params = params.set(key, String(value));
+        }
+      });
+    }
+
+    return this.http.get<PagedResultDto<ReviewDto>>(`${this.baseUrl}/creator`, { params });
   }
 
   getById(id: number): Observable<ReviewDto> {

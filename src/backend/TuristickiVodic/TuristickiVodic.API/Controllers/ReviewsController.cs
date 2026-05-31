@@ -34,6 +34,15 @@ namespace TuristickiVodic.API.Controllers
             return Ok(reviews);
         }
 
+        [HttpGet("creator")]
+        [Authorize(Roles = "ContentCreator")]
+        public async Task<IActionResult> GetForCreator([FromQuery] ReviewQueryDto query)
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var reviews = await _reviewService.GetForCreatorAsync(userId, query);
+            return Ok(reviews);
+        }
+
         [HttpGet("{id}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetById(int id, [FromQuery] string? languageCode)
