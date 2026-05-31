@@ -1383,7 +1383,7 @@ button {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    transition: opacity 0.15s ease;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease, color 0.2s ease, opacity 0.15s ease;
 
     svg {
       width: 18px;
@@ -1403,11 +1403,34 @@ button {
     &--danger {
       background: #ef4444;
       color: #ffffff;
+      box-shadow: 0 8px 20px rgba(239, 68, 68, 0.22);
+
+      &:hover:not(:disabled) {
+        transform: translateY(-2px);
+        background: #dc2626;
+        box-shadow: 0 14px 30px rgba(239, 68, 68, 0.38);
+      }
+
+      &:active:not(:disabled) {
+        transform: translateY(0);
+        box-shadow: 0 6px 14px rgba(239, 68, 68, 0.28);
+      }
     }
 
     &--cancel {
       background: #f1f5f8;
       color: #334453;
+
+      &:hover:not(:disabled) {
+        background: #e2e8ed;
+        color: #1a2b38;
+        transform: translateY(-1px);
+      }
+
+      &:active:not(:disabled) {
+        transform: translateY(0);
+        background: #d6dde4;
+      }
     }
   }
 }
@@ -2584,8 +2607,14 @@ button {
     }
 
     &:hover:not(:disabled) {
-      transform: translateY(-1px);
-      box-shadow: 0 22px 40px rgba(244, 63, 70, 0.34);
+      transform: translateY(-2px);
+      background: linear-gradient(135deg, #ff3437 0%, #e8333a 100%);
+      box-shadow: 0 24px 44px rgba(244, 63, 70, 0.44);
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0);
+      box-shadow: 0 10px 20px rgba(244, 63, 70, 0.3);
     }
   }
 
@@ -2595,8 +2624,14 @@ button {
     box-shadow: none;
 
     &:hover:not(:disabled) {
-      background: rgba(255, 255, 255, 0.04);
+      background: rgba(255, 255, 255, 0.07);
       color: #eef7fb;
+      transform: translateY(-1px);
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0);
+      background: rgba(255, 255, 255, 0.04);
     }
   }
 
