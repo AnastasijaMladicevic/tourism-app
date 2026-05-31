@@ -205,6 +205,7 @@
                                 class="planner-calendar__day"
                                 [class.planner-calendar__day--outside]="!cell.isCurrentMonth"
                                 [class.planner-calendar__day--selected]="cell.isSelected"
+                                [class.planner-calendar__day--range-start]="cell.isRangeStart"
                                 [class.planner-calendar__day--disabled]="cell.isDisabled"
                                 [disabled]="cell.isDisabled"
                                 (click)="toggleCalendarDate(cell)"

@@ -494,6 +494,18 @@
     color: #ffffff;
     box-shadow: 0 10px 20px rgba(22, 138, 173, 0.2);
   }
+
+  &--range-start {
+    background: linear-gradient(135deg, #168fc3 0%, #0f7fae 100%);
+    color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(22, 138, 173, 0.35), 0 10px 20px rgba(22, 138, 173, 0.2);
+    animation: range-start-pulse 1.2s ease-in-out infinite;
+  }
+}
+
+@keyframes range-start-pulse {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(22, 138, 173, 0.35), 0 10px 20px rgba(22, 138, 173, 0.2); }
+  50% { box-shadow: 0 0 0 5px rgba(22, 138, 173, 0.15), 0 10px 20px rgba(22, 138, 173, 0.2); }
 }
 
 .planner-calendar__footer {

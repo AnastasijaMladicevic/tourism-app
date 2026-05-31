@@ -137,6 +137,7 @@ interface PlannerCalendarCell {
   isCurrentMonth: boolean;
   isDisabled: boolean;
   isSelected: boolean;
+  isRangeStart: boolean;
 }
 
 type PlannerToolbarDropdown = 'category' | 'range' | 'cards';
@@ -190,6 +191,7 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
   protected readonly isMobileViewport = signal(false);
   protected readonly activeRegionId = signal<number | null>(this.activeRegionService.getActiveRegionId());
   protected readonly suggestionSeed = signal(this.createSuggestionSeed());
+  protected readonly calendarRangeStart = signal<string | null>(null);
 
   protected readonly plannedEventOccurrences = computed<PlannedEventOccurrence[]>(() => {
     const query = this.normalizeText(this.searchTerm());
@@ -423,6 +425,7 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
     const firstGridDate = new Date(monthStart);
     firstGridDate.setDate(monthStart.getDate() - monthStart.getDay());
     const selected = new Set(this.draftCalendarDates());
+    const rangeStart = this.calendarRangeStart();
     const weeks: PlannerCalendarCell[][] = [];
 
     for (let weekIndex = 0; weekIndex < 6; weekIndex += 1) {
@@ -441,6 +444,7 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
           isCurrentMonth: cellDate.getMonth() === monthStart.getMonth(),
           isDisabled: normalizedDate < today,
           isSelected: selected.has(key),
+          isRangeStart: key === rangeStart,
         });
       }
 
@@ -653,17 +657,38 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.draftCalendarDates.update((current) => {
-      if (current.includes(cell.key)) {
-        return current.filter((value) => value !== cell.key);
-      }
+    const rangeStart = this.calendarRangeStart();
 
-      return this.normalizeCalendarDates([...current, cell.key]);
-    });
+    if (!rangeStart) {
+      this.calendarRangeStart.set(cell.key);
+      this.draftCalendarDates.set([cell.key]);
+      return;
+    }
+
+    if (rangeStart === cell.key) {
+      this.calendarRangeStart.set(null);
+      this.draftCalendarDates.set([]);
+      return;
+    }
+
+    const startDate = this.parseDate(rangeStart)!;
+    const endDate = cell.date;
+    const [from, to] = startDate <= endDate ? [startDate, endDate] : [endDate, startDate];
+
+    const dates: string[] = [];
+    const cursor = new Date(from);
+    while (cursor <= to) {
+      dates.push(this.toDayKey(cursor));
+      cursor.setDate(cursor.getDate() + 1);
+    }
+
+    this.draftCalendarDates.set(dates);
+    this.calendarRangeStart.set(null);
   }
 
   protected clearCalendarDates(): void {
     this.draftCalendarDates.set([]);
+    this.calendarRangeStart.set(null);
   }
 
   protected confirmCalendarDates(): void {
@@ -1167,6 +1192,7 @@ export class EventPlannerPreviewComponent implements OnInit, OnDestroy {
       }
 
       this.draftCalendarDates.set([...this.selectedCalendarDates()]);
+      this.calendarRangeStart.set(null);
       this.calendarMonthCursor.set(this.resolveCalendarAnchorDate());
       return 'range';
     });
