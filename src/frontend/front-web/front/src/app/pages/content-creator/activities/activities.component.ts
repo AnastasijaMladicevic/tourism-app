@@ -2,8 +2,9 @@ import { Component, OnDestroy, OnInit, inject, ChangeDetectorRef } from '@angula
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
-import { forkJoin } from 'rxjs';
-import { ActivitiesService, ActivityDto, ActivityImageDto } from '../../../services/activities';
+import { catchError, forkJoin, map, of } from 'rxjs';
+import { ActivitiesService, ActivityDto, ActivityImageDto, ActivityTypeOption } from '../../../services/activities';
+import { DestinationDto, DestinationService } from '../../../services/destination.service';
 import { MapComponent as SharedMapComponent } from '../../../shared/components/map/map';
 import { HERO_IMAGE_ROTATION_INTERVAL_MS } from '../../../shared/constants/hero-image-rotation';
 
@@ -12,6 +13,11 @@ interface ActivityInsightCard {
   value: string;
   hint: string;
   tone: 'blue' | 'green' | 'amber';
+}
+
+interface ActivityFilterOption {
+  value: string;
+  label: string;
 }
 
 @Component({
@@ -30,6 +36,7 @@ interface ActivityInsightCard {
 })
 export class ContentCreatorActivitiesComponent implements OnInit, OnDestroy {
   private readonly activitiesService = inject(ActivitiesService);
+  private readonly destinationService = inject(DestinationService);
   private readonly cdr = inject(ChangeDetectorRef);
 
   private static readonly DEFAULT_BANNER_URL = '/assets/pozadina.png';
@@ -81,7 +88,11 @@ export class ContentCreatorActivitiesComponent implements OnInit, OnDestroy {
     { value: 'createdAt', label: 'Created date' }
   ];
 
+  typeOptions: ActivityFilterOption[] = [];
+  destinationOptions: ActivityFilterOption[] = [];
+
   ngOnInit(): void {
+    this.loadFilterOptions();
     this.loadActivities();
   }
 
@@ -443,6 +454,48 @@ export class ContentCreatorActivitiesComponent implements OnInit, OnDestroy {
     return location ? `${activity.name} · ${location}` : activity.name;
   }
 
+  private loadFilterOptions(): void {
+    forkJoin({
+      activityTypes: this.activitiesService.getActivityTypeOptions().pipe(catchError(() => of([] as ActivityTypeOption[]))),
+      destinations: this.destinationService
+        .getAll({
+          page: 1,
+          pageSize: 300,
+          sortBy: 'name',
+          sortOrder: 'asc'
+        })
+        .pipe(
+          map((response: DestinationDto[] | { items?: DestinationDto[] }) => {
+            return Array.isArray(response) ? response : (response.items ?? []);
+          }),
+          catchError(() => of([] as DestinationDto[]))
+        )
+    }).subscribe({
+      next: ({ activityTypes, destinations }) => {
+        this.typeOptions = this.toFilterOptions(activityTypes.map((type) => type.name));
+        this.destinationOptions = this.toFilterOptions(destinations.map((destination) => destination.name));
+
+        if (this.typeFilter !== 'all' && !this.typeOptions.some((option) => option.value === this.typeFilter)) {
+          this.typeFilter = 'all';
+        }
+
+        if (
+          this.destinationFilter !== 'all' &&
+          !this.destinationOptions.some((option) => option.value === this.destinationFilter)
+        ) {
+          this.destinationFilter = 'all';
+        }
+
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.typeOptions = [];
+        this.destinationOptions = [];
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
   private setSelectedActivity(activity: ActivityDto | null): void {
     const previousId = this.selectedActivity?.id ?? null;
     this.selectedActivity = activity;
@@ -569,6 +622,27 @@ export class ContentCreatorActivitiesComponent implements OnInit, OnDestroy {
     } catch {
       return encodeURI(trimmed);
     }
+  }
+
+  private toFilterOptions(values: Array<string | null | undefined>): ActivityFilterOption[] {
+    const unique = new Map<string, ActivityFilterOption>();
+
+    for (const rawValue of values) {
+      const label = rawValue?.trim();
+      if (!label) {
+        continue;
+      }
+
+      const key = label.toLowerCase();
+      if (!unique.has(key)) {
+        unique.set(key, {
+          value: label,
+          label
+        });
+      }
+    }
+
+    return Array.from(unique.values()).sort((first, second) => first.label.localeCompare(second.label));
   }
 
   private loadSelectedActivityDetails(activityId: number): void {

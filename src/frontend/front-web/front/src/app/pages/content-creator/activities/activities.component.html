@@ -60,22 +60,22 @@
 
       <label>
         <span>Type</span>
-        <input
-          type="text"
-          [(ngModel)]="typeFilter"
-          (ngModelChange)="onFilterChange()"
-          placeholder="Activity type"
-        />
+        <select [(ngModel)]="typeFilter" (ngModelChange)="onFilterChange()">
+          <option value="all">All Types</option>
+          <option *ngFor="let option of typeOptions" [value]="option.value">
+            {{ option.label }}
+          </option>
+        </select>
       </label>
 
       <label>
         <span>Destination</span>
-        <input
-          type="text"
-          [(ngModel)]="destinationFilter"
-          (ngModelChange)="onFilterChange()"
-          placeholder="Destination"
-        />
+        <select [(ngModel)]="destinationFilter" (ngModelChange)="onFilterChange()">
+          <option value="all">All Destinations</option>
+          <option *ngFor="let option of destinationOptions" [value]="option.value">
+            {{ option.label }}
+          </option>
+        </select>
       </label>
 
       <label>
