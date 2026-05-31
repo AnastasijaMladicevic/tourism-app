@@ -124,6 +124,8 @@
           class="event-image"
           [appLazyBackground]="event.imageUrl ?? null"
           [class.event-image--empty]="!event.imageUrl"
+          (click)="openEvent(event.id)"
+          style="cursor:pointer"
         >
           <span class="event-tag">{{ event.category === 'Rute' ? ('event.nature' | translate) : event.category }}</span>
           <button

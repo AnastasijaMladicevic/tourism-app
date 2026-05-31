@@ -132,6 +132,8 @@
               decoding="async"
               (error)="onImageError($event)"
               title="Image URL: {{ getMainImage(locality) }}"
+              (click)="viewDetails(locality)"
+              style="cursor:pointer"
             />
           }
 

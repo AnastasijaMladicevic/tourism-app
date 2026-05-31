@@ -170,6 +170,8 @@
               loading="lazy"
               decoding="async"
               (error)="onImageError($event)"
+              (click)="viewDetails(obj)"
+              style="cursor:pointer"
             />
           } @else {
             <div class="card__image card__image--empty">

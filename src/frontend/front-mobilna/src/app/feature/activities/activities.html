@@ -140,6 +140,8 @@
               decoding="async"
               (error)="onImageError($event)"
               title="Image URL: {{ getMainImage(activity) }}"
+              (click)="viewDetails(activity)"
+              style="cursor:pointer"
             />
           }
 
