@@ -41,6 +41,11 @@ export class RouteBuilderStateService {
   }
 
   addRoutePoint(point: RouteBuilderPoint): void {
+    const alreadyInRoute = this.routePoints.some(
+      (p) => p.id === point.id && p.type === point.type,
+    );
+    if (alreadyInRoute) return;
+
     this.routePoints = [...this.routePoints, { ...point }];
     this.plannerOpen = true;
     this.notifyRoutePointsChanged();
