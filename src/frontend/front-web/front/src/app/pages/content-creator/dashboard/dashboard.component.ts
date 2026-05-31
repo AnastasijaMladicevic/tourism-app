@@ -219,6 +219,43 @@ export class ContentCreatorDashboardComponent implements OnInit {
     }).format(new Date(value));
   }
 
+  getTopContentRoute(item: RankedContent): Array<string | number> | null {
+    const contentId = Number(item.contentId);
+    if (!Number.isFinite(contentId) || contentId <= 0) {
+      return null;
+    }
+
+    switch ((item.contentType ?? '').trim().toLowerCase()) {
+      case 'touristobject':
+      case 'object':
+        return ['/content-creator/objects/edit', contentId];
+      case 'event':
+        return ['/content-creator/events/view', contentId];
+      case 'activity':
+        return ['/content-creator/activities/edit', contentId];
+      default:
+        return null;
+    }
+  }
+
+  getTopDestinationMapQuery(item: DestinationPerformance): { destinationId: number } | null {
+    const destinationId = Number(item.destinationId);
+    if (!Number.isFinite(destinationId) || destinationId <= 0) {
+      return null;
+    }
+
+    return { destinationId };
+  }
+
+  getUpcomingEventRoute(event: ContentCreatorDashboardUpcomingEventItemDto): Array<string | number> | null {
+    const eventId = Number(event.eventId);
+    if (!Number.isFinite(eventId) || eventId <= 0) {
+      return null;
+    }
+
+    return ['/content-creator/events/view', eventId];
+  }
+
   getPublishedPercent(row: StatusRow): number {
     return row.publishedPercent;
   }

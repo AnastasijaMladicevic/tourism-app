@@ -10,7 +10,7 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin, Observable, of } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import * as L from 'leaflet';
@@ -92,6 +92,7 @@ export class ContentCreatorMapComponent implements OnInit, AfterViewInit, OnDest
   private routingControl: any = null;
 
   private allItems: SearchResult[] = [];
+  private readonly focusedDestinationId: number | null;
   private readonly markerClickHandler = (event: Event) => {
     const customEvent = event as CustomEvent<{ data: any; type: string }>;
 
@@ -107,6 +108,7 @@ export class ContentCreatorMapComponent implements OnInit, AfterViewInit, OnDest
   constructor(
     private mapService: MapService,
     private router: Router,
+    private route: ActivatedRoute,
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef,
     private authService: AuthService,
@@ -115,7 +117,9 @@ export class ContentCreatorMapComponent implements OnInit, AfterViewInit, OnDest
     private activitiesService: ActivitiesService,
     private regionService: RegionService,
     private activeRegionService: ActiveRegionService,
-  ) {}
+  ) {
+    this.focusedDestinationId = this.parsePositiveInt(this.route.snapshot.queryParamMap.get('destinationId'));
+  }
 
   ngOnInit(): void {
     window.addEventListener('map-marker-clicked', this.markerClickHandler as EventListener);
@@ -520,6 +524,13 @@ export class ContentCreatorMapComponent implements OnInit, AfterViewInit, OnDest
               this.cdr.detectChanges();
             });
           }, 100);
+        } else if (this.focusedDestinationId) {
+          setTimeout(() => {
+            this.ngZone.run(() => {
+              this.focusDestinationContent(this.focusedDestinationId!);
+              this.cdr.detectChanges();
+            });
+          }, 100);
         }
       },
       error: (err) => console.error('Greska:', err),
@@ -576,6 +587,49 @@ export class ContentCreatorMapComponent implements OnInit, AfterViewInit, OnDest
       category,
       markerType,
     };
+  }
+
+  private focusDestinationContent(destinationId: number): void {
+    const matches = this.allItems.filter((item) => {
+      const itemDestinationId = Number(item.raw?.destinationId ?? 0);
+      return itemDestinationId === destinationId && item.lat != null && item.lng != null;
+    });
+
+    if (!matches.length) {
+      return;
+    }
+
+    const firstMatch = matches[0];
+    const map = this.mapService.getMap();
+    if (!map || firstMatch.lat == null || firstMatch.lng == null) {
+      return;
+    }
+
+    if (matches.length === 1) {
+      this.mapService.flyTo(firstMatch.lat, firstMatch.lng, ContentCreatorMapComponent.TARGET_DETAIL_ZOOM);
+      this.mapService.triggerMarkerClick(firstMatch.markerType, firstMatch.id, ContentCreatorMapComponent.TARGET_DETAIL_ZOOM);
+      return;
+    }
+
+    const bounds = L.latLngBounds(matches.map((item) => [Number(item.lat), Number(item.lng)] as [number, number]));
+    map.fitBounds(bounds.pad(0.2), { padding: [28, 28], maxZoom: ContentCreatorMapComponent.CREATOR_CONTENT_FOCUS_ZOOM });
+
+    setTimeout(() => {
+      this.mapService.triggerMarkerClick(
+        firstMatch.markerType,
+        firstMatch.id,
+        ContentCreatorMapComponent.CREATOR_CONTENT_FOCUS_ZOOM,
+      );
+    }, 250);
+  }
+
+  private parsePositiveInt(raw: string | null): number | null {
+    if (!raw) {
+      return null;
+    }
+
+    const parsed = Number.parseInt(raw, 10);
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
   }
 
   private getObjectType(name: string): string {

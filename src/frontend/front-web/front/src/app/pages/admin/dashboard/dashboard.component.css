@@ -302,6 +302,18 @@
   text-decoration: underline;
 }
 
+.dashboard-item-link {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.dashboard-item-link:hover,
+.dashboard-item-link:focus-visible {
+  color: #1976d2;
+  text-decoration: underline;
+}
+
 .chart-legend--inline {
   display: flex;
   flex-wrap: wrap;

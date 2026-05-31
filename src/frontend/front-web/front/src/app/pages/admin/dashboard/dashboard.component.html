@@ -187,7 +187,13 @@
         <div *ngIf="banRegionRows.length; else emptyBanRegions" class="region-list">
           <div *ngFor="let row of banRegionRows" class="region-row">
             <div class="region-row-head">
-              <span class="region-name">{{ row.regionName }}</span>
+              <a
+                class="region-name dashboard-item-link"
+                routerLink="/admin/destinations"
+                [queryParams]="{ region: row.regionName }"
+              >
+                {{ row.regionName }}
+              </a>
               <span class="region-code">{{ row.regionCode }}</span>
             </div>
             <div
@@ -223,7 +229,13 @@
         <ul class="region-list" *ngIf="regionRows.length; else emptyRegions">
           <li *ngFor="let row of regionRows" class="region-row">
             <div class="region-row-head">
-              <span class="region-name">{{ row.name }}</span>
+              <a
+                class="region-name dashboard-item-link"
+                routerLink="/admin/destinations"
+                [queryParams]="{ region: row.name }"
+              >
+                {{ row.name }}
+              </a>
               <span class="region-code">{{ row.code }}</span>
             </div>
             <div class="region-bar-track">
@@ -327,7 +339,9 @@
           <div *ngFor="let row of topDestinationRows" class="visit-row">
             <div class="visit-row-head">
               <div>
-                <div class="visit-name">{{ row.destinationName }}</div>
+                <a class="visit-name dashboard-item-link" [routerLink]="['/admin/destinations/edit', row.destinationId]">
+                  {{ row.destinationName }}
+                </a>
                 <div class="visit-subtle">{{ row.regionName }} · {{ row.regionCode }}</div>
               </div>
               <div class="visit-count">score {{ row.engagementScore | number:'1.0-1' }}</div>
@@ -364,7 +378,13 @@
         <div *ngIf="regionVisitRows.length; else emptyRegionVisits" class="region-list">
           <div *ngFor="let row of regionVisitRows" class="region-row">
             <div class="region-row-head">
-              <span class="region-name">{{ row.regionName }}</span>
+              <a
+                class="region-name dashboard-item-link"
+                routerLink="/admin/destinations"
+                [queryParams]="{ region: row.regionName }"
+              >
+                {{ row.regionName }}
+              </a>
               <span class="region-code">{{ row.regionCode }}</span>
             </div>
             <div class="region-bar-track">

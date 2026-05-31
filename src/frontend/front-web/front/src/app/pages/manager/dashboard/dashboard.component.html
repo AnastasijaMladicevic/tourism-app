@@ -38,7 +38,7 @@
     <ng-container *ngIf="hasManagedDestination">
       <div class="kpi-row">
         <article class="kpi-card card kpi-card--destination kpi-card--teal">
-          <span class="kpi-value kpi-value--title">{{ managedDestinationTitle }}</span>
+          <a class="kpi-value kpi-value--title dashboard-item-link" [routerLink]="managedDestinationRoute">{{ managedDestinationTitle }}</a>
           <span class="kpi-destination-subtitle" *ngIf="managedDestinationDisplayTitle">{{ managedDestinationDisplayTitle }}</span>
           <span class="kpi-meta muted" *ngIf="managedDestinationSubtitle">{{ managedDestinationSubtitle }}</span>
         </article>
@@ -316,7 +316,18 @@
             <div *ngFor="let row of topCreatorRows" class="rank-row">
               <div class="rank-row-head">
                 <div>
-                  <div class="rank-name">{{ row.creatorName }}</div>
+                  <ng-container *ngIf="getTopCreatorRoute(row) as creatorRoute; else topCreatorNameText">
+                    <a
+                      class="rank-name dashboard-item-link"
+                      [routerLink]="creatorRoute"
+                      [queryParams]="getTopCreatorQueryParams(row)"
+                    >
+                      {{ row.creatorName }}
+                    </a>
+                  </ng-container>
+                  <ng-template #topCreatorNameText>
+                    <div class="rank-name">{{ row.creatorName }}</div>
+                  </ng-template>
                   <div class="rank-subtle">{{ row.creatorEmail }}</div>
                 </div>
                 <div class="rank-score">score {{ row.engagementScore | number:'1.0-1' }}</div>
@@ -358,7 +369,12 @@
             <div *ngFor="let row of topContentRows" class="rank-row">
               <div class="rank-row-head">
                 <div>
-                  <div class="rank-name">{{ row.contentName }}</div>
+                  <ng-container *ngIf="getTopContentRoute(row) as contentRoute; else topContentNameText">
+                    <a class="rank-name dashboard-item-link" [routerLink]="contentRoute">{{ row.contentName }}</a>
+                  </ng-container>
+                  <ng-template #topContentNameText>
+                    <div class="rank-name">{{ row.contentName }}</div>
+                  </ng-template>
                   <div class="rank-subtle">
                     {{ humanizeContentType(row.contentType) }}
                     <span *ngIf="row.localityName">&bull; {{ row.localityName }}</span>
@@ -404,7 +420,12 @@
             <div *ngFor="let row of localityRows" class="rank-row">
               <div class="rank-row-head">
                 <div>
-                  <div class="rank-name">{{ row.localityName }}</div>
+                  <ng-container *ngIf="getLocalityRoute(row) as localityRoute; else localityNameText">
+                    <a class="rank-name dashboard-item-link" [routerLink]="localityRoute">{{ row.localityName }}</a>
+                  </ng-container>
+                  <ng-template #localityNameText>
+                    <div class="rank-name">{{ row.localityName }}</div>
+                  </ng-template>
                   <div class="rank-subtle">{{ row.contentItems | number }} content items</div>
                 </div>
                 <div class="rank-score">score {{ row.engagementScore | number:'1.0-1' }}</div>
@@ -443,7 +464,12 @@
         <div class="upcoming-grid" *ngIf="upcomingEventRows.length; else emptyEvents">
           <article *ngFor="let row of upcomingEventRows" class="upcoming-card">
             <div class="upcoming-date">{{ formatShortDate(row.startDate) }}</div>
-            <h4>{{ row.eventName }}</h4>
+            <ng-container *ngIf="getUpcomingEventRoute(row) as eventRoute; else upcomingEventNameText">
+              <h4><a class="dashboard-item-link dashboard-item-link--heading" [routerLink]="eventRoute">{{ row.eventName }}</a></h4>
+            </ng-container>
+            <ng-template #upcomingEventNameText>
+              <h4>{{ row.eventName }}</h4>
+            </ng-template>
             <p>{{ row.localityName || managedDestinationTitle }}</p>
             <span class="upcoming-meta">Creator &bull; {{ row.creatorName }}</span>
           </article>

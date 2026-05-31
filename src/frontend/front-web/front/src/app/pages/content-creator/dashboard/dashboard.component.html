@@ -246,7 +246,12 @@
         <div *ngFor="let item of topContent" class="rank-row">
           <div class="rank-row-head">
             <div>
-              <div class="rank-name">{{ item.contentName }}</div>
+              <ng-container *ngIf="getTopContentRoute(item) as contentRoute; else topContentNameText">
+                <a class="rank-name dashboard-item-link" [routerLink]="contentRoute">{{ item.contentName }}</a>
+              </ng-container>
+              <ng-template #topContentNameText>
+                <div class="rank-name">{{ item.contentName }}</div>
+              </ng-template>
               <div class="rank-subtle">
                 {{ humanizeContentType(item.contentType) }} &bull;
                 {{ item.destinationName || 'No destination' }} &bull;
@@ -286,7 +291,18 @@
         <div *ngFor="let item of topDestinations" class="rank-row">
           <div class="rank-row-head">
             <div>
-              <div class="rank-name">{{ item.destinationName }}</div>
+              <ng-container *ngIf="getTopDestinationMapQuery(item) as destinationQuery; else topDestinationNameText">
+                <a
+                  class="rank-name dashboard-item-link"
+                  routerLink="/content-creator/map"
+                  [queryParams]="destinationQuery"
+                >
+                  {{ item.destinationName }}
+                </a>
+              </ng-container>
+              <ng-template #topDestinationNameText>
+                <div class="rank-name">{{ item.destinationName }}</div>
+              </ng-template>
               <div class="rank-subtle">{{ item.regionName }} &bull; {{ item.contentItems }} content items</div>
             </div>
             <span class="rank-score">{{ item.engagementScore | number }}</span>
@@ -320,7 +336,12 @@
         <article *ngFor="let event of upcomingEvents" class="upcoming-card">
           <div class="upcoming-date">{{ formatShortDate(event.startDate) }}</div>
           <div>
-            <h4>{{ event.eventName }}</h4>
+            <ng-container *ngIf="getUpcomingEventRoute(event) as eventRoute; else upcomingEventNameText">
+              <h4><a class="dashboard-item-link dashboard-item-link--heading" [routerLink]="eventRoute">{{ event.eventName }}</a></h4>
+            </ng-container>
+            <ng-template #upcomingEventNameText>
+              <h4>{{ event.eventName }}</h4>
+            </ng-template>
             <p>{{ event.destinationName || 'No destination' }} &bull; {{ event.regionName || 'No region' }}</p>
           </div>
         </article>

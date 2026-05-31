@@ -193,6 +193,65 @@ export class ManagerDashboardComponent implements OnInit {
     return (this.overview?.moderationQueue.totalPending ?? 0) + (this.overview?.reports.currentPending ?? 0);
   }
 
+  get managedDestinationRoute(): string[] {
+    return ['/manager/localities'];
+  }
+
+  getTopCreatorRoute(row: RankedCreatorRow): Array<string | number> | null {
+    const creatorId = Number(row.creatorId);
+    if (!Number.isFinite(creatorId) || creatorId <= 0) {
+      return null;
+    }
+
+    return ['/manager/creator-reviews'];
+  }
+
+  getTopCreatorQueryParams(row: RankedCreatorRow): { creatorId: number } | null {
+    const creatorId = Number(row.creatorId);
+    if (!Number.isFinite(creatorId) || creatorId <= 0) {
+      return null;
+    }
+
+    return { creatorId };
+  }
+
+  getTopContentRoute(row: RankedContentRow): Array<string | number> | null {
+    const contentId = Number(row.contentId);
+    if (!Number.isFinite(contentId) || contentId <= 0) {
+      return null;
+    }
+
+    switch ((row.contentType ?? '').trim().toLowerCase()) {
+      case 'touristobject':
+      case 'object':
+        return ['/manager/objects/review', contentId];
+      case 'event':
+        return ['/manager/events/edit', contentId];
+      case 'activity':
+        return ['/manager/activities/review', contentId];
+      default:
+        return null;
+    }
+  }
+
+  getLocalityRoute(row: RankedLocalityRow): Array<string | number> | null {
+    const localityId = Number(row.localityId);
+    if (!Number.isFinite(localityId) || localityId <= 0) {
+      return null;
+    }
+
+    return ['/manager/localities/edit', localityId];
+  }
+
+  getUpcomingEventRoute(row: ManagerDashboardUpcomingEventItemDto): Array<string | number> | null {
+    const eventId = Number(row.eventId);
+    if (!Number.isFinite(eventId) || eventId <= 0) {
+      return null;
+    }
+
+    return ['/manager/events/edit', eventId];
+  }
+
   private loadOverview(): void {
     this.isLoading = true;
     this.loadError = '';

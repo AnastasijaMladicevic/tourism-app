@@ -2,7 +2,7 @@ import { ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angula
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin, Observable, of } from 'rxjs';
 import { catchError, finalize, map, switchMap } from 'rxjs/operators';
 import { MapComponent as SharedMapComponent } from '../../../shared/components/map/map';
@@ -70,6 +70,7 @@ export class DestinationsComponent implements OnInit, OnDestroy {
   private readonly http = inject(HttpClient);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
   private readonly objectsUrl = `${environment.apiUrl}/objects`;
 
@@ -112,6 +113,11 @@ export class DestinationsComponent implements OnInit, OnDestroy {
   ];
 
   ngOnInit(): void {
+    const presetRegion = this.route.snapshot.queryParamMap.get('region')?.trim();
+    if (presetRegion) {
+      this.regionFilter = presetRegion;
+    }
+
     this.reloadFromApi();
   }
 
