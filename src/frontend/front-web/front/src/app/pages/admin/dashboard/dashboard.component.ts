@@ -492,6 +492,18 @@ export class DashboardComponent implements OnInit {
     start: number,
     end: number,
   ): string {
+    if (end - start >= Math.PI * 2 - 1e-4) {
+      return [
+        `M ${cx} ${cy - outerR}`,
+        `A ${outerR} ${outerR} 0 1 1 ${cx} ${cy + outerR}`,
+        `A ${outerR} ${outerR} 0 1 1 ${cx} ${cy - outerR}`,
+        `M ${cx} ${cy - innerR}`,
+        `A ${innerR} ${innerR} 0 1 0 ${cx} ${cy + innerR}`,
+        `A ${innerR} ${innerR} 0 1 0 ${cx} ${cy - innerR}`,
+        'Z',
+      ].join(' ');
+    }
+
     const x1 = cx + outerR * Math.cos(start);
     const y1 = cy + outerR * Math.sin(start);
     const x2 = cx + outerR * Math.cos(end);

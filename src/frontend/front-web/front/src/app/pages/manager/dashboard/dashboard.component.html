@@ -168,9 +168,9 @@
               </div>
               <div class="stacked-bar stacked-bar--tall">
                 <div class="stacked-bar-fill-wrap" [style.width.%]="row.totalPercent">
-                  <span class="stack-segment stack-segment--published" [style.width.%]="row.publishedPercent"></span>
-                  <span class="stack-segment stack-segment--pending" [style.width.%]="row.pendingPercent"></span>
-                  <span class="stack-segment stack-segment--rejected" [style.width.%]="row.rejectedPercent"></span>
+                  <span *ngIf="row.published > 0" class="stack-segment stack-segment--published" [style.width.%]="row.publishedPercent"></span>
+                  <span *ngIf="row.pending > 0" class="stack-segment stack-segment--pending" [style.width.%]="row.pendingPercent"></span>
+                  <span *ngIf="row.rejected > 0" class="stack-segment stack-segment--rejected" [style.width.%]="row.rejectedPercent"></span>
                 </div>
               </div>
               <div class="status-row-meta">
@@ -225,13 +225,15 @@
           </div>
 
           <div class="stacked-bar stacked-bar--tall">
-            <span
-              *ngFor="let slice of moderationSlices"
-              class="stack-segment"
-              [style.width.%]="slice.percent"
-              [style.background]="slice.color"
-              [title]="slice.label + ': ' + (slice.count | number)"
-            ></span>
+            <ng-container *ngFor="let slice of moderationSlices">
+              <span
+                *ngIf="slice.count > 0"
+                class="stack-segment"
+                [style.width.%]="slice.percent"
+                [style.background]="slice.color"
+                [title]="slice.label + ': ' + (slice.count | number)"
+              ></span>
+            </ng-container>
           </div>
 
           <ul class="legend-list">

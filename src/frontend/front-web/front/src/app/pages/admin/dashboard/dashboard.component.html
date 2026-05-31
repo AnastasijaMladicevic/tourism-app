@@ -274,13 +274,15 @@
         </div>
 
         <div class="stacked-bar stacked-bar--tall">
-          <span
-            *ngFor="let slice of creatorSlices"
-            class="stack-segment"
-            [style.width.%]="slice.percent"
-            [style.background]="slice.color"
-            [title]="slice.label + ': ' + (slice.count | number)"
-          ></span>
+          <ng-container *ngFor="let slice of creatorSlices">
+            <span
+              *ngIf="slice.count > 0"
+              class="stack-segment"
+              [style.width.%]="slice.percent"
+              [style.background]="slice.color"
+              [title]="slice.label + ': ' + (slice.count | number)"
+            ></span>
+          </ng-container>
         </div>
 
         <ul class="legend-list">

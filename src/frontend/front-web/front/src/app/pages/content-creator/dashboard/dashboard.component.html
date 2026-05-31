@@ -179,18 +179,21 @@
         <div class="donut-wrap">
           <svg viewBox="0 0 36 36" class="donut-svg" aria-label="Content status donut chart">
             <circle class="donut-track" cx="18" cy="18" r="15.9155"></circle>
-            <circle
-              *ngFor="let slice of contentDonutSlices"
-              class="donut-segment"
-              cx="18"
-              cy="18"
-              r="15.9155"
-              [attr.stroke]="slice.color"
-              [attr.stroke-dasharray]="slice.dashArray"
-              [attr.stroke-dashoffset]="slice.dashOffset"
-            >
-              <title>{{ slice.label }}: {{ slice.count }} ({{ slice.percent }}%)</title>
-            </circle>
+            <ng-container *ngFor="let slice of contentDonutSlices">
+              <circle
+                *ngIf="slice.count > 0"
+                class="donut-segment"
+                cx="18"
+                cy="18"
+                r="15.9155"
+                [attr.stroke]="slice.color"
+                [attr.stroke-linecap]="slice.percent >= 100 ? 'butt' : 'round'"
+                [attr.stroke-dasharray]="slice.dashArray"
+                [attr.stroke-dashoffset]="slice.dashOffset"
+              >
+                <title>{{ slice.label }}: {{ slice.count }} ({{ slice.percent }}%)</title>
+              </circle>
+            </ng-container>
           </svg>
           <div class="donut-center">
             <strong>{{ contentDonutTotal }}</strong>
@@ -214,9 +217,9 @@
             <span class="status-row-total">{{ row.total | number }} total</span>
           </div>
           <div class="stacked-bar">
-            <span class="stack-segment stack-segment--published" [style.width.%]="getPublishedPercent(row)"></span>
-            <span class="stack-segment stack-segment--pending" [style.width.%]="getPendingPercent(row)"></span>
-            <span class="stack-segment stack-segment--rejected" [style.width.%]="getRejectedPercent(row)"></span>
+            <span *ngIf="row.published > 0" class="stack-segment stack-segment--published" [style.width.%]="getPublishedPercent(row)"></span>
+            <span *ngIf="row.pending > 0" class="stack-segment stack-segment--pending" [style.width.%]="getPendingPercent(row)"></span>
+            <span *ngIf="row.rejected > 0" class="stack-segment stack-segment--rejected" [style.width.%]="getRejectedPercent(row)"></span>
           </div>
           <div class="status-row-meta">
             <span>{{ row.published }} published</span>
