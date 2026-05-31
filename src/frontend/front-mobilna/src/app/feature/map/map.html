@@ -127,6 +127,10 @@
           <div class="route-planner__mobile-header">
             <h3>{{ 'map.routePlanner.title' | translate }}</h3>
             <div class="route-planner__mobile-actions">
+              <button class="route-planner__toggle route-planner__toggle--mobile" type="button" (click)="toggleRouteListCollapse()">
+                <mat-icon>{{ isRouteListCollapsed ? 'expand_more' : 'expand_less' }}</mat-icon>
+                {{ isRouteListCollapsed ? ('map.routePlanner.showList' | translate) : ('map.routePlanner.hideList' | translate) }}
+              </button>
               <button class="route-planner__icon-btn route-planner__icon-btn--mobile" type="button" (click)="clearPlannedRouteKeepMyLocation()">
                 <mat-icon>delete</mat-icon>
               </button>

@@ -272,9 +272,6 @@
               (ngModelChange)="searchQuery = $event; onSearchChange()"
               [placeholder]="'map.addStop.searchCompactPlaceholder' | translate"
             />
-            <button class="add-stop-screen__icon-button" type="button" [attr.aria-label]="'map.addStop.voiceSearch' | translate">
-              <mat-icon>mic_none</mat-icon>
-            </button>
           </label>
 
           <div class="add-stop-screen__my-location-row">
@@ -324,7 +321,7 @@
                     class="add-stop-screen__recent-item"
                     type="button"
                     [class.add-stop-screen__recent-item--selected]="isSelected(item)"
-                    (click)="selectResult(item)"
+                    (click)="isDesktopLayout ? selectResult(item) : selectAndAdd(item)"
                   >
                     <span class="add-stop-screen__recent-icon">
                       <mat-icon>place</mat-icon>
@@ -350,7 +347,7 @@
                     class="add-stop-screen__recent-item"
                     type="button"
                     [class.add-stop-screen__recent-item--selected]="isSelected(item)"
-                    (click)="selectResult(item)"
+                    (click)="isDesktopLayout ? selectResult(item) : selectAndAdd(item)"
                   >
                     <span class="add-stop-screen__recent-icon">
                       <mat-icon>place</mat-icon>
@@ -377,7 +374,7 @@
                     class="add-stop-screen__recent-item"
                     type="button"
                     [class.add-stop-screen__recent-item--selected]="isSelected(item)"
-                    (click)="selectResult(item)"
+                    (click)="isDesktopLayout ? selectResult(item) : selectAndAdd(item)"
                   >
                     <span class="add-stop-screen__recent-icon">
                       <mat-icon>history</mat-icon>
@@ -452,20 +449,6 @@
         </aside>
       </div>
 
-      <footer class="add-stop-screen__footer">
-        <button class="add-stop-screen__cancel" type="button" (click)="close()">{{ 'common.cancel' | translate }}</button>
-        <button
-          class="add-stop-screen__primary"
-          type="button"
-          [disabled]="!canAddToRoute || isSubmitting"
-          (click)="addToRoute()"
-        >
-          @if (canAddToRoute) {
-            <mat-icon>add</mat-icon>
-          }
-          {{ 'map.addStop.addToRoute' | translate }}
-        </button>
-      </footer>
     </div>
   }
 </div>

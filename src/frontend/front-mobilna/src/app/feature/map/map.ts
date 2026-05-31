@@ -1630,7 +1630,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.routePlannerDefaultHeight ??= rect.height;
     this.routePlannerDragStartY = event.clientY;
     this.routePlannerDragStartHeight = this.routePlannerSettledHeight ?? rect.height;
-    this.routePlannerDragMinHeight = 188;
+    this.routePlannerDragMinHeight = 320;
     this.routePlannerDragMaxHeight = this.resolveRoutePlannerMaxHeight(rect);
     this.routePlannerDragCurrentHeight = this.routePlannerDragStartHeight;
     this.isRoutePlannerDragging = true;

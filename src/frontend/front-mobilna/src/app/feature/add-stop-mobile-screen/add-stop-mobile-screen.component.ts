@@ -196,6 +196,12 @@ export class AddStopMobileScreenComponent implements OnInit, OnDestroy {
     this.refreshRelatedResultsForSelection();
   }
 
+  selectAndAdd(item: AddStopResult): void {
+    this.selectedResultKey = item.key;
+    this.storeRecentItem(item);
+    void this.addToRoute();
+  }
+
   isSelected(item: AddStopResult): boolean {
     return item.key === this.selectedResultKey;
   }

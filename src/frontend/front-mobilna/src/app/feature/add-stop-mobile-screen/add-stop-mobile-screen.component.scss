@@ -17,7 +17,10 @@
 }
 
 :host:not(.add-stop-host--desktop) {
-  min-height: 100dvh;
+  position: fixed;
+  inset: 0;
+  z-index: 1300;
+  overflow-y: auto;
   background: #f5f7fb;
 }
 
@@ -1364,7 +1367,10 @@ body.route-add-stop-open app-floating-ai-assistant {
 
   .add-stop-route-modal__search input,
   .add-stop-screen__search input {
-    color: var(--text-dark);
+    color: var(--text-dark) !important;
+    background: transparent !important;
+    border: none !important;
+    outline: none !important;
 
     &::placeholder {
       color: var(--text-gray);
