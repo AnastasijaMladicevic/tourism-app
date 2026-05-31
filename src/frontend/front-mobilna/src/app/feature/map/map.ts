@@ -1966,7 +1966,9 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const locationPoint = this.createMyLocationRoutePoint();
     if (!locationPoint) {
-      this.openLocationConsentPrompt();
+      if (!this.locationTrackingService.isTrackingEnabled()) {
+        this.openLocationConsentPrompt();
+      }
       return;
     }
 
