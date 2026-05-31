@@ -138,7 +138,7 @@
             </label>
 
             <label class="form-field">
-              <span>Object Type *</span>
+              <span>Object</span>
               <select class="form-control" formControlName="objectId">
                 <option value="">{{ selectedDestinationId ? 'Select object' : 'Select destination first' }}</option>
                 <option *ngFor="let venue of filteredVenueOptions" [value]="venue.id">{{ venue.name }}</option>
@@ -272,8 +272,8 @@
     <aside class="form-side">
       <section class="card side-card">
         <div class="section-title compact">
-          <h2>Venue &amp; Location Intelligence</h2>
-          <p>Choose a linked venue and pin the exact event spot on the map.</p>
+          <h2>Object &amp; Location Intelligence</h2>
+          <p>Choose a linked object and pin the exact event spot on the map.</p>
         </div>
 
         <app-map
@@ -297,9 +297,9 @@
         </div>
 
         <div class="venue-card">
-          <small>Linked venue object: </small>
-          <strong>{{ selectedVenue.name }}</strong>
-          <p>{{ selectedVenue.address }}</p>
+          <small>Linked object:</small>
+          <strong>{{ linkedLocationTitle }}</strong>
+          <p>{{ linkedLocationDescription }}</p>
         </div>
       </section>
 
@@ -310,7 +310,7 @@
 
         <ul>
           <li>Events with high-resolution banners get more engagement.</li>
-          <li>Link your event to a specific venue object to show automated directions.</li>
+          <li>Link your event to a specific object to show automated directions.</li>
           <li>Clear start and end times help with exported calendars.</li>
         </ul>
 
@@ -330,7 +330,7 @@
       >
         <h3 id="tips-modal-title">Event Creator Playbook</h3>
         <p>
-          Use venue-linked events with precise map coordinates so guests can navigate directly to the event pin.
+          Use object-linked events with precise map coordinates so guests can navigate directly to the event pin.
           Keep title, schedule, and ticketing data aligned with your related activities to improve discovery.
         </p>
         <ul class="tips-modal-list">

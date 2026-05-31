@@ -110,7 +110,7 @@
           </label>
 
           <label class="form-field">
-            <span>Object Type *</span>
+            <span>Object</span>
             <select class="form-control" formControlName="objectId">
               <option value="">Select object</option>
               <option *ngFor="let venue of venueOptions" [value]="venue.id">{{ venue.name }}</option>

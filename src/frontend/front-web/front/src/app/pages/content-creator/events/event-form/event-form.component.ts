@@ -164,22 +164,57 @@ export class EventFormComponent implements OnInit, OnDestroy {
     return this.venueOptions.filter((venue) => venue.destinationId === destinationId);
   }
 
-  get selectedVenue(): VenueOption {
-    if (this.venueOptions.length === 0) {
+  get selectedVenue(): VenueOption | null {
+    const selectedObjectId = this.parseOptionalNumber(this.form.get('objectId')?.value);
+    if (!selectedObjectId) {
+      return null;
+    }
+
+    const venue = this.venueOptions.find((venueOption) => venueOption.id === selectedObjectId);
+    if (venue) {
+      return venue;
+    }
+
+    if (this.loadedEvent?.objectId === selectedObjectId) {
       return {
-        id: 0,
-        name: 'No venue available',
-        address: 'No address available',
-        destinationId: 0
+        id: selectedObjectId,
+        name: this.loadedEvent.objectName?.trim() || 'Linked object',
+        address: [
+          this.loadedEvent.localityName?.trim(),
+          this.loadedEvent.destinationName?.trim()
+        ].filter((value): value is string => !!value).join(', ') || 'No address available',
+        destinationId: this.loadedEvent.destinationId ?? 0,
+        latitude: this.loadedEvent.latitude ?? undefined,
+        longitude: this.loadedEvent.longitude ?? undefined
       };
     }
 
-    const selectedObjectId = this.parseOptionalNumber(this.form.get('objectId')?.value);
-    if (!selectedObjectId) {
-      return this.filteredVenueOptions[0] ?? this.venueOptions[0];
+    return null;
+  }
+
+  get selectedDestination(): DestinationDto | null {
+    const destinationId = this.selectedDestinationId;
+    if (!destinationId) {
+      return null;
     }
 
-    return this.venueOptions.find((venue) => venue.id === selectedObjectId) ?? (this.filteredVenueOptions[0] ?? this.venueOptions[0]);
+    return this.destinations.find((destination) => destination.id === destinationId) ?? null;
+  }
+
+  get linkedLocationTitle(): string {
+    return this.selectedVenue?.name || 'No linked object selected';
+  }
+
+  get linkedLocationDescription(): string {
+    if (this.selectedVenue?.address?.trim()) {
+      return this.selectedVenue.address.trim();
+    }
+
+    if (this.selectedDestination?.name?.trim()) {
+      return `Using destination coordinates for ${this.selectedDestination.name.trim()}.`;
+    }
+
+    return 'Select a destination and, optionally, an object to preview the right-side map.';
   }
 
   get visibleRelatedActivities(): RelatedActivity[] {

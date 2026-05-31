@@ -108,13 +108,13 @@
 
         <section class="card section-card">
           <div class="section-title compact">
-            <h3>Venue</h3>
+            <h3>Object</h3>
           </div>
 
           <div class="venue-map"></div>
           <div class="venue-meta">
-            <strong>{{ event.eventTypeName || 'Linked venue' }}</strong>
-            <span>Location is linked from the event payload.</span>
+            <strong>{{ event.objectName || event.localityName || event.destinationName || 'Linked object' }}</strong>
+            <span>Location context is linked from the event payload.</span>
           </div>
         </section>
       </aside>
