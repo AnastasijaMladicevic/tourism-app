@@ -194,12 +194,149 @@ export class NotificationBellComponent implements OnInit {
     return type === 'adminnewmanagerreport' || type === 'adminrepeatedmanagerreports';
   }
 
+  private isAdminRejectedContentNotification(notification?: NotificationDto): boolean {
+    return (notification?.type ?? '').toLowerCase() === 'admincreatormultiplerejectedcontent';
+  }
+
+  private isCreatorObjectReviewNotification(notification?: NotificationDto): boolean {
+    const type = (notification?.type ?? '').toLowerCase();
+    return type === 'creatornewobjectreview' || type === 'creatorobjectreviewdeleted';
+  }
+
+  private extractEntityId(normalized: string, resource: string): string | null {
+    const escaped = resource.replace('/', '\\/');
+    const match = normalized.match(new RegExp(`^\\/${escaped}\\/(\\d+)(?:\\/|$|\\?)`, 'i'));
+    return match?.[1] ?? null;
+  }
+
+  private resolveContentCreatorActionUrl(
+    normalized: string,
+    notification?: NotificationDto,
+  ): string | null {
+    if (normalized.startsWith('/reviews')) {
+      return `/content-creator${normalized}`;
+    }
+
+    const objectId = this.extractEntityId(normalized, 'object') ?? this.extractEntityId(normalized, 'objects');
+    if (objectId) {
+      if (this.isCreatorObjectReviewNotification(notification)) {
+        return `/content-creator/reviews?objectId=${objectId}`;
+      }
+
+      return `/content-creator/objects/edit/${objectId}`;
+    }
+
+    const activityId = this.extractEntityId(normalized, 'activity') ?? this.extractEntityId(normalized, 'activities');
+    if (activityId) {
+      return `/content-creator/activities/edit/${activityId}`;
+    }
+
+    const eventId = this.extractEntityId(normalized, 'event') ?? this.extractEntityId(normalized, 'events');
+    if (eventId) {
+      return `/content-creator/events/edit/${eventId}`;
+    }
+
+    if (this.extractEntityId(normalized, 'deletion-requests')) {
+      return '/content-creator/dashboard';
+    }
+
+    if (
+      normalized.startsWith('/objects')
+      || normalized.startsWith('/activities')
+      || normalized.startsWith('/events')
+      || normalized.startsWith('/map')
+    ) {
+      return `/content-creator${normalized}`;
+    }
+
+    return null;
+  }
+
+  private resolveManagerActionUrl(normalized: string): string | null {
+    const objectId = this.extractEntityId(normalized, 'object') ?? this.extractEntityId(normalized, 'objects');
+    if (objectId) {
+      return `/manager/objects/review/${objectId}`;
+    }
+
+    const activityId = this.extractEntityId(normalized, 'activity') ?? this.extractEntityId(normalized, 'activities');
+    if (activityId) {
+      return `/manager/activities/review/${activityId}`;
+    }
+
+    const eventId = this.extractEntityId(normalized, 'event') ?? this.extractEntityId(normalized, 'events');
+    if (eventId) {
+      return `/manager/events/edit/${eventId}`;
+    }
+
+    const localityId = this.extractEntityId(normalized, 'localities');
+    if (localityId) {
+      return `/manager/localities/edit/${localityId}`;
+    }
+
+    if (this.extractEntityId(normalized, 'manager-reports')) {
+      return '/manager/reports';
+    }
+
+    if (this.extractEntityId(normalized, 'deletion-requests')) {
+      return '/manager/dashboard';
+    }
+
+    if (
+      normalized.startsWith('/objects')
+      || normalized.startsWith('/activities')
+      || normalized.startsWith('/events')
+      || normalized.startsWith('/localities')
+      || normalized.startsWith('/map')
+      || normalized.startsWith('/reports')
+      || normalized.startsWith('/creator-reviews')
+    ) {
+      return `/manager${normalized}`;
+    }
+
+    return null;
+  }
+
+  private resolveAdminActionUrl(
+    normalized: string,
+    notification?: NotificationDto,
+  ): string | null {
+    if (
+      this.isAdminRejectedContentNotification(notification)
+      || this.extractEntityId(normalized, 'object')
+      || this.extractEntityId(normalized, 'objects')
+      || this.extractEntityId(normalized, 'activity')
+      || this.extractEntityId(normalized, 'activities')
+      || this.extractEntityId(normalized, 'event')
+      || this.extractEntityId(normalized, 'events')
+      || this.extractEntityId(normalized, 'deletion-requests')
+    ) {
+      return '/admin/users?tab=internal';
+    }
+
+    if (normalized.startsWith('/users')) {
+      return `/admin${normalized}`;
+    }
+    if (normalized.startsWith('/destinations')) {
+      return `/admin${normalized}`;
+    }
+    if (normalized.startsWith('/map')) {
+      return `/admin${normalized}`;
+    }
+
+    return null;
+  }
+
   private resolveManagerReportActionUrl(
     normalized: string,
+    role: string | null,
     notification?: NotificationDto,
   ): string | null {
     const reportIdFromPath = normalized.match(/^\/manager-reports\/(\d+)(?:\/|$)/)?.[1];
     if (reportIdFromPath) {
+      if (role === 'manager') {
+        return '/manager/reports';
+      }
+
       return `/admin/users?tab=internal&reportId=${reportIdFromPath}`;
     }
 
@@ -215,6 +352,14 @@ export class NotificationBellComponent implements OnInit {
     const role = this.authService.getAuthenticatedRole();
 
     if (
+      normalized.startsWith('/admin/')
+      || normalized.startsWith('/manager/')
+      || normalized.startsWith('/content-creator/')
+    ) {
+      return normalized;
+    }
+
+    if (
       normalized.startsWith('/users/creator-requests')
       || normalized.includes('/creator-requests')
       || (notification && this.isCreatorRoleRequestNotification(notification))
@@ -222,35 +367,29 @@ export class NotificationBellComponent implements OnInit {
       return '/admin/users?tab=tourists';
     }
 
-    const managerReportUrl = this.resolveManagerReportActionUrl(normalized, notification);
+    const managerReportUrl = this.resolveManagerReportActionUrl(normalized, role, notification);
     if (managerReportUrl) {
       return managerReportUrl;
     }
 
     if (role === 'admin') {
-      if (normalized.startsWith('/users')) {
-        return `/admin${normalized}`;
-      }
-      if (normalized.startsWith('/destinations')) {
-        return `/admin${normalized}`;
-      }
-      if (normalized.startsWith('/map')) {
-        return `/admin${normalized}`;
+      const adminUrl = this.resolveAdminActionUrl(normalized, notification);
+      if (adminUrl) {
+        return adminUrl;
       }
     }
 
     if (role === 'content-creator') {
-      if (normalized.startsWith('/reviews')) {
-        return `/content-creator${normalized}`;
-      }
-      if (normalized.startsWith('/objects') || normalized.startsWith('/activities') || normalized.startsWith('/events') || normalized.startsWith('/map')) {
-        return `/content-creator${normalized}`;
+      const creatorUrl = this.resolveContentCreatorActionUrl(normalized, notification);
+      if (creatorUrl) {
+        return creatorUrl;
       }
     }
 
     if (role === 'manager') {
-      if (normalized.startsWith('/objects') || normalized.startsWith('/activities') || normalized.startsWith('/events') || normalized.startsWith('/localities') || normalized.startsWith('/map')) {
-        return `/manager${normalized}`;
+      const managerUrl = this.resolveManagerActionUrl(normalized);
+      if (managerUrl) {
+        return managerUrl;
       }
     }
 
