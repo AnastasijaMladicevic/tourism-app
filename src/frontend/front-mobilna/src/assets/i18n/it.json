@@ -1129,6 +1129,7 @@
     "tripTitleFallback": "Il tuo piano di viaggio",
     "tripWeekSuffix": "Settimana di {{name}}",
     "preview": {
+      "heroBody": "Organizza il viaggio per giorni – aggiungi eventi, imposta le priorità e tieni traccia del programma.",
       "mobileTabs": {
         "events": "Eventi",
         "myPlanner": "Il mio pianificatore"

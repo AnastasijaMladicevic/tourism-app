@@ -1135,6 +1135,7 @@
     "tripTitleFallback": "Your trip plan",
     "tripWeekSuffix": "{{name}} week",
     "preview": {
+      "heroBody": "Organize your trip by days – add events, set priorities, and track your schedule.",
       "mobileTabs": {
         "events": "Events",
         "myPlanner": "My planner"

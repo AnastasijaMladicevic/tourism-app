@@ -1135,6 +1135,7 @@
     "tripTitleFallback": "Tvoj plan putovanja",
     "tripWeekSuffix": "{{name}} nedelja",
     "preview": {
+      "heroBody": "Organizuj putovanje po danima – dodaj događaje, postavi prioritete i prati raspored.",
       "mobileTabs": {
         "events": "Događaji",
         "myPlanner": "Moj planer"
