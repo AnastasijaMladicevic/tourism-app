@@ -14,7 +14,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { catchError, firstValueFrom, of } from 'rxjs';
+import { catchError, firstValueFrom, of, Subscription } from 'rxjs';
 import { LocationTrackingService } from '../../services/location-tracking';
 import { DestinationDto, DestinationService } from '../../services/destination';
 import { AuthService } from '../../services/auth';
@@ -23,6 +23,8 @@ import { ImageService } from '../../services/image';
 import { PendingActionService } from '../../services/pending-action';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../services/translation.service';
+import { ActiveRegionService } from '../../services/active-region';
+import { DataCacheService } from '../../services/data-cache';
 
 export interface DestinationView extends DestinationDto {
   distanceMeters?: number;
@@ -70,6 +72,11 @@ export class DestinationsComponent implements OnInit, OnDestroy {
   private searchTimeout: ReturnType<typeof setTimeout> | null = null;
   private readonly listStateKey = 'destinations-list-state';
   private readonly returnFlagKey = 'destinations-return-from-detail';
+  private readonly locationSubs = new Subscription();
+  private readonly handleFavoriteObject = (event: any) => {
+    const obj = event.detail;
+    if (obj) this.toggleFavorite(obj, new Event('click'));
+  };
 
 
   constructor(
@@ -81,7 +88,9 @@ export class DestinationsComponent implements OnInit, OnDestroy {
     private imageService: ImageService,
     private locationTrackingService: LocationTrackingService,
     private pendingActionService: PendingActionService,
-    private translationService: TranslationService
+    private translationService: TranslationService,
+    private activeRegionService: ActiveRegionService,
+    private dataCacheService: DataCacheService,
   ) {
     effect(() => {
       const language = this.translationService.language();
@@ -103,42 +112,41 @@ export class DestinationsComponent implements OnInit, OnDestroy {
   }
   @ViewChild('top') top!: ElementRef;
   ngOnInit(): void {
-    this.locationTrackingService.trackingEnabled$.subscribe(enabled => {
-      this.isTracking = enabled;
+    this.locationSubs.add(
+      this.locationTrackingService.trackingEnabled$.subscribe(enabled => {
+        this.isTracking = enabled;
 
-      if (!enabled) {
-        this.clearDistances();
-      } else {
-        this.updateDistances();
+        if (!enabled) {
+          this.clearDistances();
+        } else {
+          this.updateDistances();
+          this.cdr.detectChanges();
+        }
+      })
+    );
+
+    this.locationSubs.add(
+      this.locationTrackingService.location$.subscribe(loc => {
+        this.userLocation = loc
+          ? { lat: loc.latitude, lng: loc.longitude }
+          : null;
+
+        if (this.userLocation) {
+          this.updateDistances();
+        } else {
+          this.clearDistances();
+        }
+        this.refreshVisibleDestinations();
         this.cdr.detectChanges();
-      }
-    });
-
-    this.locationTrackingService.location$.subscribe(loc => {
-      this.userLocation = loc
-        ? { lat: loc.latitude, lng: loc.longitude }
-        : null;
-
-      if (this.userLocation) {
-        this.updateDistances();
-      } else {
-        this.clearDistances();
-      }
-      this.refreshVisibleDestinations();
-      this.cdr.detectChanges();
-    });
+      })
+    );
 
     if (sessionStorage.getItem(this.returnFlagKey)) {
       sessionStorage.removeItem(this.returnFlagKey);
       this.restoreListState();
     }
     void this.loadData();
-    window.addEventListener('favorite-object', (event: any) => {
-      const obj = event.detail;
-      if (obj) {
-        this.toggleFavorite(obj, new Event('click'));
-      }
-    });
+    window.addEventListener('favorite-object', this.handleFavoriteObject);
     this.cdr.detectChanges();
   }
 
@@ -150,7 +158,7 @@ export class DestinationsComponent implements OnInit, OnDestroy {
       if (this.authService.isLoggedIn()) {
         await firstValueFrom(
           this.favoriteStateService
-            .loadFavorites(true)
+            .loadFavorites(false)
             .pipe(catchError(() => of(new Map<string, number>()))),
         );
       }
@@ -480,6 +488,12 @@ export class DestinationsComponent implements OnInit, OnDestroy {
   }
 
   private async fetchAllDestinations(): Promise<DestinationDto[]> {
+    const regionId = this.activeRegionService.getActiveRegionId() ?? 0;
+    const lang = this.translationService.language();
+    const cacheKey = `destinations:r${regionId}:l${lang}`;
+    const cached = this.dataCacheService.get<DestinationDto[]>(cacheKey);
+    if (cached) return cached;
+
     const allDestinations: DestinationDto[] = [];
     const seenIds = new Set<number>();
 
@@ -514,6 +528,7 @@ export class DestinationsComponent implements OnInit, OnDestroy {
       }
     }
 
+    this.dataCacheService.set(cacheKey, allDestinations);
     return allDestinations;
   }
 
@@ -656,5 +671,7 @@ export class DestinationsComponent implements OnInit, OnDestroy {
     if (this.searchTimeout) {
       clearTimeout(this.searchTimeout);
     }
+    this.locationSubs.unsubscribe();
+    window.removeEventListener('favorite-object', this.handleFavoriteObject);
   }
 }

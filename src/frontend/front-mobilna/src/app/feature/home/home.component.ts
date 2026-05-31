@@ -2,12 +2,13 @@ import { ChangeDetectorRef, Component, NgZone, OnDestroy, OnInit } from '@angula
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { catchError, finalize, forkJoin, map, Observable, of } from 'rxjs';
+import { catchError, finalize, forkJoin, map, Observable, of, Subscription } from 'rxjs';
 import { BottomNavComponent } from '../bottom-nav/bottom-nav.component';
 import { DestinationDto, DestinationService } from '../../services/destination';
 import { EventDto, EventService } from '../../services/event';
 import { ActivityDto, ActivityService } from '../../services/activity';
 import { CreateFavoriteDto, FavoriteDto, FavoriteService } from '../../services/favorite';
+import { FavoriteStateService } from '../../services/favorite-state';
 import { ImageDto } from '../../services/image';
 import { environment } from '../../../environment/environment';
 import { AuthService } from '../../services/auth';
@@ -25,6 +26,7 @@ import { ActiveRegionService } from '../../services/active-region';
 import { SmartSearchResultDto } from '../../services/smart-search';
 import { LocalityDto, LocalityService } from '../../services/locality';
 import { ElementRef, HostListener } from '@angular/core';
+import { DataCacheService } from '../../services/data-cache';
 
 interface PlaceCard {
   title: string;
@@ -154,6 +156,15 @@ export class HomeComponent implements OnInit, OnDestroy {
   private lastRecommendationLocationKey: string | null = null;
   private searchIndex: HomeSearchResult[] = [];
   private isLoadingSearchIndex = false;
+  private readonly locationSubs = new Subscription();
+  private readonly handleFavoriteObject = (event: any) => {
+    const obj = event.detail;
+    if (obj) this.toggleFavorite(obj, new Event('click'));
+  };
+  private readonly handleAddToPlanner = (event: any) => {
+    const obj = event.detail;
+    if (obj) this.togglePlanner(obj, new Event('click'));
+  };
   constructor(
     public router: Router,
     private http: HttpClient,
@@ -163,6 +174,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     private objectService: ObjectService,
     private activityService: ActivityService,
     private favoriteService: FavoriteService,
+    private favoriteStateService: FavoriteStateService,
     private eventService: EventService,
     private authService: AuthService,
     private recommendationService: RecommendationService,
@@ -174,6 +186,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     private activeRegionService: ActiveRegionService,
     private localityService: LocalityService,
     private elementRef: ElementRef,
+    private dataCacheService: DataCacheService,
   ) { }
 
   @HostListener('document:click', ['$event'])
@@ -494,49 +507,43 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.currentFeatured = this.featuredDestinations[index];
   }
   ngOnInit(): void {
-    this.locationTrackingService.trackingEnabled$.subscribe(enabled => {
-      this.isTracking = enabled;
+    this.locationSubs.add(
+      this.locationTrackingService.trackingEnabled$.subscribe(enabled => {
+        this.isTracking = enabled;
 
-      if (!enabled) {
-        this.clearDistances();
-      } else {
-        this.updateDistances();
-        this.tryRefreshRecommendedCardsWithLocation();
+        if (!enabled) {
+          this.clearDistances();
+        } else {
+          this.updateDistances();
+          this.tryRefreshRecommendedCardsWithLocation();
+          this.cdr.detectChanges();
+        }
+      })
+    );
+
+    this.locationSubs.add(
+      this.locationTrackingService.location$.subscribe(loc => {
+        this.userLocation = loc
+          ? { lat: loc.latitude, lng: loc.longitude }
+          : null;
+
+        if (this.userLocation) {
+          this.updateDistances();
+          this.tryRefreshRecommendedCardsWithLocation();
+        } else {
+          this.clearDistances();
+        }
         this.cdr.detectChanges();
-      }
-    });
-
-    this.locationTrackingService.location$.subscribe(loc => {
-      this.userLocation = loc
-        ? { lat: loc.latitude, lng: loc.longitude }
-        : null;
-
-      if (this.userLocation) {
-        this.updateDistances();
-        this.tryRefreshRecommendedCardsWithLocation();
-      } else {
-        this.clearDistances();
-      }
-      this.cdr.detectChanges();
-    });
+      })
+    );
     this.loadUserName();
     this.loadPlaceCards();
     this.loadSearchIndex();
     this.loadRecommendedCards();
     this.loadEventCards();
     this.loadFavorites();
-    window.addEventListener('favorite-object', (event: any) => {
-      const obj = event.detail;
-      if (obj) {
-        this.toggleFavorite(obj, new Event('click'));
-      }
-    });
-    window.addEventListener('add-to-planner', (event: any) => {
-      const obj = event.detail;
-      if (obj) {
-        this.togglePlanner(obj, new Event('click'));
-      }
-    });
+    window.addEventListener('favorite-object', this.handleFavoriteObject);
+    window.addEventListener('add-to-planner', this.handleAddToPlanner);
     window.addEventListener('focus', this.handleWindowFocus);
     document.addEventListener('visibilitychange', this.handleVisibilityChange);
     this.cdr.detectChanges();
@@ -655,6 +662,9 @@ export class HomeComponent implements OnInit, OnDestroy {
       clearTimeout(this.searchDebounceTimer);
       this.searchDebounceTimer = null;
     }
+    this.locationSubs.unsubscribe();
+    window.removeEventListener('favorite-object', this.handleFavoriteObject);
+    window.removeEventListener('add-to-planner', this.handleAddToPlanner);
     window.removeEventListener('focus', this.handleWindowFocus);
     document.removeEventListener('visibilitychange', this.handleVisibilityChange);
   }
@@ -757,6 +767,14 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.isLoadingPlaces = true;
 
     const lang = this.translationService.language().trim().toLowerCase();
+    const cacheKey = `home-place-cards:r${regionId}:l${lang}`;
+    const cached = this.dataCacheService.get<{ destinations: unknown[]; objects: unknown[]; activities: unknown[] }>(cacheKey);
+
+    if (cached) {
+      this.isLoadingPlaces = false;
+      this.processPlaceCards(cached.destinations, cached.objects, cached.activities);
+      return;
+    }
 
     forkJoin({
       destinations: this.destinationService
@@ -782,60 +800,61 @@ export class HomeComponent implements OnInit, OnDestroy {
         }),
       )
       .subscribe(({ destinations, objects, activities }) => {
-        const destinationCards = this.toArray<DestinationDto>(destinations)
-          .map((d) => this.normalizeDestination(d))
-          .filter((d) => d.id > 0 && d.isActive !== false)
-          .map((d) => this.toDestinationCard(d));
+        this.dataCacheService.set(cacheKey, { destinations, objects, activities });
+        this.processPlaceCards(destinations, objects, activities);
+      });
+  }
 
-        const featured = this.toArray<DestinationDto>(destinations)
-          .map((destination) => this.normalizeDestination(destination))
-          .filter((destination) => destination.id > 0 && destination.isActive !== false)
-          .map((destination) => this.toFeaturedDestination(destination))
-          .filter((destination) => !!destination.imageUrl);
+  private processPlaceCards(destinations: unknown[], objects: unknown[], activities: unknown[]): void {
+    const destinationCards = this.toArray<DestinationDto>(destinations)
+      .map((d) => this.normalizeDestination(d))
+      .filter((d) => d.id > 0 && d.isActive !== false)
+      .map((d) => this.toDestinationCard(d));
 
-        const objectCards = this.toArray<ObjectDto>(objects)
-          .map((o) => this.normalizeObject(o))
-          .filter((o) => o.id > 0 && o.isActive !== false)
-          .filter((o) => {
-            const type = o.objectTypeName?.trim().toLowerCase();
-            return type === 'restoran' || type === 'kafic';
-          })
-          .map((o) => this.toObjectCard(o));
+    const featured = this.toArray<DestinationDto>(destinations)
+      .map((destination) => this.normalizeDestination(destination))
+      .filter((destination) => destination.id > 0 && destination.isActive !== false)
+      .map((destination) => this.toFeaturedDestination(destination))
+      .filter((destination) => !!destination.imageUrl);
 
-        const activityCards = this.toArray<ActivityDto>(activities)
-          .map((a) => this.normalizeActivity(a))
-          .filter((a) => a.id > 0 && a.isActive !== false)
-          .map((a) => this.toActivityCard(a));
+    const objectCards = this.toArray<ObjectDto>(objects)
+      .map((o) => this.normalizeObject(o))
+      .filter((o) => o.id > 0 && o.isActive !== false)
+      .filter((o) => {
+        const type = o.objectTypeName?.trim().toLowerCase();
+        return type === 'restoran' || type === 'kafic';
+      })
+      .map((o) => this.toObjectCard(o));
 
-        this.fallbackRecommended = this.mixRecommendedCards(destinationCards, activityCards, objectCards);
-        if (!this.hasRecommendationResponse || !this.recommended.length) {
-          this.recommended = [...this.fallbackRecommended];
-          this.applyFavoriteState(this.recommended);
-        }
-        this.popular = destinationCards;
+    const activityCards = this.toArray<ActivityDto>(activities)
+      .map((a) => this.normalizeActivity(a))
+      .filter((a) => a.id > 0 && a.isActive !== false)
+      .map((a) => this.toActivityCard(a));
 
-        if (featured.length) {
-          const shuffled = [...featured].sort(() => Math.random() - 0.5);
-          const selectedFeatured = shuffled.slice(0, Math.min(5, shuffled.length));
-          this.featuredDestinations = selectedFeatured;
-          this.translateFeaturedDisplayTitles(this.featuredDestinations).pipe().subscribe((res) => {
-            this.featuredDestinations = res;
-          });
-          this.currentIndex = 0;
-          this.translateFeaturedDisplayTitles(selectedFeatured).subscribe((res) => {
-            this.featuredDestinations = res;
-            this.currentFeatured = this.featuredDestinations[0];
-            this.startRotation();
-            this.flushUi();
-          });
-          this.flushUi();
-        } else {
-          this.featuredDestinations = [];
-          this.currentFeatured = null;
-        }
+    this.fallbackRecommended = this.mixRecommendedCards(destinationCards, activityCards, objectCards);
+    if (!this.hasRecommendationResponse || !this.recommended.length) {
+      this.recommended = [...this.fallbackRecommended];
+      this.applyFavoriteState(this.recommended);
+    }
+    this.popular = destinationCards;
 
+    if (featured.length) {
+      const shuffled = [...featured].sort(() => Math.random() - 0.5);
+      const selectedFeatured = shuffled.slice(0, Math.min(5, shuffled.length));
+      this.featuredDestinations = selectedFeatured;
+      this.currentIndex = 0;
+      this.translateFeaturedDisplayTitles(selectedFeatured).subscribe((res) => {
+        this.featuredDestinations = res;
+        this.currentFeatured = this.featuredDestinations[0];
+        this.startRotation();
         this.flushUi();
       });
+    } else {
+      this.featuredDestinations = [];
+      this.currentFeatured = null;
+    }
+
+    this.flushUi();
   }
 
   private translateFeaturedDisplayTitles(
@@ -929,6 +948,14 @@ export class HomeComponent implements OnInit, OnDestroy {
     const regionId = this.activeRegionId;
     this.isLoadingEvents = true;
 
+    const cacheKey = `home-event-cards:r${regionId}`;
+    const cached = this.dataCacheService.get<unknown[]>(cacheKey);
+    if (cached) {
+      this.isLoadingEvents = false;
+      this.processEventCards(cached);
+      return;
+    }
+
     this.eventService
       .getAll(
         { page: 1, pageSize: 12, sortBy: 'startDate', sortOrder: 'asc', regionId },
@@ -942,38 +969,42 @@ export class HomeComponent implements OnInit, OnDestroy {
         }),
       )
       .subscribe((events) => {
-        const eventList = this.toArray<EventDto>(events);
-
-        const future = eventList
-          .map((e) => this.normalizeEvent(e))
-          .filter((e) => e.id > 0 && e.isActive !== false && new Date(e.startDate) >= new Date())
-          .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
-
-        const eventCards = future.slice(0, 8).map(
-          (e): EventCard => ({
-            id: e.id,
-            title: e.name,
-            location: e.localityName ?? e.destinationName ?? e.regionName ?? '',
-            dateText: this.eventDate(e.startDate),
-            priceText: this.eventPrice(e.price),
-            isFree: !e.price || e.price <= 0,
-            timeText: this.eventTime(e.startDate, e.endDate),
-            imageUrl: this.pickEventImage(e),
-            distanceText: this.distanceTextFromCoords(e.latitude, e.longitude),
-            latitude: e.latitude,
-            longitude: e.longitude,
-            startDate: e.startDate,
-            endDate: e.endDate,
-          }),
-        );
-
-        this.upcomingEvents = eventCards;
-        this.events = eventCards;
-        this.syncPlannerStateAcrossLists();
-
-        this.flushUi();
+        this.dataCacheService.set(cacheKey, events as unknown[]);
+        this.processEventCards(events as unknown[]);
       });
     this.loadPlanner();
+  }
+
+  private processEventCards(events: unknown[]): void {
+    const eventList = this.toArray<EventDto>(events);
+
+    const future = eventList
+      .map((e) => this.normalizeEvent(e))
+      .filter((e) => e.id > 0 && e.isActive !== false && new Date(e.startDate) >= new Date())
+      .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
+
+    const eventCards = future.slice(0, 8).map(
+      (e): EventCard => ({
+        id: e.id,
+        title: e.name,
+        location: e.localityName ?? e.destinationName ?? e.regionName ?? '',
+        dateText: this.eventDate(e.startDate),
+        priceText: this.eventPrice(e.price),
+        isFree: !e.price || e.price <= 0,
+        timeText: this.eventTime(e.startDate, e.endDate),
+        imageUrl: this.pickEventImage(e),
+        distanceText: this.distanceTextFromCoords(e.latitude, e.longitude),
+        latitude: e.latitude,
+        longitude: e.longitude,
+        startDate: e.startDate,
+        endDate: e.endDate,
+      }),
+    );
+
+    this.upcomingEvents = eventCards;
+    this.events = eventCards;
+    this.syncPlannerStateAcrossLists();
+    this.flushUi();
   }
 
   private loadFavorites(): void {
@@ -981,26 +1012,11 @@ export class HomeComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.favoriteService
-      .getMyFavorites()
-      .pipe(catchError(() => of([] as FavoriteDto[])))
-      .subscribe((favorites) => {
-        this.favoriteMap = new Map<string, number>();
-
-        for (const favorite of favorites) {
-          const raw = favorite as unknown as Record<string, unknown>;
-          const favoriteId = Number(raw['id'] ?? raw['Id'] ?? 0);
-          if (!favoriteId) continue;
-
-          const destinationId = Number(raw['destinationId'] ?? raw['DestinationId'] ?? 0);
-          const objectId = Number(raw['objectId'] ?? raw['ObjectId'] ?? 0);
-          const activityId = Number(raw['activityId'] ?? raw['ActivityId'] ?? 0);
-
-          if (destinationId) this.favoriteMap.set(this.favoriteKey('destination', destinationId), favoriteId);
-          if (objectId) this.favoriteMap.set(this.favoriteKey('object', objectId), favoriteId);
-          if (activityId) this.favoriteMap.set(this.favoriteKey('activity', activityId), favoriteId);
-        }
-
+    this.favoriteStateService
+      .loadFavorites(false)
+      .pipe(catchError(() => of(new Map<string, number>())))
+      .subscribe((favoriteMap) => {
+        this.favoriteMap = favoriteMap;
         this.applyFavoriteState(this.recommended);
         this.applyFavoriteState(this.popular);
         this.flushUi();
@@ -1009,6 +1025,17 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   private loadSearchIndex(): void {
     if (this.isLoadingSearchIndex || this.searchIndex.length > 0) {
+      return;
+    }
+
+    const lang = this.translationService.language();
+    const cacheKey = `search-index:l${lang}`;
+    const cached = this.dataCacheService.get<HomeSearchResult[]>(cacheKey);
+    if (cached) {
+      this.searchIndex = cached;
+      if (this.searchQuery.trim().length >= 2) {
+        this.applyLocalSearch(this.searchQuery.trim());
+      }
       return;
     }
 
@@ -1087,6 +1114,7 @@ export class HomeComponent implements OnInit, OnDestroy {
           ...activityResults,
           ...localityResults,
         ];
+        this.dataCacheService.set(cacheKey, this.searchIndex);
       });
   }
 

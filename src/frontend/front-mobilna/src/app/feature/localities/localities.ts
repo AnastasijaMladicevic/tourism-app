@@ -13,7 +13,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { catchError, firstValueFrom, of } from 'rxjs';
+import { catchError, firstValueFrom, of, Subscription } from 'rxjs';
 import {
   LocalityDto,
   LocalityService,
@@ -25,6 +25,8 @@ import { FavoriteStateService } from '../../services/favorite-state';
 import { PendingActionService } from '../../services/pending-action';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../services/translation.service';
+import { ActiveRegionService } from '../../services/active-region';
+import { DataCacheService } from '../../services/data-cache';
 
 export interface LocalityView extends LocalityDto {
   isFavorite: boolean;
@@ -68,6 +70,11 @@ export class LocalitiesComponent implements OnInit, OnDestroy {
   private searchTimeout: ReturnType<typeof setTimeout> | null = null;
   private readonly listStateKey = 'localities-list-state';
   private readonly returnFlagKey = 'localities-return-from-detail';
+  private readonly locationSubs = new Subscription();
+  private readonly handleFavoriteObject = (event: Event & { detail?: LocalityView }) => {
+    const obj = event.detail;
+    if (obj) this.toggleFavorite(obj, new Event('click'));
+  };
 
   constructor(
     private readonly router: Router,
@@ -79,6 +86,8 @@ export class LocalitiesComponent implements OnInit, OnDestroy {
     private readonly locationTrackingService: LocationTrackingService,
     private readonly pendingActionService: PendingActionService,
     private readonly translationService: TranslationService,
+    private readonly activeRegionService: ActiveRegionService,
+    private readonly dataCacheService: DataCacheService,
   ) {
     effect(() => {
       const language = this.translationService.language();
@@ -100,41 +109,37 @@ export class LocalitiesComponent implements OnInit, OnDestroy {
   }
   @ViewChild('top') top!: ElementRef;
   ngOnInit(): void {
-    this.locationTrackingService.trackingEnabled$.subscribe((enabled) => {
-      this.isTracking = enabled;
+    this.locationSubs.add(
+      this.locationTrackingService.trackingEnabled$.subscribe((enabled) => {
+        this.isTracking = enabled;
 
-      if (this.sortOption === 'distance') {
-        this.restoreListState();
-        void this.loadData();
-        return;
-      }
+        if (!enabled) {
+          this.clearDistances();
+        } else {
+          this.updateDistances();
+        }
 
-      if (!enabled) {
-        this.clearDistances();
-      } else {
-        this.updateDistances();
-      }
+        this.cdr.detectChanges();
+      })
+    );
 
-      this.cdr.detectChanges();
-    });
+    this.locationSubs.add(
+      this.locationTrackingService.location$.subscribe((loc) => {
+        this.userLocation = loc ? { lat: loc.latitude, lng: loc.longitude } : null;
 
-    this.locationTrackingService.location$.subscribe((loc) => {
-      this.userLocation = loc ? { lat: loc.latitude, lng: loc.longitude } : null;
+        if (this.userLocation) {
+          this.updateDistances();
+        } else {
+          this.clearDistances();
+        }
 
-      if (this.sortOption === 'distance') {
-        this.restoreListState();
-        void this.loadData();
-        return;
-      }
+        if (this.sortOption === 'distance') {
+          void this.refreshVisibleLocalities();
+        }
 
-      if (this.userLocation) {
-        this.updateDistances();
-      } else {
-        this.clearDistances();
-      }
-
-      this.cdr.detectChanges();
-    });
+        this.cdr.detectChanges();
+      })
+    );
 
     if (sessionStorage.getItem(this.returnFlagKey)) {
       sessionStorage.removeItem(this.returnFlagKey);
@@ -142,12 +147,7 @@ export class LocalitiesComponent implements OnInit, OnDestroy {
     }
     void this.loadData();
 
-    window.addEventListener('favorite-object', (event: Event & { detail?: LocalityView }) => {
-      const obj = event.detail;
-      if (obj) {
-        this.toggleFavorite(obj, new Event('click'));
-      }
-    });
+    window.addEventListener('favorite-object', this.handleFavoriteObject);
   }
 
   get totalPages(): number {
@@ -361,6 +361,12 @@ export class LocalitiesComponent implements OnInit, OnDestroy {
     }
   }
   private async fetchAllLocalities(): Promise<LocalityDto[]> {
+    const regionId = this.activeRegionService.getActiveRegionId() ?? 0;
+    const lang = this.translationService.language();
+    const cacheKey = `localities:r${regionId}:l${lang}`;
+    const cached = this.dataCacheService.get<LocalityDto[]>(cacheKey);
+    if (cached) return cached;
+
     const all: LocalityDto[] = [];
     let page = 1;
     const pageSize = 100;
@@ -384,6 +390,7 @@ export class LocalitiesComponent implements OnInit, OnDestroy {
       page++;
     }
 
+    this.dataCacheService.set(cacheKey, all);
     return all;
   }
   private async refreshVisibleLocalities(): Promise<void> {
@@ -678,5 +685,7 @@ export class LocalitiesComponent implements OnInit, OnDestroy {
     if (this.searchTimeout) {
       clearTimeout(this.searchTimeout);
     }
+    this.locationSubs.unsubscribe();
+    window.removeEventListener('favorite-object', this.handleFavoriteObject);
   }
 }

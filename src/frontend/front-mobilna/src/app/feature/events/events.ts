@@ -1,9 +1,9 @@
 import { CommonModule, Location } from '@angular/common';
-import { ChangeDetectorRef, Component, ElementRef, HostListener, NgZone, OnInit, ViewChild, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, HostListener, NgZone, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { catchError, finalize, forkJoin, of } from 'rxjs';
+import { catchError, finalize, forkJoin, of, Subscription } from 'rxjs';
 import { environment } from '../../../environment/environment';
 import { EventDto, EventService } from '../../services/event';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -16,6 +16,8 @@ import { PendingActionService } from '../../services/pending-action';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { RouterHistoryService } from '../../services/router-history';
 import { TranslationService } from '../../services/translation.service';
+import { ActiveRegionService } from '../../services/active-region';
+import { DataCacheService } from '../../services/data-cache';
 
 type EventCategory = 'All' | string;
 
@@ -48,7 +50,7 @@ interface EventCard {
   templateUrl: './events.html',
   styleUrl: './events.scss',
 })
-export class EventsComponent implements OnInit {
+export class EventsComponent implements OnInit, OnDestroy {
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly ngZone = inject(NgZone);
   private readonly eventService = inject(EventService);
@@ -61,6 +63,8 @@ export class EventsComponent implements OnInit {
   private readonly pendingActionService = inject(PendingActionService);
   private readonly routerHistory = inject(RouterHistoryService);
   private readonly translationService = inject(TranslationService);
+  private readonly activeRegionService = inject(ActiveRegionService);
+  private readonly dataCacheService = inject(DataCacheService);
   private readonly listStateKey = 'events-list-state';
   private readonly returnFlagKey = 'events-return-from-detail';
   activeFilter = 'All';
@@ -83,21 +87,30 @@ export class EventsComponent implements OnInit {
   eventTypes: { id: number; name: string }[] = [];
   isPlannerBusy = false;
   private plannerMap = new Map<number, number>();
+  private readonly locationSubs = new Subscription();
+  private readonly handleAddToPlanner = (event: any) => {
+    const obj = event.detail;
+    if (obj) this.togglePlanner(obj, new Event('click'));
+  };
   @ViewChild('top') top!: ElementRef;
   ngOnInit(): void {
-    this.locationTrackingService.trackingEnabled$.subscribe(enabled => {
-      this.isTracking = enabled;
-      if (!enabled) this.clearDistances();
-      else this.updateDistances();
-    });
+    this.locationSubs.add(
+      this.locationTrackingService.trackingEnabled$.subscribe(enabled => {
+        this.isTracking = enabled;
+        if (!enabled) this.clearDistances();
+        else this.updateDistances();
+      })
+    );
 
-    this.locationTrackingService.location$.subscribe(loc => {
-      this.userLocation = loc ? { lat: loc.latitude, lng: loc.longitude } : null;
-      if (this.userLocation) this.updateDistances();
-      else this.clearDistances();
-      this.refreshVisibleEvents();
-      this.cdr.detectChanges();
-    });
+    this.locationSubs.add(
+      this.locationTrackingService.location$.subscribe(loc => {
+        this.userLocation = loc ? { lat: loc.latitude, lng: loc.longitude } : null;
+        if (this.userLocation) this.updateDistances();
+        else this.clearDistances();
+        this.refreshVisibleEvents();
+        this.cdr.detectChanges();
+      })
+    );
 
     if (sessionStorage.getItem(this.returnFlagKey)) {
       sessionStorage.removeItem(this.returnFlagKey);
@@ -106,10 +119,12 @@ export class EventsComponent implements OnInit {
     this.loadEvents();
     this.loadPlanner();
 
-    window.addEventListener('add-to-planner', (event: any) => {
-      const obj = event.detail;
-      if (obj) this.togglePlanner(obj, new Event('click'));
-    });
+    window.addEventListener('add-to-planner', this.handleAddToPlanner);
+  }
+
+  ngOnDestroy(): void {
+    this.locationSubs.unsubscribe();
+    window.removeEventListener('add-to-planner', this.handleAddToPlanner);
   }
 
   private saveListState(): void {
@@ -379,53 +394,20 @@ export class EventsComponent implements OnInit {
   private loadEvents(): void {
     this.isLoading = true;
 
+    const regionId = this.activeRegionService.getActiveRegionId() ?? 0;
+    const cacheKey = `events-list:r${regionId}`;
+    const cached = this.dataCacheService.get<EventDto[]>(cacheKey);
+    if (cached) {
+      this.isLoading = false;
+      this.applyEventsData(cached);
+      return;
+    }
+
     this.eventService.getAllItems({ sortBy: 'startDate', sortOrder: 'asc' }).subscribe({
       next: (events) => {
-        try {
-          const eventList = this.toArray<EventDto>(events).map((event) =>
-            this.normalizeEvent(event),
-          );
-
-          const active = eventList
-            .filter((event) => event.id > 0 && event.isActive !== false)
-            .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
-
-          const now = new Date();
-          const futureOnly = active.filter((event) => new Date(event.startDate) >= now);
-          const source = futureOnly.length ? futureOnly : active;
-
-          this.events = source.map((event) => ({
-            id: event.id,
-            title: event.name,
-            category: this.normalizeCategory(event.eventTypeName),
-            dateText: this.formatDate(event.startDate),
-            timeText: this.formatTimeRange(event.startDate, event.endDate),
-            location: event.localityName ?? event.destinationName ?? 'Montenegro',
-            priceText: this.formatPrice(event.price),
-            imageUrl: this.resolveMediaUrl(event.mainImageUrl),
-            attendeesText: event.maxVisitors
-              ? `Max ${event.maxVisitors} visitors`
-              : 'No attendee data',
-            latitude: event.latitude,
-            longitude: event.longitude,
-            eventTypeName: event.eventTypeName ?? '',
-            eventTypeId: event.eventTypeId ?? 0,
-            description: this.getShortDescription(event.description, 1),
-            startDate: event.startDate,
-            endDate: event.endDate,
-          }));
-          this.updateDistances();
-          this.applyPlannerState(this.events);
-          this.eventTypes = this.extractUniqueTypes(this.events);
-          this.refreshVisibleEvents();
-          this.loadPlanner();
-        } catch {
-          this.events = [];
-          this.visibleEvents = [];
-          this.totalCount = 0;
-          this.hasNextPage = false;
-        }
-
+        const rawList = this.toArray<EventDto>(events);
+        this.dataCacheService.set(cacheKey, rawList);
+        this.applyEventsData(rawList);
         this.isLoading = false;
         this.flushUi();
       },
@@ -438,6 +420,51 @@ export class EventsComponent implements OnInit {
         this.flushUi();
       },
     });
+  }
+
+  private applyEventsData(rawList: EventDto[]): void {
+    try {
+      const eventList = rawList.map((event) => this.normalizeEvent(event));
+
+      const active = eventList
+        .filter((event) => event.id > 0 && event.isActive !== false)
+        .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
+
+      const now = new Date();
+      const futureOnly = active.filter((event) => new Date(event.startDate) >= now);
+      const source = futureOnly.length ? futureOnly : active;
+
+      this.events = source.map((event) => ({
+        id: event.id,
+        title: event.name,
+        category: this.normalizeCategory(event.eventTypeName),
+        dateText: this.formatDate(event.startDate),
+        timeText: this.formatTimeRange(event.startDate, event.endDate),
+        location: event.localityName ?? event.destinationName ?? 'Montenegro',
+        priceText: this.formatPrice(event.price),
+        imageUrl: this.resolveMediaUrl(event.mainImageUrl),
+        attendeesText: event.maxVisitors
+          ? `Max ${event.maxVisitors} visitors`
+          : 'No attendee data',
+        latitude: event.latitude,
+        longitude: event.longitude,
+        eventTypeName: event.eventTypeName ?? '',
+        eventTypeId: event.eventTypeId ?? 0,
+        description: this.getShortDescription(event.description, 1),
+        startDate: event.startDate,
+        endDate: event.endDate,
+      }));
+      this.updateDistances();
+      this.applyPlannerState(this.events);
+      this.eventTypes = this.extractUniqueTypes(this.events);
+      this.refreshVisibleEvents();
+    } catch {
+      this.events = [];
+      this.visibleEvents = [];
+      this.totalCount = 0;
+      this.hasNextPage = false;
+    }
+    this.flushUi();
   }
 
   private getShortDescription(text?: string, maxSentences = 2): string {

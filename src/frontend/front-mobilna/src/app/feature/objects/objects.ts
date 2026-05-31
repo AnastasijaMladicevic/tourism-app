@@ -14,7 +14,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { catchError, firstValueFrom, of } from 'rxjs';
+import { catchError, firstValueFrom, of, Subscription } from 'rxjs';
 
 import {
   ObjectDto,
@@ -27,6 +27,8 @@ import { FavoriteStateService } from '../../services/favorite-state';
 import { PendingActionService } from '../../services/pending-action';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../services/translation.service';
+import { ActiveRegionService } from '../../services/active-region';
+import { DataCacheService } from '../../services/data-cache';
 
 @Component({
   selector: 'app-objects',
@@ -71,6 +73,11 @@ export class ObjectsComponent implements OnInit, OnDestroy {
   private searchTimeout: ReturnType<typeof setTimeout> | null = null;
   private readonly listStateKey = 'objects-list-state';
   private readonly returnFlagKey = 'objects-return-from-detail';
+  private readonly locationSubs = new Subscription();
+  private readonly handleFavoriteObject = (event: Event & { detail?: ObjectView }) => {
+    const obj = event.detail;
+    if (obj) this.toggleFavorite(obj, new Event('click'));
+  };
   private readonly groupedTypeMap: Record<string, string[]> = {
     'hrana i pice': ['restaurant', 'kafana'],
     pumpe: ['gas_station'],
@@ -107,6 +114,8 @@ export class ObjectsComponent implements OnInit, OnDestroy {
     private readonly favoriteStateService: FavoriteStateService,
     private readonly pendingActionService: PendingActionService,
     private readonly translationService: TranslationService,
+    private readonly activeRegionService: ActiveRegionService,
+    private readonly dataCacheService: DataCacheService,
   ) {
     effect(() => {
       const language = this.translationService.language();
@@ -128,28 +137,32 @@ export class ObjectsComponent implements OnInit, OnDestroy {
   }
   @ViewChild('top') top!: ElementRef;
   ngOnInit(): void {
-    this.locationTrackingService.trackingEnabled$.subscribe((enabled) => {
-      this.isTracking = enabled;
+    this.locationSubs.add(
+      this.locationTrackingService.trackingEnabled$.subscribe((enabled) => {
+        this.isTracking = enabled;
 
-      if (!enabled) {
-        this.clearDistances();
-      } else {
-        this.updateDistances();
-      }
-      this.cdr.detectChanges();
-    });
+        if (!enabled) {
+          this.clearDistances();
+        } else {
+          this.updateDistances();
+        }
+        this.cdr.detectChanges();
+      })
+    );
 
-    this.locationTrackingService.location$.subscribe((loc) => {
-      this.userLocation = loc ? { lat: loc.latitude, lng: loc.longitude } : null;
+    this.locationSubs.add(
+      this.locationTrackingService.location$.subscribe((loc) => {
+        this.userLocation = loc ? { lat: loc.latitude, lng: loc.longitude } : null;
 
-      if (this.userLocation) {
-        this.updateDistances();
-      } else {
-        this.clearDistances();
-      }
+        if (this.userLocation) {
+          this.updateDistances();
+        } else {
+          this.clearDistances();
+        }
 
-      this.cdr.detectChanges();
-    });
+        this.cdr.detectChanges();
+      })
+    );
 
     this.route.data.subscribe((routeData) => {
       const type = routeData['type'] as string | null;
@@ -169,12 +182,7 @@ export class ObjectsComponent implements OnInit, OnDestroy {
       void this.loadData();
     });
 
-    window.addEventListener('favorite-object', (event: Event & { detail?: ObjectView }) => {
-      const obj = event.detail;
-      if (obj) {
-        this.toggleFavorite(obj, new Event('click'));
-      }
-    });
+    window.addEventListener('favorite-object', this.handleFavoriteObject);
   }
 
   get totalPages(): number {
@@ -283,6 +291,11 @@ export class ObjectsComponent implements OnInit, OnDestroy {
     }
   }
   private async fetchAllObjects(): Promise<ObjectDto[]> {
+    const regionId = this.activeRegionService.getActiveRegionId() ?? 0;
+    const cacheKey = `objects:r${regionId}`;
+    const cached = this.dataCacheService.get<ObjectDto[]>(cacheKey);
+    if (cached) return cached;
+
     const all: ObjectDto[] = [];
     let page = 1;
     const batchSize = 100;
@@ -307,6 +320,7 @@ export class ObjectsComponent implements OnInit, OnDestroy {
       page++;
     }
 
+    this.dataCacheService.set(cacheKey, all);
     return all;
   }
 
@@ -822,5 +836,7 @@ export class ObjectsComponent implements OnInit, OnDestroy {
     if (this.searchTimeout) {
       clearTimeout(this.searchTimeout);
     }
+    this.locationSubs.unsubscribe();
+    window.removeEventListener('favorite-object', this.handleFavoriteObject);
   }
 }
