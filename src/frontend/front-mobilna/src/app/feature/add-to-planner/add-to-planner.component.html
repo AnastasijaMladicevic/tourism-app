@@ -92,6 +92,10 @@
             }
           </div>
 
+          @if (calendarOpen()) {
+            <div class="atp-calendar-backdrop" (click)="closeCalendar()"></div>
+          }
+
           <div class="atp-calendar-wrap" (click)="$event.stopPropagation()">
             <button
               type="button"
@@ -135,6 +139,25 @@
                   </div>
                 </div>
 
+                <div class="atp-calendar__mode-toggle">
+                  <button
+                    type="button"
+                    class="atp-calendar__mode-btn"
+                    [class.atp-calendar__mode-btn--active]="calendarMode() === 'range'"
+                    (click)="setCalendarMode('range')"
+                  >
+                    {{ translate('planner.preview.modeRange') }}
+                  </button>
+                  <button
+                    type="button"
+                    class="atp-calendar__mode-btn"
+                    [class.atp-calendar__mode-btn--active]="calendarMode() === 'individual'"
+                    (click)="setCalendarMode('individual')"
+                  >
+                    {{ translate('planner.preview.modeIndividual') }}
+                  </button>
+                </div>
+
                 <div class="atp-calendar__weekdays">
                   <span>Ne</span><span>Po</span><span>Ut</span><span>Sr</span>
                   <span>Če</span><span>Pe</span><span>Su</span>
@@ -148,6 +171,7 @@
                         class="atp-calendar__day"
                         [class.atp-calendar__day--outside]="!cell.isCurrentMonth"
                         [class.atp-calendar__day--selected]="cell.isSelected"
+                        [class.atp-calendar__day--range-start]="cell.isRangeStart"
                         [class.atp-calendar__day--disabled]="cell.isDisabled"
                         [disabled]="cell.isDisabled"
                         (click)="selectCalendarDate(cell)"
@@ -159,8 +183,11 @@
                 </div>
 
                 <div class="atp-calendar__footer">
-                  <button type="button" class="atp-calendar__footer-btn atp-calendar__footer-btn--secondary" (click)="closeCalendar()">
-                    {{ translate('common.cancel') }}
+                  <button type="button" class="atp-calendar__footer-btn atp-calendar__footer-btn--secondary" (click)="clearCalendarDates()">
+                    {{ translate('common.clear') }}
+                  </button>
+                  <button type="button" class="atp-calendar__footer-btn atp-calendar__footer-btn--primary" (click)="confirmCalendarDates()">
+                    {{ translate('common.confirm') }}
                   </button>
                 </div>
               </div>

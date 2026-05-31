@@ -15,6 +15,8 @@ interface PlannerCalendarDay {
   isoDate: string;
 }
 
+type AddPlannerCalendarMode = 'range' | 'individual';
+
 interface AddPlannerCalendarCell {
   key: string;
   label: number;
@@ -22,6 +24,7 @@ interface AddPlannerCalendarCell {
   isCurrentMonth: boolean;
   isDisabled: boolean;
   isSelected: boolean;
+  isRangeStart: boolean;
 }
 
 interface PlannerPreviewState {
@@ -88,6 +91,9 @@ export class AddToPlannerComponent implements OnInit {
   protected readonly editingPlannerId = signal<number | null>(null);
   protected readonly calendarOpen = signal(false);
   protected readonly calendarMonthCursor = signal(this.getCalendarStartOfMonth(new Date()));
+  protected readonly calendarMode = signal<AddPlannerCalendarMode>('range');
+  protected readonly calendarRangeStart = signal<string | null>(null);
+  protected readonly draftDates = signal<string[]>([]);
   protected readonly selectedStartDateTime = computed(() => this.buildSelectedStartDate());
   protected readonly selectedEndDateTime = computed(() => this.buildSelectedEndDate());
   protected readonly canSelectMultipleDays = computed(() =>
@@ -125,7 +131,8 @@ export class AddToPlannerComponent implements OnInit {
     const monthStart = this.calendarMonthCursor();
     const firstGridDate = new Date(monthStart);
     firstGridDate.setDate(monthStart.getDate() - monthStart.getDay());
-    const selectedSet = new Set(this.selectedDayIds());
+    const draftSet = new Set(this.draftDates());
+    const rangeStart = this.calendarRangeStart();
     const minDate = this.eventStartDate ? this.startOfDay(this.eventStartDate) : null;
     const maxDate = this.eventEndDate ? this.startOfDay(this.eventEndDate) : null;
     const weeks: AddPlannerCalendarCell[][] = [];
@@ -147,7 +154,8 @@ export class AddToPlannerComponent implements OnInit {
           date: cellDate,
           isCurrentMonth: cellDate.getMonth() === monthStart.getMonth(),
           isDisabled,
-          isSelected: selectedSet.has(key),
+          isSelected: draftSet.has(key),
+          isRangeStart: key === rangeStart,
         });
       }
       weeks.push(week);
@@ -258,6 +266,8 @@ export class AddToPlannerComponent implements OnInit {
       if (!open) {
         const anchor = this.parseDate(this.travelDate()) ?? this.eventStartDate ?? new Date();
         this.calendarMonthCursor.set(this.getCalendarStartOfMonth(anchor));
+        this.draftDates.set([...this.selectedDayIds()]);
+        this.calendarRangeStart.set(null);
       }
       return !open;
     });
@@ -265,6 +275,81 @@ export class AddToPlannerComponent implements OnInit {
 
   protected closeCalendar(): void {
     this.calendarOpen.set(false);
+    this.calendarRangeStart.set(null);
+  }
+
+  protected confirmCalendarDates(): void {
+    const confirmed = this.draftDates();
+    if (confirmed.length) {
+      this.selectedDayIds.set(this.normalizePlannedDates(confirmed));
+      this.travelDate.set(confirmed[0]);
+      this.selectedDayId.set(confirmed[0]);
+    }
+    this.calendarOpen.set(false);
+    this.calendarRangeStart.set(null);
+  }
+
+  protected clearCalendarDates(): void {
+    this.draftDates.set([]);
+    this.calendarRangeStart.set(null);
+  }
+
+  protected setCalendarMode(mode: AddPlannerCalendarMode): void {
+    if (this.calendarMode() === mode) return;
+    this.calendarMode.set(mode);
+    this.draftDates.set([]);
+    this.calendarRangeStart.set(null);
+  }
+
+  protected selectCalendarDate(cell: AddPlannerCalendarCell): void {
+    if (cell.isDisabled) return;
+
+    if (this.calendarMode() === 'individual') {
+      this.draftDates.update((dates) =>
+        dates.includes(cell.key)
+          ? dates.filter((d) => d !== cell.key)
+          : [...dates, cell.key],
+      );
+      return;
+    }
+
+    // Range mode
+    const rangeStart = this.calendarRangeStart();
+
+    if (!rangeStart) {
+      this.calendarRangeStart.set(cell.key);
+      this.draftDates.set([cell.key]);
+      return;
+    }
+
+    if (rangeStart === cell.key) {
+      this.calendarRangeStart.set(null);
+      this.draftDates.set([]);
+      return;
+    }
+
+    const startDate = this.parseDate(rangeStart)!;
+    const endDate = cell.date;
+    const [from, to] = startDate <= endDate ? [startDate, endDate] : [endDate, startDate];
+    const minDate = this.eventStartDate ? this.startOfDay(this.eventStartDate) : null;
+    const maxDate = this.eventEndDate ? this.startOfDay(this.eventEndDate) : null;
+
+    const dates: string[] = [];
+    const cursor = new Date(from);
+    while (cursor <= to) {
+      const normalized = this.startOfDay(new Date(cursor));
+      const key = this.toDateInputValue(cursor);
+      const withinRange =
+        (minDate === null || normalized >= minDate) &&
+        (maxDate === null || normalized <= maxDate);
+      if (withinRange) {
+        dates.push(key);
+      }
+      cursor.setDate(cursor.getDate() + 1);
+    }
+
+    this.draftDates.set(dates);
+    this.calendarRangeStart.set(null);
   }
 
   protected previousCalendarMonth(): void {
@@ -278,14 +363,6 @@ export class AddToPlannerComponent implements OnInit {
     const next = new Date(this.calendarMonthCursor());
     next.setMonth(next.getMonth() + 1);
     this.calendarMonthCursor.set(this.getCalendarStartOfMonth(next));
-  }
-
-  protected selectCalendarDate(cell: AddPlannerCalendarCell): void {
-    if (cell.isDisabled) return;
-    this.onTravelDateChange(cell.key);
-    if (!this.canSelectMultipleDays()) {
-      this.calendarOpen.set(false);
-    }
   }
 
   private getCalendarStartOfMonth(date: Date): Date {
