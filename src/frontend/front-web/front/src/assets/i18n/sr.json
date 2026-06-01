@@ -44,12 +44,6 @@
     "label": "Aktivnost",
     "participationFee": "Kotizacija"
   },
-  "object": {
-    "price": {
-      "ticket": "Cena ulaznice",
-      "starting": "Cena od"
-    }
-  },
   "nav": {
     "home": "Pocetna",
     "map": "Mapa",
@@ -386,6 +380,10 @@
     "select": "Odaberi"
   },
   "object": {
+    "price": {
+      "ticket": "Cena ulaznice",
+      "starting": "Cena od"
+    },
     "titleFallback": "Objekat",
     "loadingError": "Greska pri ucitavanju objekta.",
     "about": "O {{name}}",

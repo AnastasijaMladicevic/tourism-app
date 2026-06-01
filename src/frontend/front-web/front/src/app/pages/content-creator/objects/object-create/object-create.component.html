@@ -54,9 +54,116 @@
 
   <div class="create-layout">
     <form id="create-object-form" class="form-column card" [formGroup]="form" (ngSubmit)="submit()">
+      <section class="section-block">
+        <span class="step-tag">STEP 1</span>
+        <h2>General Information</h2>
+        <div class="grid-2">
+          <label>
+            <span>Object Name <span class="required-star" aria-hidden="true">*</span></span>
+            <input type="text" formControlName="name" placeholder="Object name" />
+          </label>
+          <label>
+            <span>Address</span>
+            <input type="text" formControlName="address" placeholder="Address" />
+          </label>
+          <label>
+            <span>Object Type <span class="required-star" aria-hidden="true">*</span></span>
+            <select formControlName="objectTypeId">
+              <option [ngValue]="null">Select type</option>
+              <option *ngFor="let type of objectTypes" [ngValue]="type.id">{{ type.name }}</option>
+            </select>
+          </label>
+          @if (showObjectPriceField) {
+            <label class="price-field">
+              <span>{{ objectPriceLabel }}</span>
+            <div class="price-input-group">
+              <span class="price-input-prefix" aria-hidden="true">€</span>
+              <input
+                type="number"
+                formControlName="price"
+                min="0"
+                step="0.01"
+                placeholder="0.00"
+                inputmode="decimal"
+              />
+            </div>
+            </label>
+          }
+          <label>
+            <span>Region</span>
+            <select
+              [ngModel]="selectedRegionId"
+              [ngModelOptions]="{ standalone: true }"
+              (ngModelChange)="onRegionChange($event || null)"
+            >
+              <option [ngValue]="null">All regions</option>
+              <option *ngFor="let region of regions" [ngValue]="region.id">{{ region.name }}</option>
+            </select>
+          </label>
+          <label>
+            <span>Destination</span>
+            <select formControlName="destinationId">
+              <option [ngValue]="null">{{ selectedRegionId ? 'Select destination' : 'Select region first' }}</option>
+              <option *ngFor="let destination of destinations" [ngValue]="destination.id">{{ destination.name }}</option>
+            </select>
+          </label>
+          <label>
+            <span>Locality</span>
+            <select formControlName="localityId">
+              <option [ngValue]="null">{{ form.controls.destinationId.value ? 'Select locality' : 'Select destination first' }}</option>
+              <option *ngFor="let locality of filteredLocalities" [ngValue]="locality.id">{{ locality.name }}</option>
+            </select>
+          </label>
+          @if (locationErrorMessage) {
+            <p class="error-msg inline-field-error" style="grid-column: 1 / -1">{{ locationErrorMessage }}</p>
+          }
+        </div>
+      </section>
+
+      <section class="section-block">
+        <span class="step-tag">STEP 2</span>
+        <h2>Custom &amp; Story</h2>
+        <label>
+          <span>Full object description</span>
+          <textarea rows="5" formControlName="description" placeholder="Describe this object..."></textarea>
+        </label>
+      </section>
+
+      <section class="section-block">
+        <span class="step-tag">STEP 3</span>
+        <h2>Amenities &amp; Contact</h2>
+        <label>
+          <span>Amenities (comma separated)</span>
+          <input type="text" formControlName="amenitiesInput" placeholder="WiFi, Parking, Outdoor Seating" />
+        </label>
+      </section>
+
+      <section class="section-block">
+        <span class="step-tag">STEP 4</span>
+        <h2>Opening Hours</h2>
+        <div class="hours-grid">
+          <div class="hour-row" *ngFor="let day of workingDays">
+            <span>{{ day.label }}</span>
+            <input type="time" [formControl]="getWorkingOpenControl(day.key)" />
+            <span>-</span>
+            <input type="time" [formControl]="getWorkingCloseControl(day.key)" />
+            @if (!isManagerReview) {
+              <button
+                type="button"
+                class="copy-hours-btn"
+                title="Apply to all days"
+                (click)="applyHoursToAllDays(day.key)"
+              >
+                <span class="material-symbols-outlined">content_copy</span>
+              </button>
+            }
+          </div>
+        </div>
+      </section>
+
       <section class="section-block section-block--gallery">
         <div class="gallery-card-head">
-          <span class="step-tag">STEP 1</span>
+          <span class="step-tag">STEP 5</span>
           <h2>Media Gallery <span class="required-star" aria-hidden="true">*</span></h2>
           <p class="gallery-intro">
             @if (isManagerReview) {
@@ -144,109 +251,6 @@
       @if (galleryErrorMessage) {
         <p class="error-msg inline-field-error">{{ galleryErrorMessage }}</p>
       }
-
-      <section class="section-block">
-        <h2>General Information</h2>
-        <div class="grid-2">
-          <label>
-            <span>Object Name *</span>
-            <input type="text" formControlName="name" placeholder="Object name" />
-          </label>
-          <label>
-            <span>Address</span>
-            <input type="text" formControlName="address" placeholder="Address" />
-          </label>
-          <label>
-            <span>Object Type *</span>
-            <select formControlName="objectTypeId">
-              <option [ngValue]="null">Select type</option>
-              <option *ngFor="let type of objectTypes" [ngValue]="type.id">{{ type.name }}</option>
-            </select>
-          </label>
-          @if (showObjectPriceField) {
-            <label class="price-field">
-              <span>{{ objectPriceLabel }}</span>
-            <div class="price-input-group">
-              <span class="price-input-prefix" aria-hidden="true">€</span>
-              <input
-                type="number"
-                formControlName="price"
-                min="0"
-                step="0.01"
-                placeholder="0.00"
-                inputmode="decimal"
-              />
-            </div>
-            </label>
-          }
-          <label>
-            <span>Region</span>
-            <select
-              [ngModel]="selectedRegionId"
-              [ngModelOptions]="{ standalone: true }"
-              (ngModelChange)="onRegionChange($event || null)"
-            >
-              <option [ngValue]="null">All regions</option>
-              <option *ngFor="let region of regions" [ngValue]="region.id">{{ region.name }}</option>
-            </select>
-          </label>
-          <label>
-            <span>Destination</span>
-            <select formControlName="destinationId">
-              <option [ngValue]="null">{{ selectedRegionId ? 'Select destination' : 'Select region first' }}</option>
-              <option *ngFor="let destination of destinations" [ngValue]="destination.id">{{ destination.name }}</option>
-            </select>
-          </label>
-          <label>
-            <span>Locality</span>
-            <select formControlName="localityId">
-              <option [ngValue]="null">{{ form.controls.destinationId.value ? 'Select locality' : 'Select destination first' }}</option>
-              <option *ngFor="let locality of filteredLocalities" [ngValue]="locality.id">{{ locality.name }}</option>
-            </select>
-          </label>
-          @if (locationErrorMessage) {
-            <p class="error-msg inline-field-error" style="grid-column: 1 / -1">{{ locationErrorMessage }}</p>
-          }
-        </div>
-      </section>
-
-      <section class="section-block">
-        <h2>Custom &amp; Story</h2>
-        <label>
-          <span>Full object description</span>
-          <textarea rows="5" formControlName="description" placeholder="Describe this object..."></textarea>
-        </label>
-      </section>
-
-      <section class="section-block">
-        <h2>Amenities &amp; Contact</h2>
-        <label>
-          <span>Amenities (comma separated)</span>
-          <input type="text" formControlName="amenitiesInput" placeholder="WiFi, Parking, Outdoor Seating" />
-        </label>
-      </section>
-
-      <section class="section-block">
-        <h2>Opening Hours</h2>
-        <div class="hours-grid">
-          <div class="hour-row" *ngFor="let day of workingDays">
-            <span>{{ day.label }}</span>
-            <input type="time" [formControl]="getWorkingOpenControl(day.key)" />
-            <span>-</span>
-            <input type="time" [formControl]="getWorkingCloseControl(day.key)" />
-            @if (!isManagerReview) {
-              <button
-                type="button"
-                class="copy-hours-btn"
-                title="Apply to all days"
-                (click)="applyHoursToAllDays(day.key)"
-              >
-                <span class="material-symbols-outlined">content_copy</span>
-              </button>
-            }
-          </div>
-        </div>
-      </section>
 
       @if (errorMessage) {
         <p class="error-msg">{{ errorMessage }}</p>

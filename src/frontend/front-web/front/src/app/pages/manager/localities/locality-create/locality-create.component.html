@@ -28,9 +28,63 @@
 
   <div class="create-layout">
     <form id="create-locality-form" class="create-form" (ngSubmit)="onSubmit()">
-      <section class="section-block section-block--gallery step-card">
+      <section class="section-block step-card">
         <div class="gallery-card-head">
           <span class="step-tag">STEP 1</span>
+          <h2>General Information</h2>
+          <p class="gallery-intro">Essential details about the locality.</p>
+        </div>
+
+        <div class="grid-2">
+          <label class="full-width">
+            <span>Locality Name <span class="required-star" aria-hidden="true">*</span></span>
+            <input type="text" [(ngModel)]="form.name" name="name" required placeholder="e.g. Barceloneta Beach" />
+          </label>
+
+          @if (singleDestinationName) {
+            <label>
+              <span>Destination</span>
+              <input type="text" [value]="singleDestinationName" readonly />
+            </label>
+          } @else {
+            <label>
+              <span>Destination <span class="required-star" aria-hidden="true">*</span></span>
+              <select
+                [(ngModel)]="form.destinationId"
+                (ngModelChange)="onDestinationChange()"
+                name="destinationId"
+                required
+                [disabled]="isLoadingDestinations"
+              >
+                <option *ngIf="isLoadingDestinations" [ngValue]="form.destinationId" disabled>Loading...</option>
+                <option *ngFor="let option of destinationOptions" [ngValue]="option.id">{{ option.name }}</option>
+              </select>
+            </label>
+          }
+
+          <label>
+            <span>Locality Type *</span>
+            <select [(ngModel)]="form.localityTypeId" name="localityTypeId" required [disabled]="isLoadingLocalityTypes">
+              <option [ngValue]="0"></option>
+              <option *ngFor="let option of localityTypeOptions" [ngValue]="option.id">{{ option.name }}</option>
+            </select>
+          </label>
+
+          <label class="full-width">
+            <span>Full Description</span>
+            <textarea
+              rows="6"
+              [(ngModel)]="form.description"
+              name="description"
+              placeholder="Write a detailed description including what guests can expect..."
+            ></textarea>
+          </label>
+        </div>
+      </section>
+
+      <section class="section-block section-block--gallery step-card">
+        <div class="gallery-card-head">
+          <span class="step-tag">STEP 2</span>
           <h2>Media Gallery <span class="required-star" aria-hidden="true">*</span></h2>
           <p class="gallery-intro">Upload one or more images and choose a primary cover image.</p>
         </div>
@@ -88,60 +142,6 @@
       @if (galleryErrorMessage) {
         <p class="error-message inline-field-error">{{ galleryErrorMessage }}</p>
       }
-
-      <section class="section-block step-card">
-        <div class="gallery-card-head">
-          <span class="step-tag">STEP 2</span>
-          <h2>General Information</h2>
-          <p class="gallery-intro">Essential details about the locality.</p>
-        </div>
-
-        <div class="grid-2">
-          <label class="full-width">
-            <span>Locality Name *</span>
-            <input type="text" [(ngModel)]="form.name" name="name" required placeholder="e.g. Barceloneta Beach" />
-          </label>
-
-          @if (singleDestinationName) {
-            <label>
-              <span>Destination</span>
-              <input type="text" [value]="singleDestinationName" readonly />
-            </label>
-          } @else {
-            <label>
-              <span>Destination *</span>
-              <select
-                [(ngModel)]="form.destinationId"
-                (ngModelChange)="onDestinationChange()"
-                name="destinationId"
-                required
-                [disabled]="isLoadingDestinations"
-              >
-                <option *ngIf="isLoadingDestinations" [ngValue]="form.destinationId" disabled>Loading...</option>
-                <option *ngFor="let option of destinationOptions" [ngValue]="option.id">{{ option.name }}</option>
-              </select>
-            </label>
-          }
-
-          <label>
-            <span>Locality Type *</span>
-            <select [(ngModel)]="form.localityTypeId" name="localityTypeId" required [disabled]="isLoadingLocalityTypes">
-              <option [ngValue]="0"></option>
-              <option *ngFor="let option of localityTypeOptions" [ngValue]="option.id">{{ option.name }}</option>
-            </select>
-          </label>
-
-          <label class="full-width">
-            <span>Full Description</span>
-            <textarea
-              rows="6"
-              [(ngModel)]="form.description"
-              name="description"
-              placeholder="Write a detailed description including what guests can expect..."
-            ></textarea>
-          </label>
-        </div>
-      </section>
 
       <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
       <p class="draft-message" *ngIf="draftSavedMessage">{{ draftSavedMessage }}</p>

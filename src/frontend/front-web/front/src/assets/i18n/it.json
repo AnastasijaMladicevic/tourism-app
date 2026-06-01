@@ -44,12 +44,6 @@
     "label": "Attivita",
     "participationFee": "Tariffa di partecipazione"
   },
-  "object": {
-    "price": {
-      "ticket": "Prezzo del biglietto",
-      "starting": "Prezzo di partenza"
-    }
-  },
   "nav": {
     "home": "Home",
     "map": "Map",
@@ -386,6 +380,10 @@
     "select": "Select"
   },
   "object": {
+    "price": {
+      "ticket": "Prezzo del biglietto",
+      "starting": "Prezzo di partenza"
+    },
     "titleFallback": "Object",
     "loadingError": "Failed to load the object.",
     "about": "About {{name}}",

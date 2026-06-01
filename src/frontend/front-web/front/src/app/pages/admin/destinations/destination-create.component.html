@@ -40,6 +40,81 @@
     <div class="workspace-main">
       <article class="panel">
         <span class="step-tag">STEP 1</span>
+        <div class="panel-head">
+          <span class="panel-icon material-symbols-outlined">info</span>
+          <div>
+            <h2 class="panel-title">General information</h2>
+            <p class="panel-sub">Set the core identity and descriptive content for this destination.</p>
+          </div>
+        </div>
+
+        <div class="field-grid">
+          <label class="form-field full">
+            <span class="label">Destination name <span class="required-star" aria-hidden="true">*</span></span>
+            <input
+              type="text"
+              [(ngModel)]="form.name"
+              (keyup)="onDestinationNameInput(($any($event.target)).value)"
+              placeholder="e.g. Emerald Valley Park"
+            />
+            @if ((locationLookupState === 'loading' || locationLookupState === 'resolved') && form.name.trim().length >= 2) {
+              <p
+                class="location-lookup-note"
+                [class.location-lookup-note--loading]="locationLookupState === 'loading'"
+                [class.location-lookup-note--ok]="locationLookupState === 'resolved'"
+              >
+                {{ locationLookupMessage }}
+              </p>
+            }
+          </label>
+
+          <label class="form-field full">
+            <span class="label">Region</span>
+            <select [(ngModel)]="form.regionId" (ngModelChange)="onRegionChange()" [disabled]="isLoadingRegions">
+              <option [ngValue]="undefined">Select a region</option>
+              <option *ngFor="let region of regions" [ngValue]="region.id">{{ region.name }}</option>
+            </select>
+          </label>
+
+          <div class="form-field full richtext-block">
+            <span class="label">Full description</span>
+            <div class="richtext-toolbar" aria-hidden="true">
+              <button type="button" class="tool-btn" disabled title="Bold"><span class="material-symbols-outlined">format_bold</span></button>
+              <button type="button" class="tool-btn" disabled title="Italic"><span class="material-symbols-outlined">format_italic</span></button>
+              <button type="button" class="tool-btn" disabled title="Underline"><span class="material-symbols-outlined">format_underlined</span></button>
+              <button type="button" class="tool-btn" disabled title="Link"><span class="material-symbols-outlined">link</span></button>
+            </div>
+            <textarea
+              rows="10"
+              class="richtext-area"
+              [(ngModel)]="fullDescription"
+              placeholder="Longer story, highlights, and practical visitor information."
+            ></textarea>
+          </div>
+
+          <div class="form-field full categories-block">
+            <span class="label">Categories &amp; tags</span>
+            <div class="category-chips">
+              @for (c of categories; track $index) {
+                <span class="chip">
+                  {{ c }}
+                  <button type="button" class="chip-remove" (click)="removeCategory($index)" aria-label="Remove">×</button>
+                </span>
+              }
+            </div>
+            <div class="category-add-row">
+              <input type="text" [(ngModel)]="categoryInput" (keydown.enter)="addCategory(); $event.preventDefault()" placeholder="Add a category" />
+              <button type="button" class="btn btn-ghost btn-sm" (click)="addCategory()">
+                <span class="material-symbols-outlined">add</span>
+                Add category
+              </button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="panel">
+        <span class="step-tag">STEP 2</span>
         <div class="panel-head panel-head--split">
           <div class="panel-head-left">
             <span class="panel-icon material-symbols-outlined">imagesmode</span>
@@ -165,81 +240,6 @@
       @if (galleryErrorMessage) {
         <div class="alert alert-error inline-field-error">{{ galleryErrorMessage }}</div>
       }
-
-      <article class="panel">
-        <span class="step-tag">STEP 2</span>
-        <div class="panel-head">
-          <span class="panel-icon material-symbols-outlined">info</span>
-          <div>
-            <h2 class="panel-title">General information</h2>
-            <p class="panel-sub">Set the core identity and descriptive content for this destination.</p>
-          </div>
-        </div>
-
-        <div class="field-grid">
-          <label class="form-field full">
-            <span class="label">Destination name *</span>
-            <input
-              type="text"
-              [(ngModel)]="form.name"
-              (keyup)="onDestinationNameInput(($any($event.target)).value)"
-              placeholder="e.g. Emerald Valley Park"
-            />
-            @if ((locationLookupState === 'loading' || locationLookupState === 'resolved') && form.name.trim().length >= 2) {
-              <p
-                class="location-lookup-note"
-                [class.location-lookup-note--loading]="locationLookupState === 'loading'"
-                [class.location-lookup-note--ok]="locationLookupState === 'resolved'"
-              >
-                {{ locationLookupMessage }}
-              </p>
-            }
-          </label>
-
-          <label class="form-field full">
-            <span class="label">Region</span>
-            <select [(ngModel)]="form.regionId" (ngModelChange)="onRegionChange()" [disabled]="isLoadingRegions">
-              <option [ngValue]="undefined">Select a region</option>
-              <option *ngFor="let region of regions" [ngValue]="region.id">{{ region.name }}</option>
-            </select>
-          </label>
-
-          <div class="form-field full richtext-block">
-            <span class="label">Full description</span>
-            <div class="richtext-toolbar" aria-hidden="true">
-              <button type="button" class="tool-btn" disabled title="Bold"><span class="material-symbols-outlined">format_bold</span></button>
-              <button type="button" class="tool-btn" disabled title="Italic"><span class="material-symbols-outlined">format_italic</span></button>
-              <button type="button" class="tool-btn" disabled title="Underline"><span class="material-symbols-outlined">format_underlined</span></button>
-              <button type="button" class="tool-btn" disabled title="Link"><span class="material-symbols-outlined">link</span></button>
-            </div>
-            <textarea
-              rows="10"
-              class="richtext-area"
-              [(ngModel)]="fullDescription"
-              placeholder="Longer story, highlights, and practical visitor information."
-            ></textarea>
-          </div>
-
-          <div class="form-field full categories-block">
-            <span class="label">Categories &amp; tags</span>
-            <div class="category-chips">
-              @for (c of categories; track $index) {
-                <span class="chip">
-                  {{ c }}
-                  <button type="button" class="chip-remove" (click)="removeCategory($index)" aria-label="Remove">×</button>
-                </span>
-              }
-            </div>
-            <div class="category-add-row">
-              <input type="text" [(ngModel)]="categoryInput" (keydown.enter)="addCategory(); $event.preventDefault()" placeholder="Add a category" />
-              <button type="button" class="btn btn-ghost btn-sm" (click)="addCategory()">
-                <span class="material-symbols-outlined">add</span>
-                Add category
-              </button>
-            </div>
-          </div>
-        </div>
-      </article>
 
       <article class="panel panel--muted">
         <span class="step-tag">STEP 3</span>

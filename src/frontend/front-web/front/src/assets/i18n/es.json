@@ -44,12 +44,6 @@
     "label": "Actividad",
     "participationFee": "Tarifa de participacion"
   },
-  "object": {
-    "price": {
-      "ticket": "Precio de entrada",
-      "starting": "Precio inicial"
-    }
-  },
   "nav": {
     "home": "Inicio",
     "map": "Mapa",
@@ -386,6 +380,10 @@
     "select": "Seleccionar"
   },
   "object": {
+    "price": {
+      "ticket": "Precio de entrada",
+      "starting": "Precio inicial"
+    },
     "titleFallback": "Objeto",
     "loadingError": "Error al cargar el objeto.",
     "about": "Acerca de {{name}}",

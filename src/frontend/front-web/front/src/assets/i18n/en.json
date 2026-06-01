@@ -44,12 +44,6 @@
     "label": "Activity",
     "participationFee": "Participation fee"
   },
-  "object": {
-    "price": {
-      "ticket": "Ticket price",
-      "starting": "Starting price"
-    }
-  },
   "nav": {
     "home": "Home",
     "map": "Map",
@@ -386,6 +380,10 @@
     "select": "Select"
   },
   "object": {
+    "price": {
+      "ticket": "Ticket price",
+      "starting": "Starting price"
+    },
     "titleFallback": "Object",
     "loadingError": "Failed to load the object.",
     "about": "About {{name}}",
