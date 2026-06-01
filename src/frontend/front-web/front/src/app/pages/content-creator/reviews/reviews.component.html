@@ -92,7 +92,7 @@
                   <span>{{ formatDate(review.createdAt) }}</span>
                 </div>
                 <span class="status" [class.approved]="review.creatorResponse" [class.pending]="!review.creatorResponse">
-                  {{ review.creatorResponse ? 'Responded' : 'Pending' }}
+                  {{ review.creatorResponse ? 'Responded' : 'Awaiting reply' }}
                 </span>
               </div>
               <p class="queue-item-preview">{{ review.text }}</p>
@@ -120,7 +120,7 @@
         <div class="case-header">
           <div>
             <h2>Review: #{{ selectedReview.id }}</h2>
-            <p>Status: {{ selectedReviewHasResponse ? 'Responded' : 'Waiting for response' }}</p>
+            <p>Status: {{ selectedReviewHasResponse ? 'Responded' : 'Awaiting reply' }}</p>
           </div>
           <div class="case-actions">
             <button class="ghost" type="button" (click)="restoreDraft()">Restore Draft</button>
@@ -135,7 +135,7 @@
             <div class="avatar">{{ selectedReview.userFullName.slice(0, 2).toUpperCase() }}</div>
             <div>
               <h3>{{ selectedReview.userFullName }}</h3>
-              <p>{{ formatDate(selectedReview.createdAt) }} • {{ selectedReview.status }}</p>
+              <p>{{ formatDate(selectedReview.createdAt) }}</p>
             </div>
           </div>
 
@@ -200,7 +200,7 @@
           <h4>Review Details</h4>
           <div class="metric-row"><span>Review ID</span><strong>#{{ selectedReview.id }}</strong></div>
           <div class="metric-row"><span>Created</span><strong>{{ formatDate(selectedReview.createdAt) }}</strong></div>
-          <div class="metric-row"><span>Status</span><strong>{{ selectedReview.status }}</strong></div>
+          <div class="metric-row"><span>Status</span><strong>{{ selectedReviewHasResponse ? 'Responded' : 'Awaiting reply' }}</strong></div>
         </section>
 
         <section class="checks">
