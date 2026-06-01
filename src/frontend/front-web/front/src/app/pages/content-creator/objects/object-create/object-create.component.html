@@ -214,6 +214,16 @@
             <input type="time" [formControl]="getWorkingOpenControl(day.key)" />
             <span>-</span>
             <input type="time" [formControl]="getWorkingCloseControl(day.key)" />
+            @if (!isManagerReview) {
+              <button
+                type="button"
+                class="copy-hours-btn"
+                title="Apply to all days"
+                (click)="applyHoursToAllDays(day.key)"
+              >
+                <span class="material-symbols-outlined">content_copy</span>
+              </button>
+            }
           </div>
         </div>
       </section>

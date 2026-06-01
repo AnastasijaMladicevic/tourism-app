@@ -547,7 +547,7 @@ textarea:focus {
 
 .hour-row {
   display: grid;
-  grid-template-columns: 90px 1fr auto 1fr;
+  grid-template-columns: 90px 1fr auto 1fr auto;
   align-items: center;
   gap: 8px;
 }
@@ -560,6 +560,28 @@ textarea:focus {
 .hour-row input {
   min-height: 34px;
   padding: 6px 8px;
+}
+
+.copy-hours-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #94a3b8;
+  padding: 4px 6px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  transition: color 0.15s, background 0.15s;
+  line-height: 1;
+}
+
+.copy-hours-btn:hover {
+  color: #3b82f6;
+  background: #eff6ff;
+}
+
+.copy-hours-btn .material-symbols-outlined {
+  font-size: 16px;
 }
 
 .form-actions {
@@ -1386,9 +1408,22 @@ textarea:focus {
     padding: 14px;
   }
 
-  .grid-2,
-  .hour-row {
+  .grid-2 {
     grid-template-columns: 1fr;
+  }
+
+  .hour-row {
+    grid-template-columns: 1fr auto;
+  }
+
+  .hour-row > span:first-child {
+    grid-column: 1 / -1;
+  }
+
+  .copy-hours-btn {
+    grid-column: 2;
+    grid-row: 2;
+    justify-self: end;
   }
 
   .form-actions {

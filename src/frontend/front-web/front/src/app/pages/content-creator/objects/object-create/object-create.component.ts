@@ -667,6 +667,19 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
     return value == null ? '-' : Number(value).toFixed(6);
   }
 
+  applyHoursToAllDays(sourceKey: WorkingDayKey): void {
+    const open = this.getWorkingOpenControl(sourceKey).value;
+    const close = this.getWorkingCloseControl(sourceKey).value;
+
+    for (const day of this.workingDays) {
+      if (day.key === sourceKey) {
+        continue;
+      }
+      this.getWorkingOpenControl(day.key).setValue(open, { emitEvent: false });
+      this.getWorkingCloseControl(day.key).setValue(close, { emitEvent: false });
+    }
+  }
+
   getWorkingOpenControl(day: WorkingDayKey) {
     switch (day) {
       case 'pon': return this.workingHoursForm.controls.ponOpen;
