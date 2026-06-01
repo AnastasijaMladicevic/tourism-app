@@ -28,7 +28,7 @@ builder.Services.Configure<OllamaOptions>(builder.Configuration.GetSection("Olla
 builder.Services.AddHttpClient();
 builder.Services.Configure<FormOptions>(options =>
 {
-    options.MultipartBodyLengthLimit = 5 * 1024 * 1024;
+    options.MultipartBodyLengthLimit = 10 * 1024 * 1024;
 });
 builder.Services.AddSwaggerGen(c =>
 {
@@ -218,12 +218,20 @@ builder.Services.AddCors(options =>
         {
             "http://softeng.pmf.kg.ac.rs:10201",
             "http://softeng.pmf.kg.ac.rs:10202",
+            "http://softeng.pmf.kg.ac.rs:10203",
+            "http://softeng.pmf.kg.ac.rs:10204",
             "https://softeng.pmf.kg.ac.rs:10201",
             "https://softeng.pmf.kg.ac.rs:10202",
+            "https://softeng.pmf.kg.ac.rs:10203",
+            "https://softeng.pmf.kg.ac.rs:10204",
             "http://147.91.204.115:10201",
             "http://147.91.204.115:10202",
+            "http://147.91.204.115:10203",
+            "http://147.91.204.115:10204",
             "https://147.91.204.115:10201",
-            "https://147.91.204.115:10202"
+            "https://147.91.204.115:10202",
+            "https://147.91.204.115:10203",
+            "https://147.91.204.115:10204"
         };
 
         var allowedOrigins = configuredOrigins

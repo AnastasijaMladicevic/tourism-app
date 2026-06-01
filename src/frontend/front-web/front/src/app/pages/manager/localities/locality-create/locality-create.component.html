@@ -85,6 +85,10 @@
         }
       </section>
 
+      @if (galleryErrorMessage) {
+        <p class="error-message inline-field-error">{{ galleryErrorMessage }}</p>
+      }
+
       <section class="section-block step-card">
         <div class="gallery-card-head">
           <span class="step-tag">STEP 2</span>

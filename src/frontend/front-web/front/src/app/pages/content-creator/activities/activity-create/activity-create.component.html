@@ -83,6 +83,10 @@
         }
       </article>
 
+      @if (galleryErrorMessage) {
+        <p class="feedback error inline-field-error">{{ galleryErrorMessage }}</p>
+      }
+
       <article class="card">
         <div class="card-head">
           <span class="step-tag">STEP 2</span>

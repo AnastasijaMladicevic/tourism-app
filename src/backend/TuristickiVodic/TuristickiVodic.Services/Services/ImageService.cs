@@ -106,10 +106,9 @@ namespace TuristickiVodic.Services.Services
                     (image.LocalityId.HasValue && i.LocalityId == image.LocalityId)
                 ));
 
-            if (currentMain == null)
-                throw new InvalidOperationException("Current entity does not have an existing main image to replace.");
+            if (currentMain != null)
+                currentMain.IsMain = false;
 
-            currentMain.IsMain = false;
             image.IsMain = true;
 
             await _context.SaveChangesAsync();

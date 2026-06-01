@@ -141,6 +141,10 @@
         }
       </section>
 
+      @if (galleryErrorMessage) {
+        <p class="error-msg inline-field-error">{{ galleryErrorMessage }}</p>
+      }
+
       <section class="section-block">
         <h2>General Information</h2>
         <div class="grid-2">
@@ -198,6 +202,9 @@
               <option *ngFor="let locality of filteredLocalities" [ngValue]="locality.id">{{ locality.name }}</option>
             </select>
           </label>
+          @if (locationErrorMessage) {
+            <p class="error-msg inline-field-error" style="grid-column: 1 / -1">{{ locationErrorMessage }}</p>
+          }
         </div>
       </section>
 

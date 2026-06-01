@@ -43,6 +43,7 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
   isLoadingDestinations = true;
   isLoadingLocalityTypes = true;
   errorMessage = '';
+  galleryErrorMessage = '';
   draftSavedMessage = '';
   showTipsModal = false;
   showDeleteConfirmModal = false;
@@ -166,7 +167,7 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
       return;
     }
     if (this.existingImages.length === 0 && this.imageFiles.length === 0) {
-      this.errorMessage = 'At least one image is required before saving.';
+      this.galleryErrorMessage = 'At least one image is required before saving.';
       return;
     }
     if (this.existingImages.length + this.imageFiles.length > this.maxImageCount) {
@@ -331,7 +332,7 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
 
     const remainingSlots = this.maxImageCount - (this.existingImages.length + this.imageFiles.length);
     if (remainingSlots <= 0) {
-      this.errorMessage = `You can upload up to ${this.maxImageCount} images per locality.`;
+      this.galleryErrorMessage = `You can upload up to ${this.maxImageCount} images per locality.`;
       input.value = '';
       return;
     }

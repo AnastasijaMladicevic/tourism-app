@@ -102,6 +102,10 @@
         }
       </div>
 
+      @if (galleryErrorMessage) {
+        <div class="alert alert-error inline-field-error">{{ galleryErrorMessage }}</div>
+      }
+
       <form class="editor-grid" [formGroup]="form" (ngSubmit)="submit()">
         <section class="card section-card">
           <div class="section-title">

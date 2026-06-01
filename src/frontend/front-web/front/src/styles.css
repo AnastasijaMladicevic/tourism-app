@@ -3,6 +3,11 @@
    src/styles.css
    ===================================================== */
 
+.inline-field-error {
+  margin-top: 6px;
+  margin-bottom: 0;
+}
+
 .required-star {
   color: #6b7280;
   margin-left: 2px;

@@ -67,6 +67,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
   isSubmitting = false;
   isLoadingRegions = true;
   errorMessage = '';
+  galleryErrorMessage = '';
   draftSavedMessage = '';
   editLockState: DestinationEditLockDto | null = null;
   isEditBlocked = false;
@@ -808,7 +809,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
     }
     const remainingSlots = this.maxImageCount - (this.destinationImages.length + this.imageFiles.length);
     if (remainingSlots <= 0) {
-      this.errorMessage = `You can upload up to ${this.maxImageCount} images per destination.`;
+      this.galleryErrorMessage = `You can upload up to ${this.maxImageCount} images per destination.`;
       input.value = '';
       return;
     }
@@ -873,7 +874,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
       return false;
     }
     if (this.destinationImages.length === 0 && this.imageFiles.length === 0) {
-      this.errorMessage = 'At least one image is required before saving.';
+      this.galleryErrorMessage = 'At least one image is required before saving.';
       return false;
     }
     if (this.destinationImages.length + this.imageFiles.length > this.maxImageCount) {

@@ -126,6 +126,7 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
   isEditMode = false;
   activityId: number | null = null;
   errorMessage = '';
+  galleryErrorMessage = '';
   successMessage = '';
 
   activityTypes: ActivityTypeOption[] = [];
@@ -303,22 +304,34 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
 
     const remainingSlots = this.maxImageCount - this.imageUrls.length;
     if (remainingSlots <= 0) {
-      this.errorMessage = `You can upload up to ${this.maxImageCount} images per activity.`;
+      this.galleryErrorMessage = `You can upload up to ${this.maxImageCount} images per activity.`;
       input.value = '';
       return;
     }
 
     const acceptedFiles = selectedFiles.slice(0, remainingSlots);
+    const duplicateNames: string[] = [];
+    const addedKeys = new Set<string>();
+
     for (const file of acceptedFiles) {
+      const key = `${file.name}_${file.size}`;
+      if (this.isPendingFileDuplicate(file) || addedKeys.has(key)) {
+        duplicateNames.push(file.name);
+        continue;
+      }
+      addedKeys.add(key);
       const previewUrl = URL.createObjectURL(file);
       this.pendingImageFiles.set(previewUrl, file);
       this.imageUrls.push(previewUrl);
     }
 
-    this.errorMessage =
-      acceptedFiles.length < selectedFiles.length
-        ? `Only the first ${remainingSlots} images were added. Each activity can have up to ${this.maxImageCount} images.`
-        : '';
+    if (duplicateNames.length > 0) {
+      this.galleryErrorMessage = `Duplicate image(s) skipped: ${duplicateNames.join(', ')}`;
+    } else if (acceptedFiles.length < selectedFiles.length) {
+      this.galleryErrorMessage = `Only the first ${remainingSlots} images were added. Each activity can have up to ${this.maxImageCount} images.`;
+    } else {
+      this.galleryErrorMessage = '';
+    }
 
     input.value = '';
   }
@@ -414,7 +427,7 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
     }
 
     if (this.imageUrls.length === 0) {
-      this.errorMessage = 'At least one image is required before saving.';
+      this.galleryErrorMessage = 'At least one image is required before saving.';
       return;
     }
 
@@ -875,6 +888,15 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
       map(() => undefined),
       catchError(() => of(undefined))
     );
+  }
+
+  private isPendingFileDuplicate(file: File): boolean {
+    for (const existing of this.pendingImageFiles.values()) {
+      if (existing.name === file.name && existing.size === file.size) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private revokePendingPreview(previewUrl: string | undefined): void {

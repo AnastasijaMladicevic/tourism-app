@@ -162,6 +162,10 @@
         }
       </article>
 
+      @if (galleryErrorMessage) {
+        <div class="alert alert-error inline-field-error">{{ galleryErrorMessage }}</div>
+      }
+
       <article class="panel">
         <span class="step-tag">STEP 2</span>
         <div class="panel-head">

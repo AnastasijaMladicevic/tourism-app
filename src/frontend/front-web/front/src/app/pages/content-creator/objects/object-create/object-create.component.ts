@@ -86,6 +86,8 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
   isLoadingObject = false;
   isSubmitting = false;
   errorMessage = '';
+  galleryErrorMessage = '';
+  locationErrorMessage = '';
   isEditMode = false;
   objectId: number | null = null;
   private deletionRequestSubmitted = false;
@@ -531,22 +533,34 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
 
     const remainingSlots = this.maxImageCount - this.editableImageUrls.length;
     if (remainingSlots <= 0) {
-      this.errorMessage = `You can upload up to ${this.maxImageCount} images per object.`;
+      this.galleryErrorMessage = `You can upload up to ${this.maxImageCount} images per object.`;
       input.value = '';
       return;
     }
 
     const acceptedFiles = selectedFiles.slice(0, remainingSlots);
+    const duplicateNames: string[] = [];
+    const addedKeys = new Set<string>();
+
     for (const file of acceptedFiles) {
+      const key = `${file.name}_${file.size}`;
+      if (this.isPendingFileDuplicate(file) || addedKeys.has(key)) {
+        duplicateNames.push(file.name);
+        continue;
+      }
+      addedKeys.add(key);
       const previewUrl = URL.createObjectURL(file);
       this.pendingImageFiles.set(previewUrl, file);
       this.editableImageUrls.push(previewUrl);
     }
 
-    this.errorMessage =
-      acceptedFiles.length < selectedFiles.length
-        ? `Only the first ${remainingSlots} images were added. Each object can have up to ${this.maxImageCount} images.`
-        : '';
+    if (duplicateNames.length > 0) {
+      this.galleryErrorMessage = `Duplicate image(s) skipped: ${duplicateNames.join(', ')}`;
+    } else if (acceptedFiles.length < selectedFiles.length) {
+      this.galleryErrorMessage = `Only the first ${remainingSlots} images were added. Each object can have up to ${this.maxImageCount} images.`;
+    } else {
+      this.galleryErrorMessage = '';
+    }
 
     input.value = '';
   }
@@ -750,14 +764,14 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
     }
 
     if (this.editableImageUrls.length === 0) {
-      this.errorMessage = 'At least one image is required before saving.';
+      this.galleryErrorMessage = 'At least one image is required before saving.';
       return;
     }
 
     const destinationId = this.form.controls.destinationId.value ?? undefined;
     const localityId = this.form.controls.localityId.value ?? undefined;
     if (!destinationId && !localityId) {
-      this.errorMessage = 'Please choose destination or locality.';
+      this.locationErrorMessage = 'Please choose a destination or locality.';
       return;
     }
 
@@ -811,7 +825,14 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
 
     return this.uploadPendingImages(created.id, this.editableImageUrls, 0).pipe(
       map(() => created),
-      catchError(() => of(created))
+      catchError((error) => {
+        const msg = error?.error?.message ?? 'Object was created but image upload failed. Please add images below.';
+        this.errorMessage = msg;
+        this.isEditMode = true;
+        this.objectId = created.id;
+        this.router.navigate(['/content-creator/objects/edit', created.id], { replaceUrl: true });
+        return of(created);
+      })
     );
   }
 
@@ -892,6 +913,15 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
       toArray(),
       map(() => urlToId)
     );
+  }
+
+  private isPendingFileDuplicate(file: File): boolean {
+    for (const existing of this.pendingImageFiles.values()) {
+      if (existing.name === file.name && existing.size === file.size) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private revokePendingPreview(previewUrl: string | undefined): void {
