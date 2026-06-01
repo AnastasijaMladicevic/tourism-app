@@ -6,7 +6,7 @@ import { of } from 'rxjs';
 import { catchError, finalize } from 'rxjs/operators';
 import { DestinationService } from '../../../services/destination.service';
 import { FilterOption, ObjectDto, ObjectImageDto, ObjectService } from '../../../services/object';
-import { ReviewService } from '../../../services/review';
+import { ReviewDto, ReviewService } from '../../../services/review';
 import { MapComponent as SharedMapComponent } from '../../../shared/components/map/map';
 import { mapReviewDtosToObjectThreads } from '../shared/manager-object-review.mapper';
 import {
@@ -452,9 +452,9 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
     const creatorName = 'Content Creator';
 
     this.reviewService
-      .getForObject(object.id)
+      .getAll({ objectId: object.id, sortBy: 'createdAt', sortOrder: 'desc', pageSize: 100 })
       .pipe(
-        catchError(() => of([])),
+        catchError(() => of({ items: [] as ReviewDto[], page: 1, pageSize: 0, totalCount: 0, totalPages: 1 })),
         finalize(() => {
           if (token === this.reviewsRequestToken) {
             this.reviewsLoading = false;
@@ -462,12 +462,12 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
           }
         })
       )
-      .subscribe((reviews) => {
+      .subscribe((response) => {
         if (token !== this.reviewsRequestToken) {
           return;
         }
 
-        this.selectedObjectReviews = mapReviewDtosToObjectThreads(reviews, creatorId, creatorName);
+        this.selectedObjectReviews = mapReviewDtosToObjectThreads(response.items ?? [], creatorId, creatorName);
         this.cdr.detectChanges();
       });
   }

@@ -1094,9 +1094,10 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
     this.managerGuestReviews = [];
 
     this.reviewService
-      .getForObject(objectId)
+      .getAll({ objectId, sortBy: 'createdAt', sortOrder: 'desc', pageSize: 100 })
       .pipe(
-        catchError(() => of([])),
+        map((response) => response.items ?? []),
+        catchError(() => of([] as ReviewDto[])),
         finalize(() => {
           this.managerGuestReviewsLoading = false;
           this.cdr.detectChanges();
