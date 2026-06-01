@@ -2,6 +2,7 @@ import { Component, OnInit, inject, ChangeDetectorRef, DestroyRef } from '@angul
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import { PaginatorComponent } from '../../../shared/components/paginator/paginator';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { forkJoin } from 'rxjs';
 import {
@@ -18,7 +19,7 @@ import { TranslationService } from '../../../services/translation.service';
 @Component({
   selector: 'app-manager-activities',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, SharedMapComponent],
+  imports: [CommonModule, FormsModule, RouterModule, SharedMapComponent, PaginatorComponent],
   templateUrl: './activities.component.html',
   styleUrls: [
     './activities.component.css',
@@ -310,6 +311,13 @@ export class ManagerActivitiesComponent implements OnInit {
 
   onFilterChange(): void {
     // Filters are applied explicitly via the panel's Apply button.
+  }
+
+  onGoToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.loadActivities();
+    }
   }
 
   onNextPage(): void {

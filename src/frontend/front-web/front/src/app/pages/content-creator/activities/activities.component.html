@@ -235,28 +235,18 @@
             </table>
           </div>
 
-          <footer class="table-footer">
-            <p>Showing {{ pageStart }} to {{ pageEnd }} of {{ totalCount }} activities</p>
-            <div class="pagination-buttons">
-              <label class="page-size-control">
-                <span>Page size</span>
-                <select
-                  class="page-size-select"
-                  [(ngModel)]="pageSize"
-                  (ngModelChange)="onPageSizeChange($event)"
-                >
-                  <option *ngFor="let option of pageSizeOptions" [ngValue]="option">{{ option }}</option>
-                </select>
-              </label>
-
-              <button type="button" class="ghost-btn slim-btn" (click)="onPreviousPage()" [disabled]="currentPage === 1">
-                Previous
-              </button>
-              <button type="button" class="ghost-btn slim-btn" (click)="onNextPage()" [disabled]="currentPage >= totalPages">
-                Next
-              </button>
-            </div>
-          </footer>
+          <app-paginator
+            [currentPage]="currentPage"
+            [totalPages]="totalPages"
+            [pageStart]="pageStart"
+            [pageEnd]="pageEnd"
+            [totalCount]="totalCount"
+            [pageSize]="pageSize"
+            [pageSizeOptions]="pageSizeOptions"
+            itemLabel="activities"
+            (pageChange)="onGoToPage($event)"
+            (pageSizeChange)="onPageSizeChange($event)"
+          ></app-paginator>
         }
       </div>
     </div>

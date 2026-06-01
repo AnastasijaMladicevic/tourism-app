@@ -1,6 +1,7 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { PaginatorComponent } from '../../../shared/components/paginator/paginator';
 import { ActivatedRoute, Router } from '@angular/router';
 import {
   Subject,
@@ -24,7 +25,7 @@ import { ReviewDto, ReviewQueryParams, ReviewService } from '../../../services/r
 @Component({
   selector: 'app-content-creator-reviews',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, PaginatorComponent],
   templateUrl: './reviews.component.html',
   styleUrls: ['./reviews.component.css', '../../admin/shared/admin-page-title.css']
 })
@@ -56,8 +57,8 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
   sortOrder: 'desc' | 'asc' = 'desc';
 
   queuePage = 1;
-  queuePageSize = 8;
-  readonly queuePageSizeOptions = [5, 8, 10, 15];
+  queuePageSize = 5;
+  readonly queuePageSizeOptions = [5, 10, 15];
   totalFilteredReviews = 0;
   totalReviewPages = 1;
 
@@ -218,6 +219,13 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
 
     this.queuePage++;
     this.loadReviews(true);
+  }
+
+  onQueueGoToPage(page: number): void {
+    if (page >= 1 && page <= this.queueTotalPages) {
+      this.queuePage = page;
+      this.loadReviews(true);
+    }
   }
 
   onQueuePageSizeChange(value: number | string): void {

@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit, inject, ChangeDetectorRef } from '@angula
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { PaginatorComponent } from '../../../shared/components/paginator/paginator';
 import { EventImageDto, EventService } from '../../../services/event.service';
 import { DestinationService } from '../../../services/destination.service';
 import { EventDto, EventQueryDto } from '../../../models/event.model';
@@ -25,7 +26,7 @@ interface EventScheduleRow {
 @Component({
   selector: 'app-manager-events',
   standalone: true,
-  imports: [CommonModule, FormsModule, SharedMapComponent],
+  imports: [CommonModule, FormsModule, SharedMapComponent, PaginatorComponent],
   templateUrl: './events.component.html',
   styleUrls: [
     './events.component.css',
@@ -297,6 +298,13 @@ export class ManagerEventsComponent implements OnInit, OnDestroy {
       return encodeURI(new URL(trimmed, document.baseURI).href);
     } catch {
       return encodeURI(trimmed);
+    }
+  }
+
+  onGoToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.loadEvents();
     }
   }
 

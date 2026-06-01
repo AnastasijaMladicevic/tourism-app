@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit, inject, ChangeDetectorRef } from '@angula
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { PaginatorComponent } from '../../../shared/components/paginator/paginator';
 import { forkJoin } from 'rxjs';
 import { EventImageDto, EventService } from '../../../services/event.service';
 import { EventDto, EventQueryDto } from '../../../models/event.model';
@@ -25,7 +26,7 @@ interface EventScheduleRow {
 @Component({
   selector: 'app-content-creator-events',
   standalone: true,
-  imports: [CommonModule, FormsModule, SharedMapComponent],
+  imports: [CommonModule, FormsModule, SharedMapComponent, PaginatorComponent],
   templateUrl: './events.component.html',
   styleUrls: [
     './events.component.css',
@@ -302,6 +303,13 @@ export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
 
   openEventDetails(event: EventDto): void {
     this.router.navigate(['/content-creator/events/view', event.id]);
+  }
+
+  onGoToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.loadEvents();
+    }
   }
 
   onNextPage(): void {

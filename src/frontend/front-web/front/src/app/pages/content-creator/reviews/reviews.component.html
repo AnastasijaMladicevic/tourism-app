@@ -100,22 +100,18 @@
             </article>
           }
         </div>
-        <footer class="queue-footer">
-          <p>{{ queuePageStart }}–{{ queuePageEnd }} of {{ totalFilteredReviews }}</p>
-          <div class="queue-pagination">
-            <label class="page-size-control">
-              <span>Per page</span>
-              <select class="page-size-select" [(ngModel)]="queuePageSize" (ngModelChange)="onQueuePageSizeChange($event)">
-                @for (option of queuePageSizeOptions; track option) {
-                  <option [ngValue]="option">{{ option }}</option>
-                }
-              </select>
-            </label>
-            <button class="queue-page-btn" type="button" (click)="onQueuePreviousPage()" [disabled]="queuePage === 1">Prev</button>
-            <span class="queue-page-indicator">{{ queuePage }} / {{ queueTotalPages }}</span>
-            <button class="queue-page-btn" type="button" (click)="onQueueNextPage()" [disabled]="queuePage >= queueTotalPages">Next</button>
-          </div>
-        </footer>
+        <app-paginator
+          [currentPage]="queuePage"
+          [totalPages]="queueTotalPages"
+          [pageStart]="queuePageStart"
+          [pageEnd]="queuePageEnd"
+          [totalCount]="totalFilteredReviews"
+          [pageSize]="queuePageSize"
+          [pageSizeOptions]="queuePageSizeOptions"
+          itemLabel="reviews"
+          (pageChange)="onQueueGoToPage($event)"
+          (pageSizeChange)="onQueuePageSizeChange($event)"
+        ></app-paginator>
       }
     </aside>
 

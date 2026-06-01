@@ -2,6 +2,7 @@ import { ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angula
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { PaginatorComponent } from '../../../shared/components/paginator/paginator';
 import { FilterOption, LocalityDto, LocalityImageDto, LocalityService } from '../../../services/locality.service';
 import { MapComponent as SharedMapComponent } from '../../../shared/components/map/map';
 import { DestinationService } from '../../../services/destination.service';
@@ -11,7 +12,7 @@ import { HERO_IMAGE_ROTATION_INTERVAL_MS } from '../../../shared/constants/hero-
 @Component({
   selector: 'app-manager-localities',
   standalone: true,
-  imports: [CommonModule, FormsModule, SharedMapComponent],
+  imports: [CommonModule, FormsModule, SharedMapComponent, PaginatorComponent],
   templateUrl: './localities.component.html',
   styleUrls: [
     './localities.component.css',
@@ -288,6 +289,13 @@ export class ManagerLocalitiesComponent implements OnInit, OnDestroy {
     }
     this.currentPage--;
     this.loadLocalities();
+  }
+
+  onGoToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.loadLocalities();
+    }
   }
 
   onNextPage(): void {

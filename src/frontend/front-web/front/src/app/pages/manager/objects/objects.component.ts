@@ -2,6 +2,7 @@ import { ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angula
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { PaginatorComponent } from '../../../shared/components/paginator/paginator';
 import { of } from 'rxjs';
 import { catchError, finalize } from 'rxjs/operators';
 import { DestinationService } from '../../../services/destination.service';
@@ -32,7 +33,7 @@ interface WorkingHoursRow {
 @Component({
   selector: 'app-manager-objects',
   standalone: true,
-  imports: [CommonModule, FormsModule, SharedMapComponent, RouterLink],
+  imports: [CommonModule, FormsModule, SharedMapComponent, RouterLink, PaginatorComponent],
   templateUrl: './objects.component.html',
   styleUrls: [
     './objects.component.css',
@@ -330,6 +331,13 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
   onSearchEnter(event: Event): void {
     event.preventDefault();
     this.onApplyFilters();
+  }
+
+  onGoToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.loadObjects();
+    }
   }
 
   onNextPage(): void {

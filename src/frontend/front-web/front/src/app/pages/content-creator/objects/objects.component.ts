@@ -2,6 +2,7 @@ import { ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angula
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { PaginatorComponent } from '../../../shared/components/paginator/paginator';
 import {
   FilterOption,
   getObjectPriceLabelKey,
@@ -24,7 +25,7 @@ interface WorkingHoursRow {
 @Component({
   selector: 'app-content-creator-objects',
   standalone: true,
-  imports: [CommonModule, FormsModule, SharedMapComponent],
+  imports: [CommonModule, FormsModule, SharedMapComponent, PaginatorComponent],
   templateUrl: './objects.component.html',
   styleUrls: [
     './objects.component.css',
@@ -202,6 +203,13 @@ export class ContentCreatorObjectsComponent implements OnInit, OnDestroy {
 
     this.currentPage--;
     this.loadObjects();
+  }
+
+  onGoToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.loadObjects();
+    }
   }
 
   onPageSizeChange(value: number | string): void {

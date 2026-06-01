@@ -2,6 +2,7 @@ import { Component, OnDestroy, OnInit, inject, ChangeDetectorRef } from '@angula
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
+import { PaginatorComponent } from '../../../shared/components/paginator/paginator';
 import { catchError, forkJoin, map, of } from 'rxjs';
 import { ActivitiesService, ActivityDto, ActivityImageDto, ActivityTypeOption } from '../../../services/activities';
 import { DestinationDto, DestinationService } from '../../../services/destination.service';
@@ -24,7 +25,7 @@ interface ActivityFilterOption {
 @Component({
   selector: 'app-content-creator-activities',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, SharedMapComponent],
+  imports: [CommonModule, FormsModule, RouterModule, SharedMapComponent, PaginatorComponent],
   templateUrl: './activities.component.html',
   styleUrls: [
     './activities.component.css',
@@ -294,6 +295,13 @@ export class ContentCreatorActivitiesComponent implements OnInit, OnDestroy {
 
   onFilterChange(): void {
     // Filters are applied explicitly via the panel's Apply button.
+  }
+
+  onGoToPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.loadActivities();
+    }
   }
 
   onNextPage(): void {
