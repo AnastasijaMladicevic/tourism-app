@@ -8,12 +8,15 @@ import { catchError, concatMap, finalize, map, switchMap, tap, toArray } from 'r
 import { ApproveContentDto } from '../../../../models/event.model';
 import {
   CreateObjectDto,
+  getObjectPriceLabelKey,
+  shouldShowObjectPrice,
   ObjectDto,
   ObjectImageDto,
   ObjectService,
   ObjectTypeOption,
   UpdateObjectDto
 } from '../../../../services/object';
+import { TranslationService } from '../../../../services/translation.service';
 import { ActivitiesService, LocalityOption } from '../../../../services/activities';
 import { DestinationDto, DestinationService } from '../../../../services/destination.service';
 import { AuthService } from '../../../../services/auth.service';
@@ -51,6 +54,7 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
   private readonly reviewService = inject(ReviewService);
   private readonly regionService = inject(RegionService);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly translationService = inject(TranslationService);
 
   /** Manager opens this page read-only via `/manager/objects/review/:id` (route data). */
   isManagerReview = false;
@@ -181,6 +185,10 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
       this.applyLocationFromSelection();
     });
 
+    this.form.controls.objectTypeId.valueChanges.subscribe(() => {
+      this.syncPriceFieldForSelectedType();
+    });
+
     if (this.isEditMode && this.objectId) {
       this.loadObjectForEdit(this.objectId);
     }
@@ -195,6 +203,28 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
 
   get showCcReviewsPreview(): boolean {
     return this.isEditMode && this.objectId != null && !this.isManagerReview;
+  }
+
+  get selectedObjectTypeName(): string {
+    const typeId = this.form.controls.objectTypeId.value;
+    if (typeId == null) {
+      return '';
+    }
+
+    return this.objectTypes.find((type) => type.id === typeId)?.name ?? this.loadedObject?.objectTypeName ?? '';
+  }
+
+  get showObjectPriceField(): boolean {
+    const typeId = this.form.controls.objectTypeId.value;
+    if (typeId == null) {
+      return true;
+    }
+
+    return shouldShowObjectPrice(this.selectedObjectTypeName);
+  }
+
+  get objectPriceLabel(): string {
+    return this.translationService.translate(getObjectPriceLabelKey(this.selectedObjectTypeName));
   }
 
   get hasPreviewReviews(): boolean {
@@ -785,7 +815,7 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
       objectTypeId: Number(this.form.controls.objectTypeId.value),
       destinationId,
       localityId,
-      price: this.form.controls.price.value ?? undefined,
+      price: this.showObjectPriceField ? this.form.controls.price.value ?? undefined : undefined,
       latitude: this.form.controls.latitude.value ?? undefined,
       longitude: this.form.controls.longitude.value ?? undefined,
       workingHours: this.buildWorkingHoursPayload(),
@@ -957,6 +987,7 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
         this.regions = regions;
         this.destinations = destinations;
         this.localities = localities;
+        this.syncPriceFieldForSelectedType();
         this.applyLocationFromSelection();
       }
     });
@@ -1155,6 +1186,7 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
       },
       { emitEvent: false }
     );
+    this.syncPriceFieldForSelectedType();
 
     const creatorName = this.resolveCreatorDisplayName(objectItem);
     this.editSidebar = {
@@ -1404,6 +1436,16 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
 
     this.form.disable({ emitEvent: false });
     this.workingHoursForm.disable({ emitEvent: false });
+  }
+
+  private syncPriceFieldForSelectedType(): void {
+    if (this.showObjectPriceField) {
+      return;
+    }
+
+    if (this.form.controls.price.value != null) {
+      this.form.controls.price.setValue(null, { emitEvent: false });
+    }
   }
 
   private patchWorkingHours(workingHours?: string): void {

@@ -5,7 +5,15 @@ import { Router, RouterLink } from '@angular/router';
 import { of } from 'rxjs';
 import { catchError, finalize } from 'rxjs/operators';
 import { DestinationService } from '../../../services/destination.service';
-import { FilterOption, ObjectDto, ObjectImageDto, ObjectService } from '../../../services/object';
+import {
+  FilterOption,
+  getObjectPriceLabelKey,
+  getObjectPriceMode,
+  ObjectDto,
+  ObjectImageDto,
+  ObjectService
+} from '../../../services/object';
+import { TranslationService } from '../../../services/translation.service';
 import { ReviewDto, ReviewService } from '../../../services/review';
 import { MapComponent as SharedMapComponent } from '../../../shared/components/map/map';
 import { mapReviewDtosToObjectThreads } from '../shared/manager-object-review.mapper';
@@ -44,6 +52,7 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
   private readonly reviewService = inject(ReviewService);
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly translationService = inject(TranslationService);
 
   private static readonly DEFAULT_BANNER_URL = '/assets/pozadina.png';
 
@@ -533,9 +542,14 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
     return { 'background-image': `url("${image}")` };
   }
 
-  formatPrice(price?: number | null): string {
+  formatPrice(price?: number | null, typeName?: string | null): string {
+    const mode = getObjectPriceMode(typeName);
+    if (mode === 'hidden') {
+      return this.translationService.translate('common.notApplicable');
+    }
+
     if (price == null) {
-      return 'Not available';
+      return this.translationService.translate('common.notSet');
     }
 
     return `$${Number(price).toFixed(2)}`;
@@ -638,6 +652,10 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
 
   get selectedObjectReviewsPreview(): ManagerObjectReviewThread[] {
     return this.selectedObjectReviews.slice(0, 2);
+  }
+
+  get selectedObjectPriceLabel(): string {
+    return this.translationService.translate(getObjectPriceLabelKey(this.selectedObject?.objectTypeName));
   }
 
   get showSelectedObjectReviewLink(): boolean {

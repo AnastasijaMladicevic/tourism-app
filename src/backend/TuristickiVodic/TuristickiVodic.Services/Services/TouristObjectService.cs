@@ -3,6 +3,8 @@ using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
 using System;
+using System.Globalization;
+using System.Text;
 using TuristickiVodic.Core.DTO;
 using TuristickiVodic.Core.Models;
 using TuristickiVodic.Infrastructure.Data;
@@ -690,7 +692,11 @@ namespace TuristickiVodic.Services.Services
             if (!destinationExists)
                 throw new InvalidOperationException("Destination not found.");
 
-            if (!await _context.ObjectTypes.AnyAsync(x => x.Id == dto.ObjectTypeId))
+            var objectType = await _context.ObjectTypes
+                .AsNoTracking()
+                .FirstOrDefaultAsync(x => x.Id == dto.ObjectTypeId);
+
+            if (objectType == null)
                 throw new InvalidOperationException("Object type not found.");
 
             if (dto.Price.HasValue && dto.Price.Value < 0)
@@ -706,7 +712,7 @@ namespace TuristickiVodic.Services.Services
                 MenuUrl = NormalizeOptionalText(dto.MenuUrl),
                 CuisineType = NormalizeOptionalText(dto.CuisineType),
                 WorkingHours = dto.WorkingHours,
-                Price = dto.Price,
+                Price = NormalizeObjectPrice(objectType.Name, dto.Price),
                 Amenities = NormalizeAmenities(dto.Amenities),
                 Geolocation = CreatePoint(dto.Longitude, dto.Latitude),
                 ObjectTypeId = dto.ObjectTypeId,
@@ -795,11 +801,25 @@ namespace TuristickiVodic.Services.Services
             if ((dto.Longitude.HasValue && !dto.Latitude.HasValue) || (!dto.Longitude.HasValue && dto.Latitude.HasValue))
                 throw new InvalidOperationException("Both longitude and latitude must be provided together.");
 
+            ObjectType? effectiveObjectType = obj.ObjectType;
+
             if (dto.ObjectTypeId.HasValue)
             {
-                if (!await _context.ObjectTypes.AnyAsync(x => x.Id == dto.ObjectTypeId.Value))
+                var nextObjectType = await _context.ObjectTypes
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(x => x.Id == dto.ObjectTypeId.Value);
+
+                if (nextObjectType == null)
                     throw new InvalidOperationException("Object type not found.");
+
                 obj.ObjectTypeId = dto.ObjectTypeId.Value;
+                effectiveObjectType = nextObjectType;
+            }
+            else if (effectiveObjectType == null)
+            {
+                effectiveObjectType = await _context.ObjectTypes
+                    .AsNoTracking()
+                    .FirstOrDefaultAsync(x => x.Id == obj.ObjectTypeId);
             }
 
             if (dto.LocalityId.HasValue)
@@ -844,6 +864,11 @@ namespace TuristickiVodic.Services.Services
                     throw new InvalidOperationException("Price cannot be negative.");
 
                 obj.Price = dto.Price.Value;
+            }
+
+            if (!ObjectTypeSupportsPrice(effectiveObjectType?.Name))
+            {
+                obj.Price = null;
             }
 
             if (dto.Amenities != null)
@@ -1336,6 +1361,66 @@ namespace TuristickiVodic.Services.Services
             return query.Where(o =>
                 o.ObjectType != null &&
                 o.ObjectType.Name.ToLower().Contains(type));
+        }
+
+        private static decimal? NormalizeObjectPrice(string? objectTypeName, decimal? submittedPrice)
+        {
+            return ObjectTypeSupportsPrice(objectTypeName) ? submittedPrice : null;
+        }
+
+        private static bool ObjectTypeSupportsPrice(string? objectTypeName)
+        {
+            var normalizedTypeName = NormalizeObjectTypeName(objectTypeName);
+            if (string.IsNullOrWhiteSpace(normalizedTypeName))
+                return true;
+
+            var nonPricedKeywords = new[]
+            {
+                "benzinska pumpa",
+                "gas station",
+                "bolnica",
+                "hospital",
+                "clinic",
+                "biblioteka",
+                "library",
+                "crkva",
+                "church",
+                "manastir",
+                "monastery",
+                "spomenik",
+                "monument",
+                "trzni centar",
+                "tržni centar",
+                "shopping centar",
+                "shopping center",
+                "mall",
+                "trznica",
+                "tržnica",
+                "suvenirnica",
+                "igraliste",
+                "igralište"
+            };
+
+            return !nonPricedKeywords.Any(keyword => normalizedTypeName.Contains(NormalizeObjectTypeName(keyword), StringComparison.Ordinal));
+        }
+
+        private static string NormalizeObjectTypeName(string? value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return string.Empty;
+
+            var normalized = value.Normalize(NormalizationForm.FormD);
+            var builder = new StringBuilder(normalized.Length);
+
+            foreach (var character in normalized)
+            {
+                if (CharUnicodeInfo.GetUnicodeCategory(character) != UnicodeCategory.NonSpacingMark)
+                {
+                    builder.Append(char.ToLowerInvariant(character));
+                }
+            }
+
+            return builder.ToString().Normalize(NormalizationForm.FormC).Trim();
         }
 
         private static string[] NormalizeAmenities(string[]? amenities)

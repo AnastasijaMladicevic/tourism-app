@@ -302,10 +302,8 @@
 
         <div class="detail-metrics">
           <div class="metric-card">
-            <span>Pricing</span>
-            <strong>{{
-              selectedEvent.price ? '$' + selectedEvent.price.toFixed(2) : 'Free'
-            }}</strong>
+            <span>{{ getTicketPriceLabel() }}</span>
+            <strong>{{ formatTicketPrice(selectedEvent.price) }}</strong>
           </div>
           <div class="metric-card">
             <span>Capacity</span>

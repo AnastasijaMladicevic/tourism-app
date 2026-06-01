@@ -319,6 +319,85 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
     return normalized || 'other';
   }
 
+  get showObjectPriceCard(): boolean {
+    return this.getObjectPriceMode(this.object?.objectTypeName) !== 'hidden' && Number(this.object?.price ?? 0) > 0;
+  }
+
+  get usesTicketPricing(): boolean {
+    return this.getObjectPriceMode(this.object?.objectTypeName) === 'ticket';
+  }
+
+  private getObjectPriceMode(typeName?: string | null): 'hidden' | 'ticket' | 'starting' {
+    const normalized = this.normalizeObjectTypeName(typeName);
+    if (!normalized) {
+      return 'starting';
+    }
+
+    const ticketKeywords = [
+      'muzej',
+      'museum',
+      'galerija',
+      'gallery',
+      'akva park',
+      'aqua park',
+      'aquapark',
+      'zoo vrt',
+      'zoo',
+      'akvarijum',
+      'aquarium',
+      'pozoriste',
+      'pozorište',
+      'theatre',
+      'theater',
+      'bioskop',
+      'cinema',
+    ];
+
+    const hiddenKeywords = [
+      'benzinska pumpa',
+      'gas station',
+      'bolnica',
+      'hospital',
+      'clinic',
+      'biblioteka',
+      'library',
+      'crkva',
+      'church',
+      'manastir',
+      'monastery',
+      'spomenik',
+      'monument',
+      'trzni centar',
+      'tržni centar',
+      'shopping centar',
+      'shopping center',
+      'mall',
+      'trznica',
+      'tržnica',
+      'suvenirnica',
+      'igraliste',
+      'igralište',
+    ];
+
+    if (hiddenKeywords.some((keyword) => normalized.includes(this.normalizeObjectTypeName(keyword)))) {
+      return 'hidden';
+    }
+
+    if (ticketKeywords.some((keyword) => normalized.includes(this.normalizeObjectTypeName(keyword)))) {
+      return 'ticket';
+    }
+
+    return 'starting';
+  }
+
+  private normalizeObjectTypeName(value?: string | null): string {
+    return (value ?? '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .trim();
+  }
+
   private extractItems(
     result: PagedResultDto<ObjectDto> | Record<string, unknown> | null | undefined,
   ): ObjectDto[] {

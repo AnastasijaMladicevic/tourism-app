@@ -282,8 +282,8 @@
 
         <div class="detail-metrics">
           <div class="metric-card">
-            <span>Pricing</span>
-            <strong>{{ selectedEvent.price != null ? '$' + selectedEvent.price.toFixed(2) : '—' }}</strong>
+            <span>{{ getTicketPriceLabel() }}</span>
+            <strong>{{ formatTicketPrice(selectedEvent.price) }}</strong>
           </div>
           <div class="metric-card">
             <span>Capacity</span>
@@ -343,9 +343,10 @@
         <div class="empty-state">
           <p class="eyebrow">No event selected</p>
           <h2>Pick an event from the table</h2>
-          <p>Select a row to preview schedule, pricing, and capacity before opening the full review.</p>
+          <p>Select a row to preview schedule, ticket price, and capacity before opening the full review.</p>
         </div>
       }
     </aside>
   </div>
 </section>
+

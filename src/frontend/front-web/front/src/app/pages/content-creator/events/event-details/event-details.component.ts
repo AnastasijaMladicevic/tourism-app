@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { EventService } from '../../../../services/event.service';
 import { EventDto } from '../../../../models/event.model';
+import { TranslationService } from '../../../../services/translation.service';
 
 interface DetailItem {
   label: string;
@@ -25,6 +26,7 @@ export class EventDetailsComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly eventService = inject(EventService);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly translationService = inject(TranslationService);
 
   event: EventDto | null = null;
   isLoading = true;
@@ -115,7 +117,10 @@ export class EventDetailsComponent implements OnInit {
     return [
       { label: 'Start date', value: this.formatDate(this.event.startDate) },
       { label: 'End date', value: this.formatDate(this.event.endDate ?? this.event.startDate) },
-      { label: 'Price', value: this.event.price ? `$${this.event.price.toFixed(2)}` : 'Free' },
+      {
+        label: this.translationService.translate('event.ticketPrice'),
+        value: this.event.price ? `$${this.event.price.toFixed(2)}` : this.translationService.translate('event.free')
+      },
       { label: 'Capacity', value: this.event.maxVisitors ? `${this.event.maxVisitors.toLocaleString('en-US')} guests` : '—' }
     ];
   }

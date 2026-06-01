@@ -8,6 +8,7 @@ import { EventDto, EventQueryDto } from '../../../models/event.model';
 import { buildEventQueryDto, EventFilterState } from '../../../models/event-filters.model';
 import { MapComponent as SharedMapComponent } from '../../../shared/components/map/map';
 import { HERO_IMAGE_ROTATION_INTERVAL_MS } from '../../../shared/constants/hero-image-rotation';
+import { TranslationService } from '../../../services/translation.service';
 
 interface EventInsightCard {
   label: string;
@@ -43,6 +44,7 @@ export class ManagerEventsComponent implements OnInit, OnDestroy {
   private readonly destinationService = inject(DestinationService);
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly translationService = inject(TranslationService);
 
   private static readonly DEFAULT_BANNER_URL = '/assets/pozadina.png';
 
@@ -396,6 +398,14 @@ export class ManagerEventsComponent implements OnInit, OnDestroy {
     }
 
     return `${new Intl.NumberFormat('en-US').format(event.maxVisitors)} max`;
+  }
+
+  getTicketPriceLabel(): string {
+    return this.translationService.translate('event.ticketPrice');
+  }
+
+  formatTicketPrice(price: number | null | undefined): string {
+    return price != null ? `$${price.toFixed(2)}` : 'â€”';
   }
 
   getCapacityProgress(event: EventDto): number {

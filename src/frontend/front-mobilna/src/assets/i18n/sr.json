@@ -1007,6 +1007,7 @@
     "loadingError": "Greška pri učitavanju dogadjaja.",
     "addedToPlanner": "Događaj je dodat u planer",
     "free": "Besplatno",
+    "ticketPrice": "Cena karte",
     "buyTicket": "Kupi kartu",
     "ticketAlert": "Kupovina karte - Cena: {{price}}",
     "addToPlanner": "Dodaj u planer",

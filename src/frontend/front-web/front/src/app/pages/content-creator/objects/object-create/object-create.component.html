@@ -163,8 +163,9 @@
               <option *ngFor="let type of objectTypes" [ngValue]="type.id">{{ type.name }}</option>
             </select>
           </label>
-          <label class="price-field">
-            <span>Price</span>
+          @if (showObjectPriceField) {
+            <label class="price-field">
+              <span>{{ objectPriceLabel }}</span>
             <div class="price-input-group">
               <span class="price-input-prefix" aria-hidden="true">€</span>
               <input
@@ -176,7 +177,8 @@
                 inputmode="decimal"
               />
             </div>
-          </label>
+            </label>
+          }
           <label>
             <span>Region</span>
             <select

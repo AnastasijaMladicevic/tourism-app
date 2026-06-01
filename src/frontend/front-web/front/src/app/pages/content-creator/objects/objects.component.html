@@ -242,8 +242,8 @@
 
         <div class="detail-metrics">
           <div class="metric-card">
-            <span>Pricing</span>
-            <strong>{{ formatPrice(selectedObject.price) }}</strong>
+            <span>{{ selectedObjectPriceLabel }}</span>
+            <strong>{{ formatPrice(selectedObject.price, selectedObject.objectTypeName) }}</strong>
           </div>
           <div class="metric-card">
             <span>Reviews</span>

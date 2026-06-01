@@ -296,8 +296,8 @@
 
         <div class="detail-metrics">
           <div class="metric-card">
-            <span>Pricing</span>
-            <strong>{{ (selectedActivityDetails ?? selectedActivity)?.price != null ? '$' + ((selectedActivityDetails ?? selectedActivity)?.price | number:'1.2-2') : 'Free' }}</strong>
+            <span>{{ translationService.translate('activity.participationFee') }}</span>
+            <strong>{{ formatParticipationFee((selectedActivityDetails ?? selectedActivity)?.price) }}</strong>
           </div>
           <div class="metric-card">
             <span>Duration</span>

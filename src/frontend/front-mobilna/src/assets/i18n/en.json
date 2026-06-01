@@ -1007,6 +1007,7 @@
     "loadingError": "Failed to load the event.",
     "addedToPlanner": "The event was added to Planner",
     "free": "Free",
+    "ticketPrice": "Ticket price",
     "buyTicket": "Buy ticket",
     "ticketAlert": "Ticket purchase - Price: {{price}}",
     "addToPlanner": "Add to Planner",

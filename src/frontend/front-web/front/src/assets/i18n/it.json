@@ -29,6 +29,9 @@
     "contactInfo": "Contact info",
     "price": "Price",
     "startingFrom": "Starting from",
+    "free": "Gratis",
+    "notApplicable": "Non applicabile",
+    "notSet": "Non impostato",
     "about": "About",
     "welcomeBack": "Bentornato",
     "score": "punteggio",
@@ -36,6 +39,16 @@
     "objects": "Oggetti",
     "events": "Eventi",
     "activities": "Attività"
+  },
+  "activity": {
+    "label": "Attivita",
+    "participationFee": "Tariffa di partecipazione"
+  },
+  "object": {
+    "price": {
+      "ticket": "Prezzo del biglietto",
+      "starting": "Prezzo di partenza"
+    }
   },
   "nav": {
     "home": "Home",
@@ -362,6 +375,7 @@
     "loadingError": "Failed to load the event.",
     "addedToPlanner": "The event was added to Planner",
     "free": "Free",
+    "ticketPrice": "Prezzo del biglietto",
     "buyTicket": "Buy ticket",
     "ticketAlert": "Ticket purchase - Price: {{price}}",
     "addToPlanner": "Add to Planner",

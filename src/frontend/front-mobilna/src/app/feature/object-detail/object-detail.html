@@ -206,7 +206,7 @@
             
           </div>
         </div>
-        @if(object.price) {
+        @if (showObjectPriceCard) {
         <div class="section">
           <div class="card price-card">
             <div class="price-header">
@@ -214,7 +214,11 @@
             </div>
             <div class="price">
               <p class="price-tag">
-                {{ 'common.startingFrom' | translate }} <strong>{{ object.price }}$</strong>
+                @if (usesTicketPricing) {
+                  {{ 'event.standardTicket' | translate }} <strong>{{ object.price }}$</strong>
+                } @else {
+                  {{ 'common.startingFrom' | translate }} <strong>{{ object.price }}$</strong>
+                }
               </p>
             </div>
           </div>

@@ -7,6 +7,7 @@ import { ActivitiesService, ActivityDto, ActivityImageDto, ActivityTypeOption } 
 import { DestinationDto, DestinationService } from '../../../services/destination.service';
 import { MapComponent as SharedMapComponent } from '../../../shared/components/map/map';
 import { HERO_IMAGE_ROTATION_INTERVAL_MS } from '../../../shared/constants/hero-image-rotation';
+import { TranslationService } from '../../../services/translation.service';
 
 interface ActivityInsightCard {
   label: string;
@@ -38,6 +39,7 @@ export class ContentCreatorActivitiesComponent implements OnInit, OnDestroy {
   private readonly activitiesService = inject(ActivitiesService);
   private readonly destinationService = inject(DestinationService);
   private readonly cdr = inject(ChangeDetectorRef);
+  readonly translationService = inject(TranslationService);
 
   private static readonly DEFAULT_BANNER_URL = '/assets/pozadina.png';
 
@@ -351,6 +353,14 @@ export class ContentCreatorActivitiesComponent implements OnInit, OnDestroy {
     }
 
     return `${hours}h ${remainingMinutes}m`;
+  }
+
+  formatParticipationFee(price?: number | null): string {
+    if (price == null) {
+      return this.translationService.translate('common.free');
+    }
+
+    return `$${Number(price).toFixed(2)}`;
   }
 
   getActivityLocation(activity: ActivityDto): string {

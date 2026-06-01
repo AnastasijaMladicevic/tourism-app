@@ -25,6 +25,7 @@ import {
 import { DestinationService, DestinationDto } from '../../../../services/destination.service';
 import { RegionDto, RegionService } from '../../../../services/region';
 import { EventService } from '../../../../services/event.service';
+import { TranslationService } from '../../../../services/translation.service';
 
 interface ObjectOption {
   id: number;
@@ -93,6 +94,7 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
   private readonly destroyRef = inject(DestroyRef);
   private readonly ngZone = inject(NgZone);
   private readonly cdr = inject(ChangeDetectorRef);
+  readonly translationService = inject(TranslationService);
 
   form = this.fb.group(
     {

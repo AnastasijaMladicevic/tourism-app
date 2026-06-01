@@ -147,6 +147,99 @@ export interface UpdateObjectDto {
   localityId?: number;
 }
 
+export type ObjectPriceMode = 'hidden' | 'ticket' | 'starting';
+export type ObjectPriceLabelKey = 'common.price' | 'object.price.ticket' | 'object.price.starting';
+
+const TICKET_OBJECT_TYPE_KEYWORDS = [
+  'muzej',
+  'museum',
+  'galerija',
+  'gallery',
+  'akva park',
+  'aqua park',
+  'aquapark',
+  'zoo vrt',
+  'zoo',
+  'akvarijum',
+  'aquarium',
+  'pozoriste',
+  'pozorište',
+  'theatre',
+  'theater',
+  'bioskop',
+  'cinema',
+];
+
+const NON_PRICED_OBJECT_TYPE_KEYWORDS = [
+  'benzinska pumpa',
+  'gas station',
+  'bolnica',
+  'hospital',
+  'clinic',
+  'biblioteka',
+  'library',
+  'crkva',
+  'church',
+  'manastir',
+  'monastery',
+  'spomenik',
+  'monument',
+  'trzni centar',
+  'tržni centar',
+  'shopping centar',
+  'shopping center',
+  'mall',
+  'trznica',
+  'tržnica',
+  'suvenirnica',
+  'igraliste',
+  'igralište',
+];
+
+function normalizeObjectTypeName(value?: string | null): string {
+  return (value ?? '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim();
+}
+
+function matchesObjectTypeKeyword(typeName: string, keywords: string[]): boolean {
+  return keywords.some((keyword) => typeName.includes(normalizeObjectTypeName(keyword)));
+}
+
+export function getObjectPriceMode(typeName?: string | null): ObjectPriceMode {
+  const normalizedTypeName = normalizeObjectTypeName(typeName);
+  if (!normalizedTypeName) {
+    return 'starting';
+  }
+
+  if (matchesObjectTypeKeyword(normalizedTypeName, NON_PRICED_OBJECT_TYPE_KEYWORDS)) {
+    return 'hidden';
+  }
+
+  if (matchesObjectTypeKeyword(normalizedTypeName, TICKET_OBJECT_TYPE_KEYWORDS)) {
+    return 'ticket';
+  }
+
+  return 'starting';
+}
+
+export function shouldShowObjectPrice(typeName?: string | null): boolean {
+  return getObjectPriceMode(typeName) !== 'hidden';
+}
+
+export function getObjectPriceLabelKey(typeName?: string | null): ObjectPriceLabelKey {
+  switch (getObjectPriceMode(typeName)) {
+    case 'ticket':
+      return 'object.price.ticket';
+    case 'starting':
+      return 'object.price.starting';
+    default:
+      return 'common.price';
+  }
+}
+
 @Injectable({ providedIn: 'root' })
 export class ObjectService {
   private readonly url = `${environment.apiUrl}/objects`;

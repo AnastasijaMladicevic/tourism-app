@@ -13,6 +13,7 @@ import { catchError, finalize, of } from 'rxjs';
 import { MapComponent } from '../../../../shared/components/map/map';
 import { ActivitiesService, ActivityDto, ActivityImageDto, ApproveActivityDto } from '../../../../services/activities';
 import { environment } from '../../../../../environment/environment';
+import { TranslationService } from '../../../../services/translation.service';
 
 @Component({
   selector: 'app-manager-activity-review',
@@ -33,6 +34,7 @@ export class ManagerActivityReviewComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly http = inject(HttpClient);
+  readonly translationService = inject(TranslationService);
 
   activityId: number | null = null;
   activity: ActivityDto | null = null;

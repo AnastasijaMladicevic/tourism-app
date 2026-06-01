@@ -2,7 +2,15 @@ import { ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angula
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { FilterOption, ObjectDto, ObjectImageDto, ObjectService } from '../../../services/object';
+import {
+  FilterOption,
+  getObjectPriceLabelKey,
+  getObjectPriceMode,
+  ObjectDto,
+  ObjectImageDto,
+  ObjectService
+} from '../../../services/object';
+import { TranslationService } from '../../../services/translation.service';
 import { MapComponent as SharedMapComponent } from '../../../shared/components/map/map';
 import { ReviewDto, ReviewService } from '../../../services/review';
 import { HERO_IMAGE_ROTATION_INTERVAL_MS } from '../../../shared/constants/hero-image-rotation';
@@ -32,6 +40,7 @@ export class ContentCreatorObjectsComponent implements OnInit, OnDestroy {
   private readonly reviewService = inject(ReviewService);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly router = inject(Router);
+  private readonly translationService = inject(TranslationService);
 
   private static readonly DEFAULT_BANNER_URL = '/assets/pozadina.png';
   private static readonly PREVIEW_REVIEWS_LIMIT = 3;
@@ -317,9 +326,14 @@ export class ContentCreatorObjectsComponent implements OnInit, OnDestroy {
     return '—';
   }
 
-  formatPrice(price?: number | null): string {
+  formatPrice(price?: number | null, typeName?: string | null): string {
+    const mode = getObjectPriceMode(typeName);
+    if (mode === 'hidden') {
+      return this.translationService.translate('common.notApplicable');
+    }
+
     if (price == null) {
-      return 'N/A';
+      return this.translationService.translate('common.notSet');
     }
 
     return `$${Number(price).toFixed(2)}`;
@@ -413,6 +427,10 @@ export class ContentCreatorObjectsComponent implements OnInit, OnDestroy {
 
   get hasPreviewReviews(): boolean {
     return this.previewReviews.length > 0;
+  }
+
+  get selectedObjectPriceLabel(): string {
+    return this.translationService.translate(getObjectPriceLabelKey(this.selectedObject?.objectTypeName));
   }
 
   get showViewMoreReviews(): boolean {

@@ -1003,6 +1003,7 @@
     "loadingError": "Error al cargar el evento.",
     "addedToPlanner": "El evento fue añadido al Planificador",
     "free": "Gratis",
+    "ticketPrice": "Precio de la entrada",
     "buyTicket": "Comprar entrada",
     "ticketAlert": "Compra de entrada - Precio: {{price}}",
     "addToPlanner": "Añadir al Planificador",

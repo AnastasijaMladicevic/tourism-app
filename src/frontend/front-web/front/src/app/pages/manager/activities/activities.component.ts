@@ -13,6 +13,7 @@ import {
 import { DestinationService } from '../../../services/destination.service';
 import { MapComponent as SharedMapComponent } from '../../../shared/components/map/map';
 import { HERO_IMAGE_ROTATION_INTERVAL_MS } from '../../../shared/constants/hero-image-rotation';
+import { TranslationService } from '../../../services/translation.service';
 
 @Component({
   selector: 'app-manager-activities',
@@ -37,6 +38,7 @@ export class ManagerActivitiesComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly destroyRef = inject(DestroyRef);
+  readonly translationService = inject(TranslationService);
 
   private static readonly DEFAULT_BANNER_URL = '/assets/pozadina.png';
 
@@ -82,7 +84,7 @@ export class ManagerActivitiesComponent implements OnInit {
 
   readonly sortByOptions = [
     { value: 'name', label: 'Name' },
-    { value: 'price', label: 'Price' },
+    { value: 'price', label: 'activity.participationFee' },
     { value: 'durationMinutes', label: 'Duration' },
     { value: 'status', label: 'Status' },
     { value: 'createdAt', label: 'Created date' }
@@ -485,6 +487,14 @@ export class ManagerActivitiesComponent implements OnInit {
     }
 
     return `${hours}h ${remainingMinutes}m`;
+  }
+
+  formatParticipationFee(price?: number | null): string {
+    if (price == null) {
+      return this.translationService.translate('common.free');
+    }
+
+    return `$${Number(price).toFixed(2)}`;
   }
 
   getActivityLocation(activity: ActivityDto): string {

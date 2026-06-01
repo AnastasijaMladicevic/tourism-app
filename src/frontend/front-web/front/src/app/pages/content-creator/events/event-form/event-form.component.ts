@@ -19,6 +19,7 @@ import { EventImageDto, EventService } from '../../../../services/event.service'
 import { ActivitiesService } from '../../../../services/activities';
 import { CreateEventDto, EventDto, UpdateEventDto } from '../../../../models/event.model';
 import { MapComponent } from '../../../../shared/components/map/map';
+import { TranslationService } from '../../../../services/translation.service';
 
 interface VenueOption {
   id: number;
@@ -53,6 +54,7 @@ export class EventFormComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly translationService = inject(TranslationService);
 
   form = this.fb.group({
     name: ['', [Validators.required, Validators.maxLength(200)]],
@@ -101,6 +103,10 @@ export class EventFormComponent implements OnInit, OnDestroy {
   private deletionRequestSubmitted = false;
   private readonly maxImageCount = 8;
   private readonly pendingImageFiles = new Map<string, File>();
+
+  get ticketPriceLabel(): string {
+    return this.translationService.translate('event.ticketPrice');
+  }
 
   private readonly fallbackEventTypes = [
     { id: 1, name: 'Festival' },
@@ -375,9 +381,14 @@ export class EventFormComponent implements OnInit, OnDestroy {
   }
 
   private buildActivityMeta(activity: { durationMinutes?: number; price?: number }): string {
-    const duration = activity.durationMinutes ? `${activity.durationMinutes} mins` : 'Duration n/a';
-    const price = activity.price != null ? `$${Number(activity.price).toFixed(0)}` : 'Price n/a';
-    return `Activity · ${duration} · ${price}`;
+    const activityLabel = this.translationService.translate('activity.label');
+    const duration = activity.durationMinutes
+      ? `${activity.durationMinutes} mins`
+      : this.translationService.translate('common.notAvailable');
+    const price = activity.price != null
+      ? `$${Number(activity.price).toFixed(0)}`
+      : this.translationService.translate('common.notAvailable');
+    return `${activityLabel} · ${duration} · ${price}`;
   }
 
   private setupDestinationObjectSync(): void {

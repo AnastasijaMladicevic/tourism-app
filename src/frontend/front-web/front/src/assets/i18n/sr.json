@@ -29,6 +29,9 @@
     "contactInfo": "Kontakt informacije",
     "price": "Cena",
     "startingFrom": "Od",
+    "free": "Besplatno",
+    "notApplicable": "Nije primenljivo",
+    "notSet": "Nije postavljeno",
     "about": "O nama",
     "welcomeBack": "Dobro dosao nazad",
     "score": "rezultat",
@@ -36,6 +39,16 @@
     "objects": "Objekti",
     "events": "Dogadjaji",
     "activities": "Aktivnosti"
+  },
+  "activity": {
+    "label": "Aktivnost",
+    "participationFee": "Kotizacija"
+  },
+  "object": {
+    "price": {
+      "ticket": "Cena ulaznice",
+      "starting": "Cena od"
+    }
   },
   "nav": {
     "home": "Pocetna",
@@ -359,6 +372,7 @@
   },
   "event": {
     "title": "Dogadjaj",
+    "ticketPrice": "Cena karte",
     "loadingError": "Greska pri ucitavanju dogadjaja.",
     "addedToPlanner": "Dogadjaj je dodat u Planner",
     "free": "Besplatno",

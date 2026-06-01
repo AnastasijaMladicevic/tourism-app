@@ -9,6 +9,7 @@ import { AuthService } from '../../../../services/auth.service';
 import { EventImageDto, EventService } from '../../../../services/event.service';
 import { ApproveContentDto, EventDto } from '../../../../models/event.model';
 import { environment } from '../../../../../environment/environment';
+import { TranslationService } from '../../../../services/translation.service';
 
 interface VenueOption {
   id: number;
@@ -42,6 +43,7 @@ export class ManagerEventFormComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly http = inject(HttpClient);
+  private readonly translationService = inject(TranslationService);
 
   form = this.fb.group({
     name: ['', [Validators.required, Validators.maxLength(200)]],
@@ -131,6 +133,10 @@ export class ManagerEventFormComponent implements OnInit, OnDestroy {
 
   readonly tags = ['Outdoor', 'Live Music', 'Summer'];
   pendingTag = '';
+
+  get ticketPriceLabel(): string {
+    return this.translationService.translate('event.ticketPrice');
+  }
 
   get selectedVenue(): VenueOption {
     if (this.loadedEvent) {

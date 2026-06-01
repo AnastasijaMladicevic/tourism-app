@@ -45,7 +45,7 @@
         <span>Sort by</span>
         <select [(ngModel)]="sortBy">
           <option *ngFor="let option of sortByOptions" [value]="option.value">
-            {{ option.label }}
+            {{ option.value === 'price' ? translationService.translate(option.label) : option.label }}
           </option>
         </select>
       </label>
@@ -272,8 +272,8 @@
 
         <div class="detail-metrics">
           <div class="metric-card">
-            <span>Pricing</span>
-            <strong>{{ (selectedActivityDetails ?? selectedActivity)?.price != null ? '$' + ((selectedActivityDetails ?? selectedActivity)?.price | number:'1.2-2') : 'Free' }}</strong>
+            <span>{{ translationService.translate('activity.participationFee') }}</span>
+            <strong>{{ formatParticipationFee((selectedActivityDetails ?? selectedActivity)?.price) }}</strong>
           </div>
           <div class="metric-card">
             <span>Duration</span>
