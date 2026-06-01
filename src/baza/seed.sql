@@ -36401,3 +36401,415 @@ VALUES
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'diego.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Taverna Campo del Sur'), 5, 'Odlično iskustvo, sve je delovalo uredno, jasno i prijatno za posetioce. Rado bih se vratila i preporučila ovo mesto drugima.', 'Approved', NOW()),
 ((SELECT "Id" FROM "Users" WHERE "Email" = 'sofia.tourist@spirego.com'), (SELECT "Id" FROM "Objects" WHERE "Name" = 'Teide Outdoor Spa'), 1, 'Očekivala sam mnogo više, ali poseta nije delovala prijatno ni dobro vođeno. Mesto ima potencijal, ali trenutno ostavlja prilično loš utisak.', 'Approved', NOW());
 
+-- DODATNE RECENZIJE ZA CG
+
+
+INSERT INTO "Reviews" ("UserId", "ObjectId", "Rating", "Text", "Status", "CreatedAt")
+VALUES
+((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Vardar'),
+ 5, 'Mesto je ostavilo vrlo dobar utisak i rado bih ga preporučio za kraću posetu.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Avala'),
+ 5, 'Mesto je ostavilo vrlo dobar utisak i rado bih ga preporučio za kraću posetu.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Durmitor'),
+ 3, 'Utisak je prosečan; sve osnovno može da posluži, ali bez jačeg razloga za ponovni dolazak.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Crkva Svetog Nikole Bar'),
+ 4, 'Poseta je bila prijatna i uglavnom dobro organizovana, uz par sitnica koje bi mogle bolje.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Bianca Kolašin'),
+ 4, 'Poseta je bila prijatna i uglavnom dobro organizovana, uz par sitnica koje bi mogle bolje.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restoran Pod Volat'),
+ 3, 'Utisak je prosečan; sve osnovno može da posluži, ali bez jačeg razloga za ponovni dolazak.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Konoba Batričević Njeguši'),
+ 5, 'Mesto je ostavilo vrlo dobar utisak i rado bih ga preporučio za kraću posetu.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Restaurant OrO'),
+ 1, 'Iskustvo mi nije bilo dobro jer su organizacija i osnovna usluga ostavili slab utisak.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Splendid Conference & Spa Resort'),
+ 2, 'Mesto ima potencijal, ali je nekoliko detalja pokvarilo ukupni doživljaj posete.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Palmon Bay'),
+ 1, 'Iskustvo mi nije bilo dobro jer su organizacija i osnovna usluga ostavili slab utisak.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Palas'),
+ 2, 'Mesto ima potencijal, ali je nekoliko detalja pokvarilo ukupni doživljaj posete.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Princess'),
+ 1, 'Iskustvo mi nije bilo dobro jer su organizacija i osnovna usluga ostavili slab utisak.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Polar Star'),
+ 2, 'Mesto ima potencijal, ali je nekoliko detalja pokvarilo ukupni doživljaj posete.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Konoba Stari grad'),
+ 1, 'Iskustvo mi nije bilo dobro jer su organizacija i osnovna usluga ostavili slab utisak.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Planinarski dom Škrka'),
+ 2, 'Mesto ima potencijal, ali je nekoliko detalja pokvarilo ukupni doživljaj posete.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Nacionalna biblioteka Crne Gore Đurđe Crnojević'),
+ 4, 'Poseta je bila prijatna i uglavnom dobro organizovana, uz par sitnica koje bi mogle bolje.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Gradska biblioteka i čitaonica Herceg Novi'),
+ 5, 'Mesto je ostavilo vrlo dobar utisak i rado bih ga preporučio za kraću posetu.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Katedrala Svetog Tripuna'),
+ 1, 'Iskustvo mi nije bilo dobro jer su organizacija i osnovna usluga ostavili slab utisak.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Crkva Svetog Jovana Vladimira'),
+ 5, 'Mesto je ostavilo vrlo dobar utisak i rado bih ga preporučio za kraću posetu.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Vuković'),
+ 4, 'Poseta je bila prijatna i uglavnom dobro organizovana, uz par sitnica koje bi mogle bolje.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartmani M Herceg Novi'),
+ 4, 'Poseta je bila prijatna i uglavnom dobro organizovana, uz par sitnica koje bi mogle bolje.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Mijović'),
+ 1, 'Iskustvo mi nije bilo dobro jer su organizacija i osnovna usluga ostavili slab utisak.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Apartments Aleksandar'),
+ 4, 'Poseta je bila prijatna i uglavnom dobro organizovana, uz par sitnica koje bi mogle bolje.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Casa Nuova'),
+ 1, 'Iskustvo mi nije bilo dobro jer su organizacija i osnovna usluga ostavili slab utisak.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Wellness Center Simo Milošević'),
+ 2, 'Mesto ima potencijal, ali je nekoliko detalja pokvarilo ukupni doživljaj posete.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Huma Bay Spa'),
+ 2, 'Mesto ima potencijal, ali je nekoliko detalja pokvarilo ukupni doživljaj posete.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Partizanu borcu na Gorici'),
+ 5, 'Mesto je ostavilo vrlo dobar utisak i rado bih ga preporučio za kraću posetu.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik kralju Nikoli'),
+ 5, 'Mesto je ostavilo vrlo dobar utisak i rado bih ga preporučio za kraću posetu.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik palim borcima na Grahovcu'),
+ 3, 'Utisak je prosečan; sve osnovno može da posluži, ali bez jačeg razloga za ponovni dolazak.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik Puniši Račiću'),
+ 3, 'Utisak je prosečan; sve osnovno može da posluži, ali bez jačeg razloga za ponovni dolazak.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Spomenik bici na Fundini'),
+ 5, 'Mesto je ostavilo vrlo dobar utisak i rado bih ga preporučio za kraću posetu.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Top Hill Club'),
+ 5, 'Mesto je ostavilo vrlo dobar utisak i rado bih ga preporučio za kraću posetu.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Maximus Club Kotor'),
+ 1, 'Iskustvo mi nije bilo dobro jer su organizacija i osnovna usluga ostavili slab utisak.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Diamond Night Club'),
+ 1, 'Iskustvo mi nije bilo dobro jer su organizacija i osnovna usluga ostavili slab utisak.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Madam Open Bar'),
+ 3, 'Utisak je prosečan; sve osnovno može da posluži, ali bez jačeg razloga za ponovni dolazak.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Montenegro Pub'),
+ 4, 'Poseta je bila prijatna i uglavnom dobro organizovana, uz par sitnica koje bi mogle bolje.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'EKO Pumpa Budva'),
+ 1, 'Iskustvo mi nije bilo dobro jer su organizacija i osnovna usluga ostavili slab utisak.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lukoil Konik Podgorica'),
+ 1, 'Iskustvo mi nije bilo dobro jer su organizacija i osnovna usluga ostavili slab utisak.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'EKO Tivat'),
+ 1, 'Iskustvo mi nije bilo dobro jer su organizacija i osnovna usluga ostavili slab utisak.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Lukoil Kolašin'),
+ 1, 'Iskustvo mi nije bilo dobro jer su organizacija i osnovna usluga ostavili slab utisak.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'EKO Kotor'),
+ 4, 'Poseta je bila prijatna i uglavnom dobro organizovana, uz par sitnica koje bi mogle bolje.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Casper Bar Budva'),
+ 3, 'Utisak je prosečan; sve osnovno može da posluži, ali bez jačeg razloga za ponovni dolazak.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Kafić Marshall’s Gelato & Coffee'),
+ 2, 'Mesto ima potencijal, ali je nekoliko detalja pokvarilo ukupni doživljaj posete.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dojmi Cafe Kotor'),
+ 1, 'Iskustvo mi nije bilo dobro jer su organizacija i osnovna usluga ostavili slab utisak.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Al Posto Giusto Tivat'),
+ 1, 'Iskustvo mi nije bilo dobro jer su organizacija i osnovna usluga ostavili slab utisak.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'HEIST Bar Ulcinj'),
+ 5, 'Mesto je ostavilo vrlo dobar utisak i rado bih ga preporučio za kraću posetu.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Beer & Bike Club'),
+ 1, 'Iskustvo mi nije bilo dobro jer su organizacija i osnovna usluga ostavili slab utisak.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Havana Beach Bar'),
+ 2, 'Mesto ima potencijal, ali je nekoliko detalja pokvarilo ukupni doživljaj posete.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Itaka Library Bar'),
+ 3, 'Utisak je prosečan; sve osnovno može da posluži, ali bez jačeg razloga za ponovni dolazak.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Old Town Pub Kotor'),
+ 4, 'Poseta je bila prijatna i uglavnom dobro organizovana, uz par sitnica koje bi mogle bolje.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Strix Bar'),
+ 5, 'Mesto je ostavilo vrlo dobar utisak i rado bih ga preporučio za kraću posetu.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Narodni muzej Crne Gore'),
+ 5, 'Mesto je ostavilo vrlo dobar utisak i rado bih ga preporučio za kraću posetu.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej kralja Nikole'),
+ 5, 'Mesto je ostavilo vrlo dobar utisak i rado bih ga preporučio za kraću posetu.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Muzej grada Perasta'),
+ 5, 'Mesto je ostavilo vrlo dobar utisak i rado bih ga preporučio za kraću posetu.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mall of Montenegro'),
+ 5, 'Mesto je ostavilo vrlo dobar utisak i rado bih ga preporučio za kraću posetu.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'City Mall'),
+ 1, 'Iskustvo mi nije bilo dobro jer su organizacija i osnovna usluga ostavili slab utisak.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Mega Mall Budva'),
+ 4, 'Poseta je bila prijatna i uglavnom dobro organizovana, uz par sitnica koje bi mogle bolje.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Laković Kotor'),
+ 1, 'Iskustvo mi nije bilo dobro jer su organizacija i osnovna usluga ostavili slab utisak.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'HDL Novi Mall'),
+ 1, 'Iskustvo mi nije bilo dobro jer su organizacija i osnovna usluga ostavili slab utisak.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Galerija Pizana'),
+ 3, 'Utisak je prosečan; sve osnovno može da posluži, ali bez jačeg razloga za ponovni dolazak.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Villa Ljubanović'),
+ 1, 'Iskustvo mi nije bilo dobro jer su organizacija i osnovna usluga ostavili slab utisak.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Guesthouse Plima'),
+ 3, 'Utisak je prosečan; sve osnovno može da posluži, ali bez jačeg razloga za ponovni dolazak.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Etno Selo Montenegro'),
+ 1, 'Iskustvo mi nije bilo dobro jer su organizacija i osnovna usluga ostavili slab utisak.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Etno Selo Komarnica'),
+ 2, 'Mesto ima potencijal, ali je nekoliko detalja pokvarilo ukupni doživljaj posete.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Vinarija Lipovac'),
+ 1, 'Iskustvo mi nije bilo dobro jer su organizacija i osnovna usluga ostavili slab utisak.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Winery Mašanović'),
+ 1, 'Iskustvo mi nije bilo dobro jer su organizacija i osnovna usluga ostavili slab utisak.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Aqua Park Budva'),
+ 4, 'Poseta je bila prijatna i uglavnom dobro organizovana, uz par sitnica koje bi mogle bolje.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Aqua Park Imanje Knjaz'),
+ 1, 'Iskustvo mi nije bilo dobro jer su organizacija i osnovna usluga ostavili slab utisak.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zoo Sad'),
+ 5, 'Mesto je ostavilo vrlo dobar utisak i rado bih ga preporučio za kraću posetu.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Akvarijum Boka'),
+ 1, 'Iskustvo mi nije bilo dobro jer su organizacija i osnovna usluga ostavili slab utisak.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Gorica Park'),
+ 2, 'Mesto ima potencijal, ali je nekoliko detalja pokvarilo ukupni doživljaj posete.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dječije Igralište Park Nezavisnosti'),
+ 3, 'Utisak je prosečan; sve osnovno može da posluži, ali bez jačeg razloga za ponovni dolazak.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Tološi'),
+ 5, 'Mesto je ostavilo vrlo dobar utisak i rado bih ga preporučio za kraću posetu.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Igalo'),
+ 4, 'Poseta je bila prijatna i uglavnom dobro organizovana, uz par sitnica koje bi mogle bolje.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Nikšić'),
+ 5, 'Mesto je ostavilo vrlo dobar utisak i rado bih ga preporučio za kraću posetu.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Bar Šetalište'),
+ 4, 'Poseta je bila prijatna i uglavnom dobro organizovana, uz par sitnica koje bi mogle bolje.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Miločer Park'),
+ 3, 'Utisak je prosečan; sve osnovno može da posluži, ali bez jačeg razloga za ponovni dolazak.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Igralište Lovćen'),
+ 2, 'Mesto ima potencijal, ali je nekoliko detalja pokvarilo ukupni doživljaj posete.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zetski dom'),
+ 1, 'Iskustvo mi nije bilo dobro jer su organizacija i osnovna usluga ostavili slab utisak.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dvorana Park Herceg Novi'),
+ 1, 'Iskustvo mi nije bilo dobro jer su organizacija i osnovna usluga ostavili slab utisak.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Javna ustanova Grad Teatar'),
+ 1, 'Iskustvo mi nije bilo dobro jer su organizacija i osnovna usluga ostavili slab utisak.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Tivat Centar za kulturu'),
+ 2, 'Mesto ima potencijal, ali je nekoliko detalja pokvarilo ukupni doživljaj posete.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom kulture Kolašin'),
+ 3, 'Utisak je prosečan; sve osnovno može da posluži, ali bez jačeg razloga za ponovni dolazak.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Cetinjski manastir'),
+ 5, 'Mesto je ostavilo vrlo dobar utisak i rado bih ga preporučio za kraću posetu.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Morača'),
+ 4, 'Poseta je bila prijatna i uglavnom dobro organizovana, uz par sitnica koje bi mogle bolje.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Nikšić'),
+ 1, 'Iskustvo mi nije bilo dobro jer su organizacija i osnovna usluga ostavili slab utisak.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'SC Kolašin'),
+ 1, 'Iskustvo mi nije bilo dobro jer su organizacija i osnovna usluga ostavili slab utisak.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'The Chedi Luštica Bay'),
+ 5, 'Mesto je ostavilo vrlo dobar utisak i rado bih ga preporučio za kraću posetu.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Shanti Wellness & Spa'),
+ 2, 'Mesto ima potencijal, ali je nekoliko detalja pokvarilo ukupni doživljaj posete.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Gradska pijaca Kotor'),
+ 5, 'Mesto je ostavilo vrlo dobar utisak i rado bih ga preporučio za kraću posetu.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zelena pijaca Nikšić'),
+ 5, 'Mesto je ostavilo vrlo dobar utisak i rado bih ga preporučio za kraću posetu.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Pijaca Herceg Novi'),
+ 5, 'Mesto je ostavilo vrlo dobar utisak i rado bih ga preporučio za kraću posetu.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'ana@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Zelena pijaca Cetinje'),
+ 2, 'Mesto ima potencijal, ali je nekoliko detalja pokvarilo ukupni doživljaj posete.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'stefan@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Riblja Pijaca Tivat'),
+ 5, 'Mesto je ostavilo vrlo dobar utisak i rado bih ga preporučio za kraću posetu.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'ivan@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'By The Sea Handmade'),
+ 1, 'Iskustvo mi nije bilo dobro jer su organizacija i osnovna usluga ostavili slab utisak.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Souvenir Shop XY'),
+ 3, 'Utisak je prosečan; sve osnovno može da posluži, ali bez jačeg razloga za ponovni dolazak.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Promenada Krupac'),
+ 4, 'Poseta je bila prijatna i uglavnom dobro organizovana, uz par sitnica koje bi mogle bolje.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'mila@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opšta bolnica Nikšić'),
+ 1, 'Iskustvo mi nije bilo dobro jer su organizacija i osnovna usluga ostavili slab utisak.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'tamara@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Opšta bolnica Kotor'),
+ 1, 'Iskustvo mi nije bilo dobro jer su organizacija i osnovna usluga ostavili slab utisak.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'nemanja@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Tivat'),
+ 2, 'Mesto ima potencijal, ali je nekoliko detalja pokvarilo ukupni doživljaj posete.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Bar'),
+ 3, 'Utisak je prosečan; sve osnovno može da posluži, ali bez jačeg razloga za ponovni dolazak.', 'Approved', NOW()),
+
+((SELECT "Id" FROM "Users" WHERE "Email" = 'jelena@gmail.com'),
+ (SELECT "Id" FROM "Objects" WHERE "Name" = 'Dom zdravlja Plav'),
+ 1, 'Iskustvo mi nije bilo dobro jer su organizacija i osnovna usluga ostavili slab utisak.', 'Approved', NOW());
