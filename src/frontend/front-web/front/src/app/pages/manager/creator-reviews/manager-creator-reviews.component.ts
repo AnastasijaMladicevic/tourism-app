@@ -34,6 +34,7 @@ import {
   Observable,
 } from 'rxjs';
 import { DestinationService } from '../../../services/destination.service';
+import { ManagerDashboardService } from '../../../services/manager-dashboard.service';
 import { ObjectDto, ObjectService } from '../../../services/object';
 import { ReviewDto, ReviewService } from '../../../services/review';
 
@@ -89,6 +90,7 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
   private readonly destinationService = inject(DestinationService);
   private readonly http = inject(HttpClient);
   private readonly managerReportsService = inject(ManagerReportsService);
+  private readonly dashboardService = inject(ManagerDashboardService);
   private readonly route = inject(ActivatedRoute);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly destroy$ = new Subject<void>();
@@ -451,6 +453,11 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
           if (!object.createdByUserId) {
             continue;
           }
+          // Pre-populate creator name from object data to avoid separate user API calls
+          const knownName = object.createdByFullName?.trim();
+          if (knownName && !this.creatorNameById.has(object.createdByUserId)) {
+            this.creatorNameById.set(object.createdByUserId, knownName);
+          }
           this.creatorObjectCounts.set(
             object.createdByUserId,
             (this.creatorObjectCounts.get(object.createdByUserId) ?? 0) + 1,
@@ -486,8 +493,11 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
           params: { page, pageSize },
         }),
       ).pipe(catchError(() => of([] as ManagerReportNameHint[]))),
+      dashboard: this.dashboardService.getOverview('1y').pipe(
+        catchError(() => of(null)),
+      ),
     }).pipe(
-      map(({ deletionRequests, managerReports }) => {
+      map(({ deletionRequests, managerReports, dashboard }) => {
         for (const request of deletionRequests) {
           const name = request.requestedByName?.trim();
           if (name && request.requestedByUserId > 0) {
@@ -499,6 +509,21 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
           const name = report.reportedUserName?.trim();
           if (name && report.reportedUserId > 0) {
             this.creatorNameById.set(report.reportedUserId, name);
+          }
+        }
+
+        if (dashboard) {
+          for (const creator of dashboard.topCreators ?? []) {
+            const name = creator.creatorName?.trim();
+            if (name && creator.creatorId > 0) {
+              this.creatorNameById.set(creator.creatorId, name);
+            }
+          }
+          for (const item of dashboard.topContent ?? []) {
+            const name = item.creatorName?.trim();
+            if (name && item.creatorId > 0) {
+              this.creatorNameById.set(item.creatorId, name);
+            }
           }
         }
       }),
@@ -545,7 +570,7 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
 
   private creatorDisplayName(creatorId: number): string {
     if (!creatorId) {
-      return 'Unknown creator';
+      return 'Content creator';
     }
 
     const known = this.creatorNameById.get(creatorId)?.trim();
@@ -553,7 +578,7 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
       return known;
     }
 
-    return 'Unknown creator';
+    return 'Content creator';
   }
 
   private resolveMissingCreatorNames(creatorIds: number[]): void {
@@ -608,7 +633,7 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
       return false;
     }
 
-    return !/^unknown creator$/i.test(name);
+    return !/^content creator$/i.test(name) && name.trim().length > 0;
   }
 
   private applyCreatorNamesToThreads(): void {

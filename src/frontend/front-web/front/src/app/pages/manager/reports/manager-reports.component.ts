@@ -306,7 +306,7 @@ export class ManagerReportsComponent implements OnInit {
     return {
       id: report.id,
       reportedUserId: report.reportedUserId,
-      reportedUserName: report.reportedUserName?.trim() || 'Unknown creator',
+      reportedUserName: report.reportedUserName?.trim() || '—',
       reason: report.reason,
       status,
       destinationName: report.destinationName?.trim() || '—',
@@ -339,7 +339,7 @@ export class ManagerReportsComponent implements OnInit {
     return Array.from(counts.entries())
       .map(([id, count]) => ({
         id,
-        name: this.creatorNameById.get(id) ?? 'Unknown creator',
+        name: this.creatorNameById.get(id) ?? 'Content creator',
         contentSummary: `${count} object${count === 1 ? '' : 's'} in your destinations`,
         hasPendingReport: pendingIds.has(id),
       }))
@@ -490,7 +490,7 @@ export class ManagerReportsComponent implements OnInit {
     if (!name) {
       return false;
     }
-    return !/^unknown creator$/i.test(name);
+    return !/^content creator$/i.test(name) && name.trim().length > 0;
   }
 
   private applyCreatorNamesToLists(): void {

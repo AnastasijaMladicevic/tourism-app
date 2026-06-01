@@ -139,7 +139,7 @@
             <p class="queue-snippet">{{ thread.touristReview }}</p>
             <div class="queue-meta">
               <span>{{ thread.objectName }}</span>
-              <span class="creator-tag">{{ thread.creatorName }}</span>
+              <span class="creator-tag">Creator: {{ thread.creatorName }}</span>
             </div>
             <span class="reply-status" [class.has-reply]="thread.creatorResponse">
               {{ thread.creatorResponse ? 'CC replied' : 'Awaiting reply' }}

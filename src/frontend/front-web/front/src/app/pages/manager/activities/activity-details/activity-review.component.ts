@@ -164,7 +164,7 @@ export class ManagerActivityReviewComponent implements OnInit, OnDestroy {
       price: activity.price != null ? this.formatPrice(activity.price) : '',
       durationMinutes: activity.durationMinutes != null ? this.formatDuration(activity.durationMinutes) : '',
       isActive: activity.isActive ? 'Active' : 'Inactive',
-      createdByUserId: creatorFullName || 'Unknown content creator',
+      createdByUserId: creatorFullName || '—',
       createdAt: this.formatDateTime(activity.createdAt),
       updatedAt: this.formatDateTime(activity.updatedAt),
       approvedAt: this.formatDateTime(activity.approvedAt),
