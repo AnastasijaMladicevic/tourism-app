@@ -102,11 +102,21 @@
             [interactive]="false"
           >
           </app-map>
-          <button class="map-btn-overlay" (click)="viewOnMap()">{{ 'common.viewOnMap' | translate }}</button>
+            <button class="map-btn-overlay" (click)="viewOnMap()">{{ 'common.viewOnMap' | translate }}</button>
+          </div>
         </div>
-      </div>
-      @if (qrLink) {
-        <div class="card qr-card">
+        <div class="card">
+          <h2>{{ 'activity.participationFee' | translate }}</h2>
+
+          <div class="ticket-card">
+            <div>
+              <span class="ticket-type">{{ 'activity.participationFee' | translate }}</span>
+              <span class="ticket-price">{{ getParticipationFee() }}</span>
+            </div>
+          </div>
+        </div>
+        @if (qrLink) {
+          <div class="card qr-card">
           <div>
             <h2>{{ 'common.qrTitle' | translate }}</h2>
             <p>{{ 'common.qrBody' | translate }}</p>

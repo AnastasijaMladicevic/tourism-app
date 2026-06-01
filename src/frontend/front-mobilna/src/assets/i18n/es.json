@@ -1224,6 +1224,8 @@
   },
   "activity": {
     "title": "Actividad",
+    "participationFee": "Cuota de participación",
+    "free": "Gratis",
     "descriptionFallback": "La descripción no está disponible.",
     "nearbyTitle": "Actividades cercanas",
     "nearbyEmpty": "No hay actividades cerca.",

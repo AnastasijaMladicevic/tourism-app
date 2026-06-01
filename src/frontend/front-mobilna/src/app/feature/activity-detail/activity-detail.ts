@@ -13,6 +13,7 @@ import { PendingActionService } from '../../services/pending-action';
 import { RouterHistoryService } from '../../services/router-history';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { QrLinkDto, QrLinkService } from '../../services/qr-link';
+import { TranslationService } from '../../services/translation.service';
 
 @Component({
   selector: 'app-activity-detail',
@@ -50,6 +51,7 @@ export class ActivityDetailComponent implements OnInit, OnDestroy {
     private pendingActionService: PendingActionService,
     private routerHistory: RouterHistoryService,
     private qrLinkService: QrLinkService,
+    private translationService: TranslationService,
     private el: ElementRef
   ) { }
 
@@ -240,6 +242,12 @@ export class ActivityDetailComponent implements OnInit, OnDestroy {
     }
 
     return this.activity?.mainImageUrl || '';
+  }
+
+  getParticipationFee(): string {
+    return this.activity?.price != null && this.activity.price > 0
+      ? `${this.activity.price} €`
+      : this.translationService.translate('activity.free');
   }
 
   isFavoritePending(activityId?: number | null): boolean {

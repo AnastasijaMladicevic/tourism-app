@@ -1223,6 +1223,8 @@
     "loadError": "Impossibile caricare le destinazioni."
   },
   "activity": {
+    "participationFee": "Quota di partecipazione",
+    "free": "Gratuito",
     "title": "Attività",
     "descriptionFallback": "La descrizione non è disponibile.",
     "nearbyTitle": "Attività vicine",

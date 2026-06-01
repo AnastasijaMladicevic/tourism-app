@@ -1230,6 +1230,8 @@
   },
   "activity": {
     "title": "Activity",
+    "participationFee": "Participation fee",
+    "free": "Free",
     "descriptionFallback": "No description available.",
     "nearbyTitle": "Nearby activities",
     "nearbyEmpty": "No activities nearby.",

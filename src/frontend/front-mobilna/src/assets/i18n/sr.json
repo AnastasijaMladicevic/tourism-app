@@ -1230,6 +1230,8 @@
   },
   "activity": {
     "title": "Aktivnost",
+    "participationFee": "Kotizacija",
+    "free": "Besplatno",
     "descriptionFallback": "Opis nije dostupan.",
     "nearbyTitle": "Obližnje aktivnosti",
     "nearbyEmpty": "Nema aktivnosti u blizini.",
