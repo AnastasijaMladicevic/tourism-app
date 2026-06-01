@@ -8,9 +8,10 @@ import { environment } from '../../../../environment/environment';
 import { AuthService, UpdateUserDto } from '../../../services/auth.service';
 import { UserDto } from '../../../models/user.model';
 import { TranslationService } from '../../../services/translation.service';
+import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 type PermissionItem = {
-  label: string;
-  detail: string;
+  labelKey: string;
+  detailKey: string;
   icon: string;
 };
 
@@ -20,13 +21,13 @@ type ModalState = 'closed' | 'opening' | 'open' | 'closing';
 
 type ProfileLanguageOption = {
   code: string;
-  label: string;
+  labelKey: string;
 };
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, MatIcon, ImageCropperComponent],
+  imports: [CommonModule, FormsModule, RouterModule, MatIcon, ImageCropperComponent, TranslatePipe],
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.css'],
 })
@@ -35,23 +36,23 @@ export class ProfileComponent implements OnInit, OnDestroy {
     `${environment.apiUrl.replace('/api', '')}/images/profiles/default_icon.png`;
 
   readonly permissionItems: PermissionItem[] = [
-    { label: 'View admin dashboard', detail: 'Open the admin overview.', icon: 'dashboard' },
-    { label: 'Manage user accounts', detail: 'View users, inspect user details, and find users by email.', icon: 'groups' },
-    { label: 'Manage admin access', detail: 'Register manager and admin accounts, plus review creator requests.', icon: 'key' },
-    { label: 'Moderate users', detail: 'Approve, reject, demote, ban, unban, activate, or deactivate accounts.', icon: 'shield' },
-    { label: 'Manage destinations', detail: 'Create, update, assign managers to, or delete destinations.', icon: 'location_on' },
-    { label: 'Control destination images', detail: 'Add destination images and handle destination edit locks.', icon: 'image' },
-    { label: 'Review manager reports', detail: 'List all reports and review pending manager reports.', icon: 'article' },
+    { labelKey: 'adminProfile.permissions.viewDashboardLabel', detailKey: 'adminProfile.permissions.viewDashboardDetail', icon: 'dashboard' },
+    { labelKey: 'adminProfile.permissions.manageUsersLabel', detailKey: 'adminProfile.permissions.manageUsersDetail', icon: 'groups' },
+    { labelKey: 'adminProfile.permissions.manageAdminAccessLabel', detailKey: 'adminProfile.permissions.manageAdminAccessDetail', icon: 'key' },
+    { labelKey: 'adminProfile.permissions.moderateUsersLabel', detailKey: 'adminProfile.permissions.moderateUsersDetail', icon: 'shield' },
+    { labelKey: 'adminProfile.permissions.manageDestinationsLabel', detailKey: 'adminProfile.permissions.manageDestinationsDetail', icon: 'location_on' },
+    { labelKey: 'adminProfile.permissions.controlImagesLabel', detailKey: 'adminProfile.permissions.controlImagesDetail', icon: 'image' },
+    { labelKey: 'adminProfile.permissions.reviewReportsLabel', detailKey: 'adminProfile.permissions.reviewReportsDetail', icon: 'article' },
   ];
 
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
   @ViewChild('languageDropdown') languageDropdown?: ElementRef<HTMLElement>;
 
   readonly languageOptions: ProfileLanguageOption[] = [
-    { code: 'sr', label: 'Serbian/Montenegrin' },
-    { code: 'en', label: 'English' },
-    { code: 'es', label: 'Spanish' },
-    { code: 'it', label: 'Italian' },
+    { code: 'sr', labelKey: 'language.serbian' },
+    { code: 'en', labelKey: 'language.english' },
+    { code: 'es', labelKey: 'language.spanish' },
+    { code: 'it', labelKey: 'language.italian' },
   ];
 
   user: UserDto = {
@@ -137,7 +138,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   }
 
   get displayName(): string {
-    return `${this.user.firstName} ${this.user.lastName}`.trim() || 'Unknown User';
+    return `${this.user.firstName} ${this.user.lastName}`.trim() || this.t('adminProfile.unknownUser');
   }
 
   get roleBadgeClass(): string {
@@ -155,6 +156,19 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   get permissionCount(): number {
     return this.permissionItems.length;
+  }
+
+  get roleLabelKey(): string {
+    switch (this.role) {
+      case 'admin':
+        return 'adminProfile.roles.admin';
+      case 'manager':
+        return 'adminProfile.roles.manager';
+      case 'content-creator':
+        return 'adminProfile.roles.contentCreator';
+      default:
+        return 'adminProfile.roles.user';
+    }
   }
 
   triggerFileInput(): void {
@@ -373,8 +387,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
   }
 
   get selectedLanguageLabel(): string {
-    const code = (this.user.language ?? 'en').trim();
-    return this.languageOptions.find((option) => option.code === code)?.label ?? 'English';
+    const labelKey = this.translationService.labelKeyForLanguage(this.user.language);
+    return this.translationService.translate(labelKey);
   }
 
   toggleLanguageMenu(event: Event): void {
@@ -423,29 +437,29 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.passwordInfo = '';
 
     if (!this.currentPassword.trim()) {
-      this.passwordError = 'Current password is required.';
+      this.passwordError = this.t('adminProfile.password.errors.currentRequired');
       return;
     }
 
     if (this.newPassword.length < 8) {
-      this.passwordError = 'New password must be at least 8 characters long.';
+      this.passwordError = this.t('adminProfile.password.errors.minLength');
       return;
     }
 
     if (!/[A-Z]/.test(this.newPassword) || !/[\d\W]/.test(this.newPassword)) {
-      this.passwordError = 'New password must include one uppercase letter and one number or symbol.';
+      this.passwordError = this.t('adminProfile.password.errors.complexity');
       return;
     }
 
     if (this.newPassword !== this.confirmNewPassword) {
-      this.passwordError = 'Passwords do not match.';
+      this.passwordError = this.t('adminProfile.password.errors.mismatch');
       return;
     }
 
     this.passwordChangeStep = 'otp';
     this.otpCode = '';
     this.otpDemoCode = this.generateDemoOtpCode();
-    this.passwordInfo = `Demo verification code: ${this.otpDemoCode}`;
+    this.passwordInfo = this.t('adminProfile.password.demoVerificationCode', { code: this.otpDemoCode });
     this.startOtpCountdown();
   }
 
@@ -456,17 +470,17 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.passwordInfo = '';
 
     if (!/^\d{6}$/.test(this.otpCode.trim())) {
-      this.passwordError = 'Enter the 6-digit verification code.';
+      this.passwordError = this.t('adminProfile.password.errors.codeRequired');
       return;
     }
 
     if (!this.otpDemoCode) {
-      this.passwordError = 'The verification session expired. Resend the code to continue.';
+      this.passwordError = this.t('adminProfile.password.errors.sessionExpired');
       return;
     }
 
     if (this.otpCode.trim() !== this.otpDemoCode) {
-      this.passwordError = 'Invalid verification code.';
+      this.passwordError = this.t('adminProfile.password.errors.invalidCode');
       return;
     }
 
@@ -481,7 +495,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
     this.authService.changePassword(this.user.id!, dto).subscribe({
       error: (err) => {
-        this.passwordError = err?.error?.message ?? err?.error?.title ?? 'Password change failed.';
+        this.passwordError = err?.error?.message ?? err?.error?.title ?? this.t('adminProfile.password.errors.changeFailed');
       },
     });
   }
@@ -493,7 +507,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.passwordInfo = '';
     this.otpDemoCode = this.generateDemoOtpCode();
     this.otpCode = '';
-    this.passwordInfo = `Demo verification code: ${this.otpDemoCode}`;
+    this.passwordInfo = this.t('adminProfile.password.demoVerificationCode', { code: this.otpDemoCode });
     this.startOtpCountdown();
   }
 
@@ -584,7 +598,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
       this.otpSecondsRemaining = Math.max(0, this.otpSecondsRemaining - 1);
 
       if (this.otpSecondsRemaining === 0) {
-        this.passwordError = 'The verification code has expired. Resend it to continue.';
+        this.passwordError = this.t('adminProfile.password.errors.codeExpired');
         this.clearOtpExpiryTimer();
       }
     }, 1000);
@@ -646,5 +660,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
   private generateDemoOtpCode(): string {
     const code = Math.floor(100000 + Math.random() * 900000);
     return code.toString();
+  }
+
+  private t(key: string, params?: Record<string, string | number>): string {
+    return this.translationService.translate(key, params);
   }
 }
