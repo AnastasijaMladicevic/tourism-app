@@ -3,12 +3,12 @@ import { HttpClient } from '@angular/common/http';
 import { MapComponent } from '../../../../shared/components/map/map';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
+import { FormArray, FormBuilder, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, finalize, of } from 'rxjs';
 import { AuthService } from '../../../../services/auth.service';
 import { EventImageDto, EventService } from '../../../../services/event.service';
-import { ApproveContentDto, EventDto } from '../../../../models/event.model';
+import { ApproveContentDto, EventDto, EventTicketTypeInputDto } from '../../../../models/event.model';
 import { environment } from '../../../../../environment/environment';
 import { TranslationService } from '../../../../services/translation.service';
 
@@ -57,7 +57,7 @@ export class ManagerEventFormComponent implements OnInit, OnDestroy {
     timezone: ['Europe/Belgrade'],
     recurringEvent: [false],
     recurrencePattern: [''],
-    price: [''],
+    ticketTypes: this.fb.array([]),
     maxVisitors: [''],
     externalLink: [''],
     imageUrl: [''],
@@ -135,8 +135,8 @@ export class ManagerEventFormComponent implements OnInit, OnDestroy {
   readonly tags = ['Outdoor', 'Live Music', 'Summer'];
   pendingTag = '';
 
-  get ticketPriceLabel(): string {
-    return this.translationService.translate('event.ticketPrice');
+  get ticketTypesArray(): FormArray {
+    return this.form.get('ticketTypes') as FormArray;
   }
 
   get selectedVenue(): VenueOption {
@@ -247,7 +247,6 @@ export class ManagerEventFormComponent implements OnInit, OnDestroy {
       timezone: 'Europe/Belgrade',
       recurringEvent: false,
       recurrencePattern: '',
-      price: event.price?.toString() || '',
       maxVisitors: event.maxVisitors?.toString() || '',
       externalLink: '',
       longitude: event.longitude?.toString() || '',
@@ -259,7 +258,43 @@ export class ManagerEventFormComponent implements OnInit, OnDestroy {
       ageRestriction: '',
       tagsInput: ''
     });
+    this.setTicketTypes(this.getReviewTicketTypes(event));
     this.selectedReviewImageUrl = event.mainImageUrl ?? '';
+  }
+
+  private setTicketTypes(ticketTypes: EventTicketTypeInputDto[]): void {
+    this.ticketTypesArray.clear();
+
+    ticketTypes.forEach((ticketType) => {
+      this.ticketTypesArray.push(
+        this.fb.group({
+          name: [ticketType.name ?? ''],
+          price: [ticketType.price != null ? String(ticketType.price) : '']
+        })
+      );
+    });
+  }
+
+  private getReviewTicketTypes(event: EventDto): EventTicketTypeInputDto[] {
+    if (Array.isArray(event.ticketTypes) && event.ticketTypes.length > 0) {
+      return [...event.ticketTypes]
+        .sort((left, right) => left.sortOrder - right.sortOrder)
+        .map((ticketType) => ({
+          name: ticketType.name,
+          price: ticketType.price
+        }));
+    }
+
+    if (event.price != null) {
+      return [
+        {
+          name: this.translationService.translate('event.standardTicket'),
+          price: event.price
+        }
+      ];
+    }
+
+    return [];
   }
 
   private resolveCreatorName(event: EventDto): void {

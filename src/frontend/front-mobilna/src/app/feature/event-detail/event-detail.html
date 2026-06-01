@@ -126,12 +126,13 @@
         }
         <div class="card">
           <h2>{{ 'event.ticketPrice' | translate }}</h2>
-
-          <div class="ticket-card">
-            <div>
-              <span class="ticket-type">{{ 'event.standardTicket' | translate }}</span><span class="ticket-price">{{ getTicketPrice() }}</span>
+          @for (ticketType of ticketTypesForDisplay; track ticketType.name + '-' + ticketType.price) {
+            <div class="ticket-card">
+              <div>
+                <span class="ticket-type">{{ ticketType.name }}</span><span class="ticket-price">{{ formatTicketPrice(ticketType.price) }}</span>
+              </div>
             </div>
-          </div>
+          }
         </div>
         <div class="card nearby-card">
           <div class="nearby-header">

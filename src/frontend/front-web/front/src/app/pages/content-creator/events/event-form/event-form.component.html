@@ -161,17 +161,54 @@
           <div class="section-title">
             <span class="step-tag">STEP 3</span>
             <h2>Ticketing &amp; Capacity</h2>
-            <p>Manage ticket prices and attendee limits.</p>
+            <p>{{ 'event.ticketTypesHelp' | translate }}</p>
           </div>
 
           <div class="field-grid ticket-grid">
-            <label class="form-field">
-              <span>{{ ticketPriceLabel }}</span>
-              <div class="input-prefix">
-                <span>€</span>
-                <input class="form-control" type="number" min="0" step="0.01" formControlName="price" placeholder="45.00" />
+            <div class="form-field full-width ticket-types-block" formArrayName="ticketTypes">
+              <div class="ticket-types-header">
+                <span>{{ 'event.ticketPrice' | translate }}</span>
+                <button type="button" class="ghost-btn small" (click)="addTicketType()">
+                  {{ 'event.addTicketType' | translate }}
+                </button>
               </div>
-            </label>
+              @if (hasTicketTypes) {
+                <div class="ticket-type-list">
+                  <div class="ticket-type-row" *ngFor="let ticketGroup of ticketTypesArray.controls; let index = index" [formGroupName]="index">
+                    <label class="form-field">
+                      <span>{{ 'event.ticketTypeName' | translate }}</span>
+                      <input
+                        class="form-control"
+                        type="text"
+                        formControlName="name"
+                        [placeholder]="'event.ticketTypeNamePlaceholder' | translate"
+                      />
+                    </label>
+
+                    <label class="form-field">
+                      <span>{{ 'event.ticketPrice' | translate }}</span>
+                      <div class="input-prefix">
+                        <span>EUR</span>
+                        <input
+                          class="form-control"
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          formControlName="price"
+                          [placeholder]="'event.ticketPricePlaceholder' | translate"
+                        />
+                      </div>
+                    </label>
+
+                    <button type="button" class="ghost-btn small danger" (click)="removeTicketType(index)">
+                      {{ 'event.removeTicketType' | translate }}
+                    </button>
+                  </div>
+                </div>
+              } @else {
+                <p class="ticket-types-empty">{{ 'event.noTicketTypesHint' | translate }}</p>
+              }
+            </div>
 
             <label class="form-field">
               <span>Capacity <span class="required-star" aria-hidden="true">*</span></span>

@@ -26,6 +26,7 @@ public class AppDbContext : DbContext
     public DbSet<Activity> Activities { get; set; }
     public DbSet<EventType> EventTypes { get; set; }
     public DbSet<Event> Events { get; set; }
+    public DbSet<EventTicketType> EventTicketTypes { get; set; }
     public DbSet<Review> Reviews { get; set; }
     public DbSet<ReviewImage> ReviewImages { get; set; }
     public DbSet<Image> Images { get; set; }
@@ -283,6 +284,24 @@ public class AppDbContext : DbContext
             .WithMany()
             .HasForeignKey(e => e.ApprovedByUserId)
             .OnDelete(DeleteBehavior.SetNull);
+
+        mb.Entity<EventTicketType>()
+            .Property(et => et.Name)
+            .HasMaxLength(120);
+
+        mb.Entity<EventTicketType>()
+            .Property(et => et.Price)
+            .HasColumnType("numeric");
+
+        mb.Entity<EventTicketType>()
+            .HasIndex(et => new { et.EventId, et.SortOrder })
+            .IsUnique();
+
+        mb.Entity<EventTicketType>()
+            .HasOne(et => et.Event)
+            .WithMany(e => e.TicketTypes)
+            .HasForeignKey(et => et.EventId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         // ==================== ACTIVITY ====================
         mb.Entity<Activity>()

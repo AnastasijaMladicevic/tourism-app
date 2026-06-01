@@ -376,8 +376,15 @@
     "about": "About the event",
     "descriptionFallback": "Description is not available.",
     "availableTickets": "Available tickets",
-    "standardTicket": "Standard ticket",
-    "select": "Select"
+      "standardTicket": "Standard ticket",
+      "ticketTypesHelp": "Aggiungi uno o piu tipi di biglietto e la capienza totale dell'evento.",
+      "addTicketType": "Aggiungi tipo di biglietto",
+      "removeTicketType": "Rimuovi",
+      "ticketTypeName": "Nome del biglietto",
+      "ticketTypeNamePlaceholder": "VIP, Standard, Early bird...",
+      "ticketPricePlaceholder": "45.00",
+      "noTicketTypesHint": "Lascia vuoto se l'evento e gratuito.",
+      "select": "Select"
   },
   "object": {
     "price": {

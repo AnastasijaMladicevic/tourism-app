@@ -376,6 +376,42 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.ToTable("Events");
                 });
 
+            modelBuilder.Entity("TuristickiVodic.Core.Models.EventTicketType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("EventId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(120)
+                        .HasColumnType("character varying(120)");
+
+                    b.Property<decimal>("Price")
+                        .HasColumnType("numeric");
+
+                    b.Property<int>("SortOrder")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventId", "SortOrder")
+                        .IsUnique();
+
+                    b.ToTable("EventTicketTypes");
+                });
+
             modelBuilder.Entity("TuristickiVodic.Core.Models.EventPlannerItem", b =>
                 {
                     b.Property<int>("Id")
@@ -1707,6 +1743,17 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("TuristickiVodic.Core.Models.EventTicketType", b =>
+                {
+                    b.HasOne("TuristickiVodic.Core.Models.Event", "Event")
+                        .WithMany("TicketTypes")
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Event");
+                });
+
             modelBuilder.Entity("TuristickiVodic.Core.Models.BrowserPushSubscription", b =>
                 {
                     b.HasOne("TuristickiVodic.Core.Models.User", "User")
@@ -2086,6 +2133,8 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.Navigation("EventPlannerItems");
 
                     b.Navigation("Images");
+
+                    b.Navigation("TicketTypes");
                 });
 
             modelBuilder.Entity("TuristickiVodic.Core.Models.EventType", b =>

@@ -1,3 +1,15 @@
+export interface EventTicketTypeDto {
+  id: number;
+  name: string;
+  price: number;
+  sortOrder: number;
+}
+
+export interface EventTicketTypeInputDto {
+  name: string;
+  price: number;
+}
+
 export interface EventDto {
   id: number;
   name: string;
@@ -9,6 +21,7 @@ export interface EventDto {
   startDate: Date | string;
   endDate?: Date | string;
   price?: number;
+  ticketTypes?: EventTicketTypeDto[];
   maxVisitors?: number;
   status: string;
   hasPendingDeletionRequest?: boolean;
@@ -37,6 +50,7 @@ export interface CreateEventDto {
   startDate: Date | string;
   endDate?: Date | string;
   price?: number;
+  ticketTypes?: EventTicketTypeInputDto[];
   maxVisitors?: number;
   eventTypeId: number;
   localityId?: number;
@@ -53,6 +67,7 @@ export interface UpdateEventDto {
   startDate: Date | string;
   endDate?: Date | string;
   price?: number;
+  ticketTypes?: EventTicketTypeInputDto[];
   maxVisitors?: number;
   eventTypeId: number;
   localityId?: number;

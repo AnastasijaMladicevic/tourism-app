@@ -554,6 +554,53 @@
   flex-basis: 100% !important;
 }
 
+.ticket-types-block {
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  background: #f8fafc;
+}
+
+.ticket-types-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.ticket-type-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ticket-type-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(180px, 0.8fr) auto;
+  gap: 12px;
+  align-items: end;
+  padding: 14px;
+  border: 1px solid #dbe3ee;
+  border-radius: 14px;
+  background: #ffffff;
+}
+
+.ticket-type-row .form-field {
+  min-width: 0;
+}
+
+.ticket-type-row .ghost-btn {
+  justify-self: end;
+}
+
+.ticket-types-empty {
+  margin: 0;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
 .half-width {
   flex-basis: calc(50% - 14px) !important;
 }
@@ -937,6 +984,15 @@
 
   .inline-fields {
     grid-template-columns: 1fr;
+  }
+
+  .ticket-type-row {
+    grid-template-columns: 1fr;
+  }
+
+  .ticket-type-row .ghost-btn {
+    justify-self: stretch;
+    justify-content: center;
   }
 
   .coordinates-grid {

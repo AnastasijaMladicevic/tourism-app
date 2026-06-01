@@ -209,6 +209,8 @@ namespace TuristickiVodic.Services.Mappings
                 .ForMember(dest => dest.Status,
                     opt => opt.MapFrom(src => src.Status.ToString()));
 
+            CreateMap<EventTicketType, EventTicketTypeDto>();
+
             CreateMap<Event, EventDto>()
                 .ForMember(dest => dest.EventTypeName,
                     opt => opt.MapFrom(src => src.EventType != null ? src.EventType.Name : string.Empty))
@@ -253,6 +255,16 @@ namespace TuristickiVodic.Services.Mappings
                 .ForMember(dest => dest.ApprovedByFullName,
                     opt => opt.MapFrom(src =>
                         src.ApprovedBy != null ? (src.ApprovedBy.FirstName + " " + src.ApprovedBy.LastName) : null))
+                .ForMember(dest => dest.Price,
+                    opt => opt.MapFrom(src =>
+                        src.TicketTypes != null && src.TicketTypes.Any()
+                            ? src.TicketTypes.Min(ticketType => (decimal?)ticketType.Price)
+                            : src.Price))
+                .ForMember(dest => dest.TicketTypes,
+                    opt => opt.MapFrom(src =>
+                        src.TicketTypes != null
+                            ? src.TicketTypes.OrderBy(ticketType => ticketType.SortOrder)
+                            : Enumerable.Empty<EventTicketType>()))
                 .ForMember(dest => dest.DistanceMeters,
                     opt => opt.Ignore())
                 .ForMember(dest => dest.HasPendingDeletionRequest,

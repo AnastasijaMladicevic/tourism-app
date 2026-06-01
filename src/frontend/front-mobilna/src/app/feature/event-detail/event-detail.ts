@@ -51,6 +51,28 @@ export class EventDetailComponent implements OnInit, OnDestroy {
   private touchStartX = 0;
   private touchEndX = 0;
 
+  get ticketTypesForDisplay(): Array<{ name: string; price?: number }> {
+    if (!this.event) {
+      return [];
+    }
+
+    if (Array.isArray(this.event.ticketTypes) && this.event.ticketTypes.length > 0) {
+      return [...this.event.ticketTypes]
+        .sort((left, right) => left.sortOrder - right.sortOrder)
+        .map((ticketType) => ({
+          name: ticketType.name,
+          price: ticketType.price,
+        }));
+    }
+
+    return [
+      {
+        name: this.translationService.translate('event.standardTicket'),
+        price: this.event.price,
+      },
+    ];
+  }
+
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -263,6 +285,7 @@ export class EventDetailComponent implements OnInit, OnDestroy {
       startDate: String(dto['startDate'] ?? dto['StartDate'] ?? ''),
       endDate: String(dto['endDate'] ?? dto['EndDate'] ?? ''),
       price: this.readOptionalNumber(dto, ['price', 'Price']),
+      ticketTypes: this.readTicketTypes(dto),
       maxVisitors: this.readOptionalNumber(dto, ['maxVisitors', 'MaxVisitors']),
       isActive: Boolean(dto['isActive'] ?? dto['IsActive'] ?? true),
       status: String(dto['status'] ?? dto['Status'] ?? ''),
@@ -291,6 +314,34 @@ export class EventDetailComponent implements OnInit, OnDestroy {
     }
 
     return undefined;
+  }
+
+  private readTicketTypes(obj: Record<string, unknown>): EventDto['ticketTypes'] {
+    const raw = obj['ticketTypes'] ?? obj['TicketTypes'];
+    if (!Array.isArray(raw)) {
+      return [];
+    }
+
+    return raw
+      .map((ticketType) => {
+        const ticketRecord = ticketType as Record<string, unknown>;
+        const id = Number(ticketRecord['id'] ?? ticketRecord['Id'] ?? 0);
+        const name = String(ticketRecord['name'] ?? ticketRecord['Name'] ?? '').trim();
+        const price = this.readOptionalNumber(ticketRecord, ['price', 'Price']);
+        const sortOrder = Number(ticketRecord['sortOrder'] ?? ticketRecord['SortOrder'] ?? 0);
+
+        if (!name) {
+          return null;
+        }
+
+        return {
+          id,
+          name,
+          price: price ?? 0,
+          sortOrder,
+        };
+      })
+      .filter((ticketType): ticketType is NonNullable<EventDto['ticketTypes']>[number] => ticketType != null);
   }
 
   private getMainImage(images: ImageDto[], event: EventDto): string {
@@ -424,15 +475,15 @@ export class EventDetailComponent implements OnInit, OnDestroy {
   }
 
   buyTicket(): void {
-    const price = this.event?.price
-      ? `${this.event.price} €`
-      : this.translationService.translate('event.free');
+    const price = this.ticketTypesForDisplay
+      .map((ticketType) => `${ticketType.name}: ${this.formatTicketPrice(ticketType.price)}`)
+      .join(', ');
     alert(this.translationService.translate('event.ticketAlert', { price }));
   }
 
-  getTicketPrice(): string {
-    return this.event?.price
-      ? `${this.event.price} €`
+  formatTicketPrice(price?: number): string {
+    return price != null
+      ? `${price} €`
       : this.translationService.translate('event.free');
   }
 

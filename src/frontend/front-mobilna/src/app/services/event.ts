@@ -5,6 +5,13 @@ import { environment } from '../../environment/environment';
 import { ActiveRegionService, RegionRequestOptions } from './active-region';
 import { TranslationService } from './translation.service';
 
+export interface EventTicketTypeDto {
+  id: number;
+  name: string;
+  price: number;
+  sortOrder: number;
+}
+
 export interface EventDto {
   id: number;
   name: string;
@@ -16,6 +23,7 @@ export interface EventDto {
   startDate: string;
   endDate: string;
   price?: number;
+  ticketTypes?: EventTicketTypeDto[];
   maxVisitors?: number;
   isActive: boolean;
   status: string;

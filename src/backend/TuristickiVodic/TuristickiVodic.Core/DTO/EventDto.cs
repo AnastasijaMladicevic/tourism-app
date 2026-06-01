@@ -26,6 +26,8 @@ namespace TuristickiVodic.Core.DTO
 
         public decimal? Price { get; set; }
 
+        public List<EventTicketTypeDto> TicketTypes { get; set; } = new();
+
         public int? MaxVisitors { get; set; }
 
         public string Status { get; set; } = string.Empty;

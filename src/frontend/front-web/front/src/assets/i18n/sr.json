@@ -376,8 +376,15 @@
     "about": "O dogadjaju",
     "descriptionFallback": "Opis nije dostupan.",
     "availableTickets": "Dostupne ulaznice",
-    "standardTicket": "Standardna ulaznica",
-    "select": "Odaberi"
+      "standardTicket": "Standardna ulaznica",
+      "ticketTypesHelp": "Dodaj jedan ili vise tipova karata i ukupan kapacitet dogadjaja.",
+      "addTicketType": "Dodaj tip karte",
+      "removeTicketType": "Ukloni",
+      "ticketTypeName": "Naziv karte",
+      "ticketTypeNamePlaceholder": "VIP, Regular, Early bird...",
+      "ticketPricePlaceholder": "45.00",
+      "noTicketTypesHint": "Ostavi prazno ako je dogadjaj besplatan.",
+      "select": "Odaberi"
   },
   "object": {
     "price": {

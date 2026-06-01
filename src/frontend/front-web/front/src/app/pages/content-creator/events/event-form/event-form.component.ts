@@ -7,7 +7,7 @@ import {
   inject
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
+import { FormArray, FormBuilder, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { forkJoin, from, Observable, of } from 'rxjs';
 import { catchError, concatMap, finalize, map, switchMap, tap, toArray } from 'rxjs/operators';
@@ -17,7 +17,7 @@ import { DestinationDto, DestinationService } from '../../../../services/destina
 import { RegionDto, RegionService } from '../../../../services/region';
 import { EventImageDto, EventService } from '../../../../services/event.service';
 import { ActivitiesService } from '../../../../services/activities';
-import { CreateEventDto, EventDto, UpdateEventDto } from '../../../../models/event.model';
+import { CreateEventDto, EventDto, EventTicketTypeInputDto, UpdateEventDto } from '../../../../models/event.model';
 import { MapComponent } from '../../../../shared/components/map/map';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../../../services/translation.service';
@@ -68,7 +68,7 @@ export class EventFormComponent implements OnInit, OnDestroy {
     timezone: ['Europe/Belgrade'],
     recurringEvent: [false],
     recurrencePattern: [''],
-    price: [''],
+    ticketTypes: this.fb.array([]),
     maxVisitors: [''],
     externalLink: [''],
     longitude: [''],
@@ -105,8 +105,8 @@ export class EventFormComponent implements OnInit, OnDestroy {
   private readonly maxImageCount = 8;
   private readonly pendingImageFiles = new Map<string, File>();
 
-  get ticketPriceLabel(): string {
-    return this.translationService.translate('event.ticketPrice');
+  get ticketTypesArray(): FormArray {
+    return this.form.get('ticketTypes') as FormArray;
   }
 
   private readonly fallbackEventTypes = [
@@ -270,6 +270,10 @@ export class EventFormComponent implements OnInit, OnDestroy {
     }
 
     return 'Select a destination and, optionally, an object to preview the right-side map.';
+  }
+
+  get hasTicketTypes(): boolean {
+    return this.ticketTypesArray.length > 0;
   }
 
   get visibleRelatedActivities(): RelatedActivity[] {
@@ -535,7 +539,6 @@ export class EventFormComponent implements OnInit, OnDestroy {
       timezone: 'Europe/Belgrade',
       recurringEvent: false,
       recurrencePattern: '',
-      price: event.price?.toString() || '',
       maxVisitors: event.maxVisitors?.toString() || '',
       externalLink: '',
       longitude: event.longitude?.toString() || '',
@@ -546,6 +549,8 @@ export class EventFormComponent implements OnInit, OnDestroy {
       ageRestriction: '',
       tagsInput: ''
     });
+
+    this.setTicketTypes(this.getEditableTicketTypes(event));
 
     // Pre-select region from the event's destination
     const destId = this.toNumber(event.destinationId);
@@ -669,6 +674,7 @@ export class EventFormComponent implements OnInit, OnDestroy {
     this.successMessage = '';
 
     const formValue = this.form.getRawValue();
+    const ticketTypes = this.buildTicketTypesPayload();
 
     // Combine startDate + startTime into ISO 8601 UTC datetime
     const startDateTime = this.combineDateAndTime(formValue.startDate, formValue.startTime);
@@ -683,7 +689,8 @@ export class EventFormComponent implements OnInit, OnDestroy {
       eventTypeId: this.parseRequiredNumber(formValue.eventTypeId),
       startDate: startDateTime,
       endDate: endDateTime,
-      price: this.parseOptionalNumber(formValue.price),
+      price: this.resolveLowestTicketPrice(ticketTypes),
+      ticketTypes,
       maxVisitors: this.parseOptionalNumber(formValue.maxVisitors),
       longitude: this.parseOptionalNumber(formValue.longitude),
       latitude: this.parseOptionalNumber(formValue.latitude),
@@ -1016,6 +1023,75 @@ export class EventFormComponent implements OnInit, OnDestroy {
 
   private parseOptionalNumber(value: string | null | undefined): number | undefined {
     return this.toNumber(value) ?? undefined;
+  }
+
+  addTicketType(ticketType?: Partial<EventTicketTypeInputDto>): void {
+    this.ticketTypesArray.push(
+      this.fb.group({
+        name: [ticketType?.name ?? '', [Validators.required, Validators.maxLength(120)]],
+        price: [
+          ticketType?.price != null ? String(ticketType.price) : '',
+          [Validators.required, Validators.min(0)]
+        ]
+      })
+    );
+  }
+
+  removeTicketType(index: number): void {
+    if (index < 0 || index >= this.ticketTypesArray.length) {
+      return;
+    }
+
+    this.ticketTypesArray.removeAt(index);
+  }
+
+  private setTicketTypes(ticketTypes: EventTicketTypeInputDto[]): void {
+    this.ticketTypesArray.clear();
+
+    for (const ticketType of ticketTypes) {
+      this.addTicketType(ticketType);
+    }
+  }
+
+  private getEditableTicketTypes(event: EventDto): EventTicketTypeInputDto[] {
+    if (event.ticketTypes && event.ticketTypes.length > 0) {
+      return event.ticketTypes
+        .slice()
+        .sort((left, right) => left.sortOrder - right.sortOrder)
+        .map((ticketType) => ({
+          name: ticketType.name,
+          price: ticketType.price
+        }));
+    }
+
+    if (event.price != null) {
+      return [
+        {
+          name: this.translationService.translate('event.standardTicket'),
+          price: event.price
+        }
+      ];
+    }
+
+    return [];
+  }
+
+  private buildTicketTypesPayload(): EventTicketTypeInputDto[] {
+    return this.ticketTypesArray.controls
+      .map((control) => {
+        const rawName = String(control.get('name')?.value ?? '').trim();
+        const price = this.parseOptionalNumber(control.get('price')?.value) ?? 0;
+        return { name: rawName, price };
+      })
+      .filter((ticketType) => ticketType.name.length > 0);
+  }
+
+  private resolveLowestTicketPrice(ticketTypes: EventTicketTypeInputDto[]): number | undefined {
+    if (ticketTypes.length === 0) {
+      return undefined;
+    }
+
+    return Math.min(...ticketTypes.map((ticketType) => ticketType.price));
   }
 
   private uploadPendingImages(

@@ -10,6 +10,7 @@ import {
   EventQueryResponse,
   ApproveContentDto,
   EventType,
+  EventTicketTypeDto,
   TouristObjectQueryResponse,
   TouristObjectQueryDto
 } from '../models/event.model';
@@ -307,7 +308,18 @@ export class EventService {
   }
 
   private normalizeEvent(event: EventDto): EventDto {
-    return normalizeEntityMedia(event);
+    return {
+      ...normalizeEntityMedia(event),
+      ticketTypes: (event.ticketTypes ?? []).map((ticketType) => this.normalizeTicketType(ticketType))
+    };
+  }
+
+  private normalizeTicketType(ticketType: EventTicketTypeDto): EventTicketTypeDto {
+    return {
+      ...ticketType,
+      price: Number(ticketType.price ?? 0),
+      sortOrder: Number(ticketType.sortOrder ?? 0)
+    };
   }
 
   private normalizeEventResponse(response: EventQueryResponse): EventQueryResponse {

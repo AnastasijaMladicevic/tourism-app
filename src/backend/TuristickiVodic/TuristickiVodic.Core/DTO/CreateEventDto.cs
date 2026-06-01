@@ -28,6 +28,8 @@ namespace TuristickiVodic.Core.DTO
 
         public decimal? Price { get; set; }
 
+        public List<EventTicketTypeInputDto>? TicketTypes { get; set; }
+
         public int? MaxVisitors { get; set; }
 
         [Range(1, int.MaxValue, ErrorMessage = "EventTypeId is required.")]
@@ -78,6 +80,42 @@ namespace TuristickiVodic.Core.DTO
                 yield return new ValidationResult(
                     "Price cannot be negative.",
                     new[] { nameof(Price) });
+            }
+
+            if (TicketTypes != null)
+            {
+                for (var i = 0; i < TicketTypes.Count; i++)
+                {
+                    var ticketType = TicketTypes[i];
+                    if (ticketType == null)
+                    {
+                        yield return new ValidationResult(
+                            "Ticket type entry is required.",
+                            new[] { $"{nameof(TicketTypes)}[{i}]" });
+                        continue;
+                    }
+
+                    if (string.IsNullOrWhiteSpace(ticketType.Name))
+                    {
+                        yield return new ValidationResult(
+                            "Ticket type name is required.",
+                            new[] { $"{nameof(TicketTypes)}[{i}].{nameof(EventTicketTypeInputDto.Name)}" });
+                    }
+
+                    if (ticketType.Name?.Length > 120)
+                    {
+                        yield return new ValidationResult(
+                            "Ticket type name cannot exceed 120 characters.",
+                            new[] { $"{nameof(TicketTypes)}[{i}].{nameof(EventTicketTypeInputDto.Name)}" });
+                    }
+
+                    if (ticketType.Price < 0)
+                    {
+                        yield return new ValidationResult(
+                            "Ticket type price cannot be negative.",
+                            new[] { $"{nameof(TicketTypes)}[{i}].{nameof(EventTicketTypeInputDto.Price)}" });
+                    }
+                }
             }
 
             if (MaxVisitors.HasValue && MaxVisitors.Value <= 0)

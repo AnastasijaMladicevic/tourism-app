@@ -37,6 +37,7 @@ namespace TuristickiVodic.Services.Services
         {
             return query
                 .Include(e => e.EventType)
+                .Include(e => e.TicketTypes)
                 .Include(e => e.Destination)
                     .ThenInclude(d => d.Region)
                 .Include(e => e.Locality)
@@ -497,7 +498,14 @@ namespace TuristickiVodic.Services.Services
             if (roleName != "ContentCreator")
                 throw new UnauthorizedAccessException("Only content creators can create events.");
 
-            ValidateEventPayload(dto.StartDate, dto.EndDate, dto.Price, dto.MaxVisitors, dto.Longitude, dto.Latitude);
+            ValidateTicketTypes(dto.TicketTypes);
+            ValidateEventPayload(
+                dto.StartDate,
+                dto.EndDate,
+                ResolveEventPrice(dto.Price, dto.TicketTypes),
+                dto.MaxVisitors,
+                dto.Longitude,
+                dto.Latitude);
 
             if (dto.EndDate.HasValue && dto.EndDate.Value < dto.StartDate)
                 throw new InvalidOperationException("End date cannot be before start date.");
@@ -522,7 +530,7 @@ namespace TuristickiVodic.Services.Services
                 Geolocation = CreatePoint(dto.Longitude, dto.Latitude),
                 StartDate = dto.StartDate,
                 EndDate = dto.EndDate,
-                Price = dto.Price,
+                Price = ResolveEventPrice(dto.Price, dto.TicketTypes),
                 MaxVisitors = dto.MaxVisitors,
                 EventTypeId = dto.EventTypeId,
                 LocalityId = dto.LocalityId,
@@ -531,7 +539,8 @@ namespace TuristickiVodic.Services.Services
                 CreatedByUserId = userId,
                 Status = ContentStatus.Pending,
                 CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
+                UpdatedAt = DateTime.UtcNow,
+                TicketTypes = BuildTicketTypes(dto.TicketTypes)
             };
 
             _context.Events.Add(ev);
@@ -601,6 +610,7 @@ namespace TuristickiVodic.Services.Services
         public async Task<EventDto?> UpdateAsync(int id, UpdateEventDto dto, int userId, string roleName)
         {
             var ev = await _context.Events
+                .Include(e => e.TicketTypes)
                 .FirstOrDefaultAsync(e => e.Id == id);
 
             if (ev == null)
@@ -619,6 +629,8 @@ namespace TuristickiVodic.Services.Services
 
             if (dto.Price.HasValue && dto.Price.Value < 0)
                 throw new InvalidOperationException("Price cannot be negative.");
+
+            ValidateTicketTypes(dto.TicketTypes);
 
             if (dto.MaxVisitors.HasValue && dto.MaxVisitors.Value <= 0)
                 throw new InvalidOperationException("MaxVisitors must be greater than 0.");
@@ -669,7 +681,16 @@ namespace TuristickiVodic.Services.Services
             if (ev.EndDate.HasValue && ev.EndDate.Value < ev.StartDate)
                 throw new InvalidOperationException("End date cannot be before start date.");
 
-            if (dto.Price.HasValue) ev.Price = dto.Price.Value;
+            if (dto.TicketTypes != null)
+            {
+                ReplaceTicketTypes(ev, dto.TicketTypes);
+                ev.Price = ResolveEventPrice(dto.Price, ev.TicketTypes);
+            }
+            else if (dto.Price.HasValue)
+            {
+                ev.Price = dto.Price.Value;
+            }
+
             if (dto.MaxVisitors.HasValue) ev.MaxVisitors = dto.MaxVisitors.Value;
 
             ev.UpdatedAt = DateTime.UtcNow;
@@ -974,6 +995,87 @@ namespace TuristickiVodic.Services.Services
 
             if (endDate.HasValue && endDate.Value < startDate)
                 throw new InvalidOperationException("End date cannot be before start date.");
+        }
+
+        private static void ValidateTicketTypes(IReadOnlyCollection<EventTicketTypeInputDto>? ticketTypes)
+        {
+            if (ticketTypes == null)
+                return;
+
+            foreach (var ticketType in ticketTypes)
+            {
+                if (ticketType == null)
+                    throw new InvalidOperationException("Ticket type entry is required.");
+
+                if (string.IsNullOrWhiteSpace(ticketType.Name))
+                    throw new InvalidOperationException("Ticket type name is required.");
+
+                if (ticketType.Name.Trim().Length > 120)
+                    throw new InvalidOperationException("Ticket type name cannot exceed 120 characters.");
+
+                if (ticketType.Price < 0)
+                    throw new InvalidOperationException("Ticket type price cannot be negative.");
+            }
+        }
+
+        private static List<EventTicketType> BuildTicketTypes(IReadOnlyCollection<EventTicketTypeInputDto>? ticketTypes)
+        {
+            if (ticketTypes == null || ticketTypes.Count == 0)
+                return new List<EventTicketType>();
+
+            var now = DateTime.UtcNow;
+            return ticketTypes
+                .Select((ticketType, index) => new EventTicketType
+                {
+                    Name = ticketType.Name.Trim(),
+                    Price = ticketType.Price,
+                    SortOrder = index,
+                    CreatedAt = now,
+                    UpdatedAt = now
+                })
+                .ToList();
+        }
+
+        private static decimal? ResolveEventPrice(decimal? fallbackPrice, IEnumerable<EventTicketTypeInputDto>? ticketTypes)
+        {
+            var normalizedTicketTypes = ticketTypes?
+                .Where(ticketType => ticketType != null && !string.IsNullOrWhiteSpace(ticketType.Name))
+                .ToList();
+
+            if (normalizedTicketTypes != null && normalizedTicketTypes.Count > 0)
+                return normalizedTicketTypes.Min(ticketType => ticketType.Price);
+
+            return fallbackPrice;
+        }
+
+        private static decimal? ResolveEventPrice(decimal? fallbackPrice, IEnumerable<EventTicketType>? ticketTypes)
+        {
+            var normalizedTicketTypes = ticketTypes?
+                .Where(ticketType => ticketType != null && !string.IsNullOrWhiteSpace(ticketType.Name))
+                .ToList();
+
+            if (normalizedTicketTypes != null && normalizedTicketTypes.Count > 0)
+                return normalizedTicketTypes.Min(ticketType => ticketType.Price);
+
+            return fallbackPrice;
+        }
+
+        private static void ReplaceTicketTypes(Event ev, IReadOnlyCollection<EventTicketTypeInputDto> ticketTypes)
+        {
+            ev.TicketTypes.Clear();
+
+            var now = DateTime.UtcNow;
+            foreach (var ticketType in ticketTypes.Select((ticketType, index) => new { ticketType, index }))
+            {
+                ev.TicketTypes.Add(new EventTicketType
+                {
+                    Name = ticketType.ticketType.Name.Trim(),
+                    Price = ticketType.ticketType.Price,
+                    SortOrder = ticketType.index,
+                    CreatedAt = now,
+                    UpdatedAt = now
+                });
+            }
         }
 
         private static Point? CreatePoint(double? longitude, double? latitude)
