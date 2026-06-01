@@ -137,17 +137,30 @@
           </div>
 
           <div class="field">
+            <label for="region-select">Region</label>
+            <select
+              id="region-select"
+              [ngModel]="selectedRegionId"
+              [ngModelOptions]="{ standalone: true }"
+              (ngModelChange)="onRegionChange($event || null)"
+            >
+              <option [ngValue]="null">All regions</option>
+              <option *ngFor="let region of regions" [ngValue]="region.id">{{ region.name }}</option>
+            </select>
+          </div>
+
+          <div class="field">
             <label for="destination-select">Destination</label>
             <select id="destination-select" formControlName="destinationId">
-              <option [ngValue]="null">Select destination</option>
+              <option [ngValue]="null">{{ selectedRegionId ? 'Select destination' : 'Select region first' }}</option>
               <option *ngFor="let destination of destinations" [ngValue]="destination.id">{{ destination.name }}</option>
             </select>
           </div>
 
           <div class="field">
-            <label for="locality-select">Specific City</label>
+            <label for="locality-select">Locality</label>
             <select id="locality-select" formControlName="localityId">
-              <option [ngValue]="null">Optional locality</option>
+              <option [ngValue]="null">{{ form.controls.destinationId.value ? 'Select locality' : 'Select destination first' }}</option>
               <option *ngFor="let locality of filteredLocalities" [ngValue]="locality.id">{{ locality.name }}</option>
             </select>
           </div>

@@ -145,6 +145,13 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
     return name || typeName || destinationName || 'New locality';
   }
 
+  get singleDestinationName(): string | null {
+    if (this.destinationOptions.length === 1) {
+      return this.destinationOptions[0].name;
+    }
+    return null;
+  }
+
   get hasAnyGalleryImages(): boolean {
     return this.existingImages.length > 0 || this.imagePreviews.length > 0;
   }
@@ -365,7 +372,7 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
     this.isLoadingLocalityTypes = true;
 
     this.destinationService
-      .getAll({ page: 1, pageSize: 50, sortBy: 'name', sortOrder: 'asc' }, { bypassRegion: true })
+      .getAll({ page: 1, pageSize: 50, sortBy: 'name', sortOrder: 'asc' })
       .subscribe({
         next: (destResponse: unknown) => {
           const destinationsRaw = Array.isArray(destResponse)

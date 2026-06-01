@@ -14,6 +14,7 @@ import { catchError, concatMap, finalize, map, switchMap, tap, toArray } from 'r
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../../../services/auth.service';
 import { DestinationDto, DestinationService } from '../../../../services/destination.service';
+import { RegionDto, RegionService } from '../../../../services/region';
 import { EventImageDto, EventService } from '../../../../services/event.service';
 import { ActivitiesService } from '../../../../services/activities';
 import { CreateEventDto, EventDto, UpdateEventDto } from '../../../../models/event.model';
@@ -45,6 +46,7 @@ export class EventFormComponent implements OnInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly authService = inject(AuthService);
   private readonly destinationService = inject(DestinationService);
+  private readonly regionService = inject(RegionService);
   private readonly eventService = inject(EventService);
   private readonly activitiesService = inject(ActivitiesService);
   private readonly router = inject(Router);
@@ -122,8 +124,10 @@ export class EventFormComponent implements OnInit, OnDestroy {
   ];
 
   eventTypes = [...this.fallbackEventTypes];
+  regions: RegionDto[] = [];
   destinations: DestinationDto[] = [...this.fallbackDestinations];
   venueOptions: VenueOption[] = [...this.fallbackVenueOptions];
+  selectedRegionId: number | null = null;
 
   relatedActivities: RelatedActivity[] = [];
 
@@ -153,6 +157,32 @@ export class EventFormComponent implements OnInit, OnDestroy {
 
   get selectedDestinationId(): number | null {
     return this.toNumber(this.form.controls.destinationId.value);
+  }
+
+  onRegionChange(regionId: number | null): void {
+    this.selectedRegionId = regionId;
+    this.form.patchValue({ destinationId: '', objectId: '' }, { emitEvent: false });
+    this.applyLocationFromSelection();
+    this.loadDestinationsForRegion(regionId);
+  }
+
+  private loadDestinationsForRegion(regionId: number | null): void {
+    this.destinationService.getAll(
+      {
+        page: 1,
+        pageSize: 200,
+        sortBy: 'name',
+        sortOrder: 'asc',
+        ...(regionId != null ? { regionId } : {})
+      },
+      { bypassRegion: true }
+    ).pipe(
+      map((response: any) => Array.isArray(response) ? response : (response?.items ?? [])),
+      catchError(() => of([] as DestinationDto[]))
+    ).subscribe((destinations) => {
+      this.destinations = destinations.length > 0 ? destinations : [...this.fallbackDestinations];
+      this.cdr.detectChanges();
+    });
   }
 
   get minEndDate(): string {
@@ -275,6 +305,7 @@ export class EventFormComponent implements OnInit, OnDestroy {
       eventTypes: this.eventService.getEventTypes().pipe(
         catchError(() => of(this.fallbackEventTypes))
       ),
+      regions: this.regionService.getAll().pipe(catchError(() => of([]))),
       destinations: this.destinationService
         .getAll({ page: 1, pageSize: 200, sortBy: 'name', sortOrder: 'asc' })
         .pipe(
@@ -305,8 +336,9 @@ export class EventFormComponent implements OnInit, OnDestroy {
         }))),
         catchError(() => of(this.fallbackVenueOptions))
       )
-    }).subscribe(({ eventTypes, destinations, venues }) => {
+    }).subscribe(({ eventTypes, regions, destinations, venues }) => {
       this.eventTypes = eventTypes.length > 0 ? eventTypes : [...this.fallbackEventTypes];
+      this.regions = regions;
       this.destinations = destinations.length > 0 ? destinations : [...this.fallbackDestinations];
       this.venueOptions = venues.length > 0 ? venues : [...this.fallbackVenueOptions];
 
@@ -487,6 +519,16 @@ export class EventFormComponent implements OnInit, OnDestroy {
       ageRestriction: '',
       tagsInput: ''
     });
+
+    // Pre-select region from the event's destination
+    const destId = this.toNumber(event.destinationId);
+    if (destId) {
+      const dest = this.destinations.find((d) => d.id === destId);
+      if (dest?.regionId != null) {
+        this.selectedRegionId = dest.regionId;
+        this.destinations = this.destinations.filter((d) => d.regionId === this.selectedRegionId);
+      }
+    }
 
     // Sync the selection and map display
     this.syncObjectSelectionWithDestination();

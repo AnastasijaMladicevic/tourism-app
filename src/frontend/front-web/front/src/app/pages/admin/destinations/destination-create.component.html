@@ -181,12 +181,11 @@
               (keyup)="onDestinationNameInput(($any($event.target)).value)"
               placeholder="e.g. Emerald Valley Park"
             />
-            @if (locationLookupState !== 'idle' && form.name.trim().length >= 2) {
+            @if ((locationLookupState === 'loading' || locationLookupState === 'resolved') && form.name.trim().length >= 2) {
               <p
                 class="location-lookup-note"
                 [class.location-lookup-note--loading]="locationLookupState === 'loading'"
                 [class.location-lookup-note--ok]="locationLookupState === 'resolved'"
-                [class.location-lookup-note--warn]="locationLookupState === 'not_found' || locationLookupState === 'error'"
               >
                 {{ locationLookupMessage }}
               </p>

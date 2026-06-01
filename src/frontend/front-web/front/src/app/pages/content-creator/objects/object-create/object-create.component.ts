@@ -18,6 +18,7 @@ import { ActivitiesService, LocalityOption } from '../../../../services/activiti
 import { DestinationDto, DestinationService } from '../../../../services/destination.service';
 import { AuthService } from '../../../../services/auth.service';
 import { ReviewDto, ReviewService } from '../../../../services/review';
+import { RegionDto, RegionService } from '../../../../services/region';
 import { MapComponent as SharedMapComponent } from '../../../../shared/components/map/map';
 import { mapReviewDtosToObjectThreads } from '../../../manager/shared/manager-object-review.mapper';
 import {
@@ -48,6 +49,7 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
   private readonly activitiesService = inject(ActivitiesService);
   private readonly authService = inject(AuthService);
   private readonly reviewService = inject(ReviewService);
+  private readonly regionService = inject(RegionService);
   private readonly cdr = inject(ChangeDetectorRef);
 
   /** Manager opens this page read-only via `/manager/objects/review/:id` (route data). */
@@ -75,8 +77,10 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
   ];
 
   objectTypes: ObjectTypeOption[] = [];
+  regions: RegionDto[] = [];
   destinations: DestinationDto[] = [];
   localities: LocalityOption[] = [];
+  selectedRegionId: number | null = null;
 
   isLoadingOptions = true;
   isLoadingObject = false;
@@ -460,11 +464,42 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
 
   get filteredLocalities(): LocalityOption[] {
     const destinationId = this.form.controls.destinationId.value;
-    if (!destinationId) {
-      return this.localities;
+    if (destinationId) {
+      return this.localities.filter((l) => l.destinationId === destinationId);
     }
+    if (this.selectedRegionId) {
+      const regionDestIds = new Set(this.destinations.map((d) => d.id));
+      return this.localities.filter((l) => regionDestIds.has(l.destinationId));
+    }
+    return this.localities;
+  }
 
-    return this.localities.filter((locality) => locality.destinationId === destinationId);
+  onRegionChange(regionId: number | null): void {
+    this.selectedRegionId = regionId;
+    this.form.patchValue({ destinationId: null, localityId: null }, { emitEvent: false });
+    this.applyLocationFromSelection();
+    this.loadDestinationsForRegion(regionId);
+  }
+
+  private loadDestinationsForRegion(regionId: number | null): void {
+    this.destinationService.getAll(
+      {
+        page: 1,
+        pageSize: 300,
+        sortBy: 'name',
+        sortOrder: 'asc',
+        ...(regionId != null ? { regionId } : {})
+      },
+      { bypassRegion: true }
+    ).pipe(
+      map((response: DestinationDto[] | { items?: DestinationDto[] }) =>
+        Array.isArray(response) ? response : (response.items ?? [])
+      ),
+      catchError(() => of([] as DestinationDto[]))
+    ).subscribe((destinations) => {
+      this.destinations = destinations;
+      this.cdr.detectChanges();
+    });
   }
 
   get mapLat(): number {
@@ -882,8 +917,9 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
         this.isLoadingOptions = false;
       })
     ).subscribe({
-      next: ({ objectTypes, destinations, localities }) => {
+      next: ({ objectTypes, regions, destinations, localities }) => {
         this.objectTypes = objectTypes;
+        this.regions = regions;
         this.destinations = destinations;
         this.localities = localities;
         this.applyLocationFromSelection();
@@ -912,12 +948,24 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
     ).subscribe({
       next: ({ lists, objectItem, images }) => {
         this.objectTypes = lists.objectTypes;
-        this.destinations = lists.destinations;
+        this.regions = lists.regions;
         this.localities = lists.localities;
+
         const merged: ObjectDto = {
           ...objectItem,
           images: images.length > 0 ? images : objectItem.images ?? []
         };
+
+        // Pre-select region based on the loaded object's destination
+        const destId = this.normalizeOptionalId(merged.destinationId);
+        const destForRegion = lists.destinations.find((d) => d.id === destId);
+        if (destForRegion?.regionId != null) {
+          this.selectedRegionId = destForRegion.regionId;
+          this.destinations = lists.destinations.filter((d) => d.regionId === this.selectedRegionId);
+        } else {
+          this.destinations = lists.destinations;
+        }
+
         this.mergeOptionsFromLoadedObject(merged);
         this.applyFormFromObject(merged);
         this.loadCcPreviewReviews(merged.id);
@@ -957,11 +1005,13 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
 
   private fetchOptionLists(): Observable<{
     objectTypes: ObjectTypeOption[];
+    regions: RegionDto[];
     destinations: DestinationDto[];
     localities: LocalityOption[];
   }> {
     return forkJoin({
       objectTypes: this.objectService.getObjectTypeOptions().pipe(catchError(() => of([]))),
+      regions: this.regionService.getAll().pipe(catchError(() => of([]))),
       destinations: this.destinationService.getAll(
         {
           page: 1,

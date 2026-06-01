@@ -98,19 +98,26 @@
             <input type="text" [(ngModel)]="form.name" name="name" required placeholder="e.g. Barceloneta Beach" />
           </label>
 
-          <label>
-            <span>Destination *</span>
-            <select
-              [(ngModel)]="form.destinationId"
-              (ngModelChange)="onDestinationChange()"
-              name="destinationId"
-              required
-              [disabled]="isLoadingDestinations"
-            >
-              <option *ngIf="isLoadingDestinations" [ngValue]="form.destinationId" disabled>Loading destinations...</option>
-              <option *ngFor="let option of destinationOptions" [ngValue]="option.id">{{ option.name }}</option>
-            </select>
-          </label>
+          @if (singleDestinationName) {
+            <label>
+              <span>Destination</span>
+              <input type="text" [value]="singleDestinationName" readonly />
+            </label>
+          } @else {
+            <label>
+              <span>Destination *</span>
+              <select
+                [(ngModel)]="form.destinationId"
+                (ngModelChange)="onDestinationChange()"
+                name="destinationId"
+                required
+                [disabled]="isLoadingDestinations"
+              >
+                <option *ngIf="isLoadingDestinations" [ngValue]="form.destinationId" disabled>Loading...</option>
+                <option *ngFor="let option of destinationOptions" [ngValue]="option.id">{{ option.name }}</option>
+              </select>
+            </label>
+          }
 
           <label>
             <span>Locality Type *</span>

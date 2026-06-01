@@ -291,7 +291,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
         } else if (result.kind === 'not_found') {
           this.locationLookupState = 'not_found';
           this.locationLookupMessage =
-            'This destination name was not found in the selected region/country. Please check spelling or set coordinates manually.';
+            'Location not found automatically — set coordinates on the map below.';
         } else {
           this.locationLookupState = 'error';
           this.locationLookupMessage =
@@ -609,7 +609,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
       } else if (result.kind === 'not_found') {
         this.locationLookupState = 'not_found';
         this.locationLookupMessage =
-          'This destination name was not found in the selected region/country. Please check spelling or set coordinates manually.';
+          'Location not found automatically — set coordinates on the map below.';
       } else {
         this.locationLookupState = 'error';
         this.locationLookupMessage =

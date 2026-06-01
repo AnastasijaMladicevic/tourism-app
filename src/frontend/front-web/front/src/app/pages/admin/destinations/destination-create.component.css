@@ -256,6 +256,11 @@
   color: #166534;
 }
 
+.location-lookup-note--info {
+  color: #64748b;
+  font-weight: 400;
+}
+
 .location-lookup-note--warn {
   color: #b45309;
 }

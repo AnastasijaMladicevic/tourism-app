@@ -23,6 +23,7 @@ import {
   ActivityDto
 } from '../../../../services/activities';
 import { DestinationService, DestinationDto } from '../../../../services/destination.service';
+import { RegionDto, RegionService } from '../../../../services/region';
 import { EventService } from '../../../../services/event.service';
 
 interface ObjectOption {
@@ -85,6 +86,7 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly activitiesService = inject(ActivitiesService);
   private readonly destinationService = inject(DestinationService);
+  private readonly regionService = inject(RegionService);
   private readonly eventService = inject(EventService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
@@ -127,8 +129,10 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
   successMessage = '';
 
   activityTypes: ActivityTypeOption[] = [];
+  regions: RegionDto[] = [];
   destinations: DestinationDto[] = [];
   localities: LocalityOption[] = [];
+  selectedRegionId: number | null = null;
   objects: ObjectOption[] = [];
   private loadedActivity: ActivityDto | null = null;
   private deletionRequestSubmitted = false;
@@ -243,11 +247,42 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
 
   get filteredLocalities(): LocalityOption[] {
     const destinationId = this.form.controls.destinationId.value;
-    if (!destinationId) {
-      return this.localities;
+    if (destinationId) {
+      return this.localities.filter((l) => l.destinationId === destinationId);
     }
+    if (this.selectedRegionId) {
+      const regionDestIds = new Set(this.destinations.map((d) => d.id));
+      return this.localities.filter((l) => regionDestIds.has(l.destinationId));
+    }
+    return this.localities;
+  }
 
-    return this.localities.filter((locality) => locality.destinationId === destinationId);
+  onRegionChange(regionId: number | null): void {
+    this.selectedRegionId = regionId;
+    this.form.patchValue({ destinationId: null, localityId: null, objectId: null }, { emitEvent: false });
+    this.applyLocationFromSelection();
+    this.loadDestinationsForRegion(regionId);
+  }
+
+  private loadDestinationsForRegion(regionId: number | null): void {
+    this.destinationService.getAll(
+      {
+        page: 1,
+        pageSize: 300,
+        sortBy: 'name',
+        sortOrder: 'asc',
+        ...(regionId != null ? { regionId } : {})
+      },
+      { bypassRegion: true }
+    ).pipe(
+      map((response: DestinationDto[] | { items?: DestinationDto[] }) =>
+        Array.isArray(response) ? response : (response.items ?? [])
+      ),
+      catchError(() => of([] as DestinationDto[]))
+    ).subscribe((destinations) => {
+      this.destinations = destinations;
+      this.cdr.detectChanges();
+    });
   }
 
   get filteredObjects(): ObjectOption[] {
@@ -531,6 +566,7 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
 
     forkJoin({
       activityTypes: this.activitiesService.getActivityTypeOptions().pipe(catchError(() => of([]))),
+      regions: this.regionService.getAll().pipe(catchError(() => of([]))),
       destinations: this.destinationService.getAll({
         page: 1,
         pageSize: 300,
@@ -559,11 +595,21 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
         }))),
         catchError(() => of([]))
       )
-    }).subscribe(({ activityTypes, destinations, localities, objects }) => {
+    }).subscribe(({ activityTypes, regions, destinations, localities, objects }) => {
       this.activityTypes = activityTypes;
-      this.destinations = destinations;
+      this.regions = regions;
       this.localities = localities;
       this.objects = objects;
+
+      // In edit mode, pre-select the region from the loaded activity
+      const regionId = this.loadedActivity?.regionId ?? null;
+      if (regionId != null) {
+        this.selectedRegionId = regionId;
+        this.destinations = destinations.filter((d) => d.regionId === regionId);
+      } else {
+        this.destinations = destinations;
+      }
+
       this.syncEditModeOptions();
       this.syncDependentSelections();
       this.applyLocationFromSelection();
