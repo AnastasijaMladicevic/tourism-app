@@ -413,6 +413,11 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
       return;
     }
 
+    if (this.imageUrls.length === 0) {
+      this.errorMessage = 'At least one image is required before saving.';
+      return;
+    }
+
     this.isSubmitting = true;
     this.errorMessage = '';
     this.successMessage = '';

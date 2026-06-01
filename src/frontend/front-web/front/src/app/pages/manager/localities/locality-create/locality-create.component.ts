@@ -165,6 +165,10 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
       this.errorMessage = 'Name, destination, and type are required.';
       return;
     }
+    if (this.existingImages.length === 0 && this.imageFiles.length === 0) {
+      this.errorMessage = 'At least one image is required before saving.';
+      return;
+    }
     if (this.existingImages.length + this.imageFiles.length > this.maxImageCount) {
       this.errorMessage = `A locality can have at most ${this.maxImageCount} images.`;
       return;

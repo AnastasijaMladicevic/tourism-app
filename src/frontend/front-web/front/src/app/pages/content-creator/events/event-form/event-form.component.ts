@@ -615,6 +615,11 @@ export class EventFormComponent implements OnInit, OnDestroy {
       return;
     }
 
+    if (this.imageUrls.length === 0) {
+      this.errorMessage = 'At least one image is required before saving.';
+      return;
+    }
+
     if (this.endDateBeforeStart) {
       this.errorMessage = 'End date and time must be after start date and time.';
       return;

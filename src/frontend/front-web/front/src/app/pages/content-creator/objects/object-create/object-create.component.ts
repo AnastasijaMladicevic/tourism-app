@@ -749,6 +749,11 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
       return;
     }
 
+    if (this.editableImageUrls.length === 0) {
+      this.errorMessage = 'At least one image is required before saving.';
+      return;
+    }
+
     const destinationId = this.form.controls.destinationId.value ?? undefined;
     const localityId = this.form.controls.localityId.value ?? undefined;
     if (!destinationId && !localityId) {

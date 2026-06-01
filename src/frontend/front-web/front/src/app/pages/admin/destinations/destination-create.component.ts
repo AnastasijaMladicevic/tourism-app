@@ -872,6 +872,10 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
       this.errorMessage = 'Destination name is required.';
       return false;
     }
+    if (this.destinationImages.length === 0 && this.imageFiles.length === 0) {
+      this.errorMessage = 'At least one image is required before saving.';
+      return false;
+    }
     if (this.destinationImages.length + this.imageFiles.length > this.maxImageCount) {
       this.errorMessage = `A destination can have at most ${this.maxImageCount} images.`;
       return false;

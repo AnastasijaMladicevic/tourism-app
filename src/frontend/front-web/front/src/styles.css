@@ -3,6 +3,12 @@
    src/styles.css
    ===================================================== */
 
+.required-star {
+  color: #6b7280;
+  margin-left: 2px;
+  font-weight: 600;
+}
+
 /* =====================
    CSS VARIABLES
    ===================== */

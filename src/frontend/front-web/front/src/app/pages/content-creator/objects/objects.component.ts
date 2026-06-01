@@ -544,6 +544,16 @@ export class ContentCreatorObjectsComponent implements OnInit, OnDestroy {
         this.heroImageUrls = orderedUrls.length > 0 ? orderedUrls : [fallbackUrl];
         this.currentHeroImageIndex = 0;
 
+        // Backfill mainImageUrl in the list row if the list endpoint didn't return it
+        if (orderedUrls.length > 0 && this.selectedObject && !this.selectedObject.mainImageUrl) {
+          const mainUrl = orderedUrls[0];
+          this.selectedObject = { ...this.selectedObject, mainImageUrl: mainUrl };
+          const idx = this.pagedObjects.findIndex((o) => o.id === this.selectedObject?.id);
+          if (idx >= 0) {
+            this.pagedObjects[idx] = { ...this.pagedObjects[idx], mainImageUrl: mainUrl };
+          }
+        }
+
         if (this.heroImageUrls.length > 1) {
           this.startHeroImageRotation();
         }

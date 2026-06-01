@@ -543,6 +543,15 @@ export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
         this.heroImageUrls = orderedUrls.length > 0 ? orderedUrls : [fallbackUrl];
         this.currentHeroImageIndex = 0;
 
+        if (orderedUrls.length > 0 && this.selectedEvent && !this.selectedEvent.mainImageUrl) {
+          const mainUrl = orderedUrls[0];
+          this.selectedEvent = { ...this.selectedEvent, mainImageUrl: mainUrl };
+          const idx = this.pagedEvents.findIndex((e) => e.id === this.selectedEvent?.id);
+          if (idx >= 0) {
+            this.pagedEvents[idx] = { ...this.pagedEvents[idx], mainImageUrl: mainUrl };
+          }
+        }
+
         if (this.heroImageUrls.length > 1) {
           this.startHeroImageRotation();
         }

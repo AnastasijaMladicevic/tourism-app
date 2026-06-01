@@ -379,6 +379,18 @@ export class ManagerActivitiesComponent implements OnInit {
         this.heroImageUrls = orderedUrls.length > 0 ? orderedUrls : [fallbackUrl];
         this.currentHeroImageIndex = 0;
 
+        if (orderedUrls.length > 0 && this.selectedActivity && !this.selectedActivity.mainImageUrl) {
+          const mainUrl = orderedUrls[0];
+          this.selectedActivity = { ...this.selectedActivity, mainImageUrl: mainUrl };
+          if (this.selectedActivityDetails && !this.selectedActivityDetails.mainImageUrl) {
+            this.selectedActivityDetails = { ...this.selectedActivityDetails, mainImageUrl: mainUrl };
+          }
+          const idx = this.activities.findIndex((a) => a.id === this.selectedActivity?.id);
+          if (idx >= 0) {
+            this.activities[idx] = { ...this.activities[idx], mainImageUrl: mainUrl };
+          }
+        }
+
         if (this.heroImageUrls.length > 1) {
           this.startHeroImageRotation();
         }
