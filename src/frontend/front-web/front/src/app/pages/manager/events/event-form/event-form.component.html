@@ -246,6 +246,7 @@
           [zoom]="15"
           [popupText]="form.controls.name.value || 'Event'"
           [interactive]="false"
+          [zoomable]="true"
           [showMarker]="true">
         </app-map>
 
@@ -254,15 +255,21 @@
           <p>{{ locationContextValue }}</p>
         </div>
 
-        <div class="location-inputs">
-          <label class="mini-field">
-            <span>Latitude</span>
-            <input class="form-control" type="text" formControlName="latitude" readonly />
-          </label>
-          <label class="mini-field">
-            <span>Longitude</span>
-            <input class="form-control" type="text" formControlName="longitude" readonly />
-          </label>
+        <div class="coord-editor">
+          <div>
+            <span class="coord-label">{{ 'Latitude' | translate }}</span>
+            <div class="coord-input-wrap">
+              <input class="form-control" type="text" formControlName="latitude" readonly />
+              <span class="coord-input-suffix">{{ latitudeDirection }}</span>
+            </div>
+          </div>
+          <div>
+            <span class="coord-label">{{ 'Longitude' | translate }}</span>
+            <div class="coord-input-wrap">
+              <input class="form-control" type="text" formControlName="longitude" readonly />
+              <span class="coord-input-suffix">{{ longitudeDirection }}</span>
+            </div>
+          </div>
         </div>
 
         <div class="map-meta">

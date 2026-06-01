@@ -16,6 +16,7 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
   @Input() zoom: number = 15;
   @Input() popupText: string = '';
   @Input() interactive: boolean = false;
+  @Input() zoomable: boolean = false;
   @Input() showMarker: boolean = true;
   @Input() mapId: string = 'map-' + Math.random().toString(36).substr(2, 9); // dinamički ID
   @Output() locationSelected = new EventEmitter<{ lat: number; lng: number }>();
@@ -62,13 +63,15 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
     });
     if (!this.interactive) {
       if (map) {
-        map.dragging.disable();
-        map.touchZoom.disable();
+        if (!this.zoomable) {
+          map.dragging.disable();
+          map.touchZoom.disable();
+          map.scrollWheelZoom.disable();
+          map.boxZoom.disable();
+          map.keyboard.disable();
+          map.zoomControl?.remove();
+        }
         map.doubleClickZoom.disable();
-        map.scrollWheelZoom.disable();
-        map.boxZoom.disable();
-        map.keyboard.disable();
-        map.zoomControl?.remove();
       }
     } else if (map) {
       map.on('click', (event: L.LeafletMouseEvent) => {

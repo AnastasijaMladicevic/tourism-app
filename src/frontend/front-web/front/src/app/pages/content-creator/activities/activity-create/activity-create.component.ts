@@ -13,6 +13,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, catchError, finalize, forkJoin, from, map, of, switchMap } from 'rxjs';
 import { concatMap, toArray } from 'rxjs/operators';
 import { MapComponent } from '../../../../shared/components/map/map';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import {
   ActivitiesService,
   ActivityTypeOption,
@@ -76,7 +77,7 @@ interface DraftPayload {
 @Component({
   selector: 'app-activity-create',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, MapComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, MapComponent, TranslatePipe],
   templateUrl: './activity-create.component.html',
   styleUrls: [
     './activity-create.component.css',
@@ -1013,6 +1014,16 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
     const manualTypeId = group.get('fallbackActivityTypeId')?.value as number | null | undefined;
 
     return (selectTypeId ?? manualTypeId) ? null : { activityTypeRequired: true };
+  }
+
+  get latitudeDirection(): 'N' | 'S' {
+    const lat = Number(this.form.controls.latitude.value);
+    return Number.isFinite(lat) && lat < 0 ? 'S' : 'N';
+  }
+
+  get longitudeDirection(): 'E' | 'W' {
+    const lng = Number(this.form.controls.longitude.value);
+    return Number.isFinite(lng) && lng < 0 ? 'W' : 'E';
   }
 
   selectLocation(latitude: number, longitude: number): void {

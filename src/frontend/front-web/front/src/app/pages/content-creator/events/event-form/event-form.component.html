@@ -301,23 +301,30 @@
           [lng]="toNumber(form.controls.longitude.value) ?? 18.771"
           [zoom]="15"
           [popupText]="form.controls.name.value || 'Event'"
-          [interactive]="false"
-          [showMarker]="true">
+          [interactive]="true"
+          [showMarker]="true"
+          (locationSelected)="onMapLocationSelected($event)">
         </app-map>
-
-        <div class="coordinates-grid" [formGroup]="form">
-          <label class="form-field">
-            <span>Latitude</span>
-            <input class="form-control" type="number" step="0.000001" formControlName="latitude" placeholder="44.8176" />
-          </label>
-          <label class="form-field">
-            <span>Longitude</span>
-            <input class="form-control" type="number" step="0.000001" formControlName="longitude" placeholder="20.4633" />
-          </label>
+<br>
+        <div class="coord-editor" [formGroup]="form">
+          <div>
+            <span class="coord-label">{{ 'Latitude' | translate }}</span>
+            <div class="coord-input-wrap">
+              <input class="form-control" type="number" formControlName="latitude" min="-90" max="90" step="0.000001" placeholder="42.4240" />
+              <span class="coord-input-suffix">{{ latitudeDirection }}</span>
+            </div>
+          </div>
+          <div>
+            <span class="coord-label">{{ 'Longitude' | translate }}</span>
+            <div class="coord-input-wrap">
+              <input class="form-control" type="number" formControlName="longitude" min="-180" max="180" step="0.000001" placeholder="18.7710" />
+              <span class="coord-input-suffix">{{ longitudeDirection }}</span>
+            </div>
+          </div>
         </div>
 
         <div class="venue-card">
-          <small>Linked object:</small>
+          <small>Linked object:</small>&nbsp; 
           <strong>{{ linkedLocationTitle }}</strong>
           <p>{{ linkedLocationDescription }}</p>
         </div>

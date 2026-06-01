@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { MapComponent } from '../../../../shared/components/map/map';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -26,7 +27,7 @@ interface RelatedActivity {
 @Component({
   selector: 'app-manager-event-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, MapComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, MapComponent, TranslatePipe],
   templateUrl: './event-form.component.html',
   styleUrls: [
     './event-form.component.css',
@@ -322,6 +323,16 @@ export class ManagerEventFormComponent implements OnInit, OnDestroy {
     }
 
     return list.slice().sort((left, right) => Number(right.isMain) - Number(left.isMain));
+  }
+
+  get latitudeDirection(): 'N' | 'S' {
+    const lat = Number(this.form.controls.latitude.value);
+    return Number.isFinite(lat) && lat < 0 ? 'S' : 'N';
+  }
+
+  get longitudeDirection(): 'E' | 'W' {
+    const lng = Number(this.form.controls.longitude.value);
+    return Number.isFinite(lng) && lng < 0 ? 'W' : 'E';
   }
 
   toNumber(value: number | string | null | undefined): number | null {

@@ -11,6 +11,7 @@ import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, finalize, of } from 'rxjs';
 import { MapComponent } from '../../../../shared/components/map/map';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import { ActivitiesService, ActivityDto, ActivityImageDto, ApproveActivityDto } from '../../../../services/activities';
 import { environment } from '../../../../../environment/environment';
 import { TranslationService } from '../../../../services/translation.service';
@@ -18,7 +19,7 @@ import { TranslationService } from '../../../../services/translation.service';
 @Component({
   selector: 'app-manager-activity-review',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, MapComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, MapComponent, TranslatePipe],
   templateUrl: './activity-review.component.html',
   styleUrls: [
     './activity-review.component.css',
@@ -442,6 +443,16 @@ export class ManagerActivityReviewComponent implements OnInit, OnDestroy {
 
   get hasCoordinates(): boolean {
     return this.latitudeNumber != null && this.longitudeNumber != null;
+  }
+
+  get latitudeDirection(): 'N' | 'S' {
+    const lat = this.latitudeNumber;
+    return lat != null && lat < 0 ? 'S' : 'N';
+  }
+
+  get longitudeDirection(): 'E' | 'W' {
+    const lng = this.longitudeNumber;
+    return lng != null && lng < 0 ? 'W' : 'E';
   }
 
   get latitudeNumber(): number | null {

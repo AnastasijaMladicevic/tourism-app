@@ -331,6 +331,7 @@
               [popupText]="hasSelectedCoordinates ? selectedMapLabel : ''"
               [showMarker]="hasSelectedCoordinates"
               [interactive]="false"
+              [zoomable]="true"
               mapId="admin-destination-map"
             ></app-map>
             @if (!hasSelectedCoordinates) {

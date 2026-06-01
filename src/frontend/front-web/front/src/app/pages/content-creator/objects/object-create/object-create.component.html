@@ -64,7 +64,12 @@
           </label>
           <label>
             <span>Address</span>
-            <input type="text" formControlName="address" placeholder="Address" />
+            <div class="address-input-row">
+              <input type="text" formControlName="address" placeholder="Address" (keyup.enter)="onAddressSearch()" />
+              <button type="button" class="ghost-btn address-pin-btn" (click)="onAddressSearch()" [disabled]="isAddressSearching" title="Find on map">
+                <span class="material-symbols-outlined">{{ isAddressSearching ? 'pending' : 'pin_drop' }}</span>
+              </button>
+            </div>
           </label>
           <label>
             <span>Object Type <span class="required-star" aria-hidden="true">*</span></span>
@@ -271,26 +276,28 @@
           [lng]="mapLng"
           [zoom]="14"
           [popupText]="form.controls.name.value || 'New object'"
-          [interactive]="false"
+          [interactive]="!isManagerReview"
           [showMarker]="hasMapCoordinates"
           mapId="create-object-map"
+          (locationSelected)="onMapLocationSelected($event)"
         ></app-map>
       </div>
 
-      <div class="location-line">
-        <span class="material-symbols-outlined">search</span>
-        <p>{{ locationSummary }}</p>
-      </div>
-
-      <div class="location-inputs">
-        <label class="mini-field">
-          <span>Latitude</span>
-          <input type="number" formControlName="latitude" min="-90" max="90" step="0.000001" placeholder="42.424000" />
-        </label>
-        <label class="mini-field">
-          <span>Longitude</span>
-          <input type="number" formControlName="longitude" min="-180" max="180" step="0.000001" placeholder="18.771000" />
-        </label>
+      <div class="coord-editor">
+        <div>
+          <span class="coord-label">{{ 'Latitude' | translate }}</span>
+          <div class="coord-input-wrap">
+            <input type="number" formControlName="latitude" min="-90" max="90" step="0.000001" placeholder="42.4240" />
+            <span class="coord-input-suffix">{{ latitudeDirection }}</span>
+          </div>
+        </div>
+        <div>
+          <span class="coord-label">{{ 'Longitude' | translate }}</span>
+          <div class="coord-input-wrap">
+            <input type="number" formControlName="longitude" min="-180" max="180" step="0.000001" placeholder="18.7710" />
+            <span class="coord-input-suffix">{{ longitudeDirection }}</span>
+          </div>
+        </div>
       </div>
 
       @if (editSidebar) {

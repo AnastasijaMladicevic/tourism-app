@@ -1,5 +1,5 @@
 import { CommonModule, Location } from '@angular/common';
-import { ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, NgZone, OnDestroy, OnInit, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -23,6 +23,7 @@ import { AuthService } from '../../../../services/auth.service';
 import { ReviewDto, ReviewService } from '../../../../services/review';
 import { RegionDto, RegionService } from '../../../../services/region';
 import { MapComponent as SharedMapComponent } from '../../../../shared/components/map/map';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import { mapReviewDtosToObjectThreads } from '../../../manager/shared/manager-object-review.mapper';
 import {
   isConcerningCreatorReply,
@@ -34,7 +35,7 @@ type WorkingDayKey = 'pon' | 'uto' | 'sre' | 'cet' | 'pet' | 'sub' | 'ned';
 @Component({
   selector: 'app-object-create',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterModule, SharedMapComponent],
+  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterModule, SharedMapComponent, TranslatePipe],
   templateUrl: './object-create.component.html',
   styleUrls: [
     './object-create.component.css',
@@ -55,9 +56,13 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
   private readonly regionService = inject(RegionService);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly translationService = inject(TranslationService);
+  private readonly ngZone = inject(NgZone);
 
   /** Manager opens this page read-only via `/manager/objects/review/:id` (route data). */
   isManagerReview = false;
+
+  isAddressSearching = false;
+  private forwardGeocodeRequestId = 0;
 
   /** Latest content status from API (for approve/decline availability). */
   reviewObjectStatus = '';
@@ -544,6 +549,53 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
 
   get hasMapCoordinates(): boolean {
     return this.form.controls.latitude.value != null && this.form.controls.longitude.value != null;
+  }
+
+  get latitudeDirection(): 'N' | 'S' {
+    const lat = Number(this.form.controls.latitude.value);
+    return Number.isFinite(lat) && lat < 0 ? 'S' : 'N';
+  }
+
+  get longitudeDirection(): 'E' | 'W' {
+    const lng = Number(this.form.controls.longitude.value);
+    return Number.isFinite(lng) && lng < 0 ? 'W' : 'E';
+  }
+
+  onMapLocationSelected(event: { lat: number; lng: number }): void {
+    if (this.isManagerReview) return;
+    this.form.patchValue({ latitude: event.lat, longitude: event.lng }, { emitEvent: false });
+    this.form.controls.latitude.markAsDirty();
+    this.form.controls.longitude.markAsDirty();
+  }
+
+  onAddressSearch(): void {
+    const query = (this.form.controls.address.value ?? '').trim();
+    if (!query || this.isAddressSearching) return;
+
+    this.isAddressSearching = true;
+    const requestId = ++this.forwardGeocodeRequestId;
+    const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&q=${encodeURIComponent(query)}&limit=1`;
+
+    fetch(url, { headers: { Accept: 'application/json' } })
+      .then(r => r.ok ? r.json() : Promise.reject(new Error('Location search failed')))
+      .then((results: { lat?: string; lon?: string }[]) => {
+        this.ngZone.run(() => {
+          if (requestId !== this.forwardGeocodeRequestId) return;
+          this.isAddressSearching = false;
+          const hit = Array.isArray(results) ? results[0] : undefined;
+          if (!hit?.lat || !hit?.lon) return;
+          const lat = Number(hit.lat);
+          const lon = Number(hit.lon);
+          if (!Number.isFinite(lat) || !Number.isFinite(lon)) return;
+          this.onMapLocationSelected({ lat, lng: lon });
+        });
+      })
+      .catch(() => {
+        this.ngZone.run(() => {
+          if (requestId !== this.forwardGeocodeRequestId) return;
+          this.isAddressSearching = false;
+        });
+      });
   }
 
   get hasEditableImages(): boolean {

@@ -19,6 +19,7 @@ import { EventImageDto, EventService } from '../../../../services/event.service'
 import { ActivitiesService } from '../../../../services/activities';
 import { CreateEventDto, EventDto, UpdateEventDto } from '../../../../models/event.model';
 import { MapComponent } from '../../../../shared/components/map/map';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../../../services/translation.service';
 
 interface VenueOption {
@@ -39,7 +40,7 @@ interface RelatedActivity {
 @Component({
   selector: 'app-event-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, MapComponent],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, MapComponent, TranslatePipe],
   templateUrl: './event-form.component.html',
   styleUrls: ['./event-form.component.css', '../../../admin/shared/admin-page-title.css']
 })
@@ -446,6 +447,20 @@ export class EventFormComponent implements OnInit, OnDestroy {
         this.setLocationFromSelection(destinationLat, destinationLng);
       }
     }
+  }
+
+  get latitudeDirection(): 'N' | 'S' {
+    const lat = Number(this.form.controls.latitude.value);
+    return Number.isFinite(lat) && lat < 0 ? 'S' : 'N';
+  }
+
+  get longitudeDirection(): 'E' | 'W' {
+    const lng = Number(this.form.controls.longitude.value);
+    return Number.isFinite(lng) && lng < 0 ? 'W' : 'E';
+  }
+
+  onMapLocationSelected(event: { lat: number; lng: number }): void {
+    this.setLocationFromSelection(event.lat, event.lng);
   }
 
   private setLocationFromSelection(latitude: number, longitude: number): void {

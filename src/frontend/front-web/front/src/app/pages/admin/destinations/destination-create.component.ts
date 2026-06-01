@@ -39,11 +39,12 @@ import {
 } from '../../../services/destination.service';
 import { RegionDto, RegionService } from '../../../services/region';
 import { MapComponent as SharedMapComponent } from '../../../shared/components/map/map';
+import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-admin-create-destination',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, SharedMapComponent],
+  imports: [CommonModule, FormsModule, RouterLink, SharedMapComponent, TranslatePipe],
   templateUrl: './destination-create.component.html',
   styleUrls: ['./destination-create.component.css', '../shared/admin-page-title.css']
 })

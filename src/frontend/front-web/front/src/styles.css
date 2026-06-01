@@ -737,3 +737,47 @@ app-map .leaflet-container {
 .leaflet-tile-pane {
   transform: translateZ(0);
 }
+
+/* =====================
+   COORD EDITOR — unified coordinate inputs below minimaps
+   ===================== */
+.coord-editor {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.coord-editor .coord-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #64748b;
+  margin-bottom: 4px;
+}
+
+.coord-input-wrap {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.coord-input-wrap input {
+  display: block;
+  width: 100%;
+  padding-right: 36px;
+  box-sizing: border-box;
+}
+
+.coord-input-suffix {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  pointer-events: none;
+}

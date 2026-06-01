@@ -999,6 +999,25 @@ textarea:focus {
   border: 1px solid #e5e7eb;
 }
 
+.address-input-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.address-input-row input {
+  flex: 1;
+}
+
+.address-pin-btn {
+  padding: 6px 8px;
+  flex-shrink: 0;
+}
+
+.address-pin-btn .material-symbols-outlined {
+  font-size: 18px;
+}
+
 .location-line {
   min-height: 34px;
   border: 1px solid #e5e7eb;

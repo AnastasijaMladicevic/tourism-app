@@ -6,6 +6,7 @@ import { catchError, finalize, of } from 'rxjs';
 import { DestinationService } from '../../../../services/destination.service';
 import { CreateLocalityDto, LocalityImageDto, LocalityService, UpdateLocalityDto } from '../../../../services/locality.service';
 import { MapComponent as SharedMapComponent } from '../../../../shared/components/map/map';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 interface LocalityTypeOption {
   id: number;
@@ -22,7 +23,7 @@ interface DestinationOption {
 @Component({
   selector: 'app-manager-locality-create',
   standalone: true,
-  imports: [CommonModule, FormsModule, SharedMapComponent],
+  imports: [CommonModule, FormsModule, SharedMapComponent, TranslatePipe],
   templateUrl: './locality-create.component.html',
   styleUrls: [
     './locality-create.component.css',
@@ -96,6 +97,22 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
       clearTimeout(this.deleteRedirectTimeoutId);
       this.deleteRedirectTimeoutId = null;
     }
+  }
+
+  get latitudeDirection(): 'N' | 'S' {
+    const lat = Number(this.form.latitude);
+    return Number.isFinite(lat) && lat < 0 ? 'S' : 'N';
+  }
+
+  get longitudeDirection(): 'E' | 'W' {
+    const lng = Number(this.form.longitude);
+    return Number.isFinite(lng) && lng < 0 ? 'W' : 'E';
+  }
+
+  onMapLocationSelected(event: { lat: number; lng: number }): void {
+    this.form.latitude = event.lat;
+    this.form.longitude = event.lng;
+    this.cdr.detectChanges();
   }
 
   get hasMapCoordinates(): boolean {
