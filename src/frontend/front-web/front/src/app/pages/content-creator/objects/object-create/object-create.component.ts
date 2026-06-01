@@ -195,6 +195,11 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
     return this.previewReviews.length > 0;
   }
 
+  get showViewMoreReviews(): boolean {
+    const total = this.editSidebar?.reviewCount ?? this.previewReviews.length;
+    return this.previewReviews.length > 0 && total > this.previewReviews.length;
+  }
+
   get previewReviewsCountLabel(): string {
     const total = this.editSidebar?.reviewCount ?? this.previewReviews.length;
     if (total > this.previewReviews.length) {
@@ -921,8 +926,9 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
     this.previewReviews = [];
 
     this.reviewService
-      .getForObject(objectId)
+      .getForCreator({ objectId, sortBy: 'createdAt', sortOrder: 'desc', pageSize: 100 }, { bypassRegion: true })
       .pipe(
+        map((response) => response.items ?? []),
         catchError(() => of([] as ReviewDto[])),
         finalize(() => {
           this.isLoadingPreviewReviews = false;

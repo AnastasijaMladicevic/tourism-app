@@ -336,14 +336,13 @@
                 <p>{{ review.text }}</p>
               </article>
             </div>
-            <button type="button" class="text-btn view-more-btn" (click)="onViewMoreReviews()">
-              View more
-            </button>
+            @if (showViewMoreReviews) {
+              <button type="button" class="text-btn view-more-btn" (click)="onViewMoreReviews()">
+                View more
+              </button>
+            }
           } @else {
             <div class="state">No reviews available for this object yet.</div>
-            <button type="button" class="text-btn view-more-btn" (click)="onViewMoreReviews()">
-              View more
-            </button>
           }
         </section>
       } @else {

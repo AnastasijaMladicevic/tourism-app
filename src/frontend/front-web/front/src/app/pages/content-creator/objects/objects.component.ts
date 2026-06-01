@@ -34,6 +34,7 @@ export class ContentCreatorObjectsComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
 
   private static readonly DEFAULT_BANNER_URL = '/assets/pozadina.png';
+  private static readonly PREVIEW_REVIEWS_LIMIT = 3;
 
   objects: ObjectDto[] = [];
   pagedObjects: ObjectDto[] = [];
@@ -414,7 +415,17 @@ export class ContentCreatorObjectsComponent implements OnInit, OnDestroy {
     return this.previewReviews.length > 0;
   }
 
+  get showViewMoreReviews(): boolean {
+    const total = this.selectedObject?.reviewCount ?? this.previewReviews.length;
+    return this.previewReviews.length > 0 && total > this.previewReviews.length;
+  }
+
   get previewReviewsCountLabel(): string {
+    const total = this.selectedObject?.reviewCount ?? this.previewReviews.length;
+    if (total > this.previewReviews.length) {
+      return `Showing ${this.previewReviews.length} of ${total}`;
+    }
+
     const count = this.previewReviews.length;
     return `${count} review${count === 1 ? '' : 's'}`;
   }
@@ -585,17 +596,16 @@ export class ContentCreatorObjectsComponent implements OnInit, OnDestroy {
     }
 
     this.isLoadingPreviewReviews = true;
-    this.reviewService.getAll({
-      page: 1,
-      pageSize: 100,
-      sortBy: 'createdAt',
-      sortOrder: 'desc'
-    }, { bypassRegion: true }).subscribe({
+    this.previewReviews = [];
+
+    this.reviewService.getForCreator(
+      { objectId, sortBy: 'createdAt', sortOrder: 'desc', pageSize: 100 },
+      { bypassRegion: true }
+    ).subscribe({
       next: (response) => {
-        const reviewsForObject = (response.items ?? [])
-          .filter((review) => review.objectId === objectId)
-          .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-        this.previewReviews = reviewsForObject.slice(0, 3);
+        this.previewReviews = (response.items ?? [])
+          .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+          .slice(0, ContentCreatorObjectsComponent.PREVIEW_REVIEWS_LIMIT);
         this.isLoadingPreviewReviews = false;
         this.cdr.detectChanges();
       },

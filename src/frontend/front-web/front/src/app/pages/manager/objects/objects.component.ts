@@ -630,6 +630,10 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
     return this.selectedObjectReviews.slice(0, 2);
   }
 
+  get showSelectedObjectReviewLink(): boolean {
+    return this.selectedObjectReviews.length > this.selectedObjectReviewsPreview.length;
+  }
+
   get concerningReportThread(): ManagerObjectReviewThread | null {
     return this.selectedObjectReviews.find((thread) => isConcerningCreatorReply(thread)) ?? null;
   }

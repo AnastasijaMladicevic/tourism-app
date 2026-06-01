@@ -336,9 +336,11 @@
           <p class="cc-reviews-empty">No reviews for this object yet.</p>
         }
 
-        <button type="button" class="text-btn view-more-btn" (click)="onViewMoreReviews()">
-          View more
-        </button>
+        @if (showViewMoreReviews) {
+          <button type="button" class="text-btn view-more-btn" (click)="onViewMoreReviews()">
+            View more
+          </button>
+        }
       </section>
     }
     </div>

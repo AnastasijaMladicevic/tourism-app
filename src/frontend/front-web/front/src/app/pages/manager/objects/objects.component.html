@@ -315,7 +315,7 @@
                 </article>
               }
             </div>
-            @if (selectedObjectReviews.length > 2) {
+            @if (showSelectedObjectReviewLink) {
               <button type="button" class="text-link-btn" (click)="onOpenSelectedObjectReview()">
                 View all {{ selectedObjectReviews.length }} reviews on object page
               </button>
