@@ -384,9 +384,9 @@ export class ContentCreatorDashboardComponent implements OnInit {
         icon: 'event_available',
       },
       {
-        label: 'New reviews',
+        label: 'Unanswered reviews',
         value: this.formatNumber(summary.unansweredReviews),
-        meta: 'Reply soon',
+        meta: `Within ${overview.periodKey}`,
         tone: 'teal',
         icon: 'forum',
       },

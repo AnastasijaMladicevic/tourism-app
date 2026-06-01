@@ -243,6 +243,7 @@ namespace TuristickiVodic.Services.Services
             var unansweredReviews = await _context.Reviews
                 .AsNoTracking()
                 .CountAsync(x =>
+                    x.CreatedAt >= periodStartUtc &&
                     x.Status == ContentStatus.Approved &&
                     x.Object.CreatedByUserId == creatorId &&
                     (x.CreatorResponse == null || x.CreatorResponse == ""));
