@@ -15,6 +15,7 @@ import {
 } from '../models/event.model';
 import { environment } from '../../environment/environment';
 import { ActiveRegionService, RegionRequestOptions } from './active-region';
+import { normalizeEntityMedia, normalizeMediaRow, normalizeMediaRows } from '../shared/utils/media-url';
 export interface EventImageDto {
   id: number;
   url: string;
@@ -93,7 +94,9 @@ export class EventService {
       }
     });
 
-    return this.http.get<PagedEventResultDto<EventDto>>(`${this.url}/nearby`, { params });
+    return this.http.get<PagedEventResultDto<EventDto>>(`${this.url}/nearby`, { params }).pipe(
+      map((response) => this.normalizePagedEvents(response))
+    );
   }
 
 
@@ -143,7 +146,10 @@ export class EventService {
     }
 
     return this.http.get<{ items: EventDto[] }>(this.url, { params }).pipe(
-      map(response => Array.isArray(response) ? response : (response?.items ?? []))
+      map(response => {
+        const items = Array.isArray(response) ? response : (response?.items ?? []);
+        return items.map((event) => this.normalizeEvent(event));
+      })
     );
   }
 
@@ -152,7 +158,9 @@ export class EventService {
    */
   getForManager(query?: EventQueryDto): Observable<EventQueryResponse> {
     const params = this.buildEventQueryParams(query);
-    return this.http.get<EventQueryResponse>(`${this.apiUrl}/manager`, { params });
+    return this.http.get<EventQueryResponse>(`${this.apiUrl}/manager`, { params }).pipe(
+      map((response) => this.normalizeEventResponse(response))
+    );
   }
 
   /**
@@ -160,21 +168,27 @@ export class EventService {
    */
   getMy(query?: EventQueryDto): Observable<EventQueryResponse> {
     const params = this.buildEventQueryParams(query);
-    return this.http.get<EventQueryResponse>(`${this.apiUrl}/my`, { params });
+    return this.http.get<EventQueryResponse>(`${this.apiUrl}/my`, { params }).pipe(
+      map((response) => this.normalizeEventResponse(response))
+    );
   }
 
   /**
    * Get event by ID
    */
   getById(id: number): Observable<EventDto> {
-    return this.http.get<EventDto>(`${this.apiUrl}/${id}`);
+    return this.http.get<EventDto>(`${this.apiUrl}/${id}`).pipe(
+      map((event) => this.normalizeEvent(event))
+    );
   }
 
   /**
    * Get event by ID only if it belongs to current content creator
    */
   getMyById(id: number): Observable<EventDto> {
-    return this.http.get<EventDto>(`${this.apiUrl}/${id}`);
+    return this.http.get<EventDto>(`${this.apiUrl}/${id}`).pipe(
+      map((event) => this.normalizeEvent(event))
+    );
   }
 
   /**
@@ -205,21 +219,27 @@ export class EventService {
    * Create new event
    */
   create(dto: CreateEventDto): Observable<EventDto> {
-    return this.http.post<EventDto>(this.apiUrl, dto);
+    return this.http.post<EventDto>(this.apiUrl, dto).pipe(
+      map((event) => this.normalizeEvent(event))
+    );
   }
 
   /**
    * Update existing event
    */
   update(id: number, dto: UpdateEventDto): Observable<EventDto> {
-    return this.http.put<EventDto>(`${this.apiUrl}/${id}`, dto);
+    return this.http.put<EventDto>(`${this.apiUrl}/${id}`, dto).pipe(
+      map((event) => this.normalizeEvent(event))
+    );
   }
 
   /**
    * Approve or decline event as manager
    */
   approve(id: number, dto: ApproveContentDto): Observable<EventDto> {
-    return this.http.post<EventDto>(`${this.apiUrl}/${id}/approve`, dto);
+    return this.http.post<EventDto>(`${this.apiUrl}/${id}/approve`, dto).pipe(
+      map((event) => this.normalizeEvent(event))
+    );
   }
 
   /**
@@ -239,7 +259,9 @@ export class EventService {
   }
 
   addImage(eventId: number, dto: AddEventImageDto): Observable<EventImageDto> {
-    return this.http.post<EventImageDto>(`${this.apiUrl}/${eventId}/images`, dto);
+    return this.http.post<EventImageDto>(`${this.apiUrl}/${eventId}/images`, dto).pipe(
+      map((image) => normalizeMediaRow(image))
+    );
   }
 
   uploadImage(eventId: number, file: File, isMain = false, altText?: string): Observable<EventImageDto> {
@@ -250,11 +272,15 @@ export class EventService {
       formData.append('altText', altText.trim());
     }
 
-    return this.http.post<EventImageDto>(`${this.apiUrl}/${eventId}/images`, formData);
+    return this.http.post<EventImageDto>(`${this.apiUrl}/${eventId}/images`, formData).pipe(
+      map((image) => normalizeMediaRow(image))
+    );
   }
 
   getImages(eventId: number): Observable<EventImageDto[]> {
-    return this.http.get<EventImageDto[]>(`${this.apiUrl}/${eventId}/images`);
+    return this.http.get<EventImageDto[]>(`${this.apiUrl}/${eventId}/images`).pipe(
+      map((images) => normalizeMediaRows(images))
+    );
   }
 
   deleteImageById(imageId: number): Observable<void> {
@@ -262,7 +288,9 @@ export class EventService {
   }
 
   setMainImage(imageId: number): Observable<EventImageDto> {
-    return this.http.patch<EventImageDto>(`${environment.apiUrl}/images/${imageId}/set-main`, {});
+    return this.http.patch<EventImageDto>(`${environment.apiUrl}/images/${imageId}/set-main`, {}).pipe(
+      map((image) => normalizeMediaRow(image))
+    );
   }
 
   /** Sequential attach after event creation; first URL becomes main. */
@@ -276,5 +304,23 @@ export class EventService {
       concatMap((url, index) => this.addImage(eventId, { url, isMain: index === 0 })),
       toArray()
     );
+  }
+
+  private normalizeEvent(event: EventDto): EventDto {
+    return normalizeEntityMedia(event);
+  }
+
+  private normalizeEventResponse(response: EventQueryResponse): EventQueryResponse {
+    return {
+      ...response,
+      items: (response?.items ?? []).map((event) => this.normalizeEvent(event))
+    };
+  }
+
+  private normalizePagedEvents(response: PagedEventResultDto<EventDto>): PagedEventResultDto<EventDto> {
+    return {
+      ...response,
+      items: (response?.items ?? []).map((event) => this.normalizeEvent(event))
+    };
   }
 }

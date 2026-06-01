@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, concatMap, from, map, of, toArray } from 'rxjs';
 import { environment } from '../../environment/environment';
 import { ActiveRegionService, RegionRequestOptions } from './active-region';
+import { normalizeEntityMedia, normalizeMediaRow, normalizeMediaRows } from '../shared/utils/media-url';
 
 export interface LocalityDto {
   id: number;
@@ -99,19 +100,30 @@ export class LocalityService {
       });
     }
 
-    return this.http.get<PagedResultDto<LocalityDto>>(this.apiUrl, { params });
+    return this.http.get<PagedResultDto<LocalityDto>>(this.apiUrl, { params }).pipe(
+      map((response) => ({
+        ...response,
+        items: (response?.items ?? []).map((item) => this.normalizeLocality(item))
+      }))
+    );
   }
 
   create(dto: CreateLocalityDto): Observable<LocalityDto> {
-    return this.http.post<LocalityDto>(this.apiUrl, dto);
+    return this.http.post<LocalityDto>(this.apiUrl, dto).pipe(
+      map((item) => this.normalizeLocality(item))
+    );
   }
 
   getById(id: number): Observable<LocalityDto> {
-    return this.http.get<LocalityDto>(`${this.apiUrl}/${id}`);
+    return this.http.get<LocalityDto>(`${this.apiUrl}/${id}`).pipe(
+      map((item) => this.normalizeLocality(item))
+    );
   }
 
   update(id: number, dto: UpdateLocalityDto): Observable<LocalityDto> {
-    return this.http.put<LocalityDto>(`${this.apiUrl}/${id}`, dto);
+    return this.http.put<LocalityDto>(`${this.apiUrl}/${id}`, dto).pipe(
+      map((item) => this.normalizeLocality(item))
+    );
   }
 
   delete(id: number): Observable<void> {
@@ -119,14 +131,18 @@ export class LocalityService {
   }
 
   getImages(localityId: number): Observable<LocalityImageDto[]> {
-    return this.http.get<LocalityImageDto[]>(`${this.apiUrl}/${localityId}/images`);
+    return this.http.get<LocalityImageDto[]>(`${this.apiUrl}/${localityId}/images`).pipe(
+      map((images) => normalizeMediaRows(images))
+    );
   }
 
   addImage(localityId: number, file: File, isMain: boolean): Observable<LocalityImageDto> {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('isMain', String(isMain));
-    return this.http.post<LocalityImageDto>(`${this.apiUrl}/${localityId}/images`, formData);
+    return this.http.post<LocalityImageDto>(`${this.apiUrl}/${localityId}/images`, formData).pipe(
+      map((image) => normalizeMediaRow(image))
+    );
   }
 
   attachImages(localityId: number, files: File[], primaryIndex = 0): Observable<LocalityImageDto[]> {
@@ -184,5 +200,9 @@ export class LocalityService {
       value,
       label: value
     }));
+  }
+
+  private normalizeLocality(item: LocalityDto): LocalityDto {
+    return normalizeEntityMedia(item);
   }
 }

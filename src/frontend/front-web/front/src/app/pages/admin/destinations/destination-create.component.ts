@@ -66,6 +66,8 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
   private isHydratingForm = false;
 
   isSubmitting = false;
+  isDeleting = false;
+  showDeleteConfirmModal = false;
   isLoadingRegions = true;
   errorMessage = '';
   galleryErrorMessage = '';
@@ -891,14 +893,14 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
   }
 
   onSaveDraft(): void {
-    if (this.isEditBlocked || !this.validateBasics() || this.isSubmitting) {
+    if (this.isEditBlocked || !this.validateBasics() || this.isSubmitting || this.isDeleting) {
       return;
     }
     this.persist(false);
   }
 
   onSubmit(): void {
-    if (this.isEditBlocked || !this.validateBasics() || this.isSubmitting) {
+    if (this.isEditBlocked || !this.validateBasics() || this.isSubmitting || this.isDeleting) {
       return;
     }
     this.persist(true);
@@ -1149,5 +1151,44 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
 
   onCancel(): void {
     this.router.navigate(['/admin/destinations']);
+  }
+
+  onDeleteDestination(): void {
+    if (!this.isEditMode || this.editDestinationId == null || this.isDeleting || this.isSubmitting) {
+      return;
+    }
+
+    this.showDeleteConfirmModal = true;
+  }
+
+  closeDeleteConfirmModal(): void {
+    if (this.isDeleting) {
+      return;
+    }
+
+    this.showDeleteConfirmModal = false;
+  }
+
+  confirmDeleteDestination(): void {
+    if (!this.isEditMode || this.editDestinationId == null || this.isDeleting || this.isSubmitting) {
+      return;
+    }
+
+    this.isDeleting = true;
+    this.errorMessage = '';
+
+    this.destinationService
+      .delete(this.editDestinationId)
+      .pipe(finalize(() => (this.isDeleting = false)))
+      .subscribe({
+        next: () => {
+          this.showDeleteConfirmModal = false;
+          this.router.navigate(['/admin/destinations']);
+        },
+        error: (err) => {
+          this.errorMessage = this.extractApiErrorMessage(err);
+          this.cdr.detectChanges();
+        }
+      });
   }
 }

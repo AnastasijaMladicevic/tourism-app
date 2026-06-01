@@ -10,6 +10,14 @@ function isAuthEndpoint(url: string): boolean {
   return /\/login$|\/register$|\/refresh$|\/logout$/i.test(url);
 }
 
+function isPublicImageReadRequest<T>(request: HttpRequest<T>): boolean {
+  if (request.method.toUpperCase() !== 'GET') {
+    return false;
+  }
+
+  return /\/api\/(?:objects|activities|events|destinations|localities)\/\d+\/images(?:\/main)?(?:\?.*)?$/i.test(request.url);
+}
+
 function withAuthHeader<T>(request: HttpRequest<T>, token: string): HttpRequest<T> {
   return request.clone({
     setHeaders: {
@@ -46,7 +54,10 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
   const token = authService.getToken();
   const language = 'en-US';
   const authRequest =
-    token && !request.headers.has('Authorization') && !isAuthEndpoint(request.url)
+    token &&
+    !request.headers.has('Authorization') &&
+    !isAuthEndpoint(request.url) &&
+    !isPublicImageReadRequest(request)
       ? withAuthHeader(request, token)
       : request;
   const localizedRequest = authRequest.headers.has('accept-language')

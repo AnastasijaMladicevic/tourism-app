@@ -18,6 +18,7 @@ namespace TuristickiVodic.API.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> GetAll(int eventId)
         {
             try
@@ -31,6 +32,7 @@ namespace TuristickiVodic.API.Controllers
         }
 
         [HttpGet("main")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetMain(int eventId)
         {
             try
@@ -55,7 +57,7 @@ namespace TuristickiVodic.API.Controllers
             try
             {
                 var result = await _service.AddToEventAsync(eventId, dto, GetUserId(), GetRole());
-                return CreatedAtAction(nameof(ImagesController.GetById), "Image", new { id = result.Id }, result);
+                return Created($"/api/images/{result.Id}", result);
             }
             catch (UnauthorizedAccessException)
             {

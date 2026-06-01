@@ -351,6 +351,16 @@ namespace TuristickiVodic.Services
             if (destination == null)
                 return false;
 
+            var managers = await _context.Users
+                .Where(u => u.ManagedDestinationId == id)
+                .ToListAsync();
+
+            foreach (var manager in managers)
+            {
+                manager.ManagedDestinationId = null;
+                manager.UpdatedAt = DateTime.UtcNow;
+            }
+
             _context.Destinations.Remove(destination);
             await _context.SaveChangesAsync();
 

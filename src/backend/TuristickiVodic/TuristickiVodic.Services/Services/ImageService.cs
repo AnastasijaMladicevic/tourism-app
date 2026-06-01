@@ -284,7 +284,7 @@ namespace TuristickiVodic.Services.Services
             if (file.Length > 10 * 1024 * 1024)
                 throw new InvalidOperationException("Slika ne sme biti veća od 10MB.");
 
-            var folder = Path.Combine(_environment.WebRootPath, "images", subfolder);
+            var folder = Path.Combine(GetWebRootPath(), "images", subfolder);
             Directory.CreateDirectory(folder);
 
             // Uvek čuvamo kao .jpg nakon kompresije
@@ -292,19 +292,30 @@ namespace TuristickiVodic.Services.Services
             var fullPath = Path.Combine(folder, fileName);
 
             using var inputStream = file.OpenReadStream();
-            using var image = await ImageSharpImage.LoadAsync(inputStream);
-
-            // Smanji samo ako je šira od MaxWidthPx, ne povećavaj male slike
-            if (image.Width > MaxWidthPx)
+            ImageSharpImage image;
+            try
             {
-                image.Mutate(x => x.Resize(new ResizeOptions
-                {
-                    Size = new ImageSharpSize(MaxWidthPx, 0),
-                    Mode = ResizeMode.Max
-                }));
+                image = await ImageSharpImage.LoadAsync(inputStream);
+            }
+            catch (UnknownImageFormatException)
+            {
+                throw new InvalidOperationException("Dozvoljeni formati su: JPG, PNG, WEBP.");
             }
 
-            await image.SaveAsJpegAsync(fullPath, new JpegEncoder { Quality = JpegQuality });
+            using (image)
+            {
+                // Smanji samo ako je šira od MaxWidthPx, ne povećavaj male slike
+                if (image.Width > MaxWidthPx)
+                {
+                    image.Mutate(x => x.Resize(new ResizeOptions
+                    {
+                        Size = new ImageSharpSize(MaxWidthPx, 0),
+                        Mode = ResizeMode.Max
+                    }));
+                }
+
+                await image.SaveAsJpegAsync(fullPath, new JpegEncoder { Quality = JpegQuality });
+            }
 
             return $"/images/{subfolder}/{fileName}";
         }
@@ -321,7 +332,7 @@ namespace TuristickiVodic.Services.Services
                     return;
 
                 var relativePath = relativeUrl.TrimStart('/').Replace('/', Path.DirectorySeparatorChar);
-                var fullPath = Path.Combine(_environment.WebRootPath, relativePath);
+                var fullPath = Path.Combine(GetWebRootPath(), relativePath);
 
                 if (File.Exists(fullPath))
                     File.Delete(fullPath);
@@ -330,6 +341,17 @@ namespace TuristickiVodic.Services.Services
             {
                 // Ne prekidamo operaciju ako brisanje fajla ne uspe
             }
+        }
+
+        private string GetWebRootPath()
+        {
+            if (!string.IsNullOrWhiteSpace(_environment.WebRootPath))
+                return _environment.WebRootPath;
+
+            if (!string.IsNullOrWhiteSpace(_environment.ContentRootPath))
+                return Path.Combine(_environment.ContentRootPath, "wwwroot");
+
+            return Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
         }
 
         // ─── Pomoćne metode (nepromenjene) ──────────────────────────────────────

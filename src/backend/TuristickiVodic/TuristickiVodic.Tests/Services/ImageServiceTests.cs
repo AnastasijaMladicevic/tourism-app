@@ -34,6 +34,18 @@ namespace TuristickiVodic.Tests.Services
 
             var mock = new Mock<IWebHostEnvironment>();
             mock.SetupGet(x => x.WebRootPath).Returns(root);
+            mock.SetupGet(x => x.ContentRootPath).Returns(Path.GetDirectoryName(root)!);
+            return mock.Object;
+        }
+
+        private static IWebHostEnvironment CreateEnvironmentWithoutWebRoot()
+        {
+            var contentRoot = Path.Combine(Path.GetTempPath(), "tv-images-tests", Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(contentRoot);
+
+            var mock = new Mock<IWebHostEnvironment>();
+            mock.SetupGet(x => x.WebRootPath).Returns((string?)null);
+            mock.SetupGet(x => x.ContentRootPath).Returns(contentRoot);
             return mock.Object;
         }
 
@@ -155,6 +167,9 @@ namespace TuristickiVodic.Tests.Services
         private static ImageService CreateService(AppDbContext ctx) =>
             new ImageService(ctx, CreateMapper(), CreateEnvironment());
 
+        private static ImageService CreateService(AppDbContext ctx, IWebHostEnvironment environment) =>
+            new ImageService(ctx, CreateMapper(), environment);
+
         [Fact]
         public async Task GetByIdAsync_KadSlikaPostoji_VracaDto()
         {
@@ -181,6 +196,23 @@ namespace TuristickiVodic.Tests.Services
             result.IsMain.Should().BeTrue();
             result.ObjectId.Should().Be(1);
             result.Url.Should().StartWith("/images/objects/");
+        }
+
+        [Fact]
+        public async Task AddToObjectAsync_KadWebRootNijePostavljen_KoristiContentRootFallback()
+        {
+            using var ctx = CreateContext();
+            SeedObject(ctx, createdByUserId: 5);
+            var environment = CreateEnvironmentWithoutWebRoot();
+            var svc = CreateService(ctx, environment);
+
+            var result = await svc.AddToObjectAsync(1, BuildAddDto("fallback.png", true), 5, "ContentCreator");
+
+            result.Url.Should().StartWith("/images/objects/");
+
+            var savedFileName = Path.GetFileName(result.Url);
+            var expectedPath = Path.Combine(environment.ContentRootPath, "wwwroot", "images", "objects", savedFileName);
+            File.Exists(expectedPath).Should().BeTrue();
         }
 
         [Fact]

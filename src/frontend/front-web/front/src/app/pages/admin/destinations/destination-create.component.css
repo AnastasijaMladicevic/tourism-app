@@ -99,6 +99,78 @@
   border-color: #dbe4ef;
 }
 
+.btn-danger {
+  background: #fff1f2;
+  color: #be123c;
+  border-color: #fecdd3;
+}
+
+.btn-danger:hover:not(:disabled) {
+  background: #ffe4e6;
+  border-color: #fda4af;
+}
+
+.destination-delete-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1300;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(15, 23, 42, 0.48);
+  backdrop-filter: blur(6px);
+}
+
+.destination-delete-modal {
+  width: min(100%, 460px);
+  padding: 24px;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 18px 44px rgba(15, 23, 42, 0.24);
+  text-align: center;
+}
+
+.destination-delete-icon {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 14px;
+  border-radius: 50%;
+  background: #fee2e2;
+  color: #ef4444;
+  display: grid;
+  place-items: center;
+}
+
+.destination-delete-icon .material-symbols-outlined {
+  font-size: 30px;
+}
+
+.destination-delete-modal h3 {
+  margin: 0;
+  font-size: 32px;
+  line-height: 1.05;
+  color: #111827;
+}
+
+.destination-delete-modal p {
+  margin: 12px auto 0;
+  max-width: 340px;
+  color: #6b7280;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.destination-delete-actions {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.destination-delete-actions .btn {
+  min-height: 44px;
+}
+
 .btn-with-icon .material-symbols-outlined {
   font-size: 18px;
   font-variation-settings: 'FILL' 0, 'wght' 500;

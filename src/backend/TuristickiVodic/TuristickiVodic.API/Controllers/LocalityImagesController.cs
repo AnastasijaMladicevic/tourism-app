@@ -60,7 +60,7 @@ namespace TuristickiVodic.API.Controllers
             try
             {
                 var created = await _imageService.AddToLocalityAsync(localityId, dto, GetUserId(), GetRoleName());
-                return CreatedAtAction(nameof(ImagesController.GetById), "Image", new { id = created.Id }, created);
+                return Created($"/api/images/{created.Id}", created);
             }
             catch (UnauthorizedAccessException)
             {

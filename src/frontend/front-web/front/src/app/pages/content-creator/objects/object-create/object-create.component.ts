@@ -3,7 +3,7 @@ import { ChangeDetectorRef, Component, NgZone, OnDestroy, OnInit, inject } from 
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { forkJoin, from, Observable, of } from 'rxjs';
+import { EMPTY, forkJoin, from, Observable, of } from 'rxjs';
 import { catchError, concatMap, finalize, map, switchMap, tap, toArray } from 'rxjs/operators';
 import { ApproveContentDto } from '../../../../models/event.model';
 import {
@@ -912,8 +912,8 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
         this.errorMessage = msg;
         this.isEditMode = true;
         this.objectId = created.id;
-        this.router.navigate(['/content-creator/objects/edit', created.id], { replaceUrl: true });
-        return of(created);
+        this.location.replaceState(`/content-creator/objects/edit/${created.id}`);
+        return EMPTY;
       })
     );
   }

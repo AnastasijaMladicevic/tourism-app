@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, from, map, of } from 'rxjs';
 import { concatMap, toArray } from 'rxjs/operators';
 import { environment } from '../../environment/environment';
+import { normalizeEntityMedia, normalizeMediaRow, normalizeMediaRows } from '../shared/utils/media-url';
 
 export interface ActivityDto {
   id: number;
@@ -141,7 +142,9 @@ export class ActivitiesService {
    */
   getMyActivities(query?: ActivityQueryDto): Observable<ActivityQueryResponse> {
     const params = this.buildActivityQueryParams(query);
-    return this.http.get<ActivityQueryResponse>(`${this.apiUrl}/my`, { params });
+    return this.http.get<ActivityQueryResponse>(`${this.apiUrl}/my`, { params }).pipe(
+      map((response) => this.normalizeActivityResponse(response))
+    );
   }
 
   /**
@@ -149,15 +152,21 @@ export class ActivitiesService {
    */
   getForManager(query?: ActivityQueryDto): Observable<ActivityQueryResponse> {
     const params = this.buildActivityQueryParams(query);
-    return this.http.get<ActivityQueryResponse>(`${this.apiUrl}/manager`, { params });
+    return this.http.get<ActivityQueryResponse>(`${this.apiUrl}/manager`, { params }).pipe(
+      map((response) => this.normalizeActivityResponse(response))
+    );
   }
 
   create(dto: CreateActivityDto): Observable<ActivityDto> {
-    return this.http.post<ActivityDto>(this.apiUrl, dto);
+    return this.http.post<ActivityDto>(this.apiUrl, dto).pipe(
+      map((activity) => this.normalizeActivity(activity))
+    );
   }
 
   getById(id: number): Observable<ActivityDto> {
-    return this.http.get<ActivityDto>(`${this.apiUrl}/${id}`);
+    return this.http.get<ActivityDto>(`${this.apiUrl}/${id}`).pipe(
+      map((activity) => this.normalizeActivity(activity))
+    );
   }
 
   getImages(id: number): Observable<ActivityImageDto[]> {
@@ -170,18 +179,15 @@ export class ActivitiesService {
       .pipe(
         map((response) => {
           const items = this.extractItems(response);
-          return items
-            .map((image) => ({
-              ...image,
-              url: image.url?.trim() ?? ''
-            }))
-            .filter((image) => !!image.url);
+          return normalizeMediaRows(items);
         })
       );
   }
 
   update(id: number, dto: UpdateActivityDto): Observable<ActivityDto> {
-    return this.http.put<ActivityDto>(`${this.apiUrl}/${id}`, dto);
+    return this.http.put<ActivityDto>(`${this.apiUrl}/${id}`, dto).pipe(
+      map((activity) => this.normalizeActivity(activity))
+    );
   }
 
   addImage(activityId: number, file: File, isMain = false, altText?: string): Observable<ActivityImageDto> {
@@ -192,7 +198,9 @@ export class ActivitiesService {
       formData.append('altText', altText.trim());
     }
 
-    return this.http.post<ActivityImageDto>(`${this.apiUrl}/${activityId}/images`, formData);
+    return this.http.post<ActivityImageDto>(`${this.apiUrl}/${activityId}/images`, formData).pipe(
+      map((image) => normalizeMediaRow(image))
+    );
   }
 
   deleteImageById(imageId: number): Observable<void> {
@@ -200,7 +208,9 @@ export class ActivitiesService {
   }
 
   setMainImage(imageId: number): Observable<ActivityImageDto> {
-    return this.http.patch<ActivityImageDto>(`${environment.apiUrl}/images/${imageId}/set-main`, {});
+    return this.http.patch<ActivityImageDto>(`${environment.apiUrl}/images/${imageId}/set-main`, {}).pipe(
+      map((image) => normalizeMediaRow(image))
+    );
   }
 
   delete(id: number): Observable<void> {
@@ -215,7 +225,9 @@ export class ActivitiesService {
   }
 
   approve(id: number, dto: ApproveActivityDto): Observable<ActivityDto> {
-    return this.http.post<ActivityDto>(`${this.apiUrl}/${id}/approve`, dto);
+    return this.http.post<ActivityDto>(`${this.apiUrl}/${id}/approve`, dto).pipe(
+      map((activity) => this.normalizeActivity(activity))
+    );
   }
 
   /**
@@ -314,5 +326,16 @@ export class ActivitiesService {
     }
 
     return params;
+  }
+
+  private normalizeActivity(activity: ActivityDto): ActivityDto {
+    return normalizeEntityMedia(activity);
+  }
+
+  private normalizeActivityResponse(response: ActivityQueryResponse): ActivityQueryResponse {
+    return {
+      ...response,
+      items: (response?.items ?? []).map((activity) => this.normalizeActivity(activity))
+    };
   }
 }

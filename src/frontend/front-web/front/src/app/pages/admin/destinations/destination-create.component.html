@@ -11,14 +11,25 @@
         <h1 class="page-title">{{ form.name.trim() || 'New destination' }}</h1>
       </div>
       <div class="title-actions">
-        <button type="button" class="btn btn-ghost btn-with-icon" (click)="onSaveDraft()" [disabled]="isSubmitting || isLoadingDestination || isEditBlocked || !selectedManager">
+        <button type="button" class="btn btn-ghost btn-with-icon" (click)="onSaveDraft()" [disabled]="isSubmitting || isDeleting || isLoadingDestination || isEditBlocked || !selectedManager">
           <span class="material-symbols-outlined">save</span>
           Save draft
         </button>
-        <button type="button" class="btn btn-primary btn-with-icon" (click)="onSubmit()" [disabled]="isSubmitting || isLoadingDestination || isEditBlocked || !selectedManager">
+        <button type="button" class="btn btn-primary btn-with-icon" (click)="onSubmit()" [disabled]="isSubmitting || isDeleting || isLoadingDestination || isEditBlocked || !selectedManager">
           <span class="material-symbols-outlined">check_circle</span>
           {{ isSubmitting ? 'Saving…' : isEditMode ? 'Save changes' : 'Create destination' }}
         </button>
+        @if (isEditMode) {
+          <button
+            type="button"
+            class="btn btn-danger btn-with-icon"
+            (click)="onDeleteDestination()"
+            [disabled]="isSubmitting || isDeleting || isLoadingDestination"
+          >
+            <span class="material-symbols-outlined">delete</span>
+            {{ isDeleting ? 'Deletingâ€¦' : 'Delete destination' }}
+          </button>
+        }
         <button type="button" class="btn btn-ghost" (click)="onCancel()">Cancel</button>
       </div>
     </div>
@@ -447,4 +458,34 @@
       </article>
     </aside>
   </div>
+
+  @if (showDeleteConfirmModal) {
+    <div class="destination-delete-backdrop" (click)="closeDeleteConfirmModal()">
+      <section
+        class="card destination-delete-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="destination-delete-title"
+        aria-describedby="destination-delete-description"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="destination-delete-icon" aria-hidden="true">
+          <span class="material-symbols-outlined">delete</span>
+        </div>
+        <h3 id="destination-delete-title">Delete destination?</h3>
+        <p id="destination-delete-description">
+          This will remove the destination, its localities, direct objects, destination images, and destination favorites.
+          This action cannot be undone.
+        </p>
+        <div class="destination-delete-actions">
+          <button type="button" class="btn btn-ghost" (click)="closeDeleteConfirmModal()" [disabled]="isDeleting">
+            Cancel
+          </button>
+          <button type="button" class="btn btn-danger" (click)="confirmDeleteDestination()" [disabled]="isDeleting">
+            {{ isDeleting ? 'Deleting...' : 'Delete' }}
+          </button>
+        </div>
+      </section>
+    </div>
+  }
 </div>

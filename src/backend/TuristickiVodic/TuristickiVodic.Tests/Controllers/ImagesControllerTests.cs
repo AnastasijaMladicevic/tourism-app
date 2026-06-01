@@ -1,7 +1,9 @@
 using FluentAssertions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using System.Reflection;
 using TuristickiVodic.API.Controllers;
 using TuristickiVodic.Core.DTO;
 using TuristickiVodic.Services.Services;
@@ -247,8 +249,8 @@ namespace TuristickiVodic.Tests.Controllers
 
             var result = await DestCtrl(mock.Object, 1, "Admin").Add(5, dto);
 
-            var createdResult = result.Should().BeOfType<CreatedAtActionResult>().Subject;
-            createdResult.RouteValues!["id"].Should().Be(10);
+            var createdResult = result.Should().BeOfType<CreatedResult>().Subject;
+            createdResult.Location.Should().Be("/api/images/10");
             createdResult.Value.Should().BeEquivalentTo(created);
         }
 
@@ -286,7 +288,8 @@ namespace TuristickiVodic.Tests.Controllers
 
             var result = await LocCtrl(mock.Object, 10, "Manager").Add(3, dto);
 
-            result.Should().BeOfType<CreatedAtActionResult>();
+            var createdResult = result.Should().BeOfType<CreatedResult>().Subject;
+            createdResult.Location.Should().Be("/api/images/20");
         }
 
         [Fact]
@@ -301,6 +304,24 @@ namespace TuristickiVodic.Tests.Controllers
             result.Should().BeOfType<ForbidResult>();
         }
 
+        [Theory]
+        [InlineData(typeof(ObjectImagesController), nameof(ObjectImagesController.GetAll))]
+        [InlineData(typeof(ObjectImagesController), nameof(ObjectImagesController.GetMain))]
+        [InlineData(typeof(ActivityImagesController), nameof(ActivityImagesController.GetAll))]
+        [InlineData(typeof(ActivityImagesController), nameof(ActivityImagesController.GetMain))]
+        [InlineData(typeof(EventImagesController), nameof(EventImagesController.GetAll))]
+        [InlineData(typeof(EventImagesController), nameof(EventImagesController.GetMain))]
+        public void Public_Image_Read_Endpoints_Are_Explicitly_Anonymous(Type controllerType, string methodName)
+        {
+            var method = controllerType.GetMethod(methodName, BindingFlags.Instance | BindingFlags.Public);
+
+            method.Should().NotBeNull($"{controllerType.Name}.{methodName} should exist");
+            method!
+                .GetCustomAttributes(typeof(AllowAnonymousAttribute), inherit: true)
+                .Should()
+                .ContainSingle($"{controllerType.Name}.{methodName} must stay public for gallery/thumbnail loading");
+        }
+
         [Fact]
         public async Task Object_Add_ValidnaSlika_VracaCreated()
         {
@@ -311,7 +332,8 @@ namespace TuristickiVodic.Tests.Controllers
 
             var result = await ObjCtrl(mock.Object, 5, "ContentCreator").Add(7, dto);
 
-            result.Should().BeOfType<CreatedAtActionResult>();
+            var createdResult = result.Should().BeOfType<CreatedResult>().Subject;
+            createdResult.Location.Should().Be("/api/images/30");
         }
 
         [Fact]
@@ -336,7 +358,8 @@ namespace TuristickiVodic.Tests.Controllers
 
             var result = await ActCtrl(mock.Object, 5, "ContentCreator").Add(4, dto);
 
-            result.Should().BeOfType<CreatedAtActionResult>();
+            var createdResult = result.Should().BeOfType<CreatedResult>().Subject;
+            createdResult.Location.Should().Be("/api/images/40");
         }
 
         [Fact]
@@ -361,7 +384,8 @@ namespace TuristickiVodic.Tests.Controllers
 
             var result = await EvCtrl(mock.Object, 5, "ContentCreator").Add(6, dto);
 
-            result.Should().BeOfType<CreatedAtActionResult>();
+            var createdResult = result.Should().BeOfType<CreatedResult>().Subject;
+            createdResult.Location.Should().Be("/api/images/50");
         }
 
         [Fact]

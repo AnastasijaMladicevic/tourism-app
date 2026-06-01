@@ -1170,6 +1170,37 @@ namespace TuristickiVodic.Tests.Services
             ctx.Destinations.Find(8).Should().BeNull();
         }
 
+        [Fact]
+        public async Task DeleteAsync_OslobadjaMenadzeraDestinacije()
+        {
+            using var ctx = CreateInMemoryContext(nameof(DeleteAsync_OslobadjaMenadzeraDestinacije));
+            var (_, managerRole, _, tip) = SeedBase(ctx);
+
+            var manager = CreateManager(81, "manager-delete@test.com", managerRole, managedDestId: 9);
+            ctx.Users.Add(manager);
+
+            var dest = new Destination
+            {
+                Id = 9,
+                Name = "Delete me",
+                DestinationTypeId = tip.Id,
+                DestinationType = tip,
+                ManagedByUserId = manager.Id,
+                CreatedByUserId = 99,
+                Status = ContentStatus.Approved
+            };
+
+            ctx.Destinations.Add(dest);
+            ctx.SaveChanges();
+
+            var svc = new DestinationService(ctx, CreateMapper());
+            var deleted = await svc.DeleteAsync(9);
+
+            deleted.Should().BeTrue();
+            ctx.Destinations.Find(9).Should().BeNull();
+            ctx.Users.Find(manager.Id)!.ManagedDestinationId.Should().BeNull();
+        }
+
         private sealed class TrackingTranslationService : ITranslationService
         {
             public Task<string> GetTextAsync(

@@ -6,6 +6,7 @@ import { environment } from '../../environment/environment';
 import { ReviewDto } from './review';
 import { ActiveRegionService, RegionRequestOptions } from './active-region';
 import { ApproveContentDto } from '../models/event.model';
+import { normalizeEntityMedia, normalizeMediaRow, normalizeMediaRows } from '../shared/utils/media-url';
 
 export interface ObjectImageDto {
   id: number;
@@ -264,11 +265,15 @@ export class ObjectService {
       });
     }
 
-    return this.http.get<ObjectDto[]>(this.url, { params });
+    return this.http.get<ObjectDto[]>(this.url, { params }).pipe(
+      map((items) => (items ?? []).map((item) => this.normalizeObject(item)))
+    );
   }
 
   getById(id: number): Observable<ObjectDto> {
-    return this.http.get<ObjectDto>(`${this.url}/${id}`);
+    return this.http.get<ObjectDto>(`${this.url}/${id}`).pipe(
+      map((item) => this.normalizeObject(item))
+    );
   }
 
   getNearby(
@@ -295,7 +300,9 @@ export class ObjectService {
       params = params.set(key, String(value));
     });
 
-    return this.http.get<PagedResultDto<ObjectDto>>(`${this.url}/nearby`, { params });
+    return this.http.get<PagedResultDto<ObjectDto>>(`${this.url}/nearby`, { params }).pipe(
+      map((response) => this.normalizePagedObjects(response))
+    );
   }
 
   getByType(typeName: string): Observable<ObjectDto[]> {
@@ -317,7 +324,9 @@ export class ObjectService {
       });
     }
 
-    return this.http.get<PagedResultDto<ObjectDto>>(`${this.url}/my`, { params });
+    return this.http.get<PagedResultDto<ObjectDto>>(`${this.url}/my`, { params }).pipe(
+      map((response) => this.normalizePagedObjects(response))
+    );
   }
 
   /** Objects assigned to the signed-in manager's destinations (server-scoped; do not apply client region filter). */
@@ -332,7 +341,9 @@ export class ObjectService {
       });
     }
 
-    return this.http.get<PagedResultDto<ObjectDto>>(`${this.url}/manager`, { params });
+    return this.http.get<PagedResultDto<ObjectDto>>(`${this.url}/manager`, { params }).pipe(
+      map((response) => this.normalizePagedObjects(response))
+    );
   }
 
   getManagerFilterOptions(): Observable<{ typeOptions: FilterOption[]; statusOptions: FilterOption[] }> {
@@ -417,7 +428,9 @@ export class ObjectService {
   }
 
   create(dto: CreateObjectDto): Observable<ObjectDto> {
-    return this.http.post<ObjectDto>(this.url, dto);
+    return this.http.post<ObjectDto>(this.url, dto).pipe(
+      map((item) => this.normalizeObject(item))
+    );
   }
 
   addImage(objectId: number, file: File, isMain = false, altText?: string): Observable<ObjectImageDto> {
@@ -428,12 +441,16 @@ export class ObjectService {
       formData.append('altText', altText.trim());
     }
 
-    return this.http.post<ObjectImageDto>(`${this.url}/${objectId}/images`, formData);
+    return this.http.post<ObjectImageDto>(`${this.url}/${objectId}/images`, formData).pipe(
+      map((image) => normalizeMediaRow(image))
+    );
   }
 
   /** Lists images linked to a tourist object (same payload as `ObjectDto.images` when populated). */
   getImages(objectId: number): Observable<ObjectImageDto[]> {
-    return this.http.get<ObjectImageDto[]>(`${this.url}/${objectId}/images`);
+    return this.http.get<ObjectImageDto[]>(`${this.url}/${objectId}/images`).pipe(
+      map((images) => normalizeMediaRows(images))
+    );
   }
 
   /** Deletes a stored image row by global image id (`api/images/{id}`). */
@@ -443,15 +460,21 @@ export class ObjectService {
 
   /** Marks an image as the main image for its entity. */
   setMainImage(imageId: number): Observable<ObjectImageDto> {
-    return this.http.patch<ObjectImageDto>(`${environment.apiUrl}/images/${imageId}/set-main`, {});
+    return this.http.patch<ObjectImageDto>(`${environment.apiUrl}/images/${imageId}/set-main`, {}).pipe(
+      map((image) => normalizeMediaRow(image))
+    );
   }
 
   update(id: number, dto: UpdateObjectDto): Observable<ObjectDto> {
-    return this.http.put<ObjectDto>(`${this.url}/${id}`, dto);
+    return this.http.put<ObjectDto>(`${this.url}/${id}`, dto).pipe(
+      map((item) => this.normalizeObject(item))
+    );
   }
 
   approve(id: number, dto: ApproveContentDto): Observable<ObjectDto> {
-    return this.http.post<ObjectDto>(`${this.url}/${id}/approve`, dto);
+    return this.http.post<ObjectDto>(`${this.url}/${id}/approve`, dto).pipe(
+      map((item) => this.normalizeObject(item))
+    );
   }
 
   delete(id: number): Observable<void> {
@@ -485,5 +508,16 @@ export class ObjectService {
       .filter(Boolean)
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(' ');
+  }
+
+  private normalizeObject(item: ObjectDto): ObjectDto {
+    return normalizeEntityMedia(item);
+  }
+
+  private normalizePagedObjects(response: PagedResultDto<ObjectDto>): PagedResultDto<ObjectDto> {
+    return {
+      ...response,
+      items: (response?.items ?? []).map((item) => this.normalizeObject(item))
+    };
   }
 }

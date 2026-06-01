@@ -1,9 +1,11 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../environment/environment';
 import { DestinationQueryDto, DestinationQueryResponse } from '../models/destination.model';
 import { ActiveRegionService, RegionRequestOptions } from './active-region';
+import { normalizeEntityMedia, normalizeMediaRow, normalizeMediaRows } from '../shared/utils/media-url';
 export interface DestinationDto {
   id: number;
   name: string;
@@ -105,18 +107,29 @@ export class DestinationService {
       });
     }
 
-    return this.http.get<DestinationDto[]>(this.apiUrl, { params });
+    return this.http.get<DestinationDto[] | { items?: DestinationDto[] }>(this.apiUrl, { params }).pipe(
+      map((response) => {
+        const items = Array.isArray(response) ? response : (response?.items ?? []);
+        return items.map((item) => this.normalizeDestination(item));
+      })
+    );
   }
   getById(id: number): Observable<DestinationDto> {
-    return this.http.get<DestinationDto>(`${this.apiUrl}/${id}`);
+    return this.http.get<DestinationDto>(`${this.apiUrl}/${id}`).pipe(
+      map((item) => this.normalizeDestination(item))
+    );
   }
 
   create(dto: CreateDestinationDto): Observable<DestinationDto> {
-    return this.http.post<DestinationDto>(this.apiUrl, dto);
+    return this.http.post<DestinationDto>(this.apiUrl, dto).pipe(
+      map((item) => this.normalizeDestination(item))
+    );
   }
 
   update(id: number, dto: UpdateDestinationDto): Observable<DestinationDto> {
-    return this.http.put<DestinationDto>(`${this.apiUrl}/${id}`, dto);
+    return this.http.put<DestinationDto>(`${this.apiUrl}/${id}`, dto).pipe(
+      map((item) => this.normalizeDestination(item))
+    );
   }
 
   acquireEditLock(id: number): Observable<DestinationEditLockDto> {
@@ -133,7 +146,9 @@ export class DestinationService {
 
   assignManager(id: number, managerUserId: number): Observable<DestinationDto> {
     const body: AssignManagerDto = { managerUserId };
-    return this.http.put<DestinationDto>(`${this.apiUrl}/${id}/assign-manager`, body);
+    return this.http.put<DestinationDto>(`${this.apiUrl}/${id}/assign-manager`, body).pipe(
+      map((item) => this.normalizeDestination(item))
+    );
   }
 
   delete(id: number): Observable<void> {
@@ -141,7 +156,9 @@ export class DestinationService {
   }
 
   getImages(destinationId: number): Observable<DestinationImageDto[]> {
-    return this.http.get<DestinationImageDto[]>(`${environment.apiUrl}/destinations/${destinationId}/images`);
+    return this.http.get<DestinationImageDto[]>(`${environment.apiUrl}/destinations/${destinationId}/images`).pipe(
+      map((images) => normalizeMediaRows(images))
+    );
   }
 
   addImage(destinationId: number, file: File, isMain = false, altText?: string): Observable<DestinationImageDto> {
@@ -154,6 +171,8 @@ export class DestinationService {
     return this.http.post<DestinationImageDto>(
       `${environment.apiUrl}/destinations/${destinationId}/images`,
       formData
+    ).pipe(
+      map((image) => normalizeMediaRow(image))
     );
   }
 
@@ -162,6 +181,12 @@ export class DestinationService {
   }
 
   setMainImage(imageId: number): Observable<DestinationImageDto> {
-    return this.http.patch<DestinationImageDto>(`${environment.apiUrl}/images/${imageId}/set-main`, {});
+    return this.http.patch<DestinationImageDto>(`${environment.apiUrl}/images/${imageId}/set-main`, {}).pipe(
+      map((image) => normalizeMediaRow(image))
+    );
+  }
+
+  private normalizeDestination(item: DestinationDto): DestinationDto {
+    return normalizeEntityMedia(item);
   }
 }
