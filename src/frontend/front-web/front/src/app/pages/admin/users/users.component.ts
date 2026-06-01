@@ -4,6 +4,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { PaginatorComponent } from '../../../shared/components/paginator/paginator';
 import { EMPTY, Observable, TimeoutError, forkJoin, of } from 'rxjs';
 import { catchError, finalize, map, switchMap, tap, timeout } from 'rxjs/operators';
 import {
@@ -80,7 +81,7 @@ interface BannedUserRow {
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, PaginatorComponent],
   templateUrl: './users.component.html',
   styleUrls: [
     './users.component.css',
@@ -817,6 +818,31 @@ export class UsersComponent implements OnInit {
   onBannedPageSizeChange(value: number | string): void {
     this.bannedPageSize = Number(value);
     this.bannedCurrentPage = 1;
+  }
+
+  onAdminGoToPage(page: number): void {
+    if (page >= 1 && page <= this.adminTotalPages) {
+      this.adminCurrentPage = page;
+    }
+  }
+
+  onTouristGoToPage(page: number): void {
+    if (page >= 1 && page <= this.touristTotalPages) {
+      this.touristCurrentPage = page;
+    }
+  }
+
+  onBannedGoToPage(page: number): void {
+    if (page >= 1 && page <= this.bannedTotalPages) {
+      this.bannedCurrentPage = page;
+    }
+  }
+
+  onCreatorRequestsGoToPage(page: number): void {
+    if (page >= 1 && page <= this.creatorRequestsTotalPages) {
+      this.creatorRequestsPage = page;
+      this.loadCreatorRequests();
+    }
   }
 
   onAdminPreviousPage(): void {

@@ -458,40 +458,18 @@
         </table>
       </div>
 
-      <footer class="table-footer">
-        <p>
-          Showing {{ adminPageStart }} to {{ adminPageEnd }} of {{ adminTotalCount }} team members
-        </p>
-        <div class="pagination-buttons">
-          <label class="page-size-control">
-            <span>Page size</span>
-            <select
-              class="page-size-select"
-              [(ngModel)]="adminPageSize"
-              (ngModelChange)="onAdminPageSizeChange($event)"
-            >
-              <option *ngFor="let option of pageSizeOptions" [ngValue]="option">{{ option }}</option>
-            </select>
-          </label>
-
-          <button
-            type="button"
-            class="ghost-btn slim-btn"
-            (click)="onAdminPreviousPage()"
-            [disabled]="adminCurrentPage <= 1"
-          >
-            Previous
-          </button>
-          <button
-            type="button"
-            class="ghost-btn slim-btn"
-            (click)="onAdminNextPage()"
-            [disabled]="adminCurrentPage >= adminTotalPages"
-          >
-            Next
-          </button>
-        </div>
-      </footer>
+      <app-paginator
+        [currentPage]="adminCurrentPage"
+        [totalPages]="adminTotalPages"
+        [pageStart]="adminPageStart"
+        [pageEnd]="adminPageEnd"
+        [totalCount]="adminTotalCount"
+        [pageSize]="adminPageSize"
+        [pageSizeOptions]="pageSizeOptions"
+        itemLabel="team members"
+        (pageChange)="onAdminGoToPage($event)"
+        (pageSizeChange)="onAdminPageSizeChange($event)"
+      ></app-paginator>
 
       <ng-container *ngIf="activeManagerReport as report">
         <div
@@ -777,41 +755,19 @@
           </table>
         </div>
 
-        <footer class="table-footer" *ngIf="!creatorRequestsLoading && creatorRequestsTotalCount > 0">
-          <p>
-            Showing {{ creatorRequestsPageStart }} to {{ creatorRequestsPageEnd }} of
-            {{ creatorRequestsTotalCount }} requests
-          </p>
-          <div class="pagination-buttons">
-            <label class="page-size-control">
-              <span>Page size</span>
-              <select
-                class="page-size-select"
-                [(ngModel)]="creatorRequestsPageSize"
-                (ngModelChange)="onCreatorRequestsPageSizeChange($event)"
-              >
-                <option *ngFor="let option of pageSizeOptions" [ngValue]="option">{{ option }}</option>
-              </select>
-            </label>
-
-            <button
-              type="button"
-              class="ghost-btn slim-btn"
-              (click)="onCreatorRequestsPreviousPage()"
-              [disabled]="creatorRequestsPage <= 1"
-            >
-              Previous
-            </button>
-            <button
-              type="button"
-              class="ghost-btn slim-btn"
-              (click)="onCreatorRequestsNextPage()"
-              [disabled]="creatorRequestsPage >= creatorRequestsTotalPages"
-            >
-              Next
-            </button>
-          </div>
-        </footer>
+        <app-paginator
+          *ngIf="!creatorRequestsLoading && creatorRequestsTotalCount > 0"
+          [currentPage]="creatorRequestsPage"
+          [totalPages]="creatorRequestsTotalPages"
+          [pageStart]="creatorRequestsPageStart"
+          [pageEnd]="creatorRequestsPageEnd"
+          [totalCount]="creatorRequestsTotalCount"
+          [pageSize]="creatorRequestsPageSize"
+          [pageSizeOptions]="pageSizeOptions"
+          itemLabel="requests"
+          (pageChange)="onCreatorRequestsGoToPage($event)"
+          (pageSizeChange)="onCreatorRequestsPageSizeChange($event)"
+        ></app-paginator>
 
         <ng-container *ngIf="approveConfirmRow as approveRow">
           <div
@@ -933,40 +889,18 @@
       </table>
     </div>
 
-    <footer class="table-footer">
-      <p>
-        Showing {{ touristPageStart }} to {{ touristPageEnd }} of {{ touristTotalCount }} tourists
-      </p>
-      <div class="pagination-buttons">
-        <label class="page-size-control">
-          <span>Page size</span>
-          <select
-            class="page-size-select"
-            [(ngModel)]="touristPageSize"
-            (ngModelChange)="onTouristPageSizeChange($event)"
-          >
-            <option *ngFor="let option of pageSizeOptions" [ngValue]="option">{{ option }}</option>
-          </select>
-        </label>
-
-        <button
-          type="button"
-          class="ghost-btn slim-btn"
-          (click)="onTouristPreviousPage()"
-          [disabled]="touristCurrentPage <= 1"
-        >
-          Previous
-        </button>
-        <button
-          type="button"
-          class="ghost-btn slim-btn"
-          (click)="onTouristNextPage()"
-          [disabled]="touristCurrentPage >= touristTotalPages"
-        >
-          Next
-        </button>
-      </div>
-    </footer>
+    <app-paginator
+      [currentPage]="touristCurrentPage"
+      [totalPages]="touristTotalPages"
+      [pageStart]="touristPageStart"
+      [pageEnd]="touristPageEnd"
+      [totalCount]="touristTotalCount"
+      [pageSize]="touristPageSize"
+      [pageSizeOptions]="pageSizeOptions"
+      itemLabel="tourists"
+      (pageChange)="onTouristGoToPage($event)"
+      (pageSizeChange)="onTouristPageSizeChange($event)"
+    ></app-paginator>
     </section>
   </ng-container>
 
@@ -1073,38 +1007,19 @@
       </table>
     </div>
 
-    <footer class="table-footer" *ngIf="bannedUsers.length">
-      <p>Showing {{ bannedPageStart }} to {{ bannedPageEnd }} of {{ bannedTotalCount }} banned users</p>
-      <div class="pagination-buttons">
-        <label class="page-size-control">
-          <span>Page size</span>
-          <select
-            class="page-size-select"
-            [(ngModel)]="bannedPageSize"
-            (ngModelChange)="onBannedPageSizeChange($event)"
-          >
-            <option *ngFor="let option of pageSizeOptions" [ngValue]="option">{{ option }}</option>
-          </select>
-        </label>
-
-        <button
-          type="button"
-          class="ghost-btn slim-btn"
-          (click)="onBannedPreviousPage()"
-          [disabled]="bannedCurrentPage <= 1"
-        >
-          Previous
-        </button>
-        <button
-          type="button"
-          class="ghost-btn slim-btn"
-          (click)="onBannedNextPage()"
-          [disabled]="bannedCurrentPage >= bannedTotalPages"
-        >
-          Next
-        </button>
-      </div>
-    </footer>
+    <app-paginator
+      *ngIf="bannedUsers.length"
+      [currentPage]="bannedCurrentPage"
+      [totalPages]="bannedTotalPages"
+      [pageStart]="bannedPageStart"
+      [pageEnd]="bannedPageEnd"
+      [totalCount]="bannedTotalCount"
+      [pageSize]="bannedPageSize"
+      [pageSizeOptions]="pageSizeOptions"
+      itemLabel="banned users"
+      (pageChange)="onBannedGoToPage($event)"
+      (pageSizeChange)="onBannedPageSizeChange($event)"
+    ></app-paginator>
 
     <ng-container *ngIf="unbanConfirmRow as unbanRow">
       <div class="creator-approve-modal-backdrop" role="presentation" (click)="cancelUnbanConfirm()">
