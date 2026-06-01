@@ -25,7 +25,7 @@ function preserveLiteralWhitespace(source: string, translated: string): string {
 export class TranslationService {
   private readonly http = inject(HttpClient);
   private readonly storageKey = 'spirego-language';
-  private readonly translationAssetVersion = '2026-06-01-event-ticket-price';
+  private readonly translationAssetVersion = '2026-06-01-filter-button-copy';
   private readonly activeLanguage = signal<AppLanguage>(this.readStoredLanguage());
   private translations: Record<string, string> = {};
   private literalTranslations = new Map<string, string>();
