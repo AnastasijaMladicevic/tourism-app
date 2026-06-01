@@ -155,6 +155,23 @@ export class EventFormComponent implements OnInit, OnDestroy {
     return this.toNumber(this.form.controls.destinationId.value);
   }
 
+  get minEndDate(): string {
+    return this.form.controls.startDate.value || '';
+  }
+
+  get endDateBeforeStart(): boolean {
+    const startDate = this.form.controls.startDate.value;
+    const endDate = this.form.controls.endDate.value;
+    if (!startDate || !endDate) {
+      return false;
+    }
+    const startTime = this.form.controls.startTime.value || '00:00';
+    const endTime = this.form.controls.endTime.value || '00:00';
+    const start = new Date(`${startDate}T${startTime}:00`);
+    const end = new Date(`${endDate}T${endTime}:00`);
+    return end <= start;
+  }
+
   get filteredVenueOptions(): VenueOption[] {
     const destinationId = this.selectedDestinationId;
     if (!destinationId) {
@@ -553,6 +570,11 @@ export class EventFormComponent implements OnInit, OnDestroy {
   submit(): void {
     if (this.form.invalid || this.isSubmitting) {
       this.form.markAllAsTouched();
+      return;
+    }
+
+    if (this.endDateBeforeStart) {
+      this.errorMessage = 'End date and time must be after start date and time.';
       return;
     }
 

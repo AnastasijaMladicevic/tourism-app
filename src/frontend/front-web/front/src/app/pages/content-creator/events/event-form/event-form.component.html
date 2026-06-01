@@ -174,9 +174,12 @@
             <label class="form-field half-width">
               <span>End Date &amp; Time *</span>
               <div class="inline-fields">
-                <input class="form-control" type="date" formControlName="endDate" />
+                <input class="form-control" type="date" formControlName="endDate" [min]="minEndDate" />
                 <input class="form-control" type="time" formControlName="endTime" />
               </div>
+              @if (endDateBeforeStart) {
+                <span class="form-field-error">End date and time must be after start.</span>
+              }
             </label>
 
             <!-- <div class="recurring-row full-width">
