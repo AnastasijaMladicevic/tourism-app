@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { map, Observable } from 'rxjs';
+import { map, Observable, of, tap } from 'rxjs';
 import { environment } from '../../environment/environment';
 import { ActiveRegionService, RegionRequestOptions } from './active-region';
+import { DataCacheService } from './data-cache';
 import { TranslationService } from './translation.service';
 
 export interface ActivityDto {
@@ -80,6 +81,7 @@ export class ActivityService {
     private readonly http: HttpClient,
     private readonly activeRegionService: ActiveRegionService,
     private readonly translationService: TranslationService,
+    private readonly dataCache: DataCacheService,
   ) { }
   getNearby(
     query: NearbyActivityQueryParams,
@@ -135,8 +137,15 @@ export class ActivityService {
   }
 
   getById(id: number): Observable<ActivityDto> {
+    const lang = this.translationService.language();
+    const cacheKey = `activity:${id}:${lang}`;
+    const cached = this.dataCache.get<ActivityDto>(cacheKey);
+    if (cached) return of(cached);
+
     let params = new HttpParams();
     params = this.addLang(params);
-    return this.http.get<ActivityDto>(`${this.url}/${id}`, { params });
+    return this.http.get<ActivityDto>(`${this.url}/${id}`, { params }).pipe(
+      tap((result) => this.dataCache.set(cacheKey, result)),
+    );
   }
 }

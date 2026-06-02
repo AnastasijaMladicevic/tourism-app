@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { map, Observable } from 'rxjs';
+import { map, Observable, of, tap } from 'rxjs';
 import { environment } from '../../environment/environment';
 import { ActiveRegionService, RegionRequestOptions } from './active-region';
+import { DataCacheService } from './data-cache';
 import { TranslationService } from './translation.service';
 
 export interface DestinationDto {
@@ -84,6 +85,7 @@ export class DestinationService {
     private readonly http: HttpClient,
     private readonly activeRegionService: ActiveRegionService,
     private readonly translationService: TranslationService,
+    private readonly dataCache: DataCacheService,
   ) { }
 
   private addLang(params: HttpParams, options?: RegionRequestOptions): HttpParams {
@@ -123,9 +125,16 @@ export class DestinationService {
   }
 
   getById(id: number): Observable<DestinationDto> {
+    const lang = this.translationService.language();
+    const cacheKey = `destination:${id}:${lang}`;
+    const cached = this.dataCache.get<DestinationDto>(cacheKey);
+    if (cached) return of(cached);
+
     let params = new HttpParams();
     params = this.addLang(params);
-    return this.http.get<DestinationDto>(`${this.url}/${id}`, { params });
+    return this.http.get<DestinationDto>(`${this.url}/${id}`, { params }).pipe(
+      tap((result) => this.dataCache.set(cacheKey, result)),
+    );
   }
 
   create(dto: CreateDestinationDto): Observable<DestinationDto> {

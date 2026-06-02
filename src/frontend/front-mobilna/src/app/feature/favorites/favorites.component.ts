@@ -429,7 +429,7 @@ export class FavoritesComponent implements OnInit {
             return of([] as FavoriteCard[]);
           }
 
-          return forkJoin(items.map((item) => this.enrichFavorite(item)));
+            return forkJoin(items.map((item) => this.enrichFavorite(item)));
         }),
         catchError(() => {
           this.errorMessage.set(this.translationService.translate('favorites.loadError'));
