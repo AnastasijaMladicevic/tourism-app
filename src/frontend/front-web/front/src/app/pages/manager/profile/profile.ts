@@ -47,12 +47,25 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
 
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
   @ViewChild('languageDropdown') languageDropdown?: ElementRef<HTMLElement>;
+  @ViewChild('countryDropdown') countryDropdown?: ElementRef<HTMLElement>;
 
   readonly languageOptions: ProfileLanguageOption[] = [
     { code: 'sr', label: 'Serbian/Montenegrin' },
     { code: 'en', label: 'English' },
     { code: 'es', label: 'Spanish' },
     { code: 'it', label: 'Italian' },
+  ];
+
+  readonly countryOptions: string[] = [
+    'Albania', 'Argentina', 'Australia', 'Austria', 'Belgium',
+    'Bosnia and Herzegovina', 'Brazil', 'Bulgaria', 'Canada', 'China',
+    'Croatia', 'Czech Republic', 'Denmark', 'Finland', 'France',
+    'Germany', 'Greece', 'Hungary', 'India', 'Italy',
+    'Japan', 'Kosovo', 'Mexico', 'Montenegro', 'Netherlands',
+    'North Macedonia', 'Norway', 'Poland', 'Portugal', 'Romania',
+    'Russia', 'Serbia', 'Slovakia', 'Slovenia', 'Spain',
+    'Sweden', 'Switzerland', 'Turkey', 'Ukraine', 'United Kingdom',
+    'United States',
   ];
 
   user: UserDto = {
@@ -88,6 +101,7 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
   otpSecondsRemaining = 0;
   otpResendSecondsRemaining = 0;
   languageMenuOpen = false;
+  countryMenuOpen = false;
 
   private cropPreviewUrl: string | null = null;
   private pendingCroppedBlob: Blob | null = null;
@@ -389,24 +403,43 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
     this.languageMenuOpen = false;
   }
 
+  get selectedCountryLabel(): string {
+    return this.user.country?.trim() || '';
+  }
+
+  toggleCountryMenu(event: Event): void {
+    event.stopPropagation();
+    this.countryMenuOpen = !this.countryMenuOpen;
+  }
+
+  selectCountry(country: string, event: Event): void {
+    event.stopPropagation();
+    this.user.country = country;
+    this.countryMenuOpen = false;
+  }
+
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: MouseEvent): void {
-    if (!this.languageMenuOpen) {
-      return;
-    }
-
     const target = event.target as Node;
-    if (this.languageDropdown?.nativeElement.contains(target)) {
-      return;
+
+    if (this.languageMenuOpen && !this.languageDropdown?.nativeElement.contains(target)) {
+      this.languageMenuOpen = false;
     }
 
-    this.languageMenuOpen = false;
+    if (this.countryMenuOpen && !this.countryDropdown?.nativeElement.contains(target)) {
+      this.countryMenuOpen = false;
+    }
   }
 
   @HostListener('document:keydown.escape')
   onEscapeKey(): void {
     if (this.languageMenuOpen) {
       this.languageMenuOpen = false;
+      return;
+    }
+
+    if (this.countryMenuOpen) {
+      this.countryMenuOpen = false;
       return;
     }
 

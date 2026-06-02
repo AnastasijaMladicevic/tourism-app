@@ -779,7 +779,7 @@
 
 .language-dropdown__menu {
   position: absolute;
-  top: calc(100% + 6px);
+  bottom: calc(100% + 6px);
   left: 0;
   right: 0;
   z-index: 30;
@@ -792,6 +792,11 @@
   box-shadow:
     0 10px 24px rgba(15, 23, 42, 0.08),
     0 2px 8px rgba(15, 23, 42, 0.04);
+}
+
+.language-dropdown__menu--scrollable {
+  max-height: 220px;
+  overflow-y: auto;
 }
 
 .language-dropdown__option {

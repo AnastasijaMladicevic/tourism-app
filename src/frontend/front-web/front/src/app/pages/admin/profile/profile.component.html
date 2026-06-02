@@ -121,10 +121,45 @@
 
               <div class="form-row">
                 <div class="form-group">
-                  <label class="form-label" for="country">Country</label>
-                  <div class="input-wrapper">
-                    <mat-icon class="input-icon" fontSet="material-icons-outlined">public</mat-icon>
-                    <input id="country" class="form-input" type="text" [(ngModel)]="user.country" />
+                  <label class="form-label" id="country-label">Country</label>
+                  <div class="language-dropdown" #countryDropdown>
+                    <button
+                      type="button"
+                      class="language-dropdown__trigger"
+                      [class.language-dropdown__trigger--open]="countryMenuOpen"
+                      (click)="toggleCountryMenu($event)"
+                      aria-haspopup="listbox"
+                      [attr.aria-expanded]="countryMenuOpen"
+                      aria-labelledby="country-label"
+                    >
+                      <mat-icon class="language-dropdown__icon" fontSet="material-icons-outlined">public</mat-icon>
+                      <span class="language-dropdown__value">{{ selectedCountryLabel }}</span>
+                      <mat-icon class="language-dropdown__chevron" fontSet="material-icons-outlined">
+                        {{ countryMenuOpen ? 'expand_less' : 'expand_more' }}
+                      </mat-icon>
+                    </button>
+
+                    @if (countryMenuOpen) {
+                      <ul class="language-dropdown__menu language-dropdown__menu--scrollable" role="listbox" aria-labelledby="country-label">
+                        @for (country of countryOptions; track country) {
+                          <li role="presentation">
+                            <button
+                              type="button"
+                              class="language-dropdown__option"
+                              [class.language-dropdown__option--active]="user.country === country"
+                              role="option"
+                              [attr.aria-selected]="user.country === country"
+                              (click)="selectCountry(country, $event)"
+                            >
+                              <span>{{ country }}</span>
+                              @if (user.country === country) {
+                                <mat-icon fontSet="material-icons-outlined">check</mat-icon>
+                              }
+                            </button>
+                          </li>
+                        }
+                      </ul>
+                    }
                   </div>
                 </div>
 
