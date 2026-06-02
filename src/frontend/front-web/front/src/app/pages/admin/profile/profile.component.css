@@ -215,7 +215,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) 352px;
   gap: 18px;
-  align-items: start;
+  align-items: stretch;
 }
 
 .profile-form-column {
@@ -226,6 +226,7 @@
   min-width: 0;
   position: sticky;
   top: 20px;
+  align-self: stretch;
   padding-top: 0;
   display: flex;
   flex-direction: column;
@@ -633,17 +634,14 @@
   color: #ffffff;
 }
 
-.profile-footer-divider {
-  margin: 18px -18px 0;
-  border-top: 1px solid #edf1f6;
-}
-
 .form-card-footer {
   display: flex;
-  align-items: center;
-  justify-content: flex-end;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
   gap: 10px;
-  padding: 18px 6px 0;
+  padding: 0 0 10px;
+  margin-top: auto;
 }
 
 .form-card-footer__actions {
@@ -1631,15 +1629,10 @@
   .form-card-footer {
     align-items: stretch;
     justify-content: flex-start;
-    flex-direction: column;
   }
 
   .form-card-footer__actions {
     width: 100%;
-  }
-
-  .profile-footer-divider {
-    margin-top: 14px;
   }
 
   .form-actions {

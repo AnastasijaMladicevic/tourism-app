@@ -218,33 +218,31 @@
                 <mat-icon fontSet="material-icons-outlined">chevron_right</mat-icon>
               </button>
             </section>
+
+            <div class="form-card-footer">
+              <div class="save-feedback save-feedback--inline" [class.visible]="saveSuccess">
+                <mat-icon fontSet="material-icons-outlined">check_circle</mat-icon>
+                <span>Changes saved</span>
+              </div>
+
+              <div class="form-card-footer__actions">
+                <button class="profile-action-btn profile-action-btn--secondary" type="button" (click)="cancel()">
+                  <mat-icon fontSet="material-icons-outlined">close</mat-icon>
+                  <span>Cancel</span>
+                </button>
+
+                <button class="profile-action-btn profile-action-btn--primary" type="button" [disabled]="isSaving" (click)="saveChanges()">
+                  @if (isSaving) {
+                    <span class="spinner" aria-hidden="true"></span>
+                  } @else {
+                    <mat-icon fontSet="material-icons-outlined">save</mat-icon>
+                  }
+                  <span>{{ isSaving ? 'Saving...' : 'Save Changes' }}</span>
+                </button>
+              </div>
+            </div>
           </aside>
         </div>
-
-        <div class="form-card-footer">
-          <div class="save-feedback save-feedback--inline" [class.visible]="saveSuccess">
-            <mat-icon fontSet="material-icons-outlined">check_circle</mat-icon>
-            <span>Changes saved</span>
-          </div>
-
-          <div class="form-card-footer__actions">
-            <button class="profile-action-btn profile-action-btn--secondary" type="button" (click)="cancel()">
-              <mat-icon fontSet="material-icons-outlined">close</mat-icon>
-              <span>Cancel</span>
-            </button>
-
-            <button class="profile-action-btn profile-action-btn--primary" type="button" [disabled]="isSaving" (click)="saveChanges()">
-              @if (isSaving) {
-                <span class="spinner" aria-hidden="true"></span>
-              } @else {
-                <mat-icon fontSet="material-icons-outlined">save</mat-icon>
-              }
-              <span>{{ isSaving ? 'Saving...' : 'Save Changes' }}</span>
-            </button>
-          </div>
-        </div>
-
-        <div class="profile-footer-divider" aria-hidden="true"></div>
       </section>
     </div>
   </div>
