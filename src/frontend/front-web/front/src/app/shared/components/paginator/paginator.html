@@ -1,8 +1,8 @@
 <div class="paginator">
-  <span class="paginator-info">{{ pageStart }}–{{ pageEnd }} of {{ totalCount }} {{ itemLabel }}</span>
+  <span class="paginator-info">{{ pageStart }}–{{ pageEnd }} {{ 'paginator.of' | translate }} {{ totalCount }} {{ itemLabel }}</span>
   <div class="paginator-controls">
     <label class="paginator-size">
-      <span>Per page</span>
+      <span>{{ 'paginator.perPage' | translate }}</span>
       <select [ngModel]="pageSize" (ngModelChange)="onSizeChange($event)">
         <option *ngFor="let opt of pageSizeOptions" [ngValue]="opt">{{ opt }}</option>
       </select>
@@ -12,7 +12,7 @@
         <span class="material-symbols-outlined">chevron_left</span>
       </button>
       <span class="pag-indicator">{{ currentPage }} / {{ totalPages }}</span>
-      <span class="pag-go-label">Go to:</span>
+      <span class="pag-go-label">{{ 'paginator.goTo' | translate }}</span>
       <input
         type="number"
         class="pag-jump"
@@ -21,7 +21,7 @@
         min="1"
         [max]="totalPages"
         (keyup.enter)="onJump()"
-        title="Type page number and press Enter"
+        [title]="'paginator.jumpHint' | translate"
       />
       <button type="button" class="pag-btn" [disabled]="currentPage >= totalPages" (click)="next()">
         <span class="material-symbols-outlined">chevron_right</span>

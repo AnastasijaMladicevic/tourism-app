@@ -44,6 +44,12 @@
     "events": "Events",
     "activities": "Activities"
   },
+  "paginator": {
+    "of": "of",
+    "perPage": "Per page",
+    "goTo": "Go to:",
+    "jumpHint": "Type page number and press Enter"
+  },
   "activity": {
     "label": "Activity",
     "participationFee": "Participation fee"

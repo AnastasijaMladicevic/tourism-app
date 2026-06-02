@@ -44,6 +44,12 @@
     "events": "Eventi",
     "activities": "Attività"
   },
+  "paginator": {
+    "of": "di",
+    "perPage": "Per pagina",
+    "goTo": "Vai a:",
+    "jumpHint": "Inserisci il numero di pagina e premi Invio"
+  },
   "activity": {
     "label": "Attivita",
     "participationFee": "Tariffa di partecipazione"
