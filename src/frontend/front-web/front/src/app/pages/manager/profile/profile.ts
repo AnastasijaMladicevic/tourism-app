@@ -90,14 +90,11 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
   passwordError = '';
   passwordInfo = '';
   passwordLoading = false;
-  currentPassword = '';
   newPassword = '';
   confirmNewPassword = '';
-  hideCurrentPassword = true;
   hideNewPassword = true;
   hideConfirmNewPassword = true;
   otpCode = '';
-  otpDemoCode = '';
   otpSecondsRemaining = 0;
   otpResendSecondsRemaining = 0;
   languageMenuOpen = false;
@@ -309,14 +306,11 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
     this.passwordError = '';
     this.passwordInfo = '';
     this.passwordLoading = false;
-    this.currentPassword = '';
     this.newPassword = '';
     this.confirmNewPassword = '';
-    this.hideCurrentPassword = true;
     this.hideNewPassword = true;
     this.hideConfirmNewPassword = true;
     this.otpCode = '';
-    this.otpDemoCode = '';
     this.otpSecondsRemaining = 0;
     this.otpResendSecondsRemaining = 0;
     this.clearPasswordTimers();
@@ -375,11 +369,9 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
     this.passwordModalCloseTimerId = window.setTimeout(() => {
       this.passwordModalState = 'closed';
       this.passwordChangeStep = 'credentials';
-      this.currentPassword = '';
       this.newPassword = '';
       this.confirmNewPassword = '';
       this.otpCode = '';
-      this.otpDemoCode = '';
       this.otpSecondsRemaining = 0;
       this.otpResendSecondsRemaining = 0;
       this.releaseBodyScrollIfNoModal();
@@ -456,11 +448,6 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
     this.passwordError = '';
     this.passwordInfo = '';
 
-    if (!this.currentPassword.trim()) {
-      this.passwordError = 'Current password is required.';
-      return;
-    }
-
     if (this.newPassword.length < 8) {
       this.passwordError = 'New password must be at least 8 characters long.';
       return;
@@ -476,11 +463,7 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
       return;
     }
 
-    this.passwordChangeStep = 'otp';
-    this.otpCode = '';
-    this.otpDemoCode = this.generateDemoOtpCode();
-    this.passwordInfo = `Demo verification code: ${this.otpDemoCode}`;
-    this.startOtpCountdown();
+    this.sendPasswordChangeCode(false);
   }
 
   submitOtpStep(): void {
@@ -494,28 +477,50 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
       return;
     }
 
-    if (!this.otpDemoCode) {
-      this.passwordError = 'The verification session expired. Resend the code to continue.';
+    if (!this.user.email) {
+      this.passwordError = 'Email address is not available for this account.';
       return;
     }
 
-    if (this.otpCode.trim() !== this.otpDemoCode) {
-      this.passwordError = 'Invalid verification code.';
-      return;
-    }
+    this.passwordLoading = true;
 
-    const dto = {
-      currentPassword: this.currentPassword,
-      newPassword: this.newPassword,
-      confirmPassword: this.confirmNewPassword,
-    };
+    this.authService.verifyResetCode({ email: this.user.email, code: this.otpCode.trim() }).subscribe({
+      next: (response: { resetSessionToken?: string; ResetSessionToken?: string; token?: string } | string) => {
+        const resetSessionToken = this.extractResetSessionToken(response);
 
-    this.showSaveSuccess();
-    this.closePasswordModal(true);
+        if (!resetSessionToken) {
+          this.passwordLoading = false;
+          this.passwordError = 'Reset session token was not returned. Please request a new code.';
+          this.cdr.detectChanges();
+          return;
+        }
 
-    this.authService.changePassword(this.user.id!, dto).subscribe({
+        this.authService
+          .resetPassword(
+            this.user.email!,
+            this.otpCode.trim(),
+            this.newPassword,
+            this.confirmNewPassword,
+            resetSessionToken,
+          )
+          .subscribe({
+            next: () => {
+              this.passwordLoading = false;
+              this.showSaveSuccess();
+              this.closePasswordModal(true);
+              this.cdr.detectChanges();
+            },
+            error: (err) => {
+              this.passwordLoading = false;
+              this.passwordError = err?.error?.message ?? 'Password change failed.';
+              this.cdr.detectChanges();
+            },
+          });
+      },
       error: (err) => {
-        this.passwordError = err?.error?.message ?? err?.error?.title ?? 'Password change failed.';
+        this.passwordLoading = false;
+        this.passwordError = err?.error?.message ?? 'Invalid or expired verification code.';
+        this.cdr.detectChanges();
       },
     });
   }
@@ -523,12 +528,7 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
   resendOtpCode(): void {
     if (this.passwordLoading || this.otpResendSecondsRemaining > 0) return;
 
-    this.passwordError = '';
-    this.passwordInfo = '';
-    this.otpDemoCode = this.generateDemoOtpCode();
-    this.otpCode = '';
-    this.passwordInfo = `Demo verification code: ${this.otpDemoCode}`;
-    this.startOtpCountdown();
+    this.sendPasswordChangeCode(true);
   }
 
   backToPasswordStep(): void {
@@ -538,7 +538,6 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
     this.passwordError = '';
     this.passwordInfo = '';
     this.otpCode = '';
-    this.otpDemoCode = '';
     this.clearPasswordTimers();
   }
 
@@ -633,6 +632,35 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
     }, 2500);
   }
 
+  private sendPasswordChangeCode(isResend: boolean): void {
+    if (!this.user.email) {
+      this.passwordError = 'Email address is not available for this account.';
+      return;
+    }
+
+    this.passwordLoading = true;
+    this.passwordError = '';
+    this.passwordInfo = '';
+
+    this.authService.forgotPassword(this.user.email).subscribe({
+      next: () => {
+        this.passwordLoading = false;
+        this.passwordChangeStep = 'otp';
+        this.otpCode = '';
+        this.passwordInfo = isResend
+          ? 'A new verification code has been sent to your email address.'
+          : 'A verification code has been sent to your email address.';
+        this.startOtpCountdown();
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.passwordLoading = false;
+        this.passwordError = err?.error?.message ?? 'Unable to send a verification code right now.';
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
   private startOtpCountdown(): void {
     this.clearPasswordTimers();
     this.otpSecondsRemaining = ProfileComponentManager.OTP_EXPIRY_SECONDS;
@@ -701,8 +729,17 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
     }
   }
 
-  private generateDemoOtpCode(): string {
-    const code = Math.floor(100000 + Math.random() * 900000);
-    return code.toString();
+  private extractResetSessionToken(
+    response: { resetSessionToken?: string; ResetSessionToken?: string; token?: string } | string | null | undefined,
+  ): string {
+    if (!response) {
+      return '';
+    }
+
+    if (typeof response === 'string') {
+      return response;
+    }
+
+    return response.resetSessionToken ?? response.ResetSessionToken ?? response.token ?? '';
   }
 }

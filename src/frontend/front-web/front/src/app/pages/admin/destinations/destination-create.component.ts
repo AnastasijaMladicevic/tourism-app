@@ -71,7 +71,6 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
   isLoadingRegions = true;
   errorMessage = '';
   galleryErrorMessage = '';
-  draftSavedMessage = '';
   editLockState: DestinationEditLockDto | null = null;
   isEditBlocked = false;
   private savedDestinationId: number | null = null;
@@ -896,12 +895,11 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
     if (this.isEditBlocked || !this.validateBasics() || this.isSubmitting || this.isDeleting) {
       return;
     }
-    this.persist(true);
+    this.persist();
   }
 
-  private persist(published: boolean): void {
+  private persist(): void {
     this.isSubmitting = true;
-    this.draftSavedMessage = '';
 
     const createPayload: CreateDestinationDto = {
       name: this.form.name.trim(),
@@ -910,7 +908,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
       regionId: this.form.regionId ? Number(this.form.regionId) : undefined,
       latitude: this.form.latitude != null ? Number(this.form.latitude) : undefined,
       longitude: this.form.longitude != null ? Number(this.form.longitude) : undefined,
-      isActive: published,
+      isActive: true,
       managedByUserId: this.selectedManager?.id
     };
 
@@ -974,24 +972,10 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
             if (!out.imageUploadFailed) {
               this.resetPendingImages();
             }
-            if (published) {
-              this.router.navigate(['/admin/destinations']);
-              return;
-            }
-            this.errorMessage = 'assignError' in out ? out.assignError : 'Destination was saved, but assigning the manager failed.';
-            this.draftSavedMessage =
-              'Draft saved to the server. You can fix manager assignment and save again.';
-            return;
-          }
-          if (published) {
             this.router.navigate(['/admin/destinations']);
             return;
           }
-          this.form.isActive = false;
-          this.resetPendingImages();
-          this.draftSavedMessage = out.imageUploadFailed
-            ? 'Draft saved to the server, but some images could not be uploaded.'
-            : 'Draft saved to the server';
+          this.router.navigate(['/admin/destinations']);
         },
         error: (err) => {
           const lockState = this.extractLockState(err);

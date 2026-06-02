@@ -376,8 +376,8 @@
           <p>
             {{
               passwordChangeStep === 'credentials'
-                ? 'Stay on this page and complete the password change in a secure modal.'
-                : 'Enter the verification code to confirm the change.'
+                ? 'Choose a new password and we will send a verification code to your email.'
+                : 'Enter the verification code from your email to confirm the change.'
             }}
           </p>
         </div>
@@ -390,29 +390,6 @@
       <div class="password-modal__body">
         @if (passwordChangeStep === 'credentials') {
           <div class="password-modal__grid">
-            <div class="modal-field">
-              <label class="modal-label" for="current-password">Current Password</label>
-              <div class="modal-input-wrap">
-                <input
-                  id="current-password"
-                  name="currentPassword"
-                  [(ngModel)]="currentPassword"
-                  [type]="hideCurrentPassword ? 'password' : 'text'"
-                  autocomplete="current-password"
-                />
-                <button
-                  class="modal-toggle"
-                  type="button"
-                  (click)="hideCurrentPassword = !hideCurrentPassword"
-                  [attr.aria-label]="hideCurrentPassword ? 'Show current password' : 'Hide current password'"
-                >
-                  <mat-icon fontSet="material-icons-outlined">
-                    {{ hideCurrentPassword ? 'visibility' : 'visibility_off' }}
-                  </mat-icon>
-                </button>
-              </div>
-            </div>
-
             <div class="modal-field">
               <label class="modal-label" for="new-password">New Password</label>
               <div class="modal-input-wrap">
@@ -474,10 +451,9 @@
             <div class="otp-panel__copy">
               <h4>Enter verification code</h4>
               <p>
-                Use the demo code shown below. It expires in
+                Check your inbox for the 6-digit verification code. It expires in
                 <strong>{{ otpSecondsRemaining }}s</strong>.
               </p>
-              <div class="otp-panel__code">Demo code: <strong>{{ otpDemoCode }}</strong></div>
             </div>
           </div>
 
@@ -535,7 +511,7 @@
           <span>
             {{
               passwordChangeStep === 'credentials'
-                ? 'Continue'
+                ? (passwordLoading ? 'Sending...' : 'Send code')
                 : (passwordLoading ? 'Verifying...' : 'Verify & Change')
             }}
           </span>
