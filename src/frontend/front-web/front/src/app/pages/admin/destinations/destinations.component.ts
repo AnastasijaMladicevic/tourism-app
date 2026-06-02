@@ -18,6 +18,7 @@ import { LocalityService, LocalityDto } from '../../../services/locality.service
 import { ObjectDto } from '../../../services/object';
 import { environment } from '../../../../environment/environment';
 import { HERO_IMAGE_ROTATION_INTERVAL_MS } from '../../../shared/constants/hero-image-rotation';
+import { TranslationService } from '../../../services/translation.service';
 
 export type AdminDestinationStatus = 'active' | 'draft' | 'archived';
 
@@ -72,6 +73,7 @@ export class DestinationsComponent implements OnInit, OnDestroy {
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+  private readonly translationService = inject(TranslationService);
 
   private readonly objectsUrl = `${environment.apiUrl}/objects`;
 
@@ -99,18 +101,18 @@ export class DestinationsComponent implements OnInit, OnDestroy {
   private heroRotationTimerId: ReturnType<typeof setInterval> | null = null;
 
   readonly statusOptions = [
-    { value: 'all', label: 'All statuses' },
-    { value: 'active', label: 'Published' },
-    { value: 'draft', label: 'Draft' },
-    { value: 'archived', label: 'Rejected' }
+    { value: 'all', labelKey: 'adminDestinations.filters.allStatuses' },
+    { value: 'active', labelKey: 'adminDestinations.status.published' },
+    { value: 'draft', labelKey: 'adminDestinations.status.draft' },
+    { value: 'archived', labelKey: 'adminDestinations.status.rejected' }
   ];
 
   readonly sortByOptions = [
-    { value: 'name', label: 'Name' },
-    { value: 'region', label: 'Region' },
-    { value: 'localityCount', label: 'Localities' },
-    { value: 'status', label: 'Status' },
-    { value: 'updatedAt', label: 'Last updated' }
+    { value: 'name', labelKey: 'adminDestinations.columns.destination' },
+    { value: 'region', labelKey: 'adminDestinations.columns.region' },
+    { value: 'localityCount', labelKey: 'adminDestinations.localities' },
+    { value: 'status', labelKey: 'adminDestinations.columns.status' },
+    { value: 'updatedAt', labelKey: 'adminDestinations.lastUpdated' }
   ];
 
   ngOnInit(): void {
@@ -131,7 +133,10 @@ export class DestinationsComponent implements OnInit, OnDestroy {
       this.allDestinations.map((d) => d.region).filter((r) => r && r.trim())
     );
     const sorted = [...names].sort((a, b) => a.localeCompare(b));
-    return [{ value: 'all', label: 'All regions' }, ...sorted.map((r) => ({ value: r, label: r }))];
+    return [
+      { value: 'all', label: this.t('adminDestinations.filters.allRegions') },
+      ...sorted.map((r) => ({ value: r, label: r }))
+    ];
   }
 
   get insightCards(): DestinationInsightCard[] {
@@ -139,23 +144,23 @@ export class DestinationsComponent implements OnInit, OnDestroy {
     const published = filtered.filter((d) => d.status === 'active').length;
     return [
       {
-        label: 'Total destinations',
+        label: this.t('adminDestinations.insights.totalDestinations'),
         value: String(filtered.length),
-        hint: 'Matching current filters',
+        hint: this.t('adminDestinations.insights.matchingCurrentFilters'),
         tone: 'blue',
         icon: 'public'
       },
       {
-        label: 'On this page',
+        label: this.t('adminDestinations.insights.onThisPage'),
         value: String(this.visibleDestinations.length),
-        hint: 'Visible rows',
+        hint: this.t('adminDestinations.insights.visibleRows'),
         tone: 'green',
         icon: 'view_list'
       },
       {
-        label: 'Published',
+        label: this.t('adminDestinations.status.published'),
         value: String(published),
-        hint: 'Matching current filters',
+        hint: this.t('adminDestinations.insights.matchingCurrentFilters'),
         tone: 'amber',
         icon: 'check_circle'
       }
@@ -209,9 +214,42 @@ export class DestinationsComponent implements OnInit, OnDestroy {
 
   get selectedMapLabel(): string {
     if (!this.selectedDestination) {
-      return 'Destination';
+      return this.t('adminDestinations.destination');
     }
     return `${this.selectedDestination.name} · ${this.selectedDestination.region}`;
+  }
+
+  formatDateLabel(value?: string): string {
+    if (!value) {
+      return this.t('common.notAvailable');
+    }
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+      return this.t('common.notAvailable');
+    }
+
+    return new Intl.DateTimeFormat(this.translationService.currentLocale(), {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric'
+    }).format(date);
+  }
+
+  objectCountLabel(count: number): string {
+    return this.t('adminDestinations.objectCount', { count });
+  }
+
+  localitiesSummary(count: number): string {
+    return this.t('adminDestinations.localityCount', { count });
+  }
+
+  detailMetaLabel(row: AdminDestinationRow): string {
+    return this.t('adminDestinations.heroMeta', {
+      region: row.region,
+      localities: row.localityCount,
+      objects: row.objectCount
+    });
   }
 
   trackByDestinationId(_: number, row: AdminDestinationRow): number {
@@ -399,11 +437,11 @@ export class DestinationsComponent implements OnInit, OnDestroy {
 
   getEditDisabledTitle(row: AdminDestinationRow | null | undefined): string {
     if (!this.isEditLockedByAnother(row)) {
-      return 'Edit destination';
+      return this.t('adminDestinations.editDestination');
     }
 
-    const lockedBy = row?.editLock?.lockedByDisplayName?.trim() || 'Another admin';
-    return `${lockedBy} is currently editing this destination.`;
+    const lockedBy = row?.editLock?.lockedByDisplayName?.trim() || this.t('adminDestinations.anotherAdmin');
+    return this.t('adminDestinations.editLockedBy', { name: lockedBy });
   }
 
   getEditLockSummary(row: AdminDestinationRow | null | undefined): string {
@@ -411,8 +449,8 @@ export class DestinationsComponent implements OnInit, OnDestroy {
       return '';
     }
 
-    const lockedBy = row?.editLock?.lockedByDisplayName?.trim() || 'Another admin';
-    return `${lockedBy} is currently editing this destination.`;
+    const lockedBy = row?.editLock?.lockedByDisplayName?.trim() || this.t('adminDestinations.anotherAdmin');
+    return this.t('adminDestinations.editLockedBy', { name: lockedBy });
   }
 
   formatStatus(status: AdminDestinationStatus): string {
@@ -423,11 +461,11 @@ export class DestinationsComponent implements OnInit, OnDestroy {
   formatTableStatus(status: AdminDestinationStatus): string {
     switch (status) {
       case 'active':
-        return 'Published';
+        return this.t('adminDestinations.status.published');
       case 'draft':
-        return 'Draft';
+        return this.t('adminDestinations.status.draft');
       case 'archived':
-        return 'Rejected';
+        return this.t('adminDestinations.status.rejected');
       default:
         return this.formatStatus(status);
     }
@@ -478,7 +516,7 @@ export class DestinationsComponent implements OnInit, OnDestroy {
     if (region && country && region !== country) {
       return `${region} · ${country}`;
     }
-    return region || country || '—';
+    return region || country || this.t('common.notAvailable');
   }
 
   getDestinationMediaStyle(row: AdminDestinationRow): Record<string, string> {
@@ -514,7 +552,7 @@ export class DestinationsComponent implements OnInit, OnDestroy {
           this.buildRowsFromApi(destinations, managers, localities, objects)
         ),
         catchError(() => {
-          this.loadError = 'Could not load destinations. Check that the API is running and try again.';
+          this.loadError = this.t('adminDestinations.loadError');
           return of([] as AdminDestinationRow[]);
         }),
         finalize(() => {
@@ -542,7 +580,7 @@ export class DestinationsComponent implements OnInit, OnDestroy {
     const managersById = new Map<number, string>();
     for (const manager of managers) {
       const fullName = `${manager.firstName ?? ''} ${manager.lastName ?? ''}`.trim();
-      managersById.set(manager.id, fullName || manager.email || '—');
+      managersById.set(manager.id, fullName || manager.email || this.t('common.notAvailable'));
     }
 
     const localityByDest = new Map<number, number>();
@@ -568,7 +606,7 @@ export class DestinationsComponent implements OnInit, OnDestroy {
         d,
         localityByDest.get(d.id) ?? 0,
         objectsByDest.get(d.id) ?? 0,
-        managersById.get(d.managedByUserId ?? -1) ?? '—'
+        managersById.get(d.managedByUserId ?? -1) ?? this.t('common.notAvailable')
       )
     );
   }
@@ -595,7 +633,7 @@ export class DestinationsComponent implements OnInit, OnDestroy {
       id: dto.id,
       name: dto.name,
       publicId: `DEST-${String(dto.id).padStart(4, '0')}`,
-      destinationType: dto.destinationTypeName?.trim() || '—',
+      destinationType: dto.destinationTypeName?.trim() || this.t('common.notAvailable'),
       region: dto.regionName?.trim() ?? '',
       country: '',
       code: dto.regionCode?.trim() ?? '',
@@ -603,7 +641,7 @@ export class DestinationsComponent implements OnInit, OnDestroy {
       localityCount,
       objectCount,
       featured: false,
-      summary: dto.description?.trim() || 'No description yet.',
+      summary: dto.description?.trim() || this.t('adminDestinations.noDescription'),
       managerName,
       mainImageUrl: dto.mainImageUrl,
       latitude: dto.latitude,
@@ -762,5 +800,9 @@ export class DestinationsComponent implements OnInit, OnDestroy {
     if (!this.selectedDestination || !visible.some((d) => d.id === this.selectedDestination?.id)) {
       this.setSelectedDestination(visible[0]);
     }
+  }
+
+  t(key: string, params?: Record<string, string | number>): string {
+    return this.translationService.translate(key, params);
   }
 }

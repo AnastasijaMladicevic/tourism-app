@@ -1,11 +1,11 @@
 ﻿<div class="users-page">
-  <div class="feedback" *ngIf="isLoading">Loading users data...</div>
+  <div class="feedback" *ngIf="isLoading">{{ t('adminUsers.loading') }}</div>
   <div class="feedback error" *ngIf="!isLoading && loadError">{{ loadError }}</div>
 
   <div class="page-header">
     <div>
-      <h1 class="page-title">Users &amp; Roles</h1>
-      <p class="page-subtitle">Manage internal team members and platform access permissions.</p>
+      <h1 class="page-title">{{ t('adminUsers.title') }}</h1>
+      <p class="page-subtitle">{{ t('adminUsers.subtitle') }}</p>
     </div>
   </div>
 
@@ -15,7 +15,7 @@
 
 
   <div class="toolbar">
-    <div class="tabs" role="tablist" aria-label="Internal team and tourists">
+    <div class="tabs" role="tablist" [attr.aria-label]="t('adminUsers.tabsLabel')">
       <button
         type="button"
         class="tab"
@@ -26,7 +26,7 @@
         aria-controls="users-panel-internal"
         (click)="selectUsersViewTab('internal')"
       >
-        Internal Team
+        {{ t('adminUsers.internalTeam') }}
       </button>
       <button
         type="button"
@@ -38,10 +38,10 @@
         aria-controls="users-panel-tourists"
         (click)="selectUsersViewTab('tourists')"
       >
-        Tourists
+        {{ t('adminUsers.tourists') }}
       </button>
     </div>
-    <a *ngIf="usersViewTab === 'internal'" class="add-btn" routerLink="/admin/users/create">+ Add User</a>
+    <a *ngIf="usersViewTab === 'internal'" class="add-btn" routerLink="/admin/users/create">+ {{ t('adminUsers.addUser') }}</a>
   </div>
 
   <div class="dashboard-overview">
@@ -53,7 +53,7 @@
               <span class="kpi-icon material-symbols-outlined">groups</span>
               <span class="kpi-pill">{{ totalRegistered | number }}</span>
             </div>
-            <p class="kpi-label">Total Registered</p>
+            <p class="kpi-label">{{ t('adminUsers.kpis.totalRegistered') }}</p>
             <p class="kpi-value">{{ totalRegistered | number }}</p>
           </article>
 
@@ -62,7 +62,7 @@
               <span class="kpi-icon material-symbols-outlined">trending_up</span>
               <span class="kpi-pill">{{ activePercentDelta }}%</span>
             </div>
-            <p class="kpi-label">Active This Period</p>
+            <p class="kpi-label">{{ t('adminUsers.kpis.activeThisPeriod') }}</p>
             <p class="kpi-value">{{ activeThisPeriod | number }}</p>
           </article>
 
@@ -71,14 +71,14 @@
               <span class="kpi-icon material-symbols-outlined">public</span>
               <span class="kpi-pill">{{ countryPercentDelta }}%</span>
             </div>
-            <p class="kpi-label">New Countries</p>
+            <p class="kpi-label">{{ t('adminUsers.kpis.newCountries') }}</p>
             <p class="kpi-value">{{ newCountries }}</p>
           </article>
         </div>
 
         <section class="card chart-card">
           <div class="card-head">
-            <h3>Team activity by role</h3>
+            <h3>{{ t('adminUsers.teamActivityByRole') }}</h3>
             <p>{{ internalChartSubtitle }}</p>
           </div>
           <div class="chart-placeholder">
@@ -126,7 +126,7 @@
                   </rect>
                 </svg>
                 <div class="chart-empty" *ngIf="internalChartIsEmpty">
-                  No new admin, manager, or content-creator accounts in the last {{ chartDays }} days (from loaded team).
+                  {{ t('adminUsers.internalChartEmpty', { days: chartDays }) }}
                 </div>
               </div>
             </div>
@@ -134,9 +134,9 @@
               <span *ngFor="let x of internalChartXLabels">{{ x.label }}</span>
             </div>
             <div class="chart-legend chart-legend--three">
-              <span class="chart-legend-item"><i class="chart-dot chart-dot--team-admin"></i> Admins</span>
-              <span class="chart-legend-item"><i class="chart-dot chart-dot--team-manager"></i> Managers</span>
-              <span class="chart-legend-item"><i class="chart-dot chart-dot--team-cc"></i> Content creators</span>
+              <span class="chart-legend-item"><i class="chart-dot chart-dot--team-admin"></i> {{ t('adminUsers.roles.admins') }}</span>
+              <span class="chart-legend-item"><i class="chart-dot chart-dot--team-manager"></i> {{ t('adminUsers.roles.managers') }}</span>
+              <span class="chart-legend-item"><i class="chart-dot chart-dot--team-cc"></i> {{ t('adminUsers.roles.contentCreators') }}</span>
             </div>
           </div>
         </section>
@@ -149,7 +149,7 @@
               <span class="kpi-icon material-symbols-outlined">travel_explore</span>
               <span class="kpi-pill">{{ touristKpiSignupDeltaPercent }}%</span>
             </div>
-            <p class="kpi-label">Registered tourists</p>
+            <p class="kpi-label">{{ t('adminUsers.kpis.registeredTourists') }}</p>
             <p class="kpi-value">{{ touristKpiTotal | number }}</p>
           </article>
 
@@ -158,7 +158,7 @@
               <span class="kpi-icon material-symbols-outlined">rate_review</span>
               <span class="kpi-pill">{{ touristKpiReviewersSharePercent }}%</span>
             </div>
-            <p class="kpi-label">Users who posted reviews</p>
+            <p class="kpi-label">{{ t('adminUsers.kpis.usersWhoPostedReviews') }}</p>
             <p class="kpi-value">{{ touristKpiUniqueReviewers | number }}</p>
           </article>
 
@@ -167,14 +167,14 @@
               <span class="kpi-icon material-symbols-outlined">verified_user</span>
               <span class="kpi-pill">{{ touristKpiActiveSharePercent }}%</span>
             </div>
-            <p class="kpi-label">Active tourist accounts</p>
+            <p class="kpi-label">{{ t('adminUsers.kpis.activeTouristAccounts') }}</p>
             <p class="kpi-value">{{ touristKpiActiveTourists | number }}</p>
           </article>
         </div>
 
         <section class="card chart-card">
           <div class="card-head">
-            <h3>Tourist signups &amp; origin diversity</h3>
+            <h3>{{ t('adminUsers.touristSignupsOriginDiversity') }}</h3>
             <p>{{ touristChartSubtitle }}</p>
           </div>
           <div class="chart-placeholder">
@@ -229,7 +229,7 @@
                   </rect>
                 </svg>
                 <div class="chart-empty" *ngIf="touristChartIsEmpty">
-                  No tourist registrations in the last {{ chartDays }} days to chart by country.
+                  {{ t('adminUsers.touristChartEmpty', { days: chartDays }) }}
                 </div>
               </div>
             </div>
@@ -237,8 +237,8 @@
               <span *ngFor="let x of touristChartXLabels">{{ x.label }}</span>
             </div>
             <div class="chart-legend">
-              <span class="chart-legend-item"><i class="chart-dot chart-dot--signups"></i> New tourists per day</span>
-              <span class="chart-legend-item"><i class="chart-dot chart-dot--origins"></i> Distinct origin countries (that day)</span>
+              <span class="chart-legend-item"><i class="chart-dot chart-dot--signups"></i> {{ t('adminUsers.newTouristsPerDay') }}</span>
+              <span class="chart-legend-item"><i class="chart-dot chart-dot--origins"></i> {{ t('adminUsers.distinctOriginCountries') }}</span>
             </div>
           </div>
         </section>
@@ -250,12 +250,12 @@
         <span class="material-symbols-outlined origins-globe" aria-hidden="true">public</span>
         <div class="origins-card-titles">
           <ng-container *ngIf="usersViewTab === 'internal'">
-            <h3>Top Origins</h3>
-            <p>Admins, managers, and content creators by country or region.</p>
+            <h3>{{ t('adminUsers.topOrigins') }}</h3>
+            <p>{{ t('adminUsers.topOriginsInternalHint') }}</p>
           </ng-container>
           <ng-container *ngIf="usersViewTab === 'tourists'">
-            <h3>Countries &amp; regions</h3>
-            <p>Where registered tourists are from (share of loaded accounts).</p>
+            <h3>{{ t('adminUsers.countriesRegions') }}</h3>
+            <p>{{ t('adminUsers.topOriginsTouristHint') }}</p>
           </ng-container>
         </div>
       </div>
@@ -271,7 +271,7 @@
                 <li *ngFor="let item of activeOriginsRows" class="origin-row">
                   <div class="origin-row-top">
                     <span class="origin-name">{{ item.name }}</span>
-                    <span class="origin-count">{{ item.users }} {{ usersViewTab === 'internal' ? 'members' : 'tourists' }}</span>
+                    <span class="origin-count">{{ originsCountLabel(item.users) }}</span>
                   </div>
                   <div class="origin-bar-track" role="presentation">
                     <div class="origin-bar-fill" [style.width.%]="item.barPercent"></div>
@@ -289,10 +289,10 @@
                 viewBox="0 0 100 100"
                 class="origin-pie-svg"
                 role="img"
-                [attr.aria-label]="usersViewTab === 'internal' ? 'Internal team by country' : 'Tourist origins distribution'"
+                [attr.aria-label]="usersViewTab === 'internal' ? t('adminUsers.internalTeamByCountry') : t('adminUsers.touristOriginsDistribution')"
               >
                 <title>
-                  {{ usersViewTab === 'internal' ? 'Share of internal team among listed countries' : 'Share of tourists among listed origins' }}
+                  {{ usersViewTab === 'internal' ? t('adminUsers.internalTeamShareTitle') : t('adminUsers.touristOriginsShareTitle') }}
                 </title>
                 <g *ngFor="let slice of originsPieSlices">
                   <path
@@ -304,8 +304,8 @@
                   >
                     <title>
                       {{ slice.name }}: {{ slice.users }}
-                      {{ usersViewTab === 'internal' ? 'team members' : 'tourists' }}
-                      ({{ slice.shareLabel }} of chart)
+                      {{ usersViewTab === 'internal' ? t('adminUsers.teamMembers') : t('adminUsers.tourists') }}
+                      ({{ t('adminUsers.shareOfChart', { share: slice.shareLabel }) }})
                     </title>
                   </path>
                 </g>
@@ -323,10 +323,10 @@
       </div>
       <p class="origins-empty" *ngIf="!activeOriginsRows.length">
         <ng-container *ngIf="usersViewTab === 'internal'">
-          No country or region recorded for the internal team yet.
+          {{ t('adminUsers.noInternalOriginData') }}
         </ng-container>
         <ng-container *ngIf="usersViewTab === 'tourists'">
-          No tourist geographic data yet.
+          {{ t('adminUsers.noTouristOriginData') }}
         </ng-container>
       </p>
 
@@ -338,7 +338,7 @@
         [attr.aria-expanded]="originsDemographicsChart"
         aria-controls="origins-demographics-panel"
       >
-        {{ originsDemographicsChart ? 'View bar list' : 'View pie chart' }}
+        {{ originsToggleLabel() }}
         <span
           class="material-symbols-outlined origins-chevron"
           [class.origins-chevron--back]="originsDemographicsChart"
@@ -357,24 +357,24 @@
     >
       <div class="table-head">
         <div>
-          <h3>Admin Directory</h3>
-          <p>A list of all users with administrative access to the platform.</p>
+          <h3>{{ t('adminUsers.adminDirectory') }}</h3>
+          <p>{{ t('adminUsers.adminDirectoryHint') }}</p>
         </div>
       </div>
 
       <div class="table-toolbar">
-        <label class="sr-only" for="admin-directory-search">Search admin directory</label>
+        <label class="sr-only" for="admin-directory-search">{{ t('adminUsers.searchAdminDirectory') }}</label>
         <input
           id="admin-directory-search"
           type="search"
           class="table-search"
-          placeholder="Search by name, email, role, status"
+          [placeholder]="t('adminUsers.adminSearchPlaceholder')"
           autocomplete="off"
           [value]="adminDirectorySearch"
           (input)="onAdminSearchInput($event)"
         />
         <span class="table-filter-meta" *ngIf="adminMembers.length && adminDirectorySearch.trim()">
-          {{ filteredAdminDirectory.length }} match(es) of {{ adminMembers.length }}
+          {{ t('adminUsers.matchesOf', { matches: filteredAdminDirectory.length, total: adminMembers.length }) }}
         </span>
         <button
           type="button"
@@ -382,7 +382,7 @@
           *ngIf="adminDirectorySearch.trim()"
           (click)="clearAdminSearch()"
         >
-          Clear
+          {{ t('adminUsers.clear') }}
         </button>
       </div>
 
@@ -393,11 +393,11 @@
         <table>
           <thead>
             <tr>
-              <th>Team Member</th>
-              <th>Role</th>
-              <th>Last Login</th>
-              <th>Status</th>
-              <th>Actions</th>
+              <th>{{ t('adminUsers.columns.teamMember') }}</th>
+              <th>{{ t('adminUsers.columns.role') }}</th>
+              <th>{{ t('adminUsers.columns.lastLogin') }}</th>
+              <th>{{ t('adminUsers.columns.status') }}</th>
+              <th>{{ t('adminUsers.columns.actions') }}</th>
             </tr>
           </thead>
           <tbody>
@@ -416,8 +416,8 @@
                     *ngIf="hasPendingManagerReport(member.id)"
                     type="button"
                     class="report-alert-btn"
-                    title="View manager report"
-                    [attr.aria-label]="'View pending report for ' + member.name"
+                    [title]="t('adminUsers.viewManagerReport')"
+                    [attr.aria-label]="t('adminUsers.viewPendingReportFor', { name: member.name })"
                     (click)="openManagerReportForUser(member.id, $event)"
                   >
                     <span class="material-symbols-outlined" aria-hidden="true">error</span>
@@ -432,7 +432,7 @@
                   [class.pending]="member.status === 'Inactive'"
                   [class.banned]="member.status === 'Banned'"
                 >
-                  {{ member.status }}
+                  {{ adminStatusLabel(member.status) }}
                 </span>
               </td>
               <td class="actions">
@@ -449,10 +449,10 @@
               </td>
             </tr>
             <tr *ngIf="!filteredAdminDirectory.length && adminMembers.length" class="table-empty-row">
-              <td colspan="5">No team members match your search.</td>
+              <td colspan="5">{{ t('adminUsers.noTeamMembersMatch') }}</td>
             </tr>
             <tr *ngIf="!adminMembers.length" class="table-empty-row">
-              <td colspan="5">No administrative users found.</td>
+              <td colspan="5">{{ t('adminUsers.noAdministrativeUsers') }}</td>
             </tr>
           </tbody>
         </table>
@@ -466,7 +466,7 @@
         [totalCount]="adminTotalCount"
         [pageSize]="adminPageSize"
         [pageSizeOptions]="pageSizeOptions"
-        itemLabel="team members"
+        [itemLabel]="t('adminUsers.teamMembers')"
         (pageChange)="onAdminGoToPage($event)"
         (pageSizeChange)="onAdminPageSizeChange($event)"
       ></app-paginator>
@@ -488,35 +488,35 @@
               <span class="manager-report-modal-icon material-symbols-outlined" aria-hidden="true">error</span>
               <div>
                 <h4 id="manager-report-modal-title" class="manager-report-modal-title">
-                  Content creator report
+                  {{ t('adminUsers.report.title') }}
                 </h4>
                 <p class="manager-report-modal-subtitle">
-                  Reported user: <strong>{{ report.reportedUserName }}</strong>
+                  {{ t('adminUsers.report.reportedUser') }}: <strong>{{ report.reportedUserName }}</strong>
                 </p>
               </div>
             </div>
 
             <dl class="manager-report-details">
               <div>
-                <dt>Submitted by</dt>
+                <dt>{{ t('adminUsers.report.submittedBy') }}</dt>
                 <dd>{{ managerReportSubmittedLabel(report) }}</dd>
               </div>
               <div *ngIf="report.destinationName">
-                <dt>Destination</dt>
+                <dt>{{ t('adminUsers.report.destination') }}</dt>
                 <dd>{{ report.destinationName }}</dd>
               </div>
               <div>
-                <dt>Submitted on</dt>
+                <dt>{{ t('adminUsers.report.submittedOn') }}</dt>
                 <dd>{{ formatDate(report.createdAt) }}</dd>
               </div>
               <div class="manager-report-reason-block">
-                <dt>Reason</dt>
+                <dt>{{ t('adminUsers.report.reason') }}</dt>
                 <dd>{{ report.reason }}</dd>
               </div>
             </dl>
 
             <section class="ban-duration-block" aria-labelledby="ban-duration-label">
-              <p id="ban-duration-label" class="ban-duration-label">Duration of Ban</p>
+              <p id="ban-duration-label" class="ban-duration-label">{{ t('adminUsers.report.banDuration') }}</p>
               <div class="ban-duration-options" role="radiogroup" aria-labelledby="ban-duration-label">
                 <button
                   type="button"
@@ -527,7 +527,7 @@
                   (click)="selectBanDuration('30-days')"
                   [disabled]="reportReviewSubmitting"
                 >
-                  30 Days
+                  {{ t('adminUsers.report.thirtyDays') }}
                 </button>
                 <button
                   type="button"
@@ -538,7 +538,7 @@
                   (click)="selectBanDuration('permanent')"
                   [disabled]="reportReviewSubmitting"
                 >
-                  Permanent
+                  {{ t('adminUsers.report.permanent') }}
                 </button>
                 <button
                   type="button"
@@ -549,12 +549,12 @@
                   (click)="selectBanDuration('custom')"
                   [disabled]="reportReviewSubmitting"
                 >
-                  Custom Date
+                  {{ t('adminUsers.report.customDate') }}
                 </button>
               </div>
 
               <label class="ban-duration-custom-field" *ngIf="banDuration === 'custom'">
-                <span>Ban ends on</span>
+                <span>{{ t('adminUsers.report.banEndsOn') }}</span>
                 <input
                   type="date"
                   class="ban-duration-date-input"
@@ -565,17 +565,16 @@
               </label>
 
               <p class="ban-duration-hint">
-                Access is blocked when you approve. The ban ends automatically on the date you choose, or never for
-                a permanent ban.
+                {{ t('adminUsers.report.banDurationHint') }}
               </p>
             </section>
 
             <label class="manager-report-reject-field" *ngIf="!reportReviewSubmitting">
-              <span>Rejection reason (required if you dismiss the report)</span>
+              <span>{{ t('adminUsers.report.rejectionReason') }}</span>
               <textarea
                 rows="3"
                 [(ngModel)]="reportRejectReason"
-                placeholder="Explain why the report is not upheldâ€¦"
+                [placeholder]="t('adminUsers.report.rejectionPlaceholder')"
               ></textarea>
             </label>
 
@@ -583,7 +582,7 @@
 
             <div class="manager-report-modal-actions">
               <button type="button" class="ghost-btn slim-btn" (click)="closeManagerReportModal()" [disabled]="reportReviewSubmitting">
-                Close
+                {{ t('common.close') }}
               </button>
               <button
                 type="button"
@@ -591,7 +590,7 @@
                 (click)="confirmRejectReport()"
                 [disabled]="reportReviewSubmitting"
               >
-                Reject report
+                {{ t('adminUsers.report.reject') }}
               </button>
               <button
                 type="button"
@@ -599,7 +598,7 @@
                 (click)="confirmBanFromReport()"
                 [disabled]="!canConfirmBanFromReport"
               >
-                {{ reportReviewSubmitting ? 'Processingâ€¦' : 'Approve & ban creator' }}
+                {{ reportActionLabel() }}
               </button>
             </div>
           </div>
@@ -609,19 +608,19 @@
 
     <div class="small-kpis">
       <article class="mini-kpi-card mini-kpi-card--admins">
-        <p class="mini-kpi-label">Total admins</p>
+        <p class="mini-kpi-label">{{ t('adminUsers.miniKpis.totalAdmins') }}</p>
         <p class="mini-kpi-value">{{ totalAdmins | number : '1.0-0' }}</p>
-        <p class="mini-kpi-hint">Admin accounts across the platform</p>
+        <p class="mini-kpi-hint">{{ t('adminUsers.miniKpis.totalAdminsHint') }}</p>
       </article>
       <article class="mini-kpi-card mini-kpi-card--managers">
-        <p class="mini-kpi-label">Total managers</p>
+        <p class="mini-kpi-label">{{ t('adminUsers.miniKpis.totalManagers') }}</p>
         <p class="mini-kpi-value">{{ totalManagers | number : '1.0-0' }}</p>
-        <p class="mini-kpi-hint">Manager accounts across the platform</p>
+        <p class="mini-kpi-hint">{{ t('adminUsers.miniKpis.totalManagersHint') }}</p>
       </article>
       <article class="mini-kpi-card mini-kpi-card--creators">
-        <p class="mini-kpi-label">Total content creators</p>
+        <p class="mini-kpi-label">{{ t('adminUsers.miniKpis.totalContentCreators') }}</p>
         <p class="mini-kpi-value">{{ totalContentCreators | number : '1.0-0' }}</p>
-        <p class="mini-kpi-hint">Content creator accounts across the platform</p>
+        <p class="mini-kpi-hint">{{ t('adminUsers.miniKpis.totalContentCreatorsHint') }}</p>
       </article>
     </div>
   </ng-container>
@@ -631,13 +630,13 @@
       <div class="creator-requests-card-inner">
         <div class="table-head creator-requests-head">
           <div class="creator-requests-head-text">
-            <h3 id="creator-requests-heading">Content creator requests</h3>
-            <p>Tourists who asked to contribute content. Approving assigns the Content Creator role.</p>
+            <h3 id="creator-requests-heading">{{ t('adminUsers.creatorRequests.title') }}</h3>
+            <p>{{ t('adminUsers.creatorRequests.subtitle') }}</p>
           </div>
           <div class="creator-requests-count-wrap" aria-live="polite">
-            <span class="creator-requests-count-label">Pending</span>
+            <span class="creator-requests-count-label">{{ t('adminUsers.creatorRequests.pending') }}</span>
             <span class="creator-requests-count">{{
-              creatorRequestsLoading ? 'â€¦' : (creatorRequestsTotalCount | number : '1.0-0')
+              creatorRequestsLoading ? t('adminUsers.ellipsis') : (creatorRequestsTotalCount | number : '1.0-0')
             }}</span>
           </div>
         </div>
@@ -653,7 +652,7 @@
           <button
             type="button"
             class="feedback-dismiss-btn"
-            aria-label="Dismiss success message"
+            [attr.aria-label]="t('adminUsers.dismissSuccessMessage')"
             (click)="dismissCreatorApproveSuccess()"
           >
             Ã—
@@ -661,12 +660,12 @@
         </div>
 
         <div class="table-toolbar creator-requests-toolbar">
-          <label class="sr-only" for="creator-requests-search">Search content creator requests</label>
+          <label class="sr-only" for="creator-requests-search">{{ t('adminUsers.creatorRequests.search') }}</label>
           <input
             id="creator-requests-search"
             type="search"
             class="table-search"
-            placeholder="Search by name or emailâ€¦"
+            [placeholder]="t('adminUsers.creatorRequests.searchPlaceholder')"
             autocomplete="off"
             [value]="creatorRequestSearch"
             (input)="onCreatorRequestSearchInput($event)"
@@ -677,22 +676,22 @@
             *ngIf="creatorRequestSearch.trim()"
             (click)="clearCreatorRequestSearch()"
           >
-            Clear
+            {{ t('adminUsers.clear') }}
           </button>
         </div>
 
-        <p class="creator-requests-loading" *ngIf="creatorRequestsLoading">Loading requestsâ€¦</p>
+        <p class="creator-requests-loading" *ngIf="creatorRequestsLoading">{{ t('adminUsers.creatorRequests.loading') }}</p>
 
         <div class="table-wrap" *ngIf="!creatorRequestsLoading">
           <table>
             <thead>
               <tr>
-                <th>Requester</th>
-                <th>Email</th>
-                <th>Account status</th>
-                <th>Verified</th>
-                <th>Member since</th>
-                <th>Actions</th>
+                <th>{{ t('adminUsers.creatorRequests.columns.requester') }}</th>
+                <th>{{ t('adminUsers.creatorRequests.columns.email') }}</th>
+                <th>{{ t('adminUsers.creatorRequests.columns.accountStatus') }}</th>
+                <th>{{ t('adminUsers.creatorRequests.columns.verified') }}</th>
+                <th>{{ t('adminUsers.creatorRequests.columns.memberSince') }}</th>
+                <th>{{ t('adminUsers.columns.actions') }}</th>
               </tr>
             </thead>
             <tbody>
@@ -708,12 +707,12 @@
                 <td>{{ req.email }}</td>
                 <td>
                   <span class="status-pill" [class.pending]="!req.isActive">{{
-                    req.isActive ? 'Active' : 'Inactive'
+                    requestStatusLabel(req.isActive)
                   }}</span>
                 </td>
                 <td>
                   <span class="verify-pill" [class.verify-pill--no]="!req.isVerified">{{
-                    req.isVerified ? 'Yes' : 'No'
+                    booleanLabel(req.isVerified)
                   }}</span>
                 </td>
                 <td>{{ formatCreatorRequestDate(req.createdAt) }}</td>
@@ -726,13 +725,9 @@
                       [disabled]="
                         approvingCreatorUserId === req.id || !req.isActive || approveConfirmRow !== null
                       "
-                      [title]="
-                        !req.isActive
-                          ? 'Activate the account before approving'
-                          : 'Grant Content Creator role'
-                      "
+                      [title]="creatorApproveTitle(req)"
                     >
-                      {{ approvingCreatorUserId === req.id ? 'Approvingâ€¦' : 'Approve' }}
+                      {{ creatorApproveButtonLabel(req.id) }}
                     </button>
                     <button
                       type="button"
@@ -741,15 +736,15 @@
                       [disabled]="
                         rejectingCreatorUserId === req.id || !req.isActive || approvingCreatorUserId !== null || approveConfirmRow !== null
                       "
-                      [title]="!req.isActive ? 'Activate the account before denying' : 'Reject Content Creator request'"
+                      [title]="creatorDenyTitle(req)"
                     >
-                      {{ rejectingCreatorUserId === req.id ? 'Denyingâ€¦' : 'Deny' }}
+                      {{ creatorDenyButtonLabel(req.id) }}
                     </button>
                   </div>
                 </td>
               </tr>
               <tr *ngIf="!creatorRequests.length" class="table-empty-row">
-                <td colspan="6">No pending content creator requests.</td>
+                <td colspan="6">{{ t('adminUsers.creatorRequests.empty') }}</td>
               </tr>
             </tbody>
           </table>
@@ -764,7 +759,7 @@
           [totalCount]="creatorRequestsTotalCount"
           [pageSize]="creatorRequestsPageSize"
           [pageSizeOptions]="pageSizeOptions"
-          itemLabel="requests"
+          [itemLabel]="t('adminUsers.creatorRequests.itemsLabel')"
           (pageChange)="onCreatorRequestsGoToPage($event)"
           (pageSizeChange)="onCreatorRequestsPageSizeChange($event)"
         ></app-paginator>
@@ -783,17 +778,16 @@
               (click)="$event.stopPropagation()"
             >
               <h4 id="creator-approve-modal-title" class="creator-approve-modal-title">
-                Approve Content Creator role
+                {{ t('adminUsers.creatorRequests.approveModalTitle') }}
               </h4>
               <p class="creator-approve-modal-body">
-                Approve <strong>{{ creatorRequestDisplayName(approveRow) }}</strong> as a Content Creator? They will
-                be able to create objects, activities, and events for manager review.
+                {{ t('adminUsers.creatorRequests.approveModalBodyStart') }} <strong>{{ creatorRequestDisplayName(approveRow) }}</strong> {{ t('adminUsers.creatorRequests.approveModalBodyEnd') }}
               </p>
               <div class="creator-approve-modal-actions">
                 <button type="button" class="ghost-btn slim-btn" (click)="cancelCreatorApproveConfirm()">
-                  Cancel
+                  {{ t('common.cancel') }}
                 </button>
-                <button type="button" class="approve-creator-btn" (click)="confirmCreatorApprove()">Confirm</button>
+                <button type="button" class="approve-creator-btn" (click)="confirmCreatorApprove()">{{ t('adminUsers.confirm') }}</button>
               </div>
             </div>
           </div>
@@ -804,27 +798,27 @@
     <section class="card" id="users-panel-tourists" role="tabpanel" aria-labelledby="users-tab-tourists">
       <div class="table-head">
         <div>
-          <h3>Tourist accounts</h3>
-          <p>Registered tourists and their profile details.</p>
+          <h3>{{ t('adminUsers.touristAccounts') }}</h3>
+          <p>{{ t('adminUsers.touristAccountsHint') }}</p>
         </div>
       </div>
 
     <div class="table-toolbar">
-      <label class="sr-only" for="tourist-search">Search tourists</label>
+      <label class="sr-only" for="tourist-search">{{ t('adminUsers.searchTourists') }}</label>
       <input
         id="tourist-search"
         type="search"
         class="table-search"
-        placeholder="Search by name, email, origin, status, joined dateâ€¦"
+        [placeholder]="t('adminUsers.touristSearchPlaceholder')"
         autocomplete="off"
         [value]="touristSearch"
         (input)="onTouristSearchInput($event)"
       />
       <span class="table-filter-meta" *ngIf="tourists.length && touristSearch.trim()">
-        {{ filteredTourists.length }} match(es) of {{ tourists.length }}
+        {{ t('adminUsers.matchesOf', { matches: filteredTourists.length, total: tourists.length }) }}
       </span>
       <button type="button" class="table-search-clear" *ngIf="touristSearch.trim()" (click)="clearTouristSearch()">
-        Clear
+        {{ t('adminUsers.clear') }}
       </button>
     </div>
 
@@ -832,12 +826,12 @@
       <table>
         <thead>
           <tr>
-            <th>Tourist</th>
-            <th>Email Address</th>
-            <th>Origin</th>
-            <th>Status</th>
-            <th>Joined Date</th>
-            <th>Actions</th>
+            <th>{{ t('adminUsers.columns.tourist') }}</th>
+            <th>{{ t('adminUsers.columns.emailAddress') }}</th>
+            <th>{{ t('adminUsers.columns.origin') }}</th>
+            <th>{{ t('adminUsers.columns.status') }}</th>
+            <th>{{ t('adminUsers.columns.joinedDate') }}</th>
+            <th>{{ t('adminUsers.columns.actions') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -845,7 +839,7 @@
             <td>
               <div class="person">
                 <div class="tourist-avatar">
-                  <span class="tourist-avatar-initials" role="img" [attr.aria-label]="'Initials for ' + tourist.name">{{
+                  <span class="tourist-avatar-initials" role="img" [attr.aria-label]="t('adminUsers.initialsFor', { name: tourist.name })">{{
                     tourist.initials
                   }}</span>
                 </div>
@@ -862,7 +856,7 @@
                 [class.pending]="tourist.status === 'inactive'"
                 [class.banned]="tourist.status === 'banned'"
               >
-                {{ tourist.status }}
+                {{ touristStatusLabel(tourist.status) }}
               </span>
             </td>
             <td>{{ tourist.joinedDate }}</td>
@@ -880,10 +874,10 @@
             </td>
           </tr>
           <tr *ngIf="!filteredTourists.length && tourists.length" class="table-empty-row">
-            <td colspan="6">No tourists match your search.</td>
+            <td colspan="6">{{ t('adminUsers.noTouristsMatch') }}</td>
           </tr>
           <tr *ngIf="!tourists.length" class="table-empty-row">
-            <td colspan="6">No tourist accounts found.</td>
+            <td colspan="6">{{ t('adminUsers.noTouristAccounts') }}</td>
           </tr>
         </tbody>
       </table>
@@ -897,7 +891,7 @@
       [totalCount]="touristTotalCount"
       [pageSize]="touristPageSize"
       [pageSizeOptions]="pageSizeOptions"
-      itemLabel="tourists"
+      [itemLabel]="t('adminUsers.tourists')"
       (pageChange)="onTouristGoToPage($event)"
       (pageSizeChange)="onTouristPageSizeChange($event)"
     ></app-paginator>
@@ -912,11 +906,11 @@
   >
     <div class="table-head creator-requests-head">
       <div class="creator-requests-head-text">
-        <h3 id="banned-users-heading">Banned team members</h3>
-        <p>Content creators with an active ban. Unban restores their access to the platform.</p>
+        <h3 id="banned-users-heading">{{ t('adminUsers.bannedUsers.title') }}</h3>
+        <p>{{ t('adminUsers.bannedUsers.subtitle') }}</p>
       </div>
       <div class="creator-requests-count-wrap banned-users-count-wrap" aria-live="polite">
-        <span class="creator-requests-count-label">Banned</span>
+        <span class="creator-requests-count-label">{{ t('adminUsers.status.banned') }}</span>
         <span class="creator-requests-count">{{ bannedUsers.length | number : '1.0-0' }}</span>
       </div>
     </div>
@@ -924,18 +918,18 @@
     <div class="feedback feedback--success" *ngIf="unbanSuccess" role="status">{{ unbanSuccess }}</div>
 
     <div class="table-toolbar">
-      <label class="sr-only" for="banned-users-search">Search banned users</label>
+      <label class="sr-only" for="banned-users-search">{{ t('adminUsers.bannedUsers.search') }}</label>
       <input
         id="banned-users-search"
         type="search"
         class="table-search"
-        placeholder="Search by name, email, role, reason"
+        [placeholder]="t('adminUsers.bannedUsers.searchPlaceholder')"
         autocomplete="off"
         [value]="bannedUsersSearch"
         (input)="onBannedUsersSearchInput($event)"
       />
       <span class="table-filter-meta" *ngIf="bannedUsers.length && bannedUsersSearch.trim()">
-        {{ filteredBannedUsers.length }} match(es) of {{ bannedUsers.length }}
+        {{ t('adminUsers.matchesOf', { matches: filteredBannedUsers.length, total: bannedUsers.length }) }}
       </span>
       <button
         type="button"
@@ -943,7 +937,7 @@
         *ngIf="bannedUsersSearch.trim()"
         (click)="clearBannedUsersSearch()"
       >
-        Clear
+        {{ t('adminUsers.clear') }}
       </button>
     </div>
 
@@ -951,12 +945,12 @@
       <table>
         <thead>
           <tr>
-            <th>User</th>
-            <th>Role</th>
-            <th>Reason</th>
-            <th>Banned on</th>
-            <th>Ban expires</th>
-            <th>Actions</th>
+            <th>{{ t('adminUsers.columns.user') }}</th>
+            <th>{{ t('adminUsers.columns.role') }}</th>
+            <th>{{ t('adminUsers.columns.reason') }}</th>
+            <th>{{ t('adminUsers.columns.bannedOn') }}</th>
+            <th>{{ t('adminUsers.columns.banExpires') }}</th>
+            <th>{{ t('adminUsers.columns.actions') }}</th>
           </tr>
         </thead>
         <tbody>
@@ -992,16 +986,16 @@
                   (click)="openUnbanConfirm(row)"
                   [disabled]="unbanSubmitting"
                 >
-                  Unban
+                  {{ t('adminUsers.unban') }}
                 </button>
               </div>
             </td>
           </tr>
           <tr *ngIf="!filteredBannedUsers.length && bannedUsers.length" class="table-empty-row">
-            <td colspan="6">No banned users match your search.</td>
+            <td colspan="6">{{ t('adminUsers.bannedUsers.noMatches') }}</td>
           </tr>
           <tr *ngIf="!bannedUsers.length" class="table-empty-row">
-            <td colspan="6">No banned content creators at the moment.</td>
+            <td colspan="6">{{ t('adminUsers.bannedUsers.empty') }}</td>
           </tr>
         </tbody>
       </table>
@@ -1016,7 +1010,7 @@
       [totalCount]="bannedTotalCount"
       [pageSize]="bannedPageSize"
       [pageSizeOptions]="pageSizeOptions"
-      itemLabel="banned users"
+      [itemLabel]="t('adminUsers.bannedUsers.itemsLabel')"
       (pageChange)="onBannedGoToPage($event)"
       (pageSizeChange)="onBannedPageSizeChange($event)"
     ></app-paginator>
@@ -1030,15 +1024,14 @@
           aria-labelledby="unban-user-modal-title"
           (click)="$event.stopPropagation()"
         >
-          <h4 id="unban-user-modal-title" class="creator-approve-modal-title">Remove ban</h4>
+          <h4 id="unban-user-modal-title" class="creator-approve-modal-title">{{ t('adminUsers.unbanModalTitle') }}</h4>
           <p class="creator-approve-modal-body">
-            Unban <strong>{{ unbanRow.name }}</strong> ({{ unbanRow.email }})? They will regain access to the
-            platform according to their role.
+            {{ t('adminUsers.unbanModalBodyStart') }} <strong>{{ unbanRow.name }}</strong> ({{ unbanRow.email }})? {{ t('adminUsers.unbanModalBodyEnd') }}
           </p>
           <p class="manager-report-modal-error" *ngIf="unbanError" role="alert">{{ unbanError }}</p>
           <div class="creator-approve-modal-actions">
             <button type="button" class="ghost-btn slim-btn" (click)="cancelUnbanConfirm()" [disabled]="unbanSubmitting">
-              Cancel
+              {{ t('common.cancel') }}
             </button>
             <button
               type="button"
@@ -1046,7 +1039,7 @@
               (click)="confirmUnban()"
               [disabled]="unbanSubmitting"
             >
-              {{ unbanSubmitting ? 'Removingâ€¦' : 'Confirm unban' }}
+              {{ unbanConfirmButtonLabel() }}
             </button>
           </div>
         </div>

@@ -4,6 +4,7 @@ import { Observable, concatMap, from, map, of, toArray } from 'rxjs';
 import { environment } from '../../environment/environment';
 import { ActiveRegionService, RegionRequestOptions } from './active-region';
 import { normalizeEntityMedia, normalizeMediaRow, normalizeMediaRows } from '../shared/utils/media-url';
+import { TranslationService } from './translation.service';
 
 export interface LocalityDto {
   id: number;
@@ -84,6 +85,15 @@ export class LocalityService {
   private readonly http = inject(HttpClient);
   private readonly activeRegionService = inject(ActiveRegionService);
   private readonly apiUrl = `${environment.apiUrl}/localities`;
+  private readonly translationService = inject(TranslationService);
+
+  private addLang(params: HttpParams, options?: RegionRequestOptions): HttpParams {
+    if (options?.bypassLanguage) {
+      return params;
+    }
+
+    return params.set('Lang', this.translationService.language());
+  }
 
   getAll(
     query?: LocalityQueryParams,
@@ -100,6 +110,7 @@ export class LocalityService {
       });
     }
 
+    params = this.addLang(params, options);
     return this.http.get<PagedResultDto<LocalityDto>>(this.apiUrl, { params }).pipe(
       map((response) => ({
         ...response,
@@ -115,7 +126,8 @@ export class LocalityService {
   }
 
   getById(id: number): Observable<LocalityDto> {
-    return this.http.get<LocalityDto>(`${this.apiUrl}/${id}`).pipe(
+    const params = this.addLang(new HttpParams());
+    return this.http.get<LocalityDto>(`${this.apiUrl}/${id}`, { params }).pipe(
       map((item) => this.normalizeLocality(item))
     );
   }

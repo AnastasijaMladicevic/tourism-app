@@ -38,6 +38,7 @@ import {
   UpdateDestinationDto
 } from '../../../services/destination.service';
 import { RegionDto, RegionService } from '../../../services/region';
+import { TranslationService } from '../../../services/translation.service';
 import { MapComponent as SharedMapComponent } from '../../../shared/components/map/map';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 
@@ -56,6 +57,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly translationService = inject(TranslationService);
 
   @ViewChild('managerCombo') managerComboRef?: ElementRef<HTMLElement>;
 
@@ -128,12 +130,12 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
       return '';
     }
 
-    const lockedBy = this.editLockState.lockedByDisplayName?.trim() || 'Another admin';
+    const lockedBy = this.editLockState.lockedByDisplayName?.trim() || this.t('adminDestinationForm.anotherAdmin');
     const expiresAt = this.editLockState.expiresAtUtc
       ? this.formatUtcForDisplay(this.editLockState.expiresAtUtc)
-      : 'the current edit session ends';
+      : this.t('adminDestinationForm.currentEditSessionEnds');
 
-    return `${lockedBy} is currently editing this destination. Editing is temporarily disabled until ${expiresAt}.`;
+    return this.t('adminDestinationForm.editLockedMessage', { lockedBy, expiresAt });
   }
 
   ngOnDestroy(): void {
@@ -175,7 +177,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
 
     const regionRequest$ = this.regionService.getAll(true).pipe(
       catchError(() => {
-        this.errorMessage = 'Could not load regions. You can still create a destination without a region.';
+        this.errorMessage = this.t('adminDestinationForm.errors.loadRegions');
         return of([] as RegionDto[]);
       })
     );
@@ -193,13 +195,13 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
                   destinationId: this.editDestinationId!,
                   isLocked: true,
                   isOwnedByCurrentUser: false,
-                  message: this.extractApiErrorMessage(err) || 'Could not start an edit session for this destination.'
+                  message: this.extractApiErrorMessage(err) || this.t('adminDestinationForm.errors.startEditSession')
                 } as DestinationEditLockDto)
               )
             )
           }).pipe(
             catchError(() => {
-              this.errorMessage = 'Could not load destination for editing.';
+              this.errorMessage = this.t('adminDestinationForm.errors.loadDestination');
               return of(null);
             })
           )
@@ -278,7 +280,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
             return;
           }
           this.locationLookupState = 'loading';
-          this.locationLookupMessage = 'Searching map location...';
+          this.locationLookupMessage = this.t('adminDestinationForm.locationLookup.searching');
         }),
         switchMap((name) => this.lookupCoordinatesByName(name)),
         takeUntil(this.destroy$)
@@ -291,15 +293,13 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
           this.form.latitude = Number(result.lat.toFixed(6));
           this.form.longitude = Number(result.lng.toFixed(6));
           this.locationLookupState = 'resolved';
-          this.locationLookupMessage = `Location matched: ${result.label}`;
+          this.locationLookupMessage = this.t('adminDestinationForm.locationLookup.matched', { label: result.label });
         } else if (result.kind === 'not_found') {
           this.locationLookupState = 'not_found';
-          this.locationLookupMessage =
-            'Location not found automatically — set coordinates on the map below.';
+          this.locationLookupMessage = this.t('adminDestinationForm.locationLookup.notFound');
         } else {
           this.locationLookupState = 'error';
-          this.locationLookupMessage =
-            'Location lookup is temporarily unavailable. You can still set coordinates manually.';
+          this.locationLookupMessage = this.t('adminDestinationForm.locationLookup.unavailable');
         }
         this.cdr.detectChanges();
       });
@@ -328,7 +328,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
             firstName: user.firstName ?? '',
             lastName: user.lastName ?? '',
             email: user.email ?? '',
-            roleName: user.roleName ?? user.role ?? 'Manager',
+            roleName: user.roleName ?? user.role ?? this.t('adminDestinationForm.managerRoleFallback'),
             profileImageUrl: user.profileImageUrl ?? null,
             country: user.country ?? null,
             isActive: user.isActive,
@@ -383,7 +383,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
             destinationId: this.editDestinationId!,
             isLocked: true,
             isOwnedByCurrentUser: false,
-            message: this.extractApiErrorMessage(err) || 'Could not keep the edit session active.'
+            message: this.extractApiErrorMessage(err) || this.t('adminDestinationForm.errors.keepEditSession')
           });
           this.cdr.detectChanges();
         }
@@ -415,7 +415,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
   private formatUtcForDisplay(isoValue: string): string {
     const parsed = new Date(isoValue);
     if (Number.isNaN(parsed.getTime())) {
-      return 'the current edit session ends';
+      return this.t('adminDestinationForm.currentEditSessionEnds');
     }
 
     return new Intl.DateTimeFormat(undefined, {
@@ -554,7 +554,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
   }
 
   get regionDisplayName(): string {
-    return this.selectedRegion?.name ?? '—';
+    return this.selectedRegion?.name ?? this.t('adminDestinationForm.notSet');
   }
 
   get latitudeDirection(): 'N' | 'S' {
@@ -577,7 +577,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
     const lat = this.form.latitude;
     const lng = this.form.longitude;
     if (lat == null || lng == null || !Number.isFinite(Number(lat)) || !Number.isFinite(Number(lng))) {
-      return 'Set latitude and longitude';
+      return this.t('adminDestinationForm.setLatitudeLongitude');
     }
     const ns = Number(lat) >= 0 ? 'N' : 'S';
     const ew = Number(lng) >= 0 ? 'E' : 'W';
@@ -585,7 +585,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
   }
 
   get mapPopupText(): string {
-    return this.form.name?.trim() || 'New destination';
+    return this.form.name?.trim() || this.t('adminDestinationForm.newDestination');
   }
 
   onDestinationNameInput(value: string): void {
@@ -600,7 +600,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
     }
 
     this.locationLookupState = 'loading';
-    this.locationLookupMessage = 'Searching map location...';
+    this.locationLookupMessage = this.t('adminDestinationForm.locationLookup.searching');
     this.lookupCoordinatesByName(query).subscribe((result) => {
       if (!result) {
         return;
@@ -609,15 +609,13 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
         this.form.latitude = Number(result.lat.toFixed(6));
         this.form.longitude = Number(result.lng.toFixed(6));
         this.locationLookupState = 'resolved';
-        this.locationLookupMessage = `Location matched: ${result.label}`;
+        this.locationLookupMessage = this.t('adminDestinationForm.locationLookup.matched', { label: result.label });
       } else if (result.kind === 'not_found') {
         this.locationLookupState = 'not_found';
-        this.locationLookupMessage =
-          'Location not found automatically — set coordinates on the map below.';
+        this.locationLookupMessage = this.t('adminDestinationForm.locationLookup.notFound');
       } else {
         this.locationLookupState = 'error';
-        this.locationLookupMessage =
-          'Location lookup is temporarily unavailable. You can still set coordinates manually.';
+        this.locationLookupMessage = this.t('adminDestinationForm.locationLookup.unavailable');
       }
       this.cdr.detectChanges();
     });
@@ -812,7 +810,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
     }
     const remainingSlots = this.maxImageCount - (this.destinationImages.length + this.imageFiles.length);
     if (remainingSlots <= 0) {
-      this.galleryErrorMessage = `You can upload up to ${this.maxImageCount} images per destination.`;
+      this.galleryErrorMessage = this.t('adminDestinationForm.errors.maxImages', { count: this.maxImageCount });
       input.value = '';
       return;
     }
@@ -827,7 +825,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
     }
     this.errorMessage =
       acceptedCount < files.length
-        ? `Only the first ${acceptedCount} image(s) were added. Each destination can have up to ${this.maxImageCount} images.`
+        ? this.t('adminDestinationForm.errors.partialImagesAdded', { acceptedCount, count: this.maxImageCount })
         : '';
     if (
       this.primaryPreviewImageIndex != null &&
@@ -873,19 +871,19 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
 
   private validateBasics(): boolean {
     if (!this.form.name.trim()) {
-      this.errorMessage = 'Destination name is required.';
+      this.errorMessage = this.t('adminDestinationForm.errors.destinationNameRequired');
       return false;
     }
     if (this.destinationImages.length === 0 && this.imageFiles.length === 0) {
-      this.galleryErrorMessage = 'At least one image is required before saving.';
+      this.galleryErrorMessage = this.t('adminDestinationForm.errors.atLeastOneImage');
       return false;
     }
     if (this.destinationImages.length + this.imageFiles.length > this.maxImageCount) {
-      this.errorMessage = `A destination can have at most ${this.maxImageCount} images.`;
+      this.errorMessage = this.t('adminDestinationForm.errors.maxImagesDestination', { count: this.maxImageCount });
       return false;
     }
     if (!this.selectedManager) {
-      this.errorMessage = 'Please select a manager.';
+      this.errorMessage = this.t('adminDestinationForm.errors.selectManager');
       return false;
     }
     this.errorMessage = '';
@@ -951,7 +949,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
                     assignError:
                       typeof err?.error?.message === 'string'
                         ? err.error.message
-                        : 'Destination was saved, but assigning the manager failed.'
+                        : this.t('adminDestinationForm.errors.assignManagerFailed')
                   })
                 )
               );
@@ -985,9 +983,8 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
               this.router.navigate(['/admin/destinations']);
               return;
             }
-            this.errorMessage = 'assignError' in out ? out.assignError : 'Destination was saved, but assigning the manager failed.';
-            this.draftSavedMessage =
-              'Draft saved to the server. You can fix manager assignment and save again.';
+            this.errorMessage = 'assignError' in out ? out.assignError : this.t('adminDestinationForm.errors.assignManagerFailed');
+            this.draftSavedMessage = this.t('adminDestinationForm.draftSavedFixManager');
             return;
           }
           if (published) {
@@ -997,8 +994,8 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
           this.form.isActive = false;
           this.resetPendingImages();
           this.draftSavedMessage = out.imageUploadFailed
-            ? 'Draft saved to the server, but some images could not be uploaded.'
-            : 'Draft saved to the server';
+            ? this.t('adminDestinationForm.draftSavedImageWarning')
+            : this.t('adminDestinationForm.draftSaved');
         },
         error: (err) => {
           const lockState = this.extractLockState(err);
@@ -1097,7 +1094,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
       expiresAtUtc: maybeError.error.expiresAtUtc,
       message: typeof maybeError.error.message === 'string' && maybeError.error.message.trim().length > 0
         ? maybeError.error.message
-        : 'Another admin is currently editing this destination.'
+        : this.t('adminDestinationForm.errors.anotherAdminEditing')
     };
   }
 
@@ -1121,7 +1118,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
         return firstValue[0];
       }
     }
-    return 'Save failed. Please check fields and try again.';
+    return this.t('adminDestinationForm.errors.saveFailed');
   }
 
   private scrollPageToTop(): void {
@@ -1190,5 +1187,9 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
           this.cdr.detectChanges();
         }
       });
+  }
+
+  t(key: string, params?: Record<string, string | number>): string {
+    return this.translationService.translate(key, params);
   }
 }

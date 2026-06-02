@@ -1,13 +1,13 @@
 <section class="admin-dashboard">
   <div class="page-head">
     <div>
-      <h1 class="page-title">Admin Dashboard</h1>
+      <h1 class="page-title">{{ t('adminDashboard.title') }}</h1>
       <p class="subtle-text">
-        Welcome back{{ user?.firstName ? ', ' + user?.firstName : '' }}. Platform overview for the selected period.
+        {{ t('adminDashboard.welcomeBack', { name: user?.firstName ? ', ' + user?.firstName : '' }) }}
       </p>
     </div>
     <div class="head-actions">
-      <div class="period-filter" role="group" aria-label="Dashboard period">
+      <div class="period-filter" role="group" [attr.aria-label]="t('adminDashboard.period')">
         <button
           type="button"
           *ngFor="let opt of periodOptions"
@@ -22,7 +22,7 @@
   </div>
 
   <p class="state-banner error" *ngIf="loadError">{{ loadError }}</p>
-  <p class="state-banner loading" *ngIf="isLoading && !loadError">Loading dashboard...</p>
+  <p class="state-banner loading" *ngIf="isLoading && !loadError">{{ t('adminDashboard.loading') }}</p>
 
   <ng-container *ngIf="!isLoading && overview">
     <div class="kpi-row">
@@ -30,10 +30,10 @@
         <div class="kpi-icon">
           <span class="material-symbols-outlined">groups</span>
         </div>
-        <span class="kpi-label">Total Tourists</span>
+        <span class="kpi-label">{{ t('adminDashboard.totalTourists') }}</span>
         <span class="kpi-value">{{ overview.summary.totalTourists | number }}</span>
         <span class="kpi-meta positive" *ngIf="overview.summary.newTouristsInPeriod > 0">
-          +{{ overview.summary.newTouristsInPeriod | number }} created in {{ overview.periodKey }}
+          {{ t('adminDashboard.createdInPeriod', { count: '+' + (overview.summary.newTouristsInPeriod | number), period: overview.periodKey }) }}
         </span>
       </article>
 
@@ -41,10 +41,10 @@
         <div class="kpi-icon">
           <span class="material-symbols-outlined">travel_explore</span>
         </div>
-        <span class="kpi-label">Active Destinations</span>
+        <span class="kpi-label">{{ t('adminDashboard.activeDestinations') }}</span>
         <span class="kpi-value">{{ overview.summary.activeDestinations | number }}</span>
         <span class="kpi-meta positive" *ngIf="overview.summary.newDestinationsInPeriod > 0">
-          +{{ overview.summary.newDestinationsInPeriod | number }} new in {{ overview.periodKey }}
+          {{ t('adminDashboard.newInPeriod', { count: '+' + (overview.summary.newDestinationsInPeriod | number), period: overview.periodKey }) }}
         </span>
       </article>
 
@@ -52,27 +52,27 @@
         <div class="kpi-icon">
           <span class="material-symbols-outlined">hourglass_top</span>
         </div>
-        <span class="kpi-label">Pending CC Requests</span>
+        <span class="kpi-label">{{ t('adminDashboard.pendingCcRequests') }}</span>
         <span class="kpi-value">{{ overview.summary.pendingCreatorRequests | number }}</span>
-        <span class="kpi-meta muted">Current pending queue</span>
+        <span class="kpi-meta muted">{{ t('adminDashboard.currentPendingQueue') }}</span>
       </article>
 
       <article class="kpi-card card kpi-card--red">
         <div class="kpi-icon">
           <span class="material-symbols-outlined">report</span>
         </div>
-        <span class="kpi-label">Open Reports</span>
+        <span class="kpi-label">{{ t('adminDashboard.openReports') }}</span>
         <span class="kpi-value">{{ overview.summary.openReports | number }}</span>
-        <span class="kpi-meta muted">{{ overview.reports.total | number }} reports created in {{ overview.periodKey }}</span>
+        <span class="kpi-meta muted">{{ t('adminDashboard.reportsCreatedInPeriod', { count: overview.reports.total, period: overview.periodKey }) }}</span>
       </article>
 
       <article class="kpi-card card kpi-card--purple">
         <div class="kpi-icon">
           <span class="material-symbols-outlined">distance</span>
         </div>
-        <span class="kpi-label">Geocoded Destinations</span>
+        <span class="kpi-label">{{ t('adminDashboard.geocodedDestinations') }}</span>
         <span class="kpi-value">{{ overview.geospatialOverview.totalActiveDestinationsWithCoordinates | number }}</span>
-        <span class="kpi-meta muted">{{ overview.geospatialOverview.regionsRepresented | number }} regions represented</span>
+        <span class="kpi-meta muted">{{ t('adminDashboard.regionsRepresentedCount', { count: overview.geospatialOverview.regionsRepresented }) }}</span>
       </article>
     </div>
 
@@ -80,10 +80,10 @@
       <article class="card panel panel--wide">
         <div class="section-head">
           <div>
-            <h3>User Growth</h3>
-            <p>{{ granularityHint }} · tourists, creators, managers, admins</p>
+            <h3>{{ t('adminDashboard.userGrowth') }}</h3>
+            <p>{{ granularityHint }} · {{ t('adminDashboard.growthLegend') }}</p>
           </div>
-          <a class="section-link" routerLink="/admin/users">All users</a>
+          <a class="section-link" routerLink="/admin/users">{{ t('adminDashboard.allUsers') }}</a>
         </div>
 
         <div class="chart-legend chart-legend--inline">
@@ -119,7 +119,7 @@
                 <title>{{ zone.title }}</title>
               </rect>
             </svg>
-            <p class="chart-empty" *ngIf="userGrowthIsEmpty">No signups in this period.</p>
+            <p class="chart-empty" *ngIf="userGrowthIsEmpty">{{ t('adminDashboard.noSignups') }}</p>
           </div>
         </div>
 
@@ -131,8 +131,8 @@
       <article class="card panel">
         <div class="section-head">
           <div>
-            <h3>Role Distribution</h3>
-            <p>Current platform roles</p>
+            <h3>{{ t('adminDashboard.roleDistribution') }}</h3>
+            <p>{{ t('adminDashboard.currentPlatformRoles') }}</p>
           </div>
         </div>
 
@@ -144,12 +144,12 @@
           </svg>
           <div class="donut-center">
             <span class="donut-center-val">{{ roleDonutTotal | number }}</span>
-            <span class="donut-center-label">users</span>
+            <span class="donut-center-label">{{ t('adminDashboard.users') }}</span>
           </div>
         </div>
 
         <ng-template #emptyRoleDonut>
-          <p class="empty-note">No role data is available.</p>
+          <p class="empty-note">{{ t('adminDashboard.noRoleData') }}</p>
         </ng-template>
 
         <ul class="donut-legend">
@@ -164,23 +164,23 @@
       <article class="card panel">
         <div class="section-head">
           <div>
-            <h3>Banned Users</h3>
-            <p>Current temporary and permanent bans by region</p>
+            <h3>{{ t('adminDashboard.bannedUsers') }}</h3>
+            <p>{{ t('adminDashboard.bansByRegion') }}</p>
           </div>
         </div>
 
         <div class="creator-summary">
           <div class="creator-stat creator-stat--pending">
             <span class="creator-stat-val">{{ overview.banOverview.totalBanned | number }}</span>
-            <span class="creator-stat-label">Total banned</span>
+            <span class="creator-stat-label">{{ t('adminDashboard.totalBanned') }}</span>
           </div>
           <div class="creator-stat">
             <span class="creator-stat-val">{{ overview.banOverview.temporarilyBanned | number }}</span>
-            <span class="creator-stat-label">Temporary</span>
+            <span class="creator-stat-label">{{ t('adminDashboard.temporary') }}</span>
           </div>
           <div class="creator-stat">
             <span class="creator-stat-val">{{ overview.banOverview.permanentlyBanned | number }}</span>
-            <span class="creator-stat-label">Permanent</span>
+            <span class="creator-stat-label">{{ t('adminDashboard.permanent') }}</span>
           </div>
         </div>
 
@@ -198,20 +198,20 @@
             </div>
             <div
               class="region-bar-track"
-              [title]="'Total banned: ' + row.totalBanned + ' · Temporary: ' + row.temporarilyBanned + ' · Permanent: ' + row.permanentlyBanned"
+              [title]="t('adminDashboard.banRegionTitle', { total: row.totalBanned, temporary: row.temporarilyBanned, permanent: row.permanentlyBanned })"
             >
               <div class="region-bar-fill region-bar-fill--ban" [style.width.%]="row.barPercent"></div>
             </div>
             <div class="region-stats">
-              <span>{{ row.totalBanned | number }} total</span>
-              <span>{{ row.temporarilyBanned | number }} temporary</span>
-              <span>{{ row.permanentlyBanned | number }} permanent</span>
+              <span>{{ t('adminDashboard.totalCount', { count: row.totalBanned }) }}</span>
+              <span>{{ t('adminDashboard.temporaryCount', { count: row.temporarilyBanned }) }}</span>
+              <span>{{ t('adminDashboard.permanentCount', { count: row.permanentlyBanned }) }}</span>
             </div>
           </div>
         </div>
 
         <ng-template #emptyBanRegions>
-          <p class="empty-note">There are currently no banned users by region.</p>
+          <p class="empty-note">{{ t('adminDashboard.noBannedUsersByRegion') }}</p>
         </ng-template>
       </article>
     </div>
@@ -220,10 +220,10 @@
       <article class="card panel panel--regions">
         <div class="section-head">
           <div>
-            <h3>Destinations by Region</h3>
-            <p>Current coverage by region</p>
+            <h3>{{ t('adminDashboard.destinationsByRegion') }}</h3>
+            <p>{{ t('adminDashboard.currentCoverageByRegion') }}</p>
           </div>
-          <a class="section-link" routerLink="/admin/destinations">Manage</a>
+          <a class="section-link" routerLink="/admin/destinations">{{ t('adminDashboard.manage') }}</a>
         </div>
 
         <ul class="region-list" *ngIf="regionRows.length; else emptyRegions">
@@ -242,46 +242,46 @@
               <div
                 class="region-bar-fill"
                 [style.width.%]="row.barPercent"
-                [title]="row.name + ': ' + row.total + ' total, ' + row.active + ' active, ' + row.geocoded + ' mapped'"
+                [title]="t('adminDashboard.regionCoverageTitle', { region: row.name, total: row.total, active: row.active, mapped: row.geocoded })"
               ></div>
             </div>
             <div class="region-stats">
-              <span>{{ row.total | number }} total</span>
-              <span>{{ row.active | number }} active</span>
+              <span>{{ t('adminDashboard.totalCount', { count: row.total }) }}</span>
+              <span>{{ t('adminDashboard.activeCount', { count: row.active }) }}</span>
               <span class="region-geocoded">
                 <span class="material-symbols-outlined">pin_drop</span>
-                {{ row.geocoded | number }} mapped
+                {{ t('adminDashboard.mappedCount', { count: row.geocoded }) }}
               </span>
             </div>
           </li>
         </ul>
 
         <ng-template #emptyRegions>
-          <p class="empty-note">No destination coverage data is available right now.</p>
+          <p class="empty-note">{{ t('adminDashboard.noDestinationCoverage') }}</p>
         </ng-template>
       </article>
 
       <article class="card panel panel--creator">
         <div class="section-head">
           <div>
-            <h3>Creator Request Status</h3>
-            <p>{{ overview.creatorRequests.totalSubmitted | number }} processed in {{ overview.periodKey }}</p>
+            <h3>{{ t('adminDashboard.creatorRequestStatus') }}</h3>
+            <p>{{ t('adminDashboard.processedInPeriod', { count: overview.creatorRequests.totalSubmitted, period: overview.periodKey }) }}</p>
           </div>
-          <a class="section-link" routerLink="/admin/users" [queryParams]="{ tab: 'tourists' }">Review</a>
+          <a class="section-link" routerLink="/admin/users" [queryParams]="{ tab: 'tourists' }">{{ t('adminDashboard.review') }}</a>
         </div>
 
         <div class="creator-summary">
           <div class="creator-stat creator-stat--pending">
             <span class="creator-stat-val">{{ overview.creatorRequests.pending | number }}</span>
-            <span class="creator-stat-label">Pending</span>
+            <span class="creator-stat-label">{{ t('adminDashboard.pending') }}</span>
           </div>
           <div class="creator-stat">
             <span class="creator-stat-val">{{ overview.creatorRequests.approved | number }}</span>
-            <span class="creator-stat-label">Approved</span>
+            <span class="creator-stat-label">{{ t('adminDashboard.approved') }}</span>
           </div>
           <div class="creator-stat">
             <span class="creator-stat-val">{{ overview.creatorRequests.rejected | number }}</span>
-            <span class="creator-stat-label">Rejected</span>
+            <span class="creator-stat-label">{{ t('adminDashboard.rejected') }}</span>
           </div>
         </div>
 
@@ -306,7 +306,7 @@
 
         <p class="creator-footnote">
           <span class="material-symbols-outlined">info</span>
-          Pending requests are always shown as the current queue, even when they are older than the selected period.
+          {{ t('adminDashboard.pendingRequestsFootnote') }}
         </p>
       </article>
     </div>
@@ -315,22 +315,22 @@
       <article class="card panel panel--visits panel--wide">
         <div class="section-head">
           <div>
-            <h3>Destination Engagement</h3>
-            <p>Favorites, planner adds and ratings in {{ overview.periodKey }}</p>
+            <h3>{{ t('adminDashboard.destinationEngagement') }}</h3>
+            <p>{{ t('adminDashboard.destinationEngagementPeriod', { period: overview.periodKey }) }}</p>
           </div>
         </div>
 
         <div class="visit-summary">
           <div class="visit-summary-card">
-            <span class="visit-summary-label">Favorite adds</span>
+            <span class="visit-summary-label">{{ t('adminDashboard.favoriteAdds') }}</span>
             <span class="visit-summary-value">{{ overview.destinationEngagement.totalFavoriteAdds | number }}</span>
           </div>
           <div class="visit-summary-card">
-            <span class="visit-summary-label">Planner adds</span>
+            <span class="visit-summary-label">{{ t('adminDashboard.plannerAdds') }}</span>
             <span class="visit-summary-value">{{ overview.destinationEngagement.totalPlannerAdds | number }}</span>
           </div>
           <div class="visit-summary-card">
-            <span class="visit-summary-label">Rated destinations</span>
+            <span class="visit-summary-label">{{ t('adminDashboard.ratedDestinations') }}</span>
             <span class="visit-summary-value">{{ overview.destinationEngagement.ratedDestinations | number }}</span>
           </div>
         </div>
@@ -344,34 +344,34 @@
                 </a>
                 <div class="visit-subtle">{{ row.regionName }} · {{ row.regionCode }}</div>
               </div>
-              <div class="visit-count">score {{ row.engagementScore | number:'1.0-1' }}</div>
+              <div class="visit-count">{{ t('adminDashboard.scoreValue', { score: row.engagementScore }) }}</div>
             </div>
             <div class="region-bar-track">
               <div
                 class="region-bar-fill region-bar-fill--teal"
                 [style.width.%]="row.barPercent"
-                [title]="row.destinationName + ': score ' + row.engagementScore + ', favorites ' + row.favoriteAdds + ', planner ' + row.plannerAdds + ', reviews ' + row.reviewCount + ', avg ' + row.averageRating"
+                [title]="t('adminDashboard.destinationEngagementTitle', { name: row.destinationName, score: row.engagementScore, favorites: row.favoriteAdds, planner: row.plannerAdds, reviews: row.reviewCount, avg: row.averageRating })"
               ></div>
             </div>
             <div class="visit-meta">
-              <span>{{ row.favoriteAdds | number }} favorites</span>
-              <span>{{ row.plannerAdds | number }} planner adds</span>
-              <span>{{ row.reviewCount | number }} reviews</span>
-              <span>{{ row.averageRating | number:'1.1-1' }} avg rating</span>
+              <span>{{ t('adminDashboard.favoritesCount', { count: row.favoriteAdds }) }}</span>
+              <span>{{ t('adminDashboard.plannerAddsCount', { count: row.plannerAdds }) }}</span>
+              <span>{{ t('adminDashboard.reviewsCount', { count: row.reviewCount }) }}</span>
+              <span>{{ t('adminDashboard.avgRating', { rating: row.averageRating }) }}</span>
             </div>
           </div>
         </div>
 
         <ng-template #emptyVisits>
-          <p class="empty-note">No destination engagement was detected for this period.</p>
+          <p class="empty-note">{{ t('adminDashboard.noDestinationEngagement') }}</p>
         </ng-template>
       </article>
 
       <article class="card panel">
         <div class="section-head">
           <div>
-            <h3>Region Engagement</h3>
-            <p>Most engaged regions in {{ overview.periodKey }}</p>
+            <h3>{{ t('adminDashboard.regionEngagement') }}</h3>
+            <p>{{ t('adminDashboard.regionEngagementPeriod', { period: overview.periodKey }) }}</p>
           </div>
         </div>
 
@@ -391,44 +391,44 @@
               <div
                 class="region-bar-fill region-bar-fill--teal"
                 [style.width.%]="row.barPercent"
-                [title]="row.regionName + ': score ' + row.engagementScore + ', favorites ' + row.favoriteAdds + ', planner ' + row.plannerAdds + ', reviews ' + row.reviewCount + ', destinations ' + row.engagedDestinations + ', avg ' + row.averageRating"
+                [title]="t('adminDashboard.regionEngagementTitle', { name: row.regionName, score: row.engagementScore, favorites: row.favoriteAdds, planner: row.plannerAdds, reviews: row.reviewCount, destinations: row.engagedDestinations, avg: row.averageRating })"
               ></div>
             </div>
             <div class="region-stats">
-              <span>{{ row.favoriteAdds | number }} favorites</span>
-              <span>{{ row.plannerAdds | number }} planner adds</span>
-              <span>{{ row.reviewCount | number }} reviews</span>
-              <span>{{ row.engagedDestinations | number }} destinations</span>
-              <span>{{ row.averageRating | number:'1.1-1' }} avg rating</span>
+              <span>{{ t('adminDashboard.favoritesCount', { count: row.favoriteAdds }) }}</span>
+              <span>{{ t('adminDashboard.plannerAddsCount', { count: row.plannerAdds }) }}</span>
+              <span>{{ t('adminDashboard.reviewsCount', { count: row.reviewCount }) }}</span>
+              <span>{{ t('adminDashboard.destinationsCount', { count: row.engagedDestinations }) }}</span>
+              <span>{{ t('adminDashboard.avgRating', { rating: row.averageRating }) }}</span>
             </div>
           </div>
         </div>
 
         <ng-template #emptyRegionVisits>
-          <p class="empty-note">No region engagement data is available for this period.</p>
+          <p class="empty-note">{{ t('adminDashboard.noRegionEngagement') }}</p>
         </ng-template>
       </article>
 
       <article class="card panel panel--map">
         <div class="section-head">
           <div>
-            <h3>Geospatial Overview</h3>
-            <p>Current active destinations with map coordinates</p>
+            <h3>{{ t('adminDashboard.geospatialOverview') }}</h3>
+            <p>{{ t('adminDashboard.currentActiveDestinationsWithMapCoordinates') }}</p>
           </div>
         </div>
 
         <div class="geo-summary">
           <div class="geo-summary-item">
             <span class="geo-summary-value">{{ overview.geospatialOverview.totalActiveDestinationsWithCoordinates | number }}</span>
-            <span class="geo-summary-label">Mapped destinations</span>
+            <span class="geo-summary-label">{{ t('adminDashboard.mappedDestinations') }}</span>
           </div>
           <div class="geo-summary-item">
             <span class="geo-summary-value">{{ overview.geospatialOverview.regionsRepresented | number }}</span>
-            <span class="geo-summary-label">Regions represented</span>
+            <span class="geo-summary-label">{{ t('adminDashboard.regionsRepresented') }}</span>
           </div>
           <div class="geo-summary-item">
             <span class="geo-summary-value">{{ overview.geospatialOverview.displayedPoints | number }}</span>
-            <span class="geo-summary-label">Displayed markers</span>
+            <span class="geo-summary-label">{{ t('adminDashboard.displayedMarkers') }}</span>
           </div>
         </div>
 
@@ -444,7 +444,7 @@
             ></app-admin-platform-map>
           </ng-container>
           <ng-template #emptyMapPreview>
-            <p class="empty-note empty-note--map">No mapped destination points are available right now.</p>
+            <p class="empty-note empty-note--map">{{ t('adminDashboard.noMappedPoints') }}</p>
           </ng-template>
         </div>
 
