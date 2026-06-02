@@ -77,8 +77,8 @@
         </div>
       </div>
 
-      <div class="field">
-        <div class="input-wrapper date-input-wrapper">
+      <div class="field" #datePickerWrap>
+        <div class="input-wrapper" style="cursor:pointer" (click)="toggleDatePicker($event)">
           <span class="input-icon">
             <svg
               width="18"
@@ -95,16 +95,75 @@
               />
             </svg>
           </span>
-          <input
-            type="date"
-            formControlName="dateOfBirth"
-            class="date-input"
-            [class.is-empty]="!dateOfBirth?.value"
-            [attr.aria-label]="'signup.dateOfBirth' | translate"
-          />
-          <!--@if (!dateOfBirth?.value) {
-            <span class="date-placeholder">{{ 'signup.dateOfBirth' | translate }}</span>
-        }-->
+          <div class="dob-picker">
+            <div class="sort-trigger language-trigger">
+              <span [class.dob-picker__placeholder]="!formattedDateOfBirth">
+                {{ formattedDateOfBirth || ('signup.dateOfBirth' | translate) }}
+              </span>
+            </div>
+
+            @if (showDatePicker) {
+              <div class="dob-calendar" (click)="$event.stopPropagation()">
+                <div class="dob-calendar__header">
+                  <strong>{{ datePickerMonthLabel }}</strong>
+                  <div class="dob-calendar__nav">
+                    <button
+                      type="button"
+                      class="dob-calendar__nav-btn"
+                      [disabled]="!canGoToPrevDatePickerMonth"
+                      (click)="prevDatePickerMonth()"
+                    >
+                      <svg viewBox="0 0 16 16" aria-hidden="true">
+                        <path d="M10 3.5 5.5 8 10 12.5" />
+                      </svg>
+                    </button>
+                    <button
+                      type="button"
+                      class="dob-calendar__nav-btn"
+                      [disabled]="!canGoToNextDatePickerMonth"
+                      (click)="nextDatePickerMonth()"
+                    >
+                      <svg viewBox="0 0 16 16" aria-hidden="true">
+                        <path d="M6 3.5 10.5 8 6 12.5" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="dob-calendar__weekdays">
+                  <span>Ne</span><span>Po</span><span>Ut</span><span>Sr</span>
+                  <span>Če</span><span>Pe</span><span>Su</span>
+                </div>
+
+                <div class="dob-calendar__grid">
+                  @for (week of datePickerWeeks; track $index) {
+                    @for (cell of week; track cell.key) {
+                      <button
+                        type="button"
+                        class="dob-calendar__day"
+                        [class.dob-calendar__day--outside]="!cell.isCurrentMonth"
+                        [class.dob-calendar__day--selected]="cell.isSelected"
+                        [class.dob-calendar__day--disabled]="cell.isDisabled"
+                        [disabled]="cell.isDisabled"
+                        (click)="selectDatePickerDay(cell)"
+                      >
+                        {{ cell.label }}
+                      </button>
+                    }
+                  }
+                </div>
+
+                <div class="dob-calendar__footer">
+                  <button type="button" class="dob-calendar__footer-btn dob-calendar__footer-btn--secondary" (click)="clearDatePicker()">
+                    {{ 'common.clear' | translate }}
+                  </button>
+                  <button type="button" class="dob-calendar__footer-btn dob-calendar__footer-btn--primary" (click)="confirmDatePicker()">
+                    {{ 'common.confirm' | translate }}
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
         </div>
         @if (dateOfBirth?.touched && dateOfBirth?.hasError('required')) {
           <p class="field-error">{{ 'signup.errors.dateRequired' | translate }}</p>

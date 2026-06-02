@@ -20,6 +20,15 @@ interface SignupLanguageOption {
   labelKey: string;
 }
 
+interface DatePickerCell {
+  key: string;
+  label: number;
+  date: Date;
+  isCurrentMonth: boolean;
+  isDisabled: boolean;
+  isSelected: boolean;
+}
+
 @Component({
   selector: 'app-signup',
   standalone: true,
@@ -31,10 +40,16 @@ export class SignupComponent implements OnDestroy {
   private readonly phonePattern = /^\+?[0-9][0-9\s/-]{5,19}$/;
 
   @ViewChild('countryDropdown') private countryDropdownEl?: ElementRef<HTMLElement>;
+  @ViewChild('datePickerWrap') private datePickerWrapEl?: ElementRef<HTMLElement>;
 
   showLanguageMenu = false;
   showCountryMenu = false;
+  showDatePicker = false;
   isLoading = false;
+
+  private datePickerMonthCursor: Date = new Date();
+  datePickerDraft = '';
+  datePickerWeeks: DatePickerCell[][] = [];
 
   readonly countryOptions: string[] = [
     'Albania', 'Argentina', 'Australia', 'Austria', 'Belgium',
@@ -135,6 +150,9 @@ export class SignupComponent implements OnDestroy {
     if (this.showCountryMenu && !this.countryDropdownEl?.nativeElement.contains(event.target as Node)) {
       this.showCountryMenu = false;
     }
+    if (this.showDatePicker && !this.datePickerWrapEl?.nativeElement.contains(event.target as Node)) {
+      this.showDatePicker = false;
+    }
   }
 
   toggleLanguageMenu(event: Event): void {
@@ -144,6 +162,7 @@ export class SignupComponent implements OnDestroy {
 
   selectLanguage(code: AppLanguage): void {
     this.form.patchValue({ language: code });
+    this.translationService.setLanguage(code);
     this.showLanguageMenu = false;
     this.cdr.detectChanges();
   }
@@ -166,6 +185,123 @@ export class SignupComponent implements OnDestroy {
 
   getSelectedCountryLabel(): string {
     return this.form.value.country || '';
+  }
+
+  get formattedDateOfBirth(): string {
+    const value = this.form.value.dateOfBirth;
+    if (!value) return '';
+    const [y, m, d] = (value as string).split('-').map(Number);
+    const date = new Date(y, m - 1, d);
+    return new Intl.DateTimeFormat(this.translationService.currentLocale(), {
+      day: 'numeric', month: 'long', year: 'numeric',
+    }).format(date);
+  }
+
+  get datePickerMonthLabel(): string {
+    return new Intl.DateTimeFormat(this.translationService.currentLocale(), {
+      month: 'long', year: 'numeric',
+    }).format(this.datePickerMonthCursor);
+  }
+
+  get canGoToPrevDatePickerMonth(): boolean {
+    return this.datePickerMonthCursor.getFullYear() > 1920;
+  }
+
+  get canGoToNextDatePickerMonth(): boolean {
+    const today = new Date();
+    const c = this.datePickerMonthCursor;
+    return c.getFullYear() < today.getFullYear() ||
+      (c.getFullYear() === today.getFullYear() && c.getMonth() < today.getMonth());
+  }
+
+  toggleDatePicker(event: Event): void {
+    event.stopPropagation();
+    if (!this.showDatePicker) {
+      const current = this.form.value.dateOfBirth as string | undefined;
+      if (current) {
+        const [y, m] = current.split('-').map(Number);
+        this.datePickerMonthCursor = new Date(y, m - 1, 1);
+      } else {
+        const today = new Date();
+        this.datePickerMonthCursor = new Date(today.getFullYear(), today.getMonth(), 1);
+      }
+      this.datePickerDraft = current ?? '';
+      this.refreshDatePickerWeeks();
+    }
+    this.showDatePicker = !this.showDatePicker;
+  }
+
+  prevDatePickerMonth(): void {
+    if (!this.canGoToPrevDatePickerMonth) return;
+    const prev = new Date(this.datePickerMonthCursor);
+    prev.setMonth(prev.getMonth() - 1);
+    this.datePickerMonthCursor = new Date(prev.getFullYear(), prev.getMonth(), 1);
+    this.refreshDatePickerWeeks();
+  }
+
+  nextDatePickerMonth(): void {
+    if (!this.canGoToNextDatePickerMonth) return;
+    const next = new Date(this.datePickerMonthCursor);
+    next.setMonth(next.getMonth() + 1);
+    this.datePickerMonthCursor = new Date(next.getFullYear(), next.getMonth(), 1);
+    this.refreshDatePickerWeeks();
+  }
+
+  selectDatePickerDay(cell: DatePickerCell): void {
+    if (cell.isDisabled) return;
+    this.datePickerDraft = cell.key;
+    this.refreshDatePickerWeeks();
+  }
+
+  confirmDatePicker(): void {
+    if (this.datePickerDraft) {
+      this.form.patchValue({ dateOfBirth: this.datePickerDraft });
+      this.form.get('dateOfBirth')?.markAsTouched();
+    }
+    this.showDatePicker = false;
+  }
+
+  clearDatePicker(): void {
+    this.datePickerDraft = '';
+    this.refreshDatePickerWeeks();
+  }
+
+  private refreshDatePickerWeeks(): void {
+    const monthStart = this.datePickerMonthCursor;
+    const firstGrid = new Date(monthStart);
+    firstGrid.setDate(monthStart.getDate() - monthStart.getDay());
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const weeks: DatePickerCell[][] = [];
+
+    for (let w = 0; w < 6; w++) {
+      const week: DatePickerCell[] = [];
+      for (let d = 0; d < 7; d++) {
+        const cellDate = new Date(firstGrid);
+        cellDate.setDate(firstGrid.getDate() + w * 7 + d);
+        const normalized = new Date(cellDate);
+        normalized.setHours(0, 0, 0, 0);
+        const key = this.toDateKey(cellDate);
+        week.push({
+          key,
+          label: cellDate.getDate(),
+          date: cellDate,
+          isCurrentMonth: cellDate.getMonth() === monthStart.getMonth(),
+          isDisabled: normalized > today,
+          isSelected: key === this.datePickerDraft,
+        });
+      }
+      weeks.push(week);
+    }
+    this.datePickerWeeks = weeks;
+  }
+
+  private toDateKey(date: Date): string {
+    const y = date.getFullYear();
+    const m = `${date.getMonth() + 1}`.padStart(2, '0');
+    const d = `${date.getDate()}`.padStart(2, '0');
+    return `${y}-${m}-${d}`;
   }
   submit(): void {
     if (this.form.invalid) {
