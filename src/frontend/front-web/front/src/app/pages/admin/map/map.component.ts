@@ -3,6 +3,7 @@ import {
   Component,
   ElementRef,
   HostListener,
+  inject,
   NgZone,
   OnDestroy,
   OnInit,
@@ -17,6 +18,7 @@ import * as L from 'leaflet';
 import { MatIconModule } from '@angular/material/icon';
 import { DestinationDto } from '../../../services/destination.service';
 import { MapService } from '../../../services/map.service';
+import { TranslationService } from '../../../services/translation.service';
 import { AdminPlatformMapComponent } from '../../../shared/components/admin-platform-map/admin-platform-map.component';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 
@@ -47,6 +49,7 @@ interface AdminMapDestination extends DestinationDto {
 })
 export class MapComponent implements OnInit, OnDestroy {
   private static readonly TARGET_DETAIL_ZOOM = 15;
+  private readonly translationService = inject(TranslationService);
   @ViewChild('cardElement') private cardElementRef?: ElementRef<HTMLElement>;
   @ViewChild('mapPage') private mapPageRef?: ElementRef<HTMLElement>;
 
@@ -247,7 +250,7 @@ export class MapComponent implements OnInit, OnDestroy {
     return {
       id: raw.id,
       name: raw.name,
-      typeName: raw.destinationTypeName ?? 'Destination',
+      typeName: raw.destinationTypeName ?? this.t('adminMap.destination'),
       location: raw.regionName ?? '',
       image: raw.mainImageUrl ?? raw.images?.[0]?.url ?? '',
       icon: 'place',
@@ -414,5 +417,9 @@ export class MapComponent implements OnInit, OnDestroy {
       markerPoint.y < topPadding ||
       markerPoint.y > mapPage.clientHeight - bottomPadding
     );
+  }
+
+  private t(key: string, params?: Record<string, string | number>): string {
+    return this.translationService.translate(key, params);
   }
 }

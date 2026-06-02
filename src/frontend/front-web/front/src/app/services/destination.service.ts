@@ -6,6 +6,7 @@ import { environment } from '../../environment/environment';
 import { DestinationQueryDto, DestinationQueryResponse } from '../models/destination.model';
 import { ActiveRegionService, RegionRequestOptions } from './active-region';
 import { normalizeEntityMedia, normalizeMediaRow, normalizeMediaRows } from '../shared/utils/media-url';
+import { TranslationService } from './translation.service';
 export interface DestinationDto {
   id: number;
   name: string;
@@ -91,7 +92,17 @@ export class DestinationService {
   private readonly apiUrl = `${environment.apiUrl}/Destinations`;
   constructor(
     private readonly activeRegionService: ActiveRegionService,
+    private readonly translationService: TranslationService,
   ) {}
+
+  private addLang(params: HttpParams, options?: RegionRequestOptions): HttpParams {
+    if (options?.bypassLanguage) {
+      return params;
+    }
+
+    return params.set('Lang', this.translationService.language());
+  }
+
   getAll(
     query?: DestinationQueryParams,
     options?: RegionRequestOptions,
@@ -107,6 +118,7 @@ export class DestinationService {
       });
     }
 
+    params = this.addLang(params, options);
     return this.http.get<DestinationDto[] | { items?: DestinationDto[] }>(this.apiUrl, { params }).pipe(
       map((response) => {
         const items = Array.isArray(response) ? response : (response?.items ?? []);
@@ -115,7 +127,8 @@ export class DestinationService {
     );
   }
   getById(id: number): Observable<DestinationDto> {
-    return this.http.get<DestinationDto>(`${this.apiUrl}/${id}`).pipe(
+    const params = this.addLang(new HttpParams());
+    return this.http.get<DestinationDto>(`${this.apiUrl}/${id}`, { params }).pipe(
       map((item) => this.normalizeDestination(item))
     );
   }

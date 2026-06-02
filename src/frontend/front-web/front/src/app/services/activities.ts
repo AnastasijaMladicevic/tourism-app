@@ -4,6 +4,7 @@ import { Observable, from, map, of } from 'rxjs';
 import { concatMap, toArray } from 'rxjs/operators';
 import { environment } from '../../environment/environment';
 import { normalizeEntityMedia, normalizeMediaRow, normalizeMediaRows } from '../shared/utils/media-url';
+import { TranslationService } from './translation.service';
 
 export interface ActivityDto {
   id: number;
@@ -135,13 +136,20 @@ export class ActivitiesService {
   private readonly apiUrl = `${environment.apiUrl}/activities`;
   private readonly localitiesApiUrl = `${environment.apiUrl}/localities`;
 
-  constructor(private readonly http: HttpClient) {}
+  constructor(
+    private readonly http: HttpClient,
+    private readonly translationService: TranslationService,
+  ) {}
+
+  private addLang(params: HttpParams): HttpParams {
+    return params.set('Lang', this.translationService.language());
+  }
 
   /**
    * Get activities created by the current content creator
    */
   getMyActivities(query?: ActivityQueryDto): Observable<ActivityQueryResponse> {
-    const params = this.buildActivityQueryParams(query);
+    const params = this.addLang(this.buildActivityQueryParams(query));
     return this.http.get<ActivityQueryResponse>(`${this.apiUrl}/my`, { params }).pipe(
       map((response) => this.normalizeActivityResponse(response))
     );
@@ -151,7 +159,7 @@ export class ActivitiesService {
    * Get activities visible to the current manager for approval/rejection
    */
   getForManager(query?: ActivityQueryDto): Observable<ActivityQueryResponse> {
-    const params = this.buildActivityQueryParams(query);
+    const params = this.addLang(this.buildActivityQueryParams(query));
     return this.http.get<ActivityQueryResponse>(`${this.apiUrl}/manager`, { params }).pipe(
       map((response) => this.normalizeActivityResponse(response))
     );
@@ -164,7 +172,8 @@ export class ActivitiesService {
   }
 
   getById(id: number): Observable<ActivityDto> {
-    return this.http.get<ActivityDto>(`${this.apiUrl}/${id}`).pipe(
+    const params = this.addLang(new HttpParams());
+    return this.http.get<ActivityDto>(`${this.apiUrl}/${id}`, { params }).pipe(
       map((activity) => this.normalizeActivity(activity))
     );
   }
@@ -276,7 +285,7 @@ export class ActivitiesService {
       .set('sortOrder', 'asc');
 
     return this.http
-      .get<PagedResponse<ActivityDto> | ActivityDto[]>(this.apiUrl, { params })
+      .get<PagedResponse<ActivityDto> | ActivityDto[]>(this.apiUrl, { params: this.addLang(params) })
       .pipe(map((response) => {
         const items = this.extractItems(response);
         const unique = new Map<number, ActivityTypeOption>();
@@ -306,7 +315,7 @@ export class ActivitiesService {
       .set('sortOrder', 'asc');
 
     return this.http
-      .get<PagedResponse<LocalityOption> | LocalityOption[]>(this.localitiesApiUrl, { params })
+      .get<PagedResponse<LocalityOption> | LocalityOption[]>(this.localitiesApiUrl, { params: this.addLang(params) })
       .pipe(map((response) => this.extractItems(response)));
   }
 

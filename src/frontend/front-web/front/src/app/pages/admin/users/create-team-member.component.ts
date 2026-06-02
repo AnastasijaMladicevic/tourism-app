@@ -7,6 +7,7 @@ import { finalize } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { CreateUserDto, UserDto } from '../../../models/user.model';
 import { AdminUsersService } from '../../../services/admin-users.service';
+import { TranslationService } from '../../../services/translation.service';
 
 export type TeamMemberRole = 'manager' | 'admin';
 
@@ -20,6 +21,7 @@ export type TeamMemberRole = 'manager' | 'admin';
 export class CreateTeamMemberComponent {
   private readonly router = inject(Router);
   private readonly adminUsers = inject(AdminUsersService);
+  private readonly translationService = inject(TranslationService);
 
   isSubmitting = false;
   submitError = '';
@@ -99,15 +101,15 @@ export class CreateTeamMemberComponent {
       score++;
     }
     if (score <= 1) {
-      return 'WEAK';
+      return this.t('adminTeamMemberCreate.passwordStrength.weak');
     }
     if (score === 2) {
-      return 'FAIR';
+      return this.t('adminTeamMemberCreate.passwordStrength.fair');
     }
     if (score === 3) {
-      return 'GOOD';
+      return this.t('adminTeamMemberCreate.passwordStrength.good');
     }
-    return 'STRONG';
+    return this.t('adminTeamMemberCreate.passwordStrength.strong');
   }
 
   get passwordStrengthClass(): 'weak' | 'fair' | 'good' | 'strong' | '' {
@@ -116,10 +118,10 @@ export class CreateTeamMemberComponent {
       return '';
     }
     const map: Record<string, 'weak' | 'fair' | 'good' | 'strong'> = {
-      WEAK: 'weak',
-      FAIR: 'fair',
-      GOOD: 'good',
-      STRONG: 'strong'
+      [this.t('adminTeamMemberCreate.passwordStrength.weak')]: 'weak',
+      [this.t('adminTeamMemberCreate.passwordStrength.fair')]: 'fair',
+      [this.t('adminTeamMemberCreate.passwordStrength.good')]: 'good',
+      [this.t('adminTeamMemberCreate.passwordStrength.strong')]: 'strong'
     };
     return map[label] ?? '';
   }
@@ -142,15 +144,15 @@ export class CreateTeamMemberComponent {
     const last = this.lastName.trim();
     const email = this.workEmail.trim();
     if (!first || !last || !email || !this.dateOfBirth) {
-      this.submitError = 'Please fill in first name, last name, work email, and date of birth.';
+      this.submitError = this.t('adminTeamMemberCreate.errors.requiredFields');
       return;
     }
     if (!this.password || this.password.length < 6) {
-      this.submitError = 'Password must be at least 6 characters.';
+      this.submitError = this.t('adminTeamMemberCreate.errors.passwordMinLength');
       return;
     }
     if (this.password !== this.confirmPassword) {
-      this.submitError = 'Passwords do not match.';
+      this.submitError = this.t('adminTeamMemberCreate.errors.passwordsMismatch');
       return;
     }
 
@@ -202,12 +204,39 @@ export class CreateTeamMemberComponent {
         }
       }
       if (err.status === 0) {
-        return 'Network error. Check that the API is running.';
+        return this.t('adminTeamMemberCreate.errors.network');
       }
       if (err.status >= 500) {
-        return 'Server error. Try again later.';
+        return this.t('adminTeamMemberCreate.errors.server');
       }
     }
-    return 'Could not create user. Please try again.';
+    return this.t('adminTeamMemberCreate.errors.createFailed');
+  }
+
+  t(key: string, params?: Record<string, string | number>): string {
+    return this.translationService.translate(key, params);
+  }
+
+  countryLabel(country: string): string {
+    const key = country
+      .replace(/[()]/g, '')
+      .replace(/\s+/g, '')
+      .replace(/[^A-Za-z]/g, '');
+    return this.t(`adminTeamMemberCreate.countries.${key}`);
+  }
+
+  languageLabel(language: string): string {
+    const key = language
+      .replace(/[()]/g, '')
+      .replace(/\s+/g, '')
+      .replace(/[^A-Za-z]/g, '');
+    return this.t(`adminTeamMemberCreate.languages.${key}`);
+  }
+
+  regionLabel(region: string): string {
+    const key = region
+      .replace(/\s+/g, '')
+      .replace(/[^A-Za-z]/g, '');
+    return this.t(`adminTeamMemberCreate.regions.${key}`);
   }
 }

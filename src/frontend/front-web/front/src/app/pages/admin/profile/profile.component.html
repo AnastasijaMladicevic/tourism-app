@@ -1,9 +1,9 @@
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
 <div class="profile-page">
   <div class="breadcrumb">
-    <span class="breadcrumb-link" routerLink="/admin/dashboard">Settings</span>
+    <span class="breadcrumb-link" routerLink="/admin/dashboard">{{ 'layout.settings' | translate }}</span>
     <mat-icon class="breadcrumb-icon" fontSet="material-icons-outlined">chevron_right</mat-icon>
-    <span class="breadcrumb-current">User Profile</span>
+    <span class="breadcrumb-current">{{ 'adminProfile.userProfile' | translate }}</span>
   </div>
 
   <div class="profile-layout">
@@ -25,7 +25,7 @@
                   }
                 </div>
 
-                <button class="avatar-edit-btn" type="button" title="Change photo" (click)="triggerFileInput()">
+                <button class="avatar-edit-btn" type="button" [title]="'adminProfile.changePhoto' | translate" (click)="triggerFileInput()">
                   <mat-icon fontSet="material-icons-outlined">edit</mat-icon>
                 </button>
 
@@ -38,7 +38,7 @@
                 />
               </div>
               <button class="avatar-remove-btn" type="button" (click)="removePhoto()">
-                <p>Remove photo</p>
+                <p>{{ 'adminProfile.removePhoto' | translate }}</p>
               </button>
             </div>
           </div>
@@ -63,8 +63,8 @@
       <section class="card profile-form-card">
         <div class="form-card-header">
           <div class="form-card-header__text">
-            <h3 class="form-card-title">Account Information</h3>
-            <p class="form-card-sub">Update the parts of the profile that are meant to be edited from this screen.</p>
+            <h3 class="form-card-title">{{ 'adminProfile.accountInformation' | translate }}</h3>
+            <p class="form-card-sub">{{ 'adminProfile.accountInformationHint' | translate }}</p>
           </div>
 
         </div>
@@ -72,23 +72,23 @@
         <div class="profile-form-grid">
           <div class="profile-form-column">
             <div class="form-section">
-              <div class="section-label">Personal Details</div>
+              <div class="section-label">{{ 'adminProfile.personalDetails' | translate }}</div>
 
               <div class="form-row">
                 <div class="form-group">
-                  <label class="form-label" for="firstName">First Name</label>
+                  <label class="form-label" for="firstName">{{ 'adminProfile.firstName' | translate }}</label>
                   <input id="firstName" class="form-input" type="text" [(ngModel)]="user.firstName" disabled />
                 </div>
 
                 <div class="form-group">
-                  <label class="form-label" for="lastName">Last Name</label>
+                  <label class="form-label" for="lastName">{{ 'adminProfile.lastName' | translate }}</label>
                   <input id="lastName" class="form-input" type="text" [(ngModel)]="user.lastName" disabled />
                 </div>
               </div>
 
               <div class="form-row form-row--compact">
                 <div class="form-group">
-                  <label class="form-label" for="dateOfBirth">Date of Birth</label>
+                  <label class="form-label" for="dateOfBirth">{{ 'adminProfile.dateOfBirth' | translate }}</label>
                   <div class="input-wrapper">
                     <mat-icon class="input-icon" fontSet="material-icons-outlined">calendar_month</mat-icon>
                     <input id="dateOfBirth" class="form-input" type="date" [(ngModel)]="user.dateOfBirth" disabled />
@@ -98,20 +98,20 @@
             </div>
 
             <div class="form-section">
-              <div class="section-label">Contact & Location</div>
+              <div class="section-label">{{ 'adminProfile.contactLocation' | translate }}</div>
 
               <div class="form-row">
                 <div class="form-group">
-                  <label class="form-label" for="email">Email Address</label>
+                  <label class="form-label" for="email">{{ 'adminProfile.emailAddress' | translate }}</label>
                   <div class="input-wrapper">
                     <mat-icon class="input-icon" fontSet="material-icons-outlined">mail</mat-icon>
                     <input id="email" class="form-input" type="email" [(ngModel)]="user.email" disabled />
                   </div>
-                  <span class="form-hint">Email is managed by the system and cannot be changed here.</span>
+                  <span class="form-hint">{{ 'adminProfile.emailManagedHint' | translate }}</span>
                 </div>
 
                 <div class="form-group">
-                  <label class="form-label" for="phoneNumber">Phone Number</label>
+                  <label class="form-label" for="phoneNumber">{{ 'adminProfile.phoneNumber' | translate }}</label>
                   <div class="input-wrapper">
                     <mat-icon class="input-icon" fontSet="material-icons-outlined">call</mat-icon>
                     <input id="phoneNumber" class="form-input" type="tel" [(ngModel)]="user.phoneNumber" />
@@ -121,7 +121,7 @@
 
               <div class="form-row">
                 <div class="form-group">
-                  <label class="form-label" id="country-label">Country</label>
+                  <label class="form-label" id="country-label">{{ 'adminProfile.country' | translate }}</label>
                   <div class="language-dropdown" #countryDropdown>
                     <button
                       type="button"
@@ -164,7 +164,7 @@
                 </div>
 
                 <div class="form-group">
-                  <label class="form-label" id="language-label">Language</label>
+                  <label class="form-label" id="language-label">{{ 'adminProfile.language' | translate }}</label>
                   <div class="language-dropdown" #languageDropdown>
                     <button
                       type="button"
@@ -194,7 +194,7 @@
                               [attr.aria-selected]="user.language === option.code"
                               (click)="selectLanguage(option.code, $event)"
                             >
-                              <span>{{ option.label }}</span>
+                              <span>{{ option.labelKey | translate }}</span>
                               @if (user.language === option.code) {
                                 <mat-icon fontSet="material-icons-outlined">check</mat-icon>
                               }
@@ -212,7 +212,7 @@
 
           <aside class="profile-sidebar">
             <section class="access-card">
-              <div class="section-label section-label--tight">System Role</div>
+              <div class="section-label section-label--tight">{{ 'adminProfile.systemRole' | translate }}</div>
 
               <div class="access-card__top">
                 <div class="access-card__icon">
@@ -220,22 +220,22 @@
                 </div>
 
                 <div class="access-card__copy">
-                  <h3 class="access-card__title">{{ role | titlecase }}</h3>
+                  <h3 class="access-card__title">{{ roleLabelKey | translate }}</h3>
                 </div>
 
-                <span class="badge badge-blue access-card__badge">{{ permissionCount }}&nbsp;<span>permissions</span></span>
+                <span class="badge badge-blue access-card__badge">{{ permissionCount }}&nbsp;<span>{{ 'adminProfile.permissionsLabel' | translate }}</span></span>
               </div>
 
-              <p class="access-card__sub">Read-only permissions inherited from the administrator role.</p>
+              <p class="access-card__sub">{{ 'adminProfile.permissionsInherited' | translate }}</p>
 
               <button class="access-card__action" type="button" (click)="openPermissionsModal()">
-                <span>Show all permissions</span>
+                <span>{{ 'adminProfile.showAllPermissions' | translate }}</span>
                 <mat-icon fontSet="material-icons-outlined">chevron_right</mat-icon>
               </button>
             </section>
 
             <section class="security-card">
-              <div class="section-label section-label--tight">Account Security</div>
+              <div class="section-label section-label--tight">{{ 'adminProfile.accountSecurity' | translate }}</div>
 
               <div class="security-card__content">
                 <div class="security-card__icon">
@@ -243,13 +243,13 @@
                 </div>
 
                 <div class="security-card__copy">
-                  <h3 class="security-card__title">Password Change</h3>
-                  <p class="security-card__sub">Regular password updates are recommended for account security.</p>
+                  <h3 class="security-card__title">{{ 'adminProfile.passwordChange' | translate }}</h3>
+                  <p class="security-card__sub">{{ 'adminProfile.passwordSecurityHint' | translate }}</p>
                 </div>
               </div>
 
               <button class="security-card__action" type="button" (click)="resetPassword()">
-                <span>Change Password</span>
+                <span>{{ 'adminProfile.changePassword' | translate }}</span>
                 <mat-icon fontSet="material-icons-outlined">chevron_right</mat-icon>
               </button>
             </section>
@@ -257,13 +257,13 @@
             <div class="form-card-footer">
               <div class="save-feedback save-feedback--inline" [class.visible]="saveSuccess">
                 <mat-icon fontSet="material-icons-outlined">check_circle</mat-icon>
-                <span>Changes saved</span>
+                <span>{{ 'adminProfile.changesSaved' | translate }}</span>
               </div>
 
               <div class="form-card-footer__actions">
                 <button class="profile-action-btn profile-action-btn--secondary" type="button" (click)="cancel()">
                   <mat-icon fontSet="material-icons-outlined">close</mat-icon>
-                  <span>Cancel</span>
+                  <span>{{ 'common.cancel' | translate }}</span>
                 </button>
 
                 <button class="profile-action-btn profile-action-btn--primary" type="button" [disabled]="isSaving" (click)="saveChanges()">
@@ -272,7 +272,7 @@
                   } @else {
                     <mat-icon fontSet="material-icons-outlined">save</mat-icon>
                   }
-                  <span>{{ isSaving ? 'Saving...' : 'Save Changes' }}</span>
+                  <span>{{ isSaving ? ('adminProfile.saving' | translate) : ('adminProfile.saveChanges' | translate) }}</span>
                 </button>
               </div>
             </div>
@@ -295,17 +295,17 @@
     >
       <div class="permissions-modal__header">
         <div>
-          <h3><span>Role permissions</span>: {{ role | titlecase }}</h3>
-          <p>Permissions are inherited from the administrator role and determine access to system features.</p>
+          <h3><span>{{ 'adminProfile.rolePermissions' | translate }}</span>: {{ roleLabelKey | translate }}</h3>
+          <p>{{ 'adminProfile.permissionsModalHint' | translate }}</p>
         </div>
 
-        <button class="permissions-modal__close" type="button" (click)="closePermissionsModal()" aria-label="Close">
+        <button class="permissions-modal__close" type="button" (click)="closePermissionsModal()" [attr.aria-label]="'common.close' | translate">
           <mat-icon fontSet="material-icons-outlined">close</mat-icon>
         </button>
       </div>
 
       <div class="permissions-modal__grid">
-        @for (permission of permissionItems; track permission.label) {
+        @for (permission of permissionItems; track permission.labelKey) {
           <article class="permission-tile">
             <span class="permission-tile__check">
               <mat-icon fontSet="material-icons-outlined">check</mat-icon>
@@ -316,15 +316,15 @@
             </span>
 
             <span class="permission-tile__copy">
-              <span class="permission-tile__label">{{ permission.label }}</span>
-              <span class="permission-tile__detail">{{ permission.detail }}</span>
+              <span class="permission-tile__label">{{ permission.labelKey | translate }}</span>
+              <span class="permission-tile__detail">{{ permission.detailKey | translate }}</span>
             </span>
           </article>
         }
       </div>
 
       <div class="permissions-modal__footer">
-        <button class="permissions-modal__button" type="button" (click)="closePermissionsModal()">Close</button>
+        <button class="permissions-modal__button" type="button" (click)="closePermissionsModal()">{{ 'common.close' | translate }}</button>
       </div>
     </div>
   </div>
@@ -333,8 +333,8 @@
   <div class="crop-modal-backdrop" (click)="cancelCrop()">
     <div class="crop-modal" (click)="$event.stopPropagation()">
       <div class="crop-modal__header">
-        <span>Crop photo</span>
-        <button class="crop-modal__close" type="button" (click)="cancelCrop()" aria-label="Close">
+        <span>{{ 'adminProfile.cropPhoto' | translate }}</span>
+        <button class="crop-modal__close" type="button" (click)="cancelCrop()" [attr.aria-label]="'common.close' | translate">
           <mat-icon fontSet="material-icons-outlined">close</mat-icon>
         </button>
       </div>
@@ -350,8 +350,8 @@
       </div>
 
       <div class="crop-modal__footer">
-        <button class="crop-confirm-button" type="button" (click)="confirmCrop()">Set photo</button>
-        <button class="crop-cancel-button" type="button" (click)="cancelCrop()">Cancel</button>
+        <button class="crop-confirm-button" type="button" (click)="confirmCrop()">{{ 'adminProfile.setPhoto' | translate }}</button>
+        <button class="crop-cancel-button" type="button" (click)="cancelCrop()">{{ 'common.cancel' | translate }}</button>
       </div>
     </div>
   </div>
@@ -369,20 +369,20 @@
     >
       <div class="password-modal__header">
         <div class="password-modal__heading-copy">
-          <span class="password-modal__eyebrow">Security</span>
+          <span class="password-modal__eyebrow">{{ 'adminProfile.password.security' | translate }}</span>
           <h3>
-            {{ passwordChangeStep === 'credentials' ? 'Change Password' : 'Verify Code' }}
+            {{ passwordChangeStep === 'credentials' ? ('adminProfile.changePassword' | translate) : ('adminProfile.password.verifyCode' | translate) }}
           </h3>
           <p>
             {{
               passwordChangeStep === 'credentials'
-                ? 'Stay on this page and complete the password change in a secure modal.'
-                : 'Enter the verification code to confirm the change.'
+                ? ('adminProfile.password.credentialsHint' | translate)
+                : ('adminProfile.password.otpHint' | translate)
             }}
           </p>
         </div>
 
-        <button class="password-modal__close" type="button" (click)="closePasswordModal()" aria-label="Close">
+        <button class="password-modal__close" type="button" (click)="closePasswordModal()" [attr.aria-label]="'common.close' | translate">
           <mat-icon fontSet="material-icons-outlined">close</mat-icon>
         </button>
       </div>
@@ -391,7 +391,7 @@
         @if (passwordChangeStep === 'credentials') {
           <div class="password-modal__grid">
             <div class="modal-field">
-              <label class="modal-label" for="current-password">Current Password</label>
+              <label class="modal-label" for="current-password">{{ 'adminProfile.password.currentPassword' | translate }}</label>
               <div class="modal-input-wrap">
                 <input
                   id="current-password"
@@ -404,7 +404,7 @@
                   class="modal-toggle"
                   type="button"
                   (click)="hideCurrentPassword = !hideCurrentPassword"
-                  [attr.aria-label]="hideCurrentPassword ? 'Show current password' : 'Hide current password'"
+                  [attr.aria-label]="hideCurrentPassword ? ('adminProfile.password.showCurrentPassword' | translate) : ('adminProfile.password.hideCurrentPassword' | translate)"
                 >
                   <mat-icon fontSet="material-icons-outlined">
                     {{ hideCurrentPassword ? 'visibility' : 'visibility_off' }}
@@ -414,7 +414,7 @@
             </div>
 
             <div class="modal-field">
-              <label class="modal-label" for="new-password">New Password</label>
+              <label class="modal-label" for="new-password">{{ 'adminProfile.password.newPassword' | translate }}</label>
               <div class="modal-input-wrap">
                 <input
                   id="new-password"
@@ -427,7 +427,7 @@
                   class="modal-toggle"
                   type="button"
                   (click)="hideNewPassword = !hideNewPassword"
-                  [attr.aria-label]="hideNewPassword ? 'Show new password' : 'Hide new password'"
+                  [attr.aria-label]="hideNewPassword ? ('adminProfile.password.showNewPassword' | translate) : ('adminProfile.password.hideNewPassword' | translate)"
                 >
                   <mat-icon fontSet="material-icons-outlined">
                     {{ hideNewPassword ? 'visibility' : 'visibility_off' }}
@@ -437,7 +437,7 @@
             </div>
 
             <div class="modal-field modal-field--full">
-              <label class="modal-label" for="confirm-new-password">Confirm New Password</label>
+              <label class="modal-label" for="confirm-new-password">{{ 'adminProfile.password.confirmNewPassword' | translate }}</label>
               <div class="modal-input-wrap">
                 <input
                   id="confirm-new-password"
@@ -450,7 +450,7 @@
                   class="modal-toggle"
                   type="button"
                   (click)="hideConfirmNewPassword = !hideConfirmNewPassword"
-                  [attr.aria-label]="hideConfirmNewPassword ? 'Show confirm password' : 'Hide confirm password'"
+                  [attr.aria-label]="hideConfirmNewPassword ? ('adminProfile.password.showConfirmPassword' | translate) : ('adminProfile.password.hideConfirmPassword' | translate)"
                 >
                   <mat-icon fontSet="material-icons-outlined">
                     {{ hideConfirmNewPassword ? 'visibility' : 'visibility_off' }}
@@ -461,9 +461,9 @@
           </div>
 
           <div class="password-rules">
-            <div class="password-rule">At least 8 characters</div>
-            <div class="password-rule">Include one uppercase letter</div>
-            <div class="password-rule">Include one number or symbol</div>
+            <div class="password-rule">{{ 'adminProfile.password.rules.minLength' | translate }}</div>
+            <div class="password-rule">{{ 'adminProfile.password.rules.uppercase' | translate }}</div>
+            <div class="password-rule">{{ 'adminProfile.password.rules.numberOrSymbol' | translate }}</div>
           </div>
         } @else {
           <div class="otp-panel">
@@ -472,17 +472,17 @@
             </div>
 
             <div class="otp-panel__copy">
-              <h4>Enter verification code</h4>
+              <h4>{{ 'adminProfile.password.enterVerificationCode' | translate }}</h4>
               <p>
-                Use the demo code shown below. It expires in
+                {{ 'adminProfile.password.demoCodeHint' | translate }}
                 <strong>{{ otpSecondsRemaining }}s</strong>.
               </p>
-              <div class="otp-panel__code">Demo code: <strong>{{ otpDemoCode }}</strong></div>
+              <div class="otp-panel__code">{{ 'adminProfile.password.demoCode' | translate:{ code: otpDemoCode } }}</div>
             </div>
           </div>
 
           <div class="modal-field modal-field--otp">
-            <label class="modal-label" for="otp-code">Verification Code</label>
+            <label class="modal-label" for="otp-code">{{ 'adminProfile.password.verificationCode' | translate }}</label>
             <input
               id="otp-code"
               name="otpCode"
@@ -491,13 +491,13 @@
               type="text"
               inputmode="numeric"
               maxlength="6"
-              placeholder="000000"
+              [placeholder]="'adminProfile.password.codePlaceholder' | translate"
               autocomplete="one-time-code"
             />
             <div class="otp-meta">
-              <span>Resend available in {{ otpResendSecondsRemaining }}s</span>
+              <span>{{ 'adminProfile.password.resendAvailableIn' | translate:{ seconds: otpResendSecondsRemaining } }}</span>
               <button class="otp-resend" type="button" [disabled]="otpResendSecondsRemaining > 0 || passwordLoading" (click)="resendOtpCode()">
-                Resend code
+                {{ 'adminProfile.password.resendCode' | translate }}
               </button>
             </div>
           </div>
@@ -515,11 +515,11 @@
       <div class="password-modal__footer">
         @if (passwordChangeStep === 'otp') {
           <button class="modal-secondary-btn" type="button" (click)="backToPasswordStep()" [disabled]="passwordLoading">
-            Back
+            {{ 'common.back' | translate }}
           </button>
         } @else {
           <button class="modal-secondary-btn" type="button" (click)="closePasswordModal()" [disabled]="passwordLoading">
-            Cancel
+            {{ 'common.cancel' | translate }}
           </button>
         }
 
@@ -535,8 +535,8 @@
           <span>
             {{
               passwordChangeStep === 'credentials'
-                ? 'Continue'
-                : (passwordLoading ? 'Verifying...' : 'Verify & Change')
+                ? ('adminProfile.password.continue' | translate)
+                : (passwordLoading ? ('adminProfile.password.verifying' | translate) : ('adminProfile.password.verifyChange' | translate))
             }}
           </span>
         </button>

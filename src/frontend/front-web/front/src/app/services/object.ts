@@ -7,6 +7,7 @@ import { ReviewDto } from './review';
 import { ActiveRegionService, RegionRequestOptions } from './active-region';
 import { ApproveContentDto } from '../models/event.model';
 import { normalizeEntityMedia, normalizeMediaRow, normalizeMediaRows } from '../shared/utils/media-url';
+import { TranslationService } from './translation.service';
 
 export interface ObjectImageDto {
   id: number;
@@ -248,7 +249,16 @@ export class ObjectService {
   constructor(
     private readonly http: HttpClient,
     private readonly activeRegionService: ActiveRegionService,
+    private readonly translationService: TranslationService,
   ) {}
+
+  private addLang(params: HttpParams, options?: RegionRequestOptions): HttpParams {
+    if (options?.bypassLanguage) {
+      return params;
+    }
+
+    return params.set('Lang', this.translationService.language());
+  }
 
   getAll(
     query?: ObjectQueryParams,
@@ -265,13 +275,15 @@ export class ObjectService {
       });
     }
 
+    params = this.addLang(params, options);
     return this.http.get<ObjectDto[]>(this.url, { params }).pipe(
       map((items) => (items ?? []).map((item) => this.normalizeObject(item)))
     );
   }
 
   getById(id: number): Observable<ObjectDto> {
-    return this.http.get<ObjectDto>(`${this.url}/${id}`).pipe(
+    const params = this.addLang(new HttpParams());
+    return this.http.get<ObjectDto>(`${this.url}/${id}`, { params }).pipe(
       map((item) => this.normalizeObject(item))
     );
   }
@@ -300,6 +312,7 @@ export class ObjectService {
       params = params.set(key, String(value));
     });
 
+    params = this.addLang(params, options);
     return this.http.get<PagedResultDto<ObjectDto>>(`${this.url}/nearby`, { params }).pipe(
       map((response) => this.normalizePagedObjects(response))
     );
@@ -324,6 +337,7 @@ export class ObjectService {
       });
     }
 
+    params = this.addLang(params, options);
     return this.http.get<PagedResultDto<ObjectDto>>(`${this.url}/my`, { params }).pipe(
       map((response) => this.normalizePagedObjects(response))
     );
@@ -341,6 +355,7 @@ export class ObjectService {
       });
     }
 
+    params = this.addLang(params);
     return this.http.get<PagedResultDto<ObjectDto>>(`${this.url}/manager`, { params }).pipe(
       map((response) => this.normalizePagedObjects(response))
     );

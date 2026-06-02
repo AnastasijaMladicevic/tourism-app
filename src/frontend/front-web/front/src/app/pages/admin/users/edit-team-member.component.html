@@ -1,22 +1,22 @@
 <div class="create-member-page">
-  <nav class="breadcrumbs" aria-label="Breadcrumb">
-    <a routerLink="/admin/users" class="crumb-link">Team Management</a>
+  <nav class="breadcrumbs" [attr.aria-label]="t('adminTeamMemberEdit.breadcrumbLabel')">
+    <a routerLink="/admin/users" class="crumb-link">{{ t('adminTeamMemberEdit.teamManagement') }}</a>
     <span class="crumb-sep" aria-hidden="true">›</span>
-    <span class="crumb-current">Edit Member</span>
+    <span class="crumb-current">{{ t('adminTeamMemberEdit.editMember') }}</span>
   </nav>
 
   <header class="page-intro">
-    <h1 class="page-title">Edit Team Member</h1>
+    <h1 class="page-title">{{ t('adminTeamMemberEdit.pageTitle') }}</h1>
     <p class="page-subtitle">
-      Update profile and localization.
+      {{ t('adminTeamMemberEdit.pageSubtitle') }}
       <ng-container *ngIf="displayRole === 'tourist'">
-        For tourist accounts, choose Tourist or Content Creator below; promotion applies when you save.
+        {{ t('adminTeamMemberEdit.touristSubtitle') }}
       </ng-container>
       <ng-container *ngIf="displayRole === 'content-creator'">
-        Choose <strong>Content Creator</strong> to keep this account, or <strong>Tourist</strong> to remove publishing access and return the user to the tourist app.
+        {{ t('adminTeamMemberEdit.contentCreatorSubtitle') }}
       </ng-container>
       <ng-container *ngIf="displayRole === 'manager' || displayRole === 'admin'">
-        Role is shown for reference; only tourist→creator promotion is available (see below when editing a tourist).
+        {{ t('adminTeamMemberEdit.readOnlyRoleSubtitle') }}
       </ng-container>
     </p>
   </header>
@@ -33,24 +33,24 @@
           <span class="material-symbols-outlined section-icon">person</span>
         </span>
         <div>
-          <h2 class="section-title">Personal Information</h2>
-          <p class="section-desc">Basic identity details for this account.</p>
+          <h2 class="section-title">{{ t('adminTeamMemberCreate.personalInformation') }}</h2>
+          <p class="section-desc">{{ t('adminTeamMemberCreate.personalInformationDesc') }}</p>
         </div>
       </div>
 
       <div class="field-grid field-grid--2">
         <label class="field">
-          <span class="field-label">First Name <span class="req">*</span></span>
-          <input type="text" class="input-control" placeholder="e.g. Sarah" [(ngModel)]="firstName" [disabled]="isEditBlocked || isSubmitting" />
+          <span class="field-label">{{ t('adminTeamMemberCreate.firstName') }} <span class="req">*</span></span>
+          <input type="text" class="input-control" [placeholder]="t('adminTeamMemberCreate.firstNamePlaceholder')" [(ngModel)]="firstName" [disabled]="isEditBlocked || isSubmitting" />
         </label>
         <label class="field">
-          <span class="field-label">Last Name <span class="req">*</span></span>
-          <input type="text" class="input-control" placeholder="e.g. Jenkins" [(ngModel)]="lastName" [disabled]="isEditBlocked || isSubmitting" />
+          <span class="field-label">{{ t('adminTeamMemberCreate.lastName') }} <span class="req">*</span></span>
+          <input type="text" class="input-control" [placeholder]="t('adminTeamMemberCreate.lastNamePlaceholder')" [(ngModel)]="lastName" [disabled]="isEditBlocked || isSubmitting" />
         </label>
       </div>
 
       <label class="field">
-        <span class="field-label">Work Email</span>
+        <span class="field-label">{{ t('adminTeamMemberCreate.workEmail') }}</span>
         <div class="input-with-icon">
           <span class="material-symbols-outlined input-lead-icon" aria-hidden="true">mail</span>
           <input
@@ -61,25 +61,25 @@
             tabindex="-1"
           />
         </div>
-        <p class="field-hint">Email cannot be changed.</p>
+        <p class="field-hint">{{ t('adminTeamMemberEdit.emailLockedHint') }}</p>
       </label>
 
       <div class="field-grid field-grid--2">
         <label class="field">
-          <span class="field-label">Date of Birth <span class="req">*</span></span>
+          <span class="field-label">{{ t('adminTeamMemberCreate.dateOfBirth') }} <span class="req">*</span></span>
           <div class="input-with-icon">
             <span class="material-symbols-outlined input-lead-icon" aria-hidden="true">calendar_today</span>
             <input type="date" class="input-control input-control--padded" [(ngModel)]="dateOfBirth" [disabled]="isEditBlocked || isSubmitting" />
           </div>
         </label>
         <label class="field">
-          <span class="field-label">Phone Number</span>
+          <span class="field-label">{{ t('adminTeamMemberCreate.phoneNumber') }}</span>
           <div class="input-with-icon">
             <span class="material-symbols-outlined input-lead-icon" aria-hidden="true">call</span>
             <input
               type="tel"
               class="input-control input-control--padded"
-              placeholder="+1 (555) 000-0000"
+              [placeholder]="t('adminTeamMemberCreate.phoneNumberPlaceholder')"
               [(ngModel)]="phoneNumber"
               [disabled]="isEditBlocked || isSubmitting"
             />
@@ -95,8 +95,8 @@
           <span class="material-symbols-outlined section-icon">shield</span>
         </span>
         <div>
-          <h2 class="section-title">Account Security</h2>
-          <p class="section-desc">Set a new password only if you want to replace the current one. The user's current password is required before you can change it.</p>
+          <h2 class="section-title">{{ t('adminTeamMemberCreate.accountSecurity') }}</h2>
+          <p class="section-desc">{{ t('adminTeamMemberEdit.accountSecurityDesc') }}</p>
         </div>
       </div>
 
@@ -105,14 +105,14 @@
       </div>
 
       <label class="field">
-        <span class="field-label">Current Password <span class="optional">(required if changing password)</span></span>
+        <span class="field-label">{{ t('adminTeamMemberEdit.currentPassword') }} <span class="optional">({{ t('adminTeamMemberEdit.currentPasswordRequiredHint') }})</span></span>
         <div class="input-with-icon">
           <span class="material-symbols-outlined input-lead-icon" aria-hidden="true">key</span>
           <input
             type="password"
             class="input-control input-control--padded"
             [class.input-invalid]="currentPasswordRequired && !currentPassword.trim()"
-            placeholder="Enter the user's current password"
+            [placeholder]="t('adminTeamMemberEdit.currentPasswordPlaceholder')"
             [(ngModel)]="currentPassword"
             autocomplete="current-password"
             [disabled]="isEditBlocked || isSubmitting || passwordChangeBlockedByActiveSession"
@@ -121,49 +121,49 @@
       </label>
 
       <label class="field">
-        <span class="field-label">New Password <span class="optional">(optional)</span></span>
+        <span class="field-label">{{ t('adminTeamMemberEdit.newPassword') }} <span class="optional">({{ t('common.optional') }})</span></span>
         <div class="input-with-icon">
           <span class="material-symbols-outlined input-lead-icon" aria-hidden="true">lock</span>
           <input
             type="password"
             class="input-control input-control--padded"
-            placeholder="Leave blank to keep current password"
+            [placeholder]="t('adminTeamMemberEdit.newPasswordPlaceholder')"
             [(ngModel)]="password"
             autocomplete="new-password"
             [disabled]="isEditBlocked || isSubmitting || passwordChangeBlockedByActiveSession"
           />
         </div>
         <p class="strength-line" *ngIf="password && passwordStrengthLabel">
-          STRENGTH:
+          {{ t('adminTeamMemberCreate.strength') }}:
           <span class="strength-value" [ngClass]="passwordStrengthClass">{{ passwordStrengthLabel }}</span>
         </p>
       </label>
 
       <label class="field">
-        <span class="field-label">Confirm New Password <span class="optional">(optional)</span></span>
+        <span class="field-label">{{ t('adminTeamMemberEdit.confirmNewPassword') }} <span class="optional">({{ t('common.optional') }})</span></span>
         <div class="input-with-icon">
           <span class="material-symbols-outlined input-lead-icon" aria-hidden="true">lock</span>
           <input
             type="password"
             class="input-control input-control--padded"
             [class.input-invalid]="passwordsMismatch"
-            placeholder="Repeat new password"
+            [placeholder]="t('adminTeamMemberEdit.confirmNewPasswordPlaceholder')"
             [(ngModel)]="confirmPassword"
             autocomplete="new-password"
             [disabled]="isEditBlocked || isSubmitting || passwordChangeBlockedByActiveSession"
           />
         </div>
-        <p class="field-error" *ngIf="passwordsMismatch">Passwords do not match</p>
+        <p class="field-error" *ngIf="passwordsMismatch">{{ t('adminTeamMemberCreate.errors.passwordsMismatchShort') }}</p>
       </label>
 
       <div class="role-block">
-        <p class="role-block-label">Primary Role</p>
+        <p class="role-block-label">{{ t('adminTeamMemberCreate.primaryRole') }}</p>
         <p class="role-api-note role-api-note--info" *ngIf="displayRole === 'admin'">
-          This account has the <strong>Admin</strong> role. Role cannot be changed on this screen.
+          {{ t('adminTeamMemberEdit.adminReadonlyRoleNote') }}
         </p>
 
         <ng-container *ngIf="showRolePairPicker">
-          <div class="role-cards role-cards--tourist-pair" role="radiogroup" aria-label="Primary role">
+          <div class="role-cards role-cards--tourist-pair" role="radiogroup" [attr.aria-label]="t('adminTeamMemberCreate.primaryRole')">
             <button
               type="button"
               class="role-card role-card--clickable"
@@ -177,8 +177,8 @@
                 aria-hidden="true"
                 >check_circle</span>
               <span class="material-symbols-outlined role-card-icon">person</span>
-              <span class="role-card-title">Tourist</span>
-              <span class="role-card-desc">Standard visitor access. No promotion when you save.</span>
+              <span class="role-card-title">{{ t('adminTeamMemberEdit.roles.tourist.title') }}</span>
+              <span class="role-card-desc">{{ t('adminTeamMemberEdit.roles.tourist.desc') }}</span>
             </button>
 
             <button
@@ -194,31 +194,31 @@
                 aria-hidden="true"
                 >check_circle</span>
               <span class="material-symbols-outlined role-card-icon">description</span>
-              <span class="role-card-title">Content Creator</span>
-              <span class="role-card-desc" *ngIf="displayRole === 'tourist'">On save, requests promotion via the server (requires prior creator request).</span>
-              <span class="role-card-desc" *ngIf="displayRole === 'content-creator'">Keeps publishing tools for this account after save.</span>
+              <span class="role-card-title">{{ t('adminTeamMemberEdit.roles.contentCreator.title') }}</span>
+              <span class="role-card-desc" *ngIf="displayRole === 'tourist'">{{ t('adminTeamMemberEdit.roles.contentCreator.promoteDesc') }}</span>
+              <span class="role-card-desc" *ngIf="displayRole === 'content-creator'">{{ t('adminTeamMemberEdit.roles.contentCreator.keepDesc') }}</span>
             </button>
           </div>
         </ng-container>
 
         <ng-container *ngIf="displayRole === 'manager'">
-          <div class="role-cards role-cards--readonly role-cards--tourist-pair" role="group" aria-label="Primary role (read-only)">
+          <div class="role-cards role-cards--readonly role-cards--tourist-pair" role="group" [attr.aria-label]="t('adminTeamMemberEdit.primaryRoleReadonly')">
             <button type="button" class="role-card" disabled [class.role-card--selected]="isRole('manager')">
               <span class="material-symbols-outlined role-card-icon">grid_view</span>
-              <span class="role-card-title">Manager</span>
-              <span class="role-card-desc">Full administrative control over teams, hubs, and billing.</span>
+              <span class="role-card-title">{{ t('adminTeamMemberCreate.roles.manager.title') }}</span>
+              <span class="role-card-desc">{{ t('adminTeamMemberCreate.roles.manager.desc') }}</span>
             </button>
 
             <button type="button" class="role-card" disabled [class.role-card--selected]="isRole('admin')">
               <span class="material-symbols-outlined role-card-icon">admin_panel_settings</span>
-              <span class="role-card-title">Admin</span>
-              <span class="role-card-desc">Platform-wide administrative access, including user and role management.</span>
+              <span class="role-card-title">{{ t('adminTeamMemberCreate.roles.admin.title') }}</span>
+              <span class="role-card-desc">{{ t('adminTeamMemberCreate.roles.admin.desc') }}</span>
             </button>
           </div>
         </ng-container>
 
         <ng-container *ngIf="displayRole === 'admin'">
-          <div class="role-cards role-cards--readonly" role="group" aria-label="Primary role (read-only)">
+          <div class="role-cards role-cards--readonly" role="group" [attr.aria-label]="t('adminTeamMemberEdit.primaryRoleReadonly')">
             <button
               type="button"
               class="role-card"
@@ -226,8 +226,8 @@
               [class.role-card--selected]="isRole('admin')"
             >
               <span class="material-symbols-outlined role-card-icon">admin_panel_settings</span>
-              <span class="role-card-title">Admin</span>
-              <span class="role-card-desc">Platform-wide administrative access, including user and role management.</span>
+              <span class="role-card-title">{{ t('adminTeamMemberCreate.roles.admin.title') }}</span>
+              <span class="role-card-desc">{{ t('adminTeamMemberCreate.roles.admin.desc') }}</span>
             </button>
 
             <button
@@ -237,8 +237,8 @@
               [class.role-card--selected]="isRole('manager')"
             >
               <span class="material-symbols-outlined role-card-icon">grid_view</span>
-              <span class="role-card-title">Manager</span>
-              <span class="role-card-desc">Full administrative control over teams, hubs, and billing.</span>
+              <span class="role-card-title">{{ t('adminTeamMemberCreate.roles.manager.title') }}</span>
+              <span class="role-card-desc">{{ t('adminTeamMemberCreate.roles.manager.desc') }}</span>
             </button>
 
           </div>
@@ -253,40 +253,40 @@
           <span class="material-symbols-outlined section-icon">public</span>
         </span>
         <div>
-          <h2 class="section-title">Region &amp; Localization</h2>
-          <p class="section-desc">Where this member operates and their UI language.</p>
+          <h2 class="section-title">{{ t('adminTeamMemberCreate.regionLocalization') }}</h2>
+          <p class="section-desc">{{ t('adminTeamMemberCreate.regionLocalizationDesc') }}</p>
         </div>
       </div>
 
       <div class="field-grid field-grid--2">
         <label class="field">
-          <span class="field-label">Country</span>
+          <span class="field-label">{{ t('adminTeamMemberCreate.country') }}</span>
           <div class="input-with-icon select-wrap">
             <span class="material-symbols-outlined input-lead-icon" aria-hidden="true">location_on</span>
             <select class="input-control input-control--padded select-control" [(ngModel)]="country" [disabled]="isEditBlocked || isSubmitting">
-              <option *ngIf="country && !countries.includes(country)" [ngValue]="country">{{ country }}</option>
-              <option *ngFor="let c of countries" [ngValue]="c">{{ c }}</option>
+              <option *ngIf="country && !countries.includes(country)" [ngValue]="country">{{ countryLabel(country) }}</option>
+              <option *ngFor="let c of countries" [ngValue]="c">{{ countryLabel(c) }}</option>
             </select>
           </div>
         </label>
         <label class="field">
-          <span class="field-label">Preferred Language</span>
+          <span class="field-label">{{ t('adminTeamMemberCreate.preferredLanguage') }}</span>
           <div class="input-with-icon select-wrap">
             <span class="material-symbols-outlined input-lead-icon" aria-hidden="true">translate</span>
             <select class="input-control input-control--padded select-control" [(ngModel)]="preferredLanguage" [disabled]="isEditBlocked || isSubmitting">
-              <option *ngFor="let lang of languages" [ngValue]="lang">{{ lang }}</option>
+              <option *ngFor="let lang of languages" [ngValue]="lang">{{ languageLabel(lang) }}</option>
             </select>
           </div>
         </label>
       </div>
 
       <label class="field">
-        <span class="field-label">Region Assignment <span class="optional">(Optional)</span></span>
+        <span class="field-label">{{ t('adminTeamMemberCreate.regionAssignment') }} <span class="optional">({{ t('common.optional') }})</span></span>
         <select class="input-control select-control select-control--full" [(ngModel)]="regionAssignment" [disabled]="isEditBlocked || isSubmitting">
-          <option value="">Select target market region</option>
-          <option *ngFor="let r of regionOptions" [ngValue]="r">{{ r }}</option>
+          <option value="">{{ t('adminTeamMemberCreate.regionAssignmentPlaceholder') }}</option>
+          <option *ngFor="let r of regionOptions" [ngValue]="r">{{ regionLabel(r) }}</option>
         </select>
-        <p class="field-hint">Leave empty to grant global access across all active regions.</p>
+        <p class="field-hint">{{ t('adminTeamMemberCreate.regionAssignmentHint') }}</p>
       </label>
     </section>
 
@@ -296,31 +296,31 @@
           <span class="material-symbols-outlined section-icon">error</span>
         </span>
         <div>
-          <h2 class="section-title">Access Restriction</h2>
-          <p class="section-desc">Temporarily or permanently ban tourist and content creator accounts, then remove the ban when needed.</p>
+          <h2 class="section-title">{{ t('adminTeamMemberEdit.accessRestriction') }}</h2>
+          <p class="section-desc">{{ t('adminTeamMemberEdit.accessRestrictionDesc') }}</p>
         </div>
       </div>
 
       <p class="role-api-note role-api-note--info" *ngIf="!canModerateBan">
-        Ban controls are available only for <strong>Tourist</strong> and <strong>Content Creator</strong> accounts.
+        {{ t('adminTeamMemberEdit.banControlsHint') }}
       </p>
 
       <div class="moderation-summary" *ngIf="canModerateBan && isBanned">
         <div class="moderation-summary-header">
           <span class="material-symbols-outlined moderation-summary-icon" aria-hidden="true">block</span>
           <div>
-            <h3 class="moderation-summary-title">This account is currently banned</h3>
-            <p class="moderation-summary-meta" *ngIf="activeBannedAtLabel">Banned at {{ activeBannedAtLabel }}</p>
+            <h3 class="moderation-summary-title">{{ t('adminTeamMemberEdit.bannedNow') }}</h3>
+            <p class="moderation-summary-meta" *ngIf="activeBannedAtLabel">{{ t('adminTeamMemberEdit.bannedAt', { date: activeBannedAtLabel }) }}</p>
           </div>
         </div>
-        <p class="moderation-summary-copy" *ngIf="activeBanReason">Reason: {{ activeBanReason }}</p>
+        <p class="moderation-summary-copy" *ngIf="activeBanReason">{{ t('adminTeamMemberEdit.reasonLabel') }}: {{ activeBanReason }}</p>
         <p class="moderation-summary-copy" *ngIf="activeBanExpiresLabel; else permanentBanCopy">
-          Ban expires: {{ activeBanExpiresLabel }}
+          {{ t('adminTeamMemberEdit.banExpires') }}: {{ activeBanExpiresLabel }}
         </p>
         <ng-template #permanentBanCopy>
-          <p class="moderation-summary-copy">Ban expires: Permanent</p>
+          <p class="moderation-summary-copy">{{ t('adminTeamMemberEdit.banExpires') }}: {{ t('adminTeamMemberEdit.permanent') }}</p>
         </ng-template>
-        <p class="moderation-summary-note">While the ban is active, this user can reach the login screen but cannot access the app.</p>
+        <p class="moderation-summary-note">{{ t('adminTeamMemberEdit.banNote') }}</p>
       </div>
 
       <div class="form-feedback error" *ngIf="moderationError" role="alert">{{ moderationError }}</div>
@@ -328,20 +328,20 @@
 
       <ng-container *ngIf="canModerateBan">
         <label class="field">
-          <span class="field-label">Ban reason <span class="req">*</span></span>
+          <span class="field-label">{{ t('adminTeamMemberEdit.banReason') }} <span class="req">*</span></span>
           <textarea
             class="input-control textarea-control"
             rows="4"
             maxlength="500"
-            placeholder="Explain why this account is being banned."
+            [placeholder]="t('adminTeamMemberEdit.banReasonPlaceholder')"
             [(ngModel)]="banReason"
             [disabled]="isEditBlocked || isModerating"
           ></textarea>
-          <p class="field-hint">This text will be shown to the user on the login screen.</p>
+          <p class="field-hint">{{ t('adminTeamMemberEdit.banReasonHint') }}</p>
         </label>
 
         <section class="ban-duration-block" aria-labelledby="edit-ban-duration-label">
-          <p id="edit-ban-duration-label" class="ban-duration-label">Duration of Ban</p>
+          <p id="edit-ban-duration-label" class="ban-duration-label">{{ t('adminTeamMemberEdit.durationOfBan') }}</p>
           <div class="ban-duration-options" role="radiogroup" aria-labelledby="edit-ban-duration-label">
             <button
               type="button"
@@ -352,7 +352,7 @@
               (click)="selectBanDuration('30-days')"
               [disabled]="isEditBlocked || isModerating"
             >
-              30 Days
+              {{ t('adminTeamMemberEdit.thirtyDays') }}
             </button>
             <button
               type="button"
@@ -363,7 +363,7 @@
               (click)="selectBanDuration('permanent')"
               [disabled]="isEditBlocked || isModerating"
             >
-              Permanent
+              {{ t('adminTeamMemberEdit.permanent') }}
             </button>
             <button
               type="button"
@@ -374,12 +374,12 @@
               (click)="selectBanDuration('custom')"
               [disabled]="isEditBlocked || isModerating"
             >
-              Custom Date
+              {{ t('adminTeamMemberEdit.customDate') }}
             </button>
           </div>
 
           <label class="ban-duration-custom-field" *ngIf="banDuration === 'custom'">
-            <span>Ban ends on</span>
+            <span>{{ t('adminTeamMemberEdit.banEndsOn') }}</span>
             <input
               type="date"
               class="ban-duration-date-input"
@@ -390,18 +390,18 @@
           </label>
 
           <p class="ban-duration-hint">
-            The ban ends automatically on the date you choose, or never for a permanent ban.
+            {{ t('adminTeamMemberEdit.banDurationHint') }}
           </p>
         </section>
 
         <div class="moderation-actions">
           <button type="button" class="btn-danger" (click)="banUser()" [disabled]="isEditBlocked || isModerating || !isBanDurationValid">
             <span class="material-symbols-outlined btn-icon" aria-hidden="true">block</span>
-            <span class="btn-text">{{ isModerating ? 'Applying…' : (isBanned ? 'Update ban' : 'Ban user') }}</span>
+            <span class="btn-text">{{ isModerating ? t('adminTeamMemberEdit.applying') : (isBanned ? t('adminTeamMemberEdit.updateBan') : t('adminTeamMemberEdit.banUser')) }}</span>
           </button>
           <button type="button" class="btn-secondary" *ngIf="isBanned" (click)="unbanUser()" [disabled]="isEditBlocked || isModerating">
             <span class="material-symbols-outlined btn-icon" aria-hidden="true">lock_open</span>
-            <span class="btn-text">{{ isModerating ? 'Working…' : 'Unban user' }}</span>
+            <span class="btn-text">{{ isModerating ? t('adminTeamMemberEdit.working') : t('adminTeamMemberEdit.unbanUser') }}</span>
           </button>
         </div>
       </ng-container>
@@ -410,25 +410,25 @@
     <footer class="form-actions">
       <button type="button" class="btn-cancel" (click)="onCancel()" [disabled]="isSubmitting">
         <span class="material-symbols-outlined btn-icon" aria-hidden="true">close</span>
-        <span class="btn-text">Cancel</span>
+        <span class="btn-text">{{ t('common.cancel') }}</span>
       </button>
       <button type="button" class="btn-primary" (click)="onSave()" [disabled]="isSubmitting || isEditBlocked">
         <span class="material-symbols-outlined btn-icon" aria-hidden="true" *ngIf="!isSubmitting">save</span>
-        <span class="btn-text">{{ isSubmitting ? 'Saving…' : 'Save changes' }}</span>
+        <span class="btn-text">{{ isSubmitting ? t('common.saving') : t('common.saveChanges') }}</span>
       </button>
     </footer>
   </div>
 
   <div class="form-shell form-shell--loading" *ngIf="isLoading">
-    <p class="loading-copy">Loading user…</p>
+    <p class="loading-copy">{{ t('adminTeamMemberEdit.loadingUser') }}</p>
   </div>
 
   <footer class="page-meta-footer">
-    <span class="page-meta-version">SPIREGO ADMIN • BUILD 2026.05</span>
+    <span class="page-meta-version">{{ t('adminTeamMemberCreate.footerVersion') }}</span>
     <div class="page-meta-links">
-      <a href="#" class="meta-link">Support Center</a>
-      <a href="#" class="meta-link">Privacy Policy</a>
-      <a href="#" class="meta-link">Terms of Service</a>
+      <a href="#" class="meta-link">{{ t('adminTeamMemberCreate.supportCenter') }}</a>
+      <a href="#" class="meta-link">{{ t('adminTeamMemberCreate.privacyPolicy') }}</a>
+      <a href="#" class="meta-link">{{ t('adminTeamMemberCreate.termsOfService') }}</a>
     </div>
   </footer>
 </div>

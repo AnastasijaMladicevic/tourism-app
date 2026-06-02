@@ -17,6 +17,7 @@ import {
 import { environment } from '../../environment/environment';
 import { ActiveRegionService, RegionRequestOptions } from './active-region';
 import { normalizeEntityMedia, normalizeMediaRow, normalizeMediaRows } from '../shared/utils/media-url';
+import { TranslationService } from './translation.service';
 export interface EventImageDto {
   id: number;
   url: string;
@@ -81,7 +82,16 @@ export class EventService {
 
   constructor(
     private readonly activeRegionService: ActiveRegionService,
+    private readonly translationService: TranslationService,
   ) {}
+
+  private addLang(params: HttpParams, options?: RegionRequestOptions): HttpParams {
+    if (options?.bypassLanguage) {
+      return params;
+    }
+
+    return params.set('Lang', this.translationService.language());
+  }
   getNearby(
     query: NearbyEventQueryParams,
     options?: RegionRequestOptions,
@@ -95,6 +105,7 @@ export class EventService {
       }
     });
 
+    params = this.addLang(params, options);
     return this.http.get<PagedEventResultDto<EventDto>>(`${this.url}/nearby`, { params }).pipe(
       map((response) => this.normalizePagedEvents(response))
     );
@@ -146,6 +157,7 @@ export class EventService {
       });
     }
 
+    params = this.addLang(params, options);
     return this.http.get<{ items: EventDto[] }>(this.url, { params }).pipe(
       map(response => {
         const items = Array.isArray(response) ? response : (response?.items ?? []);
@@ -158,7 +170,7 @@ export class EventService {
    * Get events visible to the current manager
    */
   getForManager(query?: EventQueryDto): Observable<EventQueryResponse> {
-    const params = this.buildEventQueryParams(query);
+    const params = this.addLang(this.buildEventQueryParams(query));
     return this.http.get<EventQueryResponse>(`${this.apiUrl}/manager`, { params }).pipe(
       map((response) => this.normalizeEventResponse(response))
     );
@@ -168,7 +180,7 @@ export class EventService {
    * Get events created by the current content creator
    */
   getMy(query?: EventQueryDto): Observable<EventQueryResponse> {
-    const params = this.buildEventQueryParams(query);
+    const params = this.addLang(this.buildEventQueryParams(query));
     return this.http.get<EventQueryResponse>(`${this.apiUrl}/my`, { params }).pipe(
       map((response) => this.normalizeEventResponse(response))
     );
@@ -178,7 +190,8 @@ export class EventService {
    * Get event by ID
    */
   getById(id: number): Observable<EventDto> {
-    return this.http.get<EventDto>(`${this.apiUrl}/${id}`).pipe(
+    const params = this.addLang(new HttpParams());
+    return this.http.get<EventDto>(`${this.apiUrl}/${id}`, { params }).pipe(
       map((event) => this.normalizeEvent(event))
     );
   }
@@ -187,7 +200,8 @@ export class EventService {
    * Get event by ID only if it belongs to current content creator
    */
   getMyById(id: number): Observable<EventDto> {
-    return this.http.get<EventDto>(`${this.apiUrl}/${id}`).pipe(
+    const params = this.addLang(new HttpParams());
+    return this.http.get<EventDto>(`${this.apiUrl}/${id}`, { params }).pipe(
       map((event) => this.normalizeEvent(event))
     );
   }
@@ -213,7 +227,7 @@ export class EventService {
       if (query.sortOrder) params = params.set('sortOrder', query.sortOrder);
     }
 
-    return this.http.get<TouristObjectQueryResponse>(this.objectsApiUrl, { params });
+    return this.http.get<TouristObjectQueryResponse>(this.objectsApiUrl, { params: this.addLang(params) });
   }
 
   /**

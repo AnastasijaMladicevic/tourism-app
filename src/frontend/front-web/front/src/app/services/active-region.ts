@@ -3,6 +3,7 @@ import { BehaviorSubject } from 'rxjs';
 
 export interface RegionRequestOptions {
   bypassRegion?: boolean;
+  bypassLanguage?: boolean;
 }
 
 @Injectable({ providedIn: 'root' })

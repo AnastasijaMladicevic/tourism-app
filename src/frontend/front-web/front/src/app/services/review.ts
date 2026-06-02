@@ -3,6 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
 import { environment } from '../../environment/environment';
 import { ActiveRegionService, RegionRequestOptions } from './active-region';
+import { TranslationService } from './translation.service';
 
 export interface ReviewDto {
   id: number;
@@ -64,10 +65,23 @@ export class ReviewService {
   constructor(
     private readonly http: HttpClient,
     private readonly activeRegionService: ActiveRegionService,
+    private readonly translationService: TranslationService,
   ) {}
 
+  private addLanguageCode(
+    params: HttpParams,
+    options?: RegionRequestOptions,
+  ): HttpParams {
+    if (options?.bypassLanguage) {
+      return params;
+    }
+
+    return params.set('languageCode', this.translationService.language());
+  }
+
   getForObject(objectId: number): Observable<ReviewDto[]> {
-    return this.http.get<ReviewDto[]>(`${this.baseUrl}/object/${objectId}`);
+    const params = this.addLanguageCode(new HttpParams());
+    return this.http.get<ReviewDto[]>(`${this.baseUrl}/object/${objectId}`, { params });
   }
 
   getAll(
@@ -85,6 +99,7 @@ export class ReviewService {
       });
     }
 
+    params = this.addLanguageCode(params, options);
     return this.http
       .get<PagedResultDto<ReviewDto> | ReviewDto[]>(this.baseUrl, { params })
       .pipe(map((response) => this.normalizePagedResult(response, effectiveQuery?.page, effectiveQuery?.pageSize)));
@@ -105,11 +120,13 @@ export class ReviewService {
       });
     }
 
+    params = this.addLanguageCode(params, options);
     return this.http.get<PagedResultDto<ReviewDto>>(`${this.baseUrl}/creator`, { params });
   }
 
   getById(id: number): Observable<ReviewDto> {
-    return this.http.get<ReviewDto>(`${this.baseUrl}/${id}`);
+    const params = this.addLanguageCode(new HttpParams());
+    return this.http.get<ReviewDto>(`${this.baseUrl}/${id}`, { params });
   }
 
   create(dto: any): Observable<ReviewDto> {

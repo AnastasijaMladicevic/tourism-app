@@ -1,14 +1,14 @@
 <div class="create-member-page">
-  <nav class="breadcrumbs" aria-label="Breadcrumb">
-    <a routerLink="/admin/users" class="crumb-link">Team Management</a>
+  <nav class="breadcrumbs" [attr.aria-label]="t('adminTeamMemberCreate.breadcrumbLabel')">
+    <a routerLink="/admin/users" class="crumb-link">{{ t('adminTeamMemberCreate.teamManagement') }}</a>
     <span class="crumb-sep" aria-hidden="true">›</span>
-    <span class="crumb-current">Create Member</span>
+    <span class="crumb-current">{{ t('adminTeamMemberCreate.createMember') }}</span>
   </nav>
 
   <header class="page-intro">
-    <h1 class="page-title">Create Team Member</h1>
+    <h1 class="page-title">{{ t('adminTeamMemberCreate.pageTitle') }}</h1>
     <p class="page-subtitle">
-      Add a new manager or admin to your organizational workspace.
+      {{ t('adminTeamMemberCreate.pageSubtitle') }}
     </p>
   </header>
 
@@ -22,30 +22,30 @@
           <span class="material-symbols-outlined section-icon">person</span>
         </span>
         <div>
-          <h2 class="section-title">Personal Information</h2>
-          <p class="section-desc">Basic identity details for this account.</p>
+          <h2 class="section-title">{{ t('adminTeamMemberCreate.personalInformation') }}</h2>
+          <p class="section-desc">{{ t('adminTeamMemberCreate.personalInformationDesc') }}</p>
         </div>
       </div>
 
       <div class="field-grid field-grid--2">
         <label class="field">
-          <span class="field-label">First Name <span class="req">*</span></span>
-          <input type="text" class="input-control" placeholder="e.g. Sarah" [(ngModel)]="firstName" />
+          <span class="field-label">{{ t('adminTeamMemberCreate.firstName') }} <span class="req">*</span></span>
+          <input type="text" class="input-control" [placeholder]="t('adminTeamMemberCreate.firstNamePlaceholder')" [(ngModel)]="firstName" />
         </label>
         <label class="field">
-          <span class="field-label">Last Name <span class="req">*</span></span>
-          <input type="text" class="input-control" placeholder="e.g. Jenkins" [(ngModel)]="lastName" />
+          <span class="field-label">{{ t('adminTeamMemberCreate.lastName') }} <span class="req">*</span></span>
+          <input type="text" class="input-control" [placeholder]="t('adminTeamMemberCreate.lastNamePlaceholder')" [(ngModel)]="lastName" />
         </label>
       </div>
 
       <label class="field">
-        <span class="field-label">Work Email <span class="req">*</span></span>
+        <span class="field-label">{{ t('adminTeamMemberCreate.workEmail') }} <span class="req">*</span></span>
         <div class="input-with-icon">
           <span class="material-symbols-outlined input-lead-icon" aria-hidden="true">mail</span>
           <input
             type="email"
             class="input-control input-control--padded"
-            placeholder="sarah.j@company.com"
+            [placeholder]="t('adminTeamMemberCreate.workEmailPlaceholder')"
             [(ngModel)]="workEmail"
             autocomplete="email"
           />
@@ -54,20 +54,20 @@
 
       <div class="field-grid field-grid--2">
         <label class="field">
-          <span class="field-label">Date of Birth <span class="req">*</span></span>
+          <span class="field-label">{{ t('adminTeamMemberCreate.dateOfBirth') }} <span class="req">*</span></span>
           <div class="input-with-icon">
             <span class="material-symbols-outlined input-lead-icon" aria-hidden="true">calendar_today</span>
             <input type="date" class="input-control input-control--padded" [(ngModel)]="dateOfBirth" />
           </div>
         </label>
         <label class="field">
-          <span class="field-label">Phone Number</span>
+          <span class="field-label">{{ t('adminTeamMemberCreate.phoneNumber') }}</span>
           <div class="input-with-icon">
             <span class="material-symbols-outlined input-lead-icon" aria-hidden="true">call</span>
             <input
               type="tel"
               class="input-control input-control--padded"
-              placeholder="+1 (555) 000-0000"
+              [placeholder]="t('adminTeamMemberCreate.phoneNumberPlaceholder')"
               [(ngModel)]="phoneNumber"
             />
           </div>
@@ -82,48 +82,48 @@
           <span class="material-symbols-outlined section-icon">shield</span>
         </span>
         <div>
-          <h2 class="section-title">Account Security</h2>
-          <p class="section-desc">Credentials and internal role assignment.</p>
+          <h2 class="section-title">{{ t('adminTeamMemberCreate.accountSecurity') }}</h2>
+          <p class="section-desc">{{ t('adminTeamMemberCreate.accountSecurityDesc') }}</p>
         </div>
       </div>
 
       <label class="field">
-        <span class="field-label">Password <span class="req">*</span></span>
+        <span class="field-label">{{ t('adminTeamMemberCreate.password') }} <span class="req">*</span></span>
         <div class="input-with-icon">
           <span class="material-symbols-outlined input-lead-icon" aria-hidden="true">lock</span>
           <input
             type="password"
             class="input-control input-control--padded"
-            placeholder="Secret123!"
+            [placeholder]="t('adminTeamMemberCreate.passwordPlaceholder')"
             [(ngModel)]="password"
             autocomplete="new-password"
           />
         </div>
         <p class="strength-line" *ngIf="password && passwordStrengthLabel">
-          STRENGTH:
+          {{ t('adminTeamMemberCreate.strength') }}:
           <span class="strength-value" [ngClass]="passwordStrengthClass">{{ passwordStrengthLabel }}</span>
         </p>
       </label>
 
       <label class="field">
-        <span class="field-label">Confirm Password <span class="req">*</span></span>
+        <span class="field-label">{{ t('adminTeamMemberCreate.confirmPassword') }} <span class="req">*</span></span>
         <div class="input-with-icon">
           <span class="material-symbols-outlined input-lead-icon" aria-hidden="true">lock</span>
           <input
             type="password"
             class="input-control input-control--padded"
             [class.input-invalid]="passwordsMismatch"
-            placeholder="••••••••"
+            [placeholder]="t('adminTeamMemberCreate.confirmPasswordPlaceholder')"
             [(ngModel)]="confirmPassword"
             autocomplete="new-password"
           />
         </div>
-        <p class="field-error" *ngIf="passwordsMismatch">Passwords do not match</p>
+        <p class="field-error" *ngIf="passwordsMismatch">{{ t('adminTeamMemberCreate.errors.passwordsMismatchShort') }}</p>
       </label>
 
       <div class="role-block">
-        <p class="role-block-label">Primary Role</p>
-        <div class="role-cards" role="radiogroup" aria-label="Primary role">
+        <p class="role-block-label">{{ t('adminTeamMemberCreate.primaryRole') }}</p>
+        <div class="role-cards" role="radiogroup" [attr.aria-label]="t('adminTeamMemberCreate.primaryRole')">
           <button
             type="button"
             class="role-card"
@@ -134,8 +134,8 @@
               >check_circle</span
             >
             <span class="material-symbols-outlined role-card-icon">grid_view</span>
-            <span class="role-card-title">Manager</span>
-            <span class="role-card-desc">Full administrative control over teams, hubs, and billing.</span>
+            <span class="role-card-title">{{ t('adminTeamMemberCreate.roles.manager.title') }}</span>
+            <span class="role-card-desc">{{ t('adminTeamMemberCreate.roles.manager.desc') }}</span>
           </button>
 
           <button
@@ -148,12 +148,12 @@
               >check_circle</span
             >
             <span class="material-symbols-outlined role-card-icon">admin_panel_settings</span>
-            <span class="role-card-title">Admin</span>
-            <span class="role-card-desc">Platform-wide administrative access, including user and role management.</span>
+            <span class="role-card-title">{{ t('adminTeamMemberCreate.roles.admin.title') }}</span>
+            <span class="role-card-desc">{{ t('adminTeamMemberCreate.roles.admin.desc') }}</span>
           </button>
         </div>
         <p class="role-api-note" *ngIf="selectedRole === 'admin'">
-          Admin accounts have broader system access than managers. Use this role only for trusted staff.
+          {{ t('adminTeamMemberCreate.adminRoleNote') }}
         </p>
       </div>
     </section>
@@ -165,60 +165,60 @@
           <span class="material-symbols-outlined section-icon">public</span>
         </span>
         <div>
-          <h2 class="section-title">Region &amp; Localization</h2>
-          <p class="section-desc">Where this member operates and their UI language.</p>
+          <h2 class="section-title">{{ t('adminTeamMemberCreate.regionLocalization') }}</h2>
+          <p class="section-desc">{{ t('adminTeamMemberCreate.regionLocalizationDesc') }}</p>
         </div>
       </div>
 
       <div class="field-grid field-grid--2">
         <label class="field">
-          <span class="field-label">Country</span>
+          <span class="field-label">{{ t('adminTeamMemberCreate.country') }}</span>
           <div class="input-with-icon select-wrap">
             <span class="material-symbols-outlined input-lead-icon" aria-hidden="true">location_on</span>
             <select class="input-control input-control--padded select-control" [(ngModel)]="country">
-              <option *ngFor="let c of countries" [ngValue]="c">{{ c }}</option>
+              <option *ngFor="let c of countries" [ngValue]="c">{{ countryLabel(c) }}</option>
             </select>
           </div>
         </label>
         <label class="field">
-          <span class="field-label">Preferred Language</span>
+          <span class="field-label">{{ t('adminTeamMemberCreate.preferredLanguage') }}</span>
           <div class="input-with-icon select-wrap">
             <span class="material-symbols-outlined input-lead-icon" aria-hidden="true">translate</span>
             <select class="input-control input-control--padded select-control" [(ngModel)]="preferredLanguage">
-              <option *ngFor="let lang of languages" [ngValue]="lang">{{ lang }}</option>
+              <option *ngFor="let lang of languages" [ngValue]="lang">{{ languageLabel(lang) }}</option>
             </select>
           </div>
         </label>
       </div>
 
       <label class="field">
-        <span class="field-label">Region Assignment <span class="optional">(Optional)</span></span>
+        <span class="field-label">{{ t('adminTeamMemberCreate.regionAssignment') }} <span class="optional">({{ t('common.optional') }})</span></span>
         <select class="input-control select-control select-control--full" [(ngModel)]="regionAssignment">
-          <option value="">Select target market region</option>
-          <option *ngFor="let r of regionOptions" [ngValue]="r">{{ r }}</option>
+          <option value="">{{ t('adminTeamMemberCreate.regionAssignmentPlaceholder') }}</option>
+          <option *ngFor="let r of regionOptions" [ngValue]="r">{{ regionLabel(r) }}</option>
         </select>
-        <p class="field-hint">Leave empty to grant global access across all active regions.</p>
+        <p class="field-hint">{{ t('adminTeamMemberCreate.regionAssignmentHint') }}</p>
       </label>
     </section>
 
     <footer class="form-actions">
       <button type="button" class="btn-cancel" (click)="onCancel()" [disabled]="isSubmitting">
         <span class="material-symbols-outlined btn-icon" aria-hidden="true">close</span>
-        <span class="btn-text">Cancel</span>
+        <span class="btn-text">{{ t('common.cancel') }}</span>
       </button>
       <button type="button" class="btn-primary" (click)="onCreate()" [disabled]="isSubmitting">
         <span class="material-symbols-outlined btn-icon" aria-hidden="true" *ngIf="!isSubmitting">save</span>
-        <span class="btn-text">{{ isSubmitting ? 'Creating…' : 'Create Team Member' }}</span>
+        <span class="btn-text">{{ isSubmitting ? t('adminTeamMemberCreate.creating') : t('adminTeamMemberCreate.createAction') }}</span>
       </button>
     </footer>
   </div>
 
   <footer class="page-meta-footer">
-    <span class="page-meta-version">SPIREGO ADMIN • BUILD 2026.05</span>
+    <span class="page-meta-version">{{ t('adminTeamMemberCreate.footerVersion') }}</span>
     <div class="page-meta-links">
-      <a href="#" class="meta-link">Support Center</a>
-      <a href="#" class="meta-link">Privacy Policy</a>
-      <a href="#" class="meta-link">Terms of Service</a>
+      <a href="#" class="meta-link">{{ t('adminTeamMemberCreate.supportCenter') }}</a>
+      <a href="#" class="meta-link">{{ t('adminTeamMemberCreate.privacyPolicy') }}</a>
+      <a href="#" class="meta-link">{{ t('adminTeamMemberCreate.termsOfService') }}</a>
     </div>
   </footer>
 </div>

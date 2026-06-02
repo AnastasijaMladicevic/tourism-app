@@ -19,6 +19,7 @@ import {
   ManagerReportDto,
   ManagerReportsService
 } from '../../../services/manager-reports.service';
+import { TranslationService } from '../../../services/translation.service';
 
 const CHART_DAYS = 14;
 
@@ -97,6 +98,7 @@ export class UsersComponent implements OnInit {
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly translationService = inject(TranslationService);
 
   isLoading = true;
   loadError = '';
@@ -451,9 +453,9 @@ export class UsersComponent implements OnInit {
 
           if (err instanceof TimeoutError) {
             this.loadError =
-              'Loading took too long. Check that the API is running and reachable, then try again.';
+              this.t('adminUsers.loadTimeout');
           } else {
-            this.loadError = 'Could not load users data. Check API and try again.';
+            this.loadError = this.t('adminUsers.loadError');
           }
           return of(null);
         }),
@@ -613,7 +615,7 @@ export class UsersComponent implements OnInit {
       initials: this.getInitials(u.firstName, u.lastName),
       name: `${u.firstName} ${u.lastName}`.trim(),
       email: u.email,
-      role: u.roleName || 'Unknown',
+      role: u.roleName || this.t('adminUsers.unknown'),
       lastLogin: this.formatDate(u.createdAt),
       status: u.isBanned ? 'Banned' : (u.isActive ? 'Active' : 'Inactive'),
       editLock: u.editLock ?? null
@@ -632,7 +634,7 @@ export class UsersComponent implements OnInit {
       id: u.id,
       name: `${u.firstName} ${u.lastName}`.trim(),
       email: u.email,
-      origin: (u.country ?? '').trim() || 'Unknown',
+      origin: (u.country ?? '').trim() || this.t('adminUsers.unknown'),
       status: u.isBanned ? 'banned' : (u.isActive ? 'active' : 'inactive'),
       joinedDate: this.formatDate(u.createdAt),
       profileImageUrl: (u.profileImageUrl ?? '').trim() || null,
@@ -661,10 +663,10 @@ export class UsersComponent implements OnInit {
       initials: this.getInitials(u.firstName, u.lastName),
       name: `${u.firstName} ${u.lastName}`.trim(),
       email: u.email,
-      role: u.roleName || 'Unknown',
-      banReason: (u.banReason ?? '').trim() || '—',
+      role: u.roleName || this.t('adminUsers.unknown'),
+      banReason: (u.banReason ?? '').trim() || this.t('common.notAvailable'),
       bannedAtLabel: this.formatDate(u.bannedAtUtc ?? undefined),
-      banExpiresLabel: u.banExpiresAtUtc ? this.formatDate(u.banExpiresAtUtc ?? undefined) : 'Permanent',
+      banExpiresLabel: u.banExpiresAtUtc ? this.formatDate(u.banExpiresAtUtc ?? undefined) : this.t('adminUsers.permanent'),
       bannedAtSort,
       editLock: u.editLock ?? null
     };
@@ -926,7 +928,7 @@ export class UsersComponent implements OnInit {
       .subscribe({
         next: () => {
           this.unbanConfirmRow = null;
-          this.unbanSuccess = `${row.name} has been unbanned.`;
+          this.unbanSuccess = this.t('adminUsers.unbanSuccess', { name: row.name });
           this.loadDashboardData({ silent: true });
           this.cdr.markForCheck();
         },
@@ -944,7 +946,7 @@ export class UsersComponent implements OnInit {
         return body.message;
       }
     }
-    return 'Could not remove the ban. Try again.';
+    return this.t('adminUsers.unbanError');
   }
 
   private filterBySearch<T>(rows: T[], query: string, fieldFns: (row: T) => string[]): T[] {
@@ -991,7 +993,7 @@ export class UsersComponent implements OnInit {
         takeUntilDestroyed(this.destroyRef),
         catchError(() => {
           if (!silent) {
-            this.creatorRequestsError = 'Could not load content creator requests.';
+            this.creatorRequestsError = this.t('adminUsers.creatorRequestsLoadError');
             return of({
               items: [] as CreatorRoleRequestDto[],
               page: 1,
@@ -1121,7 +1123,7 @@ export class UsersComponent implements OnInit {
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         catchError((err: unknown) => {
-          let msg = 'Could not approve this request.';
+          let msg = this.t('adminUsers.creatorApproveError');
           if (err instanceof HttpErrorResponse && err.error && typeof err.error === 'object' && 'message' in err.error) {
             msg = String((err.error as { message?: string }).message ?? msg);
           }
@@ -1135,7 +1137,7 @@ export class UsersComponent implements OnInit {
       )
       .subscribe(() => {
         this.creatorRequestsApproveError = '';
-        this.creatorRequestsApproveSuccess = `${displayName} has become a Content Creator.`;
+        this.creatorRequestsApproveSuccess = this.t('adminUsers.creatorApproveSuccess', { name: displayName });
         this.scheduleCreatorApproveSuccessDismiss();
         const nextTotal = Math.max(0, this.creatorRequestsTotalCount - 1);
         if (this.creatorRequestsPage > 1 && (this.creatorRequestsPage - 1) * this.creatorRequestsPageSize >= nextTotal) {
@@ -1161,7 +1163,7 @@ export class UsersComponent implements OnInit {
       .pipe(
         takeUntilDestroyed(this.destroyRef),
         catchError((err: unknown) => {
-          let msg = 'Could not reject this request.';
+          let msg = this.t('adminUsers.creatorRejectError');
           if (err instanceof HttpErrorResponse && err.error && typeof err.error === 'object' && 'message' in err.error) {
             msg = String((err.error as { message?: string }).message ?? msg);
           }
@@ -1175,7 +1177,7 @@ export class UsersComponent implements OnInit {
       )
       .subscribe(() => {
         this.creatorRequestsApproveError = '';
-        this.creatorRequestsApproveSuccess = `${displayName}'s request was denied and they were notified.`;
+        this.creatorRequestsApproveSuccess = this.t('adminUsers.creatorRejectSuccess', { name: displayName });
         this.scheduleCreatorApproveSuccessDismiss();
         const nextTotal = Math.max(0, this.creatorRequestsTotalCount - 1);
         if (this.creatorRequestsPage > 1 && (this.creatorRequestsPage - 1) * this.creatorRequestsPageSize >= nextTotal) {
@@ -1264,7 +1266,7 @@ export class UsersComponent implements OnInit {
   private buildTopOrigins(users: AdminUserListItemDto[]): { name: string; users: number; barPercent: number }[] {
     const counts = new Map<string, number>();
     for (const user of users) {
-      const country = (user.country ?? '').trim() || 'Unknown';
+      const country = (user.country ?? '').trim() || this.t('adminUsers.unknown');
       counts.set(country, (counts.get(country) ?? 0) + 1);
     }
     const rows = [...counts.entries()]
@@ -1290,8 +1292,8 @@ export class UsersComponent implements OnInit {
     this.touristChartYMidLabel = maxVal === 0 ? '0' : String(Math.round(maxVal / 2));
     this.touristChartIsEmpty = maxVal === 0;
     this.touristChartSubtitle = this.touristChartIsEmpty
-      ? `Last ${CHART_DAYS} days — no tourist registrations with origin data in this window.`
-      : `Last ${CHART_DAYS} days — ${signupTotal} new tourists; up to ${maxDistinct} different origin countries on a single day.`;
+      ? this.t('adminUsers.touristChartEmptySubtitle', { days: CHART_DAYS })
+      : this.t('adminUsers.touristChartSubtitle', { days: CHART_DAYS, signups: signupTotal, maxDistinct });
     this.touristChartLineSignups = this.buildLinePath(dailySignups, this.touristChartMaxY);
     this.touristChartLineDistinctOrigins = this.buildLinePath(dailyDistinctOrigins, this.touristChartMaxY);
     this.touristChartAreaSignups = this.buildAreaPath(dailySignups, this.touristChartMaxY);
@@ -1300,7 +1302,11 @@ export class UsersComponent implements OnInit {
     this.touristChartHoverZones = this.buildChartHoverZones(
       touristDayLabels,
       (index) =>
-        `${touristDayLabels[index]} · Signups: ${dailySignups[index]} · Distinct origins: ${dailyDistinctOrigins[index]}`
+        this.t('adminUsers.touristHoverTitle', {
+          day: touristDayLabels[index],
+          signups: dailySignups[index],
+          origins: dailyDistinctOrigins[index]
+        })
     );
   }
 
@@ -1362,8 +1368,8 @@ export class UsersComponent implements OnInit {
     const m = sum(dailyManagers);
     const c = sum(dailyCreators);
     this.internalChartSubtitle = this.internalChartIsEmpty
-      ? `Last ${CHART_DAYS} days — no new admin, manager, or content-creator accounts with a join date in this window (from loaded team).`
-      : `Last ${CHART_DAYS} days — new accounts: ${a} admin, ${m} manager, ${c} content creator (from loaded team).`;
+      ? this.t('adminUsers.internalChartEmptySubtitle', { days: CHART_DAYS })
+      : this.t('adminUsers.internalChartSubtitle', { days: CHART_DAYS, admins: a, managers: m, creators: c });
     this.internalChartLineAdmins = this.buildLinePath(dailyAdmins, this.internalChartMaxY);
     this.internalChartLineManagers = this.buildLinePath(dailyManagers, this.internalChartMaxY);
     this.internalChartLineCreators = this.buildLinePath(dailyCreators, this.internalChartMaxY);
@@ -1371,8 +1377,12 @@ export class UsersComponent implements OnInit {
     const internalDayLabels = this.buildChartDayLabels(CHART_DAYS);
     this.internalChartHoverZones = this.buildChartHoverZones(
       internalDayLabels,
-      (index) =>
-        `${internalDayLabels[index]} · Admins: ${dailyAdmins[index]} · Managers: ${dailyManagers[index]} · Content creators: ${dailyCreators[index]}`
+      (index) => this.t('adminUsers.internalHoverTitle', {
+        day: internalDayLabels[index],
+        admins: dailyAdmins[index],
+        managers: dailyManagers[index],
+        creators: dailyCreators[index]
+      })
     );
   }
 
@@ -1418,7 +1428,7 @@ export class UsersComponent implements OnInit {
     const start = new Date(now);
     start.setHours(0, 0, 0, 0);
     start.setDate(now.getDate() - (days - 1));
-    const fmt = new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' });
+    const fmt = new Intl.DateTimeFormat(this.translationService.currentLocale(), { month: 'short', day: 'numeric' });
     return Array.from({ length: days }, (_, i) => {
       const d = new Date(start);
       d.setDate(start.getDate() + i);
@@ -1493,11 +1503,11 @@ export class UsersComponent implements OnInit {
 
   getEditDisabledTitle(row: { name?: string; editLock?: UserEditLockDto | null } | null | undefined): string {
     if (!this.isEditLockedByAnother(row)) {
-      return 'Edit user';
+      return this.t('adminUsers.editUser');
     }
 
-    const lockedBy = row?.editLock?.lockedByDisplayName?.trim() || 'Another admin';
-    return `${lockedBy} is currently editing this user.`;
+    const lockedBy = row?.editLock?.lockedByDisplayName?.trim() || this.t('adminUsers.anotherAdmin');
+    return this.t('adminUsers.editLockedBy', { name: lockedBy });
   }
 
   hasPendingManagerReport(userId: number): boolean {
@@ -1558,7 +1568,7 @@ export class UsersComponent implements OnInit {
       return;
     }
     if (!this.isBanDurationValid) {
-      this.reportReviewError = 'Choose an end date for a custom ban duration.';
+      this.reportReviewError = this.t('adminUsers.report.chooseBanEndDate');
       this.cdr.markForCheck();
       return;
     }
@@ -1571,7 +1581,7 @@ export class UsersComponent implements OnInit {
     }
     const reason = this.reportRejectReason.trim();
     if (!reason) {
-      this.reportReviewError = 'Enter a reason when rejecting a report.';
+      this.reportReviewError = this.t('adminUsers.report.enterRejectReason');
       this.cdr.markForCheck();
       return;
     }
@@ -1612,8 +1622,8 @@ export class UsersComponent implements OnInit {
         next: () => {
           this.pendingReportByUserId.delete(report.reportedUserId);
           this.reportReviewSuccess = approve
-            ? `Report approved. The user has been banned (${this.banDurationSummary()}).`
-            : 'Report rejected. The content creator remains on the platform.';
+            ? this.t('adminUsers.report.approvedSuccess', { duration: this.banDurationSummary() })
+            : this.t('adminUsers.report.rejectedSuccess');
           this.activeManagerReport = null;
           this.highlightedReportUserId = null;
           this.reportRejectReason = '';
@@ -1643,7 +1653,7 @@ export class UsersComponent implements OnInit {
   private buildReportBanReason(report: ManagerReportDto): string {
     const reason = (report.reason ?? '').trim();
     if (!reason) {
-      return 'Banned following an upheld manager report.';
+      return this.t('adminUsers.report.defaultBanReason');
     }
     return reason.length > 500 ? reason.slice(0, 500) : reason;
   }
@@ -1655,7 +1665,7 @@ export class UsersComponent implements OnInit {
         return body.message;
       }
     }
-    return 'Could not process this report. Try again.';
+    return this.t('adminUsers.report.processError');
   }
 
   private fetchAllPendingManagerReports(): Observable<ManagerReportDto[]> {
@@ -1697,7 +1707,7 @@ export class UsersComponent implements OnInit {
           );
         }),
         catchError(() => {
-          this.managerReportsLoadError = 'Could not load pending creator reports.';
+          this.managerReportsLoadError = this.t('adminUsers.report.loadPendingError');
           return of([] as ManagerReportDto[]);
         })
       );
@@ -1782,9 +1792,9 @@ export class UsersComponent implements OnInit {
   banDurationSummary(): string {
     const endsAt = this.resolveBanExpiresAtUtc();
     if (this.banDuration === 'permanent' || !endsAt) {
-      return 'permanent';
+      return this.t('adminUsers.permanentLower');
     }
-    return `until ${this.formatDate(endsAt)}`;
+    return this.t('adminUsers.untilDate', { date: this.formatDate(endsAt) });
   }
 
   /** ISO UTC expiry for `POST /users/{id}/ban`; `null` = permanent. */
@@ -1849,21 +1859,103 @@ export class UsersComponent implements OnInit {
   }
 
   managerReportSubmittedLabel(report: ManagerReportDto): string {
-    return report.managerName?.trim() || `Manager #${report.managerId}`;
+    return report.managerName?.trim() || this.t('adminUsers.managerWithId', { id: report.managerId });
   }
 
   formatDate(value?: string): string {
     if (!value) {
-      return '—';
+      return this.t('common.notAvailable');
     }
     const date = new Date(value);
     if (Number.isNaN(date.getTime())) {
-      return '—';
+      return this.t('common.notAvailable');
     }
-    return new Intl.DateTimeFormat('en-US', {
+    return new Intl.DateTimeFormat(this.translationService.currentLocale(), {
       month: 'short',
       day: '2-digit',
       year: 'numeric'
     }).format(date);
+  }
+
+  adminStatusLabel(status: 'Active' | 'Inactive' | 'Banned'): string {
+    switch (status) {
+      case 'Active':
+        return this.t('adminUsers.status.active');
+      case 'Inactive':
+        return this.t('adminUsers.status.inactive');
+      case 'Banned':
+        return this.t('adminUsers.status.banned');
+    }
+  }
+
+  touristStatusLabel(status: 'active' | 'inactive' | 'banned'): string {
+    switch (status) {
+      case 'active':
+        return this.t('adminUsers.status.active');
+      case 'inactive':
+        return this.t('adminUsers.status.inactive');
+      case 'banned':
+        return this.t('adminUsers.status.banned');
+    }
+  }
+
+  originsCountLabel(users: number): string {
+    return this.usersViewTab === 'internal'
+      ? this.t('adminUsers.membersCount', { count: users })
+      : this.t('adminUsers.touristsCount', { count: users });
+  }
+
+  originsToggleLabel(): string {
+    return this.originsDemographicsChart
+      ? this.t('adminUsers.viewBarList')
+      : this.t('adminUsers.viewPieChart');
+  }
+
+  t(key: string, params?: Record<string, string | number>): string {
+    return this.translationService.translate(key, params);
+  }
+
+  booleanLabel(value: boolean): string {
+    return value ? this.t('adminUsers.yes') : this.t('adminUsers.no');
+  }
+
+  requestStatusLabel(isActive: boolean): string {
+    return isActive ? this.t('adminUsers.status.active') : this.t('adminUsers.status.inactive');
+  }
+
+  creatorApproveButtonLabel(id: number): string {
+    return this.approvingCreatorUserId === id
+      ? this.t('adminUsers.approving')
+      : this.t('adminUsers.approve');
+  }
+
+  creatorDenyButtonLabel(id: number): string {
+    return this.rejectingCreatorUserId === id
+      ? this.t('adminUsers.denying')
+      : this.t('adminUsers.deny');
+  }
+
+  creatorApproveTitle(req: CreatorRoleRequestDto): string {
+    return req.isActive
+      ? this.t('adminUsers.creatorRequestGrantRole')
+      : this.t('adminUsers.creatorRequestActivateBeforeApprove');
+  }
+
+  creatorDenyTitle(req: CreatorRoleRequestDto): string {
+    return req.isActive
+      ? this.t('adminUsers.creatorRequestRejectTitle')
+      : this.t('adminUsers.creatorRequestActivateBeforeDeny');
+  }
+
+  reportActionLabel(): string {
+    return this.reportReviewSubmitting
+      ? this.t('adminUsers.processing')
+      : this.t('adminUsers.report.approveAndBan');
+  }
+
+  unbanConfirmButtonLabel(): string {
+    return this.unbanSubmitting
+      ? this.t('adminUsers.removing')
+      : this.t('adminUsers.confirmUnban');
   }
 }

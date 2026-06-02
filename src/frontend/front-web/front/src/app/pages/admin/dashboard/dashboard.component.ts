@@ -15,6 +15,7 @@ import {
 } from '../../../services/admin-dashboard.service';
 import { DestinationDto } from '../../../services/destination.service';
 import { AdminPlatformMapComponent } from '../../../shared/components/admin-platform-map/admin-platform-map.component';
+import { TranslationService } from '../../../services/translation.service';
 
 interface PeriodOption {
   key: DashboardPeriod;
@@ -109,6 +110,7 @@ export class DashboardComponent implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly adminDashboardService = inject(AdminDashboardService);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly translationService = inject(TranslationService);
 
   readonly periodOptions = PERIOD_OPTIONS;
 
@@ -161,11 +163,11 @@ export class DashboardComponent implements OnInit {
   get granularityHint(): string {
     switch (this.overview?.userGrowthGranularity) {
       case 'week':
-        return 'Grouped by week';
+        return this.t('adminDashboard.groupedByWeek');
       case 'month':
-        return 'Grouped by month';
+        return this.t('adminDashboard.groupedByMonth');
       default:
-        return 'Grouped by day';
+        return this.t('adminDashboard.groupedByDay');
     }
   }
 
@@ -179,7 +181,7 @@ export class DashboardComponent implements OnInit {
 
   get selectedMapDestinationSummary(): string {
     if (!this.selectedMapDestination) {
-      return 'Click a marker to see which destination it represents.';
+      return this.t('adminDashboard.mapMarkerHint');
     }
 
     const region = this.selectedMapDestination.regionName?.trim();
@@ -213,7 +215,7 @@ export class DashboardComponent implements OnInit {
         error: () => {
           this.overview = null;
           this.resetDerivedState();
-          this.loadError = 'Dashboard data could not be loaded right now.';
+          this.loadError = this.t('adminDashboard.loadError');
           this.cdr.detectChanges();
         },
       });
@@ -290,10 +292,10 @@ export class DashboardComponent implements OnInit {
   private bindUserGrowth(overview: AdminDashboardOverviewDto): void {
     const points = overview.userGrowth;
     const seriesDefs = [
-      { key: 'tourists', label: 'Tourists', color: ROLE_COLORS['Tourist'], pick: (p: typeof points[number]) => p.tourists },
-      { key: 'creators', label: 'Creators', color: ROLE_COLORS['ContentCreator'], pick: (p: typeof points[number]) => p.contentCreators },
-      { key: 'managers', label: 'Managers', color: ROLE_COLORS['Manager'], pick: (p: typeof points[number]) => p.managers },
-      { key: 'admins', label: 'Admins', color: ROLE_COLORS['Admin'], pick: (p: typeof points[number]) => p.admins },
+      { key: 'tourists', label: this.t('adminDashboard.tourists'), color: ROLE_COLORS['Tourist'], pick: (p: typeof points[number]) => p.tourists },
+      { key: 'creators', label: this.t('adminDashboard.creators'), color: ROLE_COLORS['ContentCreator'], pick: (p: typeof points[number]) => p.contentCreators },
+      { key: 'managers', label: this.t('adminDashboard.managers'), color: ROLE_COLORS['Manager'], pick: (p: typeof points[number]) => p.managers },
+      { key: 'admins', label: this.t('adminDashboard.admins'), color: ROLE_COLORS['Admin'], pick: (p: typeof points[number]) => p.admins },
     ];
 
     const allValues = points.flatMap((p) => [p.tourists, p.contentCreators, p.managers, p.admins]);
@@ -395,9 +397,9 @@ export class DashboardComponent implements OnInit {
     const total = Math.max(creatorRequests.pending + creatorRequests.approved + creatorRequests.rejected, 1);
 
     this.creatorSlices = [
-      { label: 'Pending', count: creatorRequests.pending, color: '#d97706', percent: (creatorRequests.pending / total) * 100 },
-      { label: 'Approved', count: creatorRequests.approved, color: '#059669', percent: (creatorRequests.approved / total) * 100 },
-      { label: 'Rejected', count: creatorRequests.rejected, color: '#dc2626', percent: (creatorRequests.rejected / total) * 100 },
+      { label: this.t('adminDashboard.pending'), count: creatorRequests.pending, color: '#d97706', percent: (creatorRequests.pending / total) * 100 },
+      { label: this.t('adminDashboard.approved'), count: creatorRequests.approved, color: '#059669', percent: (creatorRequests.approved / total) * 100 },
+      { label: this.t('adminDashboard.rejected'), count: creatorRequests.rejected, color: '#dc2626', percent: (creatorRequests.rejected / total) * 100 },
     ];
   }
 
@@ -429,7 +431,7 @@ export class DashboardComponent implements OnInit {
         longitude: point.longitude,
         isActive: true,
         destinationTypeId: 0,
-        destinationTypeName: 'Destination',
+        destinationTypeName: this.t('adminDashboard.destination'),
         regionId: point.regionId,
         regionName: point.regionName,
       }));
@@ -441,13 +443,13 @@ export class DashboardComponent implements OnInit {
   private humanizeRole(role: string): string {
     switch (role) {
       case 'ContentCreator':
-        return 'Creators';
+        return this.t('adminDashboard.creators');
       case 'Manager':
-        return 'Managers';
+        return this.t('adminDashboard.managers');
       case 'Admin':
-        return 'Admins';
+        return this.t('adminDashboard.admins');
       default:
-        return 'Tourists';
+        return this.t('adminDashboard.tourists');
     }
   }
 
@@ -608,10 +610,10 @@ export class DashboardComponent implements OnInit {
         width: Math.max(2, end - start),
         title: [
           bucket.label,
-          `Tourists: ${bucket.tourists}`,
-          `Creators: ${bucket.creators}`,
-          `Managers: ${bucket.managers}`,
-          `Admins: ${bucket.admins}`,
+          `${this.t('adminDashboard.tourists')}: ${bucket.tourists}`,
+          `${this.t('adminDashboard.creators')}: ${bucket.creators}`,
+          `${this.t('adminDashboard.managers')}: ${bucket.managers}`,
+          `${this.t('adminDashboard.admins')}: ${bucket.admins}`,
         ].join(' | '),
       };
     });
@@ -619,12 +621,13 @@ export class DashboardComponent implements OnInit {
 
   private formatBucketLabel(dateIso: string, granularity: string): string {
     const date = new Date(dateIso);
+    const locale = this.translationService.currentLocale();
 
     if (granularity === 'month') {
-      return new Intl.DateTimeFormat('en-US', { month: 'short' }).format(date);
+      return new Intl.DateTimeFormat(locale, { month: 'short' }).format(date);
     }
 
-    return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(date);
+    return new Intl.DateTimeFormat(locale, { month: 'short', day: 'numeric' }).format(date);
   }
 
   formatShortDate(value: string | null | undefined): string {
@@ -632,7 +635,7 @@ export class DashboardComponent implements OnInit {
       return '—';
     }
 
-    return new Intl.DateTimeFormat('en-US', {
+    return new Intl.DateTimeFormat(this.translationService.currentLocale(), {
       month: 'short',
       day: 'numeric',
       year: 'numeric',
@@ -657,5 +660,9 @@ export class DashboardComponent implements OnInit {
 
   private isValidPeriod(value: string | null): value is DashboardPeriod {
     return PERIOD_OPTIONS.some((option) => option.key === value);
+  }
+
+  t(key: string, params?: Record<string, string | number>): string {
+    return this.translationService.translate(key, params);
   }
 }

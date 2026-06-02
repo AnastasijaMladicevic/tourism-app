@@ -1,23 +1,23 @@
 <div class="destination-form-page">
   <header class="form-top">
     <div class="breadcrumbs">
-      <a routerLink="/admin/destinations" class="crumb-link">Destinations</a>
+      <a routerLink="/admin/destinations" class="crumb-link">{{ t('adminDestinationForm.destinations') }}</a>
       <span class="crumb-sep">›</span>
-      <span class="crumb-current">{{ isEditMode ? 'Edit destination' : 'Create new' }}</span>
+      <span class="crumb-current">{{ isEditMode ? t('adminDestinationForm.editDestination') : t('adminDestinationForm.createNew') }}</span>
     </div>
 
     <div class="title-row">
       <div class="title-block">
-        <h1 class="page-title">{{ form.name.trim() || 'New destination' }}</h1>
+        <h1 class="page-title">{{ form.name.trim() || t('adminDestinationForm.newDestination') }}</h1>
       </div>
       <div class="title-actions">
         <button type="button" class="btn btn-ghost btn-with-icon" (click)="onSaveDraft()" [disabled]="isSubmitting || isDeleting || isLoadingDestination || isEditBlocked || !selectedManager">
           <span class="material-symbols-outlined">save</span>
-          Save draft
+          {{ t('adminDestinationForm.saveDraft') }}
         </button>
         <button type="button" class="btn btn-primary btn-with-icon" (click)="onSubmit()" [disabled]="isSubmitting || isDeleting || isLoadingDestination || isEditBlocked || !selectedManager">
           <span class="material-symbols-outlined">check_circle</span>
-          {{ isSubmitting ? 'Saving…' : isEditMode ? 'Save changes' : 'Create destination' }}
+          {{ isSubmitting ? t('common.saving') : isEditMode ? t('common.saveChanges') : t('adminDestinationForm.createDestination') }}
         </button>
         @if (isEditMode) {
           <button
@@ -27,10 +27,10 @@
             [disabled]="isSubmitting || isDeleting || isLoadingDestination"
           >
             <span class="material-symbols-outlined">delete</span>
-            {{ isDeleting ? 'Deletingâ€¦' : 'Delete destination' }}
+            {{ isDeleting ? t('adminDestinationForm.deleting') : t('adminDestinationForm.deleteDestination') }}
           </button>
         }
-        <button type="button" class="btn btn-ghost" (click)="onCancel()">Cancel</button>
+        <button type="button" class="btn btn-ghost" (click)="onCancel()">{{ t('common.cancel') }}</button>
       </div>
     </div>
   </header>
@@ -50,23 +50,23 @@
   <div class="workspace" [class.workspace--blocked]="isEditBlocked">
     <div class="workspace-main">
       <article class="panel">
-        <span class="step-tag">STEP 1</span>
+        <span class="step-tag">{{ t('adminDestinationForm.step1') }}</span>
         <div class="panel-head">
           <span class="panel-icon material-symbols-outlined">info</span>
           <div>
-            <h2 class="panel-title">General information</h2>
-            <p class="panel-sub">Set the core identity and descriptive content for this destination.</p>
+            <h2 class="panel-title">{{ t('adminDestinationForm.generalInformation') }}</h2>
+            <p class="panel-sub">{{ t('adminDestinationForm.generalInformationDesc') }}</p>
           </div>
         </div>
 
         <div class="field-grid">
           <label class="form-field full">
-            <span class="label">Destination name <span class="required-star" aria-hidden="true">*</span></span>
+            <span class="label">{{ t('adminDestinationForm.destinationName') }} <span class="required-star" aria-hidden="true">*</span></span>
             <input
               type="text"
               [(ngModel)]="form.name"
               (keyup)="onDestinationNameInput(($any($event.target)).value)"
-              placeholder="e.g. Emerald Valley Park"
+              [placeholder]="t('adminDestinationForm.destinationNamePlaceholder')"
             />
             @if ((locationLookupState === 'loading' || locationLookupState === 'resolved') && form.name.trim().length >= 2) {
               <p
@@ -80,44 +80,44 @@
           </label>
 
           <label class="form-field full">
-            <span class="label">Region</span>
+            <span class="label">{{ t('adminDestinationForm.region') }}</span>
             <select [(ngModel)]="form.regionId" (ngModelChange)="onRegionChange()" [disabled]="isLoadingRegions">
-              <option [ngValue]="undefined">Select a region</option>
+              <option [ngValue]="undefined">{{ t('adminDestinationForm.selectRegion') }}</option>
               <option *ngFor="let region of regions" [ngValue]="region.id">{{ region.name }}</option>
             </select>
           </label>
 
           <div class="form-field full richtext-block">
-            <span class="label">Full description</span>
+            <span class="label">{{ t('adminDestinationForm.fullDescription') }}</span>
             <div class="richtext-toolbar" aria-hidden="true">
-              <button type="button" class="tool-btn" disabled title="Bold"><span class="material-symbols-outlined">format_bold</span></button>
-              <button type="button" class="tool-btn" disabled title="Italic"><span class="material-symbols-outlined">format_italic</span></button>
-              <button type="button" class="tool-btn" disabled title="Underline"><span class="material-symbols-outlined">format_underlined</span></button>
-              <button type="button" class="tool-btn" disabled title="Link"><span class="material-symbols-outlined">link</span></button>
+              <button type="button" class="tool-btn" disabled [title]="t('adminDestinationForm.bold')"><span class="material-symbols-outlined">format_bold</span></button>
+              <button type="button" class="tool-btn" disabled [title]="t('adminDestinationForm.italic')"><span class="material-symbols-outlined">format_italic</span></button>
+              <button type="button" class="tool-btn" disabled [title]="t('adminDestinationForm.underline')"><span class="material-symbols-outlined">format_underlined</span></button>
+              <button type="button" class="tool-btn" disabled [title]="t('adminDestinationForm.link')"><span class="material-symbols-outlined">link</span></button>
             </div>
             <textarea
               rows="10"
               class="richtext-area"
               [(ngModel)]="fullDescription"
-              placeholder="Longer story, highlights, and practical visitor information."
+              [placeholder]="t('adminDestinationForm.fullDescriptionPlaceholder')"
             ></textarea>
           </div>
 
           <div class="form-field full categories-block">
-            <span class="label">Categories &amp; tags</span>
+            <span class="label">{{ t('adminDestinationForm.categoriesTags') }}</span>
             <div class="category-chips">
               @for (c of categories; track $index) {
                 <span class="chip">
                   {{ c }}
-                  <button type="button" class="chip-remove" (click)="removeCategory($index)" aria-label="Remove">×</button>
+                  <button type="button" class="chip-remove" (click)="removeCategory($index)" [attr.aria-label]="t('common.remove')">×</button>
                 </span>
               }
             </div>
             <div class="category-add-row">
-              <input type="text" [(ngModel)]="categoryInput" (keydown.enter)="addCategory(); $event.preventDefault()" placeholder="Add a category" />
+              <input type="text" [(ngModel)]="categoryInput" (keydown.enter)="addCategory(); $event.preventDefault()" [placeholder]="t('adminDestinationForm.addCategory')" />
               <button type="button" class="btn btn-ghost btn-sm" (click)="addCategory()">
                 <span class="material-symbols-outlined">add</span>
-                Add category
+                {{ t('adminDestinationForm.addCategory') }}
               </button>
             </div>
           </div>
@@ -125,24 +125,24 @@
       </article>
 
       <article class="panel">
-        <span class="step-tag">STEP 2</span>
+        <span class="step-tag">{{ t('adminDestinationForm.step2') }}</span>
         <div class="panel-head panel-head--split">
           <div class="panel-head-left">
             <span class="panel-icon material-symbols-outlined">imagesmode</span>
             <div>
-              <h2 class="panel-title">Media gallery <span class="required-star" aria-hidden="true">*</span></h2>
+              <h2 class="panel-title">{{ t('adminDestinationForm.mediaGallery') }} <span class="required-star" aria-hidden="true">*</span></h2>
               <p class="panel-sub">
                 @if (isEditMode) {
-                  Existing destination images with primary cover selection.
+                  {{ t('adminDestinationForm.existingImages') }}
                 } @else {
-                  High-quality images that represent this destination across the platform.
+                  {{ t('adminDestinationForm.newImages') }}
                 }
               </p>
             </div>
           </div>
           <label class="btn btn-ghost btn-sm upload-all-label">
             <span class="material-symbols-outlined">upload</span>
-            Upload all
+            {{ t('adminDestinationForm.uploadAll') }}
             <input type="file" accept="image/*" multiple class="sr-only" (change)="onGalleryFilesSelected($event)" />
           </label>
         </div>
@@ -151,7 +151,7 @@
           @if (!destinationImages.length) {
             <div class="gallery-empty-state">
               <span class="material-symbols-outlined">imagesmode</span>
-              <p>No images found for this destination.</p>
+              <p>{{ t('adminDestinationForm.noImagesFound') }}</p>
             </div>
           } @else {
             <div class="server-gallery-grid">
@@ -166,7 +166,7 @@
                       [disabled]="isUpdatingImages || image.isMain"
                       (click)="setPrimaryDestinationImage(image)"
                     >
-                      {{ image.isMain ? 'Primary' : 'Set Primary' }}
+                      {{ image.isMain ? t('adminDestinationForm.primary') : t('adminDestinationForm.setPrimary') }}
                     </button>
                     <button
                       type="button"
@@ -174,7 +174,7 @@
                       [disabled]="isUpdatingImages"
                       (click)="removeDestinationImage(image)"
                     >
-                      Remove
+                      {{ t('common.remove') }}
                     </button>
                   </div>
                 </div>
@@ -186,7 +186,7 @@
             <div class="server-gallery-grid">
               @for (src of imagePreviews; track $index) {
                 <div class="server-gallery-card">
-                  <img [src]="src" alt="Destination image preview" />
+                  <img [src]="src" [alt]="t('adminDestinationForm.destinationImagePreview')" />
                   <div class="server-gallery-actions">
                     <button
                       type="button"
@@ -195,14 +195,14 @@
                       [disabled]="$index === primaryPreviewImageIndex"
                       (click)="setPrimaryPreviewImage($index)"
                     >
-                      {{ $index === primaryPreviewImageIndex ? 'Primary on Save' : 'Set Primary on Save' }}
+                      {{ $index === primaryPreviewImageIndex ? t('adminDestinationForm.primaryOnSave') : t('adminDestinationForm.setPrimaryOnSave') }}
                     </button>
                     <button
                       type="button"
                       class="btn btn-chip btn-chip-danger"
                       (click)="removeGalleryImage($index)"
                     >
-                      Remove
+                      {{ t('common.remove') }}
                     </button>
                   </div>
                 </div>
@@ -212,17 +212,17 @@
         } @else {
           <label class="drop-zone">
             <span class="material-symbols-outlined drop-icon">add_photo_alternate</span>
-            <span class="drop-title">Add new image</span>
-            <span class="drop-hint">Click or drag files here</span>
+            <span class="drop-title">{{ t('adminDestinationForm.addNewImage') }}</span>
+            <span class="drop-hint">{{ t('adminDestinationForm.clickOrDrag') }}</span>
             <input type="file" accept="image/*" multiple class="sr-only" (change)="onGalleryFilesSelected($event)" />
           </label>
-          <p class="fine-print">Recommended aspect ratio 16:9. Maximum 8 images per destination.</p>
+          <p class="fine-print">{{ t('adminDestinationForm.recommendedAspectRatio') }}</p>
 
           @if (imagePreviews.length) {
             <div class="server-gallery-grid">
               @for (src of imagePreviews; track $index) {
                 <div class="server-gallery-card">
-                  <img [src]="src" alt="Destination image preview" />
+                  <img [src]="src" [alt]="t('adminDestinationForm.destinationImagePreview')" />
                   <div class="server-gallery-actions">
                     <button
                       type="button"
@@ -231,14 +231,14 @@
                       [disabled]="$index === primaryPreviewImageIndex"
                       (click)="setPrimaryPreviewImage($index)"
                     >
-                      {{ $index === primaryPreviewImageIndex ? 'Primary' : 'Set Primary' }}
+                      {{ $index === primaryPreviewImageIndex ? t('adminDestinationForm.primary') : t('adminDestinationForm.setPrimary') }}
                     </button>
                     <button
                       type="button"
                       class="btn btn-chip btn-chip-danger"
                       (click)="removeGalleryImage($index)"
                     >
-                      Remove
+                      {{ t('common.remove') }}
                     </button>
                   </div>
                 </div>
@@ -253,12 +253,12 @@
       }
 
       <article class="panel panel--muted">
-        <span class="step-tag">STEP 3</span>
+        <span class="step-tag">{{ t('adminDestinationForm.step3') }}</span>
         <div class="panel-head">
           <span class="panel-icon material-symbols-outlined">history</span>
           <div>
-            <h2 class="panel-title">Change history &amp; audit log</h2>
-            <p class="panel-sub">Edits and approvals will appear here after the destination is created.</p>
+            <h2 class="panel-title">{{ t('adminDestinationForm.changeHistory') }}</h2>
+            <p class="panel-sub">{{ t('adminDestinationForm.changeHistoryDesc') }}</p>
           </div>
         </div>
       </article>
@@ -266,12 +266,12 @@
 
     <aside class="workspace-side">
       <article class="panel">
-        <span class="step-tag">STEP 4</span>
+        <span class="step-tag">{{ t('adminDestinationForm.step4') }}</span>
         <div class="panel-head">
           <span class="panel-icon material-symbols-outlined">location_on</span>
           <div>
-            <h2 class="panel-title">Location &amp; map</h2>
-            <p class="panel-sub">Preview pin placement for this destination.</p>
+            <h2 class="panel-title">{{ t('adminDestinationForm.locationMap') }}</h2>
+            <p class="panel-sub">{{ t('adminDestinationForm.locationMapDesc') }}</p>
           </div>
         </div>
 
@@ -305,64 +305,64 @@
         </div>
 
         <div class="readonly-field">
-          <span class="label">Region (preview)</span>
+          <span class="label">{{ t('adminDestinationForm.regionPreview') }}</span>
           <p class="readonly-value">{{ regionDisplayName }}</p>
         </div>
 
       </article>
 
       <article class="panel">
-        <span class="step-tag">STEP 5</span>
+        <span class="step-tag">{{ t('adminDestinationForm.step5') }}</span>
         <div class="panel-head panel-head--split">
           <div class="panel-head-left">
             <span class="panel-icon material-symbols-outlined">hub</span>
-            <h2 class="panel-title">Linked entities</h2>
+            <h2 class="panel-title">{{ t('adminDestinationForm.linkedEntities') }}</h2>
           </div>
-          <button type="button" class="link-quiet" disabled>Link more</button>
+          <button type="button" class="link-quiet" disabled>{{ t('adminDestinationForm.linkMore') }}</button>
         </div>
         <ul class="entity-list">
           <li>
             <span class="material-symbols-outlined entity-ico">apartment</span>
             <div>
-              <span class="entity-name">Objects</span>
-              <span class="entity-meta">Hotels, shops…</span>
+              <span class="entity-name">{{ t('common.objects') }}</span>
+              <span class="entity-meta">{{ t('adminDestinationForm.hotelsShops') }}</span>
             </div>
             <span class="entity-count">{{ linkedEntityCounts.objects }}</span>
           </li>
           <li>
             <span class="material-symbols-outlined entity-ico">event</span>
             <div>
-              <span class="entity-name">Related events</span>
+              <span class="entity-name">{{ t('adminDestinationForm.relatedEvents') }}</span>
             </div>
             <span class="entity-count">{{ linkedEntityCounts.events }}</span>
           </li>
           <li>
             <span class="material-symbols-outlined entity-ico">hiking</span>
             <div>
-              <span class="entity-name">Featured activities</span>
+              <span class="entity-name">{{ t('adminDestinationForm.featuredActivities') }}</span>
             </div>
             <span class="entity-count">{{ linkedEntityCounts.activities }}</span>
           </li>
           <li>
             <span class="material-symbols-outlined entity-ico">map</span>
             <div>
-              <span class="entity-name">Localities</span>
+              <span class="entity-name">{{ t('adminDestinationForm.localities') }}</span>
             </div>
             <span class="entity-count">{{ linkedEntityCounts.localities }}</span>
           </li>
         </ul>
         <p class="fine-print">
-          {{ isLoadingLinkedEntities ? 'Loading linked entity counts…' : 'Linked entity counts are loaded from live data.' }}
+          {{ isLoadingLinkedEntities ? t('adminDestinationForm.loadingLinkedEntityCounts') : t('adminDestinationForm.linkedEntityCountsLoaded') }}
         </p>
       </article>
 
       <article class="panel">
-        <span class="step-tag">STEP 6</span>
+        <span class="step-tag">{{ t('adminDestinationForm.step6') }}</span>
         <div class="panel-head">
           <span class="panel-icon material-symbols-outlined">group</span>
           <div>
-            <h2 class="panel-title">Manager *</h2>
-            <p class="panel-sub">Every destination must always have an assigned manager.</p>
+            <h2 class="panel-title">{{ t('adminDestinationForm.manager') }} *</h2>
+            <p class="panel-sub">{{ t('adminDestinationForm.managerDesc') }}</p>
           </div>
         </div>
         <div class="manager-combo" #managerCombo>
@@ -374,7 +374,7 @@
               (ngModelChange)="onManagerSearchInput($event)"
               (focus)="onManagerSearchFocus()"
               autocomplete="off"
-              placeholder="Search managers"
+              [placeholder]="t('adminDestinationForm.searchManagers')"
               aria-autocomplete="list"
               [attr.aria-expanded]="managerSuggestionsOpen"
               aria-controls="manager-suggestion-list"
@@ -385,13 +385,13 @@
               id="manager-suggestion-list"
               class="manager-suggestions"
               role="listbox"
-              aria-label="Manager suggestions"
+              [attr.aria-label]="t('adminDestinationForm.managerSuggestions')"
             >
               @if (managerSuggestionsLoading) {
-                <li class="manager-suggestion manager-suggestion--muted" role="presentation">Searching…</li>
+                <li class="manager-suggestion manager-suggestion--muted" role="presentation">{{ t('adminDestinationForm.searching') }}</li>
               } @else if (!managerSuggestions.length) {
                 <li class="manager-suggestion manager-suggestion--muted" role="presentation">
-                  No managers match your search.
+                  {{ t('adminDestinationForm.noManagersMatch') }}
                 </li>
               } @else {
                 @for (u of managerSuggestions; track u.id) {
@@ -442,7 +442,7 @@
                   type="button"
                   class="selected-manager-remove"
                   (click)="clearSelectedManager()"
-                  aria-label="Remove manager"
+                  [attr.aria-label]="t('adminDestinationForm.removeManager')"
                 >
                   <span class="material-symbols-outlined" aria-hidden="true">close</span>
                 </button>
@@ -451,7 +451,7 @@
           } @else {
             <div class="empty-managers">
               <span class="material-symbols-outlined">person_add</span>
-              <p>Select a manager before you can save this destination.</p>
+              <p>{{ t('adminDestinationForm.selectManagerBeforeSave') }}</p>
             </div>
           }
         </div>
@@ -472,17 +472,16 @@
         <div class="destination-delete-icon" aria-hidden="true">
           <span class="material-symbols-outlined">delete</span>
         </div>
-        <h3 id="destination-delete-title">Delete destination?</h3>
+        <h3 id="destination-delete-title">{{ t('adminDestinationForm.deleteDestinationTitle') }}</h3>
         <p id="destination-delete-description">
-          This will remove the destination, its localities, direct objects, destination images, and destination favorites.
-          This action cannot be undone.
+          {{ t('adminDestinationForm.deleteDestinationDescription') }}
         </p>
         <div class="destination-delete-actions">
           <button type="button" class="btn btn-ghost" (click)="closeDeleteConfirmModal()" [disabled]="isDeleting">
-            Cancel
+            {{ t('common.cancel') }}
           </button>
           <button type="button" class="btn btn-danger" (click)="confirmDeleteDestination()" [disabled]="isDeleting">
-            {{ isDeleting ? 'Deleting...' : 'Delete' }}
+            {{ isDeleting ? t('adminDestinationForm.deletingPlain') : t('adminDestinationForm.delete') }}
           </button>
         </div>
       </section>

@@ -8,9 +8,10 @@ import { environment } from '../../../../environment/environment';
 import { AuthService, UpdateUserDto } from '../../../services/auth.service';
 import { UserDto } from '../../../models/user.model';
 import { TranslationService } from '../../../services/translation.service';
+import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 type PermissionItem = {
-  label: string;
-  detail: string;
+  labelKey: string;
+  detailKey: string;
   icon: string;
 };
 
@@ -20,13 +21,13 @@ type ModalState = 'closed' | 'opening' | 'open' | 'closing';
 
 type ProfileLanguageOption = {
   code: string;
-  label: string;
+  labelKey: string;
 };
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, MatIcon, ImageCropperComponent],
+  imports: [CommonModule, FormsModule, RouterModule, MatIcon, ImageCropperComponent, TranslatePipe],
   templateUrl: '../../admin/profile/profile.component.html',
   styleUrls: ['../../admin/profile/profile.component.css'],
 })
@@ -35,14 +36,14 @@ export class ProfileComponentContentCreator implements OnInit, OnDestroy {
     `${environment.apiUrl.replace('/api', '')}/images/profiles/default_icon.png`;
 
   readonly permissionItems: PermissionItem[] = [
-    { label: 'Create objects, events, and activities', detail: 'Content Creator can create new objects, events, and activities, and they start in Pending state.', icon: 'add_circle' },
-    { label: 'Edit own published content', detail: 'Content Creator can update only their own objects, events, and activities.', icon: 'edit' },
-    { label: 'Delete own unpublished content', detail: 'Content Creator can delete only their own content before it is Approved.', icon: 'delete' },
-    { label: 'Manage content images', detail: 'Content Creator can add images to their own objects, events, and activities.', icon: 'image' },
-    { label: 'Respond to reviews', detail: 'Content Creator can reply to reviews on their own objects and edit or delete that reply.', icon: 'rate_review' },
-    { label: 'Request deletions', detail: 'Content Creator can request deletion of their own Approved objects, events, and activities.', icon: 'request_page' },
-    { label: 'View own deletion requests', detail: 'Content Creator can list and inspect only their own deletion requests.', icon: 'list_alt' },
-    { label: 'View dashboard overview', detail: 'Content Creator can open the content creator dashboard overview.', icon: 'dashboard' },
+    { labelKey: 'Create objects, events, and activities', detailKey: 'Content Creator can create new objects, events, and activities, and they start in Pending state.', icon: 'add_circle' },
+    { labelKey: 'Edit own published content', detailKey: 'Content Creator can update only their own objects, events, and activities.', icon: 'edit' },
+    { labelKey: 'Delete own unpublished content', detailKey: 'Content Creator can delete only their own content before it is Approved.', icon: 'delete' },
+    { labelKey: 'Manage content images', detailKey: 'Content Creator can add images to their own objects, events, and activities.', icon: 'image' },
+    { labelKey: 'Respond to reviews', detailKey: 'Content Creator can reply to reviews on their own objects and edit or delete that reply.', icon: 'rate_review' },
+    { labelKey: 'Request deletions', detailKey: 'Content Creator can request deletion of their own Approved objects, events, and activities.', icon: 'request_page' },
+    { labelKey: 'View own deletion requests', detailKey: 'Content Creator can list and inspect only their own deletion requests.', icon: 'list_alt' },
+    { labelKey: 'View dashboard overview', detailKey: 'Content Creator can open the content creator dashboard overview.', icon: 'dashboard' },
   ];
 
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
@@ -50,10 +51,10 @@ export class ProfileComponentContentCreator implements OnInit, OnDestroy {
   @ViewChild('countryDropdown') countryDropdown?: ElementRef<HTMLElement>;
 
   readonly languageOptions: ProfileLanguageOption[] = [
-    { code: 'sr', label: 'Serbian/Montenegrin' },
-    { code: 'en', label: 'English' },
-    { code: 'es', label: 'Spanish' },
-    { code: 'it', label: 'Italian' },
+    { code: 'sr', labelKey: 'language.serbian' },
+    { code: 'en', labelKey: 'language.english' },
+    { code: 'es', labelKey: 'language.spanish' },
+    { code: 'it', labelKey: 'language.italian' },
   ];
 
   readonly countryOptions: string[] = [
@@ -152,11 +153,24 @@ export class ProfileComponentContentCreator implements OnInit, OnDestroy {
   }
 
   get displayName(): string {
-    return `${this.user.firstName} ${this.user.lastName}`.trim() || 'Unknown User';
+    return `${this.user.firstName} ${this.user.lastName}`.trim() || this.translationService.translate('adminProfile.unknownUser');
   }
 
   get permissionCount(): number {
     return this.permissionItems.length;
+  }
+
+  get roleLabelKey(): string {
+    switch (this.role) {
+      case 'admin':
+        return 'adminProfile.roles.admin';
+      case 'manager':
+        return 'adminProfile.roles.manager';
+      case 'content-creator':
+        return 'adminProfile.roles.contentCreator';
+      default:
+        return 'adminProfile.roles.user';
+    }
   }
 
   get roleBadgeClass(): string {
@@ -388,8 +402,7 @@ export class ProfileComponentContentCreator implements OnInit, OnDestroy {
   }
 
   get selectedLanguageLabel(): string {
-    const code = (this.user.language ?? 'en').trim();
-    return this.languageOptions.find((option) => option.code === code)?.label ?? 'English';
+    return this.translationService.translate(this.translationService.labelKeyForLanguage(this.user.language));
   }
 
   toggleLanguageMenu(event: Event): void {

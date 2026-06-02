@@ -8,9 +8,10 @@ import { environment } from '../../../../environment/environment';
 import { AuthService, UpdateUserDto } from '../../../services/auth.service';
 import { UserDto } from '../../../models/user.model';
 import { TranslationService } from '../../../services/translation.service';
+import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 type PermissionItem = {
-  label: string;
-  detail: string;
+  labelKey: string;
+  detailKey: string;
   icon: string;
 };
 
@@ -20,13 +21,13 @@ type ModalState = 'closed' | 'opening' | 'open' | 'closing';
 
 type ProfileLanguageOption = {
   code: string;
-  label: string;
+  labelKey: string;
 };
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, MatIcon, ImageCropperComponent],
+  imports: [CommonModule, FormsModule, RouterModule, MatIcon, ImageCropperComponent, TranslatePipe],
   templateUrl: '../../admin/profile/profile.component.html',
   styleUrls: ['../../admin/profile/profile.component.css'],
 })
@@ -35,14 +36,14 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
     `${environment.apiUrl.replace('/api', '')}/images/profiles/default_icon.png`;
 
   readonly permissionItems: PermissionItem[] = [
-    { label: 'View manager dashboard', detail: 'Open the manager overview at /api/manager/dashboard/overview.', icon: 'dashboard' },
-    { label: 'Manage events', detail: 'List assigned events, inspect details, approve them, and toggle active state.', icon: 'event' },
-    { label: 'Manage activities', detail: 'List assigned activities, inspect details, approve them, and toggle active state.', icon: 'local_activity' },
-    { label: 'Manage tourist objects', detail: 'List assigned tourist objects, inspect details, approve them, and toggle active state.', icon: 'storefront' },
-    { label: 'Manage localities', detail: 'Create, update, toggle active state, and delete localities in the managed destination.', icon: 'location_city' },
-    { label: 'Add locality images', detail: 'Upload images for localities that belong to the managed destination.', icon: 'image' },
-    { label: 'Review deletion requests', detail: 'View and review deletion requests for the managed destination.', icon: 'delete_sweep' },
-    { label: 'Manage manager reports', detail: 'Create reports, view your own reports, and withdraw your own reports.', icon: 'article' },
+    { labelKey: 'View manager dashboard', detailKey: 'Open the manager overview at /api/manager/dashboard/overview.', icon: 'dashboard' },
+    { labelKey: 'Manage events', detailKey: 'List assigned events, inspect details, approve them, and toggle active state.', icon: 'event' },
+    { labelKey: 'Manage activities', detailKey: 'List assigned activities, inspect details, approve them, and toggle active state.', icon: 'local_activity' },
+    { labelKey: 'Manage tourist objects', detailKey: 'List assigned tourist objects, inspect details, approve them, and toggle active state.', icon: 'storefront' },
+    { labelKey: 'Manage localities', detailKey: 'Create, update, toggle active state, and delete localities in the managed destination.', icon: 'location_city' },
+    { labelKey: 'Add locality images', detailKey: 'Upload images for localities that belong to the managed destination.', icon: 'image' },
+    { labelKey: 'Review deletion requests', detailKey: 'View and review deletion requests for the managed destination.', icon: 'delete_sweep' },
+    { labelKey: 'Manage manager reports', detailKey: 'Create reports, view your own reports, and withdraw your own reports.', icon: 'article' },
   ];
 
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
@@ -50,10 +51,10 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
   @ViewChild('countryDropdown') countryDropdown?: ElementRef<HTMLElement>;
 
   readonly languageOptions: ProfileLanguageOption[] = [
-    { code: 'sr', label: 'Serbian/Montenegrin' },
-    { code: 'en', label: 'English' },
-    { code: 'es', label: 'Spanish' },
-    { code: 'it', label: 'Italian' },
+    { code: 'sr', labelKey: 'language.serbian' },
+    { code: 'en', labelKey: 'language.english' },
+    { code: 'es', labelKey: 'language.spanish' },
+    { code: 'it', labelKey: 'language.italian' },
   ];
 
   readonly countryOptions: string[] = [
@@ -152,7 +153,7 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
   }
 
   get displayName(): string {
-    return `${this.user.firstName} ${this.user.lastName}`.trim() || 'Unknown User';
+    return `${this.user.firstName} ${this.user.lastName}`.trim() || this.translationService.translate('adminProfile.unknownUser');
   }
 
   get roleBadgeClass(): string {
@@ -170,6 +171,19 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
 
   get permissionCount(): number {
     return this.permissionItems.length;
+  }
+
+  get roleLabelKey(): string {
+    switch (this.role) {
+      case 'admin':
+        return 'adminProfile.roles.admin';
+      case 'manager':
+        return 'adminProfile.roles.manager';
+      case 'content-creator':
+        return 'adminProfile.roles.contentCreator';
+      default:
+        return 'adminProfile.roles.user';
+    }
   }
 
   triggerFileInput(): void {
@@ -388,8 +402,7 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
   }
 
   get selectedLanguageLabel(): string {
-    const code = (this.user.language ?? 'en').trim();
-    return this.languageOptions.find((option) => option.code === code)?.label ?? 'English';
+    return this.translationService.translate(this.translationService.labelKeyForLanguage(this.user.language));
   }
 
   toggleLanguageMenu(event: Event): void {

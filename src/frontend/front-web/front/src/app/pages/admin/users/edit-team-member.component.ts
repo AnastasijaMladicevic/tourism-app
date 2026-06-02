@@ -16,6 +16,7 @@ import {
 } from 'rxjs/operators';
 import { ChangePasswordDto, UpdateUserDto, UserDto, UserEditLockDto } from '../../../models/user.model';
 import { AdminUsersService, BanUserDto } from '../../../services/admin-users.service';
+import { TranslationService } from '../../../services/translation.service';
 
 /** Mirrors role cards on create page; includes Admin when API returns it. */
 export type DisplayRole = 'manager' | 'content-creator' | 'tourist' | 'admin';
@@ -34,6 +35,7 @@ export class EditTeamMemberComponent {
   private readonly route = inject(ActivatedRoute);
   private readonly adminUsers = inject(AdminUsersService);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly translationService = inject(TranslationService);
 
   userId!: number;
 
@@ -150,7 +152,7 @@ export class EditTeamMemberComponent {
                     userId,
                     isLocked: true,
                     isOwnedByCurrentUser: false,
-                    message: this.extractApiMessage(err) || 'Could not start an edit session for this user.'
+                    message: this.extractApiMessage(err) || this.t('adminTeamMemberEdit.errors.startEditSession')
                   }
                 )
               )
@@ -225,12 +227,12 @@ export class EditTeamMemberComponent {
       return '';
     }
 
-    const lockedBy = this.editLockState.lockedByDisplayName?.trim() || 'Another admin';
+    const lockedBy = this.editLockState.lockedByDisplayName?.trim() || this.t('adminTeamMemberEdit.anotherAdmin');
     const expiresAt = this.editLockState.expiresAtUtc
       ? this.formatDateTime(this.editLockState.expiresAtUtc)
-      : 'the current edit session ends';
+      : this.t('adminTeamMemberEdit.currentEditSessionEnds');
 
-    return `${lockedBy} is currently editing this user. Editing is temporarily disabled until ${expiresAt}.`;
+    return this.t('adminTeamMemberEdit.editLockedMessage', { lockedBy, expiresAt });
   }
 
   get activeSessionBlockMessage(): string {
@@ -239,10 +241,12 @@ export class EditTeamMemberComponent {
     }
 
     if (this.activeSessionExpiresLabel) {
-      return `This user is currently logged in. Ask them to log out before changing the password. Current session expires at ${this.activeSessionExpiresLabel}.`;
+      return this.t('adminTeamMemberEdit.activeSessionMessageWithExpiry', {
+        expiresAt: this.activeSessionExpiresLabel
+      });
     }
 
-    return 'This user is currently logged in. Ask them to log out before changing the password.';
+    return this.t('adminTeamMemberEdit.activeSessionMessage');
   }
 
   selectTouristRole(role: 'tourist' | 'content-creator'): void {
@@ -296,27 +300,27 @@ export class EditTeamMemberComponent {
         'name' in err &&
         (err as { name: string }).name === 'TimeoutError');
     if (isTimeout) {
-      return 'Request timed out. Start the API (e.g. TuristickiVodic on https://localhost:7047), run ng serve with the proxy, and check the browser Network tab for /api/users/....';
+      return this.t('adminTeamMemberEdit.errors.timeout');
     }
     if (err instanceof HttpErrorResponse) {
       if (err.status === 401) {
-        return 'Your session expired or you are not signed in. Open the app again and sign in as Admin.';
+        return this.t('adminTeamMemberEdit.errors.unauthorized');
       }
       if (err.status === 403) {
-        return 'You are not allowed to view this user.';
+        return this.t('adminTeamMemberEdit.errors.forbidden');
       }
       if (err.status === 404) {
-        return 'User not found.';
+        return this.t('adminTeamMemberEdit.errors.notFound');
       }
       const body = err.error as { message?: string } | null;
       if (body && typeof body.message === 'string' && body.message.trim()) {
         return body.message;
       }
       if (err.status === 0) {
-        return 'Cannot reach the API. Is the backend running and is the dev-server using proxy.conf.json for /api?';
+        return this.t('adminTeamMemberEdit.errors.apiUnavailable');
       }
     }
-    return 'Could not load this user. They may have been removed or you may not have access.';
+    return this.t('adminTeamMemberEdit.errors.loadFailed');
   }
 
   get passwordStrengthLabel(): string {
@@ -338,15 +342,15 @@ export class EditTeamMemberComponent {
       score++;
     }
     if (score <= 1) {
-      return 'WEAK';
+      return this.t('adminTeamMemberEdit.passwordStrength.weak');
     }
     if (score === 2) {
-      return 'FAIR';
+      return this.t('adminTeamMemberEdit.passwordStrength.fair');
     }
     if (score === 3) {
-      return 'GOOD';
+      return this.t('adminTeamMemberEdit.passwordStrength.good');
     }
-    return 'STRONG';
+    return this.t('adminTeamMemberEdit.passwordStrength.strong');
   }
 
   get passwordStrengthClass(): 'weak' | 'fair' | 'good' | 'strong' | '' {
@@ -355,10 +359,10 @@ export class EditTeamMemberComponent {
       return '';
     }
     const map: Record<string, 'weak' | 'fair' | 'good' | 'strong'> = {
-      WEAK: 'weak',
-      FAIR: 'fair',
-      GOOD: 'good',
-      STRONG: 'strong'
+      [this.t('adminTeamMemberEdit.passwordStrength.weak')]: 'weak',
+      [this.t('adminTeamMemberEdit.passwordStrength.fair')]: 'fair',
+      [this.t('adminTeamMemberEdit.passwordStrength.good')]: 'good',
+      [this.t('adminTeamMemberEdit.passwordStrength.strong')]: 'strong'
     };
     return map[label] ?? '';
   }
@@ -389,18 +393,18 @@ export class EditTeamMemberComponent {
     }
 
     if (!this.canModerateBan) {
-      this.moderationError = 'Only tourist and content creator accounts can be banned from this screen.';
+      this.moderationError = this.t('adminTeamMemberEdit.errors.banNotAllowed');
       return;
     }
 
     const reason = this.banReason.trim();
     if (!reason) {
-      this.moderationError = 'Please enter a ban reason.';
+      this.moderationError = this.t('adminTeamMemberEdit.errors.banReasonRequired');
       return;
     }
 
     if (!this.isBanDurationValid) {
-      this.moderationError = 'Choose an end date for a custom ban duration.';
+      this.moderationError = this.t('adminTeamMemberEdit.errors.banCustomDateRequired');
       return;
     }
 
@@ -424,8 +428,8 @@ export class EditTeamMemberComponent {
           this.banReason = '';
           this.resetBanDurationForm();
           this.moderationSuccess = user.banExpiresAtUtc
-            ? `User banned until ${this.activeBanExpiresLabel}.`
-            : 'User permanently banned.';
+            ? this.t('adminTeamMemberEdit.banSuccessUntil', { date: this.activeBanExpiresLabel })
+            : this.t('adminTeamMemberEdit.banSuccessPermanent');
           this.cdr.markForCheck();
         },
         error: (err: unknown) => {
@@ -445,7 +449,7 @@ export class EditTeamMemberComponent {
     }
 
     if (!this.canModerateBan) {
-      this.moderationError = 'This account type cannot be unbanned from this screen.';
+      this.moderationError = this.t('adminTeamMemberEdit.errors.unbanNotAllowed');
       return;
     }
 
@@ -461,7 +465,7 @@ export class EditTeamMemberComponent {
       .subscribe({
         next: (user) => {
           this.applyUser(user);
-          this.moderationSuccess = 'User ban has been removed.';
+          this.moderationSuccess = this.t('adminTeamMemberEdit.unbanSuccess');
           this.cdr.markForCheck();
         },
         error: (err: unknown) => {
@@ -482,7 +486,7 @@ export class EditTeamMemberComponent {
     const first = this.firstName.trim();
     const last = this.lastName.trim();
     if (!first || !last || !this.dateOfBirth) {
-      this.submitError = 'Please fill in first name, last name, and date of birth.';
+      this.submitError = this.t('adminTeamMemberEdit.errors.requiredFields');
       return;
     }
 
@@ -495,15 +499,15 @@ export class EditTeamMemberComponent {
         return;
       }
       if (!this.currentPassword.trim()) {
-        this.submitError = 'Current password is required before replacing this password.';
+        this.submitError = this.t('adminTeamMemberEdit.errors.currentPasswordRequired');
         return;
       }
       if (pwd.length < 6) {
-        this.submitError = 'New password must be at least 6 characters.';
+        this.submitError = this.t('adminTeamMemberEdit.errors.passwordMinLength');
         return;
       }
       if (pwd !== confirm) {
-        this.submitError = 'Passwords do not match.';
+        this.submitError = this.t('adminTeamMemberEdit.errors.passwordsMismatch');
         return;
       }
     }
@@ -661,7 +665,7 @@ export class EditTeamMemberComponent {
       return '';
     }
 
-    return new Intl.DateTimeFormat('en-GB', {
+    return new Intl.DateTimeFormat(this.translationService.currentLocale(), {
       dateStyle: 'medium',
       timeStyle: 'short'
     }).format(parsed);
@@ -695,7 +699,7 @@ export class EditTeamMemberComponent {
               userId: this.userId,
               isLocked: true,
               isOwnedByCurrentUser: false,
-              message: this.extractApiMessage(err) || 'Could not keep the edit session active.'
+              message: this.extractApiMessage(err) || this.t('adminTeamMemberEdit.errors.keepEditSession')
             }
           );
           this.cdr.detectChanges();
@@ -747,7 +751,7 @@ export class EditTeamMemberComponent {
       message:
         typeof maybeError.error.message === 'string' && maybeError.error.message.trim().length > 0
           ? maybeError.error.message
-          : 'Another admin is currently editing this user.'
+          : this.t('adminTeamMemberEdit.errors.anotherAdminEditing')
     };
   }
 
@@ -768,12 +772,39 @@ export class EditTeamMemberComponent {
         }
       }
       if (err.status === 0) {
-        return 'Network error. Check that the API is running.';
+        return this.t('adminTeamMemberEdit.errors.network');
       }
       if (err.status >= 500) {
-        return 'Server error. Try again later.';
+        return this.t('adminTeamMemberEdit.errors.server');
       }
     }
-    return 'Could not save changes. Please try again.';
+    return this.t('adminTeamMemberEdit.errors.saveFailed');
+  }
+
+  t(key: string, params?: Record<string, string | number>): string {
+    return this.translationService.translate(key, params);
+  }
+
+  countryLabel(country: string): string {
+    const key = country
+      .replace(/[()]/g, '')
+      .replace(/\s+/g, '')
+      .replace(/[^A-Za-z]/g, '');
+    return this.t(`adminTeamMemberCreate.countries.${key}`);
+  }
+
+  languageLabel(language: string): string {
+    const key = language
+      .replace(/[()]/g, '')
+      .replace(/\s+/g, '')
+      .replace(/[^A-Za-z]/g, '');
+    return this.t(`adminTeamMemberCreate.languages.${key}`);
+  }
+
+  regionLabel(region: string): string {
+    const key = region
+      .replace(/\s+/g, '')
+      .replace(/[^A-Za-z]/g, '');
+    return this.t(`adminTeamMemberCreate.regions.${key}`);
   }
 }

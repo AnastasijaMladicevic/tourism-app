@@ -1,22 +1,19 @@
 <section class="destinations-page">
   <header class="page-header">
     <div>
-      <h1 class="page-title">Destinations</h1>
-      <p class="page-intro">
-        Curate regional destinations, keep locality hierarchies organized, and preview how each
-        destination appears across the platform.
-      </p>
+      <h1 class="page-title">{{ t('adminDestinations.title') }}</h1>
+      <p class="page-intro">{{ t('adminDestinations.subtitle') }}</p>
     </div>
 
     <div class="header-actions">
       <button
         type="button"
         class="primary-btn page-header-cta"
-        aria-label="Add destination"
+        [attr.aria-label]="t('adminDestinations.addDestination')"
         (click)="onAddDestination()"
       >
         <span class="material-symbols-outlined">add</span>
-        <span class="page-header-cta-label">Add destination</span>
+        <span class="page-header-cta-label">{{ t('adminDestinations.addDestination') }}</span>
       </button>
     </div>
   </header>
@@ -29,7 +26,7 @@
         class="toolbar-input"
         [(ngModel)]="draftSearchQuery"
         (keyup)="onSearchEnter($event)"
-        placeholder="Search destinations, regions, or country..."
+        [placeholder]="t('adminDestinations.searchPlaceholder')"
       />
     </div>
 
@@ -38,16 +35,16 @@
   @if (filterPanelOpen) {
     <div class="filters-panel card">
       <label>
-        <span>Status</span>
+        <span>{{ t('adminDestinations.filters.status') }}</span>
         <select [(ngModel)]="statusFilter">
           <option *ngFor="let option of statusOptions" [value]="option.value">
-            {{ option.label }}
+            {{ t(option.labelKey) }}
           </option>
         </select>
       </label>
 
       <label>
-        <span>Region</span>
+        <span>{{ t('adminDestinations.filters.region') }}</span>
         <select [(ngModel)]="regionFilter">
           <option *ngFor="let option of regionFilterOptions" [value]="option.value">
             {{ option.label }}
@@ -56,28 +53,28 @@
       </label>
 
       <label>
-        <span>Sort by</span>
+        <span>{{ t('adminDestinations.filters.sortBy') }}</span>
         <select [(ngModel)]="sortBy">
           <option *ngFor="let option of sortByOptions" [value]="option.value">
-            {{ option.label }}
+            {{ t(option.labelKey) }}
           </option>
         </select>
       </label>
 
       <label>
-        <span>Order</span>
+        <span>{{ t('adminDestinations.filters.order') }}</span>
         <select [(ngModel)]="sortOrder">
-          <option value="asc">Ascending</option>
-          <option value="desc">Descending</option>
+          <option value="asc">{{ t('adminDestinations.filters.ascending') }}</option>
+          <option value="desc">{{ t('adminDestinations.filters.descending') }}</option>
         </select>
       </label>
 
       <div class="filter-actions">
         <button type="button" class="primary-btn filter-btn" (click)="onApplyFilters()">
-          Apply
+          {{ t('adminDestinations.filters.apply') }}
         </button>
         <button type="button" class="ghost-btn filter-btn secondary" (click)="onResetFilters()">
-          Reset
+          {{ t('adminDestinations.filters.reset') }}
         </button>
       </div>
     </div>
@@ -102,14 +99,14 @@
 
       <div class="table-card">
         @if (isLoading) {
-          <div class="list-state list-state-loading">Loading destinations…</div>
+          <div class="list-state list-state-loading">{{ t('adminDestinations.loading') }}</div>
         } @else if (loadError) {
           <div class="list-state list-state-error">
             <p>{{ loadError }}</p>
-            <button type="button" class="ghost-btn slim-btn" (click)="reloadFromApi()">Retry</button>
+            <button type="button" class="ghost-btn slim-btn" (click)="reloadFromApi()">{{ t('common.retry') }}</button>
           </div>
         } @else if (!visibleDestinations.length) {
-          <div class="list-state">No destinations match the current filters.</div>
+          <div class="list-state">{{ t('adminDestinations.emptyFiltered') }}</div>
         } @else {
           <div class="destinations-mobile-list">
             @for (row of visibleDestinations; track row.id) {
@@ -134,14 +131,14 @@
                     <span class="destination-mobile-card__type">{{ row.destinationType }}</span>
                     <span class="destination-mobile-card__inventory">
                       <span class="material-symbols-outlined" aria-hidden="true">apartment</span>
-                      {{ row.objectCount }} Objects
+                      {{ objectCountLabel(row.objectCount) }}
                     </span>
                   </div>
                 </div>
                 <button
                   type="button"
                   class="destination-mobile-card__edit"
-                  title="Edit destination"
+                  [title]="t('adminDestinations.editDestination')"
                   (click)="onEditDestination(row); $event.stopPropagation()"
                 >
                   <span class="material-symbols-outlined">edit</span>
@@ -154,13 +151,13 @@
             <table>
               <thead>
                 <tr>
-                  <th>Status</th>
-                  <th>Destination</th>
-                  <th>Type</th>
-                  <th>Region</th>
-                  <th>Manager</th>
-                  <th>Inventory</th>
-                  <th class="col-actions">Actions</th>
+                  <th>{{ t('adminDestinations.columns.status') }}</th>
+                  <th>{{ t('adminDestinations.columns.destination') }}</th>
+                  <th>{{ t('adminDestinations.columns.type') }}</th>
+                  <th>{{ t('adminDestinations.columns.region') }}</th>
+                  <th>{{ t('adminDestinations.columns.manager') }}</th>
+                  <th>{{ t('adminDestinations.columns.inventory') }}</th>
+                  <th class="col-actions">{{ t('adminDestinations.columns.actions') }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -197,7 +194,7 @@
                   <td>
                     <span class="inventory-cell">
                       <span class="material-symbols-outlined inventory-icon">apartment</span>
-                      {{ row.objectCount }} Objects
+                      {{ objectCountLabel(row.objectCount) }}
                     </span>
                   </td>
                   <td>
@@ -229,7 +226,7 @@
           [totalCount]="totalCount"
           [pageSize]="pageSize"
           [pageSizeOptions]="pageSizeOptions"
-          itemLabel="destinations"
+          [itemLabel]="t('adminDestinations.itemsLabel')"
           (pageChange)="onGoToPage($event)"
           (pageSizeChange)="onPageSizeChange($event)"
         ></app-paginator>
@@ -253,12 +250,9 @@
           </div>
 
           <div class="hero-copy">
-            <p class="eyebrow">Destination preview</p>
+            <p class="eyebrow">{{ t('adminDestinations.destinationPreview') }}</p>
             <h2>{{ selectedDestination.name }}</h2>
-            <p class="hero-meta">
-              {{ selectedDestination.region }} · {{ selectedDestination.localityCount }} localities ·
-              {{ selectedDestination.objectCount }} objects
-            </p>
+            <p class="hero-meta">{{ detailMetaLabel(selectedDestination) }}</p>
             <span class="detail-status" [ngClass]="getStatusClass(selectedDestination.status)">
               {{ formatTableStatus(selectedDestination.status) }}
             </span>
@@ -267,38 +261,38 @@
 
         <div class="detail-metrics">
           <div class="metric-card">
-            <span>Localities</span>
+            <span>{{ t('adminDestinations.localities') }}</span>
             <strong>{{ selectedDestination.localityCount }}</strong>
           </div>
           <div class="metric-card">
-            <span>Objects</span>
+            <span>{{ t('adminDestinations.objects') }}</span>
             <strong>{{ selectedDestination.objectCount }}</strong>
           </div>
         </div>
 
         <section class="detail-section">
           <div class="section-head">
-            <h3>Destination info</h3>
+            <h3>{{ t('adminDestinations.destinationInfo') }}</h3>
           </div>
 
           <div class="schedule-list">
             <div class="schedule-item">
-              <span>Manager</span>
-              <strong>{{ selectedDestination.managerName || '—' }}</strong>
+              <span>{{ t('adminDestinations.columns.manager') }}</span>
+              <strong>{{ selectedDestination.managerName || t('common.notAvailable') }}</strong>
             </div>
             <div class="schedule-item">
-              <span>Region</span>
+              <span>{{ t('adminDestinations.columns.region') }}</span>
               <strong>{{ selectedDestination.region }}</strong>
             </div>
             <div class="schedule-item">
-              <span>Last updated</span>
-              <strong>{{ selectedDestination.updatedAt | date: 'MMM d, y' }}</strong>
+              <span>{{ t('adminDestinations.lastUpdated') }}</span>
+              <strong>{{ formatDateLabel(selectedDestination.updatedAt) }}</strong>
             </div>
           </div>
         </section>
 
         <section class="detail-section">
-          <h3>Description</h3>
+          <h3>{{ t('adminDestinations.description') }}</h3>
           <p class="description-copy">{{ selectedDestination.summary }}</p>
         </section>
 
@@ -317,7 +311,7 @@
             @if (!hasSelectedCoordinates) {
               <div class="map-empty-state">
                 <span class="material-symbols-outlined">location_off</span>
-                <p>Map preview will appear when coordinates are configured.</p>
+                <p>{{ t('adminDestinations.mapEmpty') }}</p>
               </div>
             }
           </div>
@@ -338,19 +332,16 @@
             (click)="onEditDestination(selectedDestination)"
           >
             <span class="material-symbols-outlined">rate_review</span>
-            Open full review
+            {{ t('adminDestinations.openFullReview') }}
           </button>
         </section>
       } @else {
         <div class="empty-state">
-          <p class="eyebrow">No destination selected</p>
-          <h2>Pick a destination from the table</h2>
-          <p>
-            Select a row to review coverage, featured status, and how the destination is summarized
-            for admins.
-          </p>
+          <p class="eyebrow">{{ t('adminDestinations.emptySelectionEyebrow') }}</p>
+          <h2>{{ t('adminDestinations.emptySelectionTitle') }}</h2>
+          <p>{{ t('adminDestinations.emptySelectionDescription') }}</p>
           <button type="button" class="primary-btn" (click)="onAddDestination()">
-            Add destination
+            {{ t('adminDestinations.addDestination') }}
           </button>
         </div>
       }
