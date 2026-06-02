@@ -35,10 +35,6 @@
     <div class="alert alert-error" role="alert">{{ errorMessage }}</div>
   }
 
-  @if (draftSavedMessage) {
-    <div class="alert alert-success" role="status">{{ draftSavedMessage }}</div>
-  }
-
   @if (isEditBlocked) {
     <div class="alert alert-lock" role="alert">{{ editLockDisplayMessage }}</div>
   }

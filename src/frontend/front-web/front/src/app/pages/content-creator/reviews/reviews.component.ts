@@ -419,7 +419,8 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
   }
 
   ratingStars(rating: number): string {
-    return '★'.repeat(Math.max(0, Math.min(5, rating))) + '☆'.repeat(Math.max(0, 5 - rating));
+    const clamped = Math.max(0, Math.min(5, Math.round(Number(rating) || 0)));
+    return '\u2605'.repeat(clamped) + '\u2606'.repeat(5 - clamped);
   }
 
   private loadSelectedObjectDetails(objectId: number): void {

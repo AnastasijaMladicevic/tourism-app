@@ -166,26 +166,6 @@ export class TranslationService {
 
   private translateLiteralPattern(value: string): string | null {
     const language = this.activeLanguage();
-    const demoVerification = value.match(/^Demo verification code: (.+)$/);
-    if (demoVerification) {
-      return this.resolveInline({
-        sr: `Demo verifikacioni kod: ${demoVerification[1]}`,
-        en: `Demo verification code: ${demoVerification[1]}`,
-        es: `Codigo de verificacion demo: ${demoVerification[1]}`,
-        it: `Demo verification code: ${demoVerification[1]}`,
-      }, language);
-    }
-
-    const demoCode = value.match(/^Demo code: (.+)$/);
-    if (demoCode) {
-      return this.resolveInline({
-        sr: `Demo kod: ${demoCode[1]}`,
-        en: `Demo code: ${demoCode[1]}`,
-        es: `Codigo demo: ${demoCode[1]}`,
-        it: `Demo code: ${demoCode[1]}`,
-      }, language);
-    }
-
     const resend = value.match(/^Resend available in (\d+)s$/);
     if (resend) {
       return this.resolveInline({

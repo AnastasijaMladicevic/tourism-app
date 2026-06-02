@@ -1396,7 +1396,8 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
   }
 
   guestRatingStars(rating: number): string {
-    return '★'.repeat(rating) + '☆'.repeat(5 - rating);
+    const clamped = Math.max(0, Math.min(5, Math.round(Number(rating) || 0)));
+    return '\u2605'.repeat(clamped) + '\u2606'.repeat(5 - clamped);
   }
 
   reportCreatorQuery(thread: ManagerObjectReviewThread): Record<string, string> {
@@ -1405,10 +1406,10 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
 
   ratingStarsVisual(rating: number | null): string {
     if (rating == null || !Number.isFinite(rating)) {
-      return '☆☆☆☆☆';
+      return '\u2606'.repeat(5);
     }
     const rounded = Math.max(0, Math.min(5, Math.round(Number(rating))));
-    return '★'.repeat(rounded) + '☆'.repeat(5 - rounded);
+    return '\u2605'.repeat(rounded) + '\u2606'.repeat(5 - rounded);
   }
 
   ratingAverageDisplay(rating: number | null): string {
