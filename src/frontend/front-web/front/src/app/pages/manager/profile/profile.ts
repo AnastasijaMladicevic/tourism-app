@@ -552,10 +552,34 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
     return (first + last).toUpperCase() || '?';
   }
 
+  private static normalizeCountry(raw: string | null | undefined): string {
+    if (!raw) return '';
+    const map: Record<string, string> = {
+      'srbija': 'Serbia', 'crna gora': 'Montenegro', 'hrvatska': 'Croatia',
+      'bosna i hercegovina': 'Bosnia and Herzegovina', 'slovenija': 'Slovenia',
+      'severna makedonija': 'North Macedonia', 'makedonija': 'North Macedonia',
+      'albanija': 'Albania', 'bugarska': 'Bulgaria', 'rumunija': 'Romania',
+      'mađarska': 'Hungary', 'madžarska': 'Hungary', 'češka': 'Czech Republic',
+      'slovačka': 'Slovakia', 'poljska': 'Poland', 'nemačka': 'Germany',
+      'austrija': 'Austria', 'švajcarska': 'Switzerland', 'italija': 'Italy',
+      'španija': 'Spain', 'francuska': 'France', 'belgija': 'Belgium',
+      'holandija': 'Netherlands', 'norveška': 'Norway', 'danska': 'Denmark',
+      'finska': 'Finland', 'turska': 'Turkey', 'rusija': 'Russia',
+      'kina': 'China', 'indija': 'India', 'australija': 'Australia',
+      'kanada': 'Canada', 'sjedinjene američke države': 'United States',
+      'sad': 'United States', 'velika britanija': 'United Kingdom',
+      'grčka': 'Greece', 'švedska': 'Sweden', 'meksiko': 'Mexico',
+      'brazil': 'Brazil', 'argentina': 'Argentina', 'ukrajina': 'Ukraine',
+      'kosovo': 'Kosovo',
+    };
+    return map[raw.trim().toLowerCase()] ?? raw.trim();
+  }
+
   private syncUserState(user: UserDto): void {
     this.user = {
       ...user,
       language: user.language?.trim() || 'en',
+      country: ProfileComponentManager.normalizeCountry(user.country),
       dateOfBirth: this.normalizeDateForInput(user.dateOfBirth),
     };
     this.initials = this.buildInitials(user);

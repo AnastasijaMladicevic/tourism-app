@@ -165,8 +165,8 @@
         }
       </div>
 
-      <div class="field">
-        <div class="input-wrapper">
+      <div class="field" #countryDropdown>
+        <div class="input-wrapper" style="cursor:pointer" (click)="toggleCountryMenu($event)">
           <span class="input-icon">
             <svg
               width="18"
@@ -182,11 +182,25 @@
               <circle cx="12" cy="11" r="2" />
             </svg>
           </span>
-          <input type="text" formControlName="country" [placeholder]="'signup.countryOptional' | translate" />
+          <div class="language-dropdown">
+            <div class="sort-trigger language-trigger">
+              <span>{{ getSelectedCountryLabel() || ('signup.countryOptional' | translate) }}</span>
+            </div>
+            @if (showCountryMenu) {
+              <div class="language-menu" style="max-height:220px;overflow-y:auto">
+                @for (option of countryOptions; track option) {
+                  <button
+                    type="button"
+                    class="language-menu__item"
+                    [class.language-menu__item--active]="form.value.country === option"
+                    (click)="selectCountry(option); $event.stopPropagation()">
+                    {{ option }}
+                  </button>
+                }
+              </div>
+            }
+          </div>
         </div>
-        @if (country?.touched && country?.hasError('maxlength')) {
-          <p class="field-error">{{ 'signup.errors.countryMax' | translate }}</p>
-        }
       </div>
 
       <div class="field">

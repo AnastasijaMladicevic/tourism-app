@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, OnInit, ViewChild, computed, inject, signal } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, ViewChild, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { catchError, finalize, of } from 'rxjs';
@@ -35,6 +35,7 @@ const DEFAULT_PHOTO_PATH = '/images/profiles/default_icon.png';
 })
 export class EditProfileComponent implements OnInit {
   @ViewChild('photoInput') private photoInput?: ElementRef<HTMLInputElement>;
+  @ViewChild('countryDropdown') private countryDropdownRef?: ElementRef<HTMLElement>;
 
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
@@ -51,6 +52,19 @@ export class EditProfileComponent implements OnInit {
   protected readonly phone = signal('');
   protected readonly isSaving = signal(false);
   protected readonly isLanguageMenuOpen = signal(false);
+  protected readonly countryMenuOpen = signal(false);
+
+  readonly countryOptions: string[] = [
+    'Albania', 'Argentina', 'Australia', 'Austria', 'Belgium',
+    'Bosnia and Herzegovina', 'Brazil', 'Bulgaria', 'Canada', 'China',
+    'Croatia', 'Czech Republic', 'Denmark', 'Finland', 'France',
+    'Germany', 'Greece', 'Hungary', 'India', 'Italy',
+    'Japan', 'Kosovo', 'Mexico', 'Montenegro', 'Netherlands',
+    'North Macedonia', 'Norway', 'Poland', 'Portugal', 'Romania',
+    'Russia', 'Serbia', 'Slovakia', 'Slovenia', 'Spain',
+    'Sweden', 'Switzerland', 'Turkey', 'Ukraine', 'United Kingdom',
+    'United States',
+  ];
   protected readonly feedbackMessage = signal('');
   protected readonly feedbackTone = signal<'success' | 'error' | 'neutral'>('neutral');
   protected readonly fieldErrors = signal<ProfileFieldErrors>({
@@ -143,6 +157,32 @@ export class EditProfileComponent implements OnInit {
   protected updateCountry(value: string): void {
     this.country.set(value);
     this.clearFieldError('country');
+  }
+
+  protected toggleCountryMenu(event: Event): void {
+    event.stopPropagation();
+    this.countryMenuOpen.update((v) => !v);
+  }
+
+  protected selectCountry(option: string, event: Event): void {
+    event.stopPropagation();
+    this.country.set(option);
+    this.clearFieldError('country');
+    this.countryMenuOpen.set(false);
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (this.countryMenuOpen() && !this.countryDropdownRef?.nativeElement.contains(event.target as Node)) {
+      this.countryMenuOpen.set(false);
+    }
+  }
+
+  @HostListener('document:keydown.escape')
+  onEscapeKey(): void {
+    if (this.countryMenuOpen()) {
+      this.countryMenuOpen.set(false);
+    }
   }
 
   protected updatePhone(value: string): void {
@@ -326,10 +366,33 @@ export class EditProfileComponent implements OnInit {
 
   /* ── Private helpers ───────────────────────────────────────────────── */
 
+  private static normalizeCountry(raw: string | null | undefined): string {
+    if (!raw) return '';
+    const map: Record<string, string> = {
+      'srbija': 'Serbia', 'crna gora': 'Montenegro', 'hrvatska': 'Croatia',
+      'bosna i hercegovina': 'Bosnia and Herzegovina', 'slovenija': 'Slovenia',
+      'severna makedonija': 'North Macedonia', 'makedonija': 'North Macedonia',
+      'albanija': 'Albania', 'bugarska': 'Bulgaria', 'rumunija': 'Romania',
+      'mađarska': 'Hungary', 'madžarska': 'Hungary', 'češka': 'Czech Republic',
+      'slovačka': 'Slovakia', 'poljska': 'Poland', 'nemačka': 'Germany',
+      'austrija': 'Austria', 'švajcarska': 'Switzerland', 'italija': 'Italy',
+      'španija': 'Spain', 'francuska': 'France', 'belgija': 'Belgium',
+      'holandija': 'Netherlands', 'norveška': 'Norway', 'danska': 'Denmark',
+      'finska': 'Finland', 'turska': 'Turkey', 'rusija': 'Russia',
+      'kina': 'China', 'indija': 'India', 'australija': 'Australia',
+      'kanada': 'Canada', 'sjedinjene američke države': 'United States',
+      'sad': 'United States', 'velika britanija': 'United Kingdom',
+      'grčka': 'Greece', 'švedska': 'Sweden', 'meksiko': 'Mexico',
+      'brazil': 'Brazil', 'argentina': 'Argentina', 'ukrajina': 'Ukraine',
+      'kosovo': 'Kosovo',
+    };
+    return map[raw.trim().toLowerCase()] ?? raw.trim();
+  }
+
   private patchFromUser(user: UserDto): void {
     this.name.set(user.firstName ?? '');
     this.lastName.set(user.lastName ?? '');
-    this.country.set(user.country ?? '');
+    this.country.set(EditProfileComponent.normalizeCountry(user.country));
     this.email.set(user.email ?? '');
     this.phone.set(user.phoneNumber ?? '');
   }

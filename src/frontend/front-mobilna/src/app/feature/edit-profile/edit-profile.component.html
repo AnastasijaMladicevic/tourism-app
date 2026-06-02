@@ -146,8 +146,8 @@
         }
       </div>
 
-      <div class="field">
-        <div class="input-wrapper">
+      <div class="field" #countryDropdown>
+        <div class="input-wrapper" style="cursor:pointer" (click)="toggleCountryMenu($event)">
           <span class="input-icon">
             <svg
               width="18"
@@ -163,13 +163,34 @@
               <circle cx="12" cy="11" r="2" />
             </svg>
           </span>
-          <input
-            [ngModel]="country()"
-            (ngModelChange)="updateCountry($event)"
-            type="text"
-            placeholder="{{ 'editProfile.country' | translate }}"
-          />
+          @if (country()) {
+            <span style="flex:1;padding:15px 0;font-size:14px;font-weight:600;color:var(--text-dark)">{{ country() }}</span>
+          } @else {
+            <span style="flex:1;padding:15px 0;font-size:14px;font-weight:600;color:var(--text-gray);opacity:0.85">{{ 'editProfile.country' | translate }}</span>
+          }
+          <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true">
+            @if (countryMenuOpen()) {
+              <path d="m18 15-6-6-6 6" />
+            } @else {
+              <path d="m6 9 6 6 6-6" />
+            }
+          </svg>
         </div>
+        @if (countryMenuOpen()) {
+          <div class="language-picker" style="max-height:220px;overflow-y:auto">
+            @for (option of countryOptions; track option) {
+              <button
+                type="button"
+                class="language-option"
+                [style.color]="country() === option ? 'var(--primary, #168aad)' : null"
+                [style.background]="country() === option ? 'rgba(22,138,173,0.06)' : null"
+                (click)="selectCountry(option, $event)"
+              >
+                <span>{{ option }}</span>
+              </button>
+            }
+          </div>
+        }
         @if (fieldErrors().country) {
           <small class="field-error">{{ fieldErrors().country }}</small>
         }

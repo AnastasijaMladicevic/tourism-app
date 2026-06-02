@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, HostListener, OnDestroy } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, ViewChild } from '@angular/core';
 import {
   AbstractControl,
   FormBuilder,
@@ -29,8 +29,24 @@ interface SignupLanguageOption {
 })
 export class SignupComponent implements OnDestroy {
   private readonly phonePattern = /^\+?[0-9][0-9\s/-]{5,19}$/;
+
+  @ViewChild('countryDropdown') private countryDropdownEl?: ElementRef<HTMLElement>;
+
   showLanguageMenu = false;
+  showCountryMenu = false;
   isLoading = false;
+
+  readonly countryOptions: string[] = [
+    'Albania', 'Argentina', 'Australia', 'Austria', 'Belgium',
+    'Bosnia and Herzegovina', 'Brazil', 'Bulgaria', 'Canada', 'China',
+    'Croatia', 'Czech Republic', 'Denmark', 'Finland', 'France',
+    'Germany', 'Greece', 'Hungary', 'India', 'Italy',
+    'Japan', 'Kosovo', 'Mexico', 'Montenegro', 'Netherlands',
+    'North Macedonia', 'Norway', 'Poland', 'Portugal', 'Romania',
+    'Russia', 'Serbia', 'Slovakia', 'Slovenia', 'Spain',
+    'Sweden', 'Switzerland', 'Turkey', 'Ukraine', 'United Kingdom',
+    'United States',
+  ];
   errorMessage = '';
   hidePassword = true;
   hideConfirmPassword = true;
@@ -114,9 +130,13 @@ export class SignupComponent implements OnDestroy {
     return this.translationService.translate(option.labelKey);
   }
   @HostListener('document:click', ['$event'])
-  onDocumentClick(event: Event): void {
+  onDocumentClick(event: MouseEvent): void {
     this.showLanguageMenu = false;
+    if (this.showCountryMenu && !this.countryDropdownEl?.nativeElement.contains(event.target as Node)) {
+      this.showCountryMenu = false;
+    }
   }
+
   toggleLanguageMenu(event: Event): void {
     event.stopPropagation();
     this.showLanguageMenu = !this.showLanguageMenu;
@@ -131,6 +151,21 @@ export class SignupComponent implements OnDestroy {
   getSelectedLanguageLabel(): string {
     const selected = this.languageOptions.find(opt => opt.code === this.form.value.language);
     return selected ? this.languageLabel(selected) : 'Srpski';
+  }
+
+  toggleCountryMenu(event: Event): void {
+    event.stopPropagation();
+    this.showCountryMenu = !this.showCountryMenu;
+  }
+
+  selectCountry(option: string): void {
+    this.form.patchValue({ country: option });
+    this.showCountryMenu = false;
+    this.cdr.detectChanges();
+  }
+
+  getSelectedCountryLabel(): string {
+    return this.form.value.country || '';
   }
   submit(): void {
     if (this.form.invalid) {
