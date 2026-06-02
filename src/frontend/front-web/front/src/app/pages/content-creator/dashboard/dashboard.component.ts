@@ -136,7 +136,25 @@ export class ContentCreatorDashboardComponent implements OnInit {
     this.selectedPeriod = this.readSavedPeriod();
     this.loadOverview();
   }
+  getRatingStars(rating: number): string[] {
+    const stars: string[] = [];
 
+    const fullStars = Math.floor(rating);
+
+    for (let i = 0; i < fullStars; i++) {
+      stars.push('star');
+    }
+
+    if (rating - fullStars >= 0.5) {
+      stars.push('star_half');
+    }
+
+    while (stars.length < 5) {
+      stars.push('star_outline');
+    }
+
+    return stars;
+  }
   selectPeriod(period: ContentCreatorDashboardPeriod): void {
     if (this.selectedPeriod === period || this.isLoading) {
       return;

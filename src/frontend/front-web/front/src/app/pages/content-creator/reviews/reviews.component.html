@@ -123,7 +123,6 @@
             <p>Status: {{ selectedReviewHasResponse ? 'Responded' : 'Awaiting reply' }}</p>
           </div>
           <div class="case-actions">
-            <button class="ghost" type="button" (click)="restoreDraft()">Restore Draft</button>
             <button class="ghost danger" type="button" (click)="deleteResponse()" [disabled]="!selectedReviewHasResponse || isSubmitting">
               Delete Response
             </button>
@@ -172,7 +171,6 @@
           <div class="composer-footer">
             <span>Character count: {{ responseText.length }} / 1000</span>
             <div class="composer-buttons">
-              <button class="secondary" type="button" (click)="saveDraft()">Save Draft</button>
               <button class="primary" type="button" (click)="sendResponse()" [disabled]="isSubmitting">
                 {{ selectedReviewHasResponse ? 'Update Response' : 'Send Response' }}
               </button>

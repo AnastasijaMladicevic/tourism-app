@@ -132,12 +132,22 @@
           <strong>{{ data.summary.averageRatingInPeriod | number:'1.1-1' }}</strong>
           <span>/ 5.0</span>
         </div>
-        <div class="rating-stars" [attr.aria-label]="'Average rating ' + (data.summary.averageRatingInPeriod | number:'1.1-1') + ' of 5'">
-          <span class="material-symbols-outlined">star</span>
-          <span class="material-symbols-outlined">star</span>
-          <span class="material-symbols-outlined">star</span>
-          <span class="material-symbols-outlined">star</span>
-          <span class="material-symbols-outlined">star_half</span>
+        <div
+          class="rating-stars"
+          [attr.aria-label]="'Average rating ' + (data.summary.averageRatingInPeriod | number:'1.1-1') + ' of 5'"
+        >
+          @for (star of getRatingStars(data.summary.averageRatingInPeriod); track $index) {
+            <span
+              class="material-symbols-outlined"
+              [ngClass]="{
+                filled: star === 'star',
+                empty: star === 'star_outline',
+                half: star === 'star_half'
+              }"
+            >
+              {{ star }}
+            </span>
+          }
         </div>
         <p class="rating-note">{{ data.ratingDistribution.totalReviews | number }} Total reviews in the selected period</p>
       </article>

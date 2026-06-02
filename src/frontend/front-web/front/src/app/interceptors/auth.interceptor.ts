@@ -7,7 +7,7 @@ let isRefreshing = false;
 const refreshedToken$ = new BehaviorSubject<string | null>(null);
 
 function isAuthEndpoint(url: string): boolean {
-  return /\/login$|\/register$|\/refresh$|\/logout$/i.test(url);
+  return /\/login$|\/register$|\/refresh$|\/logout$|\/forgot-password$|\/verify-reset-code$|\/reset-password$/i.test(url);
 }
 
 function isPublicImageReadRequest<T>(request: HttpRequest<T>): boolean {
