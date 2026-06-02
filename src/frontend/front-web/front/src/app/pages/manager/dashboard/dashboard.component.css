@@ -127,7 +127,7 @@
 .ghost-link:hover,
 .section-link:hover {
   color: #1976d2;
-  text-decoration: underline;
+  text-decoration: none;
 }
 
 .dashboard-item-link--heading {

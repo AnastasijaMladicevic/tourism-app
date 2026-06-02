@@ -299,20 +299,6 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
     this.showTipsModal = false;
   }
 
-  onSaveDraft(): void {
-    if (this.isEditMode) {
-      this.draftSavedMessage = 'Draft is only available for new localities.';
-      return;
-    }
-
-    const draft = {
-      form: this.form,
-      primaryImageIndex: this.primaryImageIndex
-    };
-    localStorage.setItem(this.draftStorageKey, JSON.stringify(draft));
-    this.draftSavedMessage = 'Draft saved.';
-  }
-
   onPickImages(input: HTMLInputElement): void {
     input.click();
   }

@@ -183,26 +183,26 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
     const destinationRequest$ =
       this.editDestinationId != null
         ? forkJoin({
-            destination: this.destinationService.getById(this.editDestinationId),
-            images: this.destinationService.getImages(this.editDestinationId).pipe(
-              catchError(() => of([] as DestinationImageDto[]))
-            ),
-            editLock: this.destinationService.acquireEditLock(this.editDestinationId).pipe(
-              catchError((err) =>
-                of({
-                  destinationId: this.editDestinationId!,
-                  isLocked: true,
-                  isOwnedByCurrentUser: false,
-                  message: this.extractApiErrorMessage(err) || 'Could not start an edit session for this destination.'
-                } as DestinationEditLockDto)
-              )
+          destination: this.destinationService.getById(this.editDestinationId),
+          images: this.destinationService.getImages(this.editDestinationId).pipe(
+            catchError(() => of([] as DestinationImageDto[]))
+          ),
+          editLock: this.destinationService.acquireEditLock(this.editDestinationId).pipe(
+            catchError((err) =>
+              of({
+                destinationId: this.editDestinationId!,
+                isLocked: true,
+                isOwnedByCurrentUser: false,
+                message: this.extractApiErrorMessage(err) || 'Could not start an edit session for this destination.'
+              } as DestinationEditLockDto)
             )
-          }).pipe(
-            catchError(() => {
-              this.errorMessage = 'Could not load destination for editing.';
-              return of(null);
-            })
           )
+        }).pipe(
+          catchError(() => {
+            this.errorMessage = 'Could not load destination for editing.';
+            return of(null);
+          })
+        )
         : of(null);
 
     forkJoin({ regions: regionRequest$, destination: destinationRequest$ })
@@ -892,13 +892,6 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
     return true;
   }
 
-  onSaveDraft(): void {
-    if (this.isEditBlocked || !this.validateBasics() || this.isSubmitting || this.isDeleting) {
-      return;
-    }
-    this.persist(false);
-  }
-
   onSubmit(): void {
     if (this.isEditBlocked || !this.validateBasics() || this.isSubmitting || this.isDeleting) {
       return;
@@ -944,17 +937,17 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
           const assignment$ = !this.selectedManager
             ? of({ assigned: true as const })
             : this.destinationService.assignManager(saved.id, this.selectedManager.id).pipe(
-                map(() => ({ assigned: true as const })),
-                catchError((err) =>
-                  of({
-                    assigned: false as const,
-                    assignError:
-                      typeof err?.error?.message === 'string'
-                        ? err.error.message
-                        : 'Destination was saved, but assigning the manager failed.'
-                  })
-                )
-              );
+              map(() => ({ assigned: true as const })),
+              catchError((err) =>
+                of({
+                  assigned: false as const,
+                  assignError:
+                    typeof err?.error?.message === 'string'
+                      ? err.error.message
+                      : 'Destination was saved, but assigning the manager failed.'
+                })
+              )
+            );
 
           return assignment$.pipe(
             switchMap((assignmentResult) =>

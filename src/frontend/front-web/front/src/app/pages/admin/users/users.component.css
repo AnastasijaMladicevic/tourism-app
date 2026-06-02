@@ -731,7 +731,7 @@
 }
 
 .origins-details-link:hover {
-  text-decoration: underline;
+  text-decoration: none;
 }
 
 .origins-details-link:focus-visible {

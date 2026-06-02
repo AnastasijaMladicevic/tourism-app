@@ -19,7 +19,6 @@
         </button>
       }
       <button type="button" class="ghost-btn" (click)="onCancel()">Cancel</button>
-      <button type="button" class="ghost-btn" (click)="onSaveDraft()">Save Draft</button>
       <button type="submit" class="primary-btn" form="create-locality-form" [disabled]="isSubmitting || isLoadingOptions">
         {{ isSubmitting ? (isEditMode ? 'Saving...' : 'Creating...') : (isEditMode ? 'Save Changes' : 'Create Locality') }}
       </button>

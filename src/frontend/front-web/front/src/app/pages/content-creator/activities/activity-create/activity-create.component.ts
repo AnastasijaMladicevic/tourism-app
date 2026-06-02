@@ -405,20 +405,6 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
       });
   }
 
-  saveDraft(): void {
-    if (this.isEditMode) {
-      return;
-    }
-
-    const payload: DraftPayload = {
-      values: this.form.getRawValue()
-    };
-
-    localStorage.setItem(this.draftKey, JSON.stringify(payload));
-    this.successMessage = 'Draft saved.';
-    this.errorMessage = '';
-  }
-
   cancel(): void {
     this.router.navigate(['/content-creator/activities']);
   }
@@ -469,9 +455,9 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
         switchMap((createdActivity) =>
           this.isEditMode && this.activityId
             ? this.syncImagesAfterSave(this.activityId, this.imageUrls, this.imagesSnapshot).pipe(
-                map(() => ({ createdActivity, imageUploadFailed: false })),
-                catchError(() => of({ createdActivity, imageUploadFailed: true }))
-              )
+              map(() => ({ createdActivity, imageUploadFailed: false })),
+              catchError(() => of({ createdActivity, imageUploadFailed: true }))
+            )
             : this.attachImagesAfterCreate(createdActivity)
         ),
         finalize(() => {
@@ -727,9 +713,9 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
       toDelete.length === 0
         ? of(undefined)
         : forkJoin(toDelete.map((image) => this.activitiesService.deleteImageById(image.id))).pipe(
-            map(() => undefined),
-            catchError(() => of(undefined))
-          );
+          map(() => undefined),
+          catchError(() => of(undefined))
+        );
 
     return delete$.pipe(
       switchMap(() => this.uploadPendingImages(activityId, desired, surviving.length, urlToId)),

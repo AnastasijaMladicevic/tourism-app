@@ -788,10 +788,6 @@ export class EventFormComponent implements OnInit, OnDestroy {
     );
   }
 
-  saveDraft(): void {
-    this.successMessage = 'Draft saved locally.';
-  }
-
   cancel(): void {
     this.router.navigate(['/content-creator/events']);
   }

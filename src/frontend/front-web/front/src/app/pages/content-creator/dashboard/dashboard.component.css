@@ -364,7 +364,7 @@ div.state-banner {
 }
 
 .section-link:hover {
-  text-decoration: underline;
+  text-decoration: none;
 }
 
 .chart-legend {
@@ -718,7 +718,7 @@ div.state-banner {
 .dashboard-item-link:hover,
 .dashboard-item-link:focus-visible {
   color: #1976d2;
-  text-decoration: underline;
+  text-decoration: none;
 }
 
 .dashboard-item-link--heading {
