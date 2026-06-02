@@ -40,14 +40,15 @@ export class CreateTeamMemberComponent {
   regionAssignment = '';
 
   readonly countries = [
+    'Albania', 'Argentina', 'Australia', 'Austria', 'Belgium',
+    'Bosnia and Herzegovina', 'Brazil', 'Bulgaria', 'Canada', 'China',
+    'Croatia', 'Czech Republic', 'Denmark', 'Finland', 'France',
+    'Germany', 'Greece', 'Hungary', 'India', 'Italy',
+    'Japan', 'Kosovo', 'Mexico', 'Montenegro', 'Netherlands',
+    'North Macedonia', 'Norway', 'Poland', 'Portugal', 'Romania',
+    'Russia', 'Serbia', 'Slovakia', 'Slovenia', 'Spain',
+    'Sweden', 'Switzerland', 'Turkey', 'Ukraine', 'United Kingdom',
     'United States',
-    'United Kingdom',
-    'Canada',
-    'Germany',
-    'France',
-    'Croatia',
-    'Spain',
-    'Italy'
   ];
 
   readonly languages = [
