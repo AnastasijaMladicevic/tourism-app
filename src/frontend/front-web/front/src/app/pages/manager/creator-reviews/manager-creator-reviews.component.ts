@@ -19,6 +19,7 @@ import {
   ManagerReportModalComponent,
   ReportableCreatorOption,
 } from '../shared/manager-report-modal.component';
+import { PaginatorComponent } from '../../../shared/components/paginator/paginator';
 import {
   Subject,
   catchError,
@@ -74,7 +75,7 @@ interface ManagerReportNameHint {
 @Component({
   selector: 'app-manager-creator-reviews',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, ManagerReportModalComponent],
+  imports: [CommonModule, FormsModule, RouterLink, ManagerReportModalComponent, PaginatorComponent],
   templateUrl: './manager-creator-reviews.component.html',
   styleUrls: [
     './manager-creator-reviews.component.css',
@@ -107,6 +108,10 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
   selectedRatings: number[] = [];
 
   selectedThread: ManagerReviewThread | null = null;
+
+  queuePage = 1;
+  queuePageSize = 5;
+  readonly queuePageSizeOptions = [5, 10, 15, 20];
 
   isLoading = true;
   errorMessage = '';
@@ -183,6 +188,39 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
     return Array.from(map.entries())
       .map(([id, name]) => ({ id, name }))
       .sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  get pagedThreads(): ManagerReviewThread[] {
+    const start = (this.queuePage - 1) * this.queuePageSize;
+    return this.filteredThreads.slice(start, start + this.queuePageSize);
+  }
+
+  get queueTotalPages(): number {
+    return Math.max(1, Math.ceil(this.filteredThreads.length / this.queuePageSize));
+  }
+
+  get queuePageStart(): number {
+    if (this.filteredThreads.length === 0) {
+      return 0;
+    }
+    return (this.queuePage - 1) * this.queuePageSize + 1;
+  }
+
+  get queuePageEnd(): number {
+    return Math.min(this.queuePage * this.queuePageSize, this.filteredThreads.length);
+  }
+
+  onQueueGoToPage(page: number): void {
+    if (page >= 1 && page <= this.queueTotalPages) {
+      this.queuePage = page;
+      this.triggerViewUpdate();
+    }
+  }
+
+  onQueuePageSizeChange(value: number | string): void {
+    this.queuePageSize = Number(value);
+    this.queuePage = 1;
+    this.triggerViewUpdate();
   }
 
   get filteredThreads(): ManagerReviewThread[] {
@@ -323,7 +361,15 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
       this.selectedThread &&
       !this.filteredThreads.some((t) => t.id === this.selectedThread!.id)
     ) {
+      this.queuePage = 1;
       this.selectedThread = this.filteredThreads[0] ?? null;
+    } else if (this.selectedThread) {
+      const idx = this.filteredThreads.findIndex((t) => t.id === this.selectedThread!.id);
+      if (idx >= 0) {
+        this.queuePage = Math.floor(idx / this.queuePageSize) + 1;
+      }
+    } else {
+      this.queuePage = 1;
     }
     this.triggerViewUpdate();
   }

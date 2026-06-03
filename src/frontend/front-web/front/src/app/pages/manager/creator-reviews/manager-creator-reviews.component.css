@@ -329,11 +329,17 @@
   overflow: hidden;
 }
 
+.queue-panel {
+  height: auto;
+  max-height: 100%;
+  align-self: start;
+}
+
 .queue-panel-head {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 14px 16px;
+  padding: 8px 16px;
   border-bottom: 1px solid #f1f5f9;
   flex-shrink: 0;
 }
@@ -342,7 +348,11 @@
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  overscroll-behavior: contain;
+}
+
+.queue-panel-footer {
+  flex-shrink: 0;
+  border-top: 1px solid #f1f5f9;
 }
 
 .queue-panel-head h2 {
@@ -356,7 +366,7 @@
 }
 
 .queue-item {
-  padding: 14px 16px;
+  padding: 10px 14px;
   border-bottom: 1px solid #f1f5f9;
   cursor: pointer;
   transition: background 0.12s;
@@ -378,17 +388,16 @@
 .queue-item-top {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 8px;
-  margin-bottom: 6px;
+  margin-bottom: 3px;
 }
 
-.rating-badge {
-  font-size: 11px;
-  font-weight: 700;
-  padding: 3px 8px;
-  border-radius: 999px;
-  background: #fef3c7;
-  color: #92400e;
+.queue-item-top-right {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
 }
 
 .flag-dot {
@@ -405,35 +414,49 @@
 }
 
 .queue-item h3 {
-  font-size: 14px;
-  margin-bottom: 4px;
+  font-size: 13px;
+  margin: 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .queue-snippet {
-  font-size: 12px;
-  line-height: 1.45;
+  font-size: 11px;
+  line-height: 1.4;
   color: #475569;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+  -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
 }
 
 .queue-meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 5px;
   font-size: 11px;
   color: #64748b;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
+  align-items: center;
+}
+
+.queue-stars {
+  color: #f59e0b;
+  letter-spacing: 1px;
+  font-size: 12px;
 }
 
 .creator-tag {
+  display: inline-block;
+  margin-top: 5px;
   padding: 2px 6px;
   border-radius: 4px;
   background: #e0e7ff;
   color: #3730a3;
+  font-size: 11px;
   font-weight: 600;
 }
 
@@ -442,10 +465,15 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  color: #94a3b8;
+  padding: 3px 7px;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #64748b;
+  white-space: nowrap;
 }
 
 .reply-status.has-reply {
+  background: #dcfce7;
   color: #15803d;
 }
 

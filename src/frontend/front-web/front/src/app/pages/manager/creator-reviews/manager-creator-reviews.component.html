@@ -122,7 +122,7 @@
           }
         </p>
       } @else {
-        @for (thread of filteredThreads; track trackByThreadId($index, thread)) {
+        @for (thread of pagedThreads; track trackByThreadId($index, thread)) {
           <article
             class="queue-item"
             [class.active]="selectedThread?.id === thread.id"
@@ -130,24 +130,42 @@
             (click)="selectThread(thread)"
           >
             <div class="queue-item-top">
-              <span class="rating-badge">{{ thread.rating }}/5</span>
-              @if (isConcerning(thread)) {
-                <span class="flag-dot" title="Concerning reply">!</span>
-              }
+              <h3>{{ thread.touristName }}</h3>
+              <div class="queue-item-top-right">
+                @if (isConcerning(thread)) {
+                  <span class="flag-dot" title="Concerning reply">!</span>
+                }
+                <span class="reply-status" [class.has-reply]="thread.creatorResponse">
+                  {{ thread.creatorResponse ? 'CC replied' : 'Awaiting reply' }}
+                </span>
+              </div>
             </div>
-            <h3>{{ thread.touristName }}</h3>
             <p class="queue-snippet">{{ thread.touristReview }}</p>
             <div class="queue-meta">
               <span>{{ thread.objectName }}</span>
-              <span class="creator-tag">Creator: {{ thread.creatorName }}</span>
+              <span class="queue-stars">{{ ratingStars(thread.rating) }}</span>
             </div>
-            <span class="reply-status" [class.has-reply]="thread.creatorResponse">
-              {{ thread.creatorResponse ? 'CC replied' : 'Awaiting reply' }}
-            </span>
+            <span class="creator-tag">Creator: {{ thread.creatorName }}</span>
           </article>
         }
       }
       </div>
+      @if (!isLoading && filteredThreads.length > 0) {
+        <div class="queue-panel-footer">
+          <app-paginator
+            [currentPage]="queuePage"
+            [totalPages]="queueTotalPages"
+            [pageStart]="queuePageStart"
+            [pageEnd]="queuePageEnd"
+            [totalCount]="filteredThreads.length"
+            [pageSize]="queuePageSize"
+            [pageSizeOptions]="queuePageSizeOptions"
+            itemLabel="reviews"
+            (pageChange)="onQueueGoToPage($event)"
+            (pageSizeChange)="onQueuePageSizeChange($event)"
+          ></app-paginator>
+        </div>
+      }
     </aside>
 
     <main class="thread-panel card">
