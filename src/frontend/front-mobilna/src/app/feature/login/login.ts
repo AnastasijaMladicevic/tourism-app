@@ -228,7 +228,7 @@ export class LoginComponent implements OnDestroy {
     this.cleanupGooglePopup();
   }
 
-  goBack(): void { this.routerHistory.goBack(); }
+  goBack(): void { this.router.navigateByUrl(this.returnUrl); }
   goRegister(): void { this.router.navigate(['/register']); }
   goForgot(): void { this.router.navigate(['/forgot-password']); }
   goTerms(): void { this.router.navigate(['/terms']); }

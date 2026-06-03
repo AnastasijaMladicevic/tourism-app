@@ -74,6 +74,7 @@ export class DestinationsComponent implements OnInit, OnDestroy {
   private searchTimeout: ReturnType<typeof setTimeout> | null = null;
   private readonly listStateKey = 'destinations-list-state';
   private readonly returnFlagKey = 'destinations-return-from-detail';
+  private readonly pendingSortKey = 'destinations-pending-sort';
   private readonly locationSubs = new Subscription();
   private readonly handleFavoriteObject = (event: any) => {
     const obj = event.detail;
@@ -148,6 +149,7 @@ export class DestinationsComponent implements OnInit, OnDestroy {
       sessionStorage.removeItem(this.returnFlagKey);
       this.restoreListState();
     }
+    this.applyPendingSortIfReady();
     void this.loadData();
     window.addEventListener('favorite-object', this.handleFavoriteObject);
     this.cdr.detectChanges();
@@ -275,6 +277,16 @@ export class DestinationsComponent implements OnInit, OnDestroy {
       this.pageSize = state.pageSize ?? 8;
     } catch {
       sessionStorage.removeItem(this.listStateKey);
+    }
+  }
+
+  private applyPendingSortIfReady(): void {
+    const pending = sessionStorage.getItem(this.pendingSortKey);
+    if (!pending) return;
+    sessionStorage.removeItem(this.pendingSortKey);
+    if (pending === 'distance' && this.isTracking) {
+      this.sortOption = 'distance';
+      this.saveListState();
     }
   }
 
@@ -414,6 +426,7 @@ export class DestinationsComponent implements OnInit, OnDestroy {
   setSort(option: 'az' | 'za' | 'distance'): void {
     if (option === 'distance' && !this.isTracking) {
       this.showSortMenu = false;
+      sessionStorage.setItem(this.pendingSortKey, 'distance');
       this.showLocationModal = true;
       return;
     }

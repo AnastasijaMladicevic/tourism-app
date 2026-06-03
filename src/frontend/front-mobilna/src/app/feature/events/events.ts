@@ -68,6 +68,7 @@ export class EventsComponent implements OnInit, OnDestroy {
   private readonly dataCacheService = inject(DataCacheService);
   private readonly listStateKey = 'events-list-state';
   private readonly returnFlagKey = 'events-return-from-detail';
+  private readonly pendingSortKey = 'events-pending-sort';
   activeFilter = 'All';
   activeCategory: EventCategory = 'All';
   isLoading = true;
@@ -120,6 +121,7 @@ export class EventsComponent implements OnInit, OnDestroy {
       sessionStorage.removeItem(this.returnFlagKey);
       this.restoreListState();
     }
+    this.applyPendingSortIfReady();
     this.loadEvents();
     this.loadPlanner();
 
@@ -157,6 +159,16 @@ export class EventsComponent implements OnInit, OnDestroy {
       this.pageSize = state.pageSize ?? 8;
     } catch {
       sessionStorage.removeItem(this.listStateKey);
+    }
+  }
+
+  private applyPendingSortIfReady(): void {
+    const pending = sessionStorage.getItem(this.pendingSortKey);
+    if (!pending) return;
+    sessionStorage.removeItem(this.pendingSortKey);
+    if (pending === 'distance' && this.isTracking) {
+      this.sortOption = 'distance';
+      this.saveListState();
     }
   }
 
@@ -305,6 +317,7 @@ export class EventsComponent implements OnInit, OnDestroy {
   setSort(option: 'date' | 'az' | 'za' | 'price' | 'distance'): void {
     if (option === 'distance' && !this.isTracking) {
       this.showSortMenu = false;
+      sessionStorage.setItem(this.pendingSortKey, 'distance');
       this.showLocationModal = true;
       return;
     }

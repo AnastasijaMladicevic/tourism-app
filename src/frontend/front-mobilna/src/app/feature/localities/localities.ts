@@ -72,6 +72,7 @@ export class LocalitiesComponent implements OnInit, OnDestroy {
   private searchTimeout: ReturnType<typeof setTimeout> | null = null;
   private readonly listStateKey = 'localities-list-state';
   private readonly returnFlagKey = 'localities-return-from-detail';
+  private readonly pendingSortKey = 'localities-pending-sort';
   private readonly locationSubs = new Subscription();
   private readonly handleFavoriteObject = (event: Event & { detail?: LocalityView }) => {
     const obj = event.detail;
@@ -148,6 +149,7 @@ export class LocalitiesComponent implements OnInit, OnDestroy {
       sessionStorage.removeItem(this.returnFlagKey);
       this.restoreListState();
     }
+    this.applyPendingSortIfReady();
     void this.loadData();
 
     window.addEventListener('favorite-object', this.handleFavoriteObject);
@@ -208,6 +210,16 @@ export class LocalitiesComponent implements OnInit, OnDestroy {
       this.pageSize = state.pageSize ?? 8;
     } catch {
       sessionStorage.removeItem(this.listStateKey);
+    }
+  }
+
+  private applyPendingSortIfReady(): void {
+    const pending = sessionStorage.getItem(this.pendingSortKey);
+    if (!pending) return;
+    sessionStorage.removeItem(this.pendingSortKey);
+    if (pending === 'distance' && this.isTracking) {
+      this.sortOption = 'distance';
+      this.saveListState();
     }
   }
 
@@ -653,6 +665,7 @@ export class LocalitiesComponent implements OnInit, OnDestroy {
   setSort(option: 'az' | 'za' | 'distance'): void {
     if (option === 'distance' && !this.isTracking) {
       this.showSortMenu = false;
+      sessionStorage.setItem(this.pendingSortKey, 'distance');
       this.showLocationModal = true;
       return;
     }

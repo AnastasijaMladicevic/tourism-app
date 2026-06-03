@@ -75,6 +75,7 @@ export class ObjectsComponent implements OnInit, OnDestroy {
   private searchTimeout: ReturnType<typeof setTimeout> | null = null;
   private readonly listStateKey = 'objects-list-state';
   private readonly returnFlagKey = 'objects-return-from-detail';
+  private readonly pendingSortKey = 'objects-pending-sort';
   private readonly locationSubs = new Subscription();
   private readonly handleFavoriteObject = (event: Event & { detail?: ObjectView }) => {
     const obj = event.detail;
@@ -177,6 +178,7 @@ export class ObjectsComponent implements OnInit, OnDestroy {
         sessionStorage.removeItem(this.returnFlagKey);
         this.restoreListState();
       }
+      this.applyPendingSortIfReady();
 
       if (type) {
         this.activeFilter = type;
@@ -220,6 +222,16 @@ export class ObjectsComponent implements OnInit, OnDestroy {
       return true;
     } catch {
       return false;
+    }
+  }
+
+  private applyPendingSortIfReady(): void {
+    const pending = sessionStorage.getItem(this.pendingSortKey);
+    if (!pending) return;
+    sessionStorage.removeItem(this.pendingSortKey);
+    if (pending === 'distance' && this.isTracking) {
+      this.sortOption = 'distance';
+      this.saveListState();
     }
   }
 
@@ -694,6 +706,7 @@ export class ObjectsComponent implements OnInit, OnDestroy {
   setSort(option: 'rating' | 'az' | 'za' | 'distance'): void {
     if (option === 'distance' && !this.isTracking) {
       this.showSortMenu = false;
+      sessionStorage.setItem(this.pendingSortKey, 'distance');
       this.showLocationModal = true;
       return;
     }
