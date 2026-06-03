@@ -77,7 +77,7 @@ export class ManagerActivityReviewComponent implements OnInit, OnDestroy {
     const idFromRoute = Number(this.route.snapshot.paramMap.get('id'));
 
     if (!Number.isFinite(idFromRoute) || idFromRoute <= 0) {
-      this.errorMessage = 'Activity id is required for manager review.';
+      this.errorMessage = this.translationService.translate('manager.activityReview.errors.missingId');
       this.isLoading = false;
       return;
     }
@@ -107,7 +107,9 @@ export class ManagerActivityReviewComponent implements OnInit, OnDestroy {
       next: (activity) => {
         if (!activity) {
           this.activity = null;
-          this.errorMessage = 'Activity details are unavailable.';
+          this.errorMessage = this.translationService.translate(
+            'manager.activityReview.errors.detailsUnavailable',
+          );
           this.cdr.detectChanges();
           return;
         }
@@ -124,7 +126,9 @@ export class ManagerActivityReviewComponent implements OnInit, OnDestroy {
         this.loadActivityImages(activity.id, activity.mainImageUrl);
       },
       error: (error: any) => {
-        this.errorMessage = error?.error?.message ?? 'Failed to load activity';
+        this.errorMessage =
+          error?.error?.message ??
+          this.translationService.translate('manager.activityReview.errors.loadFailed');
         this.cdr.detectChanges();
       }
     });
@@ -163,13 +167,19 @@ export class ManagerActivityReviewComponent implements OnInit, OnDestroy {
       objectName: activity.objectName ?? '',
       price: activity.price != null ? this.formatPrice(activity.price) : '',
       durationMinutes: activity.durationMinutes != null ? this.formatDuration(activity.durationMinutes) : '',
-      isActive: activity.isActive ? 'Active' : 'Inactive',
-      createdByUserId: creatorFullName || '—',
+      isActive: activity.isActive
+        ? this.translationService.translate('manager.activityReview.state.active')
+        : this.translationService.translate('manager.activityReview.state.inactive'),
+      createdByUserId:
+        creatorFullName ||
+        this.translationService.translate('manager.activityReview.fallback.notAvailable'),
       createdAt: this.formatDateTime(activity.createdAt),
       updatedAt: this.formatDateTime(activity.updatedAt),
       approvedAt: this.formatDateTime(activity.approvedAt),
       approvedByName: approverFullName || '',
-      rejectionReason: activity.rejectionReason?.trim() ?? 'No rejection reason recorded.',
+      rejectionReason:
+        activity.rejectionReason?.trim() ??
+        this.translationService.translate('manager.activityReview.fallback.noRejectionReason'),
       mainImageUrl: activity.mainImageUrl ?? this.selectedImageUrl,
       latitude: activity.latitude != null ? String(activity.latitude) : '',
       longitude: activity.longitude != null ? String(activity.longitude) : ''
@@ -243,7 +253,10 @@ export class ManagerActivityReviewComponent implements OnInit, OnDestroy {
       return '';
     }
 
-    return date.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
+    return date.toLocaleDateString(this.translationService.currentLocale(), {
+      month: 'short',
+      year: 'numeric',
+    });
   }
 
   approveActivity(): void {
@@ -269,12 +282,16 @@ export class ManagerActivityReviewComponent implements OnInit, OnDestroy {
         this.patchForm(activity);
         this.form.disable({ emitEvent: false });
         this.resolveCreatorName(activity);
-        this.successMessage = 'Activity approved successfully.';
+        this.successMessage = this.translationService.translate(
+          'manager.activityReview.success.approved',
+        );
         this.cdr.detectChanges();
         setTimeout(() => this.router.navigate(['/manager/activities']), 1000);
       },
       error: (error: any) => {
-        this.errorMessage = error?.error?.message ?? 'Failed to approve activity';
+        this.errorMessage =
+          error?.error?.message ??
+          this.translationService.translate('manager.activityReview.errors.approveFailed');
         this.cdr.detectChanges();
       }
     });
@@ -305,7 +322,9 @@ export class ManagerActivityReviewComponent implements OnInit, OnDestroy {
     }
 
     if (!this.rejectionReason.trim()) {
-      this.errorMessage = 'Please provide a reason for decline.';
+      this.errorMessage = this.translationService.translate(
+        'manager.activityReview.errors.declineReasonRequired',
+      );
       return;
     }
 
@@ -331,12 +350,16 @@ export class ManagerActivityReviewComponent implements OnInit, OnDestroy {
         this.patchForm(activity);
         this.form.disable({ emitEvent: false });
         this.resolveCreatorName(activity);
-        this.successMessage = 'Activity declined successfully.';
+        this.successMessage = this.translationService.translate(
+          'manager.activityReview.success.declined',
+        );
         this.cdr.detectChanges();
         setTimeout(() => this.router.navigate(['/manager/activities']), 1000);
       },
       error: (error: any) => {
-        this.errorMessage = error?.error?.message ?? 'Failed to decline activity';
+        this.errorMessage =
+          error?.error?.message ??
+          this.translationService.translate('manager.activityReview.errors.declineFailed');
         this.cdr.detectChanges();
       }
     });
@@ -387,12 +410,19 @@ export class ManagerActivityReviewComponent implements OnInit, OnDestroy {
   }
 
   get activityLocationLabel(): string {
-    return this.activity?.destinationName || this.activity?.localityName || this.activity?.objectName || 'Location TBD';
+    return (
+      this.activity?.destinationName ||
+      this.activity?.localityName ||
+      this.activity?.objectName ||
+      this.translationService.translate('manager.activityReview.fallback.locationTbd')
+    );
   }
 
   get locationSubtitle(): string {
     const parts = [this.activity?.localityName, this.activity?.objectName].filter((value) => Boolean(value && value.trim()));
-    return parts.length > 0 ? parts.join(' · ') : 'No locality or object has been linked.';
+    return parts.length > 0
+      ? parts.join(' · ')
+      : this.translationService.translate('manager.activityReview.fallback.noLinkedLocation');
   }
 
   get locationContextValue(): string {
@@ -409,7 +439,10 @@ export class ManagerActivityReviewComponent implements OnInit, OnDestroy {
   }
 
   get creatorDisplayName(): string {
-    return this.createdByName.trim() || 'Name not available in this view.';
+    return (
+      this.createdByName.trim() ||
+      this.translationService.translate('manager.activityReview.fallback.nameNotAvailable')
+    );
   }
 
   get creatorInitials(): string {
@@ -435,7 +468,10 @@ export class ManagerActivityReviewComponent implements OnInit, OnDestroy {
     const updated = this.formatMonthYear(this.activity.updatedAt);
 
     if (created && updated && created !== updated) {
-      return `${created}, edited ${updated}`;
+      return this.translationService.translate('manager.activityReview.timeline.edited', {
+        created,
+        updated,
+      });
     }
 
     return created || updated || '';
@@ -465,23 +501,25 @@ export class ManagerActivityReviewComponent implements OnInit, OnDestroy {
 
   get mainImageCountLabel(): string {
     if (this.activityImages.length === 0) {
-      return 'No gallery images';
+      return this.translationService.translate('manager.activityReview.gallery.noImages');
     }
 
-    return `${this.activityImages.length} image${this.activityImages.length === 1 ? '' : 's'}`;
+    return this.translationService.translate('manager.activityReview.gallery.count', {
+      count: this.activityImages.length,
+    });
   }
 
   formatDateTime(value: string | Date | undefined): string {
     if (!value) {
-      return '—';
+      return this.translationService.translate('manager.activityReview.fallback.notAvailable');
     }
 
     const date = new Date(value);
     if (Number.isNaN(date.getTime())) {
-      return '—';
+      return this.translationService.translate('manager.activityReview.fallback.notAvailable');
     }
 
-    return date.toLocaleString('en-GB', {
+    return date.toLocaleString(this.translationService.currentLocale(), {
       year: 'numeric',
       month: 'short',
       day: '2-digit',
@@ -496,7 +534,7 @@ export class ManagerActivityReviewComponent implements OnInit, OnDestroy {
 
   formatDuration(minutes: number): string {
     if (!minutes || minutes <= 0) {
-      return '—';
+      return this.translationService.translate('manager.activityReview.fallback.notAvailable');
     }
 
     const hours = Math.floor(minutes / 60);
@@ -516,13 +554,13 @@ export class ManagerActivityReviewComponent implements OnInit, OnDestroy {
   getStatusLabel(status: string | undefined): string {
     switch ((status ?? '').trim().toLowerCase()) {
       case 'approved':
-        return 'Approved';
+        return this.translationService.translate('manager.activityReview.status.approved');
       case 'rejected':
-        return 'Rejected';
+        return this.translationService.translate('manager.activityReview.status.rejected');
       case 'pending':
-        return 'Pending';
+        return this.translationService.translate('manager.activityReview.status.pending');
       default:
-        return 'Pending';
+        return this.translationService.translate('manager.activityReview.status.pending');
     }
   }
 

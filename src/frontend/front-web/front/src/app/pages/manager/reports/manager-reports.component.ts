@@ -16,6 +16,8 @@ import {
   ManagerReportModalComponent,
   ReportableCreatorOption,
 } from '../shared/manager-report-modal.component';
+import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
+import { TranslationService } from '../../../services/translation.service';
 
 export type ReportStatus = 'Pending' | 'Approved' | 'Rejected';
 
@@ -44,7 +46,7 @@ interface ManagerReportNameHint {
 @Component({
   selector: 'app-manager-reports',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, ManagerReportModalComponent],
+  imports: [CommonModule, FormsModule, RouterLink, ManagerReportModalComponent, TranslatePipe],
   templateUrl: './manager-reports.component.html',
   styleUrls: [
     './manager-reports.component.css',
@@ -62,10 +64,11 @@ export class ManagerReportsComponent implements OnInit {
   private readonly http = inject(HttpClient);
   private readonly route = inject(ActivatedRoute);
   private readonly cdr = inject(ChangeDetectorRef);
+  readonly translationService = inject(TranslationService);
 
   private readonly creatorNameById = new Map<number, string>();
 
-  managedDestination = 'your destinations';
+  managedDestination = '';
   allReports: ManagerReportRow[] = [];
   reportableCreators: ReportableCreatorOption[] = [];
 
@@ -181,7 +184,8 @@ export class ManagerReportsComponent implements OnInit {
           this.allReports = [];
           this.reportableCreators = [];
           this.selectedReport = null;
-          this.errorMessage = error?.error?.message ?? 'Failed to load reports.';
+          this.errorMessage =
+            error?.error?.message ?? this.translationService.translate('manager.reports.error.load');
         },
       });
   }
@@ -228,7 +232,7 @@ export class ManagerReportsComponent implements OnInit {
   }
 
   onReportSubmitted(): void {
-    this.successMessage = 'Creator report submitted successfully.';
+    this.successMessage = this.translationService.translate('manager.reportModal.successSubmitted');
     this.reportModalOpen = false;
     this.loadPageData();
   }
@@ -241,18 +245,19 @@ export class ManagerReportsComponent implements OnInit {
 
     this.managerReportsService.withdrawReport(report.id).subscribe({
       next: () => {
-        this.successMessage = 'Report withdrawn.';
+        this.successMessage = this.translationService.translate('manager.reports.success.withdrawn');
         this.loadPageData();
       },
       error: (error: { error?: { message?: string } }) => {
-        this.errorMessage = error?.error?.message ?? 'Failed to withdraw report.';
+        this.errorMessage =
+          error?.error?.message ?? this.translationService.translate('manager.reports.error.withdraw');
         this.cdr.detectChanges();
       },
     });
   }
 
   formatStatus(status: ReportStatus): string {
-    return status;
+    return this.translationService.translate(`manager.reports.status.${status.toLowerCase()}`);
   }
 
   getStatusClass(status: ReportStatus): string {
@@ -262,7 +267,7 @@ export class ManagerReportsComponent implements OnInit {
   }
 
   formatDate(iso: string): string {
-    return new Date(iso).toLocaleDateString(undefined, {
+    return new Date(iso).toLocaleDateString(this.translationService.currentLocale(), {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
@@ -298,6 +303,14 @@ export class ManagerReportsComponent implements OnInit {
       creatorResponse: params.reply,
       category: params.category ?? 'unprofessional_conduct',
       autoDetected: params.autoDetected === '1' || params.autoDetected === 'true',
+    }, {
+      categoryPrefix: 'Category',
+      autoDetected: 'Flagged automatically as a concerning reply (language / conduct rules).',
+      managerModeration: 'Reported from manager review moderation.',
+      reviewLabel: 'Review',
+      touristLabel: 'Tourist',
+      creatorLabel: 'Content creator',
+      replyLabel: 'Reply',
     });
   }
 
@@ -306,10 +319,14 @@ export class ManagerReportsComponent implements OnInit {
     return {
       id: report.id,
       reportedUserId: report.reportedUserId,
-      reportedUserName: report.reportedUserName?.trim() || '—',
+      reportedUserName:
+        report.reportedUserName?.trim() ||
+        this.translationService.translate('manager.reports.fallback.notAvailable'),
       reason: report.reason,
       status,
-      destinationName: report.destinationName?.trim() || '—',
+      destinationName:
+        report.destinationName?.trim() ||
+        this.translationService.translate('manager.reports.fallback.notAvailable'),
       createdAt: report.createdAt,
       resolvedAt: report.resolvedAt ?? undefined,
       rejectionReason: report.rejectionReason ?? undefined,
@@ -339,8 +356,12 @@ export class ManagerReportsComponent implements OnInit {
     return Array.from(counts.entries())
       .map(([id, count]) => ({
         id,
-        name: this.creatorNameById.get(id) ?? 'Content creator',
-        contentSummary: `${count} object${count === 1 ? '' : 's'} in your destinations`,
+        name:
+          this.creatorNameById.get(id) ??
+          this.translationService.translate('manager.reports.fallback.contentCreator'),
+        contentSummary: this.translationService.translate('manager.reports.creatorSummary', {
+          count,
+        }),
         hasPendingReport: pendingIds.has(id),
       }))
       .sort((a, b) => a.name.localeCompare(b.name));
@@ -402,11 +423,15 @@ export class ManagerReportsComponent implements OnInit {
                 .filter((n): n is string => !!n),
             ),
           ].sort((a, b) => a.localeCompare(b));
-          this.managedDestination = cityNames.length ? cityNames.join(', ') : 'your destinations';
+          this.managedDestination = cityNames.length
+            ? cityNames.join(', ')
+            : this.translationService.translate('manager.reports.managedDestinationFallback');
           this.cdr.detectChanges();
         },
         error: () => {
-          this.managedDestination = 'your destinations';
+          this.managedDestination = this.translationService.translate(
+            'manager.reports.managedDestinationFallback',
+          );
         },
       });
   }
@@ -490,7 +515,8 @@ export class ManagerReportsComponent implements OnInit {
     if (!name) {
       return false;
     }
-    return !/^content creator$/i.test(name) && name.trim().length > 0;
+    const fallback = this.translationService.translate('manager.reports.fallback.contentCreator');
+    return !new RegExp(`^${fallback}$`, 'i').test(name) && name.trim().length > 0;
   }
 
   private applyCreatorNamesToLists(): void {
