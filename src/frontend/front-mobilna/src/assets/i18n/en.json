@@ -942,7 +942,7 @@
     "locationLoading": "Locating...",
     "locationConsentTitle": "Turn on location so GPS can work",
     "locationConsentBody": "Location tracking is currently turned off. Tap below to open settings and enable consent for location tracking.",
-    "locationConsentAction": "Click here",
+    "locationConsentAction": "Turn on",
     "filters": {
       "food": "Food & Drinks",
       "fuel": "Gas Stations",
