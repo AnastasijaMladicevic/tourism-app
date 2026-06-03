@@ -18,12 +18,7 @@
           {{ isDeleting ? ('manager.localityForm.deleting' | translate) : ('manager.localityForm.deleteLocality' | translate) }}
         </button>
       }
-<<<<<<< HEAD
-      <button type="button" class="ghost-btn" (click)="onCancel()">Cancel</button>
-=======
       <button type="button" class="ghost-btn" (click)="onCancel()">{{ 'common.cancel' | translate }}</button>
-      <button type="button" class="ghost-btn" (click)="onSaveDraft()">{{ 'manager.localityForm.saveDraft' | translate }}</button>
->>>>>>> menadzer-prevod-prepravke
       <button type="submit" class="primary-btn" form="create-locality-form" [disabled]="isSubmitting || isLoadingOptions">
         {{
           isSubmitting

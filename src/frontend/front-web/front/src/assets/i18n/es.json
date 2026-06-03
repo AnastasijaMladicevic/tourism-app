@@ -954,7 +954,6 @@
         "deleting": "Eliminando...",
         "deleteLocality": "Eliminar localidad",
         "delete": "Eliminar",
-        "saveDraft": "Guardar borrador",
         "creating": "Creando...",
         "step1": "PASO 1",
         "step2": "PASO 2",
@@ -1001,10 +1000,6 @@
           "tip1": "Elige el destino y el tipo de localidad que mejor coincidan con el lugar para mantener limpios los filtros.",
           "tip2": "Coloca el pin del mapa en la entrada real o en el centro de la localidad, no solo en el centro de la ciudad.",
           "tip3": "Sube al menos una imagen de alta resolución y marca la mejor como principal."
-        },
-        "draft": {
-          "newOnly": "El borrador solo está disponible para localidades nuevas.",
-          "saved": "Borrador guardado."
         },
         "errors": {
           "requiredFields": "Nombre, destino y tipo son obligatorios.",
@@ -1833,7 +1828,6 @@
     "editDestination": "Editar destino",
     "createNew": "Crear nuevo",
     "newDestination": "Nuevo destino",
-    "saveDraft": "Guardar borrador",
     "createDestination": "Crear destino",
     "deleteDestination": "Eliminar destino",
     "deleting": "Eliminando…",
@@ -1901,9 +1895,6 @@
     "managerRoleFallback": "Manager",
     "notSet": "—",
     "setLatitudeLongitude": "Define latitud y longitud",
-    "draftSavedFixManager": "El borrador se guardó en el servidor. Puedes corregir la asignación del manager y volver a guardar.",
-    "draftSavedImageWarning": "El borrador se guardó en el servidor, pero algunas imágenes no se pudieron subir.",
-    "draftSaved": "Borrador guardado en el servidor",
     "locationLookup": {
       "searching": "Buscando ubicación en el mapa...",
       "matched": "Ubicación encontrada: {{label}}",

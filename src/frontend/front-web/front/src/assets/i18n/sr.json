@@ -954,7 +954,6 @@
         "deleting": "Brisanje...",
         "deleteLocality": "Obriši lokalitet",
         "delete": "Obriši",
-        "saveDraft": "Sačuvaj nacrt",
         "creating": "Kreiranje...",
         "step1": "KORAK 1",
         "step2": "KORAK 2",
@@ -1001,10 +1000,6 @@
           "tip1": "Izaberi destinaciju i tip lokaliteta koji najbolje odgovaraju mestu kako bi filteri ostali čisti.",
           "tip2": "Postavi pin na stvarni ulaz ili centar lokaliteta, a ne samo na centar grada.",
           "tip3": "Otpremi bar jednu fotografiju visoke rezolucije i označi najbolju kao glavnu."
-        },
-        "draft": {
-          "newOnly": "Nacrt je dostupan samo za nove lokalitete.",
-          "saved": "Nacrt je sačuvan."
         },
         "errors": {
           "requiredFields": "Naziv, destinacija i tip su obavezni.",
@@ -1833,7 +1828,6 @@
     "editDestination": "Izmeni destinaciju",
     "createNew": "Kreiraj novo",
     "newDestination": "Nova destinacija",
-    "saveDraft": "Sačuvaj nacrt",
     "createDestination": "Kreiraj destinaciju",
     "deleteDestination": "Obriši destinaciju",
     "deleting": "Brisanje…",
@@ -1901,9 +1895,6 @@
     "managerRoleFallback": "Menadžer",
     "notSet": "—",
     "setLatitudeLongitude": "Postavi geografsku širinu i dužinu",
-    "draftSavedFixManager": "Nacrt je sačuvan na serveru. Možeš da ispraviš dodelu menadžera i sačuvaš ponovo.",
-    "draftSavedImageWarning": "Nacrt je sačuvan na serveru, ali neke slike nisu mogle biti otpremljene.",
-    "draftSaved": "Nacrt je sačuvan na serveru",
     "locationLookup": {
       "searching": "Pretraga lokacije na mapi...",
       "matched": "Lokacija je pronađena: {{label}}",

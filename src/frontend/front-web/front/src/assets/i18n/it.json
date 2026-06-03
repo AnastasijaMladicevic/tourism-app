@@ -954,7 +954,6 @@
         "deleting": "Eliminazione...",
         "deleteLocality": "Elimina località",
         "delete": "Elimina",
-        "saveDraft": "Salva bozza",
         "creating": "Creazione...",
         "step1": "PASSO 1",
         "step2": "PASSO 2",
@@ -1001,10 +1000,6 @@
           "tip1": "Scegli la destinazione e il tipo di località più adatti al luogo per mantenere puliti i filtri.",
           "tip2": "Posiziona il pin della mappa sull'ingresso reale o al centro della località, non solo al centro città.",
           "tip3": "Carica almeno un'immagine ad alta risoluzione e contrassegna la migliore come principale."
-        },
-        "draft": {
-          "newOnly": "La bozza è disponibile solo per le nuove località.",
-          "saved": "Bozza salvata."
         },
         "errors": {
           "requiredFields": "Nome, destinazione e tipo sono obbligatori.",
@@ -1833,7 +1828,6 @@
     "editDestination": "Modifica destinazione",
     "createNew": "Crea nuovo",
     "newDestination": "Nuova destinazione",
-    "saveDraft": "Salva bozza",
     "createDestination": "Crea destinazione",
     "deleteDestination": "Elimina destinazione",
     "deleting": "Eliminazione…",
@@ -1901,9 +1895,6 @@
     "managerRoleFallback": "Manager",
     "notSet": "—",
     "setLatitudeLongitude": "Imposta latitudine e longitudine",
-    "draftSavedFixManager": "Bozza salvata sul server. Puoi correggere l'assegnazione del manager e salvare di nuovo.",
-    "draftSavedImageWarning": "Bozza salvata sul server, ma alcune immagini non sono state caricate.",
-    "draftSaved": "Bozza salvata sul server",
     "locationLookup": {
       "searching": "Ricerca posizione sulla mappa...",
       "matched": "Posizione trovata: {{label}}",

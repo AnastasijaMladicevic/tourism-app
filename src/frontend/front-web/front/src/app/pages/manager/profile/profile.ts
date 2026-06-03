@@ -467,13 +467,8 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
 
     this.passwordError = '';
 
-<<<<<<< HEAD
-    if (!this.currentPassword) {
-      this.passwordError = 'Enter your current password.';
-=======
     if (!this.currentPassword.trim()) {
       this.passwordError = this.translationService.translate('adminProfile.password.errors.currentRequired');
->>>>>>> menadzer-prevod-prepravke
       return;
     }
 
@@ -492,9 +487,8 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
       return;
     }
 
-<<<<<<< HEAD
     if (!this.user.id) {
-      this.passwordError = 'User ID is not available.';
+      this.passwordError = this.translationService.translate('adminProfile.password.errors.currentRequired');
       return;
     }
 
@@ -515,17 +509,10 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
       },
       error: (err) => {
         this.passwordLoading = false;
-        this.passwordError = err?.error?.message ?? 'Password change failed. Check your current password.';
+        this.passwordError = err?.error?.message ?? this.translationService.translate('adminProfile.password.errors.changeFailed');
         this.cdr.detectChanges();
       },
     });
-=======
-    this.passwordChangeStep = 'otp';
-    this.otpCode = '';
-    this.otpDemoCode = this.generateDemoOtpCode();
-    this.passwordInfo = this.translationService.translate('adminProfile.password.demoVerificationCode', { code: this.otpDemoCode });
-    this.startOtpCountdown();
->>>>>>> menadzer-prevod-prepravke
   }
 
   startForgotFlow(): void {
@@ -568,27 +555,15 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
       return;
     }
 
-<<<<<<< HEAD
     this.passwordLoading = true;
 
     this.authService.verifyResetCode({ email: this.user.email, code: this.otpCode.trim() }).subscribe({
       next: (response: { resetSessionToken?: string; ResetSessionToken?: string; token?: string } | string) => {
         this.forgotResetSessionToken = this.extractResetSessionToken(response);
-=======
-    if (!this.otpDemoCode) {
-      this.passwordError = this.translationService.translate('adminProfile.password.errors.sessionExpired');
-      return;
-    }
-
-    if (this.otpCode.trim() !== this.otpDemoCode) {
-      this.passwordError = this.translationService.translate('adminProfile.password.errors.invalidCode');
-      return;
-    }
->>>>>>> menadzer-prevod-prepravke
 
         if (!this.forgotResetSessionToken) {
           this.passwordLoading = false;
-          this.passwordError = 'Verification failed. Please request a new code.';
+          this.passwordError = this.translationService.translate('adminProfile.password.errors.invalidCode');
           this.cdr.detectChanges();
           return;
         }
@@ -601,33 +576,14 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       },
       error: (err) => {
-<<<<<<< HEAD
         this.passwordLoading = false;
-        this.passwordError = err?.error?.message ?? 'Invalid or expired verification code.';
-        this.cdr.detectChanges();
-=======
         this.passwordError = err?.error?.message ?? err?.error?.title ?? this.translationService.translate('adminProfile.password.errors.changeFailed');
->>>>>>> menadzer-prevod-prepravke
+        this.cdr.detectChanges();
       },
     });
   }
 
-<<<<<<< HEAD
   submitForgotPassword(): void {
-=======
-  resendOtpCode(): void {
-    if (this.passwordLoading || this.otpResendSecondsRemaining > 0) return;
-
-    this.passwordError = '';
-    this.passwordInfo = '';
-    this.otpDemoCode = this.generateDemoOtpCode();
-    this.otpCode = '';
-    this.passwordInfo = this.translationService.translate('adminProfile.password.demoVerificationCode', { code: this.otpDemoCode });
-    this.startOtpCountdown();
-  }
-
-  backToPasswordStep(): void {
->>>>>>> menadzer-prevod-prepravke
     if (this.passwordLoading) return;
 
     this.passwordError = '';
@@ -786,14 +742,9 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
     this.otpExpiryTimerId = window.setInterval(() => {
       this.otpSecondsRemaining = Math.max(0, this.otpSecondsRemaining - 1);
       if (this.otpSecondsRemaining === 0) {
-<<<<<<< HEAD
-        this.passwordError = 'The verification code has expired. Resend it to continue.';
+        this.passwordError = this.translationService.translate('adminProfile.password.errors.codeExpired');
         window.clearInterval(this.otpExpiryTimerId!);
         this.otpExpiryTimerId = null;
-=======
-        this.passwordError = this.translationService.translate('adminProfile.password.errors.codeExpired');
-        this.clearOtpExpiryTimer();
->>>>>>> menadzer-prevod-prepravke
       }
       this.cdr.detectChanges();
     }, 1000);

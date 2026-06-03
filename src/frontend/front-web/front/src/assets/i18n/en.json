@@ -954,7 +954,6 @@
         "deleting": "Deleting...",
         "deleteLocality": "Delete Locality",
         "delete": "Delete",
-        "saveDraft": "Save Draft",
         "creating": "Creating...",
         "step1": "STEP 1",
         "step2": "STEP 2",
@@ -1001,10 +1000,6 @@
           "tip1": "Pick the destination and locality type that best matches the place to keep filters clean.",
           "tip2": "Drop the map pin on the actual entrance or center of the locality, not just the city center.",
           "tip3": "Upload at least one high-resolution image and mark the strongest one as primary."
-        },
-        "draft": {
-          "newOnly": "Draft is only available for new localities.",
-          "saved": "Draft saved."
         },
         "errors": {
           "requiredFields": "Name, destination, and type are required.",
@@ -1877,7 +1872,6 @@
     "editDestination": "Edit destination",
     "createNew": "Create new",
     "newDestination": "New destination",
-    "saveDraft": "Save draft",
     "createDestination": "Create destination",
     "deleteDestination": "Delete destination",
     "deleting": "Deleting…",
@@ -1945,9 +1939,6 @@
     "managerRoleFallback": "Manager",
     "notSet": "—",
     "setLatitudeLongitude": "Set latitude and longitude",
-    "draftSavedFixManager": "Draft saved to the server. You can fix manager assignment and save again.",
-    "draftSavedImageWarning": "Draft saved to the server, but some images could not be uploaded.",
-    "draftSaved": "Draft saved to the server",
     "locationLookup": {
       "searching": "Searching map location...",
       "matched": "Location matched: {{label}}",

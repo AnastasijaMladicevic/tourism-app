@@ -294,23 +294,6 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
     this.showTipsModal = false;
   }
 
-<<<<<<< HEAD
-=======
-  onSaveDraft(): void {
-    if (this.isEditMode) {
-      this.draftSavedMessage = this.translationService.translate('manager.localityForm.draft.newOnly');
-      return;
-    }
-
-    const draft = {
-      form: this.form,
-      primaryImageIndex: this.primaryImageIndex
-    };
-    localStorage.setItem(this.draftStorageKey, JSON.stringify(draft));
-    this.draftSavedMessage = this.translationService.translate('manager.localityForm.draft.saved');
-  }
-
->>>>>>> menadzer-prevod-prepravke
   onPickImages(input: HTMLInputElement): void {
     input.click();
   }
