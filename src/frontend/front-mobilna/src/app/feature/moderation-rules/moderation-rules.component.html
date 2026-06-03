@@ -1,6 +1,10 @@
 <div class="rules-page">
   <header class="rules-topbar">
-    <div class="topbar-spacer" aria-hidden="true"></div>
+    <a class="back-btn" routerLink="/moderator-access" [attr.aria-label]="'common.back' | translate">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="m15 18-6-6 6-6" />
+      </svg>
+    </a>
     <h1>{{ 'moderationRules.title' | translate }}</h1>
     <div class="topbar-spacer" aria-hidden="true"></div>
   </header>
