@@ -3,7 +3,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
-import { Subscription, catchError, forkJoin, of } from 'rxjs';
+import { Observable, Subscription, catchError, forkJoin, of, tap } from 'rxjs';
 import { ActivityDto, ActivityService } from '../../services/activity';
 import { DestinationDto, DestinationService } from '../../services/destination';
 import { EventDto, EventService } from '../../services/event';
@@ -11,6 +11,7 @@ import { LocalityDto, LocalityService } from '../../services/locality';
 import { ObjectDto, ObjectService } from '../../services/object';
 import { SmartSearchResultDto } from '../../services/smart-search';
 import { environment } from '../../../environment/environment';
+import { DataCacheService } from '../../services/data-cache';
 
 const SEARCH_STOP_WORDS = new Set([
   'gde', 'mogu', 'moze', 'mozete', 'da', 'na', 'sa', 'u', 'uz', 'za', 'od', 'do', 'i', 'ili',
@@ -48,6 +49,7 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
     private readonly eventService: EventService,
     private readonly activityService: ActivityService,
     private readonly localityService: LocalityService,
+    private readonly dataCache: DataCacheService,
   ) {}
 
   ngOnInit(): void {
@@ -158,41 +160,30 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
     this.runKeywordSearch(query, source);
   }
 
+  private cachedList<T>(key: string, fetch$: Observable<T[]>): Observable<T[]> {
+    const cached = this.dataCache.get<T[]>(key);
+    if (cached !== null) return of(cached);
+    return fetch$.pipe(
+      tap(data => this.dataCache.set(key, data, 10 * 60 * 1000)),
+      catchError(() => of([] as T[])),
+    );
+  }
+
   private runKeywordSearch(query: string, source: SearchSource): void {
     this.answer = '';
     this.warning = null;
 
     forkJoin({
-      destinations: this.destinationService
-        .getAll(
-          { page: 1, pageSize: 500, sortBy: 'name', sortOrder: 'asc' },
-          { bypassRegion: true, bypassLanguage: true },
-        )
-        .pipe(catchError(() => of([] as DestinationDto[]))),
-      objects: this.objectService
-        .getAll(
-          { page: 1, pageSize: 500, sortBy: 'name', sortOrder: 'asc' },
-          { bypassRegion: true, bypassLanguage: true },
-        )
-        .pipe(catchError(() => of([] as ObjectDto[]))),
-      events: this.eventService
-        .getAll(
-          { page: 1, pageSize: 500, sortBy: 'startDate', sortOrder: 'asc' },
-          { bypassRegion: true, bypassLanguage: true },
-        )
-        .pipe(catchError(() => of([] as EventDto[]))),
-      activities: this.activityService
-        .getAll(
-          { page: 1, pageSize: 500, sortBy: 'name', sortOrder: 'asc' },
-          { bypassRegion: true },
-        )
-        .pipe(catchError(() => of([] as ActivityDto[]))),
-      localities: this.localityService
-        .getAll(
-          { page: 1, pageSize: 500, sortBy: 'name', sortOrder: 'asc' },
-          { bypassRegion: true },
-        )
-        .pipe(catchError(() => of([] as LocalityDto[]))),
+      destinations: this.cachedList<DestinationDto>('sr:dest', this.destinationService
+        .getAll({ page: 1, pageSize: 500, sortBy: 'name', sortOrder: 'asc' }, { bypassRegion: true, bypassLanguage: true })),
+      objects: this.cachedList<ObjectDto>('sr:obj', this.objectService
+        .getAll({ page: 1, pageSize: 500, sortBy: 'name', sortOrder: 'asc' }, { bypassRegion: true, bypassLanguage: true })),
+      events: this.cachedList<EventDto>('sr:evt', this.eventService
+        .getAll({ page: 1, pageSize: 500, sortBy: 'startDate', sortOrder: 'asc' }, { bypassRegion: true, bypassLanguage: true })),
+      activities: this.cachedList<ActivityDto>('sr:act', this.activityService
+        .getAll({ page: 1, pageSize: 500, sortBy: 'name', sortOrder: 'asc' }, { bypassRegion: true })),
+      localities: this.cachedList<LocalityDto>('sr:loc', this.localityService
+        .getAll({ page: 1, pageSize: 500, sortBy: 'name', sortOrder: 'asc' }, { bypassRegion: true })),
     }).subscribe(({ destinations, objects, events, activities, localities }) => {
       if (this.searchQuery.trim() !== query || this.source !== source) {
         return;

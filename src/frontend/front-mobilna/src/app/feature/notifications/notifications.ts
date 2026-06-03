@@ -71,17 +71,13 @@ export class NotificationsComponent implements OnInit, OnDestroy {
 
     this.notificationService.getMy().subscribe({
       next: (res) => {
-        setTimeout(() => {
-          this.notifications = res.items ?? res ?? [];
-          this.isLoading = false;
-          this.cdr.detectChanges();
-        });
+        this.notifications = res.items ?? res ?? [];
+        this.isLoading = false;
+        this.cdr.detectChanges();
       },
       error: () => {
-        setTimeout(() => {
-          this.isLoading = false;
-          this.cdr.detectChanges();
-        });
+        this.isLoading = false;
+        this.cdr.detectChanges();
       }
     });
   }

@@ -109,7 +109,39 @@ export class RegionComponent implements OnInit {
   }
 
   protected getSelectedRegionLabel(): string {
-    return this.options().find((option) => option.id === this.selectedId())?.name ?? '';
+    const selected = this.options().find((option) => option.id === this.selectedId());
+    return selected ? this.getRegionName(selected) : '';
+  }
+
+  protected getRegionName(option: RegionOption): string {
+    const key = this.getRegionTranslationKey(option, 'name');
+    const translated = this.translationService.translate(key);
+  
+    return translated !== key ? translated : option.name;
+  }
+  
+  protected getRegionDescription(option: RegionOption): string {
+    const key = this.getRegionTranslationKey(option, 'description');
+    const translated = this.translationService.translate(key);
+  
+    return translated !== key ? translated : (option.description ?? '');
+  }
+  
+  private getRegionTranslationKey(option: RegionOption, field: 'name' | 'description'): string {
+    const code = option.code?.toLowerCase();
+  
+    switch (code) {
+      case 'me':
+        return `region.regions.montenegro.${field}`;
+      case 'it':
+        return `region.regions.italy.${field}`;
+      case 'rs':
+        return `region.regions.serbia.${field}`;
+      case 'es':
+        return `region.regions.spain.${field}`;
+      default:
+        return `region.regions.${code}.${field}`;
+    }
   }
 
   private loadRegions(): void {

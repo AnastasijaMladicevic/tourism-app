@@ -568,7 +568,25 @@
     "loadFailed": "Regioni trenutno nisu dostupni.",
     "noneAvailable": "Nema dostupnih regiona.",
     "apply": "Primeni region",
-    "confirm": "Klikom na dugme potvrđujete promenu regiona aplikacije na {{language}}."
+    "confirm": "Klikom na dugme potvrđujete promenu regiona aplikacije na {{language}}.",
+    "regions": {
+      "montenegro": {
+        "name": "Crna Gora",
+        "description": "Podrazumevani region aplikacije."
+      },
+      "italy": {
+        "name": "Italija",
+        "description": "Region za sadržaj iz Italije."
+      },
+      "serbia": {
+        "name": "Srbija",
+        "description": "Region za sadržaj iz Srbije."
+      },
+      "spain": {
+        "name": "Španija",
+        "description": "Region za sadržaj iz Španije."
+      }
+    }
   },
   "language": {
     "title": "Jezik",
@@ -996,12 +1014,7 @@
     },
     "getDirections": "Prikaži putanju"
   },
-  "regions": {
-    "montenegro": "Crna Gora",
-    "serbia": "Srbija",
-    "spain": "Španija",
-    "italy": "Italija"
-  },
+  
   "event": {
     "title": "Dogadjaj",
     "loadingError": "Greška pri učitavanju dogadjaja.",

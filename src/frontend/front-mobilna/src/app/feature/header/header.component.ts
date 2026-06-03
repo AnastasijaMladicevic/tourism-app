@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
@@ -6,6 +6,7 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
   selector: 'app-header',
   standalone: true,
   imports: [RouterLink, TranslatePipe],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="header">
       @if (backLink) {

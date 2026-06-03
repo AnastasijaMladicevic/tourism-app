@@ -24,7 +24,7 @@
           @for (option of options(); track option.id) {
             <button class="region-option" type="button" (click)="selectRegion(option.id)">
               <div class="region-option__content">
-                <strong>{{ option.name }}</strong>
+                <strong>{{ getRegionName(option) }}</strong>
                 <span>
                   {{ option.code }}
                   @if (option.isDefault) {
@@ -32,7 +32,7 @@
                   }
                 </span>
                 @if (option.description) {
-                  <small>{{ option.description }}</small>
+                  <small>{{ getRegionDescription(option) }}</small>
                 }
               </div>
 

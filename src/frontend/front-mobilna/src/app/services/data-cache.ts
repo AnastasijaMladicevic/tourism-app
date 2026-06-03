@@ -8,7 +8,7 @@ interface CacheEntry<T> {
 @Injectable({ providedIn: 'root' })
 export class DataCacheService {
   private readonly cache = new Map<string, CacheEntry<unknown>>();
-  private readonly ttlMs = 2 * 60 * 1000; // 2 minutes
+  private readonly defaultTtlMs = 2 * 60 * 1000; // 2 minuta
 
   get<T>(key: string): T | null {
     const entry = this.cache.get(key);
@@ -20,8 +20,8 @@ export class DataCacheService {
     return entry.data as T;
   }
 
-  set<T>(key: string, data: T): void {
-    this.cache.set(key, { data, expiresAt: Date.now() + this.ttlMs });
+  set<T>(key: string, data: T, ttlMs?: number): void {
+    this.cache.set(key, { data, expiresAt: Date.now() + (ttlMs ?? this.defaultTtlMs) });
   }
 
   invalidatePrefix(prefix: string): void {

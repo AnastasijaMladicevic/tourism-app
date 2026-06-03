@@ -955,20 +955,16 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
   private loadReviewImages(): void {
     if (!this.reviews.length) return;
 
-    this.reviews.forEach(review => {
-      this.imageService.getForReview(review.id).subscribe({
-        next: images => {
-          review.images = images.map(img => ({
-            ...img,
-            url: this.resolveMediaUrl(img.url) ?? ''
-          }));
-
-          this.cdr.detectChanges();
-        },
-        error: () => {
-          review.images = [];
-        }
+    forkJoin(
+      this.reviews.map(r => this.imageService.getForReview(r.id).pipe(catchError(() => of([]))))
+    ).subscribe(results => {
+      results.forEach((images, i) => {
+        this.reviews[i].images = (images as any[]).map(img => ({
+          ...img,
+          url: this.resolveMediaUrl(img.url) ?? ''
+        }));
       });
+      this.cdr.detectChanges();
     });
   }
   removeReviewImage(index: number): void {

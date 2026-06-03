@@ -14,15 +14,21 @@ export interface FavoriteStatefulItem {
   favoriteId?: number;
 }
 
+// Koliko dugo smatrati keš svežim — force=true ne pravi novi zahtev unutar ovog perioda
+const STALE_AFTER_MS = 60_000;
+
 @Injectable({ providedIn: 'root' })
 export class FavoriteStateService {
   private favoriteMap = new Map<string, number>();
   private hasLoaded = false;
+  private lastLoadedAt = 0;
 
   constructor(private readonly favoriteService: FavoriteService) { }
 
   loadFavorites(force = false): Observable<Map<string, number>> {
-    if (this.hasLoaded && !force) {
+    const isStale = Date.now() - this.lastLoadedAt > STALE_AFTER_MS;
+
+    if (this.hasLoaded && (!force || !isStale)) {
       return of(new Map(this.favoriteMap));
     }
 
@@ -31,6 +37,7 @@ export class FavoriteStateService {
       tap((favoriteMap) => {
         this.favoriteMap = favoriteMap;
         this.hasLoaded = true;
+        this.lastLoadedAt = Date.now();
       }),
       map((favoriteMap) => new Map(favoriteMap)),
     );

@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { forkJoin, map, Observable, of, switchMap } from 'rxjs';
+import { forkJoin, map, Observable, of, switchMap, tap } from 'rxjs';
 import { environment } from '../../environment/environment';
 import { ActiveRegionService, RegionRequestOptions } from './active-region';
 import { TranslationService } from './translation.service';
+import { DataCacheService } from './data-cache';
 
 export interface EventTicketTypeDto {
   id: number;
@@ -103,6 +104,7 @@ export class EventService {
     private readonly http: HttpClient,
     private readonly activeRegionService: ActiveRegionService,
     private readonly translationService: TranslationService,
+    private readonly dataCache: DataCacheService,
   ) { }
 
   private addLang(params: HttpParams, options?: RegionRequestOptions): HttpParams {
@@ -114,9 +116,16 @@ export class EventService {
   }
 
   getById(id: number): Observable<EventDto> {
+    const lang = this.translationService.language();
+    const cacheKey = `event:${id}:${lang}`;
+    const cached = this.dataCache.get<EventDto>(cacheKey);
+    if (cached) return of(cached);
+
     let params = new HttpParams();
     params = this.addLang(params);
-    return this.http.get<EventDto>(`${this.url}/${id}`, { params });
+    return this.http.get<EventDto>(`${this.url}/${id}`, { params }).pipe(
+      tap(result => this.dataCache.set(cacheKey, result)),
+    );
   }
 
   getTypes(options?: RegionRequestOptions): Observable<EventTypeOptionDto[]> {

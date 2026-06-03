@@ -1,6 +1,6 @@
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { BehaviorSubject, catchError, filter, finalize, switchMap, take, throwError } from 'rxjs';
+import { BehaviorSubject, TimeoutError, catchError, filter, finalize, switchMap, take, throwError, timeout } from 'rxjs';
 import { AuthService } from '../services/auth';
 
 let isRefreshing = false;
@@ -36,8 +36,21 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
       ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } })
       : req;
 
-  return next(authReq).pipe(
-    catchError((error: HttpErrorResponse) => {
+  const response$ = next(authReq);
+  const timedResponse$ = req.url.includes('/api/')
+    ? response$.pipe(timeout(30000))
+    : response$;
+
+  return timedResponse$.pipe(
+    catchError((error: unknown) => {
+      if (error instanceof TimeoutError) {
+        return throwError(() => new HttpErrorResponse({ status: 0, statusText: 'Request Timeout', url: req.url }));
+      }
+
+      if (!(error instanceof HttpErrorResponse)) {
+        return throwError(() => error);
+      }
+
       if (error.status === 423) {
         notifyBannedAction(error);
         return throwError(() => error);

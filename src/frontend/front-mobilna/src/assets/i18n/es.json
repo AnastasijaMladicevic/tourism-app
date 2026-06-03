@@ -566,7 +566,25 @@
     "loadFailed": "Las regiones no están disponibles actualmente.",
     "noneAvailable": "No hay regiones disponibles.",
     "apply": "Aplicar región",
-    "confirm": "Al tocar el botón confirmas que deseas cambiar la región de la app a {{language}}."
+    "confirm": "Al tocar el botón confirmas que deseas cambiar la región de la app a {{language}}.",
+    "regions": {
+      "montenegro": {
+        "name": "Montenegro",
+        "description": "Región predeterminada de la aplicación."
+      },
+      "italy": {
+        "name": "Italia",
+        "description": "Región para contenido de Italia."
+      },
+      "serbia": {
+        "name": "Serbia",
+        "description": "Región para contenido de Serbia."
+      },
+      "spain": {
+        "name": "España",
+        "description": "Región para contenido de España."
+      }
+    }
   },
   "language": {
     "title": "Idioma",
@@ -991,12 +1009,6 @@
       }
     },
     "getDirections": "Cómo llegar"
-  },
-  "regions": {
-    "montenegro": "Montenegro",
-    "serbia": "Serbia",
-    "spain": "España",
-    "italy": "Italia"
   },
   "event": {
     "title": "Evento",

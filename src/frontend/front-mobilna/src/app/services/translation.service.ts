@@ -1,6 +1,6 @@
 import { Injectable, effect, signal, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { firstValueFrom } from 'rxjs';
+import { Observable, catchError, firstValueFrom, map, of, shareReplay, tap } from 'rxjs';
 
 export type AppLanguage = 'sr' | 'en' | 'es' | 'it';
 
@@ -19,8 +19,11 @@ export class TranslationService {
   private readonly activeLanguage = signal<AppLanguage>(this.readStoredLanguage());
   private translations: Record<string, string> = {};
 
-  // Signal koji se menja svaki put kad se prevodi učitaju —
-  // TranslatePipe (pure: false) će se ponovo evaluirati
+  // Keš učitanih prevoda — jednom učitan, ostaje u memoriji za ceo sesiju
+  private readonly loadedCache = new Map<AppLanguage, Record<string, string>>();
+  // Deli isti in-flight HTTP zahtev između paralelnih potraživača istog jezika
+  private readonly inFlight = new Map<AppLanguage, Observable<Record<string, string>>>();
+
   readonly translationsVersion = signal(0);
 
   constructor() {
@@ -31,22 +34,18 @@ export class TranslationService {
         document.documentElement.setAttribute('lang', lang);
       }
 
-      this.http.get<Record<string, any>>(this.buildTranslationUrl(lang))
-        .subscribe(data => {
-          this.translations = this.flatten(data);
-          // Povećaj verziju → TranslatePipe detektuje promenu i ponovo renderuje
-          this.translationsVersion.update(v => v + 1);
-        });
+      this.fetchLanguage(lang).subscribe(flat => {
+        this.translations = flat;
+        this.translationsVersion.update(v => v + 1);
+      });
     });
   }
 
   // Koristi se u APP_INITIALIZER — čeka da se JSON učita pre starta appa
   async loadInitialTranslations(): Promise<void> {
     const lang = this.activeLanguage();
-    const data = await firstValueFrom(
-      this.http.get<Record<string, any>>(this.buildTranslationUrl(lang))
-    );
-    this.translations = this.flatten(data);
+    const flat = await firstValueFrom(this.fetchLanguage(lang));
+    this.translations = flat;
     this.translationsVersion.update(v => v + 1);
   }
 
@@ -88,6 +87,33 @@ export class TranslationService {
     return Object.entries(params).reduce(
       (val, [k, v]) => val.replaceAll(`{{${k}}}`, String(v)), template
     );
+  }
+
+  // Vraća keširani Observable — isti HTTP zahtev se ne pravi dva puta za isti jezik
+  private fetchLanguage(lang: AppLanguage): Observable<Record<string, string>> {
+    const cached = this.loadedCache.get(lang);
+    if (cached) return of(cached);
+
+    const existing = this.inFlight.get(lang);
+    if (existing) return existing;
+
+    const req$ = this.http
+      .get<Record<string, any>>(this.buildTranslationUrl(lang))
+      .pipe(
+        map(data => this.flatten(data)),
+        tap(flat => {
+          this.loadedCache.set(lang, flat);
+          this.inFlight.delete(lang);
+        }),
+        catchError(err => {
+          this.inFlight.delete(lang);
+          throw err;
+        }),
+        shareReplay(1),
+      );
+
+    this.inFlight.set(lang, req$);
+    return req$;
   }
 
   private flatten(obj: any, prefix = ''): Record<string, string> {

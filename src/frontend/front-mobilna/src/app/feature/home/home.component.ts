@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, NgZone, OnDestroy, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, NgZone, OnDestroy, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -121,6 +121,7 @@ const SEARCH_STOP_WORDS = new Set([
   imports: [BottomNavComponent, FormsModule, MatIcon, LazyBackgroundDirective, TranslatePipe],
   templateUrl: './home.component.html',
   styleUrl: './home.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class HomeComponent implements OnInit, OnDestroy {
   userName = '';
@@ -322,10 +323,10 @@ export class HomeComponent implements OnInit, OnDestroy {
     const regionId = this.activeRegionId;
   
     const regions: Record<number, string> = {
-      1: 'regions.montenegro',
-      2: 'regions.serbia',
-      3: 'regions.spain',
-      4: 'regions.italy',
+      1: 'region.regions.montenegro.name',
+      2: 'region.regions.serbia.name',
+      3: 'region.regions.spain.name',
+      4: 'region.regions.italy.name',
     };
   
     return regions[regionId] ?? regions[1];
@@ -767,32 +768,45 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.isLoadingPlaces = true;
 
     const lang = this.translationService.language().trim().toLowerCase();
-    const cacheKey = `home-place-cards:r${regionId}:l${lang}`;
-    const cached = this.dataCacheService.get<{ destinations: unknown[]; objects: unknown[]; activities: unknown[] }>(cacheKey);
 
-    if (cached) {
+    // Objects i activities ne zavise od jezika — poseban cache sa dužim TTL-om
+    const baseKey = `home-base-cards:r${regionId}`;
+    const destKey = `home-dest-cards:r${regionId}:l${lang}`;
+
+    const cachedBase = this.dataCacheService.get<{ objects: unknown[]; activities: unknown[] }>(baseKey);
+    const cachedDest = this.dataCacheService.get<unknown[]>(destKey);
+
+    if (cachedBase && cachedDest) {
       this.isLoadingPlaces = false;
-      this.processPlaceCards(cached.destinations, cached.objects, cached.activities);
+      this.processPlaceCards(cachedDest, cachedBase.objects, cachedBase.activities);
       return;
     }
 
-    forkJoin({
-      destinations: this.destinationService
-        .getAll({ page: 1, pageSize: 8, sortBy: 'name', sortOrder: 'asc', lang, regionId })
-        .pipe(catchError(() => of([] as unknown[]))),
-      objects: this.objectService
-        .getAll(
-          { page: 1, pageSize: 8, sortBy: 'name', sortOrder: 'asc', regionId },
-          { bypassLanguage: true },
-        )
-        .pipe(catchError(() => of([] as unknown[]))),
-      activities: this.activityService
-        .getAll(
-          { page: 1, pageSize: 8, sortBy: 'name', sortOrder: 'asc', regionId },
-          { bypassLanguage: true },
-        )
-        .pipe(catchError(() => of([] as unknown[]))),
-    })
+    const destinations$ = cachedDest
+      ? of(cachedDest)
+      : this.destinationService
+          .getAll({ page: 1, pageSize: 8, sortBy: 'name', sortOrder: 'asc', lang, regionId })
+          .pipe(catchError(() => of([] as unknown[])));
+
+    const objects$ = cachedBase
+      ? of(cachedBase.objects)
+      : this.objectService
+          .getAll(
+            { page: 1, pageSize: 8, sortBy: 'name', sortOrder: 'asc', regionId },
+            { bypassLanguage: true },
+          )
+          .pipe(catchError(() => of([] as unknown[])));
+
+    const activities$ = cachedBase
+      ? of(cachedBase.activities)
+      : this.activityService
+          .getAll(
+            { page: 1, pageSize: 8, sortBy: 'name', sortOrder: 'asc', regionId },
+            { bypassLanguage: true },
+          )
+          .pipe(catchError(() => of([] as unknown[])));
+
+    forkJoin({ destinations: destinations$, objects: objects$, activities: activities$ })
       .pipe(
         finalize(() => {
           this.isLoadingPlaces = false;
@@ -800,7 +814,8 @@ export class HomeComponent implements OnInit, OnDestroy {
         }),
       )
       .subscribe(({ destinations, objects, activities }) => {
-        this.dataCacheService.set(cacheKey, { destinations, objects, activities });
+        if (!cachedDest) this.dataCacheService.set(destKey, destinations as unknown[], 5 * 60 * 1000);
+        if (!cachedBase) this.dataCacheService.set(baseKey, { objects, activities }, 10 * 60 * 1000);
         this.processPlaceCards(destinations, objects, activities);
       });
   }
@@ -866,9 +881,14 @@ export class HomeComponent implements OnInit, OnDestroy {
       return of(featured);
     }
 
-   
     return forkJoin(
       featured.map((item) => {
+        const cacheKey = `feat-translation:${item.id}:l${lang}`;
+        const cached = this.dataCacheService.get<string>(cacheKey);
+
+        if (cached !== null) {
+          return of(cached ? { ...item, displayTitle: cached } : item);
+        }
 
         return this.http
           .get<ApiTranslationDto[]>(
@@ -876,29 +896,18 @@ export class HomeComponent implements OnInit, OnDestroy {
           )
           .pipe(
             map((translations) => {
-              const translatedDescription = translations
+              const translatedTitle = translations
                 .find(
-                  (translation) =>
-                    translation.fieldName?.toLowerCase() === 'displaytitle' &&
-                    translation.languageCode?.toLowerCase() === lang
+                  (t) =>
+                    t.fieldName?.toLowerCase() === 'displaytitle' &&
+                    t.languageCode?.toLowerCase() === lang
                 )
-                ?.translatedText?.trim();
+                ?.translatedText?.trim() ?? '';
 
-              return translatedDescription
-                ? {
-                  ...item,
-                  displayTitle: translatedDescription,
-                }
-                : item;
+              this.dataCacheService.set(cacheKey, translatedTitle, 15 * 60 * 1000);
+              return translatedTitle ? { ...item, displayTitle: translatedTitle } : item;
             }),
-            catchError((error) => {
-              console.error(
-                `Greška pri prevodu featured destination ${item.id}:`,
-                error
-              );
-
-              return of(item);
-            })
+            catchError(() => of(item)),
           );
       })
     );
@@ -1028,8 +1037,8 @@ export class HomeComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const lang = this.translationService.language();
-    const cacheKey = `search-index:l${lang}`;
+    // Indeks ne zavisi od jezika — isti podaci za sve jezike
+    const cacheKey = 'search-index';
     const cached = this.dataCacheService.get<HomeSearchResult[]>(cacheKey);
     if (cached) {
       this.searchIndex = cached;
@@ -1114,7 +1123,7 @@ export class HomeComponent implements OnInit, OnDestroy {
           ...activityResults,
           ...localityResults,
         ];
-        this.dataCacheService.set(cacheKey, this.searchIndex);
+        this.dataCacheService.set(cacheKey, this.searchIndex, 10 * 60 * 1000);
       });
   }
 
