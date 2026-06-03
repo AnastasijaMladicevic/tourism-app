@@ -1,19 +1,21 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
+import { RouterHistoryService } from '../../services/router-history';
 
 @Component({
   selector: 'app-privacy-data',
   standalone: true,
-  imports: [CommonModule, RouterLink, TranslatePipe],
+  imports: [CommonModule, TranslatePipe],
   templateUrl: './privacy-data.component.html',
   styleUrl: './privacy-data.component.scss',
 })
 export class PrivacyDataComponent {
-  private readonly route = inject(ActivatedRoute);
+  private readonly routerHistory = inject(RouterHistoryService);
 
-  protected readonly backLink = this.route.snapshot.queryParamMap.get('returnTo') || '/settings';
+  goBack(): void {
+    this.routerHistory.goBack('/settings');
+  }
   protected readonly sections = [
     { titleKey: 'privacy.section.1.title', bodyKey: 'privacy.section.1.body' },
     { titleKey: 'privacy.section.2.title', bodyKey: 'privacy.section.2.body' },

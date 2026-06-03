@@ -113,7 +113,7 @@ export class SettingsComponent implements OnInit, OnDestroy {
   }
 
   goBack(): void {
-    this.routerHistoryService.goBack();
+    this.routerHistoryService.goBack('/home');
   }
 
   handleItem(item: any): void {
