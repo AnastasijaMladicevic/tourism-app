@@ -699,7 +699,6 @@
       }
     }
   },
-<<<<<<< HEAD
   "adminDestinations": {
     "title": "Destinacije",
     "subtitle": "Uređujte regionalne destinacije, održavajte hijerarhiju lokaliteta i pregledajte kako se svaka destinacija prikazuje na platformi.",
@@ -1279,9 +1278,7 @@
         "changeFailed": "Promena lozinke nije uspela.",
         "codeExpired": "Verifikacioni kod je istekao. Pošalji ga ponovo da nastaviš."
       }
-    }
-=======
-  "adminProfile": {
+    },
     "passwordModalDescription": "Unesi trenutnu lozinku i izaberi novu.",
     "currentPasswordLabel": "Trenutna lozinka",
     "showCurrentPassword": "Prikaži trenutnu lozinku",
@@ -1298,7 +1295,7 @@
     "setNewPasswordBtn": "Postavi novu lozinku",
     "forgotPasswordHeading": "Potvrdi kod",
     "setPasswordHeading": "Postavi novu lozinku"
->>>>>>> 295-draft-admin-bug
+
   },
   "__literals": {
     "Settings": "Podešavanja",

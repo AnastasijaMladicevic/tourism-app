@@ -699,7 +699,6 @@
       }
     }
   },
-<<<<<<< HEAD
   "adminDestinations": {
     "title": "Destinations",
     "subtitle": "Curate regional destinations, keep locality hierarchies organized, and preview how each destination appears across the platform.",
@@ -1323,9 +1322,7 @@
         "changeFailed": "Password change failed.",
         "codeExpired": "The verification code has expired. Resend it to continue."
       }
-    }
-=======
-  "adminProfile": {
+    },
     "passwordModalDescription": "Enter your current password and choose a new one.",
     "currentPasswordLabel": "Current Password",
     "showCurrentPassword": "Show current password",
@@ -1342,7 +1339,7 @@
     "setNewPasswordBtn": "Set New Password",
     "forgotPasswordHeading": "Verify Code",
     "setPasswordHeading": "Set New Password"
->>>>>>> 295-draft-admin-bug
+
   },
   "__literals": {
     "Settings": "Settings",

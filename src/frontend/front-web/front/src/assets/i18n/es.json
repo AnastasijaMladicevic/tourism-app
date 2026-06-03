@@ -699,7 +699,6 @@
       }
     }
   },
-<<<<<<< HEAD
   "adminDestinations": {
     "title": "Destinos",
     "subtitle": "Organiza los destinos regionales, mantén ordenadas las jerarquías de localidades y previsualiza cómo aparece cada destino en la plataforma.",
@@ -1279,9 +1278,7 @@
         "changeFailed": "No se pudo cambiar la contraseña.",
         "codeExpired": "El código de verificación ha expirado. Reenvíalo para continuar."
       }
-    }
-=======
-  "adminProfile": {
+    },
     "passwordModalDescription": "Introduce tu contraseña actual y elige una nueva.",
     "currentPasswordLabel": "Contraseña actual",
     "showCurrentPassword": "Mostrar contraseña actual",
@@ -1298,7 +1295,7 @@
     "setNewPasswordBtn": "Establecer nueva contraseña",
     "forgotPasswordHeading": "Verificar código",
     "setPasswordHeading": "Establecer nueva contraseña"
->>>>>>> 295-draft-admin-bug
+
   },
   "__literals": {
     "Settings": "Configuración",
