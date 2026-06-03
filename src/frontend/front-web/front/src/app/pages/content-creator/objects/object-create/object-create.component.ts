@@ -75,14 +75,14 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
   showDeleteModal = false;
   isDeletingObject = false;
 
-  readonly workingDays: Array<{ key: WorkingDayKey; label: string }> = [
-    { key: 'pon', label: 'Monday' },
-    { key: 'uto', label: 'Tuesday' },
-    { key: 'sre', label: 'Wednesday' },
-    { key: 'cet', label: 'Thursday' },
-    { key: 'pet', label: 'Friday' },
-    { key: 'sub', label: 'Saturday' },
-    { key: 'ned', label: 'Sunday' }
+  readonly workingDays: Array<{ key: WorkingDayKey; labelKey: string }> = [
+    { key: 'pon', labelKey: 'contentCreatorObjectForm.days.monday' },
+    { key: 'uto', labelKey: 'contentCreatorObjectForm.days.tuesday' },
+    { key: 'sre', labelKey: 'contentCreatorObjectForm.days.wednesday' },
+    { key: 'cet', labelKey: 'contentCreatorObjectForm.days.thursday' },
+    { key: 'pet', labelKey: 'contentCreatorObjectForm.days.friday' },
+    { key: 'sub', labelKey: 'contentCreatorObjectForm.days.saturday' },
+    { key: 'ned', labelKey: 'contentCreatorObjectForm.days.sunday' }
   ];
 
   objectTypes: ObjectTypeOption[] = [];
@@ -201,9 +201,11 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
 
   get pageTitle(): string {
     if (this.isManagerReview) {
-      return 'Review object';
+      return this.translationService.translate('contentCreatorObjectForm.review.title');
     }
-    return this.isEditMode ? 'Edit Object' : 'Create Object';
+    return this.isEditMode
+      ? this.translationService.translate('contentCreatorObjectForm.editTitle')
+      : this.translationService.translate('contentCreatorObjectForm.createTitle');
   }
 
   get showCcReviewsPreview(): boolean {
@@ -244,18 +246,21 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
   get previewReviewsCountLabel(): string {
     const total = this.editSidebar?.reviewCount ?? this.previewReviews.length;
     if (total > this.previewReviews.length) {
-      return `Showing ${this.previewReviews.length} of ${total}`;
+      return this.translationService.translate('contentCreatorObjectForm.reviews.showingOf', {
+        shown: this.previewReviews.length,
+        total,
+      });
     }
 
     const count = this.previewReviews.length;
-    return `${count} review${count === 1 ? '' : 's'}`;
+    return this.translationService.translate('contentCreatorObjectForm.reviews.count', { count });
   }
 
   get pageIntro(): string {
     if (this.isManagerReview) {
-      return 'View object details submitted for approval. Editing is disabled.';
+      return this.translationService.translate('contentCreatorObjectForm.review.subtitle');
     }
-    return 'Add a new object with location, details, amenities, and opening hours.';
+    return this.translationService.translate('contentCreatorObjectForm.createSubtitle');
   }
 
   get objectsListPath(): string {
@@ -263,7 +268,9 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
   }
 
   get eyebrowLabel(): string {
-    return this.isManagerReview ? 'Objects review' : 'Objects management';
+    return this.isManagerReview
+      ? this.translationService.translate('contentCreatorObjectForm.review.eyebrow')
+      : this.translationService.translate('contentCreatorObjectForm.eyebrow');
   }
 
   get reviewStatusKey(): string {
@@ -307,7 +314,9 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
   }
 
   get deleteModalTitle(): string {
-    return this.isApprovedObject ? 'Request deletion' : 'Confirm deletion';
+    return this.isApprovedObject
+      ? this.translationService.translate('contentCreatorObjectForm.delete.requestTitle')
+      : this.translationService.translate('contentCreatorObjectForm.delete.confirmTitle');
   }
 
   get hasPendingDeletionRequest(): boolean {
@@ -325,8 +334,8 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
 
   get deleteModalDescription(): string {
     return this.isApprovedObject
-      ? 'This object is approved, so removal requires a manager deletion request.'
-      : 'This object is still pending, so it can be removed immediately.';
+      ? this.translationService.translate('contentCreatorObjectForm.delete.requestDescription')
+      : this.translationService.translate('contentCreatorObjectForm.delete.pendingDescription');
   }
 
   openDeleteModal(): void {
@@ -391,7 +400,9 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
             error && typeof error === 'object' && 'error' in error
               ? (error as { error?: { message?: string } }).error?.message
               : undefined;
-          this.errorMessage = message ?? 'Failed to submit deletion request';
+          this.errorMessage =
+            message ??
+            this.translationService.translate('contentCreatorObjectForm.errors.deleteRequestFailed');
         }
       });
   }
@@ -422,7 +433,8 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
             error && typeof error === 'object' && 'error' in error
               ? (error as { error?: { message?: string } }).error?.message
               : undefined;
-          this.errorMessage = message ?? 'Failed to delete object';
+          this.errorMessage =
+            message ?? this.translationService.translate('contentCreatorObjectForm.errors.deleteFailed');
         }
       });
   }
@@ -445,7 +457,9 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
           this.router.navigate(['/manager/objects']);
         },
         error: (error) => {
-          this.errorMessage = error?.error?.message ?? 'Failed to approve object.';
+          this.errorMessage =
+            error?.error?.message ??
+            this.translationService.translate('contentCreatorObjectForm.review.errors.approveFailed');
         }
       });
   }
@@ -473,7 +487,9 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
     }
 
     if (!this.rejectionReason.trim()) {
-      this.errorMessage = 'Please provide a reason for decline.';
+      this.errorMessage = this.translationService.translate(
+        'contentCreatorObjectForm.review.errors.declineReasonRequired',
+      );
       return;
     }
 
@@ -494,7 +510,9 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
           this.router.navigate(['/manager/objects']);
         },
         error: (error) => {
-          this.errorMessage = error?.error?.message ?? 'Failed to decline object.';
+          this.errorMessage =
+            error?.error?.message ??
+            this.translationService.translate('contentCreatorObjectForm.review.errors.declineFailed');
         }
       });
   }
@@ -615,7 +633,10 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
 
     const remainingSlots = this.maxImageCount - this.editableImageUrls.length;
     if (remainingSlots <= 0) {
-      this.galleryErrorMessage = `You can upload up to ${this.maxImageCount} images per object.`;
+      this.galleryErrorMessage = this.translationService.translate(
+        'contentCreatorObjectForm.errors.maxImages',
+        { count: this.maxImageCount },
+      );
       input.value = '';
       return;
     }
@@ -637,9 +658,15 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
     }
 
     if (duplicateNames.length > 0) {
-      this.galleryErrorMessage = `Duplicate image(s) skipped: ${duplicateNames.join(', ')}`;
+      this.galleryErrorMessage = this.translationService.translate(
+        'contentCreatorObjectForm.errors.duplicateImages',
+        { names: duplicateNames.join(', ') },
+      );
     } else if (acceptedFiles.length < selectedFiles.length) {
-      this.galleryErrorMessage = `Only the first ${remainingSlots} images were added. Each object can have up to ${this.maxImageCount} images.`;
+      this.galleryErrorMessage = this.translationService.translate(
+        'contentCreatorObjectForm.errors.partialImages',
+        { accepted: remainingSlots, count: this.maxImageCount },
+      );
     } else {
       this.galleryErrorMessage = '';
     }
@@ -846,14 +873,18 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
     }
 
     if (this.editableImageUrls.length === 0) {
-      this.galleryErrorMessage = 'At least one image is required before saving.';
+      this.galleryErrorMessage = this.translationService.translate(
+        'contentCreatorObjectForm.errors.imageRequired',
+      );
       return;
     }
 
     const destinationId = this.form.controls.destinationId.value ?? undefined;
     const localityId = this.form.controls.localityId.value ?? undefined;
     if (!destinationId && !localityId) {
-      this.locationErrorMessage = 'Please choose a destination or locality.';
+      this.locationErrorMessage = this.translationService.translate(
+        'contentCreatorObjectForm.errors.destinationRequired',
+      );
       return;
     }
 
@@ -895,7 +926,8 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
           this.router.navigate(['/content-creator/objects']);
         },
         error: (error) => {
-          this.errorMessage = error?.error?.message ?? 'Failed to save object.';
+          this.errorMessage =
+            error?.error?.message ?? this.translationService.translate('contentCreatorObjectForm.errors.saveFailed');
         }
       });
   }
@@ -1089,7 +1121,9 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
         this.loadCcPreviewReviews(merged.id);
       },
       error: (error) => {
-        this.errorMessage = error?.error?.message ?? 'Failed to load object details.';
+        this.errorMessage =
+          error?.error?.message ??
+          this.translationService.translate('contentCreatorObjectForm.errors.loadFailed');
         this.previewReviews = [];
         this.isLoadingPreviewReviews = false;
       }
