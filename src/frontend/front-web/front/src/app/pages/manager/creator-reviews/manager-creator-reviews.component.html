@@ -143,7 +143,7 @@
             <p class="queue-snippet">{{ thread.touristReview }}</p>
             <div class="queue-meta">
               <span>{{ thread.objectName }}</span>
-              <span class="queue-stars">{{ ratingStars(thread.rating) }}</span>
+              <span class="stars-filled">{{ filledStars(thread.rating) }}</span><span class="stars-empty">{{ emptyStars(thread.rating) }}</span>
             </div>
             <span class="creator-tag">Creator: {{ thread.creatorName }}</span>
           </article>
@@ -194,7 +194,7 @@
               <div class="message-meta">
                 <strong>{{ selectedThread.touristName }}</strong>
                 <span>Tourist · {{ formatDate(selectedThread.createdAt) }}</span>
-                <span class="stars">{{ ratingStars(selectedThread.rating) }}</span>
+                <span class="stars-filled">{{ filledStars(selectedThread.rating) }}</span><span class="stars-empty">{{ emptyStars(selectedThread.rating) }}</span>
               </div>
               <p class="message-text">{{ selectedThread.touristReview }}</p>
             </div>

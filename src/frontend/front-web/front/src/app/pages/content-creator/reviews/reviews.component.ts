@@ -423,6 +423,15 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
     return '\u2605'.repeat(clamped) + '\u2606'.repeat(5 - clamped);
   }
 
+  filledStars(rating: number): string {
+    return '\u2605'.repeat(Math.max(0, Math.min(5, Math.round(Number(rating) || 0))));
+  }
+
+  emptyStars(rating: number): string {
+    const n = Math.max(0, Math.min(5, Math.round(Number(rating) || 0)));
+    return '\u2606'.repeat(5 - n);
+  }
+
   private loadSelectedObjectDetails(objectId: number): void {
     this.objectService.getById(objectId).subscribe({
       next: (objectDetails) => {

@@ -96,7 +96,7 @@
                 </span>
               </div>
               <p class="queue-item-preview">{{ review.text }}</p>
-              <small>{{ review.objectName }} • {{ review.rating }}/5</small>
+              <small>{{ review.objectName }} <span class="stars-filled">{{ filledStars(review.rating) }}</span><span class="stars-empty">{{ emptyStars(review.rating) }}</span></small>
             </article>
           }
         </div>
@@ -140,7 +140,7 @@
 
           <div class="reviewed-item">
             <span>Reviewing item</span>
-            <h4>{{ selectedReview.objectName }}</h4>
+            <h4>{{ selectedReview.objectName }} <span class="stars-filled">{{ filledStars(selectedReview.rating) }}</span><span class="stars-empty">{{ emptyStars(selectedReview.rating) }}</span></h4>
           </div>
 
           <p class="review-text">{{ selectedReview.text }}</p>

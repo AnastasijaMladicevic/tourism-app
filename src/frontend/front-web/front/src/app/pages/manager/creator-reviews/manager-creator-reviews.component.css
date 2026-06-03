@@ -443,11 +443,6 @@
   align-items: center;
 }
 
-.queue-stars {
-  color: #f59e0b;
-  letter-spacing: 1px;
-  font-size: 12px;
-}
 
 .creator-tag {
   display: inline-block;
@@ -623,8 +618,13 @@
   font-size: 14px;
 }
 
-.stars {
-  color: #f59e0b;
+.stars-filled {
+  color: #f59e0b !important;
+  letter-spacing: 1px;
+}
+
+.stars-empty {
+  color: #d1d5db !important;
   letter-spacing: 1px;
 }
 

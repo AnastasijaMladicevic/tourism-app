@@ -346,6 +346,17 @@
   font-size: 11px;
 }
 
+.stars-filled {
+  color: #f59e0b !important;
+  letter-spacing: 1px;
+}
+
+.stars-empty {
+  color: #d1d5db !important;
+  letter-spacing: 1px;
+}
+
+
 .status {
   font-size: 10px;
   border-radius: 999px;

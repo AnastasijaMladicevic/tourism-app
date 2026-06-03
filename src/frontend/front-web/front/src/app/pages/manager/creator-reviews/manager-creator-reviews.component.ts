@@ -410,6 +410,14 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
     return '\u2605'.repeat(clamped) + '\u2606'.repeat(5 - clamped);
   }
 
+  filledStars(rating: number): string {
+    return '\u2605'.repeat(Math.max(0, Math.min(5, rating)));
+  }
+
+  emptyStars(rating: number): string {
+    return '\u2606'.repeat(5 - Math.max(0, Math.min(5, rating)));
+  }
+
   trackByThreadId(_: number, thread: ManagerReviewThread): number {
     return thread.id;
   }

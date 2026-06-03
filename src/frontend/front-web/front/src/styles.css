@@ -3,6 +3,16 @@
    src/styles.css
    ===================================================== */
 
+.stars-filled {
+  color: #f59e0b;
+  letter-spacing: 1px;
+}
+
+.stars-empty {
+  color: #d1d5db;
+  letter-spacing: 1px;
+}
+
 .inline-field-error {
   margin-top: 6px;
   margin-bottom: 0;
