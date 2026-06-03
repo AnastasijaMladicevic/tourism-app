@@ -43,7 +43,7 @@ export class ObjectsComponent implements OnInit, OnDestroy {
   searchQuery = '';
   activeFilter = 'All';
   minRatingFilter = 0;
-  sortOption: 'rating' | 'az' | 'za' | 'distance' = 'rating';
+  sortOption: 'rating' | 'az' | 'za' | 'distance' = 'az';
   showSortMenu = false;
   showPageSizeMenu = false;
   showLocationModal = false;
@@ -213,7 +213,7 @@ export class ObjectsComponent implements OnInit, OnDestroy {
       this.searchQuery = state.searchQuery ?? '';
       this.activeFilter = state.activeFilter ?? 'All';
       this.minRatingFilter = state.minRatingFilter ?? 0;
-      this.sortOption = state.sortOption ?? 'rating';
+      this.sortOption = state.sortOption ?? 'az';
       this.currentPage = state.currentPage ?? 1;
       this.pageSize = state.pageSize ?? 8;
 
@@ -228,7 +228,7 @@ export class ObjectsComponent implements OnInit, OnDestroy {
     if (!raw) return;
     try {
       const state = JSON.parse(raw) as { sortOption?: string };
-      const valid: Array<typeof this.sortOption> = ['rating', 'az', 'za', 'distance'];
+      const valid: Array<typeof this.sortOption> = ['rating', 'az', 'za'];
       if (state.sortOption && valid.includes(state.sortOption as typeof this.sortOption)) {
         this.sortOption = state.sortOption as typeof this.sortOption;
       }

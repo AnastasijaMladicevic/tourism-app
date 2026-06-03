@@ -76,7 +76,7 @@ export class EventsComponent implements OnInit, OnDestroy {
   showPageSizeMenu = false;
   showLocationModal = false;
   searchQuery = '';
-  sortOption: 'date' | 'az' | 'za' | 'distance' | 'price' = 'date';
+  sortOption: 'date' | 'az' | 'za' | 'distance' | 'price' = 'az';
   events: EventCard[] = [];
   visibleEvents: EventCard[] = [];
   currentPage = 1;
@@ -152,7 +152,7 @@ export class EventsComponent implements OnInit, OnDestroy {
       this.searchQuery = state.searchQuery ?? '';
       this.activeFilter = state.activeFilter ?? 'All';
       this.activeCategory = state.activeCategory ?? 'All';
-      this.sortOption = state.sortOption ?? 'date';
+      this.sortOption = state.sortOption ?? 'az';
       this.currentPage = state.currentPage ?? 1;
       this.pageSize = state.pageSize ?? 8;
     } catch {
@@ -165,7 +165,7 @@ export class EventsComponent implements OnInit, OnDestroy {
     if (!raw) return;
     try {
       const state = JSON.parse(raw) as { sortOption?: string };
-      const valid: Array<typeof this.sortOption> = ['date', 'az', 'za', 'distance', 'price'];
+      const valid: Array<typeof this.sortOption> = ['date', 'az', 'za', 'price'];
       if (state.sortOption && valid.includes(state.sortOption as typeof this.sortOption)) {
         this.sortOption = state.sortOption as typeof this.sortOption;
       }

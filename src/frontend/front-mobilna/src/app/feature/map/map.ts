@@ -414,7 +414,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       sessionStorage.setItem(this.GPS_CONSENT_PENDING_KEY, '1');
     }
     void this.router.navigate(['/location-settings'], {
-      queryParams: { locationConsent: '1' },
+      queryParams: { locationConsent: '1', returnUrl: '/map' },
     });
   }
 

@@ -216,7 +216,7 @@ export class LocalitiesComponent implements OnInit, OnDestroy {
     if (!raw) return;
     try {
       const state = JSON.parse(raw) as { sortOption?: string };
-      const valid: Array<typeof this.sortOption> = ['az', 'za', 'distance'];
+      const valid: Array<typeof this.sortOption> = ['az', 'za'];
       if (state.sortOption && valid.includes(state.sortOption as typeof this.sortOption)) {
         this.sortOption = state.sortOption as typeof this.sortOption;
       }
