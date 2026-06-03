@@ -57,23 +57,6 @@ interface NominatimReverseResponse {
   display_name?: string;
 }
 
-interface DraftPayload {
-  values: {
-    name: string;
-    description: string;
-    activityTypeId: number | null;
-    fallbackActivityTypeId: number | null;
-    destinationId: number | null;
-    localityId: number | null;
-    objectId: number | null;
-    price: number | null;
-    durationMinutes: number | null;
-    latitude: number | null;
-    longitude: number | null;
-    isVisible: boolean;
-  };
-}
-
 @Component({
   selector: 'app-activity-create',
   standalone: true,
@@ -142,7 +125,6 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
   private deletionRequestSubmitted = false;
   private readonly maxImageCount = 8;
 
-  private readonly draftKey = 'content-creator:add-activity-draft';
   private geocodeRequestId = 0;
   private forwardGeocodeRequestId = 0;
 
@@ -167,10 +149,6 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
     if (Number.isFinite(idFromRoute) && idFromRoute > 0) {
       this.isEditMode = true;
       this.activityId = idFromRoute;
-    }
-
-    if (!this.isEditMode) {
-      this.loadDraft();
     }
 
     this.loadOptions();
@@ -405,20 +383,6 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
       });
   }
 
-  saveDraft(): void {
-    if (this.isEditMode) {
-      return;
-    }
-
-    const payload: DraftPayload = {
-      values: this.form.getRawValue()
-    };
-
-    localStorage.setItem(this.draftKey, JSON.stringify(payload));
-    this.successMessage = 'Draft saved.';
-    this.errorMessage = '';
-  }
-
   cancel(): void {
     this.router.navigate(['/content-creator/activities']);
   }
@@ -469,9 +433,9 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
         switchMap((createdActivity) =>
           this.isEditMode && this.activityId
             ? this.syncImagesAfterSave(this.activityId, this.imageUrls, this.imagesSnapshot).pipe(
-                map(() => ({ createdActivity, imageUploadFailed: false })),
-                catchError(() => of({ createdActivity, imageUploadFailed: true }))
-              )
+              map(() => ({ createdActivity, imageUploadFailed: false })),
+              catchError(() => of({ createdActivity, imageUploadFailed: true }))
+            )
             : this.attachImagesAfterCreate(createdActivity)
         ),
         finalize(() => {
@@ -480,7 +444,6 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
       )
       .subscribe({
         next: ({ imageUploadFailed }) => {
-          localStorage.removeItem(this.draftKey);
           this.successMessage = imageUploadFailed
             ? `Activity ${this.isEditMode ? 'updated' : 'created'}, but some images could not be attached.`
             : `Activity ${this.isEditMode ? 'updated' : 'created'} successfully.`;
@@ -727,9 +690,9 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
       toDelete.length === 0
         ? of(undefined)
         : forkJoin(toDelete.map((image) => this.activitiesService.deleteImageById(image.id))).pipe(
-            map(() => undefined),
-            catchError(() => of(undefined))
-          );
+          map(() => undefined),
+          catchError(() => of(undefined))
+        );
 
     return delete$.pipe(
       switchMap(() => this.uploadPendingImages(activityId, desired, surviving.length, urlToId)),
@@ -803,23 +766,6 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
       if (!objectMatches) {
         this.form.controls.objectId.setValue(null, { emitEvent: false });
       }
-    }
-  }
-
-  private loadDraft(): void {
-    const raw = localStorage.getItem(this.draftKey);
-    if (!raw) {
-      return;
-    }
-
-    try {
-      const draft = JSON.parse(raw) as DraftPayload;
-
-      if (draft.values) {
-        this.form.patchValue(draft.values);
-      }
-    } catch {
-      localStorage.removeItem(this.draftKey);
     }
   }
 

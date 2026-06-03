@@ -1,13 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { finalize } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
 
 type ForgotPasswordStep = 'email' | 'code' | 'password' | 'success';
-
-const FORGOT_PASSWORD_DEMO_MODE = true;
 
 @Component({
   selector: 'app-forgot-password',
@@ -20,8 +18,7 @@ export class ForgotPasswordComponent {
   private readonly fb = inject(FormBuilder);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
-
-  readonly demoMode = FORGOT_PASSWORD_DEMO_MODE;
+  private readonly cdr = inject(ChangeDetectorRef);
 
   readonly emailForm = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
@@ -64,15 +61,6 @@ export class ForgotPasswordComponent {
   }
 
   submitEmailStep(): void {
-    if (this.demoMode) {
-      this.errorMessage = '';
-      this.resetEmail = this.email?.value?.trim() || 'demo@spirego.com';
-      this.step = 'code';
-      this.message = 'Demo mode: enter any code to continue.';
-      this.codeForm.reset();
-      return;
-    }
-
     if (this.emailForm.invalid || this.isLoading) {
       this.emailForm.markAllAsTouched();
       return;
@@ -95,24 +83,17 @@ export class ForgotPasswordComponent {
           this.step = 'code';
           this.message = 'A verification code has been sent to your email.';
           this.codeForm.reset();
+          this.cdr.detectChanges();
         },
         error: (error: any) => {
           this.errorMessage = error?.error?.message ?? 'Unable to send reset code.';
+          this.step = 'email';
+          this.cdr.detectChanges();
         },
       });
   }
 
   submitCodeStep(): void {
-    if (this.demoMode) {
-      this.errorMessage = '';
-      this.message = '';
-      this.resetCode = this.code?.value?.trim() || '000000';
-      this.resetSessionToken = 'demo-reset-session';
-      this.step = 'password';
-      this.passwordForm.reset();
-      return;
-    }
-
     if (this.codeForm.invalid || this.isLoading) {
       this.codeForm.markAllAsTouched();
       return;
@@ -130,25 +111,28 @@ export class ForgotPasswordComponent {
         this.isLoading = false;
       }))
       .subscribe({
-        next: (response: { resetSessionToken?: string; ResetSessionToken?: string }) => {
+        next: (response: { resetSessionToken?: string; ResetSessionToken?: string; token?: string } | string) => {
+          const resetSessionToken = this.extractResetSessionToken(response);
+
+          if (!resetSessionToken) {
+            this.errorMessage = 'Reset session token was not returned. Please request a new code.';
+            return;
+          }
+
           this.resetCode = code;
-          this.resetSessionToken =
-            response.resetSessionToken ?? response.ResetSessionToken ?? '';
+          this.resetSessionToken = resetSessionToken;
           this.step = 'password';
           this.passwordForm.reset();
+          this.cdr.detectChanges();
         },
         error: (error: any) => {
           this.errorMessage = error?.error?.message ?? 'Invalid or expired reset code.';
+          this.cdr.detectChanges();
         },
       });
   }
 
   submitPasswordStep(): void {
-    if (this.demoMode) {
-      this.router.navigateByUrl('/login');
-      return;
-    }
-
     if (this.passwordForm.invalid || this.isLoading) {
       this.passwordForm.markAllAsTouched();
       return;
@@ -164,6 +148,14 @@ export class ForgotPasswordComponent {
 
     if (!/[A-Z]/.test(newPassword) || !/[\d\W]/.test(newPassword)) {
       this.errorMessage = 'Password must include one uppercase letter and one number or symbol.';
+      return;
+    }
+
+    if (!this.resetEmail || !this.resetCode || !this.resetSessionToken) {
+      this.errorMessage = 'Reset session expired. Please request a new code.';
+      this.step = 'email';
+      this.codeForm.reset();
+      this.passwordForm.reset();
       return;
     }
 
@@ -186,9 +178,11 @@ export class ForgotPasswordComponent {
         next: () => {
           this.step = 'success';
           this.message = 'Your password has been reset successfully.';
+          this.cdr.detectChanges();
         },
         error: (error: any) => {
           this.errorMessage = error?.error?.message ?? 'Unable to reset password.';
+          this.cdr.detectChanges();
         },
       });
   }
@@ -217,5 +211,19 @@ export class ForgotPasswordComponent {
 
   goToLogin(): void {
     this.router.navigateByUrl('/login');
+  }
+
+  private extractResetSessionToken(
+    response: { resetSessionToken?: string; ResetSessionToken?: string; token?: string } | string | null | undefined,
+  ): string {
+    if (!response) {
+      return '';
+    }
+
+    if (typeof response === 'string') {
+      return response;
+    }
+
+    return response.resetSessionToken ?? response.ResetSessionToken ?? response.token ?? '';
   }
 }

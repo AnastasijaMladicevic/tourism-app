@@ -699,6 +699,7 @@
       }
     }
   },
+<<<<<<< HEAD
   "adminDestinations": {
     "title": "Destinazioni",
     "subtitle": "Organizza le destinazioni regionali, mantieni ordinate le gerarchie delle località e visualizza come ogni destinazione appare sulla piattaforma.",
@@ -1279,6 +1280,25 @@
         "codeExpired": "Il codice di verifica è scaduto. Reinviarlo per continuare."
       }
     }
+=======
+  "adminProfile": {
+    "passwordModalDescription": "Inserisci la password attuale e scegline una nuova.",
+    "currentPasswordLabel": "Password attuale",
+    "showCurrentPassword": "Mostra password attuale",
+    "hideCurrentPassword": "Nascondi password attuale",
+    "changePasswordBtn": "Cambia password",
+    "savingBtn": "Salvataggio...",
+    "passwordChangedSuccess": "La password è stata cambiata con successo.",
+    "forgotPasswordLink": "Password dimenticata?",
+    "forgotOtpDescription": "Un codice di verifica è stato inviato alla tua email. Inseriscilo qui sotto.",
+    "forgotPasswordDescription": "Codice verificato. Scegli una nuova password per il tuo account.",
+    "codeExpiresIn": "Il codice scade tra",
+    "verifyCodeBtn": "Verifica codice",
+    "verifyingBtn": "Verifica in corso...",
+    "setNewPasswordBtn": "Imposta nuova password",
+    "forgotPasswordHeading": "Verifica codice",
+    "setPasswordHeading": "Imposta nuova password"
+>>>>>>> 295-draft-admin-bug
   },
   "__literals": {
     "Settings": "Settings",

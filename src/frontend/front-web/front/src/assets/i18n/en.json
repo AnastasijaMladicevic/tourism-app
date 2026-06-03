@@ -699,6 +699,7 @@
       }
     }
   },
+<<<<<<< HEAD
   "adminDestinations": {
     "title": "Destinations",
     "subtitle": "Curate regional destinations, keep locality hierarchies organized, and preview how each destination appears across the platform.",
@@ -1323,6 +1324,25 @@
         "codeExpired": "The verification code has expired. Resend it to continue."
       }
     }
+=======
+  "adminProfile": {
+    "passwordModalDescription": "Enter your current password and choose a new one.",
+    "currentPasswordLabel": "Current Password",
+    "showCurrentPassword": "Show current password",
+    "hideCurrentPassword": "Hide current password",
+    "changePasswordBtn": "Change Password",
+    "savingBtn": "Saving...",
+    "passwordChangedSuccess": "Password changed successfully.",
+    "forgotPasswordLink": "Forgot password?",
+    "forgotOtpDescription": "A verification code was sent to your email. Enter it below.",
+    "forgotPasswordDescription": "Code verified. Choose a new password for your account.",
+    "codeExpiresIn": "Code expires in",
+    "verifyCodeBtn": "Verify Code",
+    "verifyingBtn": "Verifying...",
+    "setNewPasswordBtn": "Set New Password",
+    "forgotPasswordHeading": "Verify Code",
+    "setPasswordHeading": "Set New Password"
+>>>>>>> 295-draft-admin-bug
   },
   "__literals": {
     "Settings": "Settings",

@@ -73,7 +73,6 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
   isLoadingRegions = true;
   errorMessage = '';
   galleryErrorMessage = '';
-  draftSavedMessage = '';
   editLockState: DestinationEditLockDto | null = null;
   isEditBlocked = false;
   private savedDestinationId: number | null = null;
@@ -890,23 +889,15 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
     return true;
   }
 
-  onSaveDraft(): void {
-    if (this.isEditBlocked || !this.validateBasics() || this.isSubmitting || this.isDeleting) {
-      return;
-    }
-    this.persist(false);
-  }
-
   onSubmit(): void {
     if (this.isEditBlocked || !this.validateBasics() || this.isSubmitting || this.isDeleting) {
       return;
     }
-    this.persist(true);
+    this.persist();
   }
 
-  private persist(published: boolean): void {
+  private persist(): void {
     this.isSubmitting = true;
-    this.draftSavedMessage = '';
 
     const createPayload: CreateDestinationDto = {
       name: this.form.name.trim(),
@@ -915,7 +906,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
       regionId: this.form.regionId ? Number(this.form.regionId) : undefined,
       latitude: this.form.latitude != null ? Number(this.form.latitude) : undefined,
       longitude: this.form.longitude != null ? Number(this.form.longitude) : undefined,
-      isActive: published,
+      isActive: true,
       managedByUserId: this.selectedManager?.id
     };
 
@@ -979,23 +970,10 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
             if (!out.imageUploadFailed) {
               this.resetPendingImages();
             }
-            if (published) {
-              this.router.navigate(['/admin/destinations']);
-              return;
-            }
-            this.errorMessage = 'assignError' in out ? out.assignError : this.t('adminDestinationForm.errors.assignManagerFailed');
-            this.draftSavedMessage = this.t('adminDestinationForm.draftSavedFixManager');
-            return;
-          }
-          if (published) {
             this.router.navigate(['/admin/destinations']);
             return;
           }
-          this.form.isActive = false;
-          this.resetPendingImages();
-          this.draftSavedMessage = out.imageUploadFailed
-            ? this.t('adminDestinationForm.draftSavedImageWarning')
-            : this.t('adminDestinationForm.draftSaved');
+          this.router.navigate(['/admin/destinations']);
         },
         error: (err) => {
           const lockState = this.extractLockState(err);

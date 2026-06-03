@@ -364,7 +364,7 @@ div.state-banner {
 }
 
 .section-link:hover {
-  text-decoration: underline;
+  text-decoration: none;
 }
 
 .chart-legend {
@@ -517,6 +517,20 @@ div.state-banner {
   font-size: 24px;
 }
 
+.rating-stars .filled {
+  font-variation-settings: 'FILL' 1;
+  color: #f59e0b;
+}
+
+.rating-stars .half {
+  font-variation-settings: 'FILL' 1;
+  color: #f59e0b;
+}
+
+.rating-stars .empty {
+  font-variation-settings: 'FILL' 0;
+  color: #f59e0b;
+}
 .rating-note {
   margin: 0;
 }
@@ -718,7 +732,7 @@ div.state-banner {
 .dashboard-item-link:hover,
 .dashboard-item-link:focus-visible {
   color: #1976d2;
-  text-decoration: underline;
+  text-decoration: none;
 }
 
 .dashboard-item-link--heading {

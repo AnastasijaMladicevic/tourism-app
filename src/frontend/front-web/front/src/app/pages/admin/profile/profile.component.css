@@ -1474,12 +1474,38 @@
   color: #1d4ed8;
 }
 
+.modal-message--success {
+  border: 1px solid #bbf7d0;
+  background: #f0fdf4;
+  color: #15803d;
+}
+
 .password-modal__footer {
   display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: 12px;
   padding: 0 24px 24px;
+}
+
+.modal-footer-start {
+  flex: 1;
+}
+
+.modal-forgot-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 13px;
+  color: #2563eb;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.modal-forgot-link:disabled {
+  color: #94a3b8;
+  cursor: default;
 }
 
 .modal-secondary-btn,

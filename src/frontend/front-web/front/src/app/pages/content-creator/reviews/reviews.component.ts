@@ -299,28 +299,6 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
     this.loadSelectedObjectDetails(review.objectId);
   }
 
-  saveDraft(): void {
-    if (!this.selectedReview) {
-      return;
-    }
-
-    const key = this.getDraftKey(this.selectedReview.id);
-    localStorage.setItem(key, this.responseText);
-    this.successMessage = 'Draft saved locally.';
-    this.errorMessage = '';
-  }
-
-  restoreDraft(): void {
-    if (!this.selectedReview) {
-      return;
-    }
-
-    const draft = localStorage.getItem(this.getDraftKey(this.selectedReview.id));
-    if (draft != null) {
-      this.responseText = draft;
-    }
-  }
-
   sendResponse(): void {
     if (!this.selectedReview || this.isSubmitting) {
       return;
@@ -441,7 +419,8 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
   }
 
   ratingStars(rating: number): string {
-    return '★'.repeat(Math.max(0, Math.min(5, rating))) + '☆'.repeat(Math.max(0, 5 - rating));
+    const clamped = Math.max(0, Math.min(5, Math.round(Number(rating) || 0)));
+    return '\u2605'.repeat(clamped) + '\u2606'.repeat(5 - clamped);
   }
 
   private loadSelectedObjectDetails(objectId: number): void {

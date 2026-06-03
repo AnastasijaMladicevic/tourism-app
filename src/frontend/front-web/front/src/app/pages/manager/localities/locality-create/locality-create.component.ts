@@ -45,12 +45,10 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
   isLoadingLocalityTypes = true;
   errorMessage = '';
   galleryErrorMessage = '';
-  draftSavedMessage = '';
   showTipsModal = false;
   showDeleteConfirmModal = false;
   showDeleteSuccessModal = false;
   isDeleting = false;
-  private readonly draftStorageKey = 'manager-locality-create-draft';
   private deleteRedirectTimeoutId: ReturnType<typeof setTimeout> | null = null;
   private readonly maxImageCount = 8;
 
@@ -79,10 +77,6 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
     const parsedId = idParam ? Number(idParam) : NaN;
     this.isEditMode = Number.isInteger(parsedId) && parsedId > 0;
     this.localityId = this.isEditMode ? parsedId : null;
-
-    if (!this.isEditMode) {
-      this.loadDraft();
-    }
 
     this.loadOptions();
 
@@ -271,7 +265,6 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
     }
 
     this.errorMessage = '';
-    this.draftSavedMessage = '';
     this.isDeleting = true;
     this.showDeleteConfirmModal = false;
 
@@ -297,20 +290,6 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
 
   closeTipsModal(): void {
     this.showTipsModal = false;
-  }
-
-  onSaveDraft(): void {
-    if (this.isEditMode) {
-      this.draftSavedMessage = 'Draft is only available for new localities.';
-      return;
-    }
-
-    const draft = {
-      form: this.form,
-      primaryImageIndex: this.primaryImageIndex
-    };
-    localStorage.setItem(this.draftStorageKey, JSON.stringify(draft));
-    this.draftSavedMessage = 'Draft saved.';
   }
 
   onPickImages(input: HTMLInputElement): void {
@@ -499,33 +478,6 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
           .sort((a, b) => Number(b.isMain) - Number(a.isMain) || a.id - b.id);
         this.cdr.detectChanges();
       });
-  }
-
-  private loadDraft(): void {
-    const raw = localStorage.getItem(this.draftStorageKey);
-    if (!raw) {
-      return;
-    }
-
-    try {
-      const draft = JSON.parse(raw) as {
-        form?: Partial<CreateLocalityDto>;
-        primaryImageIndex?: number;
-      };
-
-      if (draft.form) {
-        this.form = {
-          ...this.form,
-          ...draft.form
-        };
-      }
-
-      if (typeof draft.primaryImageIndex === 'number' && draft.primaryImageIndex >= 0) {
-        this.primaryImageIndex = draft.primaryImageIndex;
-      }
-    } catch {
-      // Ignore corrupted draft payload.
-    }
   }
 
 }

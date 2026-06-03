@@ -699,6 +699,7 @@
       }
     }
   },
+<<<<<<< HEAD
   "adminDestinations": {
     "title": "Destinacije",
     "subtitle": "Uređujte regionalne destinacije, održavajte hijerarhiju lokaliteta i pregledajte kako se svaka destinacija prikazuje na platformi.",
@@ -1279,6 +1280,25 @@
         "codeExpired": "Verifikacioni kod je istekao. Pošalji ga ponovo da nastaviš."
       }
     }
+=======
+  "adminProfile": {
+    "passwordModalDescription": "Unesi trenutnu lozinku i izaberi novu.",
+    "currentPasswordLabel": "Trenutna lozinka",
+    "showCurrentPassword": "Prikaži trenutnu lozinku",
+    "hideCurrentPassword": "Sakrij trenutnu lozinku",
+    "changePasswordBtn": "Promeni lozinku",
+    "savingBtn": "Čuvanje...",
+    "passwordChangedSuccess": "Lozinka je uspešno promenjena.",
+    "forgotPasswordLink": "Zaboravili ste lozinku?",
+    "forgotOtpDescription": "Verifikacioni kod je poslat na vaš mejl. Unesite ga ispod.",
+    "forgotPasswordDescription": "Kod je potvrđen. Izaberite novu lozinku za nalog.",
+    "codeExpiresIn": "Kod ističe za",
+    "verifyCodeBtn": "Potvrdi kod",
+    "verifyingBtn": "Provera...",
+    "setNewPasswordBtn": "Postavi novu lozinku",
+    "forgotPasswordHeading": "Potvrdi kod",
+    "setPasswordHeading": "Postavi novu lozinku"
+>>>>>>> 295-draft-admin-bug
   },
   "__literals": {
     "Settings": "Podešavanja",

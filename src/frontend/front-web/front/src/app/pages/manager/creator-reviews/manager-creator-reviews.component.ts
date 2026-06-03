@@ -361,7 +361,7 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
 
   ratingStars(rating: number): string {
     const clamped = Math.max(0, Math.min(5, rating));
-    return '★'.repeat(clamped) + '☆'.repeat(5 - clamped);
+    return '\u2605'.repeat(clamped) + '\u2606'.repeat(5 - clamped);
   }
 
   trackByThreadId(_: number, thread: ManagerReviewThread): number {

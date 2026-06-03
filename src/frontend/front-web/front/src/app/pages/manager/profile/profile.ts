@@ -5,17 +5,16 @@ import { Router, RouterModule } from '@angular/router';
 import { MatIcon } from '@angular/material/icon';
 import { ImageCropperComponent, ImageCroppedEvent } from 'ngx-image-cropper';
 import { environment } from '../../../../environment/environment';
-import { AuthService, UpdateUserDto } from '../../../services/auth.service';
+import { AuthService, UpdateUserDto, ChangePasswordDto } from '../../../services/auth.service';
 import { UserDto } from '../../../models/user.model';
 import { TranslationService } from '../../../services/translation.service';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
+import { timeout } from 'rxjs';
 type PermissionItem = {
   labelKey: string;
   detailKey: string;
   icon: string;
 };
-
-type PasswordChangeStep = 'credentials' | 'otp';
 
 type ModalState = 'closed' | 'opening' | 'open' | 'closing';
 
@@ -87,9 +86,9 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
   saveSuccess = false;
   permissionsModalState: ModalState = 'closed';
   passwordModalState: ModalState = 'closed';
-  passwordChangeStep: PasswordChangeStep = 'credentials';
+  passwordChangeMode: 'direct' | 'forgot-otp' | 'forgot-password' = 'direct';
   passwordError = '';
-  passwordInfo = '';
+  passwordSuccess = false;
   passwordLoading = false;
   currentPassword = '';
   newPassword = '';
@@ -98,7 +97,6 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
   hideNewPassword = true;
   hideConfirmNewPassword = true;
   otpCode = '';
-  otpDemoCode = '';
   otpSecondsRemaining = 0;
   otpResendSecondsRemaining = 0;
   languageMenuOpen = false;
@@ -106,10 +104,11 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
 
   private cropPreviewUrl: string | null = null;
   private pendingCroppedBlob: Blob | null = null;
-  private otpExpiryTimerId: number | null = null;
-  private otpResendTimerId: number | null = null;
   private permissionsModalCloseTimerId: number | null = null;
   private passwordModalCloseTimerId: number | null = null;
+  private otpExpiryTimerId: number | null = null;
+  private otpResendTimerId: number | null = null;
+  private forgotResetSessionToken = '';
 
   private static readonly OTP_EXPIRY_SECONDS = 300;
   private static readonly OTP_RESEND_SECONDS = 30;
@@ -144,7 +143,7 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.revokeCropPreviewUrl();
     this.clearPermissionsModalTimer();
-    this.clearPasswordTimers();
+    this.clearOtpTimers();
     this.unlockBodyScroll();
   }
 
@@ -316,12 +315,12 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
   }
 
   resetPassword(): void {
-    if (!this.user.email || this.passwordModalState !== 'closed') return;
+    if (this.passwordModalState !== 'closed') return;
 
     this.passwordModalState = 'opening';
-    this.passwordChangeStep = 'credentials';
+    this.passwordChangeMode = 'direct';
     this.passwordError = '';
-    this.passwordInfo = '';
+    this.passwordSuccess = false;
     this.passwordLoading = false;
     this.currentPassword = '';
     this.newPassword = '';
@@ -330,10 +329,10 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
     this.hideNewPassword = true;
     this.hideConfirmNewPassword = true;
     this.otpCode = '';
-    this.otpDemoCode = '';
     this.otpSecondsRemaining = 0;
     this.otpResendSecondsRemaining = 0;
-    this.clearPasswordTimers();
+    this.forgotResetSessionToken = '';
+    this.clearOtpTimers();
     this.lockBodyScroll();
 
     window.setTimeout(() => {
@@ -379,8 +378,7 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
 
     this.passwordModalState = 'closing';
     this.passwordError = '';
-    this.passwordInfo = '';
-    this.clearPasswordTimers();
+    this.clearOtpTimers();
 
     if (this.passwordModalCloseTimerId) {
       window.clearTimeout(this.passwordModalCloseTimerId);
@@ -388,14 +386,15 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
 
     this.passwordModalCloseTimerId = window.setTimeout(() => {
       this.passwordModalState = 'closed';
-      this.passwordChangeStep = 'credentials';
+      this.passwordChangeMode = 'direct';
       this.currentPassword = '';
       this.newPassword = '';
       this.confirmNewPassword = '';
       this.otpCode = '';
-      this.otpDemoCode = '';
       this.otpSecondsRemaining = 0;
       this.otpResendSecondsRemaining = 0;
+      this.forgotResetSessionToken = '';
+      this.passwordSuccess = false;
       this.releaseBodyScrollIfNoModal();
       this.passwordModalCloseTimerId = null;
     }, 220);
@@ -467,10 +466,9 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
     if (this.passwordLoading) return;
 
     this.passwordError = '';
-    this.passwordInfo = '';
 
-    if (!this.currentPassword.trim()) {
-      this.passwordError = 'Current password is required.';
+    if (!this.currentPassword) {
+      this.passwordError = 'Enter your current password.';
       return;
     }
 
@@ -489,70 +487,160 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
       return;
     }
 
-    this.passwordChangeStep = 'otp';
-    this.otpCode = '';
-    this.otpDemoCode = this.generateDemoOtpCode();
-    this.passwordInfo = `Demo verification code: ${this.otpDemoCode}`;
-    this.startOtpCountdown();
+    if (!this.user.id) {
+      this.passwordError = 'User ID is not available.';
+      return;
+    }
+
+    this.passwordLoading = true;
+
+    const dto: ChangePasswordDto = {
+      currentPassword: this.currentPassword,
+      newPassword: this.newPassword,
+      confirmPassword: this.confirmNewPassword,
+    };
+
+    this.authService.changePassword(this.user.id, dto).subscribe({
+      next: () => {
+        this.passwordLoading = false;
+        this.passwordSuccess = true;
+        this.cdr.detectChanges();
+        window.setTimeout(() => this.closePasswordModal(true), 1800);
+      },
+      error: (err) => {
+        this.passwordLoading = false;
+        this.passwordError = err?.error?.message ?? 'Password change failed. Check your current password.';
+        this.cdr.detectChanges();
+      },
+    });
   }
 
-  submitOtpStep(): void {
+  startForgotFlow(): void {
+    if (this.passwordLoading) return;
+
+    if (!this.user.email) {
+      this.passwordError = 'Email address is not available for this account.';
+      return;
+    }
+
+    this.passwordLoading = true;
+    this.passwordError = '';
+    this.cdr.detectChanges();
+
+    this.authService.forgotPassword(this.user.email).pipe(timeout(15000)).subscribe({
+      next: () => {
+        this.passwordLoading = false;
+        this.passwordChangeMode = 'forgot-otp';
+        this.otpCode = '';
+        this.startOtpCountdown();
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.passwordLoading = false;
+        this.passwordError = err?.name === 'TimeoutError'
+          ? 'Request timed out. Check your connection and try again.'
+          : (err?.error?.message ?? 'Unable to send a verification code right now.');
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  submitForgotOtp(): void {
     if (this.passwordLoading) return;
 
     this.passwordError = '';
-    this.passwordInfo = '';
 
     if (!/^\d{6}$/.test(this.otpCode.trim())) {
       this.passwordError = 'Enter the 6-digit verification code.';
       return;
     }
 
-    if (!this.otpDemoCode) {
-      this.passwordError = 'The verification session expired. Resend the code to continue.';
-      return;
-    }
+    this.passwordLoading = true;
 
-    if (this.otpCode.trim() !== this.otpDemoCode) {
-      this.passwordError = 'Invalid verification code.';
-      return;
-    }
+    this.authService.verifyResetCode({ email: this.user.email, code: this.otpCode.trim() }).subscribe({
+      next: (response: { resetSessionToken?: string; ResetSessionToken?: string; token?: string } | string) => {
+        this.forgotResetSessionToken = this.extractResetSessionToken(response);
 
-    const dto = {
-      currentPassword: this.currentPassword,
-      newPassword: this.newPassword,
-      confirmPassword: this.confirmNewPassword,
-    };
+        if (!this.forgotResetSessionToken) {
+          this.passwordLoading = false;
+          this.passwordError = 'Verification failed. Please request a new code.';
+          this.cdr.detectChanges();
+          return;
+        }
 
-    this.showSaveSuccess();
-    this.closePasswordModal(true);
-
-    this.authService.changePassword(this.user.id!, dto).subscribe({
+        this.passwordLoading = false;
+        this.passwordChangeMode = 'forgot-password';
+        this.newPassword = '';
+        this.confirmNewPassword = '';
+        this.clearOtpTimers();
+        this.cdr.detectChanges();
+      },
       error: (err) => {
-        this.passwordError = err?.error?.message ?? err?.error?.title ?? 'Password change failed.';
+        this.passwordLoading = false;
+        this.passwordError = err?.error?.message ?? 'Invalid or expired verification code.';
+        this.cdr.detectChanges();
       },
     });
   }
 
-  resendOtpCode(): void {
-    if (this.passwordLoading || this.otpResendSecondsRemaining > 0) return;
-
-    this.passwordError = '';
-    this.passwordInfo = '';
-    this.otpDemoCode = this.generateDemoOtpCode();
-    this.otpCode = '';
-    this.passwordInfo = `Demo verification code: ${this.otpDemoCode}`;
-    this.startOtpCountdown();
-  }
-
-  backToPasswordStep(): void {
+  submitForgotPassword(): void {
     if (this.passwordLoading) return;
 
-    this.passwordChangeStep = 'credentials';
     this.passwordError = '';
-    this.passwordInfo = '';
+
+    if (this.newPassword.length < 8) {
+      this.passwordError = 'New password must be at least 8 characters long.';
+      return;
+    }
+
+    if (!/[A-Z]/.test(this.newPassword) || !/[\d\W]/.test(this.newPassword)) {
+      this.passwordError = 'New password must include one uppercase letter and one number or symbol.';
+      return;
+    }
+
+    if (this.newPassword !== this.confirmNewPassword) {
+      this.passwordError = 'Passwords do not match.';
+      return;
+    }
+
+    this.passwordLoading = true;
+
+    this.authService.resetPassword(
+      this.user.email!,
+      this.otpCode.trim(),
+      this.newPassword,
+      this.confirmNewPassword,
+      this.forgotResetSessionToken,
+    ).subscribe({
+      next: () => {
+        this.passwordLoading = false;
+        this.passwordSuccess = true;
+        this.cdr.detectChanges();
+        window.setTimeout(() => this.closePasswordModal(true), 1800);
+      },
+      error: (err) => {
+        this.passwordLoading = false;
+        this.passwordError = err?.error?.message ?? 'Password change failed.';
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  resendForgotCode(): void {
+    if (this.passwordLoading || this.otpResendSecondsRemaining > 0) return;
+    this.startForgotFlow();
+  }
+
+  backToDirectMode(): void {
+    if (this.passwordLoading) return;
+
+    this.passwordChangeMode = 'direct';
+    this.passwordError = '';
     this.otpCode = '';
-    this.otpDemoCode = '';
-    this.clearPasswordTimers();
+    this.newPassword = '';
+    this.confirmNewPassword = '';
+    this.forgotResetSessionToken = '';
+    this.clearOtpTimers();
   }
 
   cancel(): void {
@@ -647,56 +735,53 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
   }
 
   private startOtpCountdown(): void {
-    this.clearPasswordTimers();
+    this.clearOtpTimers();
     this.otpSecondsRemaining = ProfileComponentManager.OTP_EXPIRY_SECONDS;
     this.otpResendSecondsRemaining = ProfileComponentManager.OTP_RESEND_SECONDS;
 
     this.otpExpiryTimerId = window.setInterval(() => {
       this.otpSecondsRemaining = Math.max(0, this.otpSecondsRemaining - 1);
-
       if (this.otpSecondsRemaining === 0) {
         this.passwordError = 'The verification code has expired. Resend it to continue.';
-        this.clearOtpExpiryTimer();
+        window.clearInterval(this.otpExpiryTimerId!);
+        this.otpExpiryTimerId = null;
       }
+      this.cdr.detectChanges();
     }, 1000);
 
     this.otpResendTimerId = window.setInterval(() => {
       this.otpResendSecondsRemaining = Math.max(0, this.otpResendSecondsRemaining - 1);
-
       if (this.otpResendSecondsRemaining === 0) {
-        this.clearOtpResendTimer();
+        window.clearInterval(this.otpResendTimerId!);
+        this.otpResendTimerId = null;
       }
+      this.cdr.detectChanges();
     }, 1000);
   }
 
-  private clearPasswordTimers(): void {
-    this.clearOtpExpiryTimer();
-    this.clearOtpResendTimer();
-
-    if (this.passwordModalCloseTimerId !== null) {
-      window.clearTimeout(this.passwordModalCloseTimerId);
-      this.passwordModalCloseTimerId = null;
+  private clearOtpTimers(): void {
+    if (this.otpExpiryTimerId !== null) {
+      window.clearInterval(this.otpExpiryTimerId);
+      this.otpExpiryTimerId = null;
     }
+    if (this.otpResendTimerId !== null) {
+      window.clearInterval(this.otpResendTimerId);
+      this.otpResendTimerId = null;
+    }
+  }
+
+  private extractResetSessionToken(
+    response: { resetSessionToken?: string; ResetSessionToken?: string; token?: string } | string | null | undefined,
+  ): string {
+    if (!response) return '';
+    if (typeof response === 'string') return response;
+    return response.resetSessionToken ?? response.ResetSessionToken ?? response.token ?? '';
   }
 
   private clearPermissionsModalTimer(): void {
     if (this.permissionsModalCloseTimerId !== null) {
       window.clearTimeout(this.permissionsModalCloseTimerId);
       this.permissionsModalCloseTimerId = null;
-    }
-  }
-
-  private clearOtpExpiryTimer(): void {
-    if (this.otpExpiryTimerId !== null) {
-      window.clearInterval(this.otpExpiryTimerId);
-      this.otpExpiryTimerId = null;
-    }
-  }
-
-  private clearOtpResendTimer(): void {
-    if (this.otpResendTimerId !== null) {
-      window.clearInterval(this.otpResendTimerId);
-      this.otpResendTimerId = null;
     }
   }
 
@@ -714,8 +799,4 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
     }
   }
 
-  private generateDemoOtpCode(): string {
-    const code = Math.floor(100000 + Math.random() * 900000);
-    return code.toString();
-  }
 }

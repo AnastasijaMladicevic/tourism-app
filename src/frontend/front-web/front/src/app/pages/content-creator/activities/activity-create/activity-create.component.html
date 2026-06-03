@@ -16,9 +16,6 @@
       }
 
       <button type="button" class="ghost-btn" (click)="cancel()">Cancel</button>
-      @if (!isEditMode) {
-        <button type="button" class="ghost-btn" (click)="saveDraft()">Save Draft</button>
-      }
       <button type="button" class="primary-btn" [disabled]="isSubmitting" (click)="submit()">
         {{ isSubmitting ? (isEditMode ? 'Updating...' : 'Creating...') : (isEditMode ? 'Update Activity' : 'Create Activity') }}
       </button>

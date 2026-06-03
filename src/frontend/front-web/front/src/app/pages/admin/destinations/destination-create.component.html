@@ -11,10 +11,6 @@
         <h1 class="page-title">{{ form.name.trim() || t('adminDestinationForm.newDestination') }}</h1>
       </div>
       <div class="title-actions">
-        <button type="button" class="btn btn-ghost btn-with-icon" (click)="onSaveDraft()" [disabled]="isSubmitting || isDeleting || isLoadingDestination || isEditBlocked || !selectedManager">
-          <span class="material-symbols-outlined">save</span>
-          {{ t('adminDestinationForm.saveDraft') }}
-        </button>
         <button type="button" class="btn btn-primary btn-with-icon" (click)="onSubmit()" [disabled]="isSubmitting || isDeleting || isLoadingDestination || isEditBlocked || !selectedManager">
           <span class="material-symbols-outlined">check_circle</span>
           {{ isSubmitting ? t('common.saving') : isEditMode ? t('common.saveChanges') : t('adminDestinationForm.createDestination') }}
@@ -37,10 +33,6 @@
 
   @if (errorMessage) {
     <div class="alert alert-error" role="alert">{{ errorMessage }}</div>
-  }
-
-  @if (draftSavedMessage) {
-    <div class="alert alert-success" role="status">{{ draftSavedMessage }}</div>
   }
 
   @if (isEditBlocked) {

@@ -229,3 +229,129 @@
     </div>
   </div>
 }
+@if (passwordModalState !== 'closed') {
+  <div
+    class="password-modal-backdrop"
+    [class.password-modal-backdrop--closing]="passwordModalState === 'closing'"
+    (click)="closePasswordModal()"
+  >
+    <div
+      class="password-modal"
+      [class.password-modal--closing]="passwordModalState === 'closing'"
+      (click)="$event.stopPropagation()"
+    >
+      <div class="password-modal__header">
+        <div class="password-modal__heading-copy">
+          <span class="password-modal__eyebrow">Security</span>
+          <h3>Change Password</h3>
+          <p>Enter your current password and choose a new one.</p>
+        </div>
+
+        <button class="password-modal__close" type="button" (click)="closePasswordModal()" aria-label="Close">
+          <mat-icon fontSet="material-icons-outlined">close</mat-icon>
+        </button>
+      </div>
+
+      <div class="password-modal__body">
+        <div class="password-modal__grid">
+          <div class="modal-field modal-field--full">
+            <label class="modal-label" for="current-password">Current Password</label>
+            <div class="modal-input-wrap">
+              <input
+                id="current-password"
+                name="currentPassword"
+                [(ngModel)]="currentPassword"
+                [type]="hideCurrentPassword ? 'password' : 'text'"
+                autocomplete="current-password"
+              />
+              <button
+                class="modal-toggle"
+                type="button"
+                (click)="hideCurrentPassword = !hideCurrentPassword"
+                [attr.aria-label]="hideCurrentPassword ? 'Show current password' : 'Hide current password'"
+              >
+                <mat-icon fontSet="material-icons-outlined">
+                  {{ hideCurrentPassword ? 'visibility' : 'visibility_off' }}
+                </mat-icon>
+              </button>
+            </div>
+          </div>
+
+          <div class="modal-field">
+            <label class="modal-label" for="new-password">New Password</label>
+            <div class="modal-input-wrap">
+              <input
+                id="new-password"
+                name="newPassword"
+                [(ngModel)]="newPassword"
+                [type]="hideNewPassword ? 'password' : 'text'"
+                autocomplete="new-password"
+              />
+              <button
+                class="modal-toggle"
+                type="button"
+                (click)="hideNewPassword = !hideNewPassword"
+                [attr.aria-label]="hideNewPassword ? 'Show new password' : 'Hide new password'"
+              >
+                <mat-icon fontSet="material-icons-outlined">
+                  {{ hideNewPassword ? 'visibility' : 'visibility_off' }}
+                </mat-icon>
+              </button>
+            </div>
+          </div>
+
+          <div class="modal-field modal-field--full">
+            <label class="modal-label" for="confirm-new-password">Confirm New Password</label>
+            <div class="modal-input-wrap">
+              <input
+                id="confirm-new-password"
+                name="confirmNewPassword"
+                [(ngModel)]="confirmNewPassword"
+                [type]="hideConfirmNewPassword ? 'password' : 'text'"
+                autocomplete="new-password"
+              />
+              <button
+                class="modal-toggle"
+                type="button"
+                (click)="hideConfirmNewPassword = !hideConfirmNewPassword"
+                [attr.aria-label]="hideConfirmNewPassword ? 'Show confirm password' : 'Hide confirm password'"
+              >
+                <mat-icon fontSet="material-icons-outlined">
+                  {{ hideConfirmNewPassword ? 'visibility' : 'visibility_off' }}
+                </mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="password-rules">
+          <div class="password-rule">At least 8 characters</div>
+          <div class="password-rule">Include one uppercase letter</div>
+          <div class="password-rule">Include one number or symbol</div>
+        </div>
+
+        @if (passwordError) {
+          <p class="modal-message modal-message--error">{{ passwordError }}</p>
+        }
+      </div>
+
+      <div class="password-modal__footer">
+        <button class="modal-secondary-btn" type="button" (click)="closePasswordModal()" [disabled]="passwordLoading">
+          Cancel
+        </button>
+
+        <button
+          class="modal-primary-btn"
+          type="button"
+          [disabled]="passwordLoading"
+          (click)="submitPasswordStep()"
+        >
+          @if (passwordLoading) {
+            <span class="spinner" aria-hidden="true"></span>
+          }
+          <span>{{ passwordLoading ? 'Saving...' : 'Change Password' }}</span>
+        </button>
+      </div>
+    </div>
+  </div>
+}
