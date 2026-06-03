@@ -160,15 +160,38 @@ export class MapService {
 
   destroyMap(): void {
     if (this.map) {
-      this.map.remove();
-      this.map = null;
+      if (this.clusteringEnabled) {
+        // Full map: detach container immediately so the browser paints the new
+        // route at once, then do all heavy Leaflet cleanup off the main thread.
+        // Safe because 'main-map' is never reused by another component.
+        const mapToDestroy = this.map;
+        const groupsToDestroy = new Map(this.clusterGroups);
+
+        mapToDestroy.getContainer().parentNode?.removeChild(mapToDestroy.getContainer());
+        this.map = null;
+        this.clusterGroups.clear();
+
+        setTimeout(() => {
+          groupsToDestroy.forEach((group) => { group.clearLayers(); group.remove(); });
+          mapToDestroy.off();
+          mapToDestroy.remove();
+        }, 0);
+      } else {
+        // Mini map: synchronous cleanup (lightweight — 1 marker, no clusters).
+        // Cannot defer because ngOnChanges may re-init the same container.
+        this.clusterGroups.forEach((group) => { group.clearLayers(); group.remove(); });
+        this.clusterGroups.clear();
+        this.map.off();
+        this.map.remove();
+        this.map = null;
+      }
     }
 
-    this.clusterGroups.clear();
     this.clusteringEnabled = false;
     this.markers = [];
     this.markerMap.clear();
     this.activeMarkerKey = null;
+    this.activeFilters = [];
     this.routeMarkerKeys.clear();
     this.navigationBearing = 0;
   }

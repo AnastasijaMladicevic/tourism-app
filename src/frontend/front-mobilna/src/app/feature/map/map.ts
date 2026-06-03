@@ -352,8 +352,6 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     this.isDestroyed = true;
     this.routeCalculationVersion++;
-    this.activeFilters = [];
-    this.applyFilters();
     window.removeEventListener('map-marker-clicked', this.handleMapMarkerClicked);
     this.detachViewportListeners();
     this.clearViewportStabilizationTimers();
