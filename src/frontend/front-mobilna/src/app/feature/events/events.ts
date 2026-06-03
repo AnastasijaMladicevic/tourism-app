@@ -397,7 +397,7 @@ export class EventsComponent implements OnInit, OnDestroy {
   }
 
   goBack(): void {
-    this.routerHistory.goBack();
+    this.routerHistory.goBack('/home');
   }
 
   openEvent(id: number): void {

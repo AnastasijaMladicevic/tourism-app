@@ -424,13 +424,6 @@ export class EventDetailComponent implements OnInit, OnDestroy {
   }
 
   goBack(): void {
-    const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
-  
-    if (returnUrl?.startsWith('/')) {
-      this.router.navigateByUrl(returnUrl);
-      return;
-    }
-  
     this.routerHistory.goBack('/events');
   }
 
