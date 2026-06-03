@@ -55,8 +55,38 @@
   background: #eef8fc;
 }
 
+.search-page__type-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 14px 0 4px;
+}
+
+.type-chip {
+  border: 1.5px solid #c8e0ec;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #3a6b80;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+
+  &--active {
+    background: #1467a0;
+    border-color: #1467a0;
+    color: #ffffff;
+  }
+
+  &:hover:not(.type-chip--active) {
+    background: #eaf5fb;
+    border-color: #8abfd4;
+  }
+}
+
 .search-page__meta {
-  margin: 14px 4px 18px;
+  margin: 10px 4px 18px;
   color: #5f7b89;
   font-size: 13px;
   font-weight: 600;

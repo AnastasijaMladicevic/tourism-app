@@ -48,7 +48,7 @@ export interface DestinationView extends DestinationDto {
 })
 export class DestinationsComponent implements OnInit, OnDestroy {
   searchQuery = '';
-  activeFilter = 'All';
+  activeFilters = new Set<string>();
   sortOption: 'az' | 'za' | 'distance' = 'az';
   showSortMenu = false;
   showPageSizeMenu = false;
@@ -256,13 +256,13 @@ export class DestinationsComponent implements OnInit, OnDestroy {
   private saveListState(): void {
     sessionStorage.setItem(this.listStateKey, JSON.stringify({
       searchQuery: this.searchQuery,
-      activeFilter: this.activeFilter,
+      activeFilters: [...this.activeFilters],
       sortOption: this.sortOption,
       currentPage: this.currentPage,
       pageSize: this.pageSize,
     }));
   }
-  
+
   private restoreListState(): void {
     const raw = sessionStorage.getItem(this.listStateKey);
     if (!raw) return;
@@ -271,7 +271,7 @@ export class DestinationsComponent implements OnInit, OnDestroy {
       const state = JSON.parse(raw);
 
       this.searchQuery = state.searchQuery ?? '';
-      this.activeFilter = state.activeFilter ?? 'All';
+      this.activeFilters = new Set(Array.isArray(state.activeFilters) ? state.activeFilters : []);
       this.sortOption = state.sortOption ?? 'az';
       this.currentPage = state.currentPage ?? 1;
       this.pageSize = state.pageSize ?? 8;
@@ -321,7 +321,14 @@ export class DestinationsComponent implements OnInit, OnDestroy {
   }
 
   setFilter(filter: string): void {
-    this.activeFilter = filter;
+    if (filter === 'All') {
+      this.activeFilters = new Set();
+    } else if (this.activeFilters.has(filter)) {
+      this.activeFilters.delete(filter);
+      this.activeFilters = new Set(this.activeFilters);
+    } else {
+      this.activeFilters = new Set([...this.activeFilters, filter]);
+    }
     this.currentPage = 1;
     this.saveListState();
     void this.refreshVisibleDestinations();
@@ -397,10 +404,9 @@ export class DestinationsComponent implements OnInit, OnDestroy {
       );
     }
 
-    if (this.activeFilter !== 'All') {
-      const activeType = this.activeFilter.trim().toLowerCase();
+    if (this.activeFilters.size > 0) {
       list = list.filter(
-        (destination) => destination.destinationTypeName?.trim().toLowerCase() === activeType,
+        (destination) => this.activeFilters.has(destination.destinationTypeName ?? ''),
       );
     }
 

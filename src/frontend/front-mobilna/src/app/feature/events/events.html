@@ -87,7 +87,7 @@
     <div class="filters-scroll">
       <button
         class="filter-btn"
-        [class.filter-btn--active]="activeFilter === 'All'"
+        [class.filter-btn--active]="activeFilters.size === 0"
         (click)="setFilter('All')"
       >
       {{ 'common.all' | translate }}
@@ -95,7 +95,7 @@
       @for (type of eventTypes; track type.id) {
         <button
           class="filter-btn"
-          [class.filter-btn--active]="activeFilter === type.name"
+          [class.filter-btn--active]="activeFilters.has(type.name)"
           (click)="setFilter(type.name)"
         >
           {{ type.name }}

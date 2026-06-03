@@ -41,7 +41,7 @@ import { LocationRequiredModalComponent } from '../../shared/components/location
 })
 export class ObjectsComponent implements OnInit, OnDestroy {
   searchQuery = '';
-  activeFilter = 'All';
+  activeFilters = new Set<string>();
   minRatingFilter = 0;
   sortOption: 'rating' | 'az' | 'za' | 'distance' = 'az';
   showSortMenu = false;
@@ -181,7 +181,7 @@ export class ObjectsComponent implements OnInit, OnDestroy {
       this.applyPendingSortIfReady();
 
       if (type) {
-        this.activeFilter = type;
+        this.activeFilters = new Set([type]);
       }
     
       void this.loadData();
@@ -197,7 +197,7 @@ export class ObjectsComponent implements OnInit, OnDestroy {
   private saveListState(): void {
     sessionStorage.setItem(this.listStateKey, JSON.stringify({
       searchQuery: this.searchQuery,
-      activeFilter: this.activeFilter,
+      activeFilters: [...this.activeFilters],
       minRatingFilter: this.minRatingFilter,
       sortOption: this.sortOption,
       currentPage: this.currentPage,
@@ -213,7 +213,7 @@ export class ObjectsComponent implements OnInit, OnDestroy {
       const state = JSON.parse(raw);
 
       this.searchQuery = state.searchQuery ?? '';
-      this.activeFilter = state.activeFilter ?? 'All';
+      this.activeFilters = new Set(Array.isArray(state.activeFilters) ? state.activeFilters : []);
       this.minRatingFilter = state.minRatingFilter ?? 0;
       this.sortOption = state.sortOption ?? 'az';
       this.currentPage = state.currentPage ?? 1;
@@ -363,7 +363,7 @@ export class ObjectsComponent implements OnInit, OnDestroy {
       );
     }
 
-    if (this.activeFilter !== 'All' && this.activeFilter) {
+    if (this.activeFilters.size > 0) {
       list = list.filter((obj) => this.matchesActiveFilter(obj));
     }
 
@@ -412,8 +412,7 @@ export class ObjectsComponent implements OnInit, OnDestroy {
   }
 
   private matchesActiveFilter(obj: ObjectView): boolean {
-    const filterKey = this.normalizeTypeKey(this.activeFilter);
-    if (!filterKey || filterKey === 'all') {
+    if (this.activeFilters.size === 0) {
       return true;
     }
 
@@ -429,13 +428,17 @@ export class ObjectsComponent implements OnInit, OnDestroy {
       return false;
     }
 
-    const candidates = this.groupedTypeMap[filterKey] ?? [filterKey];
-    return candidates.some((candidate) => {
-      const normalizedCandidate = this.normalizeTypeKey(candidate);
-      return (
-        this.typeMatchesCandidate(objectType, normalizedCandidate) ||
-        this.typeMatchesCandidate(markerType, normalizedCandidate)
-      );
+    return [...this.activeFilters].some((filter) => {
+      const filterKey = this.normalizeTypeKey(filter);
+      if (!filterKey || filterKey === 'all') return true;
+      const candidates = this.groupedTypeMap[filterKey] ?? [filterKey];
+      return candidates.some((candidate) => {
+        const normalizedCandidate = this.normalizeTypeKey(candidate);
+        return (
+          this.typeMatchesCandidate(objectType, normalizedCandidate) ||
+          this.typeMatchesCandidate(markerType, normalizedCandidate)
+        );
+      });
     });
   }
 
@@ -658,7 +661,14 @@ export class ObjectsComponent implements OnInit, OnDestroy {
   }
 
   setFilter(filter: string): void {
-    this.activeFilter = filter;
+    if (filter === 'All') {
+      this.activeFilters = new Set();
+    } else if (this.activeFilters.has(filter)) {
+      this.activeFilters.delete(filter);
+      this.activeFilters = new Set(this.activeFilters);
+    } else {
+      this.activeFilters = new Set([...this.activeFilters, filter]);
+    }
     this.currentPage = 1;
     this.saveListState();
     this.refreshVisibleObjects();

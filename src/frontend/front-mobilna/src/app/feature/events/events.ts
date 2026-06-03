@@ -69,7 +69,7 @@ export class EventsComponent implements OnInit, OnDestroy {
   private readonly listStateKey = 'events-list-state';
   private readonly returnFlagKey = 'events-return-from-detail';
   private readonly pendingSortKey = 'events-pending-sort';
-  activeFilter = 'All';
+  activeFilters = new Set<string>();
   activeCategory: EventCategory = 'All';
   isLoading = true;
   showSearch = false;
@@ -136,14 +136,14 @@ export class EventsComponent implements OnInit, OnDestroy {
   private saveListState(): void {
     sessionStorage.setItem(this.listStateKey, JSON.stringify({
       searchQuery: this.searchQuery,
-      activeFilter: this.activeFilter,
+      activeFilters: [...this.activeFilters],
       activeCategory: this.activeCategory,
       sortOption: this.sortOption,
       currentPage: this.currentPage,
       pageSize: this.pageSize,
     }));
   }
-  
+
   private restoreListState(): void {
     const raw = sessionStorage.getItem(this.listStateKey);
     if (!raw) return;
@@ -152,7 +152,7 @@ export class EventsComponent implements OnInit, OnDestroy {
       const state = JSON.parse(raw);
 
       this.searchQuery = state.searchQuery ?? '';
-      this.activeFilter = state.activeFilter ?? 'All';
+      this.activeFilters = new Set(Array.isArray(state.activeFilters) ? state.activeFilters : []);
       this.activeCategory = state.activeCategory ?? 'All';
       this.sortOption = state.sortOption ?? 'az';
       this.currentPage = state.currentPage ?? 1;
@@ -263,8 +263,8 @@ export class EventsComponent implements OnInit, OnDestroy {
       );
     }
 
-    if (this.activeFilter !== 'All') {
-      list = list.filter((event) => event.category === this.activeFilter);
+    if (this.activeFilters.size > 0) {
+      list = list.filter((event) => this.activeFilters.has(event.category));
     }
 
     switch (this.sortOption) {
@@ -560,7 +560,14 @@ export class EventsComponent implements OnInit, OnDestroy {
   }
 
   setFilter(filter: string): void {
-    this.activeFilter = filter;
+    if (filter === 'All') {
+      this.activeFilters = new Set();
+    } else if (this.activeFilters.has(filter)) {
+      this.activeFilters.delete(filter);
+      this.activeFilters = new Set(this.activeFilters);
+    } else {
+      this.activeFilters = new Set([...this.activeFilters, filter]);
+    }
     this.currentPage = 1;
     this.saveListState();
     void this.refreshVisibleEvents();

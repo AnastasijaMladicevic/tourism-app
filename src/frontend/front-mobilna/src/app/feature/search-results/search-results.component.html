@@ -22,11 +22,24 @@
     </div>
   </div>
 
+  @if (!isLoading && availableTypes.length > 1) {
+    <div class="search-page__type-filters">
+      @for (type of availableTypes; track type) {
+        <button
+          class="type-chip"
+          [class.type-chip--active]="activeTypeFilters.has(type)"
+          type="button"
+          (click)="toggleTypeFilter(type)"
+        >{{ type }}</button>
+      }
+    </div>
+  }
+
   <div class="search-page__meta">
     @if (isLoading) {
       <span>Pretraga u toku...</span>
     } @else if (hasSearched) {
-      <span>{{ results.length }} rezultata</span>
+      <span>{{ displayedResults.length }} rezultata</span>
     } @else {
       <span>Ukucaj sta trazis</span>
     }
@@ -46,7 +59,7 @@
   }
 
   <div class="search-page__list">
-    @if (!isLoading && hasSearched && !results.length) {
+    @if (!isLoading && hasSearched && !displayedResults.length) {
       <div class="empty-state">
         <mat-icon>travel_explore</mat-icon>
         <h2>Nema rezultata</h2>
@@ -54,7 +67,7 @@
       </div>
     }
 
-    @for (result of results; track result.category + '-' + result.id) {
+    @for (result of displayedResults; track result.category + '-' + result.id) {
       <button class="result-card" type="button" (click)="openResult(result)">
         <div class="result-card__image">
           @if (result.imageUrl) {

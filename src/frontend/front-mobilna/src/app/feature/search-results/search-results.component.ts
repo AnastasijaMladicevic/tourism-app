@@ -32,11 +32,36 @@ type SearchSource = 'home' | 'map' | 'default';
 export class SearchResultsComponent implements OnInit, OnDestroy {
   searchQuery = '';
   results: SmartSearchResultDto[] = [];
+  activeTypeFilters = new Set<string>();
   answer = '';
   warning: string | null = null;
   isLoading = false;
   hasSearched = false;
   source: SearchSource = 'default';
+
+  get availableTypes(): string[] {
+    const seen = new Set<string>();
+    const types: string[] = [];
+    for (const r of this.results) {
+      const t = r.typeName?.trim();
+      if (t && !seen.has(t)) { seen.add(t); types.push(t); }
+    }
+    return types.sort((a, b) => a.localeCompare(b));
+  }
+
+  get displayedResults(): SmartSearchResultDto[] {
+    if (!this.activeTypeFilters.size) return this.results;
+    return this.results.filter(r => this.activeTypeFilters.has(r.typeName?.trim() ?? ''));
+  }
+
+  toggleTypeFilter(type: string): void {
+    if (this.activeTypeFilters.has(type)) {
+      this.activeTypeFilters.delete(type);
+    } else {
+      this.activeTypeFilters.add(type);
+    }
+    this.activeTypeFilters = new Set(this.activeTypeFilters);
+  }
 
   private readonly subscriptions = new Subscription();
   private searchDebounceTimer: ReturnType<typeof setTimeout> | null = null;
@@ -157,6 +182,7 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
   private runSearch(query: string, source: SearchSource): void {
     this.isLoading = true;
     this.hasSearched = true;
+    this.activeTypeFilters = new Set();
     this.runKeywordSearch(query, source);
   }
 
