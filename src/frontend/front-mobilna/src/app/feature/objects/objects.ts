@@ -29,11 +29,12 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../services/translation.service';
 import { ActiveRegionService } from '../../services/active-region';
 import { DataCacheService } from '../../services/data-cache';
+import { LocationRequiredModalComponent } from '../../shared/components/location-required-modal/location-required-modal.component';
 
 @Component({
   selector: 'app-objects',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule, TranslatePipe],
+  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule, TranslatePipe, LocationRequiredModalComponent],
   templateUrl: './objects.html',
   styleUrls: ['./objects.scss'],
   encapsulation: ViewEncapsulation.None,
@@ -45,6 +46,7 @@ export class ObjectsComponent implements OnInit, OnDestroy {
   sortOption: 'rating' | 'az' | 'za' | 'distance' = 'rating';
   showSortMenu = false;
   showPageSizeMenu = false;
+  showLocationModal = false;
   isLoading = true;
   errorMessage = '';
   pageTitle = '';
@@ -677,11 +679,27 @@ export class ObjectsComponent implements OnInit, OnDestroy {
   }
 
   setSort(option: 'rating' | 'az' | 'za' | 'distance'): void {
+    if (option === 'distance' && !this.isTracking) {
+      this.showSortMenu = false;
+      this.showLocationModal = true;
+      return;
+    }
     this.sortOption = option;
     this.showSortMenu = false;
     this.currentPage = 1;
     this.saveListState();
     this.refreshVisibleObjects();
+  }
+
+  openLocationSettings(): void {
+    this.showLocationModal = false;
+    void this.router.navigate(['/location-settings'], {
+      queryParams: { locationConsent: '1', returnUrl: this.router.url }
+    });
+  }
+
+  dismissLocationModal(): void {
+    this.showLocationModal = false;
   }
 
   sortLabel(): string {

@@ -27,6 +27,7 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../services/translation.service';
 import { ActiveRegionService } from '../../services/active-region';
 import { DataCacheService } from '../../services/data-cache';
+import { LocationRequiredModalComponent } from '../../shared/components/location-required-modal/location-required-modal.component';
 
 export interface ActivityView extends ActivityDto {
   isFavorite: boolean;
@@ -35,7 +36,7 @@ export interface ActivityView extends ActivityDto {
 
 @Component({
   selector: 'app-activities',
-  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule, TranslatePipe],
+  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule, TranslatePipe, LocationRequiredModalComponent],
   templateUrl: './activities.html',
   styleUrl: './activities.scss',
 })
@@ -54,6 +55,7 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
   activityTypes: { id: number; name: string }[] = [];
   showSortMenu = false;
   showPageSizeMenu = false;
+  showLocationModal = false;
   images: ImageDto[] = [];
   activity: ActivityDto | null = null;
   pageSizeOptions = [8, 12, 16, 24, 32];
@@ -668,11 +670,27 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
   }
 
   setSort(option: 'az' | 'za' | 'distance'): void {
+    if (option === 'distance' && !this.isTracking) {
+      this.showSortMenu = false;
+      this.showLocationModal = true;
+      return;
+    }
     this.sortOption = option;
     this.showSortMenu = false;
     this.currentPage = 1;
     this.saveListState();
     this.refreshVisibleActivities();
+  }
+
+  openLocationSettings(): void {
+    this.showLocationModal = false;
+    void this.router.navigate(['/location-settings'], {
+      queryParams: { locationConsent: '1', returnUrl: this.router.url }
+    });
+  }
+
+  dismissLocationModal(): void {
+    this.showLocationModal = false;
   }
 
   setFilter(filter: string): void {

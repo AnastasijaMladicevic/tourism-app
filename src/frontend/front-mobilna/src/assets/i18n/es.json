@@ -57,7 +57,10 @@
     "delete": "Eliminar",
     "deleting": "Eliminando...",
     "noResults": "Sin resultados",
-    "lowestPrice": "Precio más bajo"
+    "lowestPrice": "Precio más bajo",
+    "enable": "Activar",
+    "locationModalTitle": "Activa la ubicación para usar el orden",
+    "locationModalBody": "El seguimiento de ubicación está desactivado. Toca abajo para abrir ajustes y activar el permiso de ubicación."
   },
   "results": {
     "title": "Resultados",

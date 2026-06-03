@@ -1,0 +1,21 @@
+@if (show) {
+  <div class="loc-modal-overlay" (click)="dismissed.emit()">
+    <div class="loc-modal" (click)="$event.stopPropagation()">
+      <div class="loc-modal__icon-wrap">
+        <mat-icon class="loc-modal__icon">my_location</mat-icon>
+      </div>
+
+      <h2 class="loc-modal__title">{{ 'common.locationModalTitle' | translate }}</h2>
+      <p class="loc-modal__body">{{ 'common.locationModalBody' | translate }}</p>
+
+      <div class="loc-modal__actions">
+        <button class="loc-modal__btn loc-modal__btn--cancel" (click)="dismissed.emit()">
+          {{ 'common.cancel' | translate }}
+        </button>
+        <button class="loc-modal__btn loc-modal__btn--confirm" (click)="confirmed.emit()">
+          {{ 'common.enable' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+}

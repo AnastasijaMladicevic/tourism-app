@@ -27,6 +27,7 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../services/translation.service';
 import { ActiveRegionService } from '../../services/active-region';
 import { DataCacheService } from '../../services/data-cache';
+import { LocationRequiredModalComponent } from '../../shared/components/location-required-modal/location-required-modal.component';
 
 export interface LocalityView extends LocalityDto {
   isFavorite: boolean;
@@ -35,7 +36,7 @@ export interface LocalityView extends LocalityDto {
 
 @Component({
   selector: 'app-localities',
-  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule, TranslatePipe],
+  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule, TranslatePipe, LocationRequiredModalComponent],
   templateUrl: './localities.html',
   styleUrl: './localities.scss',
 })
@@ -54,6 +55,7 @@ export class LocalitiesComponent implements OnInit, OnDestroy {
   localityTypes: { id: number; name: string }[] = [];
   showSortMenu = false;
   showPageSizeMenu = false;
+  showLocationModal = false;
   images: ImageDto[] = [];
   locality: LocalityDto | null = null;
   pageSizeOptions = [8, 12, 16, 24, 32];
@@ -636,11 +638,27 @@ export class LocalitiesComponent implements OnInit, OnDestroy {
   }
 
   setSort(option: 'az' | 'za' | 'distance'): void {
+    if (option === 'distance' && !this.isTracking) {
+      this.showSortMenu = false;
+      this.showLocationModal = true;
+      return;
+    }
     this.sortOption = option;
     this.showSortMenu = false;
     this.currentPage = 1;
     this.saveListState();
     void this.refreshVisibleLocalities();
+  }
+
+  openLocationSettings(): void {
+    this.showLocationModal = false;
+    void this.router.navigate(['/location-settings'], {
+      queryParams: { locationConsent: '1', returnUrl: this.router.url }
+    });
+  }
+
+  dismissLocationModal(): void {
+    this.showLocationModal = false;
   }
 
   setFilter(filter: string): void {

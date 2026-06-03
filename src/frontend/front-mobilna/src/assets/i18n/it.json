@@ -57,7 +57,10 @@
     "delete": "Elimina",
     "deleting": "Eliminazione...",
     "noResults": "Nessun risultato",
-    "lowestPrice": "Prezzo più basso"
+    "lowestPrice": "Prezzo più basso",
+    "enable": "Attiva",
+    "locationModalTitle": "Attiva la posizione per usare l'ordinamento",
+    "locationModalBody": "Il rilevamento della posizione è disattivato. Tocca qui sotto per aprire le impostazioni e attivare il consenso alla posizione."
   },
   "results": {
     "title": "Risultati",

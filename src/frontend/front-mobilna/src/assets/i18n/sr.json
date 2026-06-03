@@ -57,7 +57,10 @@
     "delete": "Obriši",
     "deleting": "Brišem...",
     "noResults": "Nema rezultata",
-    "lowestPrice": "Najniža cena"
+    "lowestPrice": "Najniža cena",
+    "enable": "Uključi",
+    "locationModalTitle": "Uključi lokaciju da bi sortiranje radilo",
+    "locationModalBody": "Praćenje lokacije trenutno nije uključeno. Klikni ispod i otvori podešavanja da uključiš saglasnost za praćenje lokacije."
   },
   "results": {
     "title": "Rezultati",
@@ -632,7 +635,7 @@
     "readyTitle": "Spremna za sledeći korak?",
     "screenTitle": "Favoriti",
     "plannerBannerTitle": "Nastavi planiranje",
-    "plannerEventsOnly": "Dogadjaji iz favorita se dodaju kroz planer.",
+    "plannerEventsOnly": "Događaji iz favorita se dodaju kroz planer.",
     "totalFavorites": "{{count}} sačuvanih stavki",
     "openDetails": "Otvori detalje",
     "smartRoutes": "Pametni predlozi i pregled dana",
@@ -659,7 +662,7 @@
     "showMore": "Prikazi jos favorita",
     "searchPlaceholder": "Pretraži sačuvana mesta...",
     "goToPlanner": "Idi u planer",
-    "readyBody": "Otvorene favorite pretvori u konkretan plan dana i raspored dogadjaja.",
+    "readyBody": "Otvorene favorite pretvori u konkretan plan dana i raspored događaja.",
     "emptyBodyModern": "Dodaj destinacije, objekte, aktivnosti ili lokalitete i ovde ćeš ih videti na jednom mestu.",
     "emptyTitleModern": "Jos nemaš sačuvanih favorita",
     "recentTitle": "Poslednje sačuvano",
@@ -1007,7 +1010,7 @@
       "resultTypes": {
         "destination": "Destinacija",
         "object": "Objekat",
-        "event": "Dogadjaj",
+        "event": "Događaj",
         "activity": "Aktivnost",
         "locality": "Mesto"
       }
@@ -1016,8 +1019,8 @@
   },
   
   "event": {
-    "title": "Dogadjaj",
-    "loadingError": "Greška pri učitavanju dogadjaja.",
+    "title": "Događaj",
+    "loadingError": "Greška pri učitavanju događaja.",
     "addedToPlanner": "Događaj je dodat u planer",
     "free": "Besplatno",
     "ticketPrice": "Cena karte",
@@ -1027,13 +1030,13 @@
     "about": "O događaju",
     "descriptionFallback": "Opis nije dostupan.",
       "availableTickets": "Dostupne ulaznice",
-      "ticketTypesHelp": "Dodaj jedan ili vise tipova karata i ukupan kapacitet dogadjaja.",
+      "ticketTypesHelp": "Dodaj jedan ili vise tipova karata i ukupan kapacitet događaja.",
       "addTicketType": "Dodaj tip karte",
       "removeTicketType": "Ukloni",
       "ticketTypeName": "Naziv karte",
       "ticketTypeNamePlaceholder": "VIP, Regular, Early bird...",
       "ticketPricePlaceholder": "45.00",
-      "noTicketTypesHint": "Ostavi prazno ako je dogadjaj besplatan.",
+      "noTicketTypesHint": "Ostavi prazno ako je događaj besplatan.",
     "standardTicket": "Standardna ulaznica",
     "select": "Odaberi",
     "amenities": "Sadržaji",
@@ -1134,7 +1137,7 @@
     "emptyBody": "Dodaj eventove i napravi raspored putovanja po danima.",
     "scheduleTitle": "Raspored dana",
     "loadError": "Planer trenutno nije dostupan.",
-    "removeFooter": "\"{{title}}\" možeš ponovo dodati iz detalja dogadjaja.",
+    "removeFooter": "\"{{title}}\" možeš ponovo dodati iz detalja događaja.",
     "emptyTitle": "Planer je još prazan",
     "eventSingular": "događaj",
     "title": "Planer",

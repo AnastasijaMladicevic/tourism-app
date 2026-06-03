@@ -25,6 +25,7 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../services/translation.service';
 import { ActiveRegionService } from '../../services/active-region';
 import { DataCacheService } from '../../services/data-cache';
+import { LocationRequiredModalComponent } from '../../shared/components/location-required-modal/location-required-modal.component';
 
 export interface DestinationView extends DestinationDto {
   distanceMeters?: number;
@@ -40,7 +41,7 @@ export interface DestinationView extends DestinationDto {
 @Component({
   selector: 'app-destinations',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule, TranslatePipe],
+  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule, TranslatePipe, LocationRequiredModalComponent],
   templateUrl: './destinations.html',
   styleUrls: ['./destinations.scss'],
   encapsulation: ViewEncapsulation.None,
@@ -51,6 +52,7 @@ export class DestinationsComponent implements OnInit, OnDestroy {
   sortOption: 'az' | 'za' | 'distance' = 'az';
   showSortMenu = false;
   showPageSizeMenu = false;
+  showLocationModal = false;
   isLoading = true;
   errorMessage = '';
   currentPage = 1;
@@ -397,11 +399,27 @@ export class DestinationsComponent implements OnInit, OnDestroy {
   }
 
   setSort(option: 'az' | 'za' | 'distance'): void {
+    if (option === 'distance' && !this.isTracking) {
+      this.showSortMenu = false;
+      this.showLocationModal = true;
+      return;
+    }
     this.sortOption = option;
     this.showSortMenu = false;
     this.currentPage = 1;
     this.saveListState();
     void this.refreshVisibleDestinations();
+  }
+
+  openLocationSettings(): void {
+    this.showLocationModal = false;
+    void this.router.navigate(['/location-settings'], {
+      queryParams: { locationConsent: '1', returnUrl: this.router.url }
+    });
+  }
+
+  dismissLocationModal(): void {
+    this.showLocationModal = false;
   }
 
   sortLabel(): string {

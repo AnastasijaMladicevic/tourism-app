@@ -57,7 +57,10 @@
     "delete": "Delete",
     "deleting": "Deleting...",
     "noResults": "No results",
-    "lowestPrice": "Lowest Price"
+    "lowestPrice": "Lowest Price",
+    "enable": "Enable",
+    "locationModalTitle": "Enable location to use sorting",
+    "locationModalBody": "Location tracking is currently off. Tap below to open settings and enable location access."
   },
   "results": {
     "title": "Results",

@@ -32,6 +32,7 @@ export class LocationSettingsComponent implements OnInit, OnDestroy {
   private pendingLocationEnableRequest = false;
   private hasLocationConsentContext = false;
   private locationConsentMode: 'default' | 'liveShare' = 'default';
+  private locationReturnUrl: string | null = null;
   private readonly handleWindowFocus = () => {
     void this.syncLocationTrackingState();
   };
@@ -80,6 +81,10 @@ export class LocationSettingsComponent implements OnInit, OnDestroy {
           this.hasLocationConsentContext = true;
         }
         this.locationConsentMode = params.get('liveShare') === '1' ? 'liveShare' : 'default';
+        const returnUrl = params.get('returnUrl');
+        if (returnUrl) {
+          this.locationReturnUrl = returnUrl;
+        }
         this.showLocationConsentHint = !this.locationEnabled;
         void this.syncLocationTrackingState();
       }),
@@ -153,6 +158,12 @@ export class LocationSettingsComponent implements OnInit, OnDestroy {
       this.locationEnabled = this.locationTrackingService.isTrackingEnabled();
       this.showLocationConsentHint = !this.locationEnabled;
       this.cdr.markForCheck();
+
+      if (this.locationReturnUrl) {
+        const returnUrl = this.locationReturnUrl;
+        this.locationReturnUrl = null;
+        void this.router.navigateByUrl(returnUrl);
+      }
       return;
     }
 

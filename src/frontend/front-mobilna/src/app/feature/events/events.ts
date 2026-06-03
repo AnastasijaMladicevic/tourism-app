@@ -18,6 +18,7 @@ import { RouterHistoryService } from '../../services/router-history';
 import { TranslationService } from '../../services/translation.service';
 import { ActiveRegionService } from '../../services/active-region';
 import { DataCacheService } from '../../services/data-cache';
+import { LocationRequiredModalComponent } from '../../shared/components/location-required-modal/location-required-modal.component';
 
 type EventCategory = 'All' | string;
 
@@ -46,7 +47,7 @@ interface EventCard {
 @Component({
   selector: 'app-events',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule, LazyBackgroundDirective, TranslatePipe],
+  imports: [CommonModule, FormsModule, MatIconModule, MatButtonModule, LazyBackgroundDirective, TranslatePipe, LocationRequiredModalComponent],
   templateUrl: './events.html',
   styleUrl: './events.scss',
 })
@@ -72,7 +73,8 @@ export class EventsComponent implements OnInit, OnDestroy {
   isLoading = true;
   showSearch = false;
   showSortMenu = false;
-  showPageSizeMenu = false
+  showPageSizeMenu = false;
+  showLocationModal = false;
   searchQuery = '';
   sortOption: 'date' | 'az' | 'za' | 'distance' | 'price' = 'date';
   events: EventCard[] = [];
@@ -287,11 +289,27 @@ export class EventsComponent implements OnInit, OnDestroy {
   }
 
   setSort(option: 'date' | 'az' | 'za' | 'price' | 'distance'): void {
+    if (option === 'distance' && !this.isTracking) {
+      this.showSortMenu = false;
+      this.showLocationModal = true;
+      return;
+    }
     this.sortOption = option;
     this.showSortMenu = false;
     this.currentPage = 1;
     this.saveListState();
     this.refreshVisibleEvents();
+  }
+
+  openLocationSettings(): void {
+    this.showLocationModal = false;
+    void this.router.navigate(['/location-settings'], {
+      queryParams: { locationConsent: '1', returnUrl: this.router.url }
+    });
+  }
+
+  dismissLocationModal(): void {
+    this.showLocationModal = false;
   }
 
   sortLabel(): string {

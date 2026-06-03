@@ -174,3 +174,9 @@
     <button mat-button type="button" (click)="nextPage()" [disabled]="!hasNextPage">{{ 'common.next' | translate }}</button>
   </div>
 </div>
+
+<app-location-required-modal
+  [show]="showLocationModal"
+  (dismissed)="dismissLocationModal()"
+  (confirmed)="openLocationSettings()"
+/>
