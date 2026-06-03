@@ -373,13 +373,22 @@
           [value]="adminDirectorySearch"
           (input)="onAdminSearchInput($event)"
         />
-        <span class="table-filter-meta" *ngIf="adminMembers.length && adminDirectorySearch.trim()">
+        <select class="table-filter-select" [(ngModel)]="adminRoleFilter" (ngModelChange)="onAdminRoleFilterChange()">
+          <option *ngFor="let opt of adminRoleOptions" [value]="opt.value">{{ opt.label }}</option>
+        </select>
+        <select class="table-filter-select" [(ngModel)]="adminStatusFilter" (ngModelChange)="onAdminStatusFilterChange()">
+          <option value="all">{{ t('adminUsers.filters.allStatuses') }}</option>
+          <option value="active">{{ t('adminUsers.filters.active') }}</option>
+          <option value="inactive">{{ t('adminUsers.filters.inactive') }}</option>
+          <option value="banned">{{ t('adminUsers.filters.banned') }}</option>
+        </select>
+        <span class="table-filter-meta" *ngIf="adminMembers.length && (adminDirectorySearch.trim() || adminRoleFilter !== 'all' || adminStatusFilter !== 'all')">
           {{ t('adminUsers.matchesOf', { matches: filteredAdminDirectory.length, total: adminMembers.length }) }}
         </span>
         <button
           type="button"
           class="table-search-clear"
-          *ngIf="adminDirectorySearch.trim()"
+          *ngIf="adminDirectorySearch.trim() || adminRoleFilter !== 'all' || adminStatusFilter !== 'all'"
           (click)="clearAdminSearch()"
         >
           {{ t('adminUsers.clear') }}

@@ -1543,6 +1543,13 @@
     "adminSearchPlaceholder": "Pretraži po imenu, emailu, ulozi, statusu",
     "matchesOf": "{{matches}} poklapanja od {{total}}",
     "clear": "Očisti",
+    "filters": {
+      "allRoles": "Sve uloge",
+      "allStatuses": "Svi statusi",
+      "active": "Aktivan",
+      "inactive": "Neaktivan",
+      "banned": "Banovan"
+    },
     "viewManagerReport": "Prikaži menadžerski izveštaj",
     "viewPendingReportFor": "Prikaži izveštaj na čekanju za {{name}}",
     "noTeamMembersMatch": "Nijedan član tima ne odgovara pretrazi.",

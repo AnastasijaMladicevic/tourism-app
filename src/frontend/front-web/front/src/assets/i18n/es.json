@@ -1543,6 +1543,13 @@
     "adminSearchPlaceholder": "Buscar por nombre, correo, rol, estado",
     "matchesOf": "{{matches}} coincidencias de {{total}}",
     "clear": "Limpiar",
+    "filters": {
+      "allRoles": "Todos los roles",
+      "allStatuses": "Todos los estados",
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "banned": "Baneado"
+    },
     "viewManagerReport": "Ver reporte del manager",
     "viewPendingReportFor": "Ver reporte pendiente para {{name}}",
     "noTeamMembersMatch": "Ningún miembro del equipo coincide con tu búsqueda.",

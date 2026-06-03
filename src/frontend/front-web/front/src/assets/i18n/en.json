@@ -1543,6 +1543,13 @@
     "adminSearchPlaceholder": "Search by name, email, role, status",
     "matchesOf": "{{matches}} match(es) of {{total}}",
     "clear": "Clear",
+    "filters": {
+      "allRoles": "All roles",
+      "allStatuses": "All statuses",
+      "active": "Active",
+      "inactive": "Inactive",
+      "banned": "Banned"
+    },
     "viewManagerReport": "View manager report",
     "viewPendingReportFor": "View pending report for {{name}}",
     "noTeamMembersMatch": "No team members match your search.",

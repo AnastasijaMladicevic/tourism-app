@@ -179,6 +179,8 @@ export class UsersComponent implements OnInit {
   }[] = [];
 
   adminDirectorySearch = '';
+  adminRoleFilter = 'all';
+  adminStatusFilter = 'all';
   touristSearch = '';
 
   /** Internal Team vs Tourist accounts. */
@@ -685,13 +687,25 @@ export class UsersComponent implements OnInit {
   }
 
   get filteredAdminDirectory(): typeof this.adminMembers {
-    return this.filterBySearch(this.adminMembers, this.adminDirectorySearch, (m) => [
+    let result = this.filterBySearch(this.adminMembers, this.adminDirectorySearch, (m) => [
       m.name,
       m.email,
       m.role,
       m.lastLogin,
       m.status
     ]);
+    if (this.adminRoleFilter !== 'all') {
+      result = result.filter((m) => m.role.toLowerCase() === this.adminRoleFilter.toLowerCase());
+    }
+    if (this.adminStatusFilter !== 'all') {
+      result = result.filter((m) => m.status.toLowerCase() === this.adminStatusFilter.toLowerCase());
+    }
+    return result;
+  }
+
+  get adminRoleOptions(): { value: string; label: string }[] {
+    const roles = [...new Set(this.adminMembers.map((m) => m.role))].sort();
+    return [{ value: 'all', label: this.t('adminUsers.filters.allRoles') }, ...roles.map((r) => ({ value: r, label: r }))];
   }
 
   get filteredTourists(): typeof this.tourists {
@@ -971,8 +985,18 @@ export class UsersComponent implements OnInit {
     );
   }
 
+  onAdminRoleFilterChange(): void {
+    this.adminCurrentPage = 1;
+  }
+
+  onAdminStatusFilterChange(): void {
+    this.adminCurrentPage = 1;
+  }
+
   clearAdminSearch(): void {
     this.adminDirectorySearch = '';
+    this.adminRoleFilter = 'all';
+    this.adminStatusFilter = 'all';
     this.adminCurrentPage = 1;
   }
 

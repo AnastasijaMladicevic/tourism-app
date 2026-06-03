@@ -1543,6 +1543,13 @@
     "adminSearchPlaceholder": "Cerca per nome, email, ruolo, stato",
     "matchesOf": "{{matches}} risultati su {{total}}",
     "clear": "Cancella",
+    "filters": {
+      "allRoles": "Tutti i ruoli",
+      "allStatuses": "Tutti gli stati",
+      "active": "Attivo",
+      "inactive": "Inattivo",
+      "banned": "Bannato"
+    },
     "viewManagerReport": "Vedi segnalazione manager",
     "viewPendingReportFor": "Vedi segnalazione in sospeso per {{name}}",
     "noTeamMembersMatch": "Nessun membro del team corrisponde alla ricerca.",
