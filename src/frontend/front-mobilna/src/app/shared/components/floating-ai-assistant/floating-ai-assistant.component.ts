@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, DestroyRef, ElementRef, ViewChild, inject, signal } from '@angular/core';
+import { Component, DestroyRef, ElementRef, ViewChild, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationStart, Router } from '@angular/router';
 import { catchError, filter, of } from 'rxjs';
@@ -51,6 +51,18 @@ export class FloatingAiAssistantComponent {
   protected readonly chatMessages = signal<FloatingAiMessage[]>([]);
 
   constructor() {
+    effect(() => {
+      if (typeof document !== 'undefined') {
+        document.body.style.overflow = this.isOpen() ? 'hidden' : '';
+      }
+    });
+
+    this.destroyRef.onDestroy(() => {
+      if (typeof document !== 'undefined') {
+        document.body.style.overflow = '';
+      }
+    });
+
     this.updateVisibility(this.router.url);
 
     this.router.events
