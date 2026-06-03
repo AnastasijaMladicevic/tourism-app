@@ -257,7 +257,7 @@ export class MapService {
 
     if (this.clusteringEnabled) {
       this.getOrCreateClusterGroup(clusterKey).addLayer(marker);
-      this.updateMarkerStyles();
+      if (autoSync) this.updateMarkerStyles();
     } else if (autoSync) {
       this.syncVisibleMarkers();
     }
@@ -280,6 +280,14 @@ export class MapService {
         detail: { data: found.data, type: found.type },
       }),
     );
+  }
+
+  highlightMarker(type: string, id: number): void {
+    const key = this.toMarkerKey(type, id);
+    const found = this.markerMap.get(key);
+    if (!found) return;
+    this.activeMarkerKey = key;
+    this.syncVisibleMarkers();
   }
 
   triggerMarkerClick(type: string, id: number, zoom = 16): void {

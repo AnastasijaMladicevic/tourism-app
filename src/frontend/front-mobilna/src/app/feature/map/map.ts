@@ -15,7 +15,7 @@ import { RouterOutlet } from '@angular/router';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import 'leaflet.markercluster';
-import { catchError, firstValueFrom, forkJoin, of, Subscription } from 'rxjs';
+import { catchError, forkJoin, Observable, of, Subscription, tap } from 'rxjs';
 import * as L from 'leaflet';
 
 import { MapService } from '../../services/map.service';
@@ -35,6 +35,7 @@ import { RouteBuilderPoint, RouteBuilderStateService } from '../../services/rout
 import { AuthService } from '../../services/auth';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../services/translation.service';
+import { DataCacheService } from '../../services/data-cache';
 
 import { environment } from '../../../environment/environment';
 import { CdkDragDrop, moveItemInArray, DragDropModule } from '@angular/cdk/drag-drop';
@@ -257,6 +258,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     private routeBuilderStateService: RouteBuilderStateService,
     private sanitizer: DomSanitizer,
     private translationService: TranslationService,
+    private dataCache: DataCacheService,
   ) { }
 
   ngOnInit(): void {
@@ -863,53 +865,51 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     this.mapService.setActiveFilters(this.activeFilters);
   }
 
-  private async loadAllData(state?: any): Promise<void> {
+  private cachedFetch<T>(key: string, fetch$: Observable<T[]>): Observable<T[]> {
+    const cached = this.dataCache.get<T[]>(key);
+    if (cached !== null) return of(cached);
+    return fetch$.pipe(tap(data => this.dataCache.set(key, data, 5 * 60 * 1000)));
+  }
+
+  private loadAllData(state?: any): void {
     this.allItems = [];
     this.mapService.clearAllMarkers();
 
-    const allObjects = await this.fetchAllObjects();
-
     forkJoin({
-      destinations: this.destinationService.getAll(
-        { page: 1, pageSize: 500, sortBy: 'name', sortOrder: 'asc' },
-        { bypassRegion: true, bypassLanguage: true },
-      ).pipe(
-        catchError((error) => {
-          console.warn('Neuspesno ucitavanje destinacija za mapu.', error);
-          return of([]);
-        }),
+      objects: this.cachedFetch('map:obj',
+        this.objectService.getAllItems(
+          { sortBy: 'name', sortOrder: 'asc' },
+          { bypassRegion: true, bypassLanguage: true },
+        ).pipe(catchError(() => of([])))
       ),
-      events: this.eventService.getAll(
-        { page: 1, pageSize: 500, sortBy: 'startDate', sortOrder: 'asc' },
-        { bypassRegion: true, bypassLanguage: true },
-      ).pipe(
-        catchError((error) => {
-          console.warn('Neuspesno ucitavanje dogadjaja za mapu.', error);
-          return of([]);
-        }),
+      destinations: this.cachedFetch('map:dest',
+        this.destinationService.getAll(
+          { page: 1, pageSize: 500, sortBy: 'name', sortOrder: 'asc' },
+          { bypassRegion: true, bypassLanguage: true },
+        ).pipe(catchError(() => of([])))
       ),
-      activities: this.activityService.getAll(
-        { page: 1, pageSize: 500, sortBy: 'name', sortOrder: 'asc' },
-        { bypassRegion: true, bypassLanguage: true },
-      ).pipe(
-        catchError((error) => {
-          console.warn('Neuspesno ucitavanje aktivnosti za mapu.', error);
-          return of([]);
-        }),
+      events: this.cachedFetch('map:evt',
+        this.eventService.getAll(
+          { page: 1, pageSize: 500, sortBy: 'startDate', sortOrder: 'asc' },
+          { bypassRegion: true, bypassLanguage: true },
+        ).pipe(catchError(() => of([])))
       ),
-      localities: this.localityService.getAll(
-        { page: 1, pageSize: 500, sortBy: 'name', sortOrder: 'asc' },
-        { bypassRegion: true, bypassLanguage: true },
-      ).pipe(
-        catchError((error) => {
-          console.warn('Neuspesno ucitavanje lokaliteta za mapu.', error);
-          return of([]);
-        }),
+      activities: this.cachedFetch('map:act',
+        this.activityService.getAll(
+          { page: 1, pageSize: 500, sortBy: 'name', sortOrder: 'asc' },
+          { bypassRegion: true, bypassLanguage: true },
+        ).pipe(catchError(() => of([])))
+      ),
+      localities: this.cachedFetch('map:loc',
+        this.localityService.getAll(
+          { page: 1, pageSize: 500, sortBy: 'name', sortOrder: 'asc' },
+          { bypassRegion: true, bypassLanguage: true },
+        ).pipe(catchError(() => of([])))
       ),
     }).subscribe({
-      next: ({ destinations, events, activities, localities }) => {
+      next: ({ objects, destinations, events, activities, localities }) => {
         const destList = this.toArray<any>(destinations);
-        const objList = allObjects;
+        const objList = this.toArray<any>(objects);
         const evtList = this.toArray<any>(events);
         const actList = this.toArray<any>(activities);
         const locList = this.toArray<any>(localities);
@@ -981,10 +981,21 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         this.mapService.syncVisibleMarkers();
 
         if (state?.selectedItem) {
+          // Show the card immediately with the richer getById data
+          this.selectedItem = state.selectedItem;
+          this.selectedType = state.selectedType || '';
+          this.cdr.detectChanges();
+
+          // Highlight the marker visually (without dispatching click event
+          // that would overwrite selectedItem with less-rich getAll data)
           setTimeout(() => {
             this.ngZone.run(() => {
               const type = state.selectedType || 'object';
-              this.mapService.triggerMarkerClick(type, state.selectedItem.id, state.zoom ?? 16);
+              this.mapService.highlightMarker(type, state.selectedItem.id);
+              this.mapService.getMap()?.panTo(
+                [state.selectedItem.latitude, state.selectedItem.longitude],
+                { animate: false }
+              );
               this.cdr.detectChanges();
             });
           }, 100);
@@ -992,50 +1003,6 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
       },
       error: (err) => console.error('Greska:', err),
     });
-  }
-
-  private async fetchAllObjects(): Promise<any[]> {
-    try {
-      const response = await firstValueFrom(
-        this.objectService.getAllItems(
-          { sortBy: 'name', sortOrder: 'asc' },
-          { bypassRegion: true, bypassLanguage: true },
-        )
-      );
-
-      return this.toArray<any>(response);
-    } catch (err) {
-      console.error('Greška pri učitavanju svih objekata za mapu.', err);
-      return [];
-    }
-
-    const all: any[] = [];
-    let page = 1;
-
-    while (true) {
-      try {
-        const response = await firstValueFrom(
-          this.objectService.getAll(
-            { page, pageSize: 100, sortBy: 'name', sortOrder: 'asc' },
-            { bypassRegion: true, bypassLanguage: true },
-          )
-        );
-        const items = this.toArray<any>(response);
-        if (!items.length) break;
-
-        all.push(...items);
-
-        const paged = response as any;
-        const totalPages = paged?.totalPages ?? 1;
-        if (page >= totalPages) break;
-        page++;
-      } catch (err) {
-        console.error('Greška pri učitavanju objekata, stranica', page, err);
-        break;
-      }
-    }
-
-    return all;
   }
 
   private toSearchResult(
