@@ -371,7 +371,7 @@
         <div class="password-modal__heading-copy">
           <span class="password-modal__eyebrow">Security</span>
           <h3>Change Password</h3>
-          <p>Enter your current password and choose a new one.</p>
+          <p>{{ 'adminProfile.passwordModalDescription' | translate }}</p>
         </div>
 
         <button class="password-modal__close" type="button" (click)="closePasswordModal()" aria-label="Close">
@@ -382,7 +382,7 @@
       <div class="password-modal__body">
         <div class="password-modal__grid">
           <div class="modal-field modal-field--full">
-            <label class="modal-label" for="current-password">Current Password</label>
+            <label class="modal-label" for="current-password">{{ 'adminProfile.currentPasswordLabel' | translate }}</label>
             <div class="modal-input-wrap">
               <input
                 id="current-password"
@@ -395,7 +395,7 @@
                 class="modal-toggle"
                 type="button"
                 (click)="hideCurrentPassword = !hideCurrentPassword"
-                [attr.aria-label]="hideCurrentPassword ? 'Show current password' : 'Hide current password'"
+                [attr.aria-label]="hideCurrentPassword ? ('adminProfile.showCurrentPassword' | translate) : ('adminProfile.hideCurrentPassword' | translate)"
               >
                 <mat-icon fontSet="material-icons-outlined">
                   {{ hideCurrentPassword ? 'visibility' : 'visibility_off' }}
@@ -404,7 +404,7 @@
             </div>
           </div>
 
-          <div class="modal-field">
+          <div class="modal-field modal-field--full">
             <label class="modal-label" for="new-password">New Password</label>
             <div class="modal-input-wrap">
               <input
@@ -460,23 +460,27 @@
         @if (passwordError) {
           <p class="modal-message modal-message--error">{{ passwordError }}</p>
         }
+
+        @if (passwordSuccess) {
+          <p class="modal-message modal-message--success">{{ 'adminProfile.passwordChangedSuccess' | translate }}</p>
+        }
       </div>
 
       <div class="password-modal__footer">
-        <button class="modal-secondary-btn" type="button" (click)="closePasswordModal()" [disabled]="passwordLoading">
+        <button class="modal-secondary-btn" type="button" (click)="closePasswordModal()" [disabled]="passwordLoading || passwordSuccess">
           Cancel
         </button>
 
         <button
           class="modal-primary-btn"
           type="button"
-          [disabled]="passwordLoading"
+          [disabled]="passwordLoading || passwordSuccess"
           (click)="submitPasswordStep()"
         >
           @if (passwordLoading) {
             <span class="spinner" aria-hidden="true"></span>
           }
-          <span>{{ passwordLoading ? 'Saving...' : 'Change Password' }}</span>
+          <span>{{ passwordLoading ? ('adminProfile.savingBtn' | translate) : ('adminProfile.changePasswordBtn' | translate) }}</span>
         </button>
       </div>
     </div>

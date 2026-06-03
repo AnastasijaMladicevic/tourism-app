@@ -608,6 +608,15 @@
       }
     }
   },
+  "adminProfile": {
+    "passwordModalDescription": "Enter your current password and choose a new one.",
+    "currentPasswordLabel": "Current Password",
+    "showCurrentPassword": "Show current password",
+    "hideCurrentPassword": "Hide current password",
+    "changePasswordBtn": "Change Password",
+    "savingBtn": "Saving...",
+    "passwordChangedSuccess": "Password changed successfully."
+  },
   "__literals": {
     "Settings": "Settings",
     "Configuración": "Settings",

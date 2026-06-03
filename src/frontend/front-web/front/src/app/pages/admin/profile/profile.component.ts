@@ -8,6 +8,7 @@ import { environment } from '../../../../environment/environment';
 import { AuthService, UpdateUserDto, ChangePasswordDto } from '../../../services/auth.service';
 import { UserDto } from '../../../models/user.model';
 import { TranslationService } from '../../../services/translation.service';
+import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 type PermissionItem = {
   label: string;
   detail: string;
@@ -25,7 +26,7 @@ type ProfileLanguageOption = {
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, MatIcon, ImageCropperComponent],
+  imports: [CommonModule, FormsModule, RouterModule, MatIcon, ImageCropperComponent, TranslatePipe],
   templateUrl: './profile.component.html',
   styleUrls: ['./profile.component.css'],
 })
@@ -85,6 +86,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   permissionsModalState: ModalState = 'closed';
   passwordModalState: ModalState = 'closed';
   passwordError = '';
+  passwordSuccess = false;
   passwordLoading = false;
   currentPassword = '';
   newPassword = '';
@@ -354,6 +356,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
       this.currentPassword = '';
       this.newPassword = '';
       this.confirmNewPassword = '';
+      this.passwordSuccess = false;
       this.releaseBodyScrollIfNoModal();
       this.passwordModalCloseTimerId = null;
     }, 220);
@@ -463,9 +466,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.authService.changePassword(this.user.id, dto).subscribe({
       next: () => {
         this.passwordLoading = false;
-        this.showSaveSuccess();
-        this.closePasswordModal(true);
+        this.passwordSuccess = true;
         this.cdr.detectChanges();
+        window.setTimeout(() => this.closePasswordModal(true), 1800);
       },
       error: (err) => {
         this.passwordLoading = false;

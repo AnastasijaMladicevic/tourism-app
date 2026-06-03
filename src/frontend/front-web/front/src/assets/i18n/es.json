@@ -608,6 +608,15 @@
       }
     }
   },
+  "adminProfile": {
+    "passwordModalDescription": "Introduce tu contraseña actual y elige una nueva.",
+    "currentPasswordLabel": "Contraseña actual",
+    "showCurrentPassword": "Mostrar contraseña actual",
+    "hideCurrentPassword": "Ocultar contraseña actual",
+    "changePasswordBtn": "Cambiar contraseña",
+    "savingBtn": "Guardando...",
+    "passwordChangedSuccess": "La contraseña se cambió correctamente."
+  },
   "__literals": {
     "Settings": "Configuración",
     "Configuración": "Configuración",

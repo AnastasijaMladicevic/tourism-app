@@ -1474,6 +1474,12 @@
   color: #1d4ed8;
 }
 
+.modal-message--success {
+  border: 1px solid #bbf7d0;
+  background: #f0fdf4;
+  color: #15803d;
+}
+
 .password-modal__footer {
   display: flex;
   align-items: center;

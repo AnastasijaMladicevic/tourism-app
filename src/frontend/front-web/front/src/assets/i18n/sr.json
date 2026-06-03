@@ -608,6 +608,15 @@
       }
     }
   },
+  "adminProfile": {
+    "passwordModalDescription": "Unesi trenutnu lozinku i izaberi novu.",
+    "currentPasswordLabel": "Trenutna lozinka",
+    "showCurrentPassword": "Prikaži trenutnu lozinku",
+    "hideCurrentPassword": "Sakrij trenutnu lozinku",
+    "changePasswordBtn": "Promeni lozinku",
+    "savingBtn": "Čuvanje...",
+    "passwordChangedSuccess": "Lozinka je uspešno promenjena."
+  },
   "__literals": {
     "Settings": "Podešavanja",
     "Configuración": "Podešavanja",
