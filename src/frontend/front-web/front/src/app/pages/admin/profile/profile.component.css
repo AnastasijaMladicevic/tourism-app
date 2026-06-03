@@ -1488,6 +1488,26 @@
   padding: 0 24px 24px;
 }
 
+.modal-footer-start {
+  flex: 1;
+}
+
+.modal-forgot-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 13px;
+  color: #2563eb;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.modal-forgot-link:disabled {
+  color: #94a3b8;
+  cursor: default;
+}
+
 .modal-secondary-btn,
 .modal-primary-btn {
   min-height: 44px;

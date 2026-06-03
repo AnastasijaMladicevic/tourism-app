@@ -370,8 +370,20 @@
       <div class="password-modal__header">
         <div class="password-modal__heading-copy">
           <span class="password-modal__eyebrow">Security</span>
-          <h3>Change Password</h3>
-          <p>{{ 'adminProfile.passwordModalDescription' | translate }}</p>
+          <h3>
+            @if (passwordChangeMode === 'forgot-otp') { {{ 'adminProfile.forgotPasswordHeading' | translate }} }
+            @else if (passwordChangeMode === 'forgot-password') { {{ 'adminProfile.setPasswordHeading' | translate }} }
+            @else { Change Password }
+          </h3>
+          <p>
+            @if (passwordChangeMode === 'forgot-otp') {
+              {{ 'adminProfile.forgotOtpDescription' | translate }}
+            } @else if (passwordChangeMode === 'forgot-password') {
+              {{ 'adminProfile.forgotPasswordDescription' | translate }}
+            } @else {
+              {{ 'adminProfile.passwordModalDescription' | translate }}
+            }
+          </p>
         </div>
 
         <button class="password-modal__close" type="button" (click)="closePasswordModal()" aria-label="Close">
@@ -380,82 +392,173 @@
       </div>
 
       <div class="password-modal__body">
-        <div class="password-modal__grid">
-          <div class="modal-field modal-field--full">
-            <label class="modal-label" for="current-password">{{ 'adminProfile.currentPasswordLabel' | translate }}</label>
-            <div class="modal-input-wrap">
-              <input
-                id="current-password"
-                name="currentPassword"
-                [(ngModel)]="currentPassword"
-                [type]="hideCurrentPassword ? 'password' : 'text'"
-                autocomplete="current-password"
-              />
-              <button
-                class="modal-toggle"
-                type="button"
-                (click)="hideCurrentPassword = !hideCurrentPassword"
-                [attr.aria-label]="hideCurrentPassword ? ('adminProfile.showCurrentPassword' | translate) : ('adminProfile.hideCurrentPassword' | translate)"
-              >
-                <mat-icon fontSet="material-icons-outlined">
-                  {{ hideCurrentPassword ? 'visibility' : 'visibility_off' }}
-                </mat-icon>
-              </button>
+
+        @if (passwordChangeMode === 'direct') {
+          <div class="password-modal__grid">
+            <div class="modal-field modal-field--full">
+              <label class="modal-label" for="current-password">{{ 'adminProfile.currentPasswordLabel' | translate }}</label>
+              <div class="modal-input-wrap">
+                <input
+                  id="current-password"
+                  name="currentPassword"
+                  [(ngModel)]="currentPassword"
+                  [type]="hideCurrentPassword ? 'password' : 'text'"
+                  autocomplete="current-password"
+                />
+                <button
+                  class="modal-toggle"
+                  type="button"
+                  (click)="hideCurrentPassword = !hideCurrentPassword"
+                  [attr.aria-label]="hideCurrentPassword ? ('adminProfile.showCurrentPassword' | translate) : ('adminProfile.hideCurrentPassword' | translate)"
+                >
+                  <mat-icon fontSet="material-icons-outlined">
+                    {{ hideCurrentPassword ? 'visibility' : 'visibility_off' }}
+                  </mat-icon>
+                </button>
+              </div>
+            </div>
+
+            <div class="modal-field modal-field--full">
+              <label class="modal-label" for="new-password">New Password</label>
+              <div class="modal-input-wrap">
+                <input
+                  id="new-password"
+                  name="newPassword"
+                  [(ngModel)]="newPassword"
+                  [type]="hideNewPassword ? 'password' : 'text'"
+                  autocomplete="new-password"
+                />
+                <button
+                  class="modal-toggle"
+                  type="button"
+                  (click)="hideNewPassword = !hideNewPassword"
+                  [attr.aria-label]="hideNewPassword ? 'Show new password' : 'Hide new password'"
+                >
+                  <mat-icon fontSet="material-icons-outlined">
+                    {{ hideNewPassword ? 'visibility' : 'visibility_off' }}
+                  </mat-icon>
+                </button>
+              </div>
+            </div>
+
+            <div class="modal-field modal-field--full">
+              <label class="modal-label" for="confirm-new-password">Confirm New Password</label>
+              <div class="modal-input-wrap">
+                <input
+                  id="confirm-new-password"
+                  name="confirmNewPassword"
+                  [(ngModel)]="confirmNewPassword"
+                  [type]="hideConfirmNewPassword ? 'password' : 'text'"
+                  autocomplete="new-password"
+                />
+                <button
+                  class="modal-toggle"
+                  type="button"
+                  (click)="hideConfirmNewPassword = !hideConfirmNewPassword"
+                  [attr.aria-label]="hideConfirmNewPassword ? 'Show confirm password' : 'Hide confirm password'"
+                >
+                  <mat-icon fontSet="material-icons-outlined">
+                    {{ hideConfirmNewPassword ? 'visibility' : 'visibility_off' }}
+                  </mat-icon>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="password-rules">
+            <div class="password-rule">At least 8 characters</div>
+            <div class="password-rule">Include one uppercase letter</div>
+            <div class="password-rule">Include one number or symbol</div>
+          </div>
+        }
+
+        @if (passwordChangeMode === 'forgot-otp') {
+          <div class="otp-panel">
+            <div class="otp-panel__icon">
+              <mat-icon fontSet="material-icons-outlined">mark_email_read</mat-icon>
+            </div>
+            <div class="otp-panel__copy">
+              <p>{{ 'adminProfile.codeExpiresIn' | translate }} <strong>{{ otpSecondsRemaining }}s</strong></p>
             </div>
           </div>
 
           <div class="modal-field modal-field--full">
-            <label class="modal-label" for="new-password">New Password</label>
-            <div class="modal-input-wrap">
-              <input
-                id="new-password"
-                name="newPassword"
-                [(ngModel)]="newPassword"
-                [type]="hideNewPassword ? 'password' : 'text'"
-                autocomplete="new-password"
-              />
-              <button
-                class="modal-toggle"
-                type="button"
-                (click)="hideNewPassword = !hideNewPassword"
-                [attr.aria-label]="hideNewPassword ? 'Show new password' : 'Hide new password'"
-              >
-                <mat-icon fontSet="material-icons-outlined">
-                  {{ hideNewPassword ? 'visibility' : 'visibility_off' }}
-                </mat-icon>
+            <label class="modal-label" for="otp-code">Verification Code</label>
+            <input
+              id="otp-code"
+              name="otpCode"
+              [(ngModel)]="otpCode"
+              class="otp-input"
+              type="text"
+              inputmode="numeric"
+              maxlength="6"
+              placeholder="000000"
+              autocomplete="one-time-code"
+            />
+            <div class="otp-meta">
+              <span>Resend available in {{ otpResendSecondsRemaining }}s</span>
+              <button class="otp-resend" type="button" [disabled]="otpResendSecondsRemaining > 0 || passwordLoading" (click)="resendForgotCode()">
+                Resend code
               </button>
             </div>
           </div>
+        }
 
-          <div class="modal-field modal-field--full">
-            <label class="modal-label" for="confirm-new-password">Confirm New Password</label>
-            <div class="modal-input-wrap">
-              <input
-                id="confirm-new-password"
-                name="confirmNewPassword"
-                [(ngModel)]="confirmNewPassword"
-                [type]="hideConfirmNewPassword ? 'password' : 'text'"
-                autocomplete="new-password"
-              />
-              <button
-                class="modal-toggle"
-                type="button"
-                (click)="hideConfirmNewPassword = !hideConfirmNewPassword"
-                [attr.aria-label]="hideConfirmNewPassword ? 'Show confirm password' : 'Hide confirm password'"
-              >
-                <mat-icon fontSet="material-icons-outlined">
-                  {{ hideConfirmNewPassword ? 'visibility' : 'visibility_off' }}
-                </mat-icon>
-              </button>
+        @if (passwordChangeMode === 'forgot-password') {
+          <div class="password-modal__grid">
+            <div class="modal-field modal-field--full">
+              <label class="modal-label" for="forgot-new-password">New Password</label>
+              <div class="modal-input-wrap">
+                <input
+                  id="forgot-new-password"
+                  name="newPassword"
+                  [(ngModel)]="newPassword"
+                  [type]="hideNewPassword ? 'password' : 'text'"
+                  autocomplete="new-password"
+                />
+                <button
+                  class="modal-toggle"
+                  type="button"
+                  (click)="hideNewPassword = !hideNewPassword"
+                  [attr.aria-label]="hideNewPassword ? 'Show new password' : 'Hide new password'"
+                >
+                  <mat-icon fontSet="material-icons-outlined">
+                    {{ hideNewPassword ? 'visibility' : 'visibility_off' }}
+                  </mat-icon>
+                </button>
+              </div>
+            </div>
+
+            <div class="modal-field modal-field--full">
+              <label class="modal-label" for="forgot-confirm-password">Confirm New Password</label>
+              <div class="modal-input-wrap">
+                <input
+                  id="forgot-confirm-password"
+                  name="confirmNewPassword"
+                  [(ngModel)]="confirmNewPassword"
+                  [type]="hideConfirmNewPassword ? 'password' : 'text'"
+                  autocomplete="new-password"
+                />
+                <button
+                  class="modal-toggle"
+                  type="button"
+                  (click)="hideConfirmNewPassword = !hideConfirmNewPassword"
+                  [attr.aria-label]="hideConfirmNewPassword ? 'Show confirm password' : 'Hide confirm password'"
+                >
+                  <mat-icon fontSet="material-icons-outlined">
+                    {{ hideConfirmNewPassword ? 'visibility' : 'visibility_off' }}
+                  </mat-icon>
+                </button>
+              </div>
             </div>
           </div>
-        </div>
 
-        <div class="password-rules">
-          <div class="password-rule">At least 8 characters</div>
-          <div class="password-rule">Include one uppercase letter</div>
-          <div class="password-rule">Include one number or symbol</div>
-        </div>
+          <div class="password-rules">
+            <div class="password-rule">At least 8 characters</div>
+            <div class="password-rule">Include one uppercase letter</div>
+            <div class="password-rule">Include one number or symbol</div>
+          </div>
+        }
 
         @if (passwordError) {
           <p class="modal-message modal-message--error">{{ passwordError }}</p>
@@ -467,21 +570,65 @@
       </div>
 
       <div class="password-modal__footer">
-        <button class="modal-secondary-btn" type="button" (click)="closePasswordModal()" [disabled]="passwordLoading || passwordSuccess">
-          Cancel
-        </button>
+        @if (passwordChangeMode === 'direct') {
+          <button class="modal-secondary-btn" type="button" (click)="closePasswordModal()" [disabled]="passwordLoading || passwordSuccess">
+            Cancel
+          </button>
 
-        <button
-          class="modal-primary-btn"
-          type="button"
-          [disabled]="passwordLoading || passwordSuccess"
-          (click)="submitPasswordStep()"
-        >
-          @if (passwordLoading) {
-            <span class="spinner" aria-hidden="true"></span>
-          }
-          <span>{{ passwordLoading ? ('adminProfile.savingBtn' | translate) : ('adminProfile.changePasswordBtn' | translate) }}</span>
-        </button>
+          <div class="modal-footer-start">
+            <button class="modal-forgot-link" type="button" (click)="startForgotFlow()" [disabled]="passwordLoading">
+              {{ 'adminProfile.forgotPasswordLink' | translate }}
+            </button>
+          </div>
+
+          <button
+            class="modal-primary-btn"
+            type="button"
+            [disabled]="passwordLoading || passwordSuccess"
+            (click)="submitPasswordStep()"
+          >
+            @if (passwordLoading) {
+              <span class="spinner" aria-hidden="true"></span>
+            }
+            <span>{{ passwordLoading ? ('adminProfile.savingBtn' | translate) : ('adminProfile.changePasswordBtn' | translate) }}</span>
+          </button>
+        }
+
+        @if (passwordChangeMode === 'forgot-otp') {
+          <button class="modal-secondary-btn" type="button" (click)="backToDirectMode()" [disabled]="passwordLoading">
+            Back
+          </button>
+
+          <button
+            class="modal-primary-btn"
+            type="button"
+            [disabled]="passwordLoading || otpSecondsRemaining === 0"
+            (click)="submitForgotOtp()"
+          >
+            @if (passwordLoading) {
+              <span class="spinner" aria-hidden="true"></span>
+            }
+            <span>{{ passwordLoading ? ('adminProfile.verifyingBtn' | translate) : ('adminProfile.verifyCodeBtn' | translate) }}</span>
+          </button>
+        }
+
+        @if (passwordChangeMode === 'forgot-password') {
+          <button class="modal-secondary-btn" type="button" (click)="closePasswordModal()" [disabled]="passwordLoading || passwordSuccess">
+            Cancel
+          </button>
+
+          <button
+            class="modal-primary-btn"
+            type="button"
+            [disabled]="passwordLoading || passwordSuccess"
+            (click)="submitForgotPassword()"
+          >
+            @if (passwordLoading) {
+              <span class="spinner" aria-hidden="true"></span>
+            }
+            <span>{{ passwordLoading ? ('adminProfile.savingBtn' | translate) : ('adminProfile.setNewPasswordBtn' | translate) }}</span>
+          </button>
+        }
       </div>
     </div>
   </div>

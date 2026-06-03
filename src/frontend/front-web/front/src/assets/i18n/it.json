@@ -615,7 +615,16 @@
     "hideCurrentPassword": "Nascondi password attuale",
     "changePasswordBtn": "Cambia password",
     "savingBtn": "Salvataggio...",
-    "passwordChangedSuccess": "La password è stata cambiata con successo."
+    "passwordChangedSuccess": "La password è stata cambiata con successo.",
+    "forgotPasswordLink": "Password dimenticata?",
+    "forgotOtpDescription": "Un codice di verifica è stato inviato alla tua email. Inseriscilo qui sotto.",
+    "forgotPasswordDescription": "Codice verificato. Scegli una nuova password per il tuo account.",
+    "codeExpiresIn": "Il codice scade tra",
+    "verifyCodeBtn": "Verifica codice",
+    "verifyingBtn": "Verifica in corso...",
+    "setNewPasswordBtn": "Imposta nuova password",
+    "forgotPasswordHeading": "Verifica codice",
+    "setPasswordHeading": "Imposta nuova password"
   },
   "__literals": {
     "Settings": "Settings",

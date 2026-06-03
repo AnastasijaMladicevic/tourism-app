@@ -615,7 +615,16 @@
     "hideCurrentPassword": "Hide current password",
     "changePasswordBtn": "Change Password",
     "savingBtn": "Saving...",
-    "passwordChangedSuccess": "Password changed successfully."
+    "passwordChangedSuccess": "Password changed successfully.",
+    "forgotPasswordLink": "Forgot password?",
+    "forgotOtpDescription": "A verification code was sent to your email. Enter it below.",
+    "forgotPasswordDescription": "Code verified. Choose a new password for your account.",
+    "codeExpiresIn": "Code expires in",
+    "verifyCodeBtn": "Verify Code",
+    "verifyingBtn": "Verifying...",
+    "setNewPasswordBtn": "Set New Password",
+    "forgotPasswordHeading": "Verify Code",
+    "setPasswordHeading": "Set New Password"
   },
   "__literals": {
     "Settings": "Settings",
