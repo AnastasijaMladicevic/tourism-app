@@ -130,7 +130,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.revokeCropPreviewUrl();
     this.clearPermissionsModalTimer();
-    this.clearPasswordTimers();
     this.unlockBodyScroll();
   }
 
