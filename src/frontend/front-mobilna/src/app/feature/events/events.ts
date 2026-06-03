@@ -101,6 +101,7 @@ export class EventsComponent implements OnInit, OnDestroy {
         this.isTracking = enabled;
         if (!enabled) this.clearDistances();
         else this.updateDistances();
+        this.flushUi();
       })
     );
 
@@ -114,6 +115,7 @@ export class EventsComponent implements OnInit, OnDestroy {
       })
     );
 
+    this.restoreSortOption();
     if (sessionStorage.getItem(this.returnFlagKey)) {
       sessionStorage.removeItem(this.returnFlagKey);
       this.restoreListState();
@@ -143,10 +145,10 @@ export class EventsComponent implements OnInit, OnDestroy {
   private restoreListState(): void {
     const raw = sessionStorage.getItem(this.listStateKey);
     if (!raw) return;
-  
+
     try {
       const state = JSON.parse(raw);
-  
+
       this.searchQuery = state.searchQuery ?? '';
       this.activeFilter = state.activeFilter ?? 'All';
       this.activeCategory = state.activeCategory ?? 'All';
@@ -156,6 +158,18 @@ export class EventsComponent implements OnInit, OnDestroy {
     } catch {
       sessionStorage.removeItem(this.listStateKey);
     }
+  }
+
+  private restoreSortOption(): void {
+    const raw = sessionStorage.getItem(this.listStateKey);
+    if (!raw) return;
+    try {
+      const state = JSON.parse(raw) as { sortOption?: string };
+      const valid: Array<typeof this.sortOption> = ['date', 'az', 'za', 'distance', 'price'];
+      if (state.sortOption && valid.includes(state.sortOption as typeof this.sortOption)) {
+        this.sortOption = state.sortOption as typeof this.sortOption;
+      }
+    } catch { /* ignore */ }
   }
 
   togglePlanner(eventItem: EventCard, e?: Event): void {

@@ -26,6 +26,17 @@ export class LocationTrackingService {
   readonly location$ = this.locationSubject.asObservable();
 
   constructor(private readonly authService: AuthService) {
+    if (this.readEnabled()) {
+      setTimeout(() => this.resumeIfPreviouslyEnabled(), 0);
+    }
+  }
+
+  private resumeIfPreviouslyEnabled(): void {
+    if (this.canUseGeolocation()) {
+      this.ensureTracking();
+    } else if (this.canUseIpFallback()) {
+      this.ensureIpFallback();
+    }
   }
 
   isTrackingEnabled(): boolean {
@@ -284,6 +295,13 @@ export class LocationTrackingService {
 
   private setTrackingEnabled(enabled: boolean): void {
     this.trackingEnabledSubject.next(enabled);
+    if (typeof localStorage !== 'undefined') {
+      if (enabled) {
+        localStorage.setItem(this.enabledKey, 'true');
+      } else {
+        localStorage.removeItem(this.enabledKey);
+      }
+    }
   }
 
   private persistSnapshot(snapshot: TrackedLocation): void {
@@ -303,7 +321,8 @@ export class LocationTrackingService {
   }
 
   private readEnabled(): boolean {
-    return false;
+    if (typeof localStorage === 'undefined') return false;
+    return localStorage.getItem(this.enabledKey) === 'true';
   }
 
   private readSnapshot(): TrackedLocation | null {

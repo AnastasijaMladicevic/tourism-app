@@ -172,6 +172,7 @@ export class ObjectsComponent implements OnInit, OnDestroy {
     
       this.hideTypeFilters = Boolean(type);
 
+      this.restoreSortOption();
       if (sessionStorage.getItem(this.returnFlagKey)) {
         sessionStorage.removeItem(this.returnFlagKey);
         this.restoreListState();
@@ -205,21 +206,33 @@ export class ObjectsComponent implements OnInit, OnDestroy {
   private restoreListState(): boolean {
     const raw = sessionStorage.getItem(this.listStateKey);
     if (!raw) return false;
-  
+
     try {
       const state = JSON.parse(raw);
-  
+
       this.searchQuery = state.searchQuery ?? '';
       this.activeFilter = state.activeFilter ?? 'All';
       this.minRatingFilter = state.minRatingFilter ?? 0;
       this.sortOption = state.sortOption ?? 'rating';
       this.currentPage = state.currentPage ?? 1;
       this.pageSize = state.pageSize ?? 8;
-  
+
       return true;
     } catch {
       return false;
     }
+  }
+
+  private restoreSortOption(): void {
+    const raw = sessionStorage.getItem(this.listStateKey);
+    if (!raw) return;
+    try {
+      const state = JSON.parse(raw) as { sortOption?: string };
+      const valid: Array<typeof this.sortOption> = ['rating', 'az', 'za', 'distance'];
+      if (state.sortOption && valid.includes(state.sortOption as typeof this.sortOption)) {
+        this.sortOption = state.sortOption as typeof this.sortOption;
+      }
+    } catch { /* ignore */ }
   }
 
   onPageSizeChange(size: number): void {

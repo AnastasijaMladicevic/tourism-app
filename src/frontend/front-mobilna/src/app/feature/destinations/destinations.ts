@@ -122,8 +122,8 @@ export class DestinationsComponent implements OnInit, OnDestroy {
           this.clearDistances();
         } else {
           this.updateDistances();
-          this.cdr.detectChanges();
         }
+        this.cdr.detectChanges();
       })
     );
 
@@ -143,6 +143,7 @@ export class DestinationsComponent implements OnInit, OnDestroy {
       })
     );
 
+    this.restoreSortOption();
     if (sessionStorage.getItem(this.returnFlagKey)) {
       sessionStorage.removeItem(this.returnFlagKey);
       this.restoreListState();
@@ -263,10 +264,10 @@ export class DestinationsComponent implements OnInit, OnDestroy {
   private restoreListState(): void {
     const raw = sessionStorage.getItem(this.listStateKey);
     if (!raw) return;
-  
+
     try {
       const state = JSON.parse(raw);
-  
+
       this.searchQuery = state.searchQuery ?? '';
       this.activeFilter = state.activeFilter ?? 'All';
       this.sortOption = state.sortOption ?? 'az';
@@ -275,6 +276,18 @@ export class DestinationsComponent implements OnInit, OnDestroy {
     } catch {
       sessionStorage.removeItem(this.listStateKey);
     }
+  }
+
+  private restoreSortOption(): void {
+    const raw = sessionStorage.getItem(this.listStateKey);
+    if (!raw) return;
+    try {
+      const state = JSON.parse(raw) as { sortOption?: string };
+      const valid: Array<typeof this.sortOption> = ['az', 'za', 'distance'];
+      if (state.sortOption && valid.includes(state.sortOption as typeof this.sortOption)) {
+        this.sortOption = state.sortOption as typeof this.sortOption;
+      }
+    } catch { /* ignore */ }
   }
 
   onPageSizeChange(size: number | string): void {
