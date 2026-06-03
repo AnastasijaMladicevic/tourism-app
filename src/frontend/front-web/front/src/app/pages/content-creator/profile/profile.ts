@@ -5,7 +5,7 @@ import { Router, RouterModule } from '@angular/router';
 import { MatIcon } from '@angular/material/icon';
 import { ImageCropperComponent, ImageCroppedEvent } from 'ngx-image-cropper';
 import { environment } from '../../../../environment/environment';
-import { AuthService, UpdateUserDto } from '../../../services/auth.service';
+import { AuthService, UpdateUserDto, ChangePasswordDto } from '../../../services/auth.service';
 import { UserDto } from '../../../models/user.model';
 import { TranslationService } from '../../../services/translation.service';
 type PermissionItem = {
@@ -13,8 +13,6 @@ type PermissionItem = {
   detail: string;
   icon: string;
 };
-
-type PasswordChangeStep = 'credentials' | 'otp';
 
 type ModalState = 'closed' | 'opening' | 'open' | 'closing';
 
@@ -86,29 +84,21 @@ export class ProfileComponentContentCreator implements OnInit, OnDestroy {
   saveSuccess = false;
   permissionsModalState: ModalState = 'closed';
   passwordModalState: ModalState = 'closed';
-  passwordChangeStep: PasswordChangeStep = 'credentials';
   passwordError = '';
-  passwordInfo = '';
   passwordLoading = false;
+  currentPassword = '';
   newPassword = '';
   confirmNewPassword = '';
+  hideCurrentPassword = true;
   hideNewPassword = true;
   hideConfirmNewPassword = true;
-  otpCode = '';
-  otpSecondsRemaining = 0;
-  otpResendSecondsRemaining = 0;
   languageMenuOpen = false;
   countryMenuOpen = false;
 
   private cropPreviewUrl: string | null = null;
   private pendingCroppedBlob: Blob | null = null;
-  private otpExpiryTimerId: number | null = null;
-  private otpResendTimerId: number | null = null;
   private permissionsModalCloseTimerId: number | null = null;
   private passwordModalCloseTimerId: number | null = null;
-
-  private static readonly OTP_EXPIRY_SECONDS = 300;
-  private static readonly OTP_RESEND_SECONDS = 30;
 
   constructor(
     private authService: AuthService,
@@ -299,21 +289,17 @@ export class ProfileComponentContentCreator implements OnInit, OnDestroy {
   }
 
   resetPassword(): void {
-    if (!this.user.email || this.passwordModalState !== 'closed') return;
+    if (this.passwordModalState !== 'closed') return;
 
     this.passwordModalState = 'opening';
-    this.passwordChangeStep = 'credentials';
     this.passwordError = '';
-    this.passwordInfo = '';
     this.passwordLoading = false;
+    this.currentPassword = '';
     this.newPassword = '';
     this.confirmNewPassword = '';
+    this.hideCurrentPassword = true;
     this.hideNewPassword = true;
     this.hideConfirmNewPassword = true;
-    this.otpCode = '';
-    this.otpSecondsRemaining = 0;
-    this.otpResendSecondsRemaining = 0;
-    this.clearPasswordTimers();
     this.lockBodyScroll();
 
     window.setTimeout(() => {

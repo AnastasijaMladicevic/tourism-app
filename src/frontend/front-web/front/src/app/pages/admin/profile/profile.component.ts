@@ -5,7 +5,7 @@ import { Router, RouterModule } from '@angular/router';
 import { MatIcon } from '@angular/material/icon';
 import { ImageCropperComponent, ImageCroppedEvent } from 'ngx-image-cropper';
 import { environment } from '../../../../environment/environment';
-import { AuthService, UpdateUserDto } from '../../../services/auth.service';
+import { AuthService, UpdateUserDto, ChangePasswordDto } from '../../../services/auth.service';
 import { UserDto } from '../../../models/user.model';
 import { TranslationService } from '../../../services/translation.service';
 type PermissionItem = {
@@ -14,7 +14,6 @@ type PermissionItem = {
   icon: string;
 };
 
-type PasswordChangeStep = 'credentials' | 'otp';
 
 type ModalState = 'closed' | 'opening' | 'open' | 'closing';
 
@@ -85,29 +84,21 @@ export class ProfileComponent implements OnInit, OnDestroy {
   saveSuccess = false;
   permissionsModalState: ModalState = 'closed';
   passwordModalState: ModalState = 'closed';
-  passwordChangeStep: PasswordChangeStep = 'credentials';
   passwordError = '';
-  passwordInfo = '';
   passwordLoading = false;
+  currentPassword = '';
   newPassword = '';
   confirmNewPassword = '';
+  hideCurrentPassword = true;
   hideNewPassword = true;
   hideConfirmNewPassword = true;
-  otpCode = '';
-  otpSecondsRemaining = 0;
-  otpResendSecondsRemaining = 0;
   languageMenuOpen = false;
   countryMenuOpen = false;
 
   private cropPreviewUrl: string | null = null;
   private pendingCroppedBlob: Blob | null = null;
-  private otpExpiryTimerId: number | null = null;
-  private otpResendTimerId: number | null = null;
   private permissionsModalCloseTimerId: number | null = null;
   private passwordModalCloseTimerId: number | null = null;
-
-  private static readonly OTP_EXPIRY_SECONDS = 300;
-  private static readonly OTP_RESEND_SECONDS = 30;
 
   constructor(
     private authService: AuthService,
@@ -298,21 +289,17 @@ export class ProfileComponent implements OnInit, OnDestroy {
   }
 
   resetPassword(): void {
-    if (!this.user.email || this.passwordModalState !== 'closed') return;
+    if (this.passwordModalState !== 'closed') return;
 
     this.passwordModalState = 'opening';
-    this.passwordChangeStep = 'credentials';
     this.passwordError = '';
-    this.passwordInfo = '';
     this.passwordLoading = false;
+    this.currentPassword = '';
     this.newPassword = '';
     this.confirmNewPassword = '';
+    this.hideCurrentPassword = true;
     this.hideNewPassword = true;
     this.hideConfirmNewPassword = true;
-    this.otpCode = '';
-    this.otpSecondsRemaining = 0;
-    this.otpResendSecondsRemaining = 0;
-    this.clearPasswordTimers();
     this.lockBodyScroll();
 
     window.setTimeout(() => {
@@ -358,8 +345,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
     this.passwordModalState = 'closing';
     this.passwordError = '';
-    this.passwordInfo = '';
-    this.clearPasswordTimers();
 
     if (this.passwordModalCloseTimerId) {
       window.clearTimeout(this.passwordModalCloseTimerId);
@@ -367,12 +352,9 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
     this.passwordModalCloseTimerId = window.setTimeout(() => {
       this.passwordModalState = 'closed';
-      this.passwordChangeStep = 'credentials';
+      this.currentPassword = '';
       this.newPassword = '';
       this.confirmNewPassword = '';
-      this.otpCode = '';
-      this.otpSecondsRemaining = 0;
-      this.otpResendSecondsRemaining = 0;
       this.releaseBodyScrollIfNoModal();
       this.passwordModalCloseTimerId = null;
     }, 220);
@@ -445,7 +427,11 @@ export class ProfileComponent implements OnInit, OnDestroy {
     if (this.passwordLoading) return;
 
     this.passwordError = '';
-    this.passwordInfo = '';
+
+    if (!this.currentPassword) {
+      this.passwordError = 'Enter your current password.';
+      return;
+    }
 
     if (this.newPassword.length < 8) {
       this.passwordError = 'New password must be at least 8 characters long.';
@@ -462,82 +448,32 @@ export class ProfileComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.sendPasswordChangeCode(false);
-  }
-
-  submitOtpStep(): void {
-    if (this.passwordLoading) return;
-
-    this.passwordError = '';
-    this.passwordInfo = '';
-
-    if (!/^\d{6}$/.test(this.otpCode.trim())) {
-      this.passwordError = 'Enter the 6-digit verification code.';
-      return;
-    }
-
-    if (!this.user.email) {
-      this.passwordError = 'Email address is not available for this account.';
+    if (!this.user.id) {
+      this.passwordError = 'User ID is not available.';
       return;
     }
 
     this.passwordLoading = true;
 
-    this.authService.verifyResetCode({ email: this.user.email, code: this.otpCode.trim() }).subscribe({
-      next: (response: { resetSessionToken?: string; ResetSessionToken?: string; token?: string } | string) => {
-        const resetSessionToken = this.extractResetSessionToken(response);
+    const dto: ChangePasswordDto = {
+      currentPassword: this.currentPassword,
+      newPassword: this.newPassword,
+      confirmPassword: this.confirmNewPassword,
+    };
 
-        if (!resetSessionToken) {
-          this.passwordLoading = false;
-          this.passwordError = 'Reset session token was not returned. Please request a new code.';
-          this.cdr.detectChanges();
-          return;
-        }
-
-        this.authService
-          .resetPassword(
-            this.user.email!,
-            this.otpCode.trim(),
-            this.newPassword,
-            this.confirmNewPassword,
-            resetSessionToken,
-          )
-          .subscribe({
-            next: () => {
-              this.passwordLoading = false;
-              this.showSaveSuccess();
-              this.closePasswordModal(true);
-              this.cdr.detectChanges();
-            },
-            error: (err) => {
-              this.passwordLoading = false;
-              this.passwordError = err?.error?.message ?? 'Password change failed.';
-              this.cdr.detectChanges();
-            },
-          });
+    this.authService.changePassword(this.user.id, dto).subscribe({
+      next: () => {
+        this.passwordLoading = false;
+        this.showSaveSuccess();
+        this.closePasswordModal(true);
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.passwordLoading = false;
-        this.passwordError = err?.error?.message ?? 'Invalid or expired verification code.';
+        this.passwordError = err?.error?.message ?? 'Password change failed. Check your current password.';
         this.cdr.detectChanges();
       },
     });
-  }
-
-  resendOtpCode(): void {
-    if (this.passwordLoading || this.otpResendSecondsRemaining > 0) return;
-
-    this.sendPasswordChangeCode(true);
-  }
-
-  backToPasswordStep(): void {
-    if (this.passwordLoading) return;
-
-    this.passwordChangeStep = 'credentials';
-    this.passwordError = '';
-    this.passwordInfo = '';
-    this.otpCode = '';
-    this.clearPasswordTimers();
   }
 
   cancel(): void {
@@ -631,86 +567,10 @@ export class ProfileComponent implements OnInit, OnDestroy {
     }, 2500);
   }
 
-  private sendPasswordChangeCode(isResend: boolean): void {
-    if (!this.user.email) {
-      this.passwordError = 'Email address is not available for this account.';
-      return;
-    }
-
-    this.passwordLoading = true;
-    this.passwordError = '';
-    this.passwordInfo = '';
-
-    this.authService.forgotPassword(this.user.email).subscribe({
-      next: () => {
-        this.passwordLoading = false;
-        this.passwordChangeStep = 'otp';
-        this.otpCode = '';
-        this.passwordInfo = isResend
-          ? 'A new verification code has been sent to your email address.'
-          : 'A verification code has been sent to your email address.';
-        this.startOtpCountdown();
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        this.passwordLoading = false;
-        this.passwordError = err?.error?.message ?? 'Unable to send a verification code right now.';
-        this.cdr.detectChanges();
-      },
-    });
-  }
-
-  private startOtpCountdown(): void {
-    this.clearPasswordTimers();
-    this.otpSecondsRemaining = ProfileComponent.OTP_EXPIRY_SECONDS;
-    this.otpResendSecondsRemaining = ProfileComponent.OTP_RESEND_SECONDS;
-
-    this.otpExpiryTimerId = window.setInterval(() => {
-      this.otpSecondsRemaining = Math.max(0, this.otpSecondsRemaining - 1);
-
-      if (this.otpSecondsRemaining === 0) {
-        this.passwordError = 'The verification code has expired. Resend it to continue.';
-        this.clearOtpExpiryTimer();
-      }
-    }, 1000);
-
-    this.otpResendTimerId = window.setInterval(() => {
-      this.otpResendSecondsRemaining = Math.max(0, this.otpResendSecondsRemaining - 1);
-
-      if (this.otpResendSecondsRemaining === 0) {
-        this.clearOtpResendTimer();
-      }
-    }, 1000);
-  }
-
-  private clearPasswordTimers(): void {
-    this.clearOtpExpiryTimer();
-    this.clearOtpResendTimer();
-
-    if (this.passwordModalCloseTimerId !== null) {
-      window.clearTimeout(this.passwordModalCloseTimerId);
-      this.passwordModalCloseTimerId = null;
-    }
-  }
-
   private clearPermissionsModalTimer(): void {
     if (this.permissionsModalCloseTimerId !== null) {
       window.clearTimeout(this.permissionsModalCloseTimerId);
       this.permissionsModalCloseTimerId = null;
-    }
-  }
-
-  private clearOtpExpiryTimer(): void {
-    if (this.otpExpiryTimerId !== null) {
-      window.clearInterval(this.otpExpiryTimerId);
-      this.otpExpiryTimerId = null;
-    }
-  }
-
-  private clearOtpResendTimer(): void {
-    if (this.otpResendTimerId !== null) {
-      window.clearInterval(this.otpResendTimerId);
-      this.otpResendTimerId = null;
     }
   }
 
@@ -728,17 +588,4 @@ export class ProfileComponent implements OnInit, OnDestroy {
     }
   }
 
-  private extractResetSessionToken(
-    response: { resetSessionToken?: string; ResetSessionToken?: string; token?: string } | string | null | undefined,
-  ): string {
-    if (!response) {
-      return '';
-    }
-
-    if (typeof response === 'string') {
-      return response;
-    }
-
-    return response.resetSessionToken ?? response.ResetSessionToken ?? response.token ?? '';
-  }
 }
