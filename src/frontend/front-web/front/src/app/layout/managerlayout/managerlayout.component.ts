@@ -4,7 +4,6 @@ import { FormsModule } from '@angular/forms';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { filter, Subscription } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
-import { DomTranslationService } from '../../services/dom-translation.service';
 import { NotificationBellComponent } from '../../shared/components/notification-bell/notification-bell.component';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
@@ -31,12 +30,10 @@ export class ManagerLayoutComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private authService: AuthService,
-    private domTranslation: DomTranslationService,
   ) {}
 
   ngOnInit(): void {
     this.loadUser();
-    this.domTranslation.start();
     window.addEventListener('storage', this.loadUser);
     this.syncMapRoute();
     this.navSubscription = this.router.events
@@ -56,7 +53,6 @@ export class ManagerLayoutComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.domTranslation.stop();
     window.removeEventListener('storage', this.loadUser);
     this.navSubscription?.unsubscribe();
     document.body.classList.remove('manager-nav-open');

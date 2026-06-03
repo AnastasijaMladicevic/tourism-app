@@ -35,14 +35,14 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
     `${environment.apiUrl.replace('/api', '')}/images/profiles/default_icon.png`;
 
   readonly permissionItems: PermissionItem[] = [
-    { labelKey: 'View manager dashboard', detailKey: 'Open the manager overview at /api/manager/dashboard/overview.', icon: 'dashboard' },
-    { labelKey: 'Manage events', detailKey: 'List assigned events, inspect details, approve them, and toggle active state.', icon: 'event' },
-    { labelKey: 'Manage activities', detailKey: 'List assigned activities, inspect details, approve them, and toggle active state.', icon: 'local_activity' },
-    { labelKey: 'Manage tourist objects', detailKey: 'List assigned tourist objects, inspect details, approve them, and toggle active state.', icon: 'storefront' },
-    { labelKey: 'Manage localities', detailKey: 'Create, update, toggle active state, and delete localities in the managed destination.', icon: 'location_city' },
-    { labelKey: 'Add locality images', detailKey: 'Upload images for localities that belong to the managed destination.', icon: 'image' },
-    { labelKey: 'Review deletion requests', detailKey: 'View and review deletion requests for the managed destination.', icon: 'delete_sweep' },
-    { labelKey: 'Manage manager reports', detailKey: 'Create reports, view your own reports, and withdraw your own reports.', icon: 'article' },
+    { labelKey: 'managerProfile.permissions.viewDashboardLabel', detailKey: 'managerProfile.permissions.viewDashboardDetail', icon: 'dashboard' },
+    { labelKey: 'managerProfile.permissions.manageEventsLabel', detailKey: 'managerProfile.permissions.manageEventsDetail', icon: 'event' },
+    { labelKey: 'managerProfile.permissions.manageActivitiesLabel', detailKey: 'managerProfile.permissions.manageActivitiesDetail', icon: 'local_activity' },
+    { labelKey: 'managerProfile.permissions.manageObjectsLabel', detailKey: 'managerProfile.permissions.manageObjectsDetail', icon: 'storefront' },
+    { labelKey: 'managerProfile.permissions.manageLocalitiesLabel', detailKey: 'managerProfile.permissions.manageLocalitiesDetail', icon: 'location_city' },
+    { labelKey: 'managerProfile.permissions.manageLocalityImagesLabel', detailKey: 'managerProfile.permissions.manageLocalityImagesDetail', icon: 'image' },
+    { labelKey: 'managerProfile.permissions.reviewDeletionRequestsLabel', detailKey: 'managerProfile.permissions.reviewDeletionRequestsDetail', icon: 'delete_sweep' },
+    { labelKey: 'managerProfile.permissions.manageReportsLabel', detailKey: 'managerProfile.permissions.manageReportsDetail', icon: 'article' },
   ];
 
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
@@ -467,26 +467,32 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
 
     this.passwordError = '';
 
+<<<<<<< HEAD
     if (!this.currentPassword) {
       this.passwordError = 'Enter your current password.';
+=======
+    if (!this.currentPassword.trim()) {
+      this.passwordError = this.translationService.translate('adminProfile.password.errors.currentRequired');
+>>>>>>> menadzer-prevod-prepravke
       return;
     }
 
     if (this.newPassword.length < 8) {
-      this.passwordError = 'New password must be at least 8 characters long.';
+      this.passwordError = this.translationService.translate('adminProfile.password.errors.minLength');
       return;
     }
 
     if (!/[A-Z]/.test(this.newPassword) || !/[\d\W]/.test(this.newPassword)) {
-      this.passwordError = 'New password must include one uppercase letter and one number or symbol.';
+      this.passwordError = this.translationService.translate('adminProfile.password.errors.complexity');
       return;
     }
 
     if (this.newPassword !== this.confirmNewPassword) {
-      this.passwordError = 'Passwords do not match.';
+      this.passwordError = this.translationService.translate('adminProfile.password.errors.mismatch');
       return;
     }
 
+<<<<<<< HEAD
     if (!this.user.id) {
       this.passwordError = 'User ID is not available.';
       return;
@@ -513,6 +519,13 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       },
     });
+=======
+    this.passwordChangeStep = 'otp';
+    this.otpCode = '';
+    this.otpDemoCode = this.generateDemoOtpCode();
+    this.passwordInfo = this.translationService.translate('adminProfile.password.demoVerificationCode', { code: this.otpDemoCode });
+    this.startOtpCountdown();
+>>>>>>> menadzer-prevod-prepravke
   }
 
   startForgotFlow(): void {
@@ -551,15 +564,27 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
     this.passwordError = '';
 
     if (!/^\d{6}$/.test(this.otpCode.trim())) {
-      this.passwordError = 'Enter the 6-digit verification code.';
+      this.passwordError = this.translationService.translate('adminProfile.password.errors.codeRequired');
       return;
     }
 
+<<<<<<< HEAD
     this.passwordLoading = true;
 
     this.authService.verifyResetCode({ email: this.user.email, code: this.otpCode.trim() }).subscribe({
       next: (response: { resetSessionToken?: string; ResetSessionToken?: string; token?: string } | string) => {
         this.forgotResetSessionToken = this.extractResetSessionToken(response);
+=======
+    if (!this.otpDemoCode) {
+      this.passwordError = this.translationService.translate('adminProfile.password.errors.sessionExpired');
+      return;
+    }
+
+    if (this.otpCode.trim() !== this.otpDemoCode) {
+      this.passwordError = this.translationService.translate('adminProfile.password.errors.invalidCode');
+      return;
+    }
+>>>>>>> menadzer-prevod-prepravke
 
         if (!this.forgotResetSessionToken) {
           this.passwordLoading = false;
@@ -576,14 +601,33 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       },
       error: (err) => {
+<<<<<<< HEAD
         this.passwordLoading = false;
         this.passwordError = err?.error?.message ?? 'Invalid or expired verification code.';
         this.cdr.detectChanges();
+=======
+        this.passwordError = err?.error?.message ?? err?.error?.title ?? this.translationService.translate('adminProfile.password.errors.changeFailed');
+>>>>>>> menadzer-prevod-prepravke
       },
     });
   }
 
+<<<<<<< HEAD
   submitForgotPassword(): void {
+=======
+  resendOtpCode(): void {
+    if (this.passwordLoading || this.otpResendSecondsRemaining > 0) return;
+
+    this.passwordError = '';
+    this.passwordInfo = '';
+    this.otpDemoCode = this.generateDemoOtpCode();
+    this.otpCode = '';
+    this.passwordInfo = this.translationService.translate('adminProfile.password.demoVerificationCode', { code: this.otpDemoCode });
+    this.startOtpCountdown();
+  }
+
+  backToPasswordStep(): void {
+>>>>>>> menadzer-prevod-prepravke
     if (this.passwordLoading) return;
 
     this.passwordError = '';
@@ -742,9 +786,14 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
     this.otpExpiryTimerId = window.setInterval(() => {
       this.otpSecondsRemaining = Math.max(0, this.otpSecondsRemaining - 1);
       if (this.otpSecondsRemaining === 0) {
+<<<<<<< HEAD
         this.passwordError = 'The verification code has expired. Resend it to continue.';
         window.clearInterval(this.otpExpiryTimerId!);
         this.otpExpiryTimerId = null;
+=======
+        this.passwordError = this.translationService.translate('adminProfile.password.errors.codeExpired');
+        this.clearOtpExpiryTimer();
+>>>>>>> menadzer-prevod-prepravke
       }
       this.cdr.detectChanges();
     }, 1000);

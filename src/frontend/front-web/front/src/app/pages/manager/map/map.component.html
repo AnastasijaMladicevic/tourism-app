@@ -5,7 +5,7 @@
         <mat-icon>search</mat-icon>
         <input
           type="text"
-          placeholder="Search objects, events, activities..."
+          [placeholder]="'manager.map.searchPlaceholder' | translate"
           [(ngModel)]="searchQuery"
           (input)="onSearchInput()"
           (focus)="showSuggestions = searchResults.length > 0"

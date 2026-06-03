@@ -123,20 +123,34 @@ export interface ReviewReportReasonInput {
   autoDetected?: boolean;
 }
 
-export function buildReviewReportReason(input: ReviewReportReasonInput): string {
+interface ReviewReportReasonLabels {
+  categoryPrefix: string;
+  autoDetected: string;
+  managerModeration: string;
+  reviewLabel: string;
+  touristLabel: string;
+  creatorLabel: string;
+  replyLabel: string;
+  categoryLabels?: Record<string, string>;
+}
+
+export function buildReviewReportReason(
+  input: ReviewReportReasonInput,
+  labels?: ReviewReportReasonLabels,
+): string {
   const categoryKey = input.category?.trim() || 'unprofessional_conduct';
-  const categoryLabel = CATEGORY_LABELS[categoryKey] ?? categoryKey;
+  const categoryLabel = labels?.categoryLabels?.[categoryKey] ?? CATEGORY_LABELS[categoryKey] ?? categoryKey;
   const detectionNote = input.autoDetected
-    ? 'Flagged automatically as a concerning reply (language / conduct rules).'
-    : 'Reported from manager review moderation.';
+    ? labels?.autoDetected ?? 'Flagged automatically as a concerning reply (language / conduct rules).'
+    : labels?.managerModeration ?? 'Reported from manager review moderation.';
 
   const lines = [
-    `Category: ${categoryLabel}`,
+    `${labels?.categoryPrefix ?? 'Category'}: ${categoryLabel}`,
     detectionNote,
-    `Review #${input.reviewId} — object "${input.objectName}"`,
-    `Tourist: ${input.touristName} (${input.touristRating}/5)`,
-    `Content creator: ${input.creatorName}`,
-    `Reply: "${input.creatorResponse.trim().slice(0, 400)}"`,
+    `${labels?.reviewLabel ?? 'Review'} #${input.reviewId} — ${input.objectName}`,
+    `${labels?.touristLabel ?? 'Tourist'}: ${input.touristName} (${input.touristRating}/5)`,
+    `${labels?.creatorLabel ?? 'Content creator'}: ${input.creatorName}`,
+    `${labels?.replyLabel ?? 'Reply'}: "${input.creatorResponse.trim().slice(0, 400)}"`,
   ];
 
   return lines.join('\n').slice(0, 500);

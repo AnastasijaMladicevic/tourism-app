@@ -38,6 +38,8 @@ import { DestinationService } from '../../../services/destination.service';
 import { ManagerDashboardService } from '../../../services/manager-dashboard.service';
 import { ObjectDto, ObjectService } from '../../../services/object';
 import { ReviewDto, ReviewService } from '../../../services/review';
+import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
+import { TranslationService } from '../../../services/translation.service';
 
 export interface ManagerReviewThread {
   id: number;
@@ -75,7 +77,7 @@ interface ManagerReportNameHint {
 @Component({
   selector: 'app-manager-creator-reviews',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, ManagerReportModalComponent, PaginatorComponent],
+  imports: [CommonModule, FormsModule, RouterLink, ManagerReportModalComponent, PaginatorComponent, TranslatePipe],
   templateUrl: './manager-creator-reviews.component.html',
   styleUrls: [
     './manager-creator-reviews.component.css',
@@ -95,12 +97,13 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly destroy$ = new Subject<void>();
+  readonly translationService = inject(TranslationService);
   private readonly creatorNameById = new Map<number, string>();
   private readonly pendingReportCreatorIds = new Set<number>();
   private readonly creatorObjectCounts = new Map<number, number>();
 
   allThreads: ManagerReviewThread[] = [];
-  managedDestination = 'your destinations';
+  managedDestination = '';
 
   searchTerm = '';
   responseFilter: 'all' | 'responded' | 'pending' | 'concerning' = 'all';
@@ -174,7 +177,9 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
         error: (error: { error?: { message?: string } }) => {
           this.allThreads = [];
           this.selectedThread = null;
-          this.errorMessage = error?.error?.message ?? 'Failed to load reviews.';
+          this.errorMessage =
+            error?.error?.message ??
+            this.translationService.translate('manager.creatorReviews.error.load');
           this.triggerViewUpdate();
         },
       });
@@ -283,8 +288,8 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
       const objectCount = this.creatorObjectCounts.get(thread.creatorId) ?? 0;
       const summary =
         objectCount > 0
-          ? `${objectCount} object${objectCount === 1 ? '' : 's'} in your destinations`
-          : 'Content in your destinations';
+          ? this.translationService.translate('manager.creatorReviews.creatorSummary', { count: objectCount })
+          : this.translationService.translate('manager.creatorReviews.creatorSummaryFallback');
       map.set(thread.creatorId, {
         id: thread.creatorId,
         name: thread.creatorName,
@@ -314,6 +319,21 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
           creatorResponse: target.creatorResponse!,
           category: this.reportModalCategory,
           autoDetected: concerning,
+        }, {
+          categoryPrefix: this.translationService.translate('manager.reportModal.reason.category'),
+          autoDetected: this.translationService.translate('manager.reportModal.reason.autoDetected'),
+          managerModeration: this.translationService.translate('manager.reportModal.reason.managerModeration'),
+          reviewLabel: this.translationService.translate('manager.reportModal.reason.review'),
+          touristLabel: this.translationService.translate('manager.reportModal.reason.tourist'),
+          creatorLabel: this.translationService.translate('manager.reportModal.reason.creator'),
+          replyLabel: this.translationService.translate('manager.reportModal.reason.reply'),
+          categoryLabels: {
+            inappropriate_content: this.translationService.translate('manager.reportModal.categories.inappropriate_content'),
+            repeated_violations: this.translationService.translate('manager.reportModal.categories.repeated_violations'),
+            unprofessional_conduct: this.translationService.translate('manager.reportModal.categories.unprofessional_conduct'),
+            spam_abuse: this.translationService.translate('manager.reportModal.categories.spam_abuse'),
+            other: this.translationService.translate('manager.reportModal.categories.other'),
+          },
         })
       : '';
     this.reportModalOpen = true;
@@ -327,7 +347,7 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
     if (this.reportModalCreatorId) {
       this.pendingReportCreatorIds.add(this.reportModalCreatorId);
     }
-    this.successMessage = 'Creator report submitted successfully.';
+    this.successMessage = this.translationService.translate('manager.reportModal.successSubmitted');
     this.reportModalOpen = false;
     this.triggerViewUpdate();
   }
@@ -394,9 +414,9 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
   formatDate(iso: string): string {
     const date = new Date(iso);
     if (Number.isNaN(date.getTime())) {
-      return '—';
+      return this.translationService.translate('manager.creatorReviews.fallback.notAvailable');
     }
-    return date.toLocaleString(undefined, {
+    return date.toLocaleString(this.translationService.currentLocale(), {
       month: 'short',
       day: 'numeric',
       year: 'numeric',
@@ -429,10 +449,12 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
   creatorScopeSummary(creatorId: number): string {
     const objectCount = this.creatorObjectCounts.get(creatorId) ?? 0;
     if (objectCount > 0) {
-      return `${objectCount} object${objectCount === 1 ? '' : 's'} in your destinations`;
+      return this.translationService.translate('manager.creatorReviews.creatorSummary', {
+        count: objectCount,
+      });
     }
 
-    return 'Active in your destinations';
+    return this.translationService.translate('manager.creatorReviews.creatorActiveFallback');
   }
 
   private loadManagedDestinationLabel(): void {
@@ -452,11 +474,17 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
             ),
           ].sort((a, b) => a.localeCompare(b));
 
-          this.managedDestination = cityNames.length ? cityNames.join(', ') : 'your destinations';
+          this.managedDestination = cityNames.length
+            ? cityNames.join(', ')
+            : this.translationService.translate(
+                'manager.creatorReviews.managedDestinationFallback',
+              );
           this.triggerViewUpdate();
         },
         error: () => {
-          this.managedDestination = 'your destinations';
+          this.managedDestination = this.translationService.translate(
+            'manager.creatorReviews.managedDestinationFallback',
+          );
         },
       });
   }
@@ -595,22 +623,32 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
 
       return {
         id: review.id,
-        touristName: review.userFullName?.trim() || 'Tourist',
+        touristName:
+          review.userFullName?.trim() ||
+          this.translationService.translate('manager.creatorReviews.fallback.tourist'),
         touristInitials: this.initials(review.userFullName),
         objectId: review.objectId,
-        objectName: review.objectName?.trim() || `Object #${review.objectId}`,
+        objectName:
+          review.objectName?.trim() ||
+          this.translationService.translate('manager.creatorReviews.fallback.object', {
+            id: review.objectId,
+          }),
         localityName:
           review.localityName?.trim() ||
           context?.localityName ||
           review.destinationName?.trim() ||
           context?.destinationName ||
-          '—',
+          this.translationService.translate('manager.creatorReviews.fallback.notAvailable'),
         destinationName:
-          review.destinationName?.trim() || context?.destinationName || '—',
+          review.destinationName?.trim() ||
+          context?.destinationName ||
+          this.translationService.translate('manager.creatorReviews.fallback.notAvailable'),
         creatorId,
         creatorName,
         rating: review.rating,
-        touristReview: review.text?.trim() || '—',
+        touristReview:
+          review.text?.trim() ||
+          this.translationService.translate('manager.creatorReviews.fallback.notAvailable'),
         createdAt: review.createdAt,
         creatorResponse: review.creatorResponse,
         creatorResponseAt: review.creatorResponseAt,
@@ -624,7 +662,7 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
 
   private creatorDisplayName(creatorId: number): string {
     if (!creatorId) {
-      return 'Content creator';
+      return this.translationService.translate('manager.creatorReviews.fallback.contentCreator');
     }
 
     const known = this.creatorNameById.get(creatorId)?.trim();
@@ -632,7 +670,7 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
       return known;
     }
 
-    return 'Content creator';
+    return this.translationService.translate('manager.creatorReviews.fallback.contentCreator');
   }
 
   private resolveMissingCreatorNames(creatorIds: number[]): void {
@@ -687,7 +725,10 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
       return false;
     }
 
-    return !/^content creator$/i.test(name) && name.trim().length > 0;
+    const fallback = this.translationService.translate(
+      'manager.creatorReviews.fallback.contentCreator',
+    );
+    return !new RegExp(`^${fallback}$`, 'i').test(name) && name.trim().length > 0;
   }
 
   private applyCreatorNamesToThreads(): void {

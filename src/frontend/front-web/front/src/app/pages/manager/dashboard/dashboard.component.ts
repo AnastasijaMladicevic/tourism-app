@@ -4,6 +4,8 @@ import { RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { UserDto } from '../../../models/user.model';
 import { AuthService } from '../../../services/auth.service';
+import { TranslationService } from '../../../services/translation.service';
+import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 import {
   ManagerDashboardLocalityPerformanceItemDto,
   ManagerDashboardOverviewDto,
@@ -84,7 +86,7 @@ const MANAGER_DASHBOARD_PERIOD_STORAGE_KEY = 'manager-dashboard-selected-period'
 @Component({
   selector: 'app-manager-dashboard',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, TranslatePipe],
   templateUrl: './dashboard.component.html',
   styleUrls: [
     './dashboard.component.css',
@@ -96,6 +98,7 @@ const MANAGER_DASHBOARD_PERIOD_STORAGE_KEY = 'manager-dashboard-selected-period'
 export class ManagerDashboardComponent implements OnInit {
   private readonly authService = inject(AuthService);
   private readonly managerDashboardService = inject(ManagerDashboardService);
+  readonly translationService = inject(TranslationService);
   private readonly cdr = inject(ChangeDetectorRef);
 
   readonly periodOptions = PERIOD_OPTIONS;
@@ -142,17 +145,17 @@ export class ManagerDashboardComponent implements OnInit {
   get granularityHint(): string {
     switch (this.overview?.engagementTrendGranularity) {
       case 'week':
-        return 'Grouped by week';
+        return this.translationService.translate('managerDashboard.granularity.week');
       case 'month':
-        return 'Grouped by month';
+        return this.translationService.translate('managerDashboard.granularity.month');
       default:
-        return 'Grouped by day';
+        return this.translationService.translate('managerDashboard.granularity.day');
     }
   }
 
   get managedDestinationTitle(): string {
     return this.overview?.destination?.destinationName?.trim()
-      || 'No destination';
+      || this.translationService.translate('managerDashboard.noDestination');
   }
 
   get managedDestinationDisplayTitle(): string {
@@ -179,14 +182,17 @@ export class ManagerDashboardComponent implements OnInit {
     }
 
     if (!regionName) {
-      return `${localityCount} localities`;
+      return this.translationService.translate('managerDashboard.localityCount', { count: localityCount });
     }
 
     if (localityCount <= 0) {
       return regionName;
     }
 
-    return `${regionName} • ${localityCount} localities`;
+    return this.translationService.translate('managerDashboard.destinationSubtitle', {
+      region: regionName,
+      count: localityCount,
+    });
   }
 
   get moderationTotalPendingDecisions(): number {
@@ -274,7 +280,7 @@ export class ManagerDashboardComponent implements OnInit {
         error: () => {
           this.overview = null;
           this.resetDerivedState();
-          this.loadError = 'Manager dashboard data could not be loaded right now.';
+          this.loadError = this.translationService.translate('managerDashboard.loadError');
           this.cdr.detectChanges();
         },
       });
@@ -309,9 +315,9 @@ export class ManagerDashboardComponent implements OnInit {
   private bindEngagementTrend(overview: ManagerDashboardOverviewDto): void {
     const points = overview.engagementTrend ?? [];
     const seriesDefs = [
-      { key: 'favorites', label: 'Favorites', color: '#0d9488', pick: (point: typeof points[number]) => point.favorites },
-      { key: 'planner', label: 'Planner adds', color: '#2563eb', pick: (point: typeof points[number]) => point.plannerAdds },
-      { key: 'reviews', label: 'Reviews', color: '#d97706', pick: (point: typeof points[number]) => point.reviews },
+      { key: 'favorites', label: this.translationService.translate('managerDashboard.favorites'), color: '#0d9488', pick: (point: typeof points[number]) => point.favorites },
+      { key: 'planner', label: this.translationService.translate('managerDashboard.plannerAdds'), color: '#2563eb', pick: (point: typeof points[number]) => point.plannerAdds },
+      { key: 'reviews', label: this.translationService.translate('managerDashboard.reviews'), color: '#d97706', pick: (point: typeof points[number]) => point.reviews },
     ];
 
     const allValues = points.flatMap((point) => [point.favorites, point.plannerAdds, point.reviews]);
@@ -372,20 +378,20 @@ export class ManagerDashboardComponent implements OnInit {
     const total = Math.max(queue.totalPending + overview.reports.currentPending, 1);
 
     this.moderationSlices = [
-      { label: 'Objects', count: queue.pendingObjects, color: '#2563eb', percent: (queue.pendingObjects / total) * 100 },
-      { label: 'Events', count: queue.pendingEvents, color: '#0d9488', percent: (queue.pendingEvents / total) * 100 },
-      { label: 'Activities', count: queue.pendingActivities, color: '#8b5cf6', percent: (queue.pendingActivities / total) * 100 },
-      { label: 'Reports', count: overview.reports.currentPending, color: '#d97706', percent: (overview.reports.currentPending / total) * 100 },
-      { label: 'Deletion requests', count: queue.pendingDeletionRequests, color: '#dc2626', percent: (queue.pendingDeletionRequests / total) * 100 },
+      { label: this.translationService.translate('managerDashboard.objects'), count: queue.pendingObjects, color: '#2563eb', percent: (queue.pendingObjects / total) * 100 },
+      { label: this.translationService.translate('managerDashboard.events'), count: queue.pendingEvents, color: '#0d9488', percent: (queue.pendingEvents / total) * 100 },
+      { label: this.translationService.translate('managerDashboard.activities'), count: queue.pendingActivities, color: '#8b5cf6', percent: (queue.pendingActivities / total) * 100 },
+      { label: this.translationService.translate('managerDashboard.reports'), count: overview.reports.currentPending, color: '#d97706', percent: (overview.reports.currentPending / total) * 100 },
+      { label: this.translationService.translate('managerDashboard.deletionRequests'), count: queue.pendingDeletionRequests, color: '#dc2626', percent: (queue.pendingDeletionRequests / total) * 100 },
     ];
   }
 
   private bindContentStatus(overview: ManagerDashboardOverviewDto): void {
     const rows = [
-      { key: 'overall', label: 'Overall', bucket: overview.contentStatus.overall },
-      { key: 'objects', label: 'Objects', bucket: overview.contentStatus.objects },
-      { key: 'events', label: 'Events', bucket: overview.contentStatus.events },
-      { key: 'activities', label: 'Activities', bucket: overview.contentStatus.activities },
+      { key: 'overall', label: this.translationService.translate('managerDashboard.overall'), bucket: overview.contentStatus.overall },
+      { key: 'objects', label: this.translationService.translate('managerDashboard.objects'), bucket: overview.contentStatus.objects },
+      { key: 'events', label: this.translationService.translate('managerDashboard.events'), bucket: overview.contentStatus.events },
+      { key: 'activities', label: this.translationService.translate('managerDashboard.activities'), bucket: overview.contentStatus.activities },
     ];
 
     const maxTotal = Math.max(...rows.map((row) => row.bucket.total), 1);
@@ -442,13 +448,13 @@ export class ManagerDashboardComponent implements OnInit {
     switch (contentType?.toLowerCase()) {
       case 'touristobject':
       case 'object':
-        return 'Object';
+        return this.translationService.translate('managerDashboard.contentTypes.object');
       case 'event':
-        return 'Event';
+        return this.translationService.translate('managerDashboard.contentTypes.event');
       case 'activity':
-        return 'Activity';
+        return this.translationService.translate('managerDashboard.contentTypes.activity');
       default:
-        return contentType || 'Content';
+        return contentType || this.translationService.translate('managerDashboard.contentTypes.content');
     }
   }
 
@@ -456,13 +462,13 @@ export class ManagerDashboardComponent implements OnInit {
     switch (status?.trim().toLowerCase()) {
       case 'approved':
       case 'published':
-        return 'Published';
+        return this.translationService.translate('managerDashboard.status.published');
       case 'pending':
-        return 'Pending';
+        return this.translationService.translate('managerDashboard.status.pending');
       case 'rejected':
-        return 'Rejected';
+        return this.translationService.translate('managerDashboard.status.rejected');
       default:
-        return status || 'Unknown';
+        return status || this.translationService.translate('managerDashboard.status.unknown');
     }
   }
 
@@ -485,7 +491,7 @@ export class ManagerDashboardComponent implements OnInit {
       return '—';
     }
 
-    return new Intl.DateTimeFormat('en-US', {
+    return new Intl.DateTimeFormat(this.translationService.currentLocale(), {
       month: 'short',
       day: 'numeric',
       year: 'numeric',
@@ -573,12 +579,12 @@ export class ManagerDashboardComponent implements OnInit {
       return {
         x: start,
         width: Math.max(2, end - start),
-        title: [
-          bucket.label,
-          `Favorites: ${bucket.favorites}`,
-          `Planner adds: ${bucket.plannerAdds}`,
-          `Reviews: ${bucket.reviews}`,
-        ].join(' | '),
+        title: this.translationService.translate('managerDashboard.engagementHoverTitle', {
+          label: bucket.label,
+          favorites: bucket.favorites,
+          plannerAdds: bucket.plannerAdds,
+          reviews: bucket.reviews,
+        }),
       };
     });
   }
@@ -587,10 +593,10 @@ export class ManagerDashboardComponent implements OnInit {
     const date = new Date(dateIso);
 
     if (granularity === 'month') {
-      return new Intl.DateTimeFormat('en-US', { month: 'short' }).format(date);
+      return new Intl.DateTimeFormat(this.translationService.currentLocale(), { month: 'short' }).format(date);
     }
 
-    return new Intl.DateTimeFormat('en-US', { month: 'short', day: 'numeric' }).format(date);
+    return new Intl.DateTimeFormat(this.translationService.currentLocale(), { month: 'short', day: 'numeric' }).format(date);
   }
 
   private readSavedPeriod(): ManagerDashboardPeriod {

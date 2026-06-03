@@ -1,23 +1,23 @@
 <section class="manager-localities-page manager-list-page">
   <header class="page-head">
     <div>
-      <h1>Localities</h1>
-      <p class="page-subtitle">Total: {{ localitiesCountLabel }}</p>
+      <h1>{{ 'layout.localities' | translate }}</h1>
+      <p class="page-subtitle">{{ localitiesCountLabel }}</p>
     </div>
     <button type="button" class="primary-btn page-header-cta" (click)="onCreateLocation()">
       <span class="material-symbols-outlined">add</span>
-      <span class="page-header-cta-label">Create Locality</span>
+      <span class="page-header-cta-label">{{ 'manager.localities.createLocality' | translate }}</span>
     </button>
   </header>
 
   <div class="toolbar card">
-    <label class="search-field" aria-label="Search localities">
+    <label class="search-field" [attr.aria-label]="'manager.localities.searchAria' | translate">
       <span class="material-symbols-outlined">search</span>
       <input
         type="text"
         [(ngModel)]="draftSearchQuery"
         (keyup)="onSearchEnter($event)"
-        placeholder="Search by locality, destination or region..."
+        [placeholder]="'manager.localities.searchPlaceholder' | translate"
       />
     </label>
 
@@ -26,50 +26,50 @@
   @if (filterPanelOpen) {
     <div class="filters-panel card">
       <label>
-        <span>Status</span>
+        <span>{{ 'manager.localities.filters.status' | translate }}</span>
         <select [(ngModel)]="statusFilter">
-          <option value="all">All Statuses</option>
+          <option value="all">{{ 'manager.localities.filters.allStatuses' | translate }}</option>
           <option *ngFor="let option of statusOptions" [value]="option.value">{{ option.label }}</option>
         </select>
       </label>
 
       <label>
-        <span>Destination</span>
+        <span>{{ 'manager.localities.destination' | translate }}</span>
         <select [(ngModel)]="destinationFilter">
-          <option value="all">All Destinations</option>
+          <option value="all">{{ 'manager.localities.filters.allDestinations' | translate }}</option>
           <option *ngFor="let option of destinationOptions" [value]="option.value">{{ option.label }}</option>
         </select>
       </label>
 
       <label>
-        <span>Type</span>
+        <span>{{ 'manager.localities.type' | translate }}</span>
         <select [(ngModel)]="typeFilter">
-          <option value="all">All Types</option>
+          <option value="all">{{ 'manager.localities.filters.allTypes' | translate }}</option>
           <option *ngFor="let option of typeOptions" [value]="option.value">{{ option.label }}</option>
         </select>
       </label>
 
       <label>
-        <span>Sort by</span>
+        <span>{{ 'manager.localities.filters.sortBy' | translate }}</span>
         <select [(ngModel)]="sortBy">
-          <option value="name">Name</option>
-          <option value="destination">Destination</option>
-          <option value="type">Type</option>
-          <option value="createdAt">Created at</option>
+          <option value="name">{{ 'manager.localities.filters.name' | translate }}</option>
+          <option value="destination">{{ 'manager.localities.destination' | translate }}</option>
+          <option value="type">{{ 'manager.localities.type' | translate }}</option>
+          <option value="createdAt">{{ 'manager.localities.createdAt' | translate }}</option>
         </select>
       </label>
 
       <label>
-        <span>Order</span>
+        <span>{{ 'manager.localities.filters.order' | translate }}</span>
         <select [(ngModel)]="sortOrder">
-          <option value="asc">Ascending</option>
-          <option value="desc">Descending</option>
+          <option value="asc">{{ 'manager.localities.filters.ascending' | translate }}</option>
+          <option value="desc">{{ 'manager.localities.filters.descending' | translate }}</option>
         </select>
       </label>
 
       <div class="filter-actions">
-        <button type="button" class="primary-btn filter-btn" (click)="onApplyFilters()">Apply</button>
-        <button type="button" class="ghost-btn filter-btn secondary" (click)="onResetFilters()">Reset</button>
+        <button type="button" class="primary-btn filter-btn" (click)="onApplyFilters()">{{ 'manager.localities.filters.apply' | translate }}</button>
+        <button type="button" class="ghost-btn filter-btn secondary" (click)="onResetFilters()">{{ 'manager.localities.filters.reset' | translate }}</button>
       </div>
     </div>
   }
@@ -78,29 +78,29 @@
     <div class="locality-main-column">
       <div class="insights-grid">
         <article class="insight-card card" data-tone="blue">
-          <p>Total localities</p>
+          <p>{{ 'manager.localities.stats.totalLocalities' | translate }}</p>
           <strong>{{ totalCount }}</strong>
-          <span>Matching active filters</span>
+          <span>{{ 'manager.localities.stats.matchingFilters' | translate }}</span>
         </article>
         <article class="insight-card card" data-tone="green">
-          <p>On this page</p>
+          <p>{{ 'manager.localities.stats.onThisPage' | translate }}</p>
           <strong>{{ totalLocalitiesOnPage }}</strong>
-          <span>Visible rows</span>
+          <span>{{ 'manager.localities.stats.visibleRows' | translate }}</span>
         </article>
         <article class="insight-card card" data-tone="amber">
-          <p>Active ratio</p>
+          <p>{{ 'manager.localities.stats.activeRatio' | translate }}</p>
           <strong>{{ activePercent }}</strong>
-          <span>Current filtered set</span>
+          <span>{{ 'manager.localities.stats.currentFilteredSet' | translate }}</span>
         </article>
       </div>
 
       <section class="locality-table-wrap card">
         @if (isLoading) {
-          <div class="state state-loading">Loading localities...</div>
+          <div class="state state-loading">{{ 'manager.localities.loading' | translate }}</div>
         } @else if (errorMessage) {
           <div class="state state-error">{{ errorMessage }}</div>
         } @else if (!localities.length) {
-          <div class="state">No localities found for the selected filters.</div>
+          <div class="state">{{ 'manager.localities.empty.filtered' | translate }}</div>
         } @else {
           <div class="localities-mobile-list">
             @for (locality of localities; track locality.id) {
@@ -119,16 +119,16 @@
                   </div>
                   <p class="locality-mobile-card__location">
                     <span class="material-symbols-outlined" aria-hidden="true">location_on</span>
-                    {{ locality.destinationName || 'N/A' }}
+                    {{ locality.destinationName || ('common.notAvailable' | translate) }}
                   </p>
                   <div class="locality-mobile-card__meta">
-                    <span class="locality-mobile-card__type">{{ locality.localityTypeName || 'N/A' }}</span>
+                    <span class="locality-mobile-card__type">{{ locality.localityTypeName || ('common.notAvailable' | translate) }}</span>
                   </div>
                 </div>
                 <button
                   type="button"
                   class="locality-mobile-card__edit"
-                  title="Edit locality"
+                  [title]="'manager.localities.editLocality' | translate"
                   (click)="$event.stopPropagation(); onEditLocation(locality)"
                 >
                   <span class="material-symbols-outlined">edit</span>
@@ -141,12 +141,12 @@
             <table>
               <thead>
                 <tr>
-                  <th>Status</th>
-                  <th>Name</th>
-                  <th>Type</th>
-                  <th>Destination</th>
-                  <th>Created By</th>
-                  <th>Actions</th>
+                  <th>{{ 'manager.localities.table.status' | translate }}</th>
+                  <th>{{ 'manager.localities.table.name' | translate }}</th>
+                  <th>{{ 'manager.localities.table.type' | translate }}</th>
+                  <th>{{ 'manager.localities.table.destination' | translate }}</th>
+                  <th>{{ 'manager.localities.table.createdBy' | translate }}</th>
+                  <th>{{ 'manager.localities.table.actions' | translate }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -168,14 +168,14 @@
                       </div>
                     </div>
                   </td>
-                  <td>{{ locality.localityTypeName || 'N/A' }}</td>
-                  <td>{{ locality.destinationName || 'N/A' }}</td>
+                  <td>{{ locality.localityTypeName || ('common.notAvailable' | translate) }}</td>
+                  <td>{{ locality.destinationName || ('common.notAvailable' | translate) }}</td>
                   <td>{{ getCreatedByLabel(locality) }}</td>
                   <td>
                     <button
                       type="button"
                       class="icon-btn"
-                      title="Edit locality"
+                      [title]="'manager.localities.editLocality' | translate"
                       (click)="$event.stopPropagation(); onEditLocation(locality)"
                     >
                       <span class="material-symbols-outlined">edit</span>
@@ -195,7 +195,7 @@
           [totalCount]="totalCount"
           [pageSize]="pageSize"
           [pageSizeOptions]="pageSizeOptions"
-          itemLabel="localities"
+          [itemLabel]="translationService.translate('layout.localities').toLowerCase()"
           (pageChange)="onGoToPage($event)"
           (pageSizeChange)="onPageSizeChange($event)"
         ></app-paginator>
@@ -204,7 +204,7 @@
 
     <aside class="detail-column card" [class.has-selection]="!!selectedLocality">
       @if (selectedLocality) {
-        <p class="detail-sheet-label">Selected locality</p>
+        <p class="detail-sheet-label">{{ 'manager.localities.selectedLocality' | translate }}</p>
         <div class="activity-hero">
           <div class="hero-media" [class.has-slides]="heroImageUrls.length > 0">
             <div class="hero-media-slides" aria-hidden="true">
@@ -216,10 +216,10 @@
                 ></div>
               }
             </div>
-            <span class="hero-badge">{{ selectedLocality.localityTypeName || 'Locality' }}</span>
+            <span class="hero-badge">{{ selectedLocality.localityTypeName || ('layout.localities' | translate) }}</span>
           </div>
           <div class="hero-copy">
-            <p class="eyebrow">Preview</p>
+            <p class="eyebrow">{{ 'manager.localities.preview' | translate }}</p>
             <h2>{{ selectedLocality.name }}</h2>
             <p class="hero-meta">{{ selectedLocality.destinationName }} · {{ selectedLocality.regionName }}</p>
             <span class="detail-status status-published">{{ getStatusLabel(selectedLocality) }}</span>
@@ -228,36 +228,36 @@
 
         <div class="detail-metrics">
           <div class="metric-card">
-            <span>Type</span>
-            <strong>{{ selectedLocality.localityTypeName || 'N/A' }}</strong>
+            <span>{{ 'manager.localities.type' | translate }}</span>
+            <strong>{{ selectedLocality.localityTypeName || ('common.notAvailable' | translate) }}</strong>
           </div>
           <div class="metric-card">
-            <span>Created</span>
+            <span>{{ 'manager.localities.created' | translate }}</span>
             <strong>{{ selectedLocality.createdAt | date:'MMM d, y' }}</strong>
           </div>
         </div>
 
         <section class="detail-section">
           <div class="section-head">
-            <h3>Details</h3>
+            <h3>{{ 'common.details' | translate }}</h3>
           </div>
           <div class="schedule-item">
-            <span>Destination</span>
-            <strong>{{ selectedLocality.destinationName || 'N/A' }}</strong>
+            <span>{{ 'manager.localities.destination' | translate }}</span>
+            <strong>{{ selectedLocality.destinationName || ('common.notAvailable' | translate) }}</strong>
           </div>
           <div class="schedule-item">
-            <span>Region</span>
-            <strong>{{ selectedLocality.regionName || 'N/A' }}</strong>
+            <span>{{ 'manager.localities.region' | translate }}</span>
+            <strong>{{ selectedLocality.regionName || ('common.notAvailable' | translate) }}</strong>
           </div>
           <div class="schedule-item">
-            <span>Coordinates</span>
+            <span>{{ 'manager.localities.coordinates' | translate }}</span>
             <strong>{{ selectedCoordinates }}</strong>
           </div>
         </section>
 
         <section class="detail-section">
-          <h3>Description</h3>
-          <p class="description-copy">{{ selectedLocality.description || 'No description provided.' }}</p>
+          <h3>{{ 'manager.localities.description' | translate }}</h3>
+          <p class="description-copy">{{ selectedLocality.description || ('manager.localities.noDescription' | translate) }}</p>
         </section>
 
         <section class="detail-section">
@@ -275,7 +275,7 @@
             } @else {
               <div class="map-empty-state">
                 <span class="material-symbols-outlined">location_off</span>
-                <p>Coordinates are not available for this locality.</p>
+                <p>{{ 'manager.localities.noCoordinates' | translate }}</p>
               </div>
             }
           </div>
@@ -288,14 +288,14 @@
             (click)="onEditLocation(selectedLocality)"
           >
             <span class="material-symbols-outlined">rate_review</span>
-            Open full review
+            {{ 'manager.localities.openFullReview' | translate }}
           </button>
         </div>
       } @else {
         <div class="empty-state">
-          <p class="eyebrow">No locality selected</p>
-          <h2>Pick a locality from the table</h2>
-          <p>Select a row to preview details and metadata here.</p>
+          <p class="eyebrow">{{ 'manager.localities.empty.noLocalitySelected' | translate }}</p>
+          <h2>{{ 'manager.localities.empty.pickLocalityTitle' | translate }}</h2>
+          <p>{{ 'manager.localities.empty.pickLocalityBody' | translate }}</p>
         </div>
       }
     </aside>

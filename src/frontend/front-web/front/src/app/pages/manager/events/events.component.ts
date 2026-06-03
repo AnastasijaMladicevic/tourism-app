@@ -10,6 +10,7 @@ import { buildEventQueryDto, EventFilterState } from '../../../models/event-filt
 import { MapComponent as SharedMapComponent } from '../../../shared/components/map/map';
 import { HERO_IMAGE_ROTATION_INTERVAL_MS } from '../../../shared/constants/hero-image-rotation';
 import { TranslationService } from '../../../services/translation.service';
+import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 
 interface EventInsightCard {
   label: string;
@@ -26,7 +27,7 @@ interface EventScheduleRow {
 @Component({
   selector: 'app-manager-events',
   standalone: true,
-  imports: [CommonModule, FormsModule, SharedMapComponent, PaginatorComponent],
+  imports: [CommonModule, FormsModule, SharedMapComponent, PaginatorComponent, TranslatePipe],
   templateUrl: './events.component.html',
   styleUrls: [
     './events.component.css',
@@ -45,7 +46,7 @@ export class ManagerEventsComponent implements OnInit, OnDestroy {
   private readonly destinationService = inject(DestinationService);
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
-  private readonly translationService = inject(TranslationService);
+  readonly translationService = inject(TranslationService);
 
   private static readonly DEFAULT_BANNER_URL = '/assets/pozadina.png';
 
@@ -58,7 +59,7 @@ export class ManagerEventsComponent implements OnInit, OnDestroy {
   filteredEvents: EventDto[] = [];
   pagedEvents: EventDto[] = [];
   selectedEvent: EventDto | null = null;
-  managedDestinationLabel = 'Manager Events';
+  managedDestinationLabel = '';
 
   isLoading = true;
   errorMessage = '';
@@ -76,11 +77,37 @@ export class ManagerEventsComponent implements OnInit, OnDestroy {
   currentPage = 1;
   totalCount = 0;
 
-  readonly stats: EventInsightCard[] = [
-    { label: 'Upcoming this week', value: '12', hint: '+2 from last month', tone: 'blue' },
-    { label: 'Active staff', value: '48', hint: '98% availability', tone: 'green' },
-    { label: 'Total capacity filled', value: '64%', hint: 'Across all published events', tone: 'neutral' }
+  readonly categoryOptions = [
+    { value: 'Festival', label: 'manager.events.categories.festival' },
+    { value: 'Workshop', label: 'manager.events.categories.workshop' },
+    { value: 'Sports', label: 'manager.events.categories.sports' },
+    { value: 'Cultural', label: 'manager.events.categories.cultural' },
+    { value: 'Exhibition', label: 'manager.events.categories.exhibition' },
+    { value: 'Concert', label: 'manager.events.categories.concert' }
   ];
+
+  get stats(): EventInsightCard[] {
+    return [
+      {
+        label: this.translationService.translate('manager.events.stats.upcomingThisWeek'),
+        value: '12',
+        hint: this.translationService.translate('manager.events.stats.upcomingThisWeekHint'),
+        tone: 'blue'
+      },
+      {
+        label: this.translationService.translate('manager.events.stats.activeStaff'),
+        value: '48',
+        hint: this.translationService.translate('manager.events.stats.activeStaffHint'),
+        tone: 'green'
+      },
+      {
+        label: this.translationService.translate('manager.events.stats.totalCapacityFilled'),
+        value: '64%',
+        hint: this.translationService.translate('manager.events.stats.totalCapacityFilledHint'),
+        tone: 'neutral'
+      }
+    ];
+  }
 
   ngOnInit(): void {
     this.loadManagedDestinationLabel();
@@ -95,10 +122,11 @@ export class ManagerEventsComponent implements OnInit, OnDestroy {
     this.destinationService.getAll({ page: 1, pageSize: 100, sortBy: 'name', sortOrder: 'asc' }).subscribe({
     next: (response: any) => {
       const list = Array.isArray(response) ? response : (response?.items ?? []);
-      this.managedDestinationLabel = list.map((d: any) => d.name).join(', ') || 'Manager Events';
+      this.managedDestinationLabel =
+        list.map((d: any) => d.name).join(', ') || this.translationService.translate('manager.events.managedDestinationFallback');
     },
     error: () => {
-      this.managedDestinationLabel = 'Manager Events';
+      this.managedDestinationLabel = this.translationService.translate('manager.events.managedDestinationFallback');
     }
   });
   }
@@ -139,7 +167,7 @@ export class ManagerEventsComponent implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       },
       error: (error) => {
-        this.errorMessage = error?.error?.message ?? 'Failed to load events';
+        this.errorMessage = error?.error?.message ?? this.translationService.translate('manager.events.error.load');
         this.isLoading = false;
         this.cdr.detectChanges();
       }
@@ -355,7 +383,7 @@ export class ManagerEventsComponent implements OnInit, OnDestroy {
     }
 
     const d = new Date(date);
-    return d.toLocaleDateString('en-GB', {
+    return d.toLocaleDateString(this.translationService.currentLocale(), {
       year: 'numeric',
       month: '2-digit',
       day: '2-digit'
@@ -368,19 +396,14 @@ export class ManagerEventsComponent implements OnInit, OnDestroy {
     }
 
     const d = new Date(date);
-    return d.toLocaleTimeString('en-GB', {
+    return d.toLocaleTimeString(this.translationService.currentLocale(), {
       hour: '2-digit',
       minute: '2-digit'
     });
   }
 
   getCategoryLabel(event: EventDto): string {
-    if (event.eventTypeName) {
-      return event.eventTypeName;
-    }
-
-    const categories = ['Festival', 'Workshop', 'Sports', 'Cultural', 'Exhibition', 'Concert'];
-    return categories[(event.id - 1) % categories.length] ?? 'Festival';
+    return this.translateCategory(this.resolveCategoryValue(event));
   }
 
   getLocationLabel(event: EventDto): string {
@@ -402,10 +425,12 @@ export class ManagerEventsComponent implements OnInit, OnDestroy {
 
   getCapacityLabel(event: EventDto): string {
     if (!event.maxVisitors) {
-      return '—';
+      return this.translationService.translate('common.notAvailable');
     }
 
-    return `${new Intl.NumberFormat('en-US').format(event.maxVisitors)} max`;
+    return this.translationService.translate('manager.events.capacityMax', {
+      count: new Intl.NumberFormat(this.translationService.currentLocale()).format(event.maxVisitors)
+    });
   }
 
   getTicketPriceLabel(): string {
@@ -413,7 +438,7 @@ export class ManagerEventsComponent implements OnInit, OnDestroy {
   }
 
   formatTicketPrice(price: number | null | undefined): string {
-    return price != null ? `$${price.toFixed(2)}` : 'â€”';
+    return price != null ? `$${price.toFixed(2)}` : this.translationService.translate('common.notAvailable');
   }
 
   getCapacityProgress(event: EventDto): number {
@@ -422,7 +447,7 @@ export class ManagerEventsComponent implements OnInit, OnDestroy {
   }
 
   getCategoryIcon(event: EventDto): string {
-    switch (this.getCategoryLabel(event).toLowerCase()) {
+    switch (this.resolveCategoryValue(event).toLowerCase()) {
       case 'festival':
         return 'public';
       case 'workshop':
@@ -459,7 +484,7 @@ export class ManagerEventsComponent implements OnInit, OnDestroy {
 
   getSelectedSummary(event: EventDto | null): string {
     if (!event?.description) {
-      return 'A grand celebration of the longest night with light installations, traditional food, and live folk music across the Highland Park.';
+      return this.translationService.translate('manager.events.noDescription');
     }
 
     return event.description;
@@ -472,12 +497,20 @@ export class ManagerEventsComponent implements OnInit, OnDestroy {
 
     return [
       {
-        label: `Starts: ${this.formatDate(this.selectedEvent.startDate)}`,
-        value: `${this.formatTime(this.selectedEvent.startDate)} Local Time`
+        label: this.translationService.translate('manager.events.schedule.starts', {
+          date: this.formatDate(this.selectedEvent.startDate)
+        }),
+        value: this.translationService.translate('manager.events.schedule.localTime', {
+          time: this.formatTime(this.selectedEvent.startDate)
+        })
       },
       {
-        label: `Ends: ${this.formatDate(this.selectedEvent.endDate ?? this.selectedEvent.startDate)}`,
-        value: `${this.formatTime(this.selectedEvent.endDate ?? this.selectedEvent.startDate)} Local Time`
+        label: this.translationService.translate('manager.events.schedule.ends', {
+          date: this.formatDate(this.selectedEvent.endDate ?? this.selectedEvent.startDate)
+        }),
+        value: this.translationService.translate('manager.events.schedule.localTime', {
+          time: this.formatTime(this.selectedEvent.endDate ?? this.selectedEvent.startDate)
+        })
       }
     ];
   }
@@ -496,7 +529,7 @@ export class ManagerEventsComponent implements OnInit, OnDestroy {
 
   get selectedEventLocationLabel(): string {
     if (!this.selectedEvent) {
-      return 'Selected event';
+      return this.translationService.translate('manager.events.selectedEvent');
     }
 
     const location = this.selectedEvent.objectName || this.selectedEvent.localityName || this.selectedEvent.destinationName;
@@ -508,8 +541,7 @@ export class ManagerEventsComponent implements OnInit, OnDestroy {
       return '…';
     }
 
-    const count = this.totalCount;
-    return `${count} event${count === 1 ? '' : 's'}`;
+    return this.translationService.translate('manager.events.totalCount', { count: this.totalCount });
   }
 
   get pageStart(): number {
@@ -536,5 +568,49 @@ export class ManagerEventsComponent implements OnInit, OnDestroy {
     this.searchQuery = this.draftSearchQuery.trim();
     this.currentPage = 1;
     this.loadEvents();
+  }
+
+  formatStatus(status?: string): string {
+    switch ((status ?? '').toLowerCase()) {
+      case 'approved':
+      case 'published':
+        return this.translationService.translate('manager.events.status.approved');
+      case 'pending':
+        return this.translationService.translate('manager.events.status.pending');
+      case 'rejected':
+      case 'cancelled':
+        return this.translationService.translate('manager.events.status.rejected');
+      case 'draft':
+      default:
+        return this.translationService.translate('manager.events.status.draft');
+    }
+  }
+
+  private resolveCategoryValue(event: EventDto): string {
+    if (event.eventTypeName?.trim()) {
+      return event.eventTypeName.trim();
+    }
+
+    const categories = ['Festival', 'Workshop', 'Sports', 'Cultural', 'Exhibition', 'Concert'];
+    return categories[(event.id - 1) % categories.length] ?? 'Festival';
+  }
+
+  private translateCategory(value: string): string {
+    switch (value.toLowerCase()) {
+      case 'festival':
+        return this.translationService.translate('manager.events.categories.festival');
+      case 'workshop':
+        return this.translationService.translate('manager.events.categories.workshop');
+      case 'sports':
+        return this.translationService.translate('manager.events.categories.sports');
+      case 'cultural':
+        return this.translationService.translate('manager.events.categories.cultural');
+      case 'exhibition':
+        return this.translationService.translate('manager.events.categories.exhibition');
+      case 'concert':
+        return this.translationService.translate('manager.events.categories.concert');
+      default:
+        return value;
+    }
   }
 }

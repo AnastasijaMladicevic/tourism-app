@@ -1,9 +1,9 @@
 <section class="locality-create-page">
   <header class="page-head">
     <div>
-      <h1>{{ isEditMode ? 'Edit Locality' : 'Create Locality' }}</h1>
+      <h1>{{ isEditMode ? ('manager.localityForm.editTitle' | translate) : ('manager.localityForm.createTitle' | translate) }}</h1>
       <p class="subtle-text">
-        {{ isEditMode ? 'Update locality details.' : 'Add a new locality.' }}
+        {{ isEditMode ? ('manager.localityForm.editSubtitle' | translate) : ('manager.localityForm.createSubtitle' | translate) }}
       </p>
     </div>
     <div class="top-actions">
@@ -15,12 +15,21 @@
           [disabled]="isDeleting || isSubmitting"
         >
           <span class="material-symbols-outlined">delete</span>
-          {{ isDeleting ? 'Deleting...' : 'Delete Locality' }}
+          {{ isDeleting ? ('manager.localityForm.deleting' | translate) : ('manager.localityForm.deleteLocality' | translate) }}
         </button>
       }
+<<<<<<< HEAD
       <button type="button" class="ghost-btn" (click)="onCancel()">Cancel</button>
+=======
+      <button type="button" class="ghost-btn" (click)="onCancel()">{{ 'common.cancel' | translate }}</button>
+      <button type="button" class="ghost-btn" (click)="onSaveDraft()">{{ 'manager.localityForm.saveDraft' | translate }}</button>
+>>>>>>> menadzer-prevod-prepravke
       <button type="submit" class="primary-btn" form="create-locality-form" [disabled]="isSubmitting || isLoadingOptions">
-        {{ isSubmitting ? (isEditMode ? 'Saving...' : 'Creating...') : (isEditMode ? 'Save Changes' : 'Create Locality') }}
+        {{
+          isSubmitting
+            ? (isEditMode ? ('common.saving' | translate) : ('manager.localityForm.creating' | translate))
+            : (isEditMode ? ('common.saveChanges' | translate) : ('manager.localityForm.createTitle' | translate))
+        }}
       </button>
     </div>
   </header>
@@ -29,25 +38,25 @@
     <form id="create-locality-form" class="create-form" (ngSubmit)="onSubmit()">
       <section class="section-block step-card">
         <div class="gallery-card-head">
-          <span class="step-tag">STEP 1</span>
-          <h2>General Information</h2>
-          <p class="gallery-intro">Essential details about the locality.</p>
+          <span class="step-tag">{{ 'manager.localityForm.step1' | translate }}</span>
+          <h2>{{ 'manager.localityForm.generalInformation' | translate }}</h2>
+          <p class="gallery-intro">{{ 'manager.localityForm.generalInformationIntro' | translate }}</p>
         </div>
 
         <div class="grid-2">
           <label class="full-width">
-            <span>Locality Name <span class="required-star" aria-hidden="true">*</span></span>
-            <input type="text" [(ngModel)]="form.name" name="name" required placeholder="e.g. Barceloneta Beach" />
+            <span>{{ 'manager.localityForm.localityName' | translate }} <span class="required-star" aria-hidden="true">*</span></span>
+            <input type="text" [(ngModel)]="form.name" name="name" required [placeholder]="'manager.localityForm.localityNamePlaceholder' | translate" />
           </label>
 
           @if (singleDestinationName) {
             <label>
-              <span>Destination</span>
+              <span>{{ 'manager.localityForm.destination' | translate }}</span>
               <input type="text" [value]="singleDestinationName" readonly />
             </label>
           } @else {
             <label>
-              <span>Destination <span class="required-star" aria-hidden="true">*</span></span>
+              <span>{{ 'manager.localityForm.destination' | translate }} <span class="required-star" aria-hidden="true">*</span></span>
               <select
                 [(ngModel)]="form.destinationId"
                 (ngModelChange)="onDestinationChange()"
@@ -55,14 +64,14 @@
                 required
                 [disabled]="isLoadingDestinations"
               >
-                <option *ngIf="isLoadingDestinations" [ngValue]="form.destinationId" disabled>Loading...</option>
+                <option *ngIf="isLoadingDestinations" [ngValue]="form.destinationId" disabled>{{ 'common.loading' | translate }}</option>
                 <option *ngFor="let option of destinationOptions" [ngValue]="option.id">{{ option.name }}</option>
               </select>
             </label>
           }
 
           <label>
-            <span>Locality Type *</span>
+            <span>{{ 'manager.localityForm.localityType' | translate }} *</span>
             <select [(ngModel)]="form.localityTypeId" name="localityTypeId" required [disabled]="isLoadingLocalityTypes">
               <option [ngValue]="0"></option>
               <option *ngFor="let option of localityTypeOptions" [ngValue]="option.id">{{ option.name }}</option>
@@ -70,12 +79,12 @@
           </label>
 
           <label class="full-width">
-            <span>Full Description</span>
+            <span>{{ 'manager.localityForm.fullDescription' | translate }}</span>
             <textarea
               rows="6"
               [(ngModel)]="form.description"
               name="description"
-              placeholder="Write a detailed description including what guests can expect..."
+              [placeholder]="'manager.localityForm.descriptionPlaceholder' | translate"
             ></textarea>
           </label>
         </div>
@@ -83,22 +92,22 @@
 
       <section class="section-block section-block--gallery step-card">
         <div class="gallery-card-head">
-          <span class="step-tag">STEP 2</span>
-          <h2>Media Gallery <span class="required-star" aria-hidden="true">*</span></h2>
-          <p class="gallery-intro">Upload one or more images and choose a primary cover image.</p>
+          <span class="step-tag">{{ 'manager.localityForm.step2' | translate }}</span>
+          <h2>{{ 'manager.localityForm.mediaGallery' | translate }} <span class="required-star" aria-hidden="true">*</span></h2>
+          <p class="gallery-intro">{{ 'manager.localityForm.mediaGalleryIntro' | translate }}</p>
         </div>
 
         <div class="gallery-dropzone">
-          <p class="dropzone-title">Add Photo</p>
-          <p class="dropzone-copy">Images are attached after locality creation via the image endpoint.</p>
+          <p class="dropzone-title">{{ 'manager.localityForm.addPhoto' | translate }}</p>
+          <p class="dropzone-copy">{{ 'manager.localityForm.dropzoneCopy' | translate }}</p>
           <div class="dropzone-input-row">
             <input
               type="text"
-              [value]="pendingImageNames || 'Select one or more image files...'"
+              [value]="pendingImageNames || translationService.translate('manager.localityForm.selectImageFiles')"
               readonly
-              aria-label="Selected image files"
+              [attr.aria-label]="'manager.localityForm.selectedImageFiles' | translate"
             />
-            <button type="button" class="primary-btn" (click)="onPickImages(fileInput)">Add Photo</button>
+            <button type="button" class="primary-btn" (click)="onPickImages(fileInput)">{{ 'manager.localityForm.addPhoto' | translate }}</button>
             <input
               #fileInput
               type="file"
@@ -113,23 +122,23 @@
         @if (hasAnyGalleryImages) {
           <div class="gallery-grid">
             <article class="gallery-item" *ngFor="let image of existingImages">
-              <img [src]="image.url" alt="Locality image" />
+              <img [src]="image.url" [alt]="'manager.localityForm.localityImageAlt' | translate" />
               <div class="gallery-actions">
                 @if (image.isMain) {
-                  <span class="primary-badge">Primary</span>
+                  <span class="primary-badge">{{ 'manager.localityForm.primary' | translate }}</span>
                 } @else {
-                  <span class="ghost-btn small">Saved</span>
+                  <span class="ghost-btn small">{{ 'manager.localityForm.saved' | translate }}</span>
                 }
               </div>
             </article>
 
             <article class="gallery-item" *ngFor="let preview of imagePreviews; let index = index">
-              <img [src]="preview" alt="Locality image preview" />
+              <img [src]="preview" [alt]="'manager.localityForm.localityImagePreviewAlt' | translate" />
               <div class="gallery-actions">
                 @if (index === primaryImageIndex) {
-                  <span class="primary-badge">Primary</span>
+                  <span class="primary-badge">{{ 'manager.localityForm.primary' | translate }}</span>
                 } @else {
-                  <button type="button" class="ghost-btn small" (click)="setPrimaryImage(index)">Set Primary</button>
+                  <button type="button" class="ghost-btn small" (click)="setPrimaryImage(index)">{{ 'manager.localityForm.setPrimary' | translate }}</button>
                 }
                 <button type="button" class="ghost-btn small danger" (click)="removeImage(index)">Remove</button>
               </div>
@@ -150,7 +159,7 @@
       <section class="side-column card">
         <header class="side-header">
           <span class="material-symbols-outlined">my_location</span>
-          <h3>Locality Intelligence</h3>
+          <h3>{{ 'manager.localityForm.localityIntelligence' | translate }}</h3>
         </header>
 
         <div class="map-shell">
@@ -191,16 +200,16 @@
 
       <section class="card side-column tips-card">
         <header class="side-header tips-header">
-          <h3>Create Tips</h3>
+          <h3>{{ 'manager.localityForm.createTips' | translate }}</h3>
         </header>
 
         <ul>
-          <li>Use clear locality names so visitors can recognize the place quickly.</li>
-          <li>Add precise coordinates to improve map previews and navigation.</li>
-          <li>Upload high-quality images and choose the strongest one as primary.</li>
+          <li>{{ 'manager.localityForm.tips.tip1' | translate }}</li>
+          <li>{{ 'manager.localityForm.tips.tip2' | translate }}</li>
+          <li>{{ 'manager.localityForm.tips.tip3' | translate }}</li>
         </ul>
 
-        <button type="button" class="link-btn" (click)="openTipsModal()">Learn more about localities</button>
+        <button type="button" class="link-btn" (click)="openTipsModal()">{{ 'manager.localityForm.learnMore' | translate }}</button>
       </section>
     </aside>
   </div>
@@ -214,20 +223,16 @@
         aria-labelledby="locality-tips-modal-title"
         (click)="$event.stopPropagation()"
       >
-        <h3 id="locality-tips-modal-title">Locality Creator Playbook</h3>
-        <p>
-          Build complete locality profiles with sharp imagery and accurate map data so guests know exactly
-          what to expect and how to get there. Consistent destination and type metadata also boosts
-          discovery in search and filters.
-        </p>
+        <h3 id="locality-tips-modal-title">{{ 'manager.localityForm.playbookTitle' | translate }}</h3>
+        <p>{{ 'manager.localityForm.playbookBody' | translate }}</p>
         <ul class="tips-modal-list">
-          <li>Pick the destination and locality type that best matches the place to keep filters clean.</li>
-          <li>Drop the map pin on the actual entrance or center of the locality, not just the city center.</li>
-          <li>Upload at least one high-resolution image and mark the strongest one as primary.</li>
+          <li>{{ 'manager.localityForm.playbookTips.tip1' | translate }}</li>
+          <li>{{ 'manager.localityForm.playbookTips.tip2' | translate }}</li>
+          <li>{{ 'manager.localityForm.playbookTips.tip3' | translate }}</li>
         </ul>
 
         <div class="tips-modal-actions">
-          <button type="button" class="primary-btn" (click)="closeTipsModal()">Close</button>
+          <button type="button" class="primary-btn" (click)="closeTipsModal()">{{ 'common.close' | translate }}</button>
         </div>
       </section>
     </div>
@@ -244,8 +249,8 @@
         <div class="delete-success-icon" aria-hidden="true">
           <span class="delete-success-icon-check">✓</span>
         </div>
-        <h3 id="locality-delete-success-title">Locality successfully deleted</h3>
-        <p>You will be redirected to the Localities page.</p>
+        <h3 id="locality-delete-success-title">{{ 'manager.localityForm.deleteSuccessTitle' | translate }}</h3>
+        <p>{{ 'manager.localityForm.deleteSuccessBody' | translate }}</p>
       </section>
     </div>
   }
@@ -262,12 +267,12 @@
         <div class="delete-confirm-icon" aria-hidden="true">
           <span class="material-symbols-outlined">delete</span>
         </div>
-        <h3 id="locality-delete-confirm-title">Confirm deletion</h3>
-        <p>Are you sure you want to delete this item? This action cannot be undone.</p>
+        <h3 id="locality-delete-confirm-title">{{ 'manager.localityForm.confirmDeletionTitle' | translate }}</h3>
+        <p>{{ 'manager.localityForm.confirmDeletionBody' | translate }}</p>
         <div class="delete-confirm-actions">
-          <button type="button" class="ghost-btn" (click)="closeDeleteConfirmModal()" [disabled]="isDeleting">Cancel</button>
+          <button type="button" class="ghost-btn" (click)="closeDeleteConfirmModal()" [disabled]="isDeleting">{{ 'common.cancel' | translate }}</button>
           <button type="button" class="danger-btn solid" (click)="confirmDeleteLocation()" [disabled]="isDeleting">
-            {{ isDeleting ? 'Deleting...' : 'Delete' }}
+            {{ isDeleting ? ('manager.localityForm.deleting' | translate) : ('manager.localityForm.delete' | translate) }}
           </button>
         </div>
       </section>

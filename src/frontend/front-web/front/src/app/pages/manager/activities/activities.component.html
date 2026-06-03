@@ -1,8 +1,8 @@
 <section class="activities-page manager-list-page">
   <header class="page-header">
     <div class="page-header-copy">
-      <h1>Activities</h1>
-      <p class="page-subtitle">Total: {{ activitiesCountLabel }}</p>
+      <h1>{{ 'layout.activities' | translate }}</h1>
+      <p class="page-subtitle">{{ activitiesCountLabel }}</p>
     </div>
   </header>
 
@@ -14,7 +14,7 @@
         class="toolbar-input"
         [(ngModel)]="draftSearchQuery"
         (keyup)="onSearch()"
-        placeholder="Search activities, types, or destinations..."
+        [placeholder]="'manager.activities.searchPlaceholder' | translate"
       />
     </div>
 
@@ -23,18 +23,18 @@
   @if (filterPanelOpen) {
     <div class="filters-panel card">
       <label>
-        <span>Status</span>
+        <span>{{ 'manager.activities.filters.status' | translate }}</span>
         <select [(ngModel)]="statusFilter">
           <option *ngFor="let option of statusOptions" [value]="option.value">
-            {{ option.label }}
+            {{ option.label | translate }}
           </option>
         </select>
       </label>
 
       <label>
-        <span>Activity Type</span>
+        <span>{{ 'manager.activities.filters.activityType' | translate }}</span>
         <select [(ngModel)]="typeFilter" [disabled]="isLoadingTypes">
-          <option value="all">All Types</option>
+          <option value="all">{{ 'manager.activities.filters.allTypes' | translate }}</option>
           <option *ngFor="let type of activityTypeOptions" [value]="type.id">
             {{ type.name }}
           </option>
@@ -42,28 +42,28 @@
       </label>
 
       <label>
-        <span>Sort by</span>
+        <span>{{ 'manager.activities.filters.sortBy' | translate }}</span>
         <select [(ngModel)]="sortBy">
           <option *ngFor="let option of sortByOptions" [value]="option.value">
-            {{ option.value === 'price' ? translationService.translate(option.label) : option.label }}
+            {{ option.label | translate }}
           </option>
         </select>
       </label>
 
       <label>
-        <span>Order</span>
+        <span>{{ 'manager.activities.filters.order' | translate }}</span>
         <select [(ngModel)]="sortOrder">
-          <option value="asc">Ascending</option>
-          <option value="desc">Descending</option>
+          <option value="asc">{{ 'manager.activities.filters.ascending' | translate }}</option>
+          <option value="desc">{{ 'manager.activities.filters.descending' | translate }}</option>
         </select>
       </label>
 
       <div class="filter-actions">
         <button type="button" class="primary-btn filter-btn" (click)="onApplyFilters()">
-          Apply
+          {{ 'manager.activities.filters.apply' | translate }}
         </button>
         <button type="button" class="ghost-btn filter-btn secondary" (click)="onResetFilters()">
-          Reset
+          {{ 'manager.activities.filters.reset' | translate }}
         </button>
       </div>
     </div>
@@ -74,30 +74,30 @@
       @if (!errorMessage) {
         <div class="insights-grid">
           <article class="insight-card card" data-tone="blue">
-            <p>Total activities</p>
+            <p>{{ 'manager.activities.stats.totalActivities' | translate }}</p>
             <strong>{{ statsTotalAllStatuses != null ? statsTotalAllStatuses : '-' }}</strong>
-            <span>Matching active filters</span>
+            <span>{{ 'manager.activities.stats.matchingFilters' | translate }}</span>
           </article>
           <article class="insight-card card" data-tone="green">
-            <p>On this page</p>
+            <p>{{ 'manager.activities.stats.onThisPage' | translate }}</p>
             <strong>{{ isLoading ? '-' : activities.length }}</strong>
-            <span>Visible rows</span>
+            <span>{{ 'manager.activities.stats.visibleRows' | translate }}</span>
           </article>
           <article class="insight-card card" data-tone="amber">
-            <p>Pending review</p>
+            <p>{{ 'manager.activities.stats.pendingReview' | translate }}</p>
             <strong>{{ statsPendingCount != null ? statsPendingCount : '-' }}</strong>
-            <span>Matching active filters</span>
+            <span>{{ 'manager.activities.stats.matchingFilters' | translate }}</span>
           </article>
         </div>
       }
 
       <div class="table-card">
         @if (isLoading) {
-          <div class="state state-loading">Loading activities...</div>
+          <div class="state state-loading">{{ 'manager.activities.loading' | translate }}</div>
         } @else if (errorMessage) {
           <div class="state state-error">{{ errorMessage }}</div>
         } @else if (activities.length === 0) {
-          <div class="state">No activities to review yet.</div>
+          <div class="state">{{ 'manager.activities.empty.filtered' | translate }}</div>
         } @else {
           <div class="activities-mobile-list">
             @for (activity of activities; track activity.id) {
@@ -122,7 +122,7 @@
                     {{ getActivityLocalityLabel(activity) }}
                   </p>
                   <div class="activity-mobile-card__meta">
-                    <span class="activity-mobile-card__type">{{ activity.activityTypeName || 'N/A' }}</span>
+                    <span class="activity-mobile-card__type">{{ activity.activityTypeName || ('common.notAvailable' | translate) }}</span>
                     <span class="activity-mobile-card__duration">
                       <span class="material-symbols-outlined" aria-hidden="true">schedule</span>
                       {{ formatDuration(activity.durationMinutes) }}
@@ -132,7 +132,7 @@
                 <button
                   type="button"
                   class="activity-mobile-card__edit"
-                  title="Review activity"
+                  [title]="'manager.activities.reviewActivity' | translate"
                   (click)="onReviewActivity(activity); $event.stopPropagation()"
                 >
                   <span class="material-symbols-outlined">edit</span>
@@ -145,12 +145,12 @@
             <table>
               <thead>
                 <tr>
-                  <th>Status</th>
-                  <th>Activity Details</th>
-                  <th>Type</th>
-                  <th>Locality</th>
-                  <th>Duration</th>
-                  <th class="col-actions">Action</th>
+                  <th>{{ 'manager.activities.table.status' | translate }}</th>
+                  <th>{{ 'manager.activities.table.activityDetails' | translate }}</th>
+                  <th>{{ 'manager.activities.table.type' | translate }}</th>
+                  <th>{{ 'manager.activities.table.locality' | translate }}</th>
+                  <th>{{ 'manager.activities.table.duration' | translate }}</th>
+                  <th class="col-actions">{{ 'manager.activities.table.action' | translate }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -189,7 +189,7 @@
                       <button
                         type="button"
                         class="icon-btn"
-                        title="Review activity"
+                        [title]="'manager.activities.reviewActivity' | translate"
                         (click)="onReviewActivity(activity); $event.stopPropagation()"
                       >
                         <span class="material-symbols-outlined">open_in_new</span>
@@ -209,7 +209,7 @@
             [totalCount]="totalCount"
             [pageSize]="pageSize"
             [pageSizeOptions]="pageSizeOptions"
-            itemLabel="activities"
+            [itemLabel]="translationService.translate('common.activities').toLowerCase()"
             (pageChange)="onGoToPage($event)"
             (pageSizeChange)="onPageSizeChange($event)"
           ></app-paginator>
@@ -219,7 +219,7 @@
 
     <aside class="detail-column card" [class.has-selection]="!!selectedActivity">
       @if (selectedActivity) {
-        <p class="detail-sheet-label">Selected activity</p>
+        <p class="detail-sheet-label">{{ 'manager.activities.selectedActivity' | translate }}</p>
         <div class="activity-hero">
           <div class="hero-media" [class.has-slides]="heroImageUrls.length > 0">
             <div class="hero-media-slides" aria-hidden="true">
@@ -235,7 +235,7 @@
           </div>
 
           <div class="hero-copy">
-            <p class="eyebrow">Featured activity</p>
+            <p class="eyebrow">{{ 'manager.activities.featuredActivity' | translate }}</p>
             <h2>{{ (selectedActivityDetails ?? selectedActivity)?.name }}</h2>
             <p class="hero-meta">
               {{ selectedLocation }} &middot; {{ formatDuration((selectedActivityDetails ?? selectedActivity)?.durationMinutes) }}
@@ -252,7 +252,7 @@
 
               @if (hasSelectedRejection) {
                 <div class="status-tooltip" role="tooltip">
-                  <strong>Rejection reason</strong>
+                  <strong>{{ 'manager.activities.rejectionReason' | translate }}</strong>
                   <p>{{ selectedRejectionReason }}</p>
                 </div>
               }
@@ -266,63 +266,63 @@
             <strong>{{ formatParticipationFee((selectedActivityDetails ?? selectedActivity)?.price) }}</strong>
           </div>
           <div class="metric-card">
-            <span>Duration</span>
+            <span>{{ 'manager.activities.duration' | translate }}</span>
             <strong>{{ formatDuration((selectedActivityDetails ?? selectedActivity)?.durationMinutes) }}</strong>
           </div>
         </div>
 
         <section class="detail-section">
           <div class="section-head">
-            <h3>Activity Info</h3>
+            <h3>{{ 'manager.activities.activityInfo' | translate }}</h3>
           </div>
 
           <div class="schedule-list">
             <div class="schedule-item">
-              <span>Type</span>
-              <strong>{{ (selectedActivityDetails ?? selectedActivity)?.activityTypeName || '-' }}</strong>
+              <span>{{ 'manager.activities.table.type' | translate }}</span>
+              <strong>{{ (selectedActivityDetails ?? selectedActivity)?.activityTypeName || ('common.notAvailable' | translate) }}</strong>
             </div>
             <div class="schedule-item">
-              <span>Destination</span>
-              <strong>{{ (selectedActivityDetails ?? selectedActivity)?.destinationName || '-' }}</strong>
+              <span>{{ 'manager.activities.destination' | translate }}</span>
+              <strong>{{ (selectedActivityDetails ?? selectedActivity)?.destinationName || ('common.notAvailable' | translate) }}</strong>
             </div>
             <div class="schedule-item">
-              <span>Locality</span>
-              <strong>{{ (selectedActivityDetails ?? selectedActivity)?.localityName || '-' }}</strong>
+              <span>{{ 'manager.activities.table.locality' | translate }}</span>
+              <strong>{{ (selectedActivityDetails ?? selectedActivity)?.localityName || ('common.notAvailable' | translate) }}</strong>
             </div>
             <div class="schedule-item">
-              <span>Object</span>
-              <strong>{{ (selectedActivityDetails ?? selectedActivity)?.objectName || '-' }}</strong>
+              <span>{{ 'manager.activities.object' | translate }}</span>
+              <strong>{{ (selectedActivityDetails ?? selectedActivity)?.objectName || ('common.notAvailable' | translate) }}</strong>
             </div>
           </div>
         </section>
 
         <section class="detail-section">
           <div class="section-head">
-            <h3>Coordinates</h3>
+            <h3>{{ 'manager.activities.coordinates' | translate }}</h3>
           </div>
 
           <div class="schedule-list">
             <div class="schedule-item">
-              <span>Latitude</span>
-              <strong>{{ (selectedActivityDetails ?? selectedActivity)?.latitude ?? '-' }}</strong>
+              <span>{{ 'common.latitude' | translate }}</span>
+              <strong>{{ (selectedActivityDetails ?? selectedActivity)?.latitude ?? ('common.notAvailable' | translate) }}</strong>
             </div>
             <div class="schedule-item">
-              <span>Longitude</span>
-              <strong>{{ (selectedActivityDetails ?? selectedActivity)?.longitude ?? '-' }}</strong>
+              <span>{{ 'common.longitude' | translate }}</span>
+              <strong>{{ (selectedActivityDetails ?? selectedActivity)?.longitude ?? ('common.notAvailable' | translate) }}</strong>
             </div>
             <div class="schedule-item">
-              <span>Created</span>
+              <span>{{ 'manager.activities.created' | translate }}</span>
               <strong>{{ (selectedActivityDetails ?? selectedActivity)?.createdAt | date:'MMM d, y, HH:mm' }}</strong>
             </div>
             <div class="schedule-item">
-              <span>Updated</span>
+              <span>{{ 'manager.activities.updated' | translate }}</span>
               <strong>{{ (selectedActivityDetails ?? selectedActivity)?.updatedAt | date:'MMM d, y, HH:mm' }}</strong>
             </div>
           </div>
         </section>
 
         <section class="detail-section">
-          <h3>Description</h3>
+          <h3>{{ 'manager.activities.description' | translate }}</h3>
           <p class="description-copy">{{ selectedSummary }}</p>
         </section>
 
@@ -341,7 +341,7 @@
             } @else {
               <div class="map-empty-state">
                 <span class="material-symbols-outlined">location_off</span>
-                <p>Coordinates are not available for this activity.</p>
+                <p>{{ 'manager.activities.noCoordinates' | translate }}</p>
               </div>
             }
           </div>
@@ -354,16 +354,14 @@
             (click)="onReviewActivity((selectedActivityDetails ?? selectedActivity)!)"
           >
             <span class="material-symbols-outlined">rate_review</span>
-            Open full review
+            {{ 'manager.activities.openFullReview' | translate }}
           </button>
         </div>
       } @else {
         <div class="empty-state">
-          <p class="eyebrow">No activity selected</p>
-          <h2>Pick an activity from the table</h2>
-          <p>
-            Select a row to inspect media, location, and metadata of the submission in this panel.
-          </p>
+          <p class="eyebrow">{{ 'manager.activities.empty.noActivitySelected' | translate }}</p>
+          <h2>{{ 'manager.activities.empty.pickActivityTitle' | translate }}</h2>
+          <p>{{ 'manager.activities.empty.pickActivityBody' | translate }}</p>
         </div>
       }
     </aside>

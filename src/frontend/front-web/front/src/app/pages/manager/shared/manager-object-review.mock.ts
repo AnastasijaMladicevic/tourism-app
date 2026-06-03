@@ -63,7 +63,7 @@ const BY_OBJECT_ID: Record<number, ManagerObjectReviewThread[]> = {
 
 export function getMockObjectReviewThreads(
   objectId: number,
-  creatorName = 'Content Creator',
+  creatorName = '',
   creatorId = 201,
 ): ManagerObjectReviewThread[] {
   const base = BY_OBJECT_ID[objectId] ?? DEFAULT_THREADS;

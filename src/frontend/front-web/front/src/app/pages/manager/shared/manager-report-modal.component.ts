@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { finalize } from 'rxjs';
 import { ManagerReportsService } from '../../../services/manager-reports.service';
 import { REPORT_CATEGORY_OPTIONS } from './concerning-reply.util';
+import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
+import { TranslationService } from '../../../services/translation.service';
 
 export interface ReportableCreatorOption {
   id: number;
@@ -15,12 +17,13 @@ export interface ReportableCreatorOption {
 @Component({
   selector: 'app-manager-report-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslatePipe],
   templateUrl: './manager-report-modal.component.html',
   styleUrls: ['./manager-report-modal.component.css'],
 })
 export class ManagerReportModalComponent implements OnChanges {
   private readonly managerReportsService = inject(ManagerReportsService);
+  readonly translationService = inject(TranslationService);
 
   @Input() open = false;
   @Input() creators: ReportableCreatorOption[] = [];
@@ -30,8 +33,6 @@ export class ManagerReportModalComponent implements OnChanges {
 
   @Output() closed = new EventEmitter<void>();
   @Output() submitted = new EventEmitter<void>();
-
-  readonly reportCategoryOptions = REPORT_CATEGORY_OPTIONS;
 
   reportForm = {
     creatorId: null as number | null,
@@ -45,6 +46,15 @@ export class ManagerReportModalComponent implements OnChanges {
 
   get availableCreators(): ReportableCreatorOption[] {
     return this.creators.filter((creator) => !creator.hasPendingReport);
+  }
+
+  get reportCategoryOptions(): Array<{ value: string; label: string }> {
+    return REPORT_CATEGORY_OPTIONS.map((option) => ({
+      value: option.value,
+      label: this.translationService.translate(
+        `manager.reportModal.categories.${option.value || 'placeholder'}`,
+      ),
+    }));
   }
 
   ngOnChanges(): void {
@@ -80,12 +90,16 @@ export class ManagerReportModalComponent implements OnChanges {
       )
       .subscribe({
         next: () => {
-          this.successMessage = 'Report submitted. Admin will review your submission.';
+          this.successMessage = this.translationService.translate(
+            'manager.reportModal.successSubmittedReview',
+          );
           this.submitted.emit();
           setTimeout(() => this.close(), 600);
         },
         error: (error: { error?: { message?: string } }) => {
-          this.errorMessage = error?.error?.message ?? 'Failed to submit report.';
+          this.errorMessage =
+            error?.error?.message ??
+            this.translationService.translate('manager.reportModal.errorSubmit');
         },
       });
   }

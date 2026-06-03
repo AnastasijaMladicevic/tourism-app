@@ -193,7 +193,7 @@
 
           <button class="btn btn-secondary" type="button" (click)="cancel()">
             <mat-icon fontSet="material-icons-outlined">close</mat-icon>
-            <span>Cancel</span>
+            <span>{{ 'common.cancel' | translate }}</span>
           </button>
 
           <button class="btn btn-primary" type="button" [disabled]="isSaving" (click)="saveChanges()">
@@ -367,11 +367,11 @@
       <div class="password-modal__footer">
         @if (passwordChangeStep === 'otp') {
           <button class="modal-secondary-btn" type="button" (click)="backToPasswordStep()" [disabled]="passwordLoading">
-            Back
+            {{ 'common.back' | translate }}
           </button>
         } @else {
           <button class="modal-secondary-btn" type="button" (click)="closePasswordModal()" [disabled]="passwordLoading">
-            Cancel
+            {{ 'common.cancel' | translate }}
           </button>
         }
 
@@ -387,8 +387,8 @@
           <span>
             {{
               passwordChangeStep === 'credentials'
-                ? 'Continue'
-                : (passwordLoading ? 'Verifying...' : 'Verify & Change')
+                ? ('managerProfile.actions.continue' | translate)
+                : (passwordLoading ? ('managerProfile.actions.verifying' | translate) : ('managerProfile.actions.verifyAndChange' | translate))
             }}
           </span>
         </button>
@@ -400,8 +400,8 @@
   <div class="crop-modal-backdrop" (click)="cancelCrop()">
     <div class="crop-modal" (click)="$event.stopPropagation()">
       <div class="crop-modal__header">
-        <span>Crop photo</span>
-        <button class="crop-modal__close" type="button" (click)="cancelCrop()" aria-label="Close">
+        <span>{{ 'managerProfile.actions.cropPhoto' | translate }}</span>
+        <button class="crop-modal__close" type="button" (click)="cancelCrop()" [attr.aria-label]="'common.close' | translate">
           <mat-icon fontSet="material-icons-outlined">close</mat-icon>
         </button>
       </div>
@@ -417,8 +417,8 @@
       </div>
 
       <div class="crop-modal__footer">
-        <button class="crop-confirm-button" type="button" (click)="confirmCrop()">Set photo</button>
-        <button class="crop-cancel-button" type="button" (click)="cancelCrop()">Cancel</button>
+        <button class="crop-confirm-button" type="button" (click)="confirmCrop()">{{ 'managerProfile.actions.setPhoto' | translate }}</button>
+        <button class="crop-cancel-button" type="button" (click)="cancelCrop()">{{ 'common.cancel' | translate }}</button>
       </div>
     </div>
   </div>

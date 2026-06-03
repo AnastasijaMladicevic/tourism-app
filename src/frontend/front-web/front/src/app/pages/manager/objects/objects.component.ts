@@ -17,6 +17,7 @@ import {
 import { TranslationService } from '../../../services/translation.service';
 import { ReviewDto, ReviewService } from '../../../services/review';
 import { MapComponent as SharedMapComponent } from '../../../shared/components/map/map';
+import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 import { mapReviewDtosToObjectThreads } from '../shared/manager-object-review.mapper';
 import {
   isConcerningCreatorReply,
@@ -33,7 +34,7 @@ interface WorkingHoursRow {
 @Component({
   selector: 'app-manager-objects',
   standalone: true,
-  imports: [CommonModule, FormsModule, SharedMapComponent, RouterLink, PaginatorComponent],
+  imports: [CommonModule, FormsModule, SharedMapComponent, RouterLink, PaginatorComponent, TranslatePipe],
   templateUrl: './objects.component.html',
   styleUrls: [
     './objects.component.css',
@@ -53,7 +54,7 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
   private readonly reviewService = inject(ReviewService);
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
-  private readonly translationService = inject(TranslationService);
+  readonly translationService = inject(TranslationService);
 
   private static readonly DEFAULT_BANNER_URL = '/assets/pozadina.png';
 
@@ -89,25 +90,25 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
   readonly pageSizeOptions = [5, 10, 20, 50];
 
   readonly sortByOptions = [
-    { value: 'name', label: 'Name' },
-    { value: 'averageRating', label: 'Rating' },
-    { value: 'status', label: 'Status' }
+    { value: 'name', label: 'manager.objects.sort.name' },
+    { value: 'averageRating', label: 'manager.objects.sort.rating' },
+    { value: 'status', label: 'manager.objects.sort.status' }
   ];
 
   readonly ratingOptions = [
-    { value: 'all', label: 'Any rating' },
-    { value: '1', label: '1.0+' },
-    { value: '2', label: '2.0+' },
-    { value: '3', label: '3.0+' },
-    { value: '3.5', label: '3.5+' },
-    { value: '4', label: '4.0+' },
-    { value: '4.5', label: '4.5+' }
+    { value: 'all', label: 'manager.objects.rating.any' },
+    { value: '1', label: 'manager.objects.rating.1' },
+    { value: '2', label: 'manager.objects.rating.2' },
+    { value: '3', label: 'manager.objects.rating.3' },
+    { value: '3.5', label: 'manager.objects.rating.3_5' },
+    { value: '4', label: 'manager.objects.rating.4' },
+    { value: '4.5', label: 'manager.objects.rating.4_5' }
   ];
 
   private readonly fallbackStatusOptions: FilterOption[] = [
-    { value: 'Approved', label: 'Approved' },
-    { value: 'Pending', label: 'Pending' },
-    { value: 'Rejected', label: 'Rejected' }
+    { value: 'Approved', label: 'manager.objects.status.approved' },
+    { value: 'Pending', label: 'manager.objects.status.pending' },
+    { value: 'Rejected', label: 'manager.objects.status.rejected' }
   ];
 
   statusOptions: FilterOption[] = [...this.fallbackStatusOptions];
@@ -185,7 +186,7 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
           this.cdr.detectChanges();
         },
         error: (error) => {
-          this.errorMessage = error?.error?.message ?? 'Failed to load objects';
+          this.errorMessage = error?.error?.message ?? this.translationService.translate('manager.objects.error.load');
           this.pagedObjects = [];
           this.setSelectedObject(null);
           this.selectedObjectReviews = [];
@@ -234,8 +235,7 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
       return '...';
     }
 
-    const count = this.totalCount;
-    return `${count} objects`;
+    return this.translationService.translate('manager.objects.totalCount', { count: this.totalCount });
   }
 
   get pageStart(): number {
@@ -476,7 +476,7 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
     const token = ++this.reviewsRequestToken;
     this.reviewsLoading = true;
     const creatorId = object.createdByUserId ?? 0;
-    const creatorName = 'Content Creator';
+    const creatorName = this.translationService.translate('adminProfile.roles.contentCreator');
 
     this.reviewService
       .getAll({ objectId: object.id, sortBy: 'createdAt', sortOrder: 'desc', pageSize: 100 })
@@ -494,7 +494,20 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
           return;
         }
 
-        this.selectedObjectReviews = mapReviewDtosToObjectThreads(response.items ?? [], creatorId, creatorName);
+        this.selectedObjectReviews = mapReviewDtosToObjectThreads(
+          response.items ?? [],
+          creatorId,
+          creatorName,
+          {
+            touristName: this.translationService.translate('manager.creatorReviews.fallback.tourist'),
+            creatorName: this.translationService.translate(
+              'manager.creatorReviews.fallback.contentCreator',
+            ),
+            notAvailable: this.translationService.translate(
+              'manager.creatorReviews.fallback.notAvailable',
+            ),
+          },
+        );
         this.cdr.detectChanges();
       });
   }
@@ -577,14 +590,14 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
 
       const dayOrder = ['pon', 'uto', 'sre', 'cet', '\u010det', 'pet', 'sub', 'ned'] as const;
       const dayLabels: Record<string, string> = {
-        pon: 'Mon',
-        uto: 'Tue',
-        sre: 'Wed',
-        cet: 'Thu',
-        '\u010det': 'Thu',
-        pet: 'Fri',
-        sub: 'Sat',
-        ned: 'Sun'
+        pon: 'Pon',
+        uto: 'Uto',
+        sre: 'Sre',
+        cet: 'Čet',
+        '\u010det': 'Čet',
+        pet: 'Pet',
+        sub: 'Sub',
+        ned: 'Ned'
       };
 
       return dayOrder
@@ -633,7 +646,7 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
 
   get selectedObjectLocationLabel(): string {
     if (!this.selectedObject) {
-      return 'Selected object';
+      return this.translationService.translate('manager.objects.selectedObject');
     }
 
     const location =
@@ -711,15 +724,15 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
     switch ((status ?? '').toLowerCase()) {
       case 'approved':
       case 'published':
-        return 'Approved';
+        return this.translationService.translate('manager.objects.status.approved');
       case 'pending':
       case 'draft':
-        return 'Pending';
+        return this.translationService.translate('manager.objects.status.pending');
       case 'rejected':
       case 'cancelled':
-        return 'Rejected';
+        return this.translationService.translate('manager.objects.status.rejected');
       default:
-        return status ? status.charAt(0).toUpperCase() + status.slice(1).toLowerCase() : 'Pending';
+        return status ? status.charAt(0).toUpperCase() + status.slice(1).toLowerCase() : this.translationService.translate('manager.objects.status.pending');
     }
   }
 

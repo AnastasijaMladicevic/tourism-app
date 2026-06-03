@@ -15,11 +15,12 @@ import { DestinationService } from '../../../services/destination.service';
 import { MapComponent as SharedMapComponent } from '../../../shared/components/map/map';
 import { HERO_IMAGE_ROTATION_INTERVAL_MS } from '../../../shared/constants/hero-image-rotation';
 import { TranslationService } from '../../../services/translation.service';
+import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-manager-activities',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, SharedMapComponent, PaginatorComponent],
+  imports: [CommonModule, FormsModule, RouterModule, SharedMapComponent, PaginatorComponent, TranslatePipe],
   templateUrl: './activities.component.html',
   styleUrls: [
     './activities.component.css',
@@ -77,18 +78,18 @@ export class ManagerActivitiesComponent implements OnInit {
   statsPendingCount: number | null = null;
 
   readonly statusOptions = [
-    { value: 'all', label: 'All Statuses' },
-    { value: 'pending', label: 'Pending' },
-    { value: 'approved', label: 'Approved' },
-    { value: 'rejected', label: 'Rejected' }
+    { value: 'all', label: 'manager.activities.filters.allStatuses' },
+    { value: 'pending', label: 'manager.activities.status.pending' },
+    { value: 'approved', label: 'manager.activities.status.approved' },
+    { value: 'rejected', label: 'manager.activities.status.rejected' }
   ];
 
   readonly sortByOptions = [
-    { value: 'name', label: 'Name' },
+    { value: 'name', label: 'manager.activities.filters.name' },
     { value: 'price', label: 'activity.participationFee' },
-    { value: 'durationMinutes', label: 'Duration' },
-    { value: 'status', label: 'Status' },
-    { value: 'createdAt', label: 'Created date' }
+    { value: 'durationMinutes', label: 'manager.activities.duration' },
+    { value: 'status', label: 'manager.activities.filters.status' },
+    { value: 'createdAt', label: 'manager.activities.filters.createdDate' }
   ];
 
   ngOnInit(): void {
@@ -114,11 +115,11 @@ export class ManagerActivitiesComponent implements OnInit {
             )
           ].sort((a, b) => a.localeCompare(b));
 
-          this.managedCityLabel = cityNames.join(', ') || '—';
+          this.managedCityLabel = cityNames.join(', ') || this.translationService.translate('common.notAvailable');
           this.cdr.detectChanges();
         },
         error: () => {
-          this.managedCityLabel = '—';
+          this.managedCityLabel = this.translationService.translate('common.notAvailable');
           this.cdr.detectChanges();
         }
       });
@@ -179,7 +180,7 @@ export class ManagerActivitiesComponent implements OnInit {
           this.cdr.detectChanges();
         },
         error: (error) => {
-          this.errorMessage = error?.error?.message ?? 'Failed to load activities';
+          this.errorMessage = error?.error?.message ?? this.translationService.translate('manager.activities.error.load');
           this.activities = [];
           this.totalCount = 0;
           this.totalPages = 1;
@@ -480,21 +481,24 @@ export class ManagerActivitiesComponent implements OnInit {
 
   formatDuration(minutes?: number): string {
     if (!minutes || minutes <= 0) {
-      return '-';
+      return this.translationService.translate('common.notAvailable');
     }
 
     if (minutes < 60) {
-      return `${minutes} min`;
+      return this.translationService.translate('manager.activities.durationMinutes', { count: minutes });
     }
 
     const hours = Math.floor(minutes / 60);
     const remainingMinutes = minutes % 60;
 
     if (remainingMinutes === 0) {
-      return hours === 1 ? '1 Hour' : `${hours} Hours`;
+      return this.translationService.translate(hours === 1 ? 'manager.activities.oneHour' : 'manager.activities.hours', { count: hours });
     }
 
-    return `${hours}h ${remainingMinutes}m`;
+    return this.translationService.translate('manager.activities.hoursMinutes', {
+      hours,
+      minutes: remainingMinutes
+    });
   }
 
   formatParticipationFee(price?: number | null): string {
@@ -506,22 +510,22 @@ export class ManagerActivitiesComponent implements OnInit {
   }
 
   getActivityLocation(activity: ActivityDto): string {
-    return activity.destinationName || activity.localityName || activity.objectName || activity.regionName || '-';
+    return activity.destinationName || activity.localityName || activity.objectName || activity.regionName || this.translationService.translate('common.notAvailable');
   }
 
   getActivityLocalityLabel(activity: ActivityDto): string {
-    return activity.localityName || activity.objectName || activity.destinationName || '-';
+    return activity.localityName || activity.objectName || activity.destinationName || this.translationService.translate('common.notAvailable');
   }
 
   getActivityLocalitySubLabel(activity: ActivityDto): string {
-    return activity.destinationName || activity.regionName || this.managedCityLabel || '—';
+    return activity.destinationName || activity.regionName || this.managedCityLabel || this.translationService.translate('common.notAvailable');
   }
 
   getStatusLabel(status?: string): string {
     const normalized = (status ?? '').trim().toLowerCase();
-    if (normalized === 'approved') return 'Approved';
-    if (normalized === 'rejected') return 'Rejected';
-    return 'Pending';
+    if (normalized === 'approved') return this.translationService.translate('manager.activities.status.approved');
+    if (normalized === 'rejected') return this.translationService.translate('manager.activities.status.rejected');
+    return this.translationService.translate('manager.activities.status.pending');
   }
 
   getStatusClass(status?: string): string {
@@ -536,8 +540,7 @@ export class ManagerActivitiesComponent implements OnInit {
       return '…';
     }
 
-    const count = this.totalCount;
-    return `${count} activit${count === 1 ? 'y' : 'ies'}`;
+    return this.translationService.translate('manager.activities.totalCount', { count: this.totalCount });
   }
 
   get pageStart(): number {
@@ -556,7 +559,7 @@ export class ManagerActivitiesComponent implements OnInit {
     const activity = this.selectedActivityDetails ?? this.selectedActivity;
 
     if (!activity?.description) {
-      return 'A submitted activity awaiting your oversight. Review the details, location, and metadata before approving or declining.';
+      return this.translationService.translate('manager.activities.noDescription');
     }
 
     return activity.description;
@@ -564,17 +567,17 @@ export class ManagerActivitiesComponent implements OnInit {
 
   get selectedCategory(): string {
     const activity = this.selectedActivityDetails ?? this.selectedActivity;
-    return activity?.activityTypeName || 'Activity';
+    return activity?.activityTypeName || this.translationService.translate('layout.activities');
   }
 
   get selectedLocation(): string {
     const activity = this.selectedActivityDetails ?? this.selectedActivity;
 
     if (!activity) {
-      return '-';
+      return this.translationService.translate('common.notAvailable');
     }
 
-    return activity.destinationName || activity.localityName || activity.objectName || activity.regionName || '-';
+    return activity.destinationName || activity.localityName || activity.objectName || activity.regionName || this.translationService.translate('common.notAvailable');
   }
 
   get hasSelectedActivityCoordinates(): boolean {
@@ -595,7 +598,7 @@ export class ManagerActivitiesComponent implements OnInit {
   get selectedActivityLocationLabel(): string {
     const activity = this.selectedActivityDetails ?? this.selectedActivity;
     if (!activity) {
-      return 'Selected activity';
+      return this.translationService.translate('manager.activities.selectedActivity');
     }
 
     const location = activity.localityName || activity.destinationName || activity.regionName;

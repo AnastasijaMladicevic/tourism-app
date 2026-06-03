@@ -44,7 +44,7 @@ export class ManagerEventFormComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly http = inject(HttpClient);
-  private readonly translationService = inject(TranslationService);
+  readonly translationService = inject(TranslationService);
 
   form = this.fb.group({
     name: ['', [Validators.required, Validators.maxLength(200)]],
@@ -143,11 +143,11 @@ export class ManagerEventFormComponent implements OnInit, OnDestroy {
     if (this.loadedEvent) {
       return {
         id: this.loadedEvent.objectId ?? 0,
-        name: this.loadedEvent.objectName || this.loadedEvent.localityName || this.loadedEvent.destinationName || 'Linked location',
+        name: this.loadedEvent.objectName || this.loadedEvent.localityName || this.loadedEvent.destinationName || this.translationService.translate('manager.eventReview.linkedLocation'),
         address: [
           this.loadedEvent.localityName,
           this.loadedEvent.destinationName
-        ].filter((value): value is string => !!value && value.trim().length > 0).join(', ') || 'No address available'
+        ].filter((value): value is string => !!value && value.trim().length > 0).join(', ') || this.translationService.translate('manager.eventReview.noAddressAvailable')
       };
     }
 
@@ -159,7 +159,7 @@ export class ManagerEventFormComponent implements OnInit, OnDestroy {
   }
 
   get creatorDisplayName(): string {
-    return this.createdByName.trim() || 'Name not available in this view.';
+    return this.createdByName.trim() || this.translationService.translate('manager.eventReview.nameNotAvailable');
   }
 
   get creatorInitials(): string {
@@ -202,7 +202,7 @@ export class ManagerEventFormComponent implements OnInit, OnDestroy {
         this.eventId = Number(params['id']);
         this.loadEvent();
       } else {
-        this.errorMessage = 'Event id is required for manager review.';
+        this.errorMessage = this.translationService.translate('manager.eventReview.errors.missingId');
       }
     });
   }
@@ -227,7 +227,7 @@ export class ManagerEventFormComponent implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       },
       error: (error: any) => {
-        this.errorMessage = error?.error?.message ?? 'Failed to load event';
+        this.errorMessage = error?.error?.message ?? this.translationService.translate('manager.eventReview.errors.loadFailed');
         this.isLoading = false;
         this.cdr.detectChanges();
       }
@@ -398,11 +398,11 @@ export class ManagerEventFormComponent implements OnInit, OnDestroy {
     ).subscribe({
       next: (event) => {
         this.reviewStatus = event.status;
-        this.successMessage = 'Event approved successfully.';
+        this.successMessage = this.translationService.translate('manager.eventReview.success.approved');
         setTimeout(() => this.router.navigate(['/manager/events']), 1000);
       },
       error: (error: any) => {
-        this.errorMessage = error?.error?.message ?? 'Failed to approve event';
+        this.errorMessage = error?.error?.message ?? this.translationService.translate('manager.eventReview.errors.approveFailed');
         this.cdr.detectChanges();
       }
     });
@@ -433,7 +433,7 @@ export class ManagerEventFormComponent implements OnInit, OnDestroy {
     }
 
     if (!this.rejectionReason.trim()) {
-      this.errorMessage = 'Please provide a reason for decline.';
+      this.errorMessage = this.translationService.translate('manager.eventReview.errors.declineReasonRequired');
       return;
     }
 
@@ -455,11 +455,11 @@ export class ManagerEventFormComponent implements OnInit, OnDestroy {
       next: (event) => {
         this.showDeclineModal = false;
         this.reviewStatus = event.status;
-        this.successMessage = 'Event declined successfully.';
+        this.successMessage = this.translationService.translate('manager.eventReview.success.declined');
         setTimeout(() => this.router.navigate(['/manager/events']), 1000);
       },
       error: (error: any) => {
-        this.errorMessage = error?.error?.message ?? 'Failed to decline event';
+        this.errorMessage = error?.error?.message ?? this.translationService.translate('manager.eventReview.errors.declineFailed');
         this.cdr.detectChanges();
       }
     });
@@ -632,7 +632,7 @@ export class ManagerEventFormComponent implements OnInit, OnDestroy {
       return '';
     }
 
-    return date.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
+    return date.toLocaleDateString(this.translationService.currentLocale(), { month: 'short', year: 'numeric' });
   }
 
   private getDroppedImageUrl(event: DragEvent): string {

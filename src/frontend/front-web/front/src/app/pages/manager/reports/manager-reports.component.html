@@ -1,15 +1,12 @@
 <section class="manager-reports-page manager-list-page">
   <header class="page-head">
     <div class="page-head-copy">
-      <h1>Content Creator Reports</h1>
-      <p class="subtle-text">
-        Escalate serious or repeated violations to Admin review.
-        Use object, event, and activity review for individual content issues first.
-      </p>
+      <h1>{{ 'manager.reports.title' | translate }}</h1>
+      <p class="subtle-text">{{ 'manager.reports.subtitle' | translate }}</p>
     </div>
     <button type="button" class="primary-btn" (click)="openReportModal()">
       <span class="material-symbols-outlined">flag</span>
-      <span class="btn-label">Report Content Creator</span>
+      <span class="btn-label">{{ 'manager.reports.reportCreator' | translate }}</span>
     </button>
   </header>
 
@@ -23,41 +20,38 @@
   <div class="info-banner card">
     <span class="material-symbols-outlined info-icon">info</span>
     <div>
-      <strong>When to use a report</strong>
-      <p>
-        Reports are for account-level concerns (repeated violations, abuse, unprofessional conduct).
-        Reject or deactivate specific content from Objects, Events, or Activities first when possible.
-      </p>
-      <a class="info-link" routerLink="/manager/creator-reviews">View tourist reviews &amp; creator replies →</a>
+      <strong>{{ 'manager.reports.infoTitle' | translate }}</strong>
+      <p>{{ 'manager.reports.infoBody' | translate }}</p>
+      <a class="info-link" routerLink="/manager/creator-reviews">{{ 'manager.reports.infoLink' | translate }}</a>
     </div>
   </div>
 
   <div class="stats-row">
     <article class="stat-card" data-tone="amber">
-      <p>Pending review</p>
+      <p>{{ 'manager.reports.stats.pendingReview' | translate }}</p>
       <strong>{{ pendingCount }}</strong>
-      <span>Awaiting Admin decision</span>
+      <span>{{ 'manager.reports.stats.pendingReviewHint' | translate }}</span>
     </article>
     <article class="stat-card" data-tone="blue">
-      <p>Total submitted</p>
+      <p>{{ 'manager.reports.stats.totalSubmitted' | translate }}</p>
       <strong>{{ allReports.length }}</strong>
-      <span>Your submitted reports</span>
+      <span>{{ 'manager.reports.stats.totalSubmittedHint' | translate }}</span>
     </article>
     <article class="stat-card" data-tone="green">
-      <p>Creators you can report</p>
+      <p>{{ 'manager.reports.stats.creatorsAvailable' | translate }}</p>
       <strong>{{ availableCreators.length }}</strong>
-      <span>No pending report on file</span>
+      <span>{{ 'manager.reports.stats.creatorsAvailableHint' | translate }}</span>
     </article>
   </div>
 
   <div class="toolbar card">
-    <label class="search-field" aria-label="Search reports">
+    <label class="search-field" [attr.aria-label]="'manager.reports.searchAria' | translate">
       <span class="material-symbols-outlined">search</span>
       <input
         type="text"
         [(ngModel)]="draftSearchQuery"
         (keyup)="onSearchEnter($event)"
-        placeholder="Search by creator name, reason, or report ID..."
+        [placeholder]="'manager.reports.searchPlaceholder' | translate"
       />
     </label>
   </div>
@@ -65,16 +59,18 @@
   @if (filterPanelOpen) {
     <div class="filters-panel card">
       <label>
-        <span>Status</span>
+        <span>{{ 'manager.reports.filters.status' | translate }}</span>
         <select [(ngModel)]="statusFilter" (ngModelChange)="onApplyFilters()">
-          <option value="all">All statuses</option>
-          <option value="Pending">Pending</option>
-          <option value="Approved">Approved</option>
-          <option value="Rejected">Rejected</option>
+          <option value="all">{{ 'manager.reports.filters.allStatuses' | translate }}</option>
+          <option value="Pending">{{ 'manager.reports.status.pending' | translate }}</option>
+          <option value="Approved">{{ 'manager.reports.status.approved' | translate }}</option>
+          <option value="Rejected">{{ 'manager.reports.status.rejected' | translate }}</option>
         </select>
       </label>
       <div class="filter-actions">
-        <button type="button" class="ghost-btn filter-btn secondary" (click)="onResetFilters()">Reset</button>
+        <button type="button" class="ghost-btn filter-btn secondary" (click)="onResetFilters()">
+          {{ 'manager.reports.filters.reset' | translate }}
+        </button>
       </div>
     </div>
   }
@@ -83,19 +79,19 @@
     <div class="reports-main-column">
       <section class="reports-table-wrap table-card card">
         <header class="table-header">
-          <h2>Your reports</h2>
-          <span class="table-meta">{{ filteredReports.length }} shown</span>
+          <h2>{{ 'manager.reports.table.title' | translate }}</h2>
+          <span class="table-meta">{{ 'manager.reports.table.shown' | translate:{ count: filteredReports.length } }}</span>
         </header>
 
         @if (isLoading) {
-          <div class="state">Loading reports…</div>
+          <div class="state">{{ 'manager.reports.loading' | translate }}</div>
         } @else if (!filteredReports.length) {
           <div class="state">
             @if (allReports.length) {
-              No reports match your filters.
+              {{ 'manager.reports.empty.filtered' | translate }}
             } @else {
-              You have not submitted any creator reports yet. Use Report on a creator below, or report from
-              <a routerLink="/manager/creator-reviews">tourist reviews &amp; creator replies</a>.
+              {{ 'manager.reports.empty.nonePrefix' | translate }}
+              <a routerLink="/manager/creator-reviews">{{ 'manager.reports.empty.linkLabel' | translate }}</a>.
             }
           </div>
         } @else {
@@ -126,7 +122,7 @@
                       class="report-mobile-card__withdraw danger-outline"
                       (click)="withdrawReport(report, $event)"
                     >
-                      Withdraw
+                      {{ 'manager.reports.withdraw' | translate }}
                     </button>
                   }
                 </div>
@@ -138,10 +134,10 @@
             <table>
               <thead>
                 <tr>
-                  <th>Status</th>
-                  <th>Content Creator</th>
-                  <th>Reason</th>
-                  <th>Submitted</th>
+                  <th>{{ 'manager.reports.table.status' | translate }}</th>
+                  <th>{{ 'manager.reports.table.creator' | translate }}</th>
+                  <th>{{ 'manager.reports.table.reason' | translate }}</th>
+                  <th>{{ 'manager.reports.table.submitted' | translate }}</th>
                   <th></th>
                 </tr>
               </thead>
@@ -159,7 +155,11 @@
                     <td>
                       <div class="creator-cell">
                         <strong>{{ report.reportedUserName }}</strong>
-                        <span>{{ report.destinationName && report.destinationName !== '—' ? report.destinationName : 'Account report' }}</span>
+                        <span>{{
+                          report.destinationName && report.destinationName !== ('manager.reports.fallback.notAvailable' | translate)
+                            ? report.destinationName
+                            : ('manager.reports.accountReport' | translate)
+                        }}</span>
                       </div>
                     </td>
                     <td class="reason-cell">{{ report.reason }}</td>
@@ -171,7 +171,7 @@
                           class="ghost-btn small-btn danger-outline"
                           (click)="withdrawReport(report, $event)"
                         >
-                          Withdraw
+                          {{ 'manager.reports.withdraw' | translate }}
                         </button>
                       }
                     </td>
@@ -186,8 +186,8 @@
       <section class="creators-panel card">
         <header class="section-inline-head">
           <div>
-            <h2>Report a creator</h2>
-            <p class="section-hint">Content creators currently available for reporting</p>
+            <h2>{{ 'manager.reports.creatorPanelTitle' | translate }}</h2>
+            <p class="section-hint">{{ 'manager.reports.creatorPanelHint' | translate }}</p>
           </div>
         </header>
         <ul class="creator-list">
@@ -199,7 +199,7 @@
                 <span class="content-pill">{{ creator.contentSummary }}</span>
               </div>
               @if (creator.hasPendingReport) {
-                <span class="pending-tag">Pending report</span>
+                <span class="pending-tag">{{ 'manager.reports.pendingTag' | translate }}</span>
               }
               <button
                 type="button"
@@ -207,7 +207,7 @@
                 [disabled]="creator.hasPendingReport"
                 (click)="openReportModal(creator)"
               >
-                Report
+                {{ 'manager.reports.report' | translate }}
               </button>
             </li>
           }
@@ -218,7 +218,7 @@
     <aside class="detail-column card">
       @if (selectedReport) {
         <div class="detail-hero">
-          <span class="detail-eyebrow">Report #{{ selectedReport.id }}</span>
+          <span class="detail-eyebrow">{{ 'manager.reports.reportNumber' | translate:{ id: selectedReport.id } }}</span>
           <h2>{{ selectedReport.reportedUserName }}</h2>
           <span class="status-chip" [ngClass]="getStatusClass(selectedReport.status)">
             {{ formatStatus(selectedReport.status) }}
@@ -227,42 +227,40 @@
 
         <div class="detail-metrics">
           <div class="metric-card">
-            <span>Destination</span>
+            <span>{{ 'manager.reports.detail.destination' | translate }}</span>
             <strong>{{ selectedReport.destinationName }}</strong>
           </div>
           <div class="metric-card">
-            <span>Submitted</span>
+            <span>{{ 'manager.reports.detail.submitted' | translate }}</span>
             <strong>{{ formatDate(selectedReport.createdAt) }}</strong>
           </div>
         </div>
 
         <section class="detail-section">
-          <h3>Reason</h3>
+          <h3>{{ 'manager.reports.detail.reason' | translate }}</h3>
           <p class="detail-body">{{ selectedReport.reason }}</p>
         </section>
 
         @if (selectedReport.resolvedAt) {
           <section class="detail-section">
-            <h3>Admin decision</h3>
-            <p class="detail-meta">Resolved {{ formatDate(selectedReport.resolvedAt) }}</p>
+            <h3>{{ 'manager.reports.detail.adminDecision' | translate }}</h3>
+            <p class="detail-meta">{{ 'manager.reports.detail.resolvedOn' | translate:{ date: formatDate(selectedReport.resolvedAt) } }}</p>
             @if (selectedReport.rejectionReason) {
               <p class="detail-body muted">{{ selectedReport.rejectionReason }}</p>
             } @else if (selectedReport.status === 'Approved') {
-              <p class="detail-body muted">
-                Report approved — creator role removed and account blacklisted per platform policy.
-              </p>
+              <p class="detail-body muted">{{ 'manager.reports.detail.approvedBody' | translate }}</p>
             }
           </section>
         } @else {
           <section class="detail-section notice-pending">
             <span class="material-symbols-outlined">hourglass_top</span>
-            <p>Admin has not reviewed this report yet. You can withdraw while status is Pending.</p>
+            <p>{{ 'manager.reports.detail.pendingNotice' | translate }}</p>
           </section>
         }
       } @else {
         <div class="detail-empty">
           <span class="material-symbols-outlined">description</span>
-          <p>Select a report to view details</p>
+          <p>{{ 'manager.reports.detail.empty' | translate }}</p>
         </div>
       }
     </aside>

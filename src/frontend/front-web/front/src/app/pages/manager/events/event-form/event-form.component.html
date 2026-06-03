@@ -1,29 +1,29 @@
 <section class="event-form-page">
   <div class="page-header">
     <div>
-      <h1>Event Review</h1>
-      <p class="review-subtitle">Inspect event details and approve or decline submission.</p>
+      <h1>{{ 'manager.eventReview.title' | translate }}</h1>
+      <p class="review-subtitle">{{ 'manager.eventReview.subtitle' | translate }}</p>
     </div>
 
     <div class="header-actions">
       <button type="button" class="ghost-btn" (click)="cancel()">
         <span class="material-symbols-outlined">close</span>
-        Back
+        {{ 'common.back' | translate }}
       </button>
       <button type="button" class="danger-btn" (click)="openDeclineModal()" [disabled]="isSubmitting">
         <span class="material-symbols-outlined">thumb_down</span>
-        Decline
+        {{ 'manager.eventReview.decline' | translate }}
       </button>
       <button
         type="button"
         class="primary-btn"
         [class.approved-locked]="reviewStatus === 'Approved'"
-        [attr.title]="reviewStatus === 'Approved' ? 'Event is already approved.' : null"
+        [attr.title]="reviewStatus === 'Approved' ? translationService.translate('manager.eventReview.alreadyApproved') : null"
         (click)="approveEvent()"
         [disabled]="isSubmitting || reviewStatus === 'Approved'"
       >
         <span class="material-symbols-outlined">thumb_up</span>
-        Approve
+        {{ 'manager.eventReview.approve' | translate }}
       </button>
     </div>
   </div>
@@ -38,20 +38,20 @@
 
   <section class="review-shell">
     <section class="card media-card">
-      <div class="section-title">
-        <h2>Event Images</h2>
-        <p>Read-only gallery shown before the review details.</p>
+        <div class="section-title">
+        <h2>{{ 'manager.eventReview.eventImages' | translate }}</h2>
+        <p>{{ 'manager.eventReview.eventImagesHint' | translate }}</p>
       </div>
 
-      <div class="media-layout" aria-label="Event image gallery">
-        <div class="media-preview" aria-label="Main event image preview">
+      <div class="media-layout" [attr.aria-label]="'manager.eventReview.imageGalleryAria' | translate">
+        <div class="media-preview" [attr.aria-label]="'manager.eventReview.mainImagePreviewAria' | translate">
           @if (imagePreviewUrl && !isImagePreviewBroken) {
-            <img [src]="imagePreviewUrl" alt="Event preview" (error)="onImagePreviewError()" />
+            <img [src]="imagePreviewUrl" [alt]="'manager.eventReview.eventPreviewAlt' | translate" (error)="onImagePreviewError()" />
           } @else {
             <div class="upload-placeholder">
               <span class="material-symbols-outlined">image</span>
-              <strong>No usable image preview yet</strong>
-              <p>The event does not have a valid main image URL, or the image could not be loaded.</p>
+              <strong>{{ 'manager.eventReview.noUsableImage' | translate }}</strong>
+              <p>{{ 'manager.eventReview.noUsableImageHint' | translate }}</p>
             </div>
           }
         </div>
@@ -61,12 +61,12 @@
             <div class="media-thumbnails">
               @for (image of sideGalleryImages; track image.id) {
                 <button type="button" class="media-thumb" (click)="selectReviewImage(image.url)">
-                  <img [src]="image.url" [alt]="image.altText || 'Event image thumbnail'" />
+                  <img [src]="image.url" [alt]="image.altText || translationService.translate('manager.eventReview.eventThumbnailAlt')" />
                 </button>
               }
             </div>
           } @else {
-            <div class="media-empty">No additional gallery images are available.</div>
+            <div class="media-empty">{{ 'manager.eventReview.noAdditionalImages' | translate }}</div>
           }
         </div>
       </div>
@@ -78,61 +78,61 @@
     <div class="form-main">
       <section class="card section-card">
         <div class="section-title">
-          <h2>General Information</h2>
-          <p>Essential details about your upcoming event.</p>
+          <h2>{{ 'manager.eventReview.generalInformation' | translate }}</h2>
+          <p>{{ 'manager.eventReview.generalInformationHint' | translate }}</p>
         </div>
 
         <div class="field-grid two-columns">
           <label class="form-field full-width">
-            <span>Event Title *</span>
-            <input class="form-control" type="text" formControlName="name" placeholder="e.g. Summer Jazz Festival 2024" />
+            <span>{{ 'manager.eventReview.eventTitle' | translate }} *</span>
+            <input class="form-control" type="text" formControlName="name" [placeholder]="'manager.eventReview.eventTitlePlaceholder' | translate" />
           </label>
 
           <label class="form-field">
-            <span>Event Type *</span>
+            <span>{{ 'manager.eventReview.eventType' | translate }} *</span>
             <select class="form-control" formControlName="eventTypeId">
-              <option value="">Select type</option>
+              <option value="">{{ 'manager.eventReview.selectType' | translate }}</option>
               <option *ngFor="let type of eventTypes" [value]="type.id">{{ type.name }}</option>
             </select>
           </label>
 
           <label class="form-field">
-            <span>Organizer *</span>
+            <span>{{ 'manager.eventReview.organizer' | translate }} *</span>
             <input class="form-control" type="text" [value]="organizerName" readonly />
           </label>
 
           <label class="form-field">
-            <span>Destination *</span>
+            <span>{{ 'manager.eventReview.destination' | translate }} *</span>
             <select class="form-control" formControlName="destinationId">
-              <option value="">Select destination</option>
+              <option value="">{{ 'manager.eventReview.selectDestination' | translate }}</option>
               <option *ngFor="let destination of destinations" [value]="destination.id">{{ destination.name }}</option>
             </select>
           </label>
 
           <label class="form-field">
-            <span>Object</span>
+            <span>{{ 'manager.eventReview.object' | translate }}</span>
             <select class="form-control" formControlName="objectId">
-              <option value="">Select object</option>
+              <option value="">{{ 'manager.eventReview.selectObject' | translate }}</option>
               <option *ngFor="let venue of venueOptions" [value]="venue.id">{{ venue.name }}</option>
             </select>
           </label>
         </div>
 
         <label class="form-field full-width description-field">
-          <span>Full Description</span>
-          <textarea class="form-control text-area" formControlName="description" rows="8" placeholder="Write a detailed description including what guests can expect..."></textarea>
+          <span>{{ 'manager.eventReview.fullDescription' | translate }}</span>
+          <textarea class="form-control text-area" formControlName="description" rows="8" [placeholder]="'manager.eventReview.descriptionPlaceholder' | translate"></textarea>
         </label>
       </section>
 
       <section class="card section-card schedule-card">
         <div class="section-title">
-          <h2>Schedule</h2>
-          <p>When and how often this event takes place.</p>
+          <h2>{{ 'manager.eventReview.schedule' | translate }}</h2>
+          <p>{{ 'manager.eventReview.scheduleHint' | translate }}</p>
         </div>
 
         <div class="field-grid schedule-grid">
           <label class="form-field half-width">
-            <span>Start Date &amp; Time *</span>
+            <span>{{ 'manager.eventReview.startDateTime' | translate }} *</span>
             <div class="inline-fields">
               <input class="form-control" type="date" formControlName="startDate" />
               <input class="form-control" type="time" formControlName="startTime" />
@@ -140,7 +140,7 @@
           </label>
 
           <label class="form-field half-width">
-            <span>End Date &amp; Time *</span>
+            <span>{{ 'manager.eventReview.endDateTime' | translate }} *</span>
             <div class="inline-fields">
               <input class="form-control" type="date" formControlName="endDate" />
               <input class="form-control" type="time" formControlName="endTime" />
@@ -159,7 +159,7 @@
           </div> -->
 
           <label class="form-field full-width">
-            <span>Timezone</span>
+            <span>{{ 'manager.eventReview.timezone' | translate }}</span>
             <select class="form-control" formControlName="timezone">
               <option *ngFor="let timezone of timezoneOptions" [value]="timezone">{{ timezone }}</option>
             </select>
@@ -169,7 +169,7 @@
 
       <section class="card section-card">
         <div class="section-title">
-          <h2>Ticketing &amp; Capacity</h2>
+          <h2>{{ 'manager.eventReview.ticketingCapacity' | translate }}</h2>
           <p>{{ 'event.ticketTypesHelp' | translate }}</p>
         </div>
 
@@ -216,18 +216,18 @@
           </div>
 
           <label class="form-field">
-            <span>Capacity *</span>
+            <span>{{ 'manager.eventReview.capacity' | translate }} *</span>
             <div class="input-prefix">
               <span class="material-symbols-outlined prefix-icon">group</span>
-              <input class="form-control" type="number" min="1" step="1" formControlName="maxVisitors" placeholder="500" />
+              <input class="form-control" type="number" min="1" step="1" formControlName="maxVisitors" [placeholder]="'manager.eventReview.capacityPlaceholder' | translate" />
             </div>
           </label>
 
           <label class="form-field">
-            <span>External Link</span>
+            <span>{{ 'manager.eventReview.externalLink' | translate }}</span>
             <div class="input-prefix">
               <span class="material-symbols-outlined prefix-icon">link</span>
-              <input class="form-control" type="url" formControlName="externalLink" placeholder="https://..." />
+              <input class="form-control" type="url" formControlName="externalLink" [placeholder]="'manager.eventReview.externalLinkPlaceholder' | translate" />
             </div>
           </label>
         </div>
@@ -235,12 +235,12 @@
 
       <section class="card section-card highlighted-card">
         <div class="section-title">
-          <h2>Categorization &amp; Restrictions</h2>
-          <p>Tags and access controls for the event listing.</p>
+          <h2>{{ 'manager.eventReview.categorization' | translate }}</h2>
+          <p>{{ 'manager.eventReview.categorizationHint' | translate }}</p>
         </div>
 
         <label class="form-field full-width">
-          <span>Tags &amp; Categories</span>
+          <span>{{ 'manager.eventReview.tagsCategories' | translate }}</span>
           <div class="tag-editor">
             <span class="tag-chip" *ngFor="let tag of tags">
               {{ tag }}
@@ -250,16 +250,16 @@
               class="tag-input"
               type="text"
               [value]="''"
-              placeholder="Add tag..."
+              [placeholder]="'manager.eventReview.addTagPlaceholder' | translate"
               readonly
             />
           </div>
         </label>
 
         <label class="form-field restriction-field">
-          <span>Age Restriction</span>
+          <span>{{ 'manager.eventReview.ageRestriction' | translate }}</span>
           <select class="form-control" formControlName="ageRestriction">
-            <option value="">Select restriction</option>
+            <option value="">{{ 'manager.eventReview.selectRestriction' | translate }}</option>
             <option *ngFor="let restriction of ageRestrictionOptions" [value]="restriction">{{ restriction }}</option>
           </select>
         </label>
@@ -269,15 +269,15 @@
     <aside class="form-side">
       <section class="card side-card">
         <div class="section-title compact">
-          <h2>Location Intelligence</h2>
-          <p>Map preview and coordinates for the linked location.</p>
+          <h2>{{ 'manager.eventReview.locationIntelligence' | translate }}</h2>
+          <p>{{ 'manager.eventReview.locationIntelligenceHint' | translate }}</p>
         </div>
 
         <app-map
           [lat]="toNumber(form.controls.latitude.value) ?? 42.424"
           [lng]="toNumber(form.controls.longitude.value) ?? 18.771"
           [zoom]="15"
-          [popupText]="form.controls.name.value || 'Event'"
+          [popupText]="form.controls.name.value || translationService.translate('event.title')"
           [interactive]="false"
           [zoomable]="true"
           [showMarker]="true">
@@ -313,9 +313,9 @@
           <div class="creator-avatar">{{ creatorInitials }}</div>
           <div>
             @if (createdByName.trim()) {
-              <strong>Created by {{ creatorDisplayName }}</strong>
+              <strong>{{ 'manager.eventReview.createdBy' | translate:{ name: creatorDisplayName } }}</strong>
             } @else {
-              <strong>Creator</strong>
+              <strong>{{ 'manager.eventReview.creator' | translate }}</strong>
               <p class="sidebar-muted">{{ creatorDisplayName }}</p>
             }
             @if (creatorTimeline) {
@@ -342,17 +342,15 @@
           <span class="material-symbols-outlined">thumb_down</span>
         </div>
 
-        <h3 id="decline-modal-title">Decline event</h3>
-        <p id="decline-modal-description">
-          Provide a clear reason so the content creator can address required changes.
-        </p>
+        <h3 id="decline-modal-title">{{ 'manager.eventReview.declineEventTitle' | translate }}</h3>
+        <p id="decline-modal-description">{{ 'manager.eventReview.declineEventDescription' | translate }}</p>
 
         <textarea
           class="decline-reason-input"
           [(ngModel)]="rejectionReason"
           [ngModelOptions]="{ standalone: true }"
           rows="4"
-          placeholder="Example: Event location does not match the submitted event."
+          [placeholder]="'manager.eventReview.declineReasonPlaceholder' | translate"
         ></textarea>
 
         <div class="event-delete-modal-actions">
@@ -362,7 +360,7 @@
             (click)="closeDeclineModal()"
             [disabled]="isSubmitting"
           >
-            Keep pending
+            {{ 'manager.eventReview.keepPending' | translate }}
           </button>
           <button
             type="button"
@@ -370,7 +368,7 @@
             (click)="declineEvent()"
             [disabled]="isSubmitting"
           >
-            {{ isSubmitting ? 'Declining...' : 'Decline event' }}
+            {{ isSubmitting ? ('manager.eventReview.declining' | translate) : ('manager.eventReview.declineEvent' | translate) }}
           </button>
         </div>
       </section>

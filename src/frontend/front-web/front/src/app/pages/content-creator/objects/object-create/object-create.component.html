@@ -15,17 +15,27 @@
             [disabled]="isSubmitting || isDeletingObject || isLoadingOptions || hasPendingDeletionRequest"
           >
             <span class="material-symbols-outlined" aria-hidden="true">delete</span>
-            {{ isApprovedObject ? (hasPendingDeletionRequest ? 'Deletion Requested' : 'Request Deletion') : 'Delete' }}
+            {{
+              isApprovedObject
+                ? (hasPendingDeletionRequest
+                    ? ('contentCreatorObjectForm.delete.requested' | translate)
+                    : ('contentCreatorObjectForm.delete.requestAction' | translate))
+                : ('contentCreatorObjectForm.delete.deleteAction' | translate)
+            }}
           </button>
         }
         <button type="submit" class="primary-btn" [disabled]="isSubmitting || isLoadingOptions" form="create-object-form">
-          {{ isSubmitting ? (isEditMode ? 'Saving...' : 'Creating...') : (isEditMode ? 'Save changes' : 'Create object') }}
+          {{
+            isSubmitting
+              ? (isEditMode ? ('common.saving' | translate) : ('contentCreatorObjectForm.creating' | translate))
+              : (isEditMode ? ('common.saveChanges' | translate) : ('contentCreatorObjectForm.createAction' | translate))
+          }}
         </button>
       }
       @if (isManagerReview) {
         <button type="button" class="ghost-btn ghost-btn--back" (click)="goBack()">
           <span class="material-symbols-outlined" aria-hidden="true">arrow_back</span>
-          Back
+          {{ 'common.back' | translate }}
         </button>
         <button
           type="button"
@@ -34,7 +44,7 @@
           [disabled]="declineActionDisabled"
         >
           <span class="material-symbols-outlined" aria-hidden="true">thumb_down</span>
-          Decline
+          {{ 'contentCreatorObjectForm.review.decline' | translate }}
         </button>
         <button
           type="button"
@@ -44,10 +54,10 @@
           [class.approved-locked]="reviewStatusKey === 'approved'"
         >
           <span class="material-symbols-outlined" aria-hidden="true">thumb_up</span>
-          Approve
+          {{ 'contentCreatorObjectForm.review.approve' | translate }}
         </button>
       } @else {
-        <button type="button" class="ghost-btn" [routerLink]="objectsListPath">Cancel</button>
+        <button type="button" class="ghost-btn" [routerLink]="objectsListPath">{{ 'common.cancel' | translate }}</button>
       }
     </div>
   </header>
@@ -55,26 +65,26 @@
   <div class="create-layout">
     <form id="create-object-form" class="form-column card" [formGroup]="form" (ngSubmit)="submit()">
       <section class="section-block">
-        <span class="step-tag">STEP 1</span>
-        <h2>General Information</h2>
+        <span class="step-tag">{{ 'contentCreatorObjectForm.step1' | translate }}</span>
+        <h2>{{ 'contentCreatorObjectForm.generalInformation' | translate }}</h2>
         <div class="grid-2">
           <label>
-            <span>Object Name <span class="required-star" aria-hidden="true">*</span></span>
-            <input type="text" formControlName="name" placeholder="Object name" />
+            <span>{{ 'contentCreatorObjectForm.objectName' | translate }} <span class="required-star" aria-hidden="true">*</span></span>
+            <input type="text" formControlName="name" [placeholder]="'contentCreatorObjectForm.objectNamePlaceholder' | translate" />
           </label>
           <label>
-            <span>Address</span>
+            <span>{{ 'contentCreatorObjectForm.address' | translate }}</span>
             <div class="address-input-row">
-              <input type="text" formControlName="address" placeholder="Address" (keyup.enter)="onAddressSearch()" />
-              <button type="button" class="ghost-btn address-pin-btn" (click)="onAddressSearch()" [disabled]="isAddressSearching" title="Find on map">
+              <input type="text" formControlName="address" [placeholder]="'contentCreatorObjectForm.addressPlaceholder' | translate" (keyup.enter)="onAddressSearch()" />
+              <button type="button" class="ghost-btn address-pin-btn" (click)="onAddressSearch()" [disabled]="isAddressSearching" [title]="'contentCreatorObjectForm.findOnMap' | translate">
                 <span class="material-symbols-outlined">{{ isAddressSearching ? 'pending' : 'pin_drop' }}</span>
               </button>
             </div>
           </label>
           <label>
-            <span>Object Type <span class="required-star" aria-hidden="true">*</span></span>
+            <span>{{ 'contentCreatorObjectForm.objectType' | translate }} <span class="required-star" aria-hidden="true">*</span></span>
             <select formControlName="objectTypeId">
-              <option [ngValue]="null">Select type</option>
+              <option [ngValue]="null">{{ 'contentCreatorObjectForm.selectType' | translate }}</option>
               <option *ngFor="let type of objectTypes" [ngValue]="type.id">{{ type.name }}</option>
             </select>
           </label>
@@ -95,27 +105,27 @@
             </label>
           }
           <label>
-            <span>Region</span>
+            <span>{{ 'contentCreatorObjectForm.region' | translate }}</span>
             <select
               [ngModel]="selectedRegionId"
               [ngModelOptions]="{ standalone: true }"
               (ngModelChange)="onRegionChange($event || null)"
             >
-              <option [ngValue]="null">All regions</option>
+              <option [ngValue]="null">{{ 'contentCreatorObjectForm.allRegions' | translate }}</option>
               <option *ngFor="let region of regions" [ngValue]="region.id">{{ region.name }}</option>
             </select>
           </label>
           <label>
-            <span>Destination</span>
+            <span>{{ 'contentCreatorObjectForm.destination' | translate }}</span>
             <select formControlName="destinationId">
-              <option [ngValue]="null">{{ selectedRegionId ? 'Select destination' : 'Select region first' }}</option>
+              <option [ngValue]="null">{{ selectedRegionId ? ('contentCreatorObjectForm.selectDestination' | translate) : ('contentCreatorObjectForm.selectRegionFirst' | translate) }}</option>
               <option *ngFor="let destination of destinations" [ngValue]="destination.id">{{ destination.name }}</option>
             </select>
           </label>
           <label>
-            <span>Locality</span>
+            <span>{{ 'contentCreatorObjectForm.locality' | translate }}</span>
             <select formControlName="localityId">
-              <option [ngValue]="null">{{ form.controls.destinationId.value ? 'Select locality' : 'Select destination first' }}</option>
+              <option [ngValue]="null">{{ form.controls.destinationId.value ? ('contentCreatorObjectForm.selectLocality' | translate) : ('contentCreatorObjectForm.selectDestinationFirst' | translate) }}</option>
               <option *ngFor="let locality of filteredLocalities" [ngValue]="locality.id">{{ locality.name }}</option>
             </select>
           </label>
@@ -126,29 +136,29 @@
       </section>
 
       <section class="section-block">
-        <span class="step-tag">STEP 2</span>
-        <h2>Custom &amp; Story</h2>
+        <span class="step-tag">{{ 'contentCreatorObjectForm.step2' | translate }}</span>
+        <h2>{{ 'contentCreatorObjectForm.story' | translate }}</h2>
         <label>
-          <span>Full object description</span>
-          <textarea rows="5" formControlName="description" placeholder="Describe this object..."></textarea>
+          <span>{{ 'contentCreatorObjectForm.fullDescription' | translate }}</span>
+          <textarea rows="5" formControlName="description" [placeholder]="'contentCreatorObjectForm.descriptionPlaceholder' | translate"></textarea>
         </label>
       </section>
 
       <section class="section-block">
-        <span class="step-tag">STEP 3</span>
-        <h2>Amenities &amp; Contact</h2>
+        <span class="step-tag">{{ 'contentCreatorObjectForm.step3' | translate }}</span>
+        <h2>{{ 'contentCreatorObjectForm.amenitiesContact' | translate }}</h2>
         <label>
-          <span>Amenities (comma separated)</span>
-          <input type="text" formControlName="amenitiesInput" placeholder="WiFi, Parking, Outdoor Seating" />
+          <span>{{ 'contentCreatorObjectForm.amenities' | translate }}</span>
+          <input type="text" formControlName="amenitiesInput" [placeholder]="'contentCreatorObjectForm.amenitiesPlaceholder' | translate" />
         </label>
       </section>
 
       <section class="section-block">
-        <span class="step-tag">STEP 4</span>
-        <h2>Opening Hours</h2>
+        <span class="step-tag">{{ 'contentCreatorObjectForm.step4' | translate }}</span>
+        <h2>{{ 'contentCreatorObjectForm.openingHours' | translate }}</h2>
         <div class="hours-grid">
           <div class="hour-row" *ngFor="let day of workingDays">
-            <span>{{ day.label }}</span>
+            <span>{{ day.labelKey | translate }}</span>
             <input type="time" [formControl]="getWorkingOpenControl(day.key)" />
             <span>-</span>
             <input type="time" [formControl]="getWorkingCloseControl(day.key)" />
@@ -156,7 +166,7 @@
               <button
                 type="button"
                 class="copy-hours-btn"
-                title="Apply to all days"
+                [title]="'contentCreatorObjectForm.applyToAllDays' | translate"
                 (click)="applyHoursToAllDays(day.key)"
               >
                 <span class="material-symbols-outlined">content_copy</span>
@@ -168,29 +178,29 @@
 
       <section class="section-block section-block--gallery">
         <div class="gallery-card-head">
-          <span class="step-tag">STEP 5</span>
-          <h2>Media Gallery <span class="required-star" aria-hidden="true">*</span></h2>
+          <span class="step-tag">{{ 'contentCreatorObjectForm.step5' | translate }}</span>
+          <h2>{{ 'contentCreatorObjectForm.mediaGallery' | translate }} <span class="required-star" aria-hidden="true">*</span></h2>
           <p class="gallery-intro">
             @if (isManagerReview) {
-              Read-only gallery shown before the review details.
+              {{ 'contentCreatorObjectForm.review.readOnlyGallery' | translate }}
             } @else {
-              Upload up to 8 images and choose a primary cover image.
+              {{ 'contentCreatorObjectForm.galleryIntro' | translate }}
             }
           </p>
         </div>
 
         @if (!isManagerReview) {
           <div class="gallery-dropzone">
-            <p class="dropzone-title">Add Photos</p>
-            <p class="dropzone-copy">Choose local image files. They are uploaded after the object is saved.</p>
+            <p class="dropzone-title">{{ 'contentCreatorObjectForm.addPhotos' | translate }}</p>
+            <p class="dropzone-copy">{{ 'contentCreatorObjectForm.dropzoneCopy' | translate }}</p>
 
             <div class="dropzone-input-row">
               <input
                 type="text"
-                [value]="hasEditableImages ? editableImageUrls.length + ' image(s) selected' : 'Select one or more image files...'"
+                [value]="hasEditableImages ? ('contentCreatorObjectForm.imagesSelected' | translate:{ count: editableImageUrls.length }) : ('contentCreatorObjectForm.selectImageFiles' | translate)"
                 readonly
               />
-              <button type="button" class="primary-btn" (click)="galleryFileInput.click()">Add Photo</button>
+              <button type="button" class="primary-btn" (click)="galleryFileInput.click()">{{ 'contentCreatorObjectForm.addPhoto' | translate }}</button>
               <input
                 #galleryFileInput
                 type="file"
@@ -205,9 +215,9 @@
 
         @if (isManagerReview ? imageUrls.length > 0 : hasEditableImages) {
           @if (isManagerReview) {
-            <div class="media-layout" aria-label="Object image gallery">
-              <div class="media-preview" aria-label="Main object image preview">
-                <img [src]="reviewImagePreviewUrl" alt="Object preview" />
+            <div class="media-layout" [attr.aria-label]="'contentCreatorObjectForm.review.imageGalleryAria' | translate">
+              <div class="media-preview" [attr.aria-label]="'contentCreatorObjectForm.review.mainImageAria' | translate">
+                <img [src]="reviewImagePreviewUrl" [alt]="'contentCreatorObjectForm.review.previewAlt' | translate" />
               </div>
 
               <div class="media-strip">
@@ -215,26 +225,26 @@
                   <div class="media-thumbnails">
                     @for (imageUrl of sideReviewImages; track imageUrl) {
                       <button type="button" class="media-thumb" (click)="selectReviewImage(imageUrl)">
-                        <img [src]="imageUrl" alt="Object image thumbnail" />
+                        <img [src]="imageUrl" [alt]="'contentCreatorObjectForm.review.thumbnailAlt' | translate" />
                       </button>
                     }
                   </div>
                 } @else {
-                  <div class="media-empty">No additional gallery images are available.</div>
+                  <div class="media-empty">{{ 'contentCreatorObjectForm.review.noAdditionalImages' | translate }}</div>
                 }
               </div>
             </div>
           } @else {
             <div class="gallery-grid">
               <article class="gallery-item" *ngFor="let imageUrl of editableImageUrls; let index = index">
-                <img [src]="imageUrl" alt="Object image preview" />
+                <img [src]="imageUrl" [alt]="'contentCreatorObjectForm.galleryPreviewAlt' | translate" />
                 <div class="gallery-actions">
                   @if (index === 0) {
-                    <span class="primary-badge">Primary</span>
+                    <span class="primary-badge">{{ 'contentCreatorObjectForm.primary' | translate }}</span>
                   } @else {
-                    <button type="button" class="ghost-btn small" (click)="setPrimaryImage(index)">Set Primary</button>
+                    <button type="button" class="ghost-btn small" (click)="setPrimaryImage(index)">{{ 'contentCreatorObjectForm.setPrimary' | translate }}</button>
                   }
-                  <button type="button" class="ghost-btn small danger" (click)="removeImage(index)">Remove</button>
+                  <button type="button" class="ghost-btn small danger" (click)="removeImage(index)">{{ 'common.remove' | translate }}</button>
                 </div>
               </article>
             </div>
@@ -244,9 +254,9 @@
             <span class="material-symbols-outlined">image</span>
             <p>
               @if (isManagerReview) {
-                No images submitted for this object.
+                {{ 'contentCreatorObjectForm.review.noImagesSubmitted' | translate }}
               } @else {
-                Add one or more image files above. Images are saved when you create or update the object.
+                {{ 'contentCreatorObjectForm.noImagesHelp' | translate }}
               }
             </p>
           </div>
@@ -267,7 +277,7 @@
     <aside class="side-column card" [formGroup]="form">
       <header class="side-header">
         <span class="material-symbols-outlined">my_location</span>
-        <h3>Location Intelligence</h3>
+        <h3>{{ 'contentCreatorObjectForm.locationIntelligence' | translate }}</h3>
       </header>
 
       <div class="map-shell">
@@ -275,7 +285,7 @@
           [lat]="mapLat"
           [lng]="mapLng"
           [zoom]="14"
-          [popupText]="form.controls.name.value || 'New object'"
+          [popupText]="form.controls.name.value || ('contentCreatorObjectForm.newObject' | translate)"
           [interactive]="!isManagerReview"
           [showMarker]="hasMapCoordinates"
           mapId="create-object-map"
@@ -285,14 +295,14 @@
 
       <div class="coord-editor">
         <div>
-          <span class="coord-label">{{ 'Latitude' | translate }}</span>
+          <span class="coord-label">{{ 'common.latitude' | translate }}</span>
           <div class="coord-input-wrap">
             <input type="number" formControlName="latitude" min="-90" max="90" step="0.000001" placeholder="42.4240" />
             <span class="coord-input-suffix">{{ latitudeDirection }}</span>
           </div>
         </div>
         <div>
-          <span class="coord-label">{{ 'Longitude' | translate }}</span>
+          <span class="coord-label">{{ 'common.longitude' | translate }}</span>
           <div class="coord-input-wrap">
             <input type="number" formControlName="longitude" min="-180" max="180" step="0.000001" placeholder="18.7710" />
             <span class="coord-input-suffix">{{ longitudeDirection }}</span>
@@ -302,11 +312,11 @@
 
       @if (editSidebar) {
         <div class="review-snapshot">
-          <span>Review Snapshot</span>
+          <span>{{ 'contentCreatorObjectForm.review.snapshot' | translate }}</span>
           <div class="review-row">
             <strong>{{ ratingAverageDisplay(editSidebar.averageRating) }}</strong>
             <span class="stars" aria-hidden="true">{{ ratingStarsVisual(editSidebar.averageRating) }}</span>
-            <span class="review-count">{{ editSidebar.reviewCount | number }} reviews</span>
+            <span class="review-count">{{ 'contentCreatorObjectForm.reviews.count' | translate:{ count: editSidebar.reviewCount } }}</span>
           </div>
         </div>
 
@@ -314,10 +324,10 @@
           <div class="creator-avatar">{{ editSidebar.creatorInitials }}</div>
           <div>
             @if (editSidebar.creatorFullName) {
-              <strong>Created by {{ editSidebar.creatorFullName }}</strong>
+              <strong>{{ 'contentCreatorObjectForm.createdBy' | translate:{ name: editSidebar.creatorFullName } }}</strong>
             } @else {
-              <strong>Creator</strong>
-              <p class="sidebar-muted">Name not available in this view.</p>
+              <strong>{{ 'contentCreatorObjectForm.creator' | translate }}</strong>
+              <p class="sidebar-muted">{{ 'contentCreatorObjectForm.nameNotAvailable' | translate }}</p>
             }
             @if (editSidebar.createdUpdatedLine) {
               <p>{{ editSidebar.createdUpdatedLine }}</p>
@@ -327,11 +337,9 @@
       }
 
       @if (isManagerReview) {
-        <p class="sidebar-note">You are viewing this submission as a destination manager. Editing is disabled on this page.</p>
+        <p class="sidebar-note">{{ 'contentCreatorObjectForm.review.sidebarNote' | translate }}</p>
       } @else {
-        <p class="sidebar-note">
-          Save changes to update this object. Ratings and review counts reflect approved guest reviews.
-        </p>
+        <p class="sidebar-note">{{ 'contentCreatorObjectForm.sidebarNote' | translate }}</p>
       }
     </aside>
 
@@ -339,8 +347,8 @@
       <section class="cc-reviews-preview card" aria-labelledby="cc-reviews-preview-title">
         <header class="cc-reviews-preview-head">
           <div>
-            <p class="cc-reviews-eyebrow">Guest feedback</p>
-            <h2 id="cc-reviews-preview-title">Recent reviews</h2>
+            <p class="cc-reviews-eyebrow">{{ 'contentCreatorObjectForm.reviews.guestFeedbackEyebrow' | translate }}</p>
+            <h2 id="cc-reviews-preview-title">{{ 'contentCreatorObjectForm.reviews.recentTitle' | translate }}</h2>
           </div>
           @if (hasPreviewReviews || (editSidebar?.reviewCount ?? 0) > 0) {
             <span class="reviews-count-pill">{{ previewReviewsCountLabel }}</span>
@@ -348,7 +356,7 @@
         </header>
 
         @if (isLoadingPreviewReviews) {
-          <p class="cc-reviews-empty">Loading reviews…</p>
+          <p class="cc-reviews-empty">{{ 'contentCreatorObjectForm.reviews.loading' | translate }}</p>
         } @else if (hasPreviewReviews) {
           <div class="reviews-preview-list">
             @for (review of previewReviews; track trackByReviewId($index, review)) {
@@ -367,19 +375,19 @@
                 @if (review.creatorResponse?.trim()) {
                   <p class="review-reply-hint">
                     <span class="material-symbols-outlined" aria-hidden="true">reply</span>
-                    You replied
+                    {{ 'contentCreatorObjectForm.reviews.youReplied' | translate }}
                   </p>
                 }
               </article>
             }
           </div>
         } @else {
-          <p class="cc-reviews-empty">No reviews for this object yet.</p>
+          <p class="cc-reviews-empty">{{ 'contentCreatorObjectForm.reviews.noneForObject' | translate }}</p>
         }
 
         @if (showViewMoreReviews) {
           <button type="button" class="text-btn view-more-btn" (click)="onViewMoreReviews()">
-            View more
+            {{ 'contentCreatorObjectForm.reviews.viewMore' | translate }}
           </button>
         }
       </section>
@@ -391,12 +399,9 @@
     <section class="manager-guest-reviews card">
       <header class="guest-reviews-header">
         <div>
-          <p class="guest-reviews-eyebrow">Tourist feedback on this object</p>
-          <h2>Guest reviews &amp; creator replies</h2>
-          <p class="guest-reviews-intro">
-            Only tourists can review objects. Read what guests wrote and how the Content Creator
-            responded before approving content or reporting the creator.
-          </p>
+          <p class="guest-reviews-eyebrow">{{ 'contentCreatorObjectForm.review.guestFeedbackEyebrow' | translate }}</p>
+          <h2>{{ 'contentCreatorObjectForm.review.guestReviewsTitle' | translate }}</h2>
+          <p class="guest-reviews-intro">{{ 'contentCreatorObjectForm.review.guestReviewsIntro' | translate }}</p>
         </div>
         @if (primaryReportThread) {
           <a
@@ -405,15 +410,15 @@
             [queryParams]="reportCreatorQuery(primaryReportThread)"
           >
             <span class="material-symbols-outlined">flag</span>
-            Report creator
+            {{ 'contentCreatorObjectForm.review.reportCreator' | translate }}
           </a>
         }
       </header>
 
       @if (managerGuestReviewsLoading) {
-        <p class="guest-reviews-empty">Loading guest reviews…</p>
+        <p class="guest-reviews-empty">{{ 'contentCreatorObjectForm.review.loadingGuestReviews' | translate }}</p>
       } @else if (!managerGuestReviews.length) {
-        <p class="guest-reviews-empty">No guest reviews for this object yet.</p>
+        <p class="guest-reviews-empty">{{ 'contentCreatorObjectForm.review.noGuestReviews' | translate }}</p>
       } @else {
         <div class="guest-reviews-list">
           @for (thread of managerGuestReviews; track thread.id) {
@@ -438,23 +443,23 @@
               @if (isGuestReviewExpanded(thread.id)) {
                 <div class="guest-review-thread">
                   <div class="thread-bubble thread-tourist">
-                    <span class="bubble-role">Tourist review</span>
+                    <span class="bubble-role">{{ 'contentCreatorObjectForm.review.touristReview' | translate }}</span>
                     <p>{{ thread.touristReview }}</p>
                   </div>
 
                   @if (thread.creatorResponse?.trim()) {
                     <div class="thread-bubble thread-creator" [class.concerning]="isConcerningGuestReply(thread)">
                       <span class="bubble-role">
-                        {{ thread.creatorName }} · Content Creator
+                        {{ thread.creatorName }} · {{ 'contentCreatorObjectForm.review.contentCreator' | translate }}
                         @if (isConcerningGuestReply(thread)) {
-                          <em class="concerning-tag">Concerning</em>
+                          <em class="concerning-tag">{{ 'contentCreatorObjectForm.review.concerning' | translate }}</em>
                         }
                       </span>
                       <p>{{ thread.creatorResponse }}</p>
                       <span class="bubble-time">{{ formatGuestReviewDate(thread.creatorResponseAt!) }}</span>
                     </div>
                   } @else {
-                    <p class="thread-no-reply">Creator has not replied to this review yet.</p>
+                    <p class="thread-no-reply">{{ 'contentCreatorObjectForm.review.creatorNoReply' | translate }}</p>
                   }
 
                   @if (isConcerningGuestReply(thread)) {
@@ -464,7 +469,7 @@
                       [queryParams]="reportCreatorQuery(thread)"
                     >
                       <span class="material-symbols-outlined">flag</span>
-                      Report {{ thread.creatorName }}
+                      {{ 'contentCreatorObjectForm.review.reportCreatorName' | translate:{ name: thread.creatorName } }}
                     </a>
                   }
                 </div>
@@ -489,22 +494,20 @@
           <span class="material-symbols-outlined">thumb_down</span>
         </div>
 
-        <h3 id="object-decline-title">Decline object</h3>
-        <p class="object-decline-description">
-          Provide a clear reason so the content creator can address required changes.
-        </p>
+        <h3 id="object-decline-title">{{ 'contentCreatorObjectForm.review.declineTitle' | translate }}</h3>
+        <p class="object-decline-description">{{ 'contentCreatorObjectForm.review.declineDescription' | translate }}</p>
 
         <textarea
           class="decline-reason-input"
           [(ngModel)]="rejectionReason"
           [ngModelOptions]="{ standalone: true }"
           rows="4"
-          placeholder="Example: Details do not match the destination guidelines."
+          [placeholder]="'contentCreatorObjectForm.review.declinePlaceholder' | translate"
         ></textarea>
 
         <div class="object-decline-modal-actions">
           <button type="button" class="ghost-btn" (click)="closeDeclineModal()" [disabled]="isReviewSubmitting">
-            Keep pending
+            {{ 'contentCreatorObjectForm.review.keepPending' | translate }}
           </button>
           <button
             type="button"
@@ -512,7 +515,7 @@
             (click)="declineObject()"
             [disabled]="isReviewSubmitting"
           >
-            {{ isReviewSubmitting ? 'Declining...' : 'Decline object' }}
+            {{ isReviewSubmitting ? ('contentCreatorObjectForm.review.declining' | translate) : ('contentCreatorObjectForm.review.declineObject' | translate) }}
           </button>
         </div>
       </section>
@@ -538,14 +541,14 @@
           {{ deleteModalDescription }}<br />
           {{
             isApprovedObject
-              ? 'A manager will review the request before the object is removed.'
-              : 'This action cannot be undone.'
+              ? ('contentCreatorObjectForm.delete.managerReviewNote' | translate)
+              : ('contentCreatorObjectForm.delete.cannotUndo' | translate)
           }}
         </p>
 
         <div class="object-delete-modal-actions">
           <button type="button" class="ghost-btn" (click)="closeDeleteModal()" [disabled]="isDeletingObject">
-            Cancel
+            {{ 'common.cancel' | translate }}
           </button>
           <button
             type="button"
@@ -555,8 +558,14 @@
           >
             {{
               isDeletingObject
-                ? (isApprovedObject ? 'Submitting...' : 'Deleting...')
-                : (isApprovedObject ? (hasPendingDeletionRequest ? 'Already requested' : 'Request deletion') : 'Delete')
+                ? (isApprovedObject
+                    ? ('contentCreatorObjectForm.delete.submitting' | translate)
+                    : ('contentCreatorObjectForm.delete.deleting' | translate))
+                : (isApprovedObject
+                    ? (hasPendingDeletionRequest
+                        ? ('contentCreatorObjectForm.delete.alreadyRequested' | translate)
+                        : ('contentCreatorObjectForm.delete.requestAction' | translate))
+                    : ('contentCreatorObjectForm.delete.deleteAction' | translate))
             }}
           </button>
         </div>

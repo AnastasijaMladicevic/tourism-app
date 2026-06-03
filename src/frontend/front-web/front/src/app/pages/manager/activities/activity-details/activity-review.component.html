@@ -1,8 +1,8 @@
 <section class="event-form-page">
   <div class="page-header">
     <div>
-      <h1>Activity Review</h1>
-      <p class="review-subtitle">Inspect the submitted activity and approve or decline the submission.</p>
+      <h1>{{ 'manager.activityReview.title' | translate }}</h1>
+      <p class="review-subtitle">{{ 'manager.activityReview.subtitle' | translate }}</p>
 
       @if (activity) {
         <div class="review-status-wrap">
@@ -16,22 +16,22 @@
     <div class="header-actions">
       <button type="button" class="ghost-btn" (click)="cancel()">
         <span class="material-symbols-outlined">close</span>
-        Back
+        {{ 'common.back' | translate }}
       </button>
       <button type="button" class="danger-btn" (click)="openDeclineModal()" [disabled]="isSubmitting || !activity">
         <span class="material-symbols-outlined">thumb_down</span>
-        Decline
+        {{ 'manager.activityReview.decline' | translate }}
       </button>
       <button
         type="button"
         class="primary-btn"
         [class.approved-locked]="reviewStatusKey === 'approved'"
-        [attr.title]="reviewStatusKey === 'approved' ? 'Activity is already approved.' : null"
+        [attr.title]="reviewStatusKey === 'approved' ? ('manager.activityReview.alreadyApproved' | translate) : null"
         (click)="approveActivity()"
         [disabled]="isSubmitting || reviewStatusKey === 'approved' || !activity"
       >
         <span class="material-symbols-outlined">thumb_up</span>
-        Approve
+        {{ 'manager.activityReview.approve' | translate }}
       </button>
     </div>
   </div>
@@ -48,19 +48,19 @@
     <section class="review-shell">
       <section class="card media-card">
         <div class="section-title">
-          <h2>Activity Images</h2>
-          <p>Read-only gallery shown before the review details.</p>
+          <h2>{{ 'manager.activityReview.images' | translate }}</h2>
+          <p>{{ 'manager.activityReview.imagesHint' | translate }}</p>
         </div>
 
-        <div class="media-layout" aria-label="Activity image gallery">
-          <div class="media-preview" aria-label="Main activity image preview">
+        <div class="media-layout" [attr.aria-label]="'manager.activityReview.imageGalleryAria' | translate">
+          <div class="media-preview" [attr.aria-label]="'manager.activityReview.mainImageAria' | translate">
             @if (imagePreviewUrl && !isImagePreviewBroken) {
-              <img [src]="imagePreviewUrl" alt="Activity preview" (error)="onImagePreviewError()" />
+              <img [src]="imagePreviewUrl" [alt]="'manager.activityReview.previewAlt' | translate" (error)="onImagePreviewError()" />
             } @else {
               <div class="upload-placeholder">
                 <span class="material-symbols-outlined">image</span>
-                <strong>No usable image preview yet</strong>
-                <p>The activity does not have a valid main image URL, or the image could not be loaded.</p>
+                <strong>{{ 'manager.activityReview.noImage' | translate }}</strong>
+                <p>{{ 'manager.activityReview.noImageHint' | translate }}</p>
                 <small>{{ mainImageCountLabel }}</small>
               </div>
             }
@@ -71,12 +71,12 @@
               <div class="media-thumbnails">
                 @for (image of sideGalleryImages; track image.url) {
                   <button type="button" class="media-thumb" (click)="selectImage(image.url)">
-                    <img [src]="image.url" [alt]="image.altText || 'Activity image thumbnail'" />
+                    <img [src]="image.url" [alt]="image.altText || ('manager.activityReview.thumbnailAlt' | translate)" />
                   </button>
                 }
               </div>
             } @else {
-              <div class="media-empty">No additional gallery images are available.</div>
+              <div class="media-empty">{{ 'manager.activityReview.noAdditionalImages' | translate }}</div>
             }
           </div>
         </div>
@@ -87,62 +87,62 @@
           <div class="review-main">
             <section class="card section-card">
               <div class="section-title">
-                <h2>Core Details</h2>
-                <p>Basic information from the submitted activity.</p>
+                <h2>{{ 'manager.activityReview.coreDetails' | translate }}</h2>
+                <p>{{ 'manager.activityReview.coreDetailsHint' | translate }}</p>
               </div>
 
               <div class="field-grid two-columns">
                 <label class="form-field full-width">
-                  <span>Activity Name</span>
+                  <span>{{ 'manager.activityReview.activityName' | translate }}</span>
                   <input class="form-control" type="text" formControlName="name" readonly />
                 </label>
 
                 <label class="form-field">
-                  <span>Activity Type</span>
+                  <span>{{ 'manager.activityReview.activityType' | translate }}</span>
                   <input class="form-control" type="text" formControlName="activityTypeName" readonly />
                 </label>
 
                 <label class="form-field">
-                  <span>Status</span>
+                  <span>{{ 'manager.activityReview.statusLabel' | translate }}</span>
                   <input class="form-control" type="text" formControlName="status" readonly />
                 </label>
 
                 <label class="form-field">
-                  <span>Created By</span>
+                  <span>{{ 'manager.activityReview.createdBy' | translate }}</span>
                   <input class="form-control" type="text" formControlName="createdByUserId" readonly />
                 </label>
               </div>
 
               <label class="form-field full-width description-field">
-                <span>Description</span>
+                <span>{{ 'manager.activityReview.description' | translate }}</span>
                 <textarea class="form-control text-area" formControlName="description" rows="8" readonly></textarea>
               </label>
             </section>
 
             <section class="card section-card schedule-card">
               <div class="section-title">
-                <h2>Logistics &amp; Classification</h2>
-                <p>Commercial and destination details used by the listing.</p>
+                <h2>{{ 'manager.activityReview.logistics' | translate }}</h2>
+                <p>{{ 'manager.activityReview.logisticsHint' | translate }}</p>
               </div>
 
               <div class="field-grid schedule-grid">
                 <label class="form-field half-width">
-                  <span>Destination</span>
+                  <span>{{ 'manager.activityReview.destination' | translate }}</span>
                   <input class="form-control" type="text" formControlName="destinationName" readonly />
                 </label>
 
                 <label class="form-field half-width">
-                  <span>Locality</span>
+                  <span>{{ 'manager.activityReview.locality' | translate }}</span>
                   <input class="form-control" type="text" formControlName="localityName" readonly />
                 </label>
 
                 <label class="form-field half-width">
-                  <span>Tourist Object</span>
+                  <span>{{ 'manager.activityReview.touristObject' | translate }}</span>
                   <input class="form-control" type="text" formControlName="objectName" readonly />
                 </label>
 
                 <label class="form-field half-width">
-                  <span>Listing State</span>
+                  <span>{{ 'manager.activityReview.listingState' | translate }}</span>
                   <input class="form-control" type="text" formControlName="isActive" readonly />
                 </label>
 
@@ -152,7 +152,7 @@
                 </label>
 
                 <label class="form-field half-width">
-                  <span>Duration</span>
+                  <span>{{ 'manager.activityReview.duration' | translate }}</span>
                   <input class="form-control" type="text" formControlName="durationMinutes" readonly />
                 </label>
               </div>
@@ -162,15 +162,15 @@
           <aside class="review-side">
             <section class="card section-card highlighted-card">
               <div class="section-title compact">
-                <h2>Location Intelligence</h2>
-                <p>Map preview and coordinates for the linked location.</p>
+                <h2>{{ 'manager.activityReview.locationIntelligence' | translate }}</h2>
+                <p>{{ 'manager.activityReview.locationIntelligenceHint' | translate }}</p>
               </div>
 
               <app-map
                 [lat]="latitudeNumber ?? 42.424"
                 [lng]="longitudeNumber ?? 18.771"
                 [zoom]="15"
-                [popupText]="form.controls.name.value || 'Activity'"
+                [popupText]="form.controls.name.value || ('activity.label' | translate)"
                 [interactive]="false"
                 [zoomable]="true"
                 [showMarker]="true">
@@ -183,14 +183,14 @@
 
               <div class="coord-editor">
                 <div>
-                  <span class="coord-label">{{ 'Latitude' | translate }}</span>
+                  <span class="coord-label">{{ 'common.latitude' | translate }}</span>
                   <div class="coord-input-wrap">
                     <input class="form-control" type="text" formControlName="latitude" readonly />
                     <span class="coord-input-suffix">{{ latitudeDirection }}</span>
                   </div>
                 </div>
                 <div>
-                  <span class="coord-label">{{ 'Longitude' | translate }}</span>
+                  <span class="coord-label">{{ 'common.longitude' | translate }}</span>
                   <div class="coord-input-wrap">
                     <input class="form-control" type="text" formControlName="longitude" readonly />
                     <span class="coord-input-suffix">{{ longitudeDirection }}</span>
@@ -206,9 +206,9 @@
                 <div class="creator-avatar">{{ creatorInitials }}</div>
                 <div>
                   @if (createdByName.trim()) {
-                    <strong>Created by {{ creatorDisplayName }}</strong>
+                    <strong>{{ 'manager.activityReview.createdByName' | translate:{ name: creatorDisplayName } }}</strong>
                   } @else {
-                    <strong>Creator</strong>
+                    <strong>{{ 'manager.activityReview.creator' | translate }}</strong>
                     <p class="sidebar-muted">{{ creatorDisplayName }}</p>
                   }
                   @if (creatorTimeline) {
@@ -220,30 +220,30 @@
 
             <section class="card side-card">
               <div class="section-title compact">
-                <h2>Review Summary</h2>
+                <h2>{{ 'manager.activityReview.reviewSummary' | translate }}</h2>
               </div>
 
               <div class="summary-grid">
                 <div class="summary-row">
-                  <span>Created</span>
+                  <span>{{ 'manager.activityReview.created' | translate }}</span>
                   <strong>{{ form.controls.createdAt.value }}</strong>
                 </div>
                 <div class="summary-row">
-                  <span>Updated</span>
+                  <span>{{ 'manager.activityReview.updated' | translate }}</span>
                   <strong>{{ form.controls.updatedAt.value }}</strong>
                 </div>
                 <div class="summary-row">
-                  <span>Approved at</span>
+                  <span>{{ 'manager.activityReview.approvedAt' | translate }}</span>
                   <strong>{{ form.controls.approvedAt.value }}</strong>
                 </div>
                 @if (reviewStatusKey === 'approved') {
                   <div class="summary-row">
-                    <span>Approved by</span>
-                    <strong>{{ form.controls.approvedByName.value || '—' }}</strong>
+                    <span>{{ 'manager.activityReview.approvedBy' | translate }}</span>
+                    <strong>{{ form.controls.approvedByName.value || ('manager.activityReview.fallback.notAvailable' | translate) }}</strong>
                   </div>
                 } @else if (reviewStatusKey === 'rejected') {
                   <div class="summary-row summary-row--full">
-                    <span>Rejection reason</span>
+                    <span>{{ 'manager.activityReview.rejectionReason' | translate }}</span>
                     <strong>{{ form.controls.rejectionReason.value }}</strong>
                   </div>
                 }
@@ -255,7 +255,7 @@
       </form>
     </section>
   } @else if (isLoading) {
-    <section class="card loading-shell" aria-label="Loading activity review skeleton">
+    <section class="card loading-shell" [attr.aria-label]="'manager.activityReview.loadingAria' | translate">
       <div class="loading-surface loading-surface-lg"></div>
       <div class="loading-row">
         <div class="loading-surface"></div>
@@ -265,8 +265,8 @@
     </section>
   } @else {
     <section class="card empty-shell">
-      <h2>Activity review is unavailable</h2>
-      <p>{{ errorMessage || 'No activity data was returned for this page.' }}</p>
+      <h2>{{ 'manager.activityReview.unavailableTitle' | translate }}</h2>
+      <p>{{ errorMessage || ('manager.activityReview.unavailableBody' | translate) }}</p>
     </section>
   }
 
@@ -284,17 +284,15 @@
           <span class="material-symbols-outlined">thumb_down</span>
         </div>
 
-        <h3 id="decline-modal-title">Decline activity</h3>
-        <p id="decline-modal-description">
-          Provide a clear reason so the content creator can address required changes.
-        </p>
+        <h3 id="decline-modal-title">{{ 'manager.activityReview.declineTitle' | translate }}</h3>
+        <p id="decline-modal-description">{{ 'manager.activityReview.declineDescription' | translate }}</p>
 
         <textarea
           class="decline-reason-input"
           [(ngModel)]="rejectionReason"
           [ngModelOptions]="{ standalone: true }"
           rows="4"
-          placeholder="Example: The linked object does not match the submitted activity."
+          [placeholder]="'manager.activityReview.declinePlaceholder' | translate"
         ></textarea>
 
         <div class="event-delete-modal-actions">
@@ -304,7 +302,7 @@
             (click)="closeDeclineModal()"
             [disabled]="isSubmitting"
           >
-            Keep pending
+            {{ 'manager.activityReview.keepPending' | translate }}
           </button>
           <button
             type="button"
@@ -312,7 +310,7 @@
             (click)="declineActivity()"
             [disabled]="isSubmitting"
           >
-            {{ isSubmitting ? 'Declining...' : 'Decline activity' }}
+            {{ isSubmitting ? ('manager.activityReview.declining' | translate) : ('manager.activityReview.declineAction' | translate) }}
           </button>
         </div>
       </section>

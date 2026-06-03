@@ -7,6 +7,7 @@ import { DestinationService } from '../../../../services/destination.service';
 import { CreateLocalityDto, LocalityImageDto, LocalityService, UpdateLocalityDto } from '../../../../services/locality.service';
 import { MapComponent as SharedMapComponent } from '../../../../shared/components/map/map';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
+import { TranslationService } from '../../../../services/translation.service';
 
 interface LocalityTypeOption {
   id: number;
@@ -38,6 +39,7 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly cdr = inject(ChangeDetectorRef);
+  readonly translationService = inject(TranslationService);
 
   isSubmitting = false;
   isLoadingOptions = true;
@@ -133,12 +135,12 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
       return `${typeName} · ${destinationName}`;
     }
     if (destinationName) {
-      return `Destination: ${destinationName}`;
+      return this.translationService.translate('manager.localityForm.locationSummary.destination', { destination: destinationName });
     }
     if (typeName) {
-      return `Type: ${typeName}`;
+      return this.translationService.translate('manager.localityForm.locationSummary.type', { type: typeName });
     }
-    return 'Set destination and locality type for map context';
+    return this.translationService.translate('manager.localityForm.locationSummary.empty');
   }
 
   get mapPopupText(): string {
@@ -154,7 +156,7 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
     if (typeName && destinationName) {
       return `${typeName} · ${destinationName}`;
     }
-    return name || typeName || destinationName || 'New locality';
+    return name || typeName || destinationName || this.translationService.translate('manager.localityForm.newLocality');
   }
 
   get singleDestinationName(): string | null {
@@ -174,15 +176,15 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
     }
 
     if (!this.form.name.trim() || !this.form.destinationId || !this.form.localityTypeId) {
-      this.errorMessage = 'Name, destination, and type are required.';
+      this.errorMessage = this.translationService.translate('manager.localityForm.errors.requiredFields');
       return;
     }
     if (this.existingImages.length === 0 && this.imageFiles.length === 0) {
-      this.galleryErrorMessage = 'At least one image is required before saving.';
+      this.galleryErrorMessage = this.translationService.translate('manager.localityForm.errors.imageRequired');
       return;
     }
     if (this.existingImages.length + this.imageFiles.length > this.maxImageCount) {
-      this.errorMessage = `A locality can have at most ${this.maxImageCount} images.`;
+      this.errorMessage = this.translationService.translate('manager.localityForm.errors.maxImages', { count: this.maxImageCount });
       return;
     }
 
@@ -223,7 +225,7 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
       this.localityService.update(this.localityId, updatePayload).subscribe({
         next: (updated) => onSuccess(updated.id),
         error: (error) => {
-          this.errorMessage = error?.error?.message ?? 'Failed to update locality.';
+          this.errorMessage = error?.error?.message ?? this.translationService.translate('manager.localityForm.errors.updateFailed');
           this.isSubmitting = false;
         }
       });
@@ -233,7 +235,7 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
     this.localityService.create(payload).subscribe({
       next: (created) => onSuccess(created.id),
       error: (error) => {
-        this.errorMessage = error?.error?.message ?? 'Failed to create locality.';
+        this.errorMessage = error?.error?.message ?? this.translationService.translate('manager.localityForm.errors.createFailed');
         this.isSubmitting = false;
       }
     });
@@ -278,7 +280,7 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
         }, 1800);
       },
       error: (error) => {
-        this.errorMessage = error?.error?.message ?? 'Failed to delete locality.';
+        this.errorMessage = error?.error?.message ?? this.translationService.translate('manager.localityForm.errors.deleteFailed');
         this.isDeleting = false;
       }
     });
@@ -292,6 +294,23 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
     this.showTipsModal = false;
   }
 
+<<<<<<< HEAD
+=======
+  onSaveDraft(): void {
+    if (this.isEditMode) {
+      this.draftSavedMessage = this.translationService.translate('manager.localityForm.draft.newOnly');
+      return;
+    }
+
+    const draft = {
+      form: this.form,
+      primaryImageIndex: this.primaryImageIndex
+    };
+    localStorage.setItem(this.draftStorageKey, JSON.stringify(draft));
+    this.draftSavedMessage = this.translationService.translate('manager.localityForm.draft.saved');
+  }
+
+>>>>>>> menadzer-prevod-prepravke
   onPickImages(input: HTMLInputElement): void {
     input.click();
   }
@@ -328,7 +347,7 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
 
     const remainingSlots = this.maxImageCount - (this.existingImages.length + this.imageFiles.length);
     if (remainingSlots <= 0) {
-      this.galleryErrorMessage = `You can upload up to ${this.maxImageCount} images per locality.`;
+      this.galleryErrorMessage = this.translationService.translate('manager.localityForm.errors.uploadLimit', { count: this.maxImageCount });
       input.value = '';
       return;
     }
@@ -341,7 +360,7 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
 
     this.errorMessage =
       acceptedFiles.length < imageFiles.length
-        ? `Only the first ${acceptedFiles.length} image(s) were added. Each locality can have up to ${this.maxImageCount} images.`
+        ? this.translationService.translate('manager.localityForm.errors.partialUpload', { accepted: acceptedFiles.length, count: this.maxImageCount })
         : '';
     this.pendingImageNames = this.imageFiles.map((file) => file.name).join(', ');
     input.value = '';
@@ -463,7 +482,7 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       },
       error: (error) => {
-        this.errorMessage = error?.error?.message ?? 'Failed to load locality for editing.';
+        this.errorMessage = error?.error?.message ?? this.translationService.translate('manager.localityForm.errors.loadEditFailed');
       }
     });
   }

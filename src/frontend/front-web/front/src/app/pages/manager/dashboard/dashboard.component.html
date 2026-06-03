@@ -1,13 +1,13 @@
 <section class="manager-dashboard">
   <div class="page-head">
     <div>
-      <h1 class="page-title">Manager Dashboard</h1>
+      <h1 class="page-title">{{ 'managerDashboard.title' | translate }}</h1>
       <p class="subtle-text">
-        Welcome back{{ user?.firstName ? ', ' + user?.firstName : '' }}. Destination performance and moderation overview for the selected period.
+        {{ 'managerDashboard.welcomeBack' | translate:{ name: user?.firstName ? ', ' + user?.firstName : '' } }}
       </p>
     </div>
     <div class="head-actions">
-      <div class="period-filter" role="group" aria-label="Dashboard period">
+      <div class="period-filter" role="group" [attr.aria-label]="'managerDashboard.period' | translate">
         <button
           type="button"
           *ngFor="let opt of periodOptions"
@@ -22,16 +22,16 @@
   </div>
 
   <p class="state-banner error" *ngIf="loadError">{{ loadError }}</p>
-  <p class="state-banner loading" *ngIf="isLoading && !loadError">Loading manager dashboard...</p>
+  <p class="state-banner loading" *ngIf="isLoading && !loadError">{{ 'managerDashboard.loading' | translate }}</p>
 
   <ng-container *ngIf="!isLoading && overview">
     <article class="card empty-shell" *ngIf="!hasManagedDestination">
-      <h3>No destination assigned yet</h3>
+      <h3>{{ 'managerDashboard.noDestinationAssignedTitle' | translate }}</h3>
       <p>
-        This dashboard becomes active as soon as an admin assigns you to a destination. Until then, you can still review your profile and wait for assignment.
+        {{ 'managerDashboard.noDestinationAssignedBody' | translate }}
       </p>
       <div class="empty-shell-actions">
-        <a class="ghost-link" routerLink="/manager/profile">Open profile</a>
+        <a class="ghost-link" routerLink="/manager/profile">{{ 'managerDashboard.openProfile' | translate }}</a>
       </div>
     </article>
 
@@ -44,38 +44,45 @@
         </article>
 
         <article class="kpi-card card kpi-card--blue">
-          <span class="kpi-label">Active creators</span>
+          <span class="kpi-label">{{ 'managerDashboard.activeCreators' | translate }}</span>
           <span class="kpi-value">{{ overview.summary.activeCreators | number }}</span>
           <span class="kpi-meta muted">
-            {{ overview.summary.activeObjects | number }} objects &bull; {{ overview.summary.activeEvents | number }} events &bull; {{ overview.summary.activeActivities | number }} activities
+            {{ 'managerDashboard.activeCreatorsMeta' | translate:{
+              objects: overview.summary.activeObjects,
+              events: overview.summary.activeEvents,
+              activities: overview.summary.activeActivities
+            } }}
           </span>
         </article>
 
         <article class="kpi-card card kpi-card--amber" [class.kpi-card--alert]="overview.summary.pendingModerationItems > 0">
-          <span class="kpi-label">Pending moderation</span>
+          <span class="kpi-label">{{ 'managerDashboard.pendingModeration' | translate }}</span>
           <span class="kpi-value">{{ overview.summary.pendingModerationItems | number }}</span>
-          <span class="kpi-meta muted">Current moderation queue</span>
+          <span class="kpi-meta muted">{{ 'managerDashboard.currentModerationQueue' | translate }}</span>
         </article>
 
         <article class="kpi-card card kpi-card--red" [class.kpi-card--alert]="overview.summary.openReports > 0">
-          <span class="kpi-label">Open reports</span>
+          <span class="kpi-label">{{ 'managerDashboard.openReports' | translate }}</span>
           <span class="kpi-value">{{ overview.summary.openReports | number }}</span>
-          <span class="kpi-meta muted">{{ overview.reports.totalInPeriod | number }} submitted in {{ overview.periodKey }}</span>
+          <span class="kpi-meta muted">{{ 'managerDashboard.submittedInPeriod' | translate:{ count: overview.reports.totalInPeriod, period: overview.periodKey } }}</span>
         </article>
 
         <article class="kpi-card card kpi-card--purple">
-          <span class="kpi-label">Average rating</span>
+          <span class="kpi-label">{{ 'managerDashboard.averageRating' | translate }}</span>
           <span class="kpi-value">{{ overview.summary.averageRatingInPeriod | number:'1.1-1' }}</span>
           <span class="kpi-meta muted">
-            {{ overview.summary.newReviewsInPeriod | number }} new reviews &bull; {{ overview.summary.lowRatedReviewsInPeriod | number }} low-rated
+            {{ 'managerDashboard.averageRatingMeta' | translate:{
+              reviews: overview.summary.newReviewsInPeriod,
+              lowRated: overview.summary.lowRatedReviewsInPeriod
+            } }}
           </span>
         </article>
 
         <article class="kpi-card card kpi-card--green">
-          <span class="kpi-label">Unanswered reviews</span>
+          <span class="kpi-label">{{ 'managerDashboard.unansweredReviews' | translate }}</span>
           <span class="kpi-value">{{ overview.summary.unansweredReviews | number }}</span>
           <span class="kpi-meta muted">
-            {{ overview.summary.upcomingEventsInNext30Days | number }} upcoming events in next 30 days
+            {{ 'managerDashboard.upcomingEventsInNext30Days' | translate:{ count: overview.summary.upcomingEventsInNext30Days } }}
           </span>
         </article>
       </div>
@@ -84,10 +91,10 @@
         <article class="card panel panel--wide">
           <div class="section-head">
             <div>
-              <h3>Engagement Trend</h3>
-              <p>{{ granularityHint }} &bull; favorites, planner adds, reviews</p>
+              <h3>{{ 'managerDashboard.engagementTrend' | translate }}</h3>
+              <p>{{ granularityHint }} &bull; {{ 'managerDashboard.engagementTrendHint' | translate }}</p>
             </div>
-            <a class="section-link" routerLink="/manager/creator-reviews">Review feedback</a>
+            <a class="section-link" routerLink="/manager/creator-reviews">{{ 'managerDashboard.reviewFeedback' | translate }}</a>
           </div>
 
           <div class="trend-panel-body">
@@ -125,7 +132,7 @@
                       <title>{{ zone.title }}</title>
                     </rect>
                   </svg>
-                  <p class="chart-empty" *ngIf="engagementIsEmpty">No engagement activity was recorded for this period.</p>
+                  <p class="chart-empty" *ngIf="engagementIsEmpty">{{ 'managerDashboard.noEngagement' | translate }}</p>
                 </div>
               </div>
 
@@ -136,15 +143,15 @@
 
             <div class="trend-summary-row">
               <div class="trend-summary-card">
-                <span class="trend-summary-label">Favorites in period</span>
+                <span class="trend-summary-label">{{ 'managerDashboard.favoritesInPeriod' | translate }}</span>
                 <span class="trend-summary-value">{{ overview.summary.favoritesInPeriod | number }}</span>
               </div>
               <div class="trend-summary-card">
-                <span class="trend-summary-label">Planner adds</span>
+                <span class="trend-summary-label">{{ 'managerDashboard.plannerAdds' | translate }}</span>
                 <span class="trend-summary-value">{{ overview.summary.plannerAddsInPeriod | number }}</span>
               </div>
               <div class="trend-summary-card">
-                <span class="trend-summary-label">New reviews</span>
+                <span class="trend-summary-label">{{ 'managerDashboard.newReviews' | translate }}</span>
                 <span class="trend-summary-value">{{ overview.summary.newReviewsInPeriod | number }}</span>
               </div>
             </div>
@@ -154,17 +161,17 @@
         <article class="card panel">
           <div class="section-head">
             <div>
-              <h3>Content Status</h3>
-              <p>Published, pending and rejected across your destination</p>
+              <h3>{{ 'managerDashboard.contentStatus' | translate }}</h3>
+              <p>{{ 'managerDashboard.contentStatusHint' | translate }}</p>
             </div>
-            <a class="section-link" routerLink="/manager/localities">Open localities</a>
+            <a class="section-link" routerLink="/manager/localities">{{ 'managerDashboard.openLocalities' | translate }}</a>
           </div>
 
           <div class="status-list" *ngIf="contentStatusRows.length; else emptyContentStatus">
             <div *ngFor="let row of contentStatusRows" class="status-row">
               <div class="status-row-head">
                 <span class="status-row-name">{{ row.label }}</span>
-                <span class="status-row-total">{{ row.total | number }} total</span>
+                <span class="status-row-total">{{ 'managerDashboard.totalCount' | translate:{ count: row.total } }}</span>
               </div>
               <div class="stacked-bar stacked-bar--tall">
                 <div class="stacked-bar-fill-wrap" [style.width.%]="row.totalPercent">
@@ -174,53 +181,55 @@
                 </div>
               </div>
               <div class="status-row-meta">
-                <span>{{ row.published | number }} published</span>
-                <span>{{ row.pending | number }} pending</span>
-                <span>{{ row.rejected | number }} rejected</span>
+                <span>{{ 'managerDashboard.publishedCount' | translate:{ count: row.published } }}</span>
+                <span>{{ 'managerDashboard.pendingCount' | translate:{ count: row.pending } }}</span>
+                <span>{{ 'managerDashboard.rejectedCount' | translate:{ count: row.rejected } }}</span>
               </div>
             </div>
           </div>
 
           <ng-template #emptyContentStatus>
-            <p class="empty-note">No content status is available right now.</p>
+            <p class="empty-note">{{ 'managerDashboard.noContentStatus' | translate }}</p>
           </ng-template>
         </article>
 
         <article class="card panel">
           <div class="section-head">
             <div>
-              <h3>Pending approvals</h3>
-              <p>Objects, events, activities and reports waiting for your review</p>
+              <h3>{{ 'managerDashboard.pendingApprovals' | translate }}</h3>
+              <p>{{ 'managerDashboard.pendingApprovalsHint' | translate }}</p>
             </div>
-            <a class="section-link" routerLink="/manager/reports">Reports</a>
+            <a class="section-link" routerLink="/manager/reports">{{ 'managerDashboard.reports' | translate }}</a>
           </div>
 
           <div class="creator-summary">
             <div class="creator-stat">
               <span class="creator-stat-val">{{ overview.moderationQueue.pendingObjects | number }}</span>
-              <span class="creator-stat-label">Objects</span>
+              <span class="creator-stat-label">{{ 'managerDashboard.objects' | translate }}</span>
             </div>
             <div class="creator-stat">
               <span class="creator-stat-val">{{ overview.moderationQueue.pendingEvents | number }}</span>
-              <span class="creator-stat-label">Events</span>
+              <span class="creator-stat-label">{{ 'managerDashboard.events' | translate }}</span>
             </div>
             <div class="creator-stat">
               <span class="creator-stat-val">{{ overview.moderationQueue.pendingActivities | number }}</span>
-              <span class="creator-stat-label">Activities</span>
+              <span class="creator-stat-label">{{ 'managerDashboard.activities' | translate }}</span>
             </div>
             <div class="creator-stat creator-stat--reports">
               <span class="creator-stat-val">{{ overview.reports.currentPending | number }}</span>
-              <span class="creator-stat-label">Reports</span>
+              <span class="creator-stat-label">{{ 'managerDashboard.reports' | translate }}</span>
             </div>
           </div>
 
           <div class="queue-total-card queue-total-card--highlight">
-            <span class="queue-total-label">Total pending</span>
+            <span class="queue-total-label">{{ 'managerDashboard.totalPending' | translate }}</span>
             <span class="queue-total-value">{{ moderationTotalPendingDecisions | number }}</span>
             <span class="queue-total-meta">
-              {{ overview.moderationQueue.totalPending | number }} objects, events and activities
+              {{ 'managerDashboard.moderationQueueMeta' | translate:{
+                items: overview.moderationQueue.totalPending,
+                reports: overview.reports.currentPending
+              } }}
               <br />
-              {{ overview.reports.currentPending | number }} reports
             </span>
           </div>
 
@@ -249,27 +258,27 @@
         <article class="card panel">
           <div class="section-head">
             <div>
-              <h3>Reports Status</h3>
-              <p>Current queue and resolved reports in {{ overview.periodKey }}</p>
+              <h3>{{ 'managerDashboard.reportsStatus' | translate }}</h3>
+              <p>{{ 'managerDashboard.reportsStatusHint' | translate:{ period: overview.periodKey } }}</p>
             </div>
-            <a class="section-link" routerLink="/manager/reports">Open reports</a>
+            <a class="section-link" routerLink="/manager/reports">{{ 'managerDashboard.openReportsLink' | translate }}</a>
           </div>
 
           <div class="report-grid">
             <div class="report-chip">
-              <span class="report-chip-label">Pending now</span>
+              <span class="report-chip-label">{{ 'managerDashboard.pendingNow' | translate }}</span>
               <span class="report-chip-value">{{ overview.reports.currentPending | number }}</span>
             </div>
             <div class="report-chip">
-              <span class="report-chip-label">Submitted</span>
+              <span class="report-chip-label">{{ 'managerDashboard.submitted' | translate }}</span>
               <span class="report-chip-value">{{ overview.reports.submittedInPeriod | number }}</span>
             </div>
             <div class="report-chip">
-              <span class="report-chip-label">Approved</span>
+              <span class="report-chip-label">{{ 'managerDashboard.approved' | translate }}</span>
               <span class="report-chip-value">{{ overview.reports.approvedInPeriod | number }}</span>
             </div>
             <div class="report-chip">
-              <span class="report-chip-label">Rejected</span>
+              <span class="report-chip-label">{{ 'managerDashboard.rejected' | translate }}</span>
               <span class="report-chip-value">{{ overview.reports.rejectedInPeriod | number }}</span>
             </div>
           </div>
@@ -278,27 +287,27 @@
         <article class="card panel">
           <div class="section-head">
             <div>
-              <h3>Review Health</h3>
-              <p>How tourists currently rate this destination content</p>
+              <h3>{{ 'managerDashboard.reviewHealth' | translate }}</h3>
+              <p>{{ 'managerDashboard.reviewHealthHint' | translate }}</p>
             </div>
-            <a class="section-link" routerLink="/manager/creator-reviews">See reviews</a>
+            <a class="section-link" routerLink="/manager/creator-reviews">{{ 'managerDashboard.seeReviews' | translate }}</a>
           </div>
 
           <div class="review-health">
             <div class="review-health-card">
-              <span class="review-health-label">Average rating</span>
+              <span class="review-health-label">{{ 'managerDashboard.averageRating' | translate }}</span>
               <span class="review-health-value">{{ overview.summary.averageRatingInPeriod | number:'1.1-1' }}</span>
             </div>
             <div class="review-health-card">
-              <span class="review-health-label">New reviews</span>
+              <span class="review-health-label">{{ 'managerDashboard.newReviews' | translate }}</span>
               <span class="review-health-value">{{ overview.summary.newReviewsInPeriod | number }}</span>
             </div>
             <div class="review-health-card">
-              <span class="review-health-label">Unanswered</span>
+              <span class="review-health-label">{{ 'managerDashboard.unanswered' | translate }}</span>
               <span class="review-health-value">{{ overview.summary.unansweredReviews | number }}</span>
             </div>
             <div class="review-health-card">
-              <span class="review-health-label">Low-rated</span>
+              <span class="review-health-label">{{ 'managerDashboard.lowRated' | translate }}</span>
               <span class="review-health-value">{{ overview.summary.lowRatedReviewsInPeriod | number }}</span>
             </div>
           </div>
@@ -307,15 +316,15 @@
         <article class="card panel">
           <div class="section-head">
             <div>
-              <h3>Top Creators</h3>
-              <p>Creators with the strongest engagement score in {{ overview.periodKey }}</p>
+              <h3>{{ 'managerDashboard.topCreators' | translate }}</h3>
+              <p>{{ 'managerDashboard.topCreatorsHint' | translate:{ period: overview.periodKey } }}</p>
             </div>
           </div>
 
           <div class="creator-rank-list" *ngIf="topCreatorRows.length; else emptyCreators">
             <div *ngFor="let row of topCreatorRows" class="rank-row">
-              <div class="rank-row-head">
-                <div>
+                <div class="rank-row-head">
+                  <div>
                   <ng-container *ngIf="getTopCreatorRoute(row) as creatorRoute; else topCreatorNameText">
                     <a
                       class="rank-name dashboard-item-link"
@@ -330,7 +339,7 @@
                   </ng-template>
                   <div class="rank-subtle">{{ row.creatorEmail }}</div>
                 </div>
-                <div class="rank-score">score {{ row.engagementScore | number:'1.0-1' }}</div>
+                <div class="rank-score">{{ 'managerDashboard.scoreValue' | translate:{ score: row.engagementScore } }}</div>
               </div>
               <div class="region-bar-track">
                 <div
@@ -340,17 +349,17 @@
                 ></div>
               </div>
               <div class="rank-meta">
-                <span>{{ row.contentItems | number }} items</span>
-                <span>{{ row.publishedItems | number }} published</span>
-                <span>{{ row.pendingItems | number }} pending</span>
-                <span>{{ row.reviewCount | number }} reviews</span>
-                <span>{{ row.averageRating | number:'1.1-1' }} avg</span>
+                <span>{{ 'managerDashboard.itemsCount' | translate:{ count: row.contentItems } }}</span>
+                <span>{{ 'managerDashboard.publishedCount' | translate:{ count: row.publishedItems } }}</span>
+                <span>{{ 'managerDashboard.pendingCount' | translate:{ count: row.pendingItems } }}</span>
+                <span>{{ 'managerDashboard.reviewsCount' | translate:{ count: row.reviewCount } }}</span>
+                <span>{{ 'managerDashboard.avgRating' | translate:{ rating: row.averageRating } }}</span>
               </div>
             </div>
           </div>
 
           <ng-template #emptyCreators>
-            <p class="empty-note">No creator performance data is available for this period.</p>
+            <p class="empty-note">{{ 'managerDashboard.noCreatorPerformance' | translate }}</p>
           </ng-template>
         </article>
       </div>
@@ -359,10 +368,10 @@
         <article class="card panel panel--wide">
           <div class="section-head">
             <div>
-              <h3>Top Content</h3>
-              <p>Best performing objects, events and activities in {{ overview.periodKey }}</p>
+              <h3>{{ 'managerDashboard.topContent' | translate }}</h3>
+              <p>{{ 'managerDashboard.topContentHint' | translate:{ period: overview.periodKey } }}</p>
             </div>
-            <a class="section-link" routerLink="/manager/localities">Manage content</a>
+            <a class="section-link" routerLink="/manager/localities">{{ 'managerDashboard.manageContent' | translate }}</a>
           </div>
 
           <div class="rank-list" *ngIf="topContentRows.length; else emptyTopContent">
@@ -383,7 +392,7 @@
                 </div>
                 <div class="rank-side">
                   <span [class]="statusClass(row.status)">{{ humanizeStatus(row.status) }}</span>
-                  <span class="rank-score">score {{ row.engagementScore | number:'1.0-1' }}</span>
+                  <span class="rank-score">{{ 'managerDashboard.scoreValue' | translate:{ score: row.engagementScore } }}</span>
                 </div>
               </div>
               <div class="region-bar-track">
@@ -394,26 +403,26 @@
                 ></div>
               </div>
               <div class="rank-meta">
-                <span>{{ row.favoriteAdds | number }} favorites</span>
-                <span>{{ row.plannerAdds | number }} planner adds</span>
-                <span>{{ row.reviewCount | number }} reviews</span>
-                <span>{{ row.averageRating | number:'1.1-1' }} avg</span>
+                <span>{{ 'managerDashboard.favoritesCount' | translate:{ count: row.favoriteAdds } }}</span>
+                <span>{{ 'managerDashboard.plannerAddsCount' | translate:{ count: row.plannerAdds } }}</span>
+                <span>{{ 'managerDashboard.reviewsCount' | translate:{ count: row.reviewCount } }}</span>
+                <span>{{ 'managerDashboard.avgRating' | translate:{ rating: row.averageRating } }}</span>
               </div>
             </div>
           </div>
 
           <ng-template #emptyTopContent>
-            <p class="empty-note">No top content data is available for this period.</p>
+            <p class="empty-note">{{ 'managerDashboard.noTopContent' | translate }}</p>
           </ng-template>
         </article>
 
         <article class="card panel">
           <div class="section-head">
             <div>
-              <h3>Locality Performance</h3>
-              <p>Most engaged localities in {{ overview.periodKey }}</p>
+              <h3>{{ 'managerDashboard.localityPerformance' | translate }}</h3>
+              <p>{{ 'managerDashboard.localityPerformanceHint' | translate:{ period: overview.periodKey } }}</p>
             </div>
-            <a class="section-link" routerLink="/manager/localities">Open localities</a>
+            <a class="section-link" routerLink="/manager/localities">{{ 'managerDashboard.openLocalities' | translate }}</a>
           </div>
 
           <div class="locality-list" *ngIf="localityRows.length; else emptyLocalities">
@@ -426,9 +435,9 @@
                   <ng-template #localityNameText>
                     <div class="rank-name">{{ row.localityName }}</div>
                   </ng-template>
-                  <div class="rank-subtle">{{ row.contentItems | number }} content items</div>
+                  <div class="rank-subtle">{{ 'managerDashboard.contentItemsCount' | translate:{ count: row.contentItems } }}</div>
                 </div>
-                <div class="rank-score">score {{ row.engagementScore | number:'1.0-1' }}</div>
+                <div class="rank-score">{{ 'managerDashboard.scoreValue' | translate:{ score: row.engagementScore } }}</div>
               </div>
               <div class="region-bar-track">
                 <div
@@ -438,16 +447,16 @@
                 ></div>
               </div>
               <div class="rank-meta">
-                <span>{{ row.favoriteAdds | number }} favorites</span>
-                <span>{{ row.plannerAdds | number }} planner adds</span>
-                <span>{{ row.reviewCount | number }} reviews</span>
-                <span>{{ row.averageRating | number:'1.1-1' }} avg</span>
+                <span>{{ 'managerDashboard.favoritesCount' | translate:{ count: row.favoriteAdds } }}</span>
+                <span>{{ 'managerDashboard.plannerAddsCount' | translate:{ count: row.plannerAdds } }}</span>
+                <span>{{ 'managerDashboard.reviewsCount' | translate:{ count: row.reviewCount } }}</span>
+                <span>{{ 'managerDashboard.avgRating' | translate:{ rating: row.averageRating } }}</span>
               </div>
             </div>
           </div>
 
           <ng-template #emptyLocalities>
-            <p class="empty-note">No locality performance data is available for this period.</p>
+            <p class="empty-note">{{ 'managerDashboard.noLocalityPerformance' | translate }}</p>
           </ng-template>
         </article>
       </div>
@@ -455,10 +464,10 @@
       <article class="card panel">
         <div class="section-head">
           <div>
-            <h3>Upcoming Events</h3>
-            <p>{{ overview.upcomingEvents.next7Days | number }} in next 7 days &bull; {{ overview.upcomingEvents.next30Days | number }} in next 30 days</p>
+            <h3>{{ 'managerDashboard.upcomingEvents' | translate }}</h3>
+            <p>{{ 'managerDashboard.upcomingEventsHint' | translate:{ next7: overview.upcomingEvents.next7Days, next30: overview.upcomingEvents.next30Days } }}</p>
           </div>
-          <a class="section-link" routerLink="/manager/events">Open events</a>
+          <a class="section-link" routerLink="/manager/events">{{ 'managerDashboard.openEvents' | translate }}</a>
         </div>
 
         <div class="upcoming-grid" *ngIf="upcomingEventRows.length; else emptyEvents">
@@ -471,12 +480,12 @@
               <h4>{{ row.eventName }}</h4>
             </ng-template>
             <p>{{ row.localityName || managedDestinationTitle }}</p>
-            <span class="upcoming-meta">Creator &bull; {{ row.creatorName }}</span>
+            <span class="upcoming-meta">{{ 'managerDashboard.creator' | translate }} &bull; {{ row.creatorName }}</span>
           </article>
         </div>
 
         <ng-template #emptyEvents>
-          <p class="empty-note">No upcoming events are scheduled in the selected period.</p>
+          <p class="empty-note">{{ 'managerDashboard.noUpcomingEvents' | translate }}</p>
         </ng-template>
       </article>
     </ng-container>
