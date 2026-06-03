@@ -8,11 +8,13 @@ import { MapComponent as SharedMapComponent } from '../../../shared/components/m
 import { DestinationService } from '../../../services/destination.service';
 import { AuthService } from '../../../services/auth.service';
 import { HERO_IMAGE_ROTATION_INTERVAL_MS } from '../../../shared/constants/hero-image-rotation';
+import { TranslationService } from '../../../services/translation.service';
+import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-manager-localities',
   standalone: true,
-  imports: [CommonModule, FormsModule, SharedMapComponent, PaginatorComponent],
+  imports: [CommonModule, FormsModule, SharedMapComponent, PaginatorComponent, TranslatePipe],
   templateUrl: './localities.component.html',
   styleUrls: [
     './localities.component.css',
@@ -32,6 +34,7 @@ export class ManagerLocalitiesComponent implements OnInit, OnDestroy {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
+  readonly translationService = inject(TranslationService);
 
   localities: LocalityDto[] = [];
   selectedLocality: LocalityDto | null = null;
@@ -81,8 +84,7 @@ export class ManagerLocalitiesComponent implements OnInit, OnDestroy {
       return '…';
     }
 
-    const count = this.totalCount;
-    return `${count} localit${count === 1 ? 'y' : 'ies'}`;
+    return this.translationService.translate('manager.localities.totalCount', { count: this.totalCount });
   }
 
   get pageStart(): number {
@@ -106,7 +108,7 @@ export class ManagerLocalitiesComponent implements OnInit, OnDestroy {
 
   get selectedCoordinates(): string {
     if (this.selectedLocality?.latitude == null || this.selectedLocality?.longitude == null) {
-      return 'N/A';
+      return this.translationService.translate('common.notAvailable');
     }
     return `${this.selectedLocality.latitude.toFixed(4)}, ${this.selectedLocality.longitude.toFixed(4)}`;
   }
@@ -125,7 +127,7 @@ export class ManagerLocalitiesComponent implements OnInit, OnDestroy {
 
   get selectedLocalityLocationLabel(): string {
     if (!this.selectedLocality) {
-      return 'Selected locality';
+      return this.translationService.translate('manager.localities.selectedLocality');
     }
 
     return `${this.selectedLocality.name} · ${this.selectedLocality.destinationName || this.selectedLocality.regionName}`;
@@ -171,7 +173,7 @@ export class ManagerLocalitiesComponent implements OnInit, OnDestroy {
           this.cdr.detectChanges();
         },
         error: (error) => {
-          this.errorMessage = error?.error?.message ?? 'Failed to load localities';
+          this.errorMessage = error?.error?.message ?? this.translationService.translate('manager.localities.error.load');
           this.localities = [];
           this.setSelectedLocality(null);
           this.totalCount = 0;
@@ -219,7 +221,7 @@ export class ManagerLocalitiesComponent implements OnInit, OnDestroy {
         const destinationOptions = this.toUniqueOptions(scopedItems.map((item) => item.destinationName));
         const typeOptions = this.toUniqueOptions(scopedItems.map((item) => item.localityTypeName));
         const statusOptions = this.toUniqueOptions(
-          scopedItems.map((item) => (item.isActive ? 'Published' : 'Archived'))
+          scopedItems.map((item) => this.getStatusLabel(item))
         );
 
         this.destinationOptions = destinationOptions;
@@ -389,7 +391,9 @@ export class ManagerLocalitiesComponent implements OnInit, OnDestroy {
   }
 
   getStatusLabel(locality: LocalityDto): string {
-    return locality.isActive ? 'Published' : 'Archived';
+    return locality.isActive
+      ? this.translationService.translate('manager.localities.status.published')
+      : this.translationService.translate('manager.localities.status.archived');
   }
 
   getStatusClass(locality: LocalityDto): string {
@@ -398,16 +402,16 @@ export class ManagerLocalitiesComponent implements OnInit, OnDestroy {
 
   getCreatedByLabel(locality: LocalityDto): string {
     if (locality.createdByUserId == null) {
-      return 'N/A';
+      return this.translationService.translate('common.notAvailable');
     }
 
     const displayName = this.creatorNameById.get(locality.createdByUserId);
-    return displayName || `User #${locality.createdByUserId}`;
+    return displayName || this.translationService.translate('manager.localities.userFallback', { id: locality.createdByUserId });
   }
 
   getCoordinatesLabel(locality: LocalityDto): string {
     if (locality.latitude == null || locality.longitude == null) {
-      return 'N/A';
+      return this.translationService.translate('common.notAvailable');
     }
     return `${locality.latitude.toFixed(4)}, ${locality.longitude.toFixed(4)}`;
   }
@@ -483,11 +487,11 @@ export class ManagerLocalitiesComponent implements OnInit, OnDestroy {
       this.authService.getById(userId).subscribe({
         next: (user) => {
           const fullName = `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim();
-          this.creatorNameById.set(userId, fullName || `User #${userId}`);
+          this.creatorNameById.set(userId, fullName || this.translationService.translate('manager.localities.userFallback', { id: userId }));
           this.cdr.detectChanges();
         },
         error: () => {
-          this.creatorNameById.set(userId, `User #${userId}`);
+          this.creatorNameById.set(userId, this.translationService.translate('manager.localities.userFallback', { id: userId }));
         }
       });
     }

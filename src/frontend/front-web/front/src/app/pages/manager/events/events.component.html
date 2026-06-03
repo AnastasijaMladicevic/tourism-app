@@ -1,25 +1,25 @@
 <section class="manager-events-page manager-list-page">
   <header class="page-head">
     <div>
-      <h1>Events</h1>
-      <p class="page-subtitle">Total: {{ eventsCountLabel }}</p>
+      <h1>{{ 'layout.events' | translate }}</h1>
+      <p class="page-subtitle">{{ eventsCountLabel }}</p>
     </div>
   </header>
 
   <div class="toolbar card">
-    <label class="search-field" aria-label="Search events">
+    <label class="search-field" [attr.aria-label]="'manager.events.searchAria' | translate">
       <span class="material-symbols-outlined">search</span>
       <input
         type="text"
         [(ngModel)]="draftSearchQuery"
         (keyup)="onSearchChange()"
-        placeholder="Search events, objects, or organizers..."
+        [placeholder]="'manager.events.searchPlaceholder' | translate"
       />
     </label>
 
-    <button type="button" class="ghost-btn date-pill" aria-label="Date range filter">
+    <button type="button" class="ghost-btn date-pill" [attr.aria-label]="'manager.events.dateRangeFilter' | translate">
       <span class="material-symbols-outlined">calendar_month</span>
-      Filters ready
+      {{ 'manager.events.filtersReady' | translate }}
     </button>
 
   </div>
@@ -27,52 +27,47 @@
   @if (filterPanelOpen) {
     <div class="filters-panel card">
       <label>
-        <span>Status</span>
+        <span>{{ 'manager.events.filters.status' | translate }}</span>
         <select [(ngModel)]="statusFilter">
-          <option value="all">All Statuses</option>
-          <option value="approved">Approved</option>
-          <option value="pending">Pending</option>
-          <option value="rejected">Rejected</option>
-          <option value="draft">Draft</option>
+          <option value="all">{{ 'manager.events.filters.allStatuses' | translate }}</option>
+          <option value="approved">{{ 'manager.events.status.approved' | translate }}</option>
+          <option value="pending">{{ 'manager.events.status.pending' | translate }}</option>
+          <option value="rejected">{{ 'manager.events.status.rejected' | translate }}</option>
+          <option value="draft">{{ 'manager.events.status.draft' | translate }}</option>
         </select>
       </label>
 
       <label>
-        <span>Category</span>
+        <span>{{ 'manager.events.filters.category' | translate }}</span>
         <select [(ngModel)]="categoryFilter">
-          <option value="all">All Categories</option>
-          <option value="Festival">Festival</option>
-          <option value="Workshop">Workshop</option>
-          <option value="Sports">Sports</option>
-          <option value="Cultural">Cultural</option>
-          <option value="Exhibition">Exhibition</option>
-          <option value="Concert">Concert</option>
+          <option value="all">{{ 'manager.events.filters.allCategories' | translate }}</option>
+          <option *ngFor="let option of categoryOptions" [value]="option.value">{{ option.label | translate }}</option>
         </select>
       </label>
 
       <label>
-        <span>Sort by</span>
+        <span>{{ 'manager.events.filters.sortBy' | translate }}</span>
         <select [(ngModel)]="sortBy">
-          <option value="startDate">Start date</option>
-          <option value="name">Name</option>
-          <option value="status">Status</option>
+          <option value="startDate">{{ 'manager.events.filters.startDate' | translate }}</option>
+          <option value="name">{{ 'manager.events.filters.name' | translate }}</option>
+          <option value="status">{{ 'manager.events.filters.status' | translate }}</option>
         </select>
       </label>
 
       <label>
-        <span>Order</span>
+        <span>{{ 'manager.events.filters.order' | translate }}</span>
         <select [(ngModel)]="sortOrder">
-          <option value="asc">Ascending</option>
-          <option value="desc">Descending</option>
+          <option value="asc">{{ 'manager.events.filters.ascending' | translate }}</option>
+          <option value="desc">{{ 'manager.events.filters.descending' | translate }}</option>
         </select>
       </label>
 
       <div class="filter-actions">
         <button type="button" class="primary-btn filter-btn" (click)="onApplyFilters()">
-          Apply
+          {{ 'manager.events.filters.apply' | translate }}
         </button>
         <button type="button" class="ghost-btn filter-btn secondary" (click)="onResetFilters()">
-          Reset
+          {{ 'manager.events.filters.reset' | translate }}
         </button>
       </div>
     </div>
@@ -90,7 +85,7 @@
 
       <section class="event-table-wrap card">
         @if (isLoading) {
-          <div class="state">Loading events...</div>
+          <div class="state">{{ 'manager.events.loading' | translate }}</div>
         } @else if (errorMessage) {
           <div class="state state-error">{{ errorMessage }}</div>
         } @else {
@@ -109,7 +104,7 @@
                   <div class="event-mobile-card__head">
                     <h3>{{ event.name }}</h3>
                     <span class="status-chip status-chip--compact" [ngClass]="getStatusBadgeClass(event.status)">
-                      {{ event.status || 'Draft' }}
+                      {{ formatStatus(event.status) }}
                     </span>
                   </div>
                   <p class="event-mobile-card__date">
@@ -128,7 +123,7 @@
                 <button
                   type="button"
                   class="event-mobile-card__edit"
-                  title="Review event"
+                  [title]="'manager.events.reviewEvent' | translate"
                   (click)="onEditEvent(event); $event.stopPropagation()"
                 >
                   <span class="material-symbols-outlined">edit</span>
@@ -141,12 +136,12 @@
             <table>
               <thead>
                 <tr>
-                  <th>Status</th>
-                  <th>Event Details</th>
-                  <th>Locality</th>
-                  <th>Category</th>
-                  <th>Capacity</th>
-                  <th>Action</th>
+                  <th>{{ 'manager.events.table.status' | translate }}</th>
+                  <th>{{ 'manager.events.table.eventDetails' | translate }}</th>
+                  <th>{{ 'manager.events.table.locality' | translate }}</th>
+                  <th>{{ 'manager.events.table.category' | translate }}</th>
+                  <th>{{ 'manager.events.table.capacity' | translate }}</th>
+                  <th>{{ 'manager.events.table.action' | translate }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -158,7 +153,7 @@
                   <td>
                     <span class="status-chip" [ngClass]="getStatusBadgeClass(event.status)">
                       <span class="chip-dot">●</span>
-                      {{ event.status || 'Draft' }}
+                      {{ formatStatus(event.status) }}
                     </span>
                   </td>
                   <td>
@@ -202,7 +197,7 @@
                     <button
                       type="button"
                       class="icon-btn"
-                      title="Review event"
+                      [title]="'manager.events.reviewEvent' | translate"
                       (click)="onEditEvent(event); $event.stopPropagation()"
                     >
                       <span class="material-symbols-outlined">open_in_new</span>
@@ -221,7 +216,7 @@
             [totalCount]="totalCount"
             [pageSize]="pageSize"
             [pageSizeOptions]="pageSizeOptions"
-            itemLabel="events"
+            [itemLabel]="translationService.translate('common.events').toLowerCase()"
             (pageChange)="onGoToPage($event)"
             (pageSizeChange)="onPageSizeChange($event)"
           ></app-paginator>
@@ -231,7 +226,7 @@
 
     <aside class="detail-column card" [class.has-selection]="!!selectedEvent">
       @if (selectedEvent) {
-        <p class="detail-sheet-label">Selected event</p>
+        <p class="detail-sheet-label">{{ 'manager.events.selectedEvent' | translate }}</p>
         <div class="activity-hero">
           <div class="hero-media" [class.has-slides]="heroImageUrls.length > 0">
             <div class="hero-media-slides" aria-hidden="true">
@@ -247,7 +242,7 @@
           </div>
 
           <div class="hero-copy">
-            <p class="eyebrow">Featured event</p>
+            <p class="eyebrow">{{ 'manager.events.featuredEvent' | translate }}</p>
             <h2>{{ selectedEvent.name }}</h2>
             <p class="hero-meta">
               {{ getLocationLabel(selectedEvent) }} · {{ formatDate(selectedEvent.startDate) }}
@@ -259,12 +254,12 @@
               tabindex="0"
             >
               <span class="detail-status" [ngClass]="getStatusBadgeClass(selectedEvent.status)">
-                {{ selectedEvent.status || 'Draft' }}
+                {{ formatStatus(selectedEvent.status) }}
               </span>
 
               @if (hasSelectedEventRejectionReason(selectedEvent)) {
                 <div class="status-tooltip" role="tooltip">
-                  <strong>Rejection reason</strong>
+                  <strong>{{ 'manager.events.rejectionReason' | translate }}</strong>
                   <p>{{ getSelectedEventRejectionReason(selectedEvent) }}</p>
                 </div>
               }
@@ -278,18 +273,18 @@
             <strong>{{ formatTicketPrice(selectedEvent.price) }}</strong>
           </div>
           <div class="metric-card">
-            <span>Capacity</span>
+            <span>{{ 'manager.events.table.capacity' | translate }}</span>
             <strong>{{
               selectedEvent.maxVisitors != null
-                ? selectedEvent.maxVisitors.toLocaleString('en-US')
-                : '—'
+                ? selectedEvent.maxVisitors.toLocaleString(translationService.currentLocale())
+                : ('common.notAvailable' | translate)
             }}</strong>
           </div>
         </div>
 
         <section class="detail-section">
           <div class="section-head">
-            <h3>Schedule</h3>
+            <h3>{{ 'manager.events.schedule.title' | translate }}</h3>
           </div>
 
           <div class="schedule-list">
@@ -301,7 +296,7 @@
         </section>
 
         <section class="detail-section">
-          <h3>Description</h3>
+          <h3>{{ 'manager.events.description' | translate }}</h3>
           <p class="description-copy">{{ getSelectedSummary(selectedEvent) }}</p>
         </section>
 
@@ -320,7 +315,7 @@
             } @else {
               <div class="map-empty-state">
                 <span class="material-symbols-outlined">location_off</span>
-                <p>Coordinates are not available for this event.</p>
+                <p>{{ 'manager.events.noCoordinates' | translate }}</p>
               </div>
             }
           </div>
@@ -329,14 +324,14 @@
         <div class="detail-cta">
           <button type="button" class="primary-btn full-cta sidebar-cta-btn" (click)="onEditEvent(selectedEvent)">
             <span class="material-symbols-outlined">rate_review</span>
-            Open full review
+            {{ 'manager.events.openFullReview' | translate }}
           </button>
         </div>
       } @else {
         <div class="empty-state">
-          <p class="eyebrow">No event selected</p>
-          <h2>Pick an event from the table</h2>
-          <p>Select a row to preview schedule, ticket price, and capacity before opening the full review.</p>
+          <p class="eyebrow">{{ 'manager.events.empty.noEventSelected' | translate }}</p>
+          <h2>{{ 'manager.events.empty.pickEventTitle' | translate }}</h2>
+          <p>{{ 'manager.events.empty.pickEventBody' | translate }}</p>
         </div>
       }
     </aside>

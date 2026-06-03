@@ -1,6 +1,12 @@
 import { ReviewDto } from '../../../services/review';
 import { ManagerObjectReviewThread } from './manager-object-review.mock';
 
+interface ReviewThreadFallbackLabels {
+  touristName: string;
+  creatorName: string;
+  notAvailable: string;
+}
+
 function initialsFromFullName(fullName?: string | null): string {
   const parts = (fullName ?? '')
     .trim()
@@ -23,19 +29,20 @@ export function mapReviewDtosToObjectThreads(
   reviews: ReviewDto[],
   creatorId: number,
   creatorName: string,
+  labels?: ReviewThreadFallbackLabels,
 ): ManagerObjectReviewThread[] {
   return [...reviews]
     .map((review) => ({
       id: review.id,
-      touristName: review.userFullName?.trim() || 'Tourist',
+      touristName: review.userFullName?.trim() || labels?.touristName || 'Tourist',
       touristInitials: initialsFromFullName(review.userFullName),
       rating: review.rating,
-      touristReview: review.text?.trim() || '—',
+      touristReview: review.text?.trim() || labels?.notAvailable || '—',
       createdAt: review.createdAt,
       creatorResponse: review.creatorResponse ?? null,
       creatorResponseAt: review.creatorResponseAt ?? null,
       creatorId: creatorId || 0,
-      creatorName: creatorName.trim() || 'Content Creator',
+      creatorName: creatorName.trim() || labels?.creatorName || 'Content Creator',
     }))
     .sort((left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime());
 }

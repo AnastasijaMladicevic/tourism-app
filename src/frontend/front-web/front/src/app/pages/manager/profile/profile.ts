@@ -36,14 +36,14 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
     `${environment.apiUrl.replace('/api', '')}/images/profiles/default_icon.png`;
 
   readonly permissionItems: PermissionItem[] = [
-    { labelKey: 'View manager dashboard', detailKey: 'Open the manager overview at /api/manager/dashboard/overview.', icon: 'dashboard' },
-    { labelKey: 'Manage events', detailKey: 'List assigned events, inspect details, approve them, and toggle active state.', icon: 'event' },
-    { labelKey: 'Manage activities', detailKey: 'List assigned activities, inspect details, approve them, and toggle active state.', icon: 'local_activity' },
-    { labelKey: 'Manage tourist objects', detailKey: 'List assigned tourist objects, inspect details, approve them, and toggle active state.', icon: 'storefront' },
-    { labelKey: 'Manage localities', detailKey: 'Create, update, toggle active state, and delete localities in the managed destination.', icon: 'location_city' },
-    { labelKey: 'Add locality images', detailKey: 'Upload images for localities that belong to the managed destination.', icon: 'image' },
-    { labelKey: 'Review deletion requests', detailKey: 'View and review deletion requests for the managed destination.', icon: 'delete_sweep' },
-    { labelKey: 'Manage manager reports', detailKey: 'Create reports, view your own reports, and withdraw your own reports.', icon: 'article' },
+    { labelKey: 'managerProfile.permissions.viewDashboardLabel', detailKey: 'managerProfile.permissions.viewDashboardDetail', icon: 'dashboard' },
+    { labelKey: 'managerProfile.permissions.manageEventsLabel', detailKey: 'managerProfile.permissions.manageEventsDetail', icon: 'event' },
+    { labelKey: 'managerProfile.permissions.manageActivitiesLabel', detailKey: 'managerProfile.permissions.manageActivitiesDetail', icon: 'local_activity' },
+    { labelKey: 'managerProfile.permissions.manageObjectsLabel', detailKey: 'managerProfile.permissions.manageObjectsDetail', icon: 'storefront' },
+    { labelKey: 'managerProfile.permissions.manageLocalitiesLabel', detailKey: 'managerProfile.permissions.manageLocalitiesDetail', icon: 'location_city' },
+    { labelKey: 'managerProfile.permissions.manageLocalityImagesLabel', detailKey: 'managerProfile.permissions.manageLocalityImagesDetail', icon: 'image' },
+    { labelKey: 'managerProfile.permissions.reviewDeletionRequestsLabel', detailKey: 'managerProfile.permissions.reviewDeletionRequestsDetail', icon: 'delete_sweep' },
+    { labelKey: 'managerProfile.permissions.manageReportsLabel', detailKey: 'managerProfile.permissions.manageReportsDetail', icon: 'article' },
   ];
 
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
@@ -470,29 +470,29 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
     this.passwordInfo = '';
 
     if (!this.currentPassword.trim()) {
-      this.passwordError = 'Current password is required.';
+      this.passwordError = this.translationService.translate('adminProfile.password.errors.currentRequired');
       return;
     }
 
     if (this.newPassword.length < 8) {
-      this.passwordError = 'New password must be at least 8 characters long.';
+      this.passwordError = this.translationService.translate('adminProfile.password.errors.minLength');
       return;
     }
 
     if (!/[A-Z]/.test(this.newPassword) || !/[\d\W]/.test(this.newPassword)) {
-      this.passwordError = 'New password must include one uppercase letter and one number or symbol.';
+      this.passwordError = this.translationService.translate('adminProfile.password.errors.complexity');
       return;
     }
 
     if (this.newPassword !== this.confirmNewPassword) {
-      this.passwordError = 'Passwords do not match.';
+      this.passwordError = this.translationService.translate('adminProfile.password.errors.mismatch');
       return;
     }
 
     this.passwordChangeStep = 'otp';
     this.otpCode = '';
     this.otpDemoCode = this.generateDemoOtpCode();
-    this.passwordInfo = `Demo verification code: ${this.otpDemoCode}`;
+    this.passwordInfo = this.translationService.translate('adminProfile.password.demoVerificationCode', { code: this.otpDemoCode });
     this.startOtpCountdown();
   }
 
@@ -503,17 +503,17 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
     this.passwordInfo = '';
 
     if (!/^\d{6}$/.test(this.otpCode.trim())) {
-      this.passwordError = 'Enter the 6-digit verification code.';
+      this.passwordError = this.translationService.translate('adminProfile.password.errors.codeRequired');
       return;
     }
 
     if (!this.otpDemoCode) {
-      this.passwordError = 'The verification session expired. Resend the code to continue.';
+      this.passwordError = this.translationService.translate('adminProfile.password.errors.sessionExpired');
       return;
     }
 
     if (this.otpCode.trim() !== this.otpDemoCode) {
-      this.passwordError = 'Invalid verification code.';
+      this.passwordError = this.translationService.translate('adminProfile.password.errors.invalidCode');
       return;
     }
 
@@ -528,7 +528,7 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
 
     this.authService.changePassword(this.user.id!, dto).subscribe({
       error: (err) => {
-        this.passwordError = err?.error?.message ?? err?.error?.title ?? 'Password change failed.';
+        this.passwordError = err?.error?.message ?? err?.error?.title ?? this.translationService.translate('adminProfile.password.errors.changeFailed');
       },
     });
   }
@@ -540,7 +540,7 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
     this.passwordInfo = '';
     this.otpDemoCode = this.generateDemoOtpCode();
     this.otpCode = '';
-    this.passwordInfo = `Demo verification code: ${this.otpDemoCode}`;
+    this.passwordInfo = this.translationService.translate('adminProfile.password.demoVerificationCode', { code: this.otpDemoCode });
     this.startOtpCountdown();
   }
 
@@ -655,7 +655,7 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
       this.otpSecondsRemaining = Math.max(0, this.otpSecondsRemaining - 1);
 
       if (this.otpSecondsRemaining === 0) {
-        this.passwordError = 'The verification code has expired. Resend it to continue.';
+        this.passwordError = this.translationService.translate('adminProfile.password.errors.codeExpired');
         this.clearOtpExpiryTimer();
       }
     }, 1000);
