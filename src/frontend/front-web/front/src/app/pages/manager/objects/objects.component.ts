@@ -200,16 +200,12 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
 
   loadFilterOptions(): void {
     this.objectService.getManagerFilterOptions().subscribe({
-      next: ({ typeOptions, statusOptions }) => {
+      next: ({ typeOptions }) => {
         this.typeOptions = typeOptions;
-        this.statusOptions = statusOptions.length > 0 ? statusOptions : [...this.fallbackStatusOptions];
+        this.statusOptions = [...this.fallbackStatusOptions];
 
         if (this.typeFilter !== 'all' && !this.typeOptions.some((option) => option.value === this.typeFilter)) {
           this.typeFilter = 'all';
-        }
-
-        if (this.statusFilter !== 'all' && !this.statusOptions.some((option) => option.value === this.statusFilter)) {
-          this.statusFilter = 'all';
         }
 
         this.cdr.detectChanges();

@@ -94,7 +94,7 @@ export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
     { value: 'published', label: 'Published' },
     { value: 'pending', label: 'Pending' },
     { value: 'approved', label: 'Approved' },
-    { value: 'cancelled', label: 'Cancelled' }
+    { value: 'rejected', label: 'Rejected' }
   ];
 
   categoryOptions = [...this.fallbackCategoryOptions];
@@ -655,19 +655,7 @@ export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
   }
 
   private syncStatusOptionsFromEvents(): void {
-    const dynamicStatuses = this.events
-      .map((event) => event.status?.trim())
-      .filter((status): status is string => !!status)
-      .filter((status, index, all) => all.findIndex((x) => x.toLowerCase() === status.toLowerCase()) === index)
-      .sort((a, b) => a.localeCompare(b))
-      .map((status) => ({
-        value: status.toLowerCase(),
-        label: this.toTitleCase(status)
-      }));
-
-    this.statusOptions = dynamicStatuses.length > 0
-      ? [{ value: 'all', label: 'All Statuses' }, ...dynamicStatuses]
-      : [...this.fallbackStatusOptions];
+    this.statusOptions = [...this.fallbackStatusOptions];
 
     if (!this.statusOptions.some((option) => option.value === this.statusFilter)) {
       this.statusFilter = 'all';

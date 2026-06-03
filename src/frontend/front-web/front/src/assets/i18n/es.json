@@ -803,6 +803,7 @@
           "approved": "Aprobado",
           "pending": "Pendiente",
           "rejected": "Rechazado",
+          "cancelled": "Cancelado",
           "draft": "Borrador"
         },
         "schedule": {

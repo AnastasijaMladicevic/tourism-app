@@ -161,6 +161,7 @@ export class UsersComponent implements OnInit {
     name: string;
     email: string;
     role: string;
+    country: string;
     lastLogin: string;
     status: 'Active' | 'Inactive' | 'Banned';
     editLock?: UserEditLockDto | null;
@@ -293,6 +294,16 @@ export class UsersComponent implements OnInit {
         this.selectUsersViewTab('internal');
       }
     }
+  }
+
+  onOriginNameClick(name: string): void {
+    if (this.usersViewTab === 'internal') {
+      this.adminDirectorySearch = name;
+    } else {
+      this.touristSearch = name;
+    }
+    const panelId = this.usersViewTab === 'internal' ? 'users-panel-internal' : 'users-panel-tourists';
+    document.getElementById(panelId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   selectUsersViewTab(tab: UsersPageViewTab): void {
@@ -616,6 +627,7 @@ export class UsersComponent implements OnInit {
       name: `${u.firstName} ${u.lastName}`.trim(),
       email: u.email,
       role: u.roleName || this.t('adminUsers.unknown'),
+      country: (u.country ?? '').trim() || this.t('adminUsers.unknown'),
       lastLogin: this.formatDate(u.createdAt),
       status: u.isBanned ? 'Banned' : (u.isActive ? 'Active' : 'Inactive'),
       editLock: u.editLock ?? null

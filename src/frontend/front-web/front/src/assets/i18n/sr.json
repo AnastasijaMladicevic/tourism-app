@@ -803,6 +803,7 @@
           "approved": "Odobreno",
           "pending": "Na čekanju",
           "rejected": "Odbijeno",
+          "cancelled": "Otkazano",
           "draft": "Nacrt"
         },
         "schedule": {

@@ -578,8 +578,9 @@ export class ManagerEventsComponent implements OnInit, OnDestroy {
       case 'pending':
         return this.translationService.translate('manager.events.status.pending');
       case 'rejected':
-      case 'cancelled':
         return this.translationService.translate('manager.events.status.rejected');
+      case 'cancelled':
+        return this.translationService.translate('manager.events.status.cancelled');
       case 'draft':
       default:
         return this.translationService.translate('manager.events.status.draft');

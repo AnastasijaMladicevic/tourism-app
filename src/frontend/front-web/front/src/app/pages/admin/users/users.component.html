@@ -270,7 +270,7 @@
               <ul class="origin-list">
                 <li *ngFor="let item of activeOriginsRows" class="origin-row">
                   <div class="origin-row-top">
-                    <span class="origin-name">{{ item.name }}</span>
+                    <button class="origin-name origin-name-link" (click)="onOriginNameClick(item.name)">{{ item.name }}</button>
                     <span class="origin-count">{{ originsCountLabel(item.users) }}</span>
                   </div>
                   <div class="origin-bar-track" role="presentation">
