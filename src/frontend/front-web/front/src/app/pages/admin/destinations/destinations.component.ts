@@ -103,7 +103,6 @@ export class DestinationsComponent implements OnInit, OnDestroy {
   readonly statusOptions = [
     { value: 'all', labelKey: 'adminDestinations.filters.allStatuses' },
     { value: 'active', labelKey: 'adminDestinations.status.published' },
-    { value: 'draft', labelKey: 'adminDestinations.status.draft' },
     { value: 'archived', labelKey: 'adminDestinations.status.rejected' }
   ];
 

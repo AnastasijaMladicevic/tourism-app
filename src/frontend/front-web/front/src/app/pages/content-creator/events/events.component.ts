@@ -92,7 +92,6 @@ export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
   private readonly fallbackStatusOptions = [
     { value: 'all', label: 'All Statuses' },
     { value: 'published', label: 'Published' },
-    { value: 'draft', label: 'Draft' },
     { value: 'pending', label: 'Pending' },
     { value: 'approved', label: 'Approved' },
     { value: 'cancelled', label: 'Cancelled' }

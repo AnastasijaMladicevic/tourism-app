@@ -937,7 +937,7 @@
         },
         "status": {
           "published": "Objavljeno",
-          "archived": "Arhivirano"
+          "archived": "Odbijeno"
         },
         "empty": {
           "filtered": "Nema lokaliteta za izabrane filtere.",
@@ -2778,9 +2778,9 @@
     "Rejected": "Odbijeno",
     "Rechazado": "Odbijeno",
     "Odbijeno": "Odbijeno",
-    "Archived": "Arhivirano",
-    "Archivado": "Arhivirano",
-    "Arhivirano": "Arhivirano",
+    "Archived": "Odbijeno",
+    "Archivado": "Odbijeno",
+    "Arhivirano": "Odbijeno",
     "Cancelled": "Otkazano",
     "Cancelado": "Otkazano",
     "Otkazano": "Otkazano",

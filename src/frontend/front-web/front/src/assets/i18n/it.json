@@ -937,7 +937,7 @@
         },
         "status": {
           "published": "Pubblicato",
-          "archived": "Archiviato"
+          "archived": "Rifiutato"
         },
         "empty": {
           "filtered": "Nessuna località trovata per i filtri selezionati.",
@@ -2778,9 +2778,9 @@
     "Rejected": "Rejected",
     "Rechazado": "Rejected",
     "Odbijeno": "Rejected",
-    "Archived": "Archived",
-    "Archivado": "Archived",
-    "Arhivirano": "Archived",
+    "Archived": "Rifiutato",
+    "Archivado": "Rifiutato",
+    "Arhivirano": "Rifiutato",
     "Cancelled": "Cancelled",
     "Cancelado": "Cancelled",
     "Otkazano": "Cancelled",

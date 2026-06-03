@@ -77,10 +77,9 @@ export class ContentCreatorActivitiesComponent implements OnInit, OnDestroy {
   readonly statusOptions = [
     { value: 'all', label: 'All Statuses' },
     { value: 'published', label: 'Published' },
-    { value: 'draft', label: 'Draft' },
     { value: 'pending', label: 'Pending' },
     { value: 'approved', label: 'Approved' },
-    { value: 'archived', label: 'Archived' }
+    { value: 'rejected', label: 'Rejected' }
   ];
 
   readonly sortByOptions = [

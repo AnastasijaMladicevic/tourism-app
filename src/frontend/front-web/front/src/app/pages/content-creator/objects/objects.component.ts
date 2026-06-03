@@ -95,7 +95,6 @@ export class ContentCreatorObjectsComponent implements OnInit, OnDestroy {
     { value: 'published', label: 'Published' },
     { value: 'approved', label: 'Approved' },
     { value: 'pending', label: 'Pending' },
-    { value: 'draft', label: 'Draft' },
     { value: 'rejected', label: 'Rejected' }
   ];
 
