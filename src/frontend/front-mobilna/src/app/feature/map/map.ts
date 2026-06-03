@@ -1537,7 +1537,7 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     return {
       id: item.id ?? `${type}:${lat}:${lng}`,
       name: String(item.name ?? 'Point'),
-      type: String(item.objectTypeName ?? item.destinationTypeName ?? item.eventTypeName ?? type),
+      type: markerType,
       lat,
       lng,
       markerType,
@@ -2457,8 +2457,10 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
     routePoint: RoutePoint,
     options: { disableMapPickingAfterAdd?: boolean } = {},
   ): void {
+    const routePointId = String(routePoint.id);
+    const routePointType = (routePoint.markerType || routePoint.type || '').toLowerCase();
     const alreadyInRoute = this.routePoints.some(
-      (p) => p.id === routePoint.id && p.type === routePoint.type,
+      (p) => String(p.id) === routePointId && (p.markerType || p.type || '').toLowerCase() === routePointType,
     );
     if (alreadyInRoute) return;
 

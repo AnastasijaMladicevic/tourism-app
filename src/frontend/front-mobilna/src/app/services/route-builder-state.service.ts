@@ -41,8 +41,10 @@ export class RouteBuilderStateService {
   }
 
   addRoutePoint(point: RouteBuilderPoint): void {
+    const pointId = String(point.id);
+    const pointType = (point.markerType || point.type || '').toLowerCase();
     const alreadyInRoute = this.routePoints.some(
-      (p) => p.id === point.id && p.type === point.type,
+      (p) => String(p.id) === pointId && (p.markerType || p.type || '').toLowerCase() === pointType,
     );
     if (alreadyInRoute) return;
 
