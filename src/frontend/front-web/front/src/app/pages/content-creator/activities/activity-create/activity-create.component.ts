@@ -176,7 +176,9 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
   }
 
   get pageTitle(): string {
-    return this.isEditMode ? 'Edit Activity' : 'Create Activity';
+    return this.translationService.translate(
+      this.isEditMode ? 'contentCreator.activityForm.editTitle' : 'contentCreator.activityForm.createTitle',
+    );
   }
 
   get isApprovedActivity(): boolean {
@@ -184,13 +186,17 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
   }
 
   get deleteModalTitle(): string {
-    return this.isApprovedActivity ? 'Request deletion' : 'Confirm deletion';
+    return this.translationService.translate(
+      this.isApprovedActivity ? 'contentCreator.activityForm.delete.requestTitle' : 'contentCreator.activityForm.delete.confirmTitle',
+    );
   }
 
   get deleteModalDescription(): string {
-    return this.isApprovedActivity
-      ? 'This activity is approved, so removal requires a manager deletion request.'
-      : 'This activity is still pending, so it can be removed immediately.';
+    return this.translationService.translate(
+      this.isApprovedActivity
+        ? 'contentCreator.activityForm.delete.requestDescription'
+        : 'contentCreator.activityForm.delete.confirmDescription',
+    );
   }
 
   get hasPendingDeletionRequest(): boolean {
@@ -285,7 +291,9 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
 
     const remainingSlots = this.maxImageCount - this.imageUrls.length;
     if (remainingSlots <= 0) {
-      this.galleryErrorMessage = `You can upload up to ${this.maxImageCount} images per activity.`;
+      this.galleryErrorMessage = this.translationService.translate('contentCreator.activityForm.errors.uploadLimit', {
+        count: this.maxImageCount,
+      });
       input.value = '';
       return;
     }
@@ -307,9 +315,14 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
     }
 
     if (duplicateNames.length > 0) {
-      this.galleryErrorMessage = `Duplicate image(s) skipped: ${duplicateNames.join(', ')}`;
+      this.galleryErrorMessage = this.translationService.translate('contentCreator.activityForm.errors.duplicateImages', {
+        files: duplicateNames.join(', '),
+      });
     } else if (acceptedFiles.length < selectedFiles.length) {
-      this.galleryErrorMessage = `Only the first ${remainingSlots} images were added. Each activity can have up to ${this.maxImageCount} images.`;
+      this.galleryErrorMessage = this.translationService.translate('contentCreator.activityForm.errors.partialUpload', {
+        accepted: remainingSlots,
+        count: this.maxImageCount,
+      });
     } else {
       this.galleryErrorMessage = '';
     }
@@ -394,7 +407,7 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
     }
 
     if (this.imageUrls.length === 0) {
-      this.galleryErrorMessage = 'At least one image is required before saving.';
+      this.galleryErrorMessage = this.translationService.translate('contentCreator.activityForm.errors.imageRequired');
       return;
     }
 
@@ -407,7 +420,7 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
 
     if (!activityTypeId) {
       this.isSubmitting = false;
-      this.errorMessage = 'Activity type is required.';
+      this.errorMessage = this.translationService.translate('contentCreator.activityForm.errors.typeRequired');
       return;
     }
 
@@ -445,8 +458,10 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
       .subscribe({
         next: ({ imageUploadFailed }) => {
           this.successMessage = imageUploadFailed
-            ? `Activity ${this.isEditMode ? 'updated' : 'created'}, but some images could not be attached.`
-            : `Activity ${this.isEditMode ? 'updated' : 'created'} successfully.`;
+            ? this.translationService.translate('contentCreator.activityForm.success.partialImageUpload')
+            : this.translationService.translate(
+              this.isEditMode ? 'contentCreator.activityForm.success.updated' : 'contentCreator.activityForm.success.created',
+            );
 
           setTimeout(() => {
             this.router.navigate(['/content-creator/activities']);
@@ -455,7 +470,7 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
           this.errorMessage = '';
         },
         error: (error: unknown) => {
-          const message = this.extractErrorMessage(error) ?? `Failed to ${this.isEditMode ? 'update' : 'create'} activity.`;
+          const message = this.extractErrorMessage(error) ?? this.translationService.translate('contentCreator.activityForm.errors.saveFailed');
           this.errorMessage = message;
           this.successMessage = '';
         }
@@ -503,13 +518,13 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
             this.loadedActivity.hasPendingDeletionRequest = true;
           }
           this.showDeleteModal = false;
-          this.successMessage = 'Deletion request submitted. A manager must review it before activity removal.';
+          this.successMessage = this.translationService.translate('contentCreator.activityForm.success.deletionRequested');
           setTimeout(() => {
             this.router.navigate(['/content-creator/activities']);
           }, 1200);
         },
         error: (error: unknown) => {
-          this.errorMessage = this.extractErrorMessage(error) ?? 'Failed to submit deletion request';
+          this.errorMessage = this.extractErrorMessage(error) ?? this.translationService.translate('contentCreator.activityForm.errors.deletionRequestFailed');
         }
       });
   }
@@ -534,13 +549,13 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           this.showDeleteModal = false;
-          this.successMessage = 'Activity deleted successfully.';
+          this.successMessage = this.translationService.translate('contentCreator.activityForm.success.deleted');
           setTimeout(() => {
             this.router.navigate(['/content-creator/activities']);
           }, 700);
         },
         error: (error: unknown) => {
-          this.errorMessage = this.extractErrorMessage(error) ?? 'Failed to delete activity.';
+          this.errorMessage = this.extractErrorMessage(error) ?? this.translationService.translate('contentCreator.activityForm.errors.deleteFailed');
         }
       });
   }
@@ -738,7 +753,7 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
 
         },
         error: (error: unknown) => {
-          this.errorMessage = this.extractErrorMessage(error) ?? 'Failed to load activity for editing.';
+          this.errorMessage = this.extractErrorMessage(error) ?? this.translationService.translate('contentCreator.activityForm.errors.loadEditFailed');
         }
       });
   }

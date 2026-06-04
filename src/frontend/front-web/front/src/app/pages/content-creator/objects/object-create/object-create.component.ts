@@ -709,7 +709,7 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
   getReviewInitials(review: ReviewDto): string {
     const fullName = review.userFullName?.trim();
     if (!fullName) {
-      return 'U';
+      return this.translationService.translate('common.userFallbackInitial');
     }
 
     const parts = fullName.split(/\s+/).filter(Boolean);
@@ -732,34 +732,34 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
 
     const minutes = Math.max(0, Math.floor((Date.now() - createdAt) / 60000));
     if (minutes < 1) {
-      return 'just now';
+      return this.translationService.translate('common.time.justNow');
     }
     if (minutes < 60) {
-      return `${minutes}m ago`;
+      return this.translationService.translate('common.time.minutesAgoShort', { count: minutes });
     }
 
     const hours = Math.floor(minutes / 60);
     if (hours < 24) {
-      return `${hours}h ago`;
+      return this.translationService.translate('common.time.hoursAgoShort', { count: hours });
     }
 
     const days = Math.floor(hours / 24);
     if (days < 7) {
-      return `${days}d ago`;
+      return this.translationService.translate('common.time.daysAgoShort', { count: days });
     }
 
     const weeks = Math.floor(days / 7);
     if (weeks < 5) {
-      return `${weeks}w ago`;
+      return this.translationService.translate('common.time.weeksAgoShort', { count: weeks });
     }
 
     const months = Math.floor(days / 30);
     if (months < 12) {
-      return `${months}mo ago`;
+      return this.translationService.translate('common.time.monthsAgoShort', { count: months });
     }
 
     const years = Math.floor(days / 365);
-    return `${years}y ago`;
+    return this.translationService.translate('common.time.yearsAgoShort', { count: years });
   }
 
   onViewMoreReviews(): void {
@@ -812,7 +812,7 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
       return `${localityName}, ${destinationName}`;
     }
 
-    return localityName || destinationName || 'Set destination/locality for location context';
+    return localityName || destinationName || this.translationService.translate('contentCreatorObjectForm.locationContextPlaceholder');
   }
 
   get latitudeLabel(): string {
@@ -940,7 +940,7 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
     return this.uploadPendingImages(created.id, this.editableImageUrls, 0).pipe(
       map(() => created),
       catchError((error) => {
-        const msg = error?.error?.message ?? 'Object was created but image upload failed. Please add images below.';
+        const msg = error?.error?.message ?? this.translationService.translate('contentCreatorObjectForm.errors.imageUploadAfterCreate');
         this.errorMessage = msg;
         this.isEditMode = true;
         this.objectId = created.id;
@@ -1323,7 +1323,7 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
         this.managerGuestReviews = mapReviewDtosToObjectThreads(
           reviews,
           createdByUserId ?? 0,
-          creatorName.trim() || 'Content Creator',
+          creatorName.trim() || this.translationService.translate('contentCreatorObjectForm.review.contentCreator'),
         );
         this.initManagerGuestReviewExpansion();
         this.cdr.detectChanges();
@@ -1384,13 +1384,13 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
     const created = createdIso ? this.formatSidebarMonthYear(createdIso) : '';
     const updated = updatedIso ? this.formatSidebarMonthYear(updatedIso) : '';
     if (created && updated && created !== updated) {
-      return `${created}, edited ${updated}`;
+      return this.translationService.translate('contentCreatorObjectForm.review.timeline.edited', { created, updated });
     }
     if (created) {
       return created;
     }
     if (updated) {
-      return `Updated ${updated}`;
+      return this.translationService.translate('contentCreatorObjectForm.review.timeline.updatedOnly', { updated });
     }
     return '';
   }
@@ -1401,7 +1401,7 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
       if (Number.isNaN(d.getTime())) {
         return '';
       }
-      return new Intl.DateTimeFormat('en-GB', { month: 'short', year: 'numeric' }).format(d);
+      return new Intl.DateTimeFormat(this.translationService.currentLocale(), { month: 'short', year: 'numeric' }).format(d);
     } catch {
       return '';
     }

@@ -2,22 +2,20 @@
   <header class="page-header">
     <div>
       <h1>{{ pageTitle }}</h1>
-      <p class="intro">
-        Build and manage activity listings with location, logistics, and gallery details.
-      </p>
+      <p class="intro">{{ 'contentCreator.activityForm.subtitle' | translate }}</p>
     </div>
 
     <div class="header-actions">
       @if (isEditMode) {
         <button type="button" class="danger-btn" (click)="openDeleteModal()" [disabled]="isSubmitting || isDeleting || hasPendingDeletionRequest">
           <span class="material-symbols-outlined">delete</span>
-          {{ isApprovedActivity ? (hasPendingDeletionRequest ? 'Deletion Requested' : 'Request Deletion') : 'Delete' }}
+          {{ isApprovedActivity ? (hasPendingDeletionRequest ? ('contentCreator.activityForm.delete.requested' | translate) : ('contentCreator.activityForm.delete.requestAction' | translate)) : ('contentCreator.activityForm.delete.deleteAction' | translate) }}
         </button>
       }
 
-      <button type="button" class="ghost-btn" (click)="cancel()">Cancel</button>
+      <button type="button" class="ghost-btn" (click)="cancel()">{{ 'common.cancel' | translate }}</button>
       <button type="button" class="primary-btn" [disabled]="isSubmitting" (click)="submit()">
-        {{ isSubmitting ? (isEditMode ? 'Updating...' : 'Creating...') : (isEditMode ? 'Update Activity' : 'Create Activity') }}
+        {{ isSubmitting ? (isEditMode ? ('contentCreator.activityForm.updating' | translate) : ('contentCreator.activityForm.creating' | translate)) : (isEditMode ? ('contentCreator.activityForm.updateAction' | translate) : ('contentCreator.activityForm.createAction' | translate)) }}
       </button>
     </div>
   </header>
@@ -34,44 +32,44 @@
     <div class="main-column">
       <article class="card">
         <div class="card-head">
-          <span class="step-tag">STEP 1</span>
-          <h2>Core Details</h2>
-          <p>Establish the basic identity of your experience.</p>
+          <span class="step-tag">{{ 'contentCreator.activityForm.step1' | translate }}</span>
+          <h2>{{ 'contentCreator.activityForm.coreDetails' | translate }}</h2>
+          <p>{{ 'contentCreator.activityForm.coreDetailsIntro' | translate }}</p>
         </div>
 
         <div class="field">
-          <label for="activity-name">Activity Name <span class="required-star" aria-hidden="true">*</span></label>
-          <input id="activity-name" type="text" formControlName="name" placeholder="e.g. Sunrise Hot Air Balloon over Cappadocia" />
+          <label for="activity-name">{{ 'contentCreator.activityForm.activityName' | translate }} <span class="required-star" aria-hidden="true">*</span></label>
+          <input id="activity-name" type="text" formControlName="name" [placeholder]="'contentCreator.activityForm.activityNamePlaceholder' | translate" />
         </div>
 
         <div class="field">
-          <label for="activity-description">Description</label>
+          <label for="activity-description">{{ 'contentCreator.activityForm.description' | translate }}</label>
           <textarea
             id="activity-description"
             rows="8"
             formControlName="description"
-            placeholder="Describe the experience in detail. Highlight what makes it unique, what's included, and what travelers should expect."
+            [placeholder]="'contentCreator.activityForm.descriptionPlaceholder' | translate"
           ></textarea>
         </div>
 
         @if (form.controls.name.invalid && form.controls.name.touched) {
-          <p class="field-error">Activity name is required and must have at most 150 characters.</p>
+          <p class="field-error">{{ 'contentCreator.activityForm.errors.nameInvalid' | translate }}</p>
         }
       </article>
 
       <article class="card">
         <div class="card-head">
-          <span class="step-tag">STEP 2</span>
-          <h2>Logistics & Classification</h2>
-          <p>Define where, when, and how much.</p>
+          <span class="step-tag">{{ 'contentCreator.activityForm.step2' | translate }}</span>
+          <h2>{{ 'contentCreator.activityForm.logistics' | translate }}</h2>
+          <p>{{ 'contentCreator.activityForm.logisticsIntro' | translate }}</p>
         </div>
 
         <div class="fields-grid">
           <div class="field">
-            <label for="type-select">Activity Type <span class="required-star" aria-hidden="true">*</span></label>
+            <label for="type-select">{{ 'contentCreator.activityForm.activityType' | translate }} <span class="required-star" aria-hidden="true">*</span></label>
             @if (hasTypeOptions) {
               <select id="type-select" formControlName="activityTypeId">
-                <option [ngValue]="null">Select activity type</option>
+                <option [ngValue]="null">{{ 'contentCreator.activityForm.selectActivityType' | translate }}</option>
                 <option *ngFor="let type of activityTypes" [ngValue]="type.id">{{ type.name }}</option>
               </select>
             } @else {
@@ -80,44 +78,44 @@
                 type="number"
                 min="1"
                 formControlName="fallbackActivityTypeId"
-                placeholder="Enter Activity Type ID"
+                [placeholder]="'contentCreator.activityForm.enterActivityTypeId' | translate"
               />
             }
           </div>
 
           <div class="field">
-            <label for="region-select">Region</label>
+            <label for="region-select">{{ 'contentCreator.activityForm.region' | translate }}</label>
             <select
               id="region-select"
               [ngModel]="selectedRegionId"
               [ngModelOptions]="{ standalone: true }"
               (ngModelChange)="onRegionChange($event || null)"
             >
-              <option [ngValue]="null">All regions</option>
+              <option [ngValue]="null">{{ 'contentCreator.activityForm.allRegions' | translate }}</option>
               <option *ngFor="let region of regions" [ngValue]="region.id">{{ region.name }}</option>
             </select>
           </div>
 
           <div class="field">
-            <label for="destination-select">Destination</label>
+            <label for="destination-select">{{ 'contentCreator.activityForm.destination' | translate }}</label>
             <select id="destination-select" formControlName="destinationId">
-              <option [ngValue]="null">{{ selectedRegionId ? 'Select destination' : 'Select region first' }}</option>
+              <option [ngValue]="null">{{ selectedRegionId ? ('contentCreator.activityForm.selectDestination' | translate) : ('contentCreator.activityForm.selectRegionFirst' | translate) }}</option>
               <option *ngFor="let destination of destinations" [ngValue]="destination.id">{{ destination.name }}</option>
             </select>
           </div>
 
           <div class="field">
-            <label for="locality-select">Locality</label>
+            <label for="locality-select">{{ 'contentCreator.activityForm.locality' | translate }}</label>
             <select id="locality-select" formControlName="localityId">
-              <option [ngValue]="null">{{ form.controls.destinationId.value ? 'Select locality' : 'Select destination first' }}</option>
+              <option [ngValue]="null">{{ form.controls.destinationId.value ? ('contentCreator.activityForm.selectLocality' | translate) : ('contentCreator.activityForm.selectDestinationFirst' | translate) }}</option>
               <option *ngFor="let locality of filteredLocalities" [ngValue]="locality.id">{{ locality.name }}</option>
             </select>
           </div>
 
           <div class="field">
-            <label for="object-select">Tourist Object</label>
+            <label for="object-select">{{ 'contentCreator.activityForm.touristObject' | translate }}</label>
             <select id="object-select" formControlName="objectId">
-              <option [ngValue]="null">Optional object</option>
+              <option [ngValue]="null">{{ 'common.optional' | translate }}</option>
               <option *ngFor="let objectItem of filteredObjects" [ngValue]="objectItem.id">{{ objectItem.name }}</option>
             </select>
           </div>
@@ -131,52 +129,44 @@
           </div>
 
           <div class="field compact-suffix">
-            <label for="duration-input">Duration</label>
+            <label for="duration-input">{{ 'contentCreator.activities.duration' | translate }}</label>
             <div class="inline-input">
               <input id="duration-input" type="number" min="1" formControlName="durationMinutes" placeholder="120" />
-              <span class="suffix">MIN</span>
+              <span class="suffix">{{ 'contentCreator.activityForm.minutesShort' | translate }}</span>
             </div>
           </div>
 
-          <!-- <div class="field toggle-field">
-            <label for="visibility-toggle">Visible & Active</label>
-            <label class="switch">
-              <input id="visibility-toggle" type="checkbox" formControlName="isVisible" />
-              <span class="slider"></span>
-              <span class="switch-copy">Listed for guests when approved by manager.</span>
-            </label>
-          </div> -->
         </div>
 
         @if (form.errors?.['locationRequired'] && (form.controls.destinationId.touched || form.controls.localityId.touched)) {
-          <p class="field-error">Select at least destination or locality.</p>
+          <p class="field-error">{{ 'contentCreator.activityForm.errors.locationRequired' | translate }}</p>
         }
 
         @if (form.errors?.['activityTypeRequired'] && (form.controls.activityTypeId.touched || form.controls.fallbackActivityTypeId.touched)) {
-          <p class="field-error">Activity type is required.</p>
+          <p class="field-error">{{ 'contentCreator.activityForm.errors.typeRequired' | translate }}</p>
         }
       </article>
 
       <article class="card">
         <div class="card-head card-head-inline">
           <div>
-            <span class="step-tag">STEP 3</span>
-            <h2>Media Gallery <span class="required-star" aria-hidden="true">*</span></h2>
-            <p>Upload up to 8 images and choose a primary cover image.</p>
+            <span class="step-tag">{{ 'contentCreator.activityForm.step3' | translate }}</span>
+            <h2>{{ 'contentCreator.activityForm.mediaGallery' | translate }} <span class="required-star" aria-hidden="true">*</span></h2>
+            <p>{{ 'contentCreator.activityForm.mediaGalleryIntro' | translate }}</p>
           </div>
         </div>
 
         <div class="gallery-dropzone">
-          <p class="dropzone-title">Add Photos</p>
-          <p class="dropzone-copy">Choose local image files. They are uploaded after the activity is saved.</p>
+          <p class="dropzone-title">{{ 'contentCreator.activityForm.addPhotos' | translate }}</p>
+          <p class="dropzone-copy">{{ 'contentCreator.activityForm.dropzoneCopy' | translate }}</p>
 
           <div class="dropzone-input-row">
             <input
               type="text"
-              [value]="imageUrls.length ? imageUrls.length + ' image(s) selected' : 'Select one or more image files...'"
+              [value]="imageUrls.length ? ('contentCreator.activityForm.imagesSelected' | translate:{ count: imageUrls.length }) : ('contentCreator.activityForm.selectImageFiles' | translate)"
               readonly
             />
-            <button type="button" class="primary-btn" (click)="galleryFileInput.click()">Add Photo</button>
+            <button type="button" class="primary-btn" (click)="galleryFileInput.click()">{{ 'contentCreator.activityForm.addPhoto' | translate }}</button>
             <input
               #galleryFileInput
               type="file"
@@ -191,14 +181,14 @@
         @if (imageUrls.length > 0) {
           <div class="gallery-grid">
             <article class="gallery-item" *ngFor="let imageUrl of imageUrls; let index = index">
-              <img [src]="imageUrl" alt="Activity image preview" />
+              <img [src]="imageUrl" [alt]="'contentCreator.activityForm.activityImageAlt' | translate" />
               <div class="gallery-actions">
                 @if (index === 0) {
-                  <span class="primary-badge">Primary</span>
+                  <span class="primary-badge">{{ 'contentCreator.activityForm.primary' | translate }}</span>
                 } @else {
-                  <button type="button" class="ghost-btn small" (click)="setPrimaryImage(index)">Set Primary</button>
+                  <button type="button" class="ghost-btn small" (click)="setPrimaryImage(index)">{{ 'contentCreator.activityForm.setPrimary' | translate }}</button>
                 }
-                <button type="button" class="ghost-btn small danger" (click)="removeImage(index)">Remove</button>
+                <button type="button" class="ghost-btn small danger" (click)="removeImage(index)">{{ 'common.remove' | translate }}</button>
               </div>
             </article>
           </div>
@@ -219,7 +209,7 @@
               <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41" />
             </svg>
           </span>
-          <h3 class="location-card__title">Location Intelligence</h3>
+          <h3 class="location-card__title">{{ 'contentCreator.activityForm.locationIntelligence' | translate }}</h3>
         </div>
 
         <app-map
@@ -227,7 +217,7 @@
           [lat]="form.controls.latitude.value ?? 42.424"
           [lng]="form.controls.longitude.value ?? 18.771"
           [zoom]="form.controls.latitude.value && form.controls.longitude.value ? 15 : 13"
-          [popupText]="form.controls.name.value || 'Activity'"
+          [popupText]="form.controls.name.value || ('common.activity' | translate)"
           (mapClick)="selectLocation($event.lat, $event.lng)">
         </app-map>
 
@@ -239,22 +229,22 @@
             [(ngModel)]="locationContextQuery"
             [ngModelOptions]="{ standalone: true }"
             (keyup)="onLocationContextSearch()"
-            placeholder="Set destination/locality for location context"
-            aria-label="Search for a place to set map context"
+            [placeholder]="'contentCreator.activityForm.locationContextPlaceholder' | translate"
+            [attr.aria-label]="'contentCreator.activityForm.locationContextAria' | translate"
             [disabled]="isLocationContextSearching"
           />
         </div>
 
         <div class="coord-editor">
           <div>
-            <span class="coord-label">{{ 'Latitude' | translate }}</span>
+            <span class="coord-label">{{ 'common.latitude' | translate }}</span>
             <div class="coord-input-wrap">
               <input id="latitude-input" type="number" formControlName="latitude" min="-90" max="90" step="0.000001" placeholder="42.4240" />
               <span class="coord-input-suffix">{{ latitudeDirection }}</span>
             </div>
           </div>
           <div>
-            <span class="coord-label">{{ 'Longitude' | translate }}</span>
+            <span class="coord-label">{{ 'common.longitude' | translate }}</span>
             <div class="coord-input-wrap">
               <input id="longitude-input" type="number" formControlName="longitude" min="-180" max="180" step="0.000001" placeholder="18.7710" />
               <span class="coord-input-suffix">{{ longitudeDirection }}</span>
@@ -262,30 +252,7 @@
           </div>
         </div>
 
-        <!-- TODO: Re-enable when location detail mapping is finalized -->
-        <!--
-        <div class="location-details">
-          <div class="location-detail-row">
-            <span>City</span>
-            <strong>{{ locationDetails.city }}</strong>
-          </div>
-          <div class="location-detail-row">
-            <span>Street</span>
-            <strong>{{ locationDetails.street }}</strong>
-          </div>
-          <div class="location-detail-row location-detail-row--full">
-            <span>Selected address</span>
-            <strong>{{ locationDetails.fullAddress }}</strong>
-          </div>
-        </div>
-        -->
       </article>
-
-      <!-- @if (isLoadingOptions) {
-        <p class="side-hint">Loading options...</p>
-      } @else if (!hasTypeOptions) {
-        <p class="side-hint warning">No activity types were discovered from existing catalog entries. Use Activity Type ID input.</p>
-      } -->
     </aside>
   </div>
 
@@ -308,14 +275,14 @@
           {{ deleteModalDescription }}<br />
           {{
             isApprovedActivity
-              ? 'A manager will review the request before the activity is removed.'
-              : 'This action cannot be undone.'
+              ? ('contentCreator.activityForm.delete.managerReviewNote' | translate)
+              : ('contentCreator.activityForm.delete.cannotUndo' | translate)
           }}
         </p>
 
         <div class="activity-delete-modal-actions">
           <button type="button" class="ghost-btn" (click)="closeDeleteModal()" [disabled]="isDeleting">
-            Cancel
+            {{ 'common.cancel' | translate }}
           </button>
           <button
             type="button"
@@ -323,7 +290,7 @@
             (click)="deleteActivity()"
             [disabled]="isDeleting || (isApprovedActivity && hasPendingDeletionRequest)"
           >
-            {{ isDeleting ? (isApprovedActivity ? 'Submitting...' : 'Deleting...') : (isApprovedActivity ? (hasPendingDeletionRequest ? 'Already requested' : 'Request deletion') : 'Delete') }}
+            {{ isDeleting ? (isApprovedActivity ? ('contentCreator.activityForm.delete.submitting' | translate) : ('contentCreator.activityForm.delete.deleting' | translate)) : (isApprovedActivity ? (hasPendingDeletionRequest ? ('contentCreator.activityForm.delete.alreadyRequested' | translate) : ('contentCreator.activityForm.delete.requestAction' | translate)) : ('contentCreator.activityForm.delete.deleteAction' | translate)) }}
           </button>
         </div>
       </section>
