@@ -5,17 +5,22 @@
 
 .bell-btn {
   position: relative;
-  width: 36px;
-  height: 36px;
-  border: none;
-  border-radius: 8px;
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  border: 1px solid transparent;
+  border-radius: 12px;
   background: transparent;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  color: #5a5a5a;
-  transition: background 0.12s ease, color 0.12s ease;
+  color: #64748b;
+  transition:
+    background 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease,
+    box-shadow 0.18s ease;
   appearance: none;
   -webkit-appearance: none;
   box-shadow: none;
@@ -23,24 +28,50 @@
 }
 
 .bell-btn:hover {
-  background: #f3f4f6;
-  color: #111111;
+  background: #f8fafc;
+  border-color: #e2e8f0;
+  color: #0f172a;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
 }
 
 .bell-btn:focus-visible {
-  background: #f3f4f6;
-  color: #111111;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+  background: #f8fafc;
+  border-color: #bfdbfe;
+  color: #0f172a;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.14);
 }
 
-.bell-btn svg {
-  display: block;
+.bell-btn:has(.badge) {
+  background: #f0f7ff;
+  border-color: #dbeafe;
+  color: #2563eb;
+}
+
+.bell-btn:has(.badge):hover {
+  background: #e8f1ff;
+  border-color: #bfdbfe;
+}
+
+.bell-icon {
+  font-size: 22px;
+  line-height: 1;
+  font-variation-settings: 'FILL' 0, 'wght' 350, 'GRAD' 0, 'opsz' 24;
+  transition: transform 0.18s ease, font-variation-settings 0.18s ease;
+}
+
+.bell-btn:hover .bell-icon {
+  transform: scale(1.06);
+  font-variation-settings: 'FILL' 1, 'wght' 450, 'GRAD' 0, 'opsz' 24;
+}
+
+.bell-icon--unread {
+  font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
 }
 
 .badge {
   position: absolute;
-  top: 4px;
-  right: 3px;
+  top: 5px;
+  right: 5px;
   min-width: 18px;
   height: 18px;
   padding: 0 5px;

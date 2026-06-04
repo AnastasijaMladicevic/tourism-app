@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { finalize } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { CreateUserDto, UserDto } from '../../../models/user.model';
@@ -14,7 +14,7 @@ export type TeamMemberRole = 'manager' | 'admin';
 @Component({
   selector: 'app-create-team-member',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule],
   templateUrl: './create-team-member.component.html',
   styleUrls: ['./create-team-member.component.css', '../shared/admin-page-title.css']
 })
