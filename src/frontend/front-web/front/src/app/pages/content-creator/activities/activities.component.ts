@@ -9,6 +9,7 @@ import { DestinationDto, DestinationService } from '../../../services/destinatio
 import { MapComponent as SharedMapComponent } from '../../../shared/components/map/map';
 import { HERO_IMAGE_ROTATION_INTERVAL_MS } from '../../../shared/constants/hero-image-rotation';
 import { TranslationService } from '../../../services/translation.service';
+import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 
 interface ActivityInsightCard {
   label: string;
@@ -19,13 +20,14 @@ interface ActivityInsightCard {
 
 interface ActivityFilterOption {
   value: string;
-  label: string;
+  label?: string;
+  labelKey?: string;
 }
 
 @Component({
   selector: 'app-content-creator-activities',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, SharedMapComponent, PaginatorComponent],
+  imports: [CommonModule, FormsModule, RouterModule, SharedMapComponent, PaginatorComponent, TranslatePipe],
   templateUrl: './activities.component.html',
   styleUrls: [
     './activities.component.css',
@@ -75,20 +77,20 @@ export class ContentCreatorActivitiesComponent implements OnInit, OnDestroy {
   statsPendingCount: number | null = null;
 
   readonly statusOptions = [
-    { value: 'all', label: 'All Statuses' },
-    { value: 'published', label: 'Published' },
-    { value: 'draft', label: 'Draft' },
-    { value: 'pending', label: 'Pending' },
-    { value: 'approved', label: 'Approved' },
-    { value: 'archived', label: 'Archived' }
+    { value: 'all', labelKey: 'contentCreator.activities.filters.allStatuses' },
+    { value: 'published', labelKey: 'contentCreator.activities.status.published' },
+    { value: 'draft', labelKey: 'contentCreator.activities.status.draft' },
+    { value: 'pending', labelKey: 'contentCreator.activities.status.pending' },
+    { value: 'approved', labelKey: 'contentCreator.activities.status.approved' },
+    { value: 'archived', labelKey: 'contentCreator.activities.status.archived' }
   ];
 
   readonly sortByOptions = [
-    { value: 'name', label: 'Name' },
-    { value: 'activityTypeName', label: 'Type' },
-    { value: 'durationMinutes', label: 'Duration' },
-    { value: 'status', label: 'Status' },
-    { value: 'createdAt', label: 'Created date' }
+    { value: 'name', labelKey: 'contentCreator.objects.filters.name' },
+    { value: 'activityTypeName', labelKey: 'contentCreator.activities.filters.type' },
+    { value: 'durationMinutes', labelKey: 'contentCreator.activities.duration' },
+    { value: 'status', labelKey: 'contentCreator.activities.filters.status' },
+    { value: 'createdAt', labelKey: 'contentCreator.activities.filters.createdDate' }
   ];
 
   typeOptions: ActivityFilterOption[] = [];
@@ -103,27 +105,35 @@ export class ContentCreatorActivitiesComponent implements OnInit, OnDestroy {
     this.stopHeroImageRotation();
   }
 
+  translateOptionLabel(option: ActivityFilterOption): string {
+    if (option.labelKey) {
+      return this.translationService.translate(option.labelKey);
+    }
+
+    return option.label ?? '';
+  }
+
   /**
    * Same structure as content-creator events: summary KPI → current page → pipeline insight (blue → green → amber).
    */
   get insightCards(): ActivityInsightCard[] {
     return [
       {
-        label: 'Total activities',
+        label: this.translationService.translate('contentCreator.activities.stats.totalActivities'),
         value: this.statsTotalCount != null ? String(this.statsTotalCount) : '—',
-        hint: 'Matching active filters',
+        hint: this.translationService.translate('contentCreator.activities.stats.matchingFilters'),
         tone: 'blue',
       },
       {
-        label: 'On this page',
+        label: this.translationService.translate('contentCreator.activities.stats.onThisPage'),
         value: this.isLoading ? '—' : String(this.activities.length),
-        hint: 'Visible rows',
+        hint: this.translationService.translate('contentCreator.activities.stats.visibleRows'),
         tone: 'green',
       },
       {
-        label: 'Pending review',
+        label: this.translationService.translate('contentCreator.activities.stats.pendingReview'),
         value: this.statsPendingCount != null ? String(this.statsPendingCount) : '—',
-        hint: 'Matching active filters',
+        hint: this.translationService.translate('contentCreator.activities.stats.matchingFilters'),
         tone: 'amber',
       },
     ];
@@ -167,7 +177,7 @@ export class ContentCreatorActivitiesComponent implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       },
       error: (error) => {
-        this.errorMessage = error?.error?.message ?? 'Failed to load activities';
+        this.errorMessage = error?.error?.message ?? this.translationService.translate('contentCreator.activities.error.load');
         this.activities = [];
         this.totalCount = 0;
         this.totalPages = 1;
@@ -346,7 +356,7 @@ export class ContentCreatorActivitiesComponent implements OnInit, OnDestroy {
 
   formatDuration(minutes?: number): string {
     if (!minutes || minutes <= 0) {
-      return '-';
+      return this.translationService.translate('common.notAvailable');
     }
 
     if (minutes < 60) {
@@ -357,10 +367,15 @@ export class ContentCreatorActivitiesComponent implements OnInit, OnDestroy {
     const remainingMinutes = minutes % 60;
 
     if (remainingMinutes === 0) {
-      return hours === 1 ? '1 Hour' : `${hours} Hours`;
+      return hours === 1
+        ? this.translationService.translate('contentCreator.activities.oneHour')
+        : this.translationService.translate('contentCreator.activities.hours', { count: hours });
     }
 
-    return `${hours}h ${remainingMinutes}m`;
+    return this.translationService.translate('contentCreator.activities.hoursMinutes', {
+      hours,
+      minutes: remainingMinutes,
+    });
   }
 
   formatParticipationFee(price?: number | null): string {
@@ -372,11 +387,11 @@ export class ContentCreatorActivitiesComponent implements OnInit, OnDestroy {
   }
 
   getActivityLocation(activity: ActivityDto): string {
-    return activity.destinationName || activity.localityName || activity.objectName || activity.regionName || '-';
+    return activity.destinationName || activity.localityName || activity.objectName || activity.regionName || this.translationService.translate('common.notAvailable');
   }
 
   getActivityDestinationSubLabel(activity: ActivityDto): string {
-    return activity.localityName || activity.objectName || activity.regionName || '—';
+    return activity.localityName || activity.objectName || activity.regionName || this.translationService.translate('common.notAvailable');
   }
 
   getStatusClass(status?: string): string {
@@ -396,13 +411,33 @@ export class ContentCreatorActivitiesComponent implements OnInit, OnDestroy {
     }
   }
 
+  translateStatus(status?: string | null): string {
+    const normalized = (status ?? 'draft').trim().toLowerCase();
+    const key = `contentCreator.activities.status.${normalized}`;
+    const translated = this.translationService.translate(key);
+    return translated === key ? status || this.translationService.translate('contentCreator.activities.status.draft') : translated;
+  }
+
+  formatDateTime(value?: string | Date | null): string {
+    if (!value) {
+      return this.translationService.translate('common.notAvailable');
+    }
+
+    return new Intl.DateTimeFormat(this.translationService.currentLocale(), {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(new Date(value));
+  }
+
   get activitiesCountLabel(): string {
     if (this.isLoading) {
       return '…';
     }
 
-    const count = this.totalCount;
-    return `${count} activit${count === 1 ? 'y' : 'ies'}`;
+    return this.translationService.translate('contentCreator.activities.totalCount', { count: this.totalCount });
   }
 
   get pageStart(): number {
@@ -421,7 +456,7 @@ export class ContentCreatorActivitiesComponent implements OnInit, OnDestroy {
     const activity = this.selectedActivityDetails ?? this.selectedActivity;
 
     if (!activity?.description) {
-      return 'A featured activity selected from the creator workspace. Use this panel to inspect the location, logistics, and metadata for the activity.';
+      return this.translationService.translate('contentCreator.activities.noDescription');
     }
 
     return activity.description;
@@ -429,17 +464,17 @@ export class ContentCreatorActivitiesComponent implements OnInit, OnDestroy {
 
   get selectedCategory(): string {
     const activity = this.selectedActivityDetails ?? this.selectedActivity;
-    return activity?.activityTypeName || 'Activity';
+    return activity?.activityTypeName || this.translationService.translate('common.activity');
   }
 
   get selectedLocation(): string {
     const activity = this.selectedActivityDetails ?? this.selectedActivity;
 
     if (!activity) {
-      return '-';
+      return this.translationService.translate('common.notAvailable');
     }
 
-    return activity.destinationName || activity.localityName || activity.objectName || activity.regionName || '-';
+    return activity.destinationName || activity.localityName || activity.objectName || activity.regionName || this.translationService.translate('common.notAvailable');
   }
 
   get selectedBanner(): string {
@@ -469,7 +504,7 @@ export class ContentCreatorActivitiesComponent implements OnInit, OnDestroy {
   get selectedActivityLocationLabel(): string {
     const activity = this.selectedActivityDetails ?? this.selectedActivity;
     if (!activity) {
-      return 'Selected activity';
+      return this.translationService.translate('contentCreator.activities.selectedActivity');
     }
 
     const location = activity.localityName || activity.destinationName || activity.regionName || activity.objectName;
@@ -676,7 +711,9 @@ export class ContentCreatorActivitiesComponent implements OnInit, OnDestroy {
       }
     }
 
-    return Array.from(unique.values()).sort((first, second) => first.label.localeCompare(second.label));
+    return Array.from(unique.values()).sort((first, second) =>
+      (first.label ?? '').localeCompare(second.label ?? '')
+    );
   }
 
   private loadSelectedActivityDetails(activityId: number): void {

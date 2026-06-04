@@ -1,14 +1,14 @@
 <section class="events-page">
   <header class="page-header">
     <div class="page-header-copy">
-      <p class="eyebrow page-header-eyebrow">Events management</p>
-      <h1>Events &amp; Schedules</h1>
-      <p class="page-subtitle">Total: {{ eventsCountLabel }}</p>
+      <p class="eyebrow page-header-eyebrow">{{ 'contentCreator.events.eyebrow' | translate }}</p>
+      <h1>{{ 'contentCreator.events.title' | translate }}</h1>
+      <p class="page-subtitle">{{ eventsCountLabel }}</p>
     </div>
 
     <button type="button" class="primary-btn page-header-cta" (click)="onCreateEvent()">
       <span class="material-symbols-outlined">add</span>
-      <span class="page-header-cta-label">Create New Event</span>
+      <span class="page-header-cta-label">{{ 'contentCreator.events.createEvent' | translate }}</span>
     </button>
   </header>
 
@@ -20,12 +20,12 @@
         class="toolbar-input"
         [(ngModel)]="draftSearchQuery"
         (keyup)="onSearch()"
-        placeholder="Search events, objects, or organizers..."
+        [placeholder]="'contentCreator.events.searchPlaceholder' | translate"
       />
     </div>
 
     <div class="toolbar-date-row">
-      <div class="date-range-pill" aria-label="Date range filter">
+      <div class="date-range-pill" [attr.aria-label]="'contentCreator.events.dateRangeFilter' | translate">
         <span class="material-symbols-outlined date-range-icon" aria-hidden="true">calendar_month</span>
         <div class="date-range-inputs">
           <input
@@ -33,7 +33,7 @@
             class="date-range-input"
             [(ngModel)]="rangeStartDate"
             (ngModelChange)="onDateRangeChange()"
-            aria-label="From date"
+            [attr.aria-label]="'contentCreator.events.fromDate' | translate"
           />
           <span class="date-range-separator" aria-hidden="true">–</span>
           <input
@@ -41,7 +41,7 @@
             class="date-range-input"
             [(ngModel)]="rangeEndDate"
             (ngModelChange)="onDateRangeChange()"
-            aria-label="To date"
+            [attr.aria-label]="'contentCreator.events.toDate' | translate"
           />
         </div>
       </div>
@@ -52,46 +52,46 @@
   @if (filterPanelOpen) {
     <div class="filters-panel card">
       <label>
-        <span>Status</span>
+        <span>{{ 'contentCreator.events.filters.status' | translate }}</span>
         <select [(ngModel)]="statusFilter">
           <option *ngFor="let option of statusOptions" [value]="option.value">
-            {{ option.label }}
+            {{ translateOptionLabel(option) }}
           </option>
         </select>
       </label>
 
       <label>
-        <span>Category</span>
+        <span>{{ 'contentCreator.events.filters.category' | translate }}</span>
         <select [(ngModel)]="categoryFilter">
           <option *ngFor="let option of categoryOptions" [value]="option.value">
-            {{ option.label }}
+            {{ translateOptionLabel(option) }}
           </option>
         </select>
       </label>
 
       <label>
-        <span>Sort by</span>
+        <span>{{ 'contentCreator.events.filters.sortBy' | translate }}</span>
         <select [(ngModel)]="sortBy">
-          <option value="startDate">Start date</option>
-          <option value="name">Name</option>
-          <option value="status">Status</option>
+          <option value="startDate">{{ 'contentCreator.events.filters.startDate' | translate }}</option>
+          <option value="name">{{ 'contentCreator.events.filters.name' | translate }}</option>
+          <option value="status">{{ 'contentCreator.events.filters.status' | translate }}</option>
         </select>
       </label>
 
       <label>
-        <span>Order</span>
+        <span>{{ 'contentCreator.events.filters.order' | translate }}</span>
         <select [(ngModel)]="sortOrder">
-          <option value="asc">Ascending</option>
-          <option value="desc">Descending</option>
+          <option value="asc">{{ 'contentCreator.events.filters.ascending' | translate }}</option>
+          <option value="desc">{{ 'contentCreator.events.filters.descending' | translate }}</option>
         </select>
       </label>
 
       <div class="filter-actions">
         <button type="button" class="primary-btn filter-btn" (click)="onApplyFilters()">
-          Apply
+          {{ 'contentCreator.events.filters.apply' | translate }}
         </button>
         <button type="button" class="ghost-btn filter-btn secondary" (click)="onResetFilters()">
-          Reset
+          {{ 'contentCreator.events.filters.reset' | translate }}
         </button>
       </div>
     </div>
@@ -113,7 +113,7 @@
 
       <div class="card table-card">
         @if (isLoading) {
-          <div class="state state-loading">Loading events...</div>
+          <div class="state state-loading">{{ 'contentCreator.events.loading' | translate }}</div>
         } @else if (errorMessage) {
           <div class="state state-error">{{ errorMessage }}</div>
         } @else {
@@ -129,7 +129,7 @@
                   <div class="event-mobile-card__head">
                     <h3>{{ event.name }}</h3>
                     <span class="status-chip status-chip--compact" [ngClass]="getStatusBadgeClass(event.status)">
-                      {{ event.status || 'Draft' }}
+                      {{ humanizeStatus(event.status) }}
                     </span>
                   </div>
                   <p class="event-mobile-card__date">
@@ -148,7 +148,7 @@
                 <button
                   type="button"
                   class="event-mobile-card__edit"
-                  title="Edit"
+                  [title]="'common.edit' | translate"
                   (click)="onEditEvent(event); $event.stopPropagation()"
                 >
                   <span class="material-symbols-outlined">edit</span>
@@ -161,12 +161,12 @@
             <table class="events-table">
               <thead>
                 <tr>
-                  <th>Status</th>
-                  <th>Event Details</th>
-                  <th>Destination</th>
-                  <th>Category</th>
-                  <th>Capacity</th>
-                  <th>Action</th>
+                  <th>{{ 'contentCreator.events.table.status' | translate }}</th>
+                  <th>{{ 'contentCreator.events.table.eventDetails' | translate }}</th>
+                  <th>{{ 'contentCreator.events.table.destination' | translate }}</th>
+                  <th>{{ 'contentCreator.events.table.category' | translate }}</th>
+                  <th>{{ 'contentCreator.events.table.capacity' | translate }}</th>
+                  <th>{{ 'contentCreator.events.table.action' | translate }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -177,7 +177,7 @@
                 >
                   <td>
                     <span class="status-chip" [ngClass]="getStatusBadgeClass(event.status)">
-                      {{ event.status || 'Draft' }}
+                      {{ humanizeStatus(event.status) }}
                     </span>
                   </td>
                   <td>
@@ -212,7 +212,7 @@
                         type="button"
                         class="icon-btn plain"
                         (click)="onEditEvent(event); $event.stopPropagation()"
-                        title="Edit"
+                        [title]="'common.edit' | translate"
                       >
                         <span class="material-symbols-outlined">edit</span>
                       </button>
@@ -241,7 +241,7 @@
 
     <aside class="detail-column card" [class.has-selection]="!!selectedEvent">
       @if (selectedEvent) {
-        <p class="detail-sheet-label">Selected event</p>
+        <p class="detail-sheet-label">{{ 'contentCreator.events.selectedEvent' | translate }}</p>
         <div class="event-hero">
           <div
             class="hero-media"
@@ -260,7 +260,7 @@
             <span class="hero-badge">{{ getCategoryLabel(selectedEvent) }}</span>
           </div>
           <div class="hero-copy">
-            <p class="eyebrow">Featured event</p>
+            <p class="eyebrow">{{ 'contentCreator.events.featuredEvent' | translate }}</p>
             <h2>{{ selectedEvent.name }}</h2>
             <p class="hero-meta">
               {{ getLocationLabel(selectedEvent) }} · {{ formatDate(selectedEvent.startDate) }}
@@ -270,13 +270,13 @@
               [class.has-tooltip]="hasRejectionReason(selectedEvent)"
               tabindex="0"
             >
-              <span class="detail-status" [ngClass]="getStatusBadgeClass(selectedEvent.status)">
-                {{ selectedEvent.status || 'Draft' }}
+            <span class="detail-status" [ngClass]="getStatusBadgeClass(selectedEvent.status)">
+                {{ humanizeStatus(selectedEvent.status) }}
               </span>
 
               @if (hasRejectionReason(selectedEvent)) {
                 <div class="status-tooltip" role="tooltip">
-                  <strong>Rejection reason</strong>
+                  <strong>{{ 'contentCreator.events.rejectionReason' | translate }}</strong>
                   <p>{{ getRejectionReason(selectedEvent) }}</p>
                 </div>
               }
@@ -290,7 +290,7 @@
             <strong>{{ formatTicketPrice(selectedEvent.price) }}</strong>
           </div>
           <div class="metric-card">
-            <span>Capacity</span>
+            <span>{{ 'contentCreator.events.capacity' | translate }}</span>
             <strong>{{
               selectedEvent.maxVisitors
                 ? selectedEvent.maxVisitors.toLocaleString('en-US')
@@ -301,7 +301,7 @@
 
         <section class="detail-section">
           <div class="section-head">
-            <h3>Schedule</h3>
+            <h3>{{ 'contentCreator.events.schedule.title' | translate }}</h3>
           </div>
 
           <div class="schedule-list">
@@ -313,7 +313,7 @@
         </section>
 
         <section class="detail-section">
-          <h3>Description</h3>
+          <h3>{{ 'contentCreator.events.description' | translate }}</h3>
           <p class="description-copy">{{ getSelectedSummary(selectedEvent) }}</p>
         </section>
         <section class="detail-section">
@@ -331,7 +331,7 @@
             } @else {
               <div class="map-empty-state">
                 <span class="material-symbols-outlined">location_off</span>
-                <p>Coordinates are not available for this event.</p>
+                <p>{{ 'contentCreator.events.noCoordinates' | translate }}</p>
               </div>
             }
           </div>
@@ -358,13 +358,13 @@
         </section> -->
       } @else {
         <div class="empty-state">
-          <p class="eyebrow">No event selected</p>
-          <h2>Pick an event from the table</h2>
+          <p class="eyebrow">{{ 'contentCreator.events.empty.noEventSelected' | translate }}</p>
+          <h2>{{ 'contentCreator.events.empty.pickEventTitle' | translate }}</h2>
           <p>
-            Select a row to inspect media, schedule, and staffing details in the right-hand panel.
+            {{ 'contentCreator.events.empty.pickEventBody' | translate }}
           </p>
           <button type="button" class="primary-btn" (click)="onCreateEvent()">
-            Create New Event
+            {{ 'contentCreator.events.createEvent' | translate }}
           </button>
         </div>
       }

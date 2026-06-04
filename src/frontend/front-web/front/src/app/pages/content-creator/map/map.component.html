@@ -5,7 +5,7 @@
         <mat-icon>search</mat-icon>
         <input
           type="text"
-          placeholder="Search objects, events, activities..."
+          [placeholder]="'contentCreator.map.searchPlaceholder' | translate"
           [(ngModel)]="searchQuery"
           (input)="onSearchInput()"
           (focus)="showSuggestions = searchResults.length > 0"
@@ -49,7 +49,7 @@
         (click)="toggleFilter('object')"
       >
         <span>🏨</span>
-        Objects
+        {{ 'common.objects' | translate }}
       </button>
       <button
         class="chip"
@@ -57,7 +57,7 @@
         (click)="toggleFilter('event')"
       >
         <span>🎉</span>
-        Events
+        {{ 'common.events' | translate }}
       </button>
       <button
         class="chip"
@@ -65,7 +65,7 @@
         (click)="toggleFilter('activity')"
       >
         <span>🏃</span>
-        Activities
+        {{ 'common.activities' | translate }}
       </button>
     </div>
   </div>

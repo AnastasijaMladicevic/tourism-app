@@ -21,11 +21,13 @@ import {
 } from 'rxjs';
 import { ObjectDto, ObjectImageDto, ObjectService } from '../../../services/object';
 import { ReviewDto, ReviewQueryParams, ReviewService } from '../../../services/review';
+import { TranslationService } from '../../../services/translation.service';
+import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-content-creator-reviews',
   standalone: true,
-  imports: [CommonModule, FormsModule, PaginatorComponent],
+  imports: [CommonModule, FormsModule, PaginatorComponent, TranslatePipe],
   templateUrl: './reviews.component.html',
   styleUrls: ['./reviews.component.css', '../../admin/shared/admin-page-title.css']
 })
@@ -35,6 +37,7 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
+  readonly translationService = inject(TranslationService);
   private readonly destroy$ = new Subject<void>();
 
   allReviews: ReviewDto[] = [];
@@ -163,7 +166,7 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
           this.totalFilteredReviews = 0;
           this.totalReviewPages = 1;
           this.selectReview(null);
-          this.errorMessage = error?.error?.message ?? 'Failed to load reviews.';
+          this.errorMessage = error?.error?.message ?? this.translationService.translate('contentCreator.reviews.error.load');
           this.triggerViewUpdate();
         }
       });
@@ -254,19 +257,21 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
   get emptyQueueMessage(): string {
     if (this.objectFilterId != null) {
       const name = this.creatorObjects.find((object) => object.id === this.objectFilterId)?.name?.trim();
-      return name ? `No reviews found for ${name}.` : 'No reviews found for this object.';
+      return name
+        ? this.translationService.translate('contentCreator.reviews.empty.forObjectNamed', { name })
+        : this.translationService.translate('contentCreator.reviews.empty.forObject');
     }
 
-    return 'No reviews found for your objects.';
+    return this.translationService.translate('contentCreator.reviews.empty.none');
   }
 
   get selectedObjectFilterLabel(): string {
     if (this.objectFilterId == null) {
-      return 'All objects';
+      return this.translationService.translate('contentCreator.reviews.filters.allObjects');
     }
 
     return this.creatorObjects.find((object) => object.id === this.objectFilterId)?.name?.trim()
-      ?? 'Selected object';
+      ?? this.translationService.translate('contentCreator.objects.selectedObject');
   }
 
   toggleRating(rating: number): void {
@@ -306,7 +311,7 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
 
     const content = this.responseText.trim();
     if (!content) {
-      this.errorMessage = 'Response cannot be empty.';
+      this.errorMessage = this.translationService.translate('contentCreator.reviews.error.responseRequired');
       this.successMessage = '';
       return;
     }
@@ -335,11 +340,11 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
         next: (fresh) => {
           this.updateReviewInCollections(fresh);
           localStorage.removeItem(this.getDraftKey(fresh.id));
-          this.successMessage = 'Response sent successfully.';
+          this.successMessage = this.translationService.translate('contentCreator.reviews.success.responseSent');
           this.loadReviews(true);
         },
         error: (error: any) => {
-          this.errorMessage = error?.error?.message ?? 'Failed to send response.';
+          this.errorMessage = error?.error?.message ?? this.translationService.translate('contentCreator.reviews.error.responseSend');
         }
       });
   }
@@ -362,17 +367,17 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
         next: (updated) => {
           this.updateReviewInCollections(updated);
           this.responseText = '';
-          this.successMessage = 'Response deleted successfully.';
+          this.successMessage = this.translationService.translate('contentCreator.reviews.success.responseDeleted');
           this.loadReviews(true);
         },
         error: (error: any) => {
-          this.errorMessage = error?.error?.message ?? 'Failed to delete response.';
+          this.errorMessage = error?.error?.message ?? this.translationService.translate('contentCreator.reviews.error.responseDelete');
         }
       });
   }
 
   get queueCountLabel(): string {
-    return `${this.totalFilteredReviews} review${this.totalFilteredReviews === 1 ? '' : 's'}`;
+    return this.translationService.translate('contentCreator.reviews.count', { count: this.totalFilteredReviews });
   }
 
   get queueTotalPages(): number {
@@ -401,15 +406,15 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
 
   formatDate(value?: string | null): string {
     if (!value) {
-      return '—';
+      return this.translationService.translate('common.notAvailable');
     }
 
     const date = new Date(value);
     if (Number.isNaN(date.getTime())) {
-      return '—';
+      return this.translationService.translate('common.notAvailable');
     }
 
-    return date.toLocaleString('en-GB', {
+    return date.toLocaleString(this.translationService.currentLocale(), {
       year: 'numeric',
       month: 'short',
       day: '2-digit',
@@ -532,7 +537,8 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
               ...review,
               objectName: review.objectName?.trim()
                 ? review.objectName
-                : (objectNames.get(review.objectId) ?? `Object #${review.objectId}`)
+                : (objectNames.get(review.objectId)
+                  ?? this.translationService.translate('contentCreator.reviews.fallback.object', { id: review.objectId }))
             })),
             totalCount: result.totalCount ?? 0,
             totalPages: result.totalPages ?? 1

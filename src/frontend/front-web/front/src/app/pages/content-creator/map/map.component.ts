@@ -24,6 +24,7 @@ import { AuthService } from '../../../services/auth.service';
 import { RegionService } from '../../../services/region';
 import { ActiveRegionService } from '../../../services/active-region';
 import { ActivitiesService } from '../../../services/activities';
+import { TranslationService } from '../../../services/translation.service';
 
 interface SearchResult {
   id: number;
@@ -41,7 +42,7 @@ interface SearchResult {
 
 interface FilterChip {
   key: string;
-  label: string;
+  labelKey: string;
   icon: string;
 }
 
@@ -70,11 +71,11 @@ export class ContentCreatorMapComponent implements OnInit, AfterViewInit, OnDest
 
   activeFilters: string[] = [];
   filterChips: FilterChip[] = [
-    { key: 'hotel', label: 'Hotels', icon: '🏨' },
-    { key: 'restaurant', label: 'Restaurants', icon: '🍽️' },
-    { key: 'kafana', label: 'Bars', icon: '🍷' },
-    { key: 'event', label: 'Events', icon: '🎉' },
-    { key: 'activity', label: 'Activities', icon: '🏃' },
+    { key: 'hotel', labelKey: 'contentCreator.map.filters.hotels', icon: '🏨' },
+    { key: 'restaurant', labelKey: 'contentCreator.map.filters.restaurants', icon: '🍽️' },
+    { key: 'kafana', labelKey: 'contentCreator.map.filters.bars', icon: '🍷' },
+    { key: 'event', labelKey: 'common.events', icon: '🎉' },
+    { key: 'activity', labelKey: 'common.activities', icon: '🏃' },
   ];
 
   selectedItem: any = null;
@@ -117,6 +118,7 @@ export class ContentCreatorMapComponent implements OnInit, AfterViewInit, OnDest
     private activitiesService: ActivitiesService,
     private regionService: RegionService,
     private activeRegionService: ActiveRegionService,
+    private translationService: TranslationService,
   ) {
     this.focusedDestinationId = this.parsePositiveInt(this.route.snapshot.queryParamMap.get('destinationId'));
   }
@@ -167,7 +169,7 @@ export class ContentCreatorMapComponent implements OnInit, AfterViewInit, OnDest
 
   private startTracking(): void {
     if (!navigator.geolocation) {
-      alert('Geolocation nije podrzana.');
+      alert(this.translationService.translate('map.geoUnsupported'));
       return;
     }
 
@@ -195,7 +197,7 @@ export class ContentCreatorMapComponent implements OnInit, AfterViewInit, OnDest
         this.ngZone.run(() => {
           this.isTracking = false;
           if (err.code === err.PERMISSION_DENIED) {
-            alert('Dozvolite pristup lokaciji.');
+            alert(this.translationService.translate('map.geoDenied'));
           }
           this.cdr.detectChanges();
         });
@@ -827,7 +829,7 @@ export class ContentCreatorMapComponent implements OnInit, AfterViewInit, OnDest
   }
 
   routeSummary(point: RoutePoint | null): string {
-    if (!point) return 'Not selected';
+    if (!point) return this.translationService.translate('common.notAvailable');
     return `${point.name} (${point.type})`;
   }
 
@@ -900,7 +902,7 @@ export class ContentCreatorMapComponent implements OnInit, AfterViewInit, OnDest
 
     return {
       id: Number(item.id),
-      name: String(item.name ?? 'Point'),
+      name: String(item.name ?? this.translationService.translate('common.location')),
       type: String(
         item.objectTypeName ?? item.destinationTypeName ?? item.eventTypeName ?? item.activityTypeName ?? type,
       ),

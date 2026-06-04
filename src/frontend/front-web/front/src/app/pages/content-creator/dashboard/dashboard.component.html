@@ -1,15 +1,15 @@
 <section class="cc-dashboard" [attr.data-render-version]="renderVersion()">
   <div class="page-head">
     <div>
-      <h1 class="page-title">Content Creator Dashboard</h1>
+      <h1 class="page-title">{{ 'dashboard.cc.title' | translate }}</h1>
       <p class="subtle-text">
-        Welcome back{{ user?.firstName ? ', ' + user?.firstName : '' }}. Preview of your content performance, reviews and upcoming events.
+        {{ 'dashboard.cc.subtitle' | translate }}
       </p>
     </div>
 
     <div class="head-actions">
       <!-- <span class="preview-pill">Live data</span> -->
-      <div class="period-filter" role="group" aria-label="Display period">
+      <div class="period-filter" role="group" [attr.aria-label]="'dashboard.period' | translate">
         <button
           type="button"
           *ngFor="let opt of periodOptions"
@@ -25,26 +25,26 @@
 
   <div class="state-banner error" *ngIf="loadError">
     <span>{{ loadError }}</span>
-    <button type="button" class="state-action" (click)="retryLoad()">Retry</button>
+    <button type="button" class="state-action" (click)="retryLoad()">{{ 'common.retry' | translate }}</button>
   </div>
-  <p class="state-banner loading" *ngIf="isLoading && !loadError && !overview">Loading content creator dashboard...</p>
+  <p class="state-banner loading" *ngIf="isLoading && !loadError && !overview">{{ 'dashboard.cc.loading' | translate }}</p>
 
   <ng-container *ngIf="overview as data">
   <div class="summary-strip card">
     <div>
-      <span class="summary-label">Total content</span>
+      <span class="summary-label">{{ 'dashboard.cc.totalContent' | translate }}</span>
       <strong>{{ data.summary.totalContent | number }}</strong>
     </div>
     <div>
-      <span class="summary-label">Reviews in period</span>
+      <span class="summary-label">{{ 'dashboard.cc.newReviews' | translate }}</span>
       <strong>{{ data.summary.newReviewsInPeriod | number }}</strong>
     </div>
     <div>
-      <span class="summary-label">Average rating</span>
+      <span class="summary-label">{{ 'dashboard.cc.averageRating' | translate }}</span>
       <strong>{{ data.summary.averageRatingInPeriod | number:'1.1-1' }}</strong>
     </div>
     <div>
-      <span class="summary-label">Next 30 days</span>
+      <span class="summary-label">{{ 'dashboard.cc.upcoming30' | translate }}</span>
       <strong>{{ data.summary.upcomingEventsInNext30Days | number }}</strong>
     </div>
   </div>
@@ -64,10 +64,10 @@
     <article class="card panel panel--wide">
       <div class="section-head">
         <div>
-          <h3>Engagement trend</h3>
-          <p>{{ granularityHint }} &bull; favorites, planner adds and reviews in {{ data.periodKey }}</p>
+          <h3>{{ 'dashboard.cc.engagementTrend' | translate }}</h3>
+          <p>{{ granularityHint }} &bull; {{ 'dashboard.cc.during' | translate:{ period: data.periodKey } }}</p>
         </div>
-        <a class="section-link" routerLink="/content-creator/reviews">Open reviews</a>
+        <a class="section-link" routerLink="/content-creator/reviews">{{ 'dashboard.cc.reviewOpen' | translate }}</a>
       </div>
 
       <div class="chart-legend">
@@ -84,7 +84,7 @@
           <span>0</span>
         </div>
         <div class="chart-surface">
-          <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="chart-svg" aria-label="Engagement trend">
+          <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="chart-svg" [attr.aria-label]="'dashboard.cc.engagementTrend' | translate">
             <path
               *ngFor="let series of engagementSeries"
               [attr.d]="series.linePath"
@@ -103,7 +103,7 @@
               <title>{{ zone.title }}</title>
             </rect>
           </svg>
-          <p class="chart-empty" *ngIf="engagementIsEmpty">No engagement activity was recorded for this period.</p>
+          <p class="chart-empty" *ngIf="engagementIsEmpty">{{ 'dashboard.cc.noEngagement' | translate }}</p>
         </div>
       </div>
 
@@ -124,8 +124,8 @@
       <article class="card panel rating-card">
         <div class="section-head">
           <div>
-            <h3>Average rating</h3>
-            <p>Across reviews in {{ data.periodKey }}</p>
+            <h3>{{ 'dashboard.cc.averageRating' | translate }}</h3>
+            <p>{{ 'dashboard.cc.acrossReviews' | translate:{ period: data.periodKey } }}</p>
           </div>
         </div>
         <div class="rating-score">
@@ -134,7 +134,7 @@
         </div>
         <div
           class="rating-stars"
-          [attr.aria-label]="'Average rating ' + (data.summary.averageRatingInPeriod | number:'1.1-1') + ' of 5'"
+          [attr.aria-label]="formatRatingAriaLabel(data.summary.averageRatingInPeriod)"
         >
           @for (star of getRatingStars(data.summary.averageRatingInPeriod); track $index) {
             <span
@@ -149,14 +149,14 @@
             </span>
           }
         </div>
-        <p class="rating-note">{{ data.ratingDistribution.totalReviews | number }} Total reviews in the selected period</p>
+        <p class="rating-note">{{ data.ratingDistribution.totalReviews | number }} {{ 'dashboard.cc.totalReviews' | translate }}</p>
       </article>
 
       <article class="card panel">
         <div class="section-head">
           <div>
-            <h3>Rating distribution</h3>
-            <p>One star to five stars</p>
+            <h3>{{ 'dashboard.cc.ratingDistribution' | translate }}</h3>
+            <p>{{ 'dashboard.cc.oneToFiveStars' | translate }}</p>
           </div>
         </div>
 
@@ -170,7 +170,7 @@
           </div>
         </div>
         <ng-template #emptyRatings>
-          <p class="empty-note">No ratings are available for this period.</p>
+          <p class="empty-note">{{ 'dashboard.cc.noRatings' | translate }}</p>
         </ng-template>
       </article>
     </div>
@@ -180,14 +180,14 @@
     <article class="card panel">
       <div class="section-head">
         <div>
-          <h3>Content Status Split</h3>
-          <p>Overall, objects, events and activities</p>
+          <h3>{{ 'dashboard.cc.contentStatusSplit' | translate }}</h3>
+          <p>{{ 'dashboard.cc.contentStatusSubtitle' | translate }}</p>
         </div>
       </div>
 
       <div class="donut-section">
         <div class="donut-wrap">
-          <svg viewBox="0 0 36 36" class="donut-svg" aria-label="Content status donut chart">
+          <svg viewBox="0 0 36 36" class="donut-svg" [attr.aria-label]="'dashboard.cc.contentStatusSplit' | translate">
             <circle class="donut-track" cx="18" cy="18" r="15.9155"></circle>
             <ng-container *ngFor="let slice of contentDonutSlices">
               <circle
@@ -207,7 +207,7 @@
           </svg>
           <div class="donut-center">
             <strong>{{ contentDonutTotal }}</strong>
-            <span>total</span>
+            <span>{{ 'dashboard.cc.total' | translate }}</span>
           </div>
         </div>
 
@@ -224,7 +224,7 @@
         <div *ngFor="let row of statusRows" class="status-row">
           <div class="status-row-head">
             <span class="status-row-name">{{ row.label }}</span>
-            <span class="status-row-total">{{ row.total | number }} total</span>
+            <span class="status-row-total">{{ row.total | number }} {{ 'dashboard.cc.total' | translate }}</span>
           </div>
           <div class="stacked-bar">
             <span *ngIf="row.published > 0" class="stack-segment stack-segment--published" [style.width.%]="getPublishedPercent(row)"></span>
@@ -232,24 +232,24 @@
             <span *ngIf="row.rejected > 0" class="stack-segment stack-segment--rejected" [style.width.%]="getRejectedPercent(row)"></span>
           </div>
           <div class="status-row-meta">
-            <span>{{ row.published }} published</span>
-            <span>{{ row.pending }} pending</span>
-            <span>{{ row.rejected }} rejected</span>
+            <span>{{ row.published }} {{ 'dashboard.cc.published' | translate }}</span>
+            <span>{{ row.pending }} {{ 'dashboard.cc.pending' | translate }}</span>
+            <span>{{ row.rejected }} {{ 'dashboard.cc.rejected' | translate }}</span>
           </div>
         </div>
       </div>
       <ng-template #emptyStatus>
-        <p class="empty-note">No content status is available right now.</p>
+        <p class="empty-note">{{ 'dashboard.cc.noContentStatus' | translate }}</p>
       </ng-template>
     </article>
 
     <article class="card panel panel--wide">
-      <div class="section-head">
-        <div>
-          <h3>Top Content</h3>
-          <p>Objects, events and activities with strongest engagement score</p>
-        </div>
-        <a class="section-link" routerLink="/content-creator/objects">Manage content</a>
+        <div class="section-head">
+          <div>
+            <h3>{{ 'dashboard.cc.topContent' | translate }}</h3>
+            <p>{{ 'dashboard.cc.topContentSubtitle' | translate }}</p>
+          </div>
+        <a class="section-link" routerLink="/content-creator/objects">{{ 'dashboard.cc.manageContent' | translate }}</a>
       </div>
 
       <div class="rank-list" *ngIf="topContent.length; else emptyTopContent">
@@ -264,38 +264,38 @@
               </ng-template>
               <div class="rank-subtle">
                 {{ humanizeContentType(item.contentType) }} &bull;
-                {{ item.destinationName || 'No destination' }} &bull;
-                {{ item.regionName || 'No region' }}
+                {{ item.destinationName || ('dashboard.cc.noDestination' | translate) }} &bull;
+                {{ item.regionName || ('dashboard.cc.noRegion' | translate) }}
               </div>
             </div>
             <div class="rank-side">
               <span [class]="statusClass(item.status)">{{ humanizeStatus(item.status) }}</span>
-              <span class="rank-score">score {{ item.engagementScore | number }}</span>
+              <span class="rank-score">{{ 'dashboard.cc.scoreValue' | translate:{ score: item.engagementScore } }}</span>
             </div>
           </div>
           <div class="region-bar-track">
             <div class="region-bar-fill" [style.width.%]="item.barPercent"></div>
           </div>
           <div class="rank-meta">
-            <span>{{ item.favoriteAdds | number }} favorites</span>
-            <span>{{ item.plannerAdds | number }} planner adds</span>
-            <span>{{ item.reviewCount | number }} reviews</span>
-            <span>{{ item.averageRating | number:'1.1-1' }} avg rating</span>
+            <span>{{ item.favoriteAdds | number }} {{ 'dashboard.cc.favorites' | translate }}</span>
+            <span>{{ item.plannerAdds | number }} {{ 'dashboard.cc.plannerAdds' | translate }}</span>
+            <span>{{ item.reviewCount | number }} {{ 'dashboard.cc.reviews' | translate }}</span>
+            <span>{{ item.averageRating | number:'1.1-1' }} {{ 'dashboard.cc.avgRating' | translate }}</span>
           </div>
         </div>
       </div>
       <ng-template #emptyTopContent>
-        <p class="empty-note">No content engagement data is available for this period.</p>
+        <p class="empty-note">{{ 'dashboard.cc.noContentEngagement' | translate }}</p>
       </ng-template>
     </article>
 
     <article class="card panel">
-      <div class="section-head">
-        <div>
-          <h3>Top Destinations</h3>
-          <p>Destination performance from your content</p>
+        <div class="section-head">
+          <div>
+            <h3>{{ 'dashboard.cc.topDestinations' | translate }}</h3>
+            <p>{{ 'dashboard.cc.topDestinationsSubtitle' | translate }}</p>
+          </div>
         </div>
-      </div>
 
       <div class="destination-list" *ngIf="topDestinations.length; else emptyDestinations">
         <div *ngFor="let item of topDestinations" class="rank-row">
@@ -313,7 +313,7 @@
               <ng-template #topDestinationNameText>
                 <div class="rank-name">{{ item.destinationName }}</div>
               </ng-template>
-              <div class="rank-subtle">{{ item.regionName }} &bull; {{ item.contentItems }} content items</div>
+              <div class="rank-subtle">{{ item.regionName }} &bull; {{ item.contentItems }} {{ 'common.contentItems' | translate }}</div>
             </div>
             <span class="rank-score">{{ item.engagementScore | number }}</span>
           </div>
@@ -321,25 +321,25 @@
             <div class="region-bar-fill region-bar-fill--blue" [style.width.%]="item.barPercent"></div>
           </div>
           <div class="rank-meta">
-            <span>{{ item.favoriteAdds | number }} favorites</span>
-            <span>{{ item.plannerAdds | number }} planner adds</span>
-            <span>{{ item.reviewCount | number }} reviews</span>
-            <span>{{ item.averageRating | number:'1.1-1' }} avg rating</span>
+            <span>{{ item.favoriteAdds | number }} {{ 'dashboard.cc.favorites' | translate }}</span>
+            <span>{{ item.plannerAdds | number }} {{ 'dashboard.cc.plannerAdds' | translate }}</span>
+            <span>{{ item.reviewCount | number }} {{ 'dashboard.cc.reviews' | translate }}</span>
+            <span>{{ item.averageRating | number:'1.1-1' }} {{ 'dashboard.cc.avgRating' | translate }}</span>
           </div>
         </div>
       </div>
       <ng-template #emptyDestinations>
-        <p class="empty-note">No destination performance is available for this period.</p>
+        <p class="empty-note">{{ 'dashboard.cc.noDestinationPerformance' | translate }}</p>
       </ng-template>
     </article>
 
     <article class="card panel">
-      <div class="section-head">
-        <div>
-          <h3>Upcoming Events</h3>
-          <p>{{ data.upcomingEvents.next7Days }} in next 7 days · {{ data.upcomingEvents.next30Days }} in next 30 days</p>
-        </div>
-        <a class="section-link" routerLink="/content-creator/events">Open events</a>
+        <div class="section-head">
+          <div>
+            <h3>{{ 'dashboard.cc.upcomingEvents' | translate }}</h3>
+            <p>{{ 'dashboard.cc.upcomingEventsSubtitle' | translate:{ count7: data.upcomingEvents.next7Days, count30: data.upcomingEvents.next30Days } }}</p>
+          </div>
+        <a class="section-link" routerLink="/content-creator/events">{{ 'dashboard.cc.openEvents' | translate }}</a>
       </div>
 
       <div class="upcoming-list" *ngIf="upcomingEvents.length; else emptyUpcomingEvents">
@@ -352,12 +352,12 @@
             <ng-template #upcomingEventNameText>
               <h4>{{ event.eventName }}</h4>
             </ng-template>
-            <p>{{ event.destinationName || 'No destination' }} &bull; {{ event.regionName || 'No region' }}</p>
+            <p>{{ event.destinationName || ('dashboard.cc.noDestination' | translate) }} &bull; {{ event.regionName || ('dashboard.cc.noRegion' | translate) }}</p>
           </div>
         </article>
       </div>
       <ng-template #emptyUpcomingEvents>
-        <p class="empty-note">No upcoming approved events in the next 30 days.</p>
+        <p class="empty-note">{{ 'dashboard.cc.noUpcomingEvents' | translate }}</p>
       </ng-template>
     </article>
   </div>

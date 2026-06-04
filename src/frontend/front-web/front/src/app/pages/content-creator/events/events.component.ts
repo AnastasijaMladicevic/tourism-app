@@ -10,6 +10,7 @@ import { buildEventQueryDto, EventFilterState } from '../../../models/event-filt
 import { MapComponent as SharedMapComponent } from '../../../shared/components/map/map';
 import { HERO_IMAGE_ROTATION_INTERVAL_MS } from '../../../shared/constants/hero-image-rotation';
 import { TranslationService } from '../../../services/translation.service';
+import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 
 interface EventInsightCard {
   label: string;
@@ -23,10 +24,16 @@ interface EventScheduleRow {
   value: string;
 }
 
+interface EventFilterOption {
+  value: string;
+  label?: string;
+  labelKey?: string;
+}
+
 @Component({
   selector: 'app-content-creator-events',
   standalone: true,
-  imports: [CommonModule, FormsModule, SharedMapComponent, PaginatorComponent],
+  imports: [CommonModule, FormsModule, SharedMapComponent, PaginatorComponent, TranslatePipe],
   templateUrl: './events.component.html',
   styleUrls: [
     './events.component.css',
@@ -73,33 +80,39 @@ export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
   rangeStartDate = '';
   rangeEndDate = '';
 
-  stats: EventInsightCard[] = [
-    { label: 'Upcoming this week', value: '-', hint: 'Events published in the next 7 days', tone: 'blue' },
-    { label: 'Published on page', value: '-', hint: 'Published/approved events in current table page', tone: 'green' },
-    { label: 'Capacity configured', value: '-', hint: 'Share of visible events with max visitors set', tone: 'amber' }
+  upcomingThisWeekCount = '-';
+  publishedOnPageCount = '-';
+  capacityConfiguredRate = '-';
+
+  private readonly fallbackCategoryOptions: EventFilterOption[] = [
+    { value: 'all', labelKey: 'contentCreator.events.filters.allCategories' },
+    { value: 'Festival', labelKey: 'contentCreator.events.categories.festival' },
+    { value: 'Workshop', labelKey: 'contentCreator.events.categories.workshop' },
+    { value: 'Sports', labelKey: 'contentCreator.events.categories.sports' },
+    { value: 'Cultural', labelKey: 'contentCreator.events.categories.cultural' },
+    { value: 'Exhibition', labelKey: 'contentCreator.events.categories.exhibition' },
+    { value: 'Concert', labelKey: 'contentCreator.events.categories.concert' }
   ];
 
-  private readonly fallbackCategoryOptions = [
-    { value: 'all', label: 'All Categories' },
-    { value: 'Festival', label: 'Festival' },
-    { value: 'Workshop', label: 'Workshop' },
-    { value: 'Sports', label: 'Sports' },
-    { value: 'Cultural', label: 'Cultural' },
-    { value: 'Exhibition', label: 'Exhibition' },
-    { value: 'Concert', label: 'Concert' }
-  ];
-
-  private readonly fallbackStatusOptions = [
-    { value: 'all', label: 'All Statuses' },
-    { value: 'published', label: 'Published' },
-    { value: 'draft', label: 'Draft' },
-    { value: 'pending', label: 'Pending' },
-    { value: 'approved', label: 'Approved' },
-    { value: 'cancelled', label: 'Cancelled' }
+  private readonly fallbackStatusOptions: EventFilterOption[] = [
+    { value: 'all', labelKey: 'contentCreator.events.filters.allStatuses' },
+    { value: 'published', labelKey: 'contentCreator.events.status.published' },
+    { value: 'draft', labelKey: 'contentCreator.events.status.draft' },
+    { value: 'pending', labelKey: 'contentCreator.events.status.pending' },
+    { value: 'approved', labelKey: 'contentCreator.events.status.approved' },
+    { value: 'cancelled', labelKey: 'contentCreator.events.status.cancelled' }
   ];
 
   categoryOptions = [...this.fallbackCategoryOptions];
   statusOptions = [...this.fallbackStatusOptions];
+
+  translateOptionLabel(option: EventFilterOption): string {
+    if (option.labelKey) {
+      return this.translationService.translate(option.labelKey);
+    }
+
+    return option.label ?? '';
+  }
 
   ngOnInit(): void {
     this.loadCategoryOptions();
@@ -132,17 +145,11 @@ export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
     }).subscribe({
       next: ({ approved, published }) => {
         const upcomingVisibleCount = (approved.totalCount ?? 0) + (published.totalCount ?? 0);
-        this.stats[0] = {
-          ...this.stats[0],
-          value: String(upcomingVisibleCount)
-        };
+        this.upcomingThisWeekCount = String(upcomingVisibleCount);
         this.cdr.detectChanges();
       },
       error: () => {
-        this.stats[0] = {
-          ...this.stats[0],
-          value: String(this.countUpcomingNonDeclinedInEvents(this.events))
-        };
+        this.upcomingThisWeekCount = String(this.countUpcomingNonDeclinedInEvents(this.events));
       }
     });
   }
@@ -209,7 +216,7 @@ export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       },
       error: (error) => {
-        this.errorMessage = error?.error?.message ?? 'Failed to load events';
+        this.errorMessage = error?.error?.message ?? this.translationService.translate('contentCreator.events.error.load');
         this.isLoading = false;
         this.cdr.detectChanges();
       }
@@ -357,6 +364,18 @@ export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
     }
   }
 
+  humanizeStatus(status?: string | null): string {
+    const normalized = status?.trim().toLowerCase();
+    if (!normalized) {
+      return this.translationService.translate('contentCreator.events.status.draft');
+    }
+
+    const translated = this.translationService.translate(`contentCreator.events.status.${normalized}`);
+    return translated === `contentCreator.events.status.${normalized}`
+      ? status!
+      : translated;
+  }
+
   getRejectionReason(event: EventDto | null): string {
     const reason = event?.rejectionReason?.trim();
     if (!reason || (event?.status ?? '').toLowerCase() !== 'rejected') {
@@ -373,7 +392,7 @@ export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
   formatDate(date: string | Date | undefined): string {
     if (!date) return '-';
     const d = new Date(date);
-    return d.toLocaleDateString('en-US', {
+    return d.toLocaleString(this.translationService.currentLocale(), {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
@@ -383,27 +402,27 @@ export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
   }
 
   getCategoryLabel(event: EventDto): string {
-    return event.eventTypeName?.trim() || 'Uncategorized';
+    return event.eventTypeName?.trim() || this.translationService.translate('contentCreator.events.uncategorized');
   }
 
   getLocationLabel(event: EventDto): string {
-    return event.objectName || event.localityName || event.destinationName || '-';
+    return event.objectName || event.localityName || event.destinationName || this.translationService.translate('common.notAvailable');
   }
 
   getDestinationLabel(event: EventDto): string {
-    return event.destinationName || event.localityName || event.objectName || '-';
+    return event.destinationName || event.localityName || event.objectName || this.translationService.translate('common.notAvailable');
   }
 
   getDestinationSubLabel(event: EventDto): string {
     if (event.destinationName) {
-      return event.localityName || event.objectName || '—';
+      return event.localityName || event.objectName || this.translationService.translate('common.notAvailable');
     }
 
     if (event.localityName) {
-      return event.objectName || '—';
+      return event.objectName || this.translationService.translate('common.notAvailable');
     }
 
-    return '—';
+    return this.translationService.translate('common.notAvailable');
   }
 
   getDestinationLocalityLabel(event: EventDto): string {
@@ -411,15 +430,17 @@ export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
       return event.localityName.trim();
     }
 
-    return 'Glavna destinacija';
+      return this.translationService.translate('contentCreator.events.primaryDestination');
   }
 
   getCapacityLabel(event: EventDto): string {
     if (!event.maxVisitors) {
-      return '—';
+      return this.translationService.translate('common.notAvailable');
     }
 
-    return `${new Intl.NumberFormat('en-US').format(event.maxVisitors)} max`;
+    return this.translationService.translate('contentCreator.events.capacityMax', {
+      count: new Intl.NumberFormat(this.translationService.currentLocale()).format(event.maxVisitors),
+    });
   }
 
   getTicketPriceLabel(): string {
@@ -452,7 +473,7 @@ export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
 
   getSelectedSummary(event: EventDto | null): string {
     if (!event?.description) {
-      return 'A featured event selected from the creator workspace. Use this panel to inspect the schedule, media, and staffing for the event.';
+      return this.translationService.translate('contentCreator.events.noDescription');
     }
 
     return event.description;
@@ -463,8 +484,7 @@ export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
       return '…';
     }
 
-    const count = this.totalCount;
-    return `${count} event${count === 1 ? '' : 's'}`;
+    return this.translationService.translate('contentCreator.events.totalCount', { count: this.totalCount });
   }
 
   get pageStart(): number {
@@ -488,7 +508,26 @@ export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
   }
 
   get selectedInsightCards(): EventInsightCard[] {
-    return this.stats;
+    return [
+      {
+        label: this.translationService.translate('contentCreator.events.stats.upcomingThisWeek'),
+        value: this.upcomingThisWeekCount,
+        hint: this.translationService.translate('contentCreator.events.stats.next7DaysHint'),
+        tone: 'blue',
+      },
+      {
+        label: this.translationService.translate('contentCreator.events.stats.publishedOnPage'),
+        value: this.publishedOnPageCount,
+        hint: this.translationService.translate('contentCreator.events.stats.pageVisibilityHint'),
+        tone: 'green',
+      },
+      {
+        label: this.translationService.translate('contentCreator.events.stats.capacityConfigured'),
+        value: this.capacityConfiguredRate,
+        hint: this.translationService.translate('contentCreator.events.stats.capacityConfiguredHint'),
+        tone: 'amber',
+      },
+    ];
   }
 
   get selectedSchedule(): EventScheduleRow[] {
@@ -497,10 +536,10 @@ export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
     }
 
     return [
-      { label: 'Starts', value: this.formatDate(this.selectedEvent.startDate) },
-      { label: 'Ends', value: this.formatDate(this.selectedEvent.endDate ?? this.selectedEvent.startDate) },
-      { label: 'Location', value: this.getLocationLabel(this.selectedEvent) },
-      { label: 'Category', value: this.getCategoryLabel(this.selectedEvent) }
+      { label: this.translationService.translate('contentCreator.events.schedule.starts'), value: this.formatDate(this.selectedEvent.startDate) },
+      { label: this.translationService.translate('contentCreator.events.schedule.ends'), value: this.formatDate(this.selectedEvent.endDate ?? this.selectedEvent.startDate) },
+      { label: this.translationService.translate('contentCreator.events.schedule.location'), value: this.getLocationLabel(this.selectedEvent) },
+      { label: this.translationService.translate('contentCreator.events.schedule.category'), value: this.getCategoryLabel(this.selectedEvent) }
     ];
   }
 
@@ -518,7 +557,7 @@ export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
 
   get selectedEventLocationLabel(): string {
     if (!this.selectedEvent) {
-      return 'Selected event';
+      return this.translationService.translate('contentCreator.events.selectedEvent');
     }
 
     const location = this.selectedEvent.localityName || this.selectedEvent.destinationName || this.selectedEvent.objectName;
@@ -642,7 +681,7 @@ export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
           .map((name) => ({ value: name, label: name }));
 
         this.categoryOptions = dynamicCategories.length > 0
-          ? [{ value: 'all', label: 'All Categories' }, ...dynamicCategories]
+          ? [{ value: 'all', labelKey: 'contentCreator.events.filters.allCategories' }, ...dynamicCategories]
           : [...this.fallbackCategoryOptions];
 
         if (!this.categoryOptions.some((option) => option.value === this.categoryFilter)) {
@@ -663,11 +702,11 @@ export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
       .sort((a, b) => a.localeCompare(b))
       .map((status) => ({
         value: status.toLowerCase(),
-        label: this.toTitleCase(status)
+        label: this.humanizeStatus(status)
       }));
 
     this.statusOptions = dynamicStatuses.length > 0
-      ? [{ value: 'all', label: 'All Statuses' }, ...dynamicStatuses]
+      ? [{ value: 'all', labelKey: 'contentCreator.events.filters.allStatuses' }, ...dynamicStatuses]
       : [...this.fallbackStatusOptions];
 
     if (!this.statusOptions.some((option) => option.value === this.statusFilter)) {
@@ -686,24 +725,8 @@ export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
       ? Math.round((configuredCapacityCount / items.length) * 100)
       : 0;
 
-    this.stats[1] = {
-      ...this.stats[1],
-      value: String(publishedCount)
-    };
-
-    this.stats[2] = {
-      ...this.stats[2],
-      value: `${capacityConfiguredRate}%`
-    };
-  }
-
-  private toTitleCase(value: string): string {
-    return value
-      .toLowerCase()
-      .split(/\s+/)
-      .filter(Boolean)
-      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
+    this.publishedOnPageCount = String(publishedCount);
+    this.capacityConfiguredRate = `${capacityConfiguredRate}%`;
   }
 
 }

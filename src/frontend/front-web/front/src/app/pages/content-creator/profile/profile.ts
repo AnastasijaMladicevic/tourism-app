@@ -35,14 +35,14 @@ export class ProfileComponentContentCreator implements OnInit, OnDestroy {
     `${environment.apiUrl.replace('/api', '')}/images/profiles/default_icon.png`;
 
   readonly permissionItems: PermissionItem[] = [
-    { labelKey: 'Create objects, events, and activities', detailKey: 'Content Creator can create new objects, events, and activities, and they start in Pending state.', icon: 'add_circle' },
-    { labelKey: 'Edit own published content', detailKey: 'Content Creator can update only their own objects, events, and activities.', icon: 'edit' },
-    { labelKey: 'Delete own unpublished content', detailKey: 'Content Creator can delete only their own content before it is Approved.', icon: 'delete' },
-    { labelKey: 'Manage content images', detailKey: 'Content Creator can add images to their own objects, events, and activities.', icon: 'image' },
-    { labelKey: 'Respond to reviews', detailKey: 'Content Creator can reply to reviews on their own objects and edit or delete that reply.', icon: 'rate_review' },
-    { labelKey: 'Request deletions', detailKey: 'Content Creator can request deletion of their own Approved objects, events, and activities.', icon: 'request_page' },
-    { labelKey: 'View own deletion requests', detailKey: 'Content Creator can list and inspect only their own deletion requests.', icon: 'list_alt' },
-    { labelKey: 'View dashboard overview', detailKey: 'Content Creator can open the content creator dashboard overview.', icon: 'dashboard' },
+    { labelKey: 'contentCreatorProfile.permissions.createContentLabel', detailKey: 'contentCreatorProfile.permissions.createContentDetail', icon: 'add_circle' },
+    { labelKey: 'contentCreatorProfile.permissions.editPublishedLabel', detailKey: 'contentCreatorProfile.permissions.editPublishedDetail', icon: 'edit' },
+    { labelKey: 'contentCreatorProfile.permissions.deletePendingLabel', detailKey: 'contentCreatorProfile.permissions.deletePendingDetail', icon: 'delete' },
+    { labelKey: 'contentCreatorProfile.permissions.manageImagesLabel', detailKey: 'contentCreatorProfile.permissions.manageImagesDetail', icon: 'image' },
+    { labelKey: 'contentCreatorProfile.permissions.respondReviewsLabel', detailKey: 'contentCreatorProfile.permissions.respondReviewsDetail', icon: 'rate_review' },
+    { labelKey: 'contentCreatorProfile.permissions.requestDeletionLabel', detailKey: 'contentCreatorProfile.permissions.requestDeletionDetail', icon: 'request_page' },
+    { labelKey: 'contentCreatorProfile.permissions.viewDeletionRequestsLabel', detailKey: 'contentCreatorProfile.permissions.viewDeletionRequestsDetail', icon: 'list_alt' },
+    { labelKey: 'contentCreatorProfile.permissions.viewDashboardLabel', detailKey: 'contentCreatorProfile.permissions.viewDashboardDetail', icon: 'dashboard' },
   ];
 
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;

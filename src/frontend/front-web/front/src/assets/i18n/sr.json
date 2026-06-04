@@ -44,7 +44,20 @@
     "contentItems": "stavki sadržaja",
     "objects": "Objekti",
     "events": "Događaji",
-    "activities": "Aktivnosti"
+    "activities": "Aktivnosti",
+    "object": "Objekat",
+    "activity": "Aktivnost",
+    "edit": "Izmeni",
+    "userFallbackInitial": "K",
+    "time": {
+      "justNow": "upravo sada",
+      "minutesAgoShort": "pre {{count}}m",
+      "hoursAgoShort": "pre {{count}}h",
+      "daysAgoShort": "pre {{count}}d",
+      "weeksAgoShort": "pre {{count}}n",
+      "monthsAgoShort": "pre {{count}}mes",
+      "yearsAgoShort": "pre {{count}}g"
+    }
   },
   "paginator": {
     "of": "od",
@@ -573,12 +586,14 @@
       "topContent": "Najuspesniji sadrzaj",
       "topContentSubtitle": "Objekti, dogadjaji i aktivnosti sa najjacim angažovanjem",
       "manageContent": "Upravljaj sadrzajem",
+      "scoreValue": "rezultat {{score}}",
       "noDestination": "Nema destinacije",
       "noRegion": "Nema regiona",
       "favorites": "omiljene stavke",
       "plannerAdds": "dodavanja u planer",
       "reviews": "recenzije",
       "avgRating": "prosecna ocena",
+      "averageRatingAria": "Prosečna ocena {{rating}} od 5",
       "noContentEngagement": "Nema dostupnih podataka o angazovanju za ovaj period.",
       "topDestinations": "Najuspesnije destinacije",
       "topDestinationsSubtitle": "Ucinak destinacija iz tvojeg sadrzaja",
@@ -586,7 +601,8 @@
       "upcomingEvents": "Naredni dogadjaji",
       "upcomingEventsSubtitle": "{{count7}} u narednih 7 dana · {{count30}} u narednih 30 dana",
       "openEvents": "Otvori dogadjaje",
-      "noUpcomingEvents": "Nema odobrenih dogadjaja u narednih 30 dana."
+      "noUpcomingEvents": "Nema odobrenih dogadjaja u narednih 30 dana.",
+      "loadError": "Podaci kontrolne table kreatora sadržaja trenutno ne mogu da se učitaju."
     }
   },
   "auth": {
@@ -740,7 +756,27 @@
       "manageReportsDetail": "Kreiraj izveštaje, prikaži svoje izveštaje i povuci svoje izveštaje."
     }
   },
-    "manager": {
+  "contentCreatorProfile": {
+    "permissions": {
+      "createContentLabel": "Kreiraj objekte, događaje i aktivnosti",
+      "createContentDetail": "Kreiraj nove objekte, događaje i aktivnosti koji ulaze u tok pregleda menadžera.",
+      "editPublishedLabel": "Izmeni sopstveni objavljeni sadržaj",
+      "editPublishedDetail": "Ažuriraj samo sopstvene objekte, događaje i aktivnosti koji su objavljeni ili na čekanju.",
+      "deletePendingLabel": "Obriši sopstveni neobjavljeni sadržaj",
+      "deletePendingDetail": "Obriši sopstveni sadržaj pre nego što dobije odobren status.",
+      "manageImagesLabel": "Upravljaj slikama sadržaja",
+      "manageImagesDetail": "Dodaj i organizuj slike za sopstvene objekte, događaje i aktivnosti.",
+      "respondReviewsLabel": "Odgovaraj na recenzije",
+      "respondReviewsDetail": "Odgovaraj na recenzije svojih objekata i upravljaj tim odgovorima.",
+      "requestDeletionLabel": "Zatraži brisanja",
+      "requestDeletionDetail": "Zatraži brisanje sopstvenih odobrenih objekata, događaja i aktivnosti.",
+      "viewDeletionRequestsLabel": "Pregledaj sopstvene zahteve za brisanje",
+      "viewDeletionRequestsDetail": "Prati status zahteva za brisanje koje si već poslao.",
+      "viewDashboardLabel": "Pregledaj kontrolnu tablu",
+      "viewDashboardDetail": "Otvori pregled kontrolne table kreatora sadržaja."
+    }
+  },
+  "manager": {
       "events": {
         "searchAria": "Pretraži događaje",
         "searchPlaceholder": "Pretraži događaje, objekte ili organizatore...",
@@ -2031,6 +2067,331 @@
     "setPasswordHeading": "Postavi novu lozinku"
 
   },
+  "contentCreator": {
+    "objects": {
+      "eyebrow": "Upravljanje objektima",
+      "title": "Objekti",
+      "createObject": "Kreiraj objekat",
+      "searchPlaceholder": "Pretraži po nazivu, kategoriji ili regionu...",
+      "loading": "Učitavanje objekata...",
+      "totalCount": "Ukupno: {{count}} objekata",
+      "details": "Detalji",
+      "destination": "Destinacija",
+      "locality": "Lokalitet",
+      "description": "Opis",
+      "reviews": "Recenzije",
+      "selectedObject": "Izabrani objekat",
+      "featuredObject": "Izdvojeni objekat",
+      "noDescription": "Opis nije dodat za ovaj objekat.",
+      "noCoordinates": "Koordinate nisu dostupne za ovaj objekat.",
+      "filters": {
+        "status": "Status",
+        "type": "Tip",
+        "rating": "Ocena",
+        "sortBy": "Sortiraj po",
+        "order": "Redosled",
+        "ascending": "Rastuće",
+        "descending": "Opadajuće",
+        "apply": "Primeni",
+        "reset": "Resetuj",
+        "allStatuses": "Svi statusi",
+        "allTypes": "Svi tipovi",
+        "anyRating": "Bilo koja ocena",
+        "name": "Naziv",
+        "createdDate": "Datum kreiranja"
+      },
+      "stats": {
+        "totalObjects": "Ukupno objekata",
+        "matchingFilters": "Odgovara aktivnim filterima",
+        "onThisPage": "Na ovoj stranici",
+        "visibleRows": "Vidljivi redovi",
+        "averageRating": "Prosečna ocena",
+        "acrossPage": "Na trenutnoj stranici"
+      },
+      "table": {
+        "status": "Status",
+        "objectDetails": "Detalji objekta",
+        "type": "Tip",
+        "destination": "Destinacija",
+        "rating": "Ocena",
+        "action": "Akcija"
+      },
+      "empty": {
+        "filtered": "Nema objekata za izabrane filtere.",
+        "pickObjectBody": "Izaberi objekat iz tabele da vidiš detalje."
+      },
+      "status": {
+        "published": "Objavljeno",
+        "approved": "Odobreno",
+        "pending": "Na čekanju",
+        "draft": "Nacrt",
+        "rejected": "Odbijeno"
+      },
+      "error": {
+        "load": "Učitavanje objekata nije uspelo."
+      }
+    },
+    "events": {
+      "eyebrow": "Upravljanje događajima",
+      "title": "Događaji i rasporedi",
+      "createEvent": "Kreiraj novi događaj",
+      "searchPlaceholder": "Pretraži događaje, objekte ili organizatore...",
+      "dateRangeFilter": "Filter opsega datuma",
+      "fromDate": "Od datuma",
+      "toDate": "Do datuma",
+      "loading": "Učitavanje događaja...",
+      "selectedEvent": "Izabrani događaj",
+      "featuredEvent": "Izdvojeni događaj",
+      "rejectionReason": "Razlog odbijanja",
+      "capacity": "Kapacitet",
+      "description": "Opis",
+      "noDescription": "Izdvojeni događaj iz kreator radnog prostora. U ovom panelu proveravaš raspored, medije i detalje događaja.",
+      "noCoordinates": "Koordinate nisu dostupne za ovaj događaj.",
+      "uncategorized": "Bez kategorije",
+      "primaryDestination": "Glavna destinacija",
+      "capacityMax": "maks. {{count}}",
+      "totalCount": "Ukupno: {{count}} događaja",
+      "filters": {
+        "status": "Status",
+        "category": "Kategorija",
+        "allStatuses": "Svi statusi",
+        "allCategories": "Sve kategorije",
+        "sortBy": "Sortiraj po",
+        "startDate": "Datum početka",
+        "name": "Naziv",
+        "order": "Redosled",
+        "ascending": "Rastuće",
+        "descending": "Opadajuće",
+        "apply": "Primeni",
+        "reset": "Resetuj"
+      },
+      "categories": {
+        "festival": "Festival",
+        "workshop": "Radionica",
+        "sports": "Sport",
+        "cultural": "Kulturni",
+        "exhibition": "Izložba",
+        "concert": "Koncert"
+      },
+      "stats": {
+        "upcomingThisWeek": "Predstojeće ove nedelje",
+        "next7DaysHint": "Događaji objavljeni u narednih 7 dana",
+        "publishedOnPage": "Objavljeno na stranici",
+        "pageVisibilityHint": "Objavljeni ili odobreni događaji na trenutnoj stranici tabele",
+        "capacityConfigured": "Podešen kapacitet",
+        "capacityConfiguredHint": "Udeo vidljivih događaja sa podešenim maksimalnim brojem posetilaca"
+      },
+      "table": {
+        "status": "Status",
+        "eventDetails": "Detalji događaja",
+        "destination": "Destinacija",
+        "category": "Kategorija",
+        "capacity": "Kapacitet",
+        "action": "Akcija"
+      },
+      "schedule": {
+        "title": "Raspored",
+        "starts": "Počinje",
+        "ends": "Završava",
+        "location": "Lokacija",
+        "category": "Kategorija"
+      },
+      "empty": {
+        "noEventSelected": "Nijedan događaj nije izabran",
+        "pickEventTitle": "Izaberi događaj iz tabele",
+        "pickEventBody": "Izaberi red da pregledaš medije, raspored i detalje u desnom panelu."
+      },
+      "status": {
+        "published": "Objavljeno",
+        "approved": "Odobreno",
+        "pending": "Na čekanju",
+        "draft": "Nacrt",
+        "rejected": "Odbijeno",
+        "cancelled": "Otkazano"
+      },
+      "error": {
+        "load": "Učitavanje događaja nije uspelo."
+      }
+    },
+    "activities": {
+      "eyebrow": "Upravljanje aktivnostima",
+      "title": "Aktivnosti",
+      "createActivity": "Dodaj aktivnost",
+      "searchPlaceholder": "Pretraži aktivnosti, tipove ili destinacije...",
+      "loading": "Učitavanje aktivnosti...",
+      "selectedActivity": "Izabrana aktivnost",
+      "featuredActivity": "Izdvojena aktivnost",
+      "duration": "Trajanje",
+      "activityInfo": "Informacije o aktivnosti",
+      "destination": "Destinacija",
+      "locality": "Lokalitet",
+      "object": "Objekat",
+      "coordinates": "Koordinate",
+      "created": "Kreirano",
+      "updated": "Ažurirano",
+      "description": "Opis",
+      "noDescription": "Izdvojena aktivnost iz kreator radnog prostora. U ovom panelu proveravaš lokaciju, logistiku i metapodatke aktivnosti.",
+      "noCoordinates": "Koordinate nisu dostupne za ovu aktivnost.",
+      "oneHour": "1 sat",
+      "hours": "{{count}} sati",
+      "hoursMinutes": "{{hours}}h {{minutes}}m",
+      "totalCount": "Ukupno: {{count}} aktivnosti",
+      "filters": {
+        "status": "Status",
+        "allStatuses": "Svi statusi",
+        "type": "Tip",
+        "destination": "Destinacija",
+        "sortBy": "Sortiraj po",
+        "createdDate": "Datum kreiranja",
+        "order": "Redosled",
+        "ascending": "Rastuće",
+        "descending": "Opadajuće",
+        "apply": "Primeni",
+        "reset": "Resetuj",
+        "allTypes": "Svi tipovi",
+        "allDestinations": "Sve destinacije"
+      },
+      "stats": {
+        "totalActivities": "Ukupno aktivnosti",
+        "matchingFilters": "Odgovara aktivnim filterima",
+        "onThisPage": "Na ovoj stranici",
+        "visibleRows": "Vidljivi redovi",
+        "pendingReview": "Na čekanju za pregled"
+      },
+      "table": {
+        "status": "Status",
+        "activityDetails": "Detalji aktivnosti",
+        "type": "Tip",
+        "destination": "Destinacija",
+        "duration": "Trajanje",
+        "action": "Akcija"
+      },
+      "empty": {
+        "noActivitySelected": "Nijedna aktivnost nije izabrana",
+        "pickActivityTitle": "Izaberi aktivnost iz tabele",
+        "pickActivityBody": "Izaberi red da pregledaš medije, raspored i logistiku u desnom panelu."
+      },
+      "status": {
+        "published": "Objavljeno",
+        "approved": "Odobreno",
+        "pending": "Na čekanju",
+        "draft": "Nacrt",
+        "archived": "Arhivirano",
+        "rejected": "Odbijeno"
+      },
+      "error": {
+        "load": "Učitavanje aktivnosti nije uspelo."
+      }
+    },
+    "reviews": {
+      "title": "Moderacija recenzija",
+      "queue": "Red",
+      "count": "{{count}} recenzija",
+      "loading": "Učitavanje recenzija...",
+      "loadingImages": "Učitavanje slika...",
+      "reviewLabel": "Recenzija #{{id}}",
+      "statusLabel": "Status",
+      "deleteResponse": "Obriši odgovor",
+      "reviewingItem": "Recenzirani sadržaj",
+      "objectImages": "Slike objekta ({{count}})",
+      "objectImageAlt": "Slika objekta",
+      "responsePlaceholder": "Ovde napiši profesionalan odgovor turisti...",
+      "characterCount": "Broj karaktera: {{count}} / 1000",
+      "sendResponse": "Pošalji odgovor",
+      "updateResponse": "Ažuriraj odgovor",
+      "reviewerInsight": "Uvid o recenzentu",
+      "reviewer": "Recenzent",
+      "reviewDetails": "Detalji recenzije",
+      "reviewId": "ID recenzije",
+      "created": "Kreirano",
+      "object": "Objekat",
+      "responseLog": "Evidencija odgovora",
+      "response": "Odgovor",
+      "sent": "Poslato",
+      "noResponseYet": "Odgovor još nije poslat.",
+      "filters": {
+        "allRatings": "Sve ocene",
+        "filterByObject": "Filtriraj po objektu",
+        "allObjects": "Svi objekti",
+        "all": "Sve",
+        "pendingReply": "Bez odgovora",
+        "responded": "Sa odgovorom kreatora",
+        "reset": "Resetuj",
+        "searchPlaceholder": "Pretraži recenzenta, objekat ili sadržaj..."
+      },
+      "status": {
+        "responded": "Odgovoreno",
+        "awaitingReply": "Čeka odgovor"
+      },
+      "templates": {
+        "thankYou": "Hvala",
+        "thankYouText": "Hvala vam na povratnoj informaciji i poseti našoj lokaciji.",
+        "addressingIssues": "Radimo na problemu",
+        "addressingIssuesText": "Hvala vam na povratnoj informaciji. Već radimo na navedenom problemu.",
+        "needDetails": "Treba više detalja",
+        "needDetailsText": "Hvala vam na povratnoj informaciji. Voleli bismo da ovo detaljnije istražimo."
+      },
+      "empty": {
+        "forObjectNamed": "Nema recenzija za {{name}}.",
+        "forObject": "Nema recenzija za ovaj objekat.",
+        "none": "Nema recenzija za tvoje objekte.",
+        "thread": "Izaberi recenziju iz reda da vidiš detalje i odgovoriš.",
+        "context": "Uvid o recenzentu će se pojaviti nakon izbora recenzije."
+      },
+      "fallback": {
+        "object": "Objekat #{{id}}"
+      },
+      "success": {
+        "responseSent": "Odgovor je uspešno poslat.",
+        "responseDeleted": "Odgovor je uspešno obrisan."
+      },
+      "error": {
+        "load": "Učitavanje recenzija nije uspelo.",
+        "responseRequired": "Odgovor ne može biti prazan.",
+        "responseSend": "Slanje odgovora nije uspelo.",
+        "responseDelete": "Brisanje odgovora nije uspelo."
+      },
+      "noImages": "Nema dostupnih slika objekta."
+    },
+    "eventForm": {
+      "createTitle": "Kreiraj događaj", "editTitle": "Izmeni događaj", "createAction": "Kreiraj događaj", "updateAction": "Ažuriraj događaj", "subtitle": "Kreiraj stranicu događaja, upravljaj lokacijom i pripremi raspored u okviru kreator radnog prostora.", "step1": "KORAK 1", "step2": "KORAK 2", "step3": "KORAK 3", "step4": "KORAK 4", "step5": "KORAK 5", "generalInformation": "Opšte informacije", "generalInformationIntro": "Osnovni podaci o tvom predstojećem događaju.", "eventTitle": "Naziv događaja", "eventTitlePlaceholder": "npr. Letnji džez festival 2024", "eventType": "Tip događaja", "selectType": "Izaberi tip", "organizer": "Organizator", "region": "Region", "allRegions": "Svi regioni", "destination": "Destinacija", "selectDestination": "Izaberi destinaciju", "selectRegionFirst": "Prvo izaberi region", "object": "Objekat", "selectObject": "Izaberi objekat", "selectDestinationFirst": "Prvo izaberi destinaciju", "noObjectsForDestination": "Nema objekata za izabranu destinaciju.", "fullDescription": "Pun opis", "descriptionPlaceholder": "Napiši detaljan opis i objasni šta gosti mogu da očekuju...", "schedule": "Raspored", "scheduleIntro": "Kada i kako često se događaj održava.", "startDateTime": "Datum i vreme početka", "endDateTime": "Datum i vreme završetka", "timezone": "Vremenska zona", "ticketingCapacity": "Karte i kapacitet", "capacity": "Kapacitet", "capacityPlaceholder": "500", "categorization": "Kategorizacija i ograničenja", "categorizationIntro": "Tagovi i pravila pristupa za prikaz događaja.", "tagsCategories": "Tagovi i kategorije", "addTagPlaceholder": "Dodaj tag...", "ageRestriction": "Starosno ograničenje", "selectRestriction": "Izaberi ograničenje", "mediaGallery": "Medijska galerija", "mediaGalleryIntro": "Otpremi do 8 slika i izaberi glavnu naslovnu sliku.", "addPhotos": "Dodaj fotografije", "dropzoneCopy": "Izaberi lokalne slike ili ih prevuci ovde. Otpremiće se nakon čuvanja događaja.", "imagesSelected": "{{count}} izabranih slika", "selectImageFiles": "Izaberi jednu ili više slika...", "addPhoto": "Dodaj fotografiju", "eventImageAlt": "Pregled slike događaja", "primary": "Glavna", "setPrimary": "Postavi kao glavnu", "noImagesHelp": "Dodaj jednu ili više slika iznad. Slike se čuvaju kada kreiraš ili ažuriraš događaj.", "locationIntelligence": "Objekat i lokacijska analiza", "locationIntelligenceHint": "Izaberi povezani objekat i označi tačnu lokaciju događaja na mapi.", "linkedObjectLabel": "Povezani objekat:", "linkedObject": "Povezani objekat", "noLinkedObjectSelected": "Nijedan povezani objekat nije izabran", "noAddressAvailable": "Adresa nije dostupna", "usingDestinationCoordinates": "Koriste se koordinate destinacije {{destination}}.", "locationHint": "Izaberi destinaciju i, po želji, objekat za prikaz mape desno.", "creatorTips": "Saveti za kreatora", "learnMore": "Saznaj više o događajima", "activityDurationMinutes": "{{count}} min", "tips": { "tip1": "Događaji sa kvalitetnim naslovnim slikama imaju više angažmana.", "tip2": "Poveži događaj sa konkretnim objektom radi automatskih smernica.", "tip3": "Jasno vreme početka i kraja pomaže pri izvozu kalendara." }, "playbookTitle": "Vodič za kreatora događaja", "playbookBody": "Koristi događaje povezane sa objektom i precizne koordinate kako bi gosti lako stigli do lokacije. Uskladi naziv, raspored i cene karata sa povezanim aktivnostima radi boljeg otkrivanja.", "playbookTips": { "tip1": "Kad god je moguće koristi istu destinaciju i objekat kao povezane aktivnosti.", "tip2": "Postavi pin mape blizu stvarnog ulaza, ne samo centra grada.", "tip3": "Dodaj makar jednu povezanu aktivnost za potpuniji dnevni plan." }, "delete": { "requestTitle": "Zatraži brisanje", "confirmTitle": "Potvrdi brisanje", "requestDescription": "Ovaj događaj je odobren, pa je za uklanjanje potreban zahtev menadžeru.", "confirmDescription": "Ovaj događaj je još na čekanju, pa može odmah da se obriše.", "managerReviewNote": "Menadžer će pregledati zahtev pre uklanjanja događaja.", "cannotUndo": "Ova radnja ne može da se poništi.", "requestAction": "Zatraži brisanje", "requested": "Brisanje zatraženo", "alreadyRequested": "Već zatraženo", "submitting": "Slanje...", "deleting": "Brisanje...", "deleteAction": "Obriši", "deleteEventAction": "Obriši događaj" }, "success": { "created": "Događaj je uspešno kreiran!", "updated": "Događaj je uspešno ažuriran!", "deleted": "Događaj je uspešno obrisan.", "deletionRequested": "Zahtev za brisanje je poslat. Menadžer mora da ga pregleda pre uklanjanja događaja." }, "errors": { "loadEditFailed": "Događaj nije pronađen ili nemaš dozvolu za izmenu.", "uploadLimit": "Možeš otpremiti najviše {{count}} slika po događaju.", "duplicateImages": "Duplirane slike su preskočene: {{files}}", "partialUpload": "Dodato je samo prvih {{accepted}} slika. Događaj može imati najviše {{count}} slika.", "imageRequired": "Potrebna je bar jedna slika pre čuvanja.", "endAfterStart": "Datum i vreme završetka moraju biti posle početka.", "endAfterStartShort": "Kraj mora biti posle početka.", "saveFailed": "Čuvanje događaja nije uspelo", "imageUploadAfterCreate": "Događaj je kreiran, ali otpremanje slika nije uspelo. Dodaj ih preko izmene.", "deletionRequestFailed": "Slanje zahteva za brisanje nije uspelo", "deleteFailed": "Brisanje događaja nije uspelo" }
+    },
+    "activityForm": {
+      "createTitle": "Kreiraj aktivnost", "editTitle": "Izmeni aktivnost", "createAction": "Kreiraj aktivnost", "updateAction": "Ažuriraj aktivnost", "creating": "Kreiranje...", "updating": "Ažuriranje...", "subtitle": "Kreiraj i uređuj aktivnosti sa lokacijom, logistikom i galerijom.", "step1": "KORAK 1", "step2": "KORAK 2", "step3": "KORAK 3", "coreDetails": "Osnovni detalji", "coreDetailsIntro": "Postavi osnovni identitet svog iskustva.", "activityName": "Naziv aktivnosti", "activityNamePlaceholder": "npr. Let balonom u izlazak sunca", "description": "Opis", "descriptionPlaceholder": "Detaljno opiši iskustvo, šta ga čini posebnim i šta putnici mogu da očekuju.", "logistics": "Logistika i klasifikacija", "logisticsIntro": "Definiši gde, kada i po kojoj ceni.", "activityType": "Tip aktivnosti", "selectActivityType": "Izaberi tip aktivnosti", "enterActivityTypeId": "Unesi ID tipa aktivnosti", "region": "Region", "allRegions": "Svi regioni", "destination": "Destinacija", "selectDestination": "Izaberi destinaciju", "selectRegionFirst": "Prvo izaberi region", "locality": "Lokalitet", "selectLocality": "Izaberi lokalitet", "selectDestinationFirst": "Prvo izaberi destinaciju", "touristObject": "Turistički objekat", "minutesShort": "MIN", "mediaGallery": "Medijska galerija", "mediaGalleryIntro": "Otpremi do 8 slika i izaberi glavnu naslovnu sliku.", "addPhotos": "Dodaj fotografije", "dropzoneCopy": "Izaberi lokalne slike. Otpremiće se nakon čuvanja aktivnosti.", "imagesSelected": "{{count}} izabranih slika", "selectImageFiles": "Izaberi jednu ili više slika...", "addPhoto": "Dodaj fotografiju", "activityImageAlt": "Pregled slike aktivnosti", "primary": "Glavna", "setPrimary": "Postavi kao glavnu", "locationIntelligence": "Lokacijska analiza", "locationContextPlaceholder": "Postavi destinaciju/lokalitet za kontekst lokacije", "locationContextAria": "Pretraži mesto za kontekst mape", "delete": { "requestTitle": "Zatraži brisanje", "confirmTitle": "Potvrdi brisanje", "requestDescription": "Ova aktivnost je odobrena, pa je za uklanjanje potreban zahtev menadžeru.", "confirmDescription": "Ova aktivnost je još na čekanju, pa može odmah da se obriše.", "managerReviewNote": "Menadžer će pregledati zahtev pre uklanjanja aktivnosti.", "cannotUndo": "Ova radnja ne može da se poništi.", "requestAction": "Zatraži brisanje", "requested": "Brisanje zatraženo", "alreadyRequested": "Već zatraženo", "submitting": "Slanje...", "deleting": "Brisanje...", "deleteAction": "Obriši" }, "success": { "created": "Aktivnost je uspešno kreirana.", "updated": "Aktivnost je uspešno ažurirana.", "partialImageUpload": "Aktivnost je sačuvana, ali neke slike nisu mogle da se dodaju.", "deleted": "Aktivnost je uspešno obrisana.", "deletionRequested": "Zahtev za brisanje je poslat. Menadžer mora da ga pregleda pre uklanjanja aktivnosti." }, "errors": { "nameInvalid": "Naziv aktivnosti je obavezan i može imati najviše 150 karaktera.", "locationRequired": "Izaberi bar destinaciju ili lokalitet.", "typeRequired": "Tip aktivnosti je obavezan.", "imageRequired": "Potrebna je bar jedna slika pre čuvanja.", "uploadLimit": "Možeš otpremiti najviše {{count}} slika po aktivnosti.", "duplicateImages": "Duplirane slike su preskočene: {{files}}", "partialUpload": "Dodato je samo prvih {{accepted}} slika. Aktivnost može imati najviše {{count}} slika.", "saveFailed": "Čuvanje aktivnosti nije uspelo.", "deletionRequestFailed": "Slanje zahteva za brisanje nije uspelo", "deleteFailed": "Brisanje aktivnosti nije uspelo.", "loadEditFailed": "Učitavanje aktivnosti za izmenu nije uspelo." }
+    },
+    "map": {
+      "searchPlaceholder": "Pretraži objekte, događaje, aktivnosti...",
+      "filters": {
+        "hotels": "Hoteli",
+        "restaurants": "Restorani",
+        "bars": "Barovi"
+      }
+    },
+    "eventDetails": {
+      "pageEyebrow": "Događaji > Detalji događaja",
+      "titleFallback": "Detalji događaja",
+      "pageIntro": "Pregledaj rezime događaja, raspored i kontekst organizatora u okviru radnog prostora kreatora.",
+      "back": "Nazad",
+      "share": "Podeli",
+      "loading": "Učitavanje detalja događaja...",
+      "featuredEvent": "Izdvojeni događaj",
+      "rejectionReason": "Razlog odbijanja",
+      "quickFacts": "Brze informacije",
+      "about": "O ovom događaju",
+      "schedule": "Raspored",
+      "organizers": "Organizatori",
+      "objectSection": "Objekat",
+      "linkedObject": "Povezani objekat",
+      "locationContextNote": "Kontekst lokacije je povezan iz podataka događaja.",
+      "invalidId": "Neispravan ID događaja.",
+      "notFound": "Događaj nije pronađen ili nemaš dozvolu da ga vidiš.",
+      "startDate": "Datum početka",
+      "endDate": "Datum završetka",
+      "capacity": "Kapacitet",
+      "guests": "{{count}} gostiju",
+      "summaryFallback": "Ovaj prikaz događaja za kreatora objedinjeno prikazuje raspored, medije i informacije o organizatorima."
+    }
+  },
   "contentCreatorObjectForm": {
     "eyebrow": "Studio objekta",
     "createTitle": "Kreiraj objekat",
@@ -2079,6 +2440,7 @@
     "setPrimary": "Postavi kao primarnu",
     "noImagesHelp": "Otpremi bar jednu sliku da bi objekat mogao da ide na pregled i objavu.",
     "locationIntelligence": "Informacije o lokaciji",
+    "locationContextPlaceholder": "Izaberi destinaciju ili lokalitet za kontekst lokacije",
     "newObject": "Novi objekat",
     "createdBy": "Kreirao/la {{name}}",
     "creator": "Kreator",
@@ -2143,6 +2505,10 @@
       "concerning": "Sporno",
       "creatorNoReply": "Kreator još nije odgovorio.",
       "reportCreatorName": "Prijavi {{name}}",
+      "timeline": {
+        "edited": "{{created}}, izmenjeno {{updated}}",
+        "updatedOnly": "Ažurirano {{updated}}"
+      },
       "declineTitle": "Odbij objekat",
       "declineDescription": "Objasni šta treba ispraviti pre nego što ovaj objekat može da bude odobren.",
       "declinePlaceholder": "Napiši razlog odbijanja ovog objekta...",
@@ -2164,7 +2530,8 @@
       "imageRequired": "Dodaj bar jednu sliku pre slanja objekta.",
       "destinationRequired": "Izaberi destinaciju pre slanja objekta.",
       "saveFailed": "Objekat nije mogao da bude sačuvan.",
-      "loadFailed": "Objekat nije mogao da bude učitan."
+      "loadFailed": "Objekat nije mogao da bude učitan.",
+      "imageUploadAfterCreate": "Objekat je kreiran, ali otpremanje slika nije uspelo. Dodaj slike ispod."
     }
   },
   "__literals": {

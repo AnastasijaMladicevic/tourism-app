@@ -1,14 +1,14 @@
 <section class="activities-page">
   <header class="page-header">
     <div class="page-header-copy">
-      <p class="eyebrow page-header-eyebrow">Activities management</p>
-      <h1>Activities</h1>
-      <p class="page-subtitle">Total: {{ activitiesCountLabel }}</p>
+      <p class="eyebrow page-header-eyebrow">{{ 'contentCreator.activities.eyebrow' | translate }}</p>
+      <h1>{{ 'contentCreator.activities.title' | translate }}</h1>
+      <p class="page-subtitle">{{ activitiesCountLabel }}</p>
     </div>
 
     <button type="button" class="primary-btn page-header-cta" routerLink="/content-creator/activities/create">
       <span class="material-symbols-outlined">add</span>
-      <span class="page-header-cta-label">Add Activity</span>
+      <span class="page-header-cta-label">{{ 'contentCreator.activities.createActivity' | translate }}</span>
     </button>
   </header>
 
@@ -20,87 +20,65 @@
         class="toolbar-input"
         [(ngModel)]="draftSearchQuery"
         (keyup)="onSearch()"
-        placeholder="Search activities, types, or destinations..."
+        [placeholder]="'contentCreator.activities.searchPlaceholder' | translate"
       />
     </div>
-<!-- 
-    <div class="date-range-pill" aria-label="Date range filter">
-      <span class="material-symbols-outlined">calendar_month</span>
-      <div class="date-range-inputs">
-        <input
-          type="date"
-          class="date-range-input"
-          [(ngModel)]="rangeStartDate"
-          (ngModelChange)="onDateRangeChange()"
-          aria-label="From date"
-        />
-        <span class="date-range-separator">-</span>
-        <input
-          type="date"
-          class="date-range-input"
-          [(ngModel)]="rangeEndDate"
-          (ngModelChange)="onDateRangeChange()"
-          aria-label="To date"
-        />
-      </div>
-    </div> -->
-
   </div>
 
   @if (filterPanelOpen) {
     <div class="filters-panel card">
       <label>
-        <span>Status</span>
+        <span>{{ 'contentCreator.activities.filters.status' | translate }}</span>
         <select [(ngModel)]="statusFilter">
           <option *ngFor="let option of statusOptions" [value]="option.value">
-            {{ option.label }}
+            {{ translateOptionLabel(option) }}
           </option>
         </select>
       </label>
 
       <label>
-        <span>Type</span>
+        <span>{{ 'contentCreator.activities.filters.type' | translate }}</span>
         <select [(ngModel)]="typeFilter" (ngModelChange)="onFilterChange()">
-          <option value="all">All Types</option>
+          <option value="all">{{ 'contentCreator.activities.filters.allTypes' | translate }}</option>
           <option *ngFor="let option of typeOptions" [value]="option.value">
-            {{ option.label }}
+            {{ translateOptionLabel(option) }}
           </option>
         </select>
       </label>
 
       <label>
-        <span>Destination</span>
+        <span>{{ 'contentCreator.activities.filters.destination' | translate }}</span>
         <select [(ngModel)]="destinationFilter" (ngModelChange)="onFilterChange()">
-          <option value="all">All Destinations</option>
+          <option value="all">{{ 'contentCreator.activities.filters.allDestinations' | translate }}</option>
           <option *ngFor="let option of destinationOptions" [value]="option.value">
-            {{ option.label }}
+            {{ translateOptionLabel(option) }}
           </option>
         </select>
       </label>
 
       <label>
-        <span>Sort by</span>
+        <span>{{ 'contentCreator.activities.filters.sortBy' | translate }}</span>
         <select [(ngModel)]="sortBy">
           <option *ngFor="let option of sortByOptions" [value]="option.value">
-            {{ option.label }}
+            {{ translateOptionLabel(option) }}
           </option>
         </select>
       </label>
 
       <label>
-        <span>Order</span>
+        <span>{{ 'contentCreator.activities.filters.order' | translate }}</span>
         <select [(ngModel)]="sortOrder">
-          <option value="asc">Ascending</option>
-          <option value="desc">Descending</option>
+          <option value="asc">{{ 'contentCreator.activities.filters.ascending' | translate }}</option>
+          <option value="desc">{{ 'contentCreator.activities.filters.descending' | translate }}</option>
         </select>
       </label>
 
       <div class="filter-actions">
         <button type="button" class="primary-btn filter-btn" (click)="onApplyFilters()">
-          Apply
+          {{ 'contentCreator.activities.filters.apply' | translate }}
         </button>
         <button type="button" class="ghost-btn filter-btn secondary" (click)="onResetFilters()">
-          Reset
+          {{ 'contentCreator.activities.filters.reset' | translate }}
         </button>
       </div>
     </div>
@@ -124,7 +102,7 @@
 
       <div class="table-card">
         @if (isLoading) {
-          <div class="state state-loading">Loading activities...</div>
+          <div class="state state-loading">{{ 'contentCreator.activities.loading' | translate }}</div>
         } @else if (errorMessage) {
           <div class="state state-error">{{ errorMessage }}</div>
         } @else {
@@ -143,7 +121,7 @@
                   <div class="activity-mobile-card__head">
                     <h3>{{ activity.name }}</h3>
                     <span class="status-chip status-chip--compact" [ngClass]="getStatusClass(activity.status)">
-                      {{ activity.status || 'Draft' }}
+                      {{ translateStatus(activity.status) }}
                     </span>
                   </div>
                   <p class="activity-mobile-card__location">
@@ -154,7 +132,7 @@
                     }
                   </p>
                   <div class="activity-mobile-card__meta">
-                    <span class="activity-mobile-card__type">{{ activity.activityTypeName || 'N/A' }}</span>
+                    <span class="activity-mobile-card__type">{{ activity.activityTypeName || ('common.notAvailable' | translate) }}</span>
                     <span class="activity-mobile-card__duration">
                       <span class="material-symbols-outlined" aria-hidden="true">schedule</span>
                       {{ formatDuration(activity.durationMinutes) }}
@@ -163,7 +141,7 @@
                 </div>
                 <a
                   class="activity-mobile-card__edit"
-                  title="Edit activity"
+                  [title]="'common.edit' | translate"
                   [routerLink]="['/content-creator/activities/edit', activity.id]"
                   (click)="$event.stopPropagation()"
                 >
@@ -177,12 +155,12 @@
             <table class="activities-table">
               <thead>
                 <tr>
-                  <th>Status</th>
-                  <th>Activity Details</th>
-                  <th>Type</th>
-                  <th>Destination</th>
-                  <th>Duration</th>
-                  <th class="col-actions">Action</th>
+                  <th>{{ 'contentCreator.activities.table.status' | translate }}</th>
+                  <th>{{ 'contentCreator.activities.table.activityDetails' | translate }}</th>
+                  <th>{{ 'contentCreator.activities.table.type' | translate }}</th>
+                  <th>{{ 'contentCreator.activities.table.destination' | translate }}</th>
+                  <th>{{ 'contentCreator.activities.table.duration' | translate }}</th>
+                  <th class="col-actions">{{ 'contentCreator.activities.table.action' | translate }}</th>
                 </tr>
               </thead>
               <tbody>
@@ -194,7 +172,7 @@
                   <td>
                     <span class="status-chip" [ngClass]="getStatusClass(activity.status)">
                       <span class="chip-dot">&#9679;</span>
-                      {{ activity.status || 'Draft' }}
+                      {{ translateStatus(activity.status) }}
                     </span>
                   </td>
                   <td>
@@ -222,7 +200,7 @@
                       <button
                         type="button"
                         class="icon-btn plain"
-                        title="Edit activity"
+                        [title]="'common.edit' | translate"
                         [routerLink]="['/content-creator/activities/edit', activity.id]"
                         (click)="$event.stopPropagation()"
                       >
@@ -253,7 +231,7 @@
 
     <aside class="detail-column card" [class.has-selection]="!!selectedActivity">
       @if (selectedActivity) {
-        <p class="detail-sheet-label">Selected activity</p>
+        <p class="detail-sheet-label">{{ 'contentCreator.activities.selectedActivity' | translate }}</p>
         <div class="activity-hero">
           <div
             class="hero-media"
@@ -273,13 +251,13 @@
           </div>
 
           <div class="hero-copy">
-            <p class="eyebrow">Featured activity</p>
+            <p class="eyebrow">{{ 'contentCreator.activities.featuredActivity' | translate }}</p>
             <h2>{{ (selectedActivityDetails ?? selectedActivity)?.name }}</h2>
             <p class="hero-meta">
               {{ selectedLocation }} &middot; {{ formatDuration((selectedActivityDetails ?? selectedActivity)?.durationMinutes) }}
             </p>
             <span class="detail-status" [ngClass]="getStatusClass((selectedActivityDetails ?? selectedActivity)?.status)">
-              {{ (selectedActivityDetails ?? selectedActivity)?.status || 'Draft' }}
+              {{ translateStatus((selectedActivityDetails ?? selectedActivity)?.status) }}
             </span>
           </div>
         </div>
@@ -290,31 +268,31 @@
             <strong>{{ formatParticipationFee((selectedActivityDetails ?? selectedActivity)?.price) }}</strong>
           </div>
           <div class="metric-card">
-            <span>Duration</span>
+            <span>{{ 'contentCreator.activities.duration' | translate }}</span>
             <strong>{{ formatDuration((selectedActivityDetails ?? selectedActivity)?.durationMinutes) }}</strong>
           </div>
         </div>
 
         <section class="detail-section">
           <div class="section-head">
-            <h3>Activity Info</h3>
+            <h3>{{ 'contentCreator.activities.activityInfo' | translate }}</h3>
           </div>
 
           <div class="schedule-list">
             <div class="schedule-item">
-              <span>Type</span>
+              <span>{{ 'contentCreator.activities.table.type' | translate }}</span>
               <strong>{{ (selectedActivityDetails ?? selectedActivity)?.activityTypeName || '-' }}</strong>
             </div>
             <div class="schedule-item">
-              <span>Destination</span>
+              <span>{{ 'contentCreator.activities.destination' | translate }}</span>
               <strong>{{ (selectedActivityDetails ?? selectedActivity)?.destinationName || '-' }}</strong>
             </div>
             <div class="schedule-item">
-              <span>Locality</span>
+              <span>{{ 'contentCreator.activities.locality' | translate }}</span>
               <strong>{{ (selectedActivityDetails ?? selectedActivity)?.localityName || '-' }}</strong>
             </div>
             <div class="schedule-item">
-              <span>Object</span>
+              <span>{{ 'contentCreator.activities.object' | translate }}</span>
               <strong>{{ (selectedActivityDetails ?? selectedActivity)?.objectName || '-' }}</strong>
             </div>
           </div>
@@ -322,31 +300,31 @@
 
         <section class="detail-section">
           <div class="section-head">
-            <h3>Coordinates</h3>
+            <h3>{{ 'contentCreator.activities.coordinates' | translate }}</h3>
           </div>
 
           <div class="schedule-list">
             <div class="schedule-item">
-              <span>Latitude</span>
+              <span>{{ 'common.latitude' | translate }}</span>
               <strong>{{ (selectedActivityDetails ?? selectedActivity)?.latitude ?? '-' }}</strong>
             </div>
             <div class="schedule-item">
-              <span>Longitude</span>
+              <span>{{ 'common.longitude' | translate }}</span>
               <strong>{{ (selectedActivityDetails ?? selectedActivity)?.longitude ?? '-' }}</strong>
             </div>
             <div class="schedule-item">
-              <span>Created</span>
-              <strong>{{ (selectedActivityDetails ?? selectedActivity)?.createdAt | date:'MMM d, y, HH:mm' }}</strong>
+              <span>{{ 'contentCreator.activities.created' | translate }}</span>
+              <strong>{{ formatDateTime((selectedActivityDetails ?? selectedActivity)?.createdAt) }}</strong>
             </div>
             <div class="schedule-item">
-              <span>Updated</span>
-              <strong>{{ (selectedActivityDetails ?? selectedActivity)?.updatedAt | date:'MMM d, y, HH:mm' }}</strong>
+              <span>{{ 'contentCreator.activities.updated' | translate }}</span>
+              <strong>{{ formatDateTime((selectedActivityDetails ?? selectedActivity)?.updatedAt) }}</strong>
             </div>
           </div>
         </section>
 
         <section class="detail-section">
-          <h3>Description</h3>
+          <h3>{{ 'contentCreator.activities.description' | translate }}</h3>
           <p class="description-copy">{{ selectedSummary }}</p>
         </section>
 
@@ -365,17 +343,17 @@
             } @else {
               <div class="map-empty-state">
                 <span class="material-symbols-outlined">location_off</span>
-                <p>Coordinates are not available for this activity.</p>
+                <p>{{ 'contentCreator.activities.noCoordinates' | translate }}</p>
               </div>
             }
           </div>
         </section>
       } @else {
         <div class="empty-state">
-          <p class="eyebrow">No activity selected</p>
-          <h2>Pick an activity from the table</h2>
+          <p class="eyebrow">{{ 'contentCreator.activities.empty.noActivitySelected' | translate }}</p>
+          <h2>{{ 'contentCreator.activities.empty.pickActivityTitle' | translate }}</h2>
           <p>
-            Select a row to inspect media, schedule, and logistics details in the right-hand panel.
+            {{ 'contentCreator.activities.empty.pickActivityBody' | translate }}
           </p>
         </div>
       }
