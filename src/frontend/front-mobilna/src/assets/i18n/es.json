@@ -1074,6 +1074,18 @@
     "ownerReply": "Respuesta del propietario",
     "editReview": "Editar reseña",
     "workingHoursNotAvailable": "Horario no disponible",
+    "fullWorkingHours": "Horario semanal",
+    "viewFullHours": "Ver horario completo",
+    "closed": "Cerrado",
+    "days": {
+      "pon": "lunes",
+      "uto": "martes",
+      "sre": "miércoles",
+      "cet": "jueves",
+      "pet": "viernes",
+      "sub": "sábado",
+      "ned": "domingo"
+    },
     "deleteReview": "Eliminar",
     "deleteReviewConfirm": "¿Estás seguro de que deseas eliminar esta reseña?",
     "deleteReviewSuccess": "La reseña se eliminó correctamente.",

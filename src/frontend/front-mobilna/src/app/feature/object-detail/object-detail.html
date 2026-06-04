@@ -193,7 +193,13 @@
                   </p>
                 }
                 @if (object.workingHours) {
-                  <p class="date"><mat-icon>access_time</mat-icon> {{ getWorkingHours() }}</p>
+                  <p class="date">
+                    <mat-icon>access_time</mat-icon>
+                    {{ getWorkingHours() }}
+                  </p>
+                  <button class="view-full-hours-btn" (click)="openHoursModal()">
+                    {{ 'object.viewFullHours' | translate }}
+                  </button>
                 }
               </div>
               @if (qrLink) {
@@ -362,10 +368,10 @@
     <div class="modal-content-reviews" (click)="$event.stopImmediatePropagation()">
       <!-- Header -->
       <div class="modal-header">
-        <button class="modal-close" (click)="closeAllReviews()">
-          <mat-icon>arrow_back</mat-icon>
-        </button>
         <h2>{{ 'object.allReviews' | translate }}</h2>
+        <button class="modal-close" (click)="closeAllReviews()">
+          <mat-icon>close</mat-icon>
+        </button>
       </div>
 
       <!-- Prosečna ocena + grafik -->
@@ -544,6 +550,27 @@
   }
   
   
+  @if (showHoursModal) {
+    <div class="all-reviews-modal hours-modal-backdrop" (click)="closeHoursModal()">
+      <div class="hours-modal-content" (click)="$event.stopImmediatePropagation()">
+        <div class="modal-header">
+          <h2>{{ 'object.fullWorkingHours' | translate }}</h2>
+          <button class="modal-close" (click)="closeHoursModal()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+        <div class="hours-schedule">
+          @for (entry of getFullWeekSchedule(); track entry.key) {
+            <div class="hours-row" [class.hours-row--today]="entry.isToday">
+              <span class="hours-day">{{ entry.dayName }}</span>
+              <span class="hours-value">{{ entry.hours }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
   @if (showConfirmModal) {
     <div class="custom-modal-backdrop" (click)="closeConfirm()">
       <div class="custom-modal" (click)="$event.stopImmediatePropagation()">

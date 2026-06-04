@@ -1080,6 +1080,18 @@
     "ownerReply": "Owner reply",
     "editReview": "Edit review",
     "workingHoursNotAvailable": "Working hours are not available",
+    "fullWorkingHours": "Weekly working hours",
+    "viewFullHours": "View full working hours",
+    "closed": "Closed",
+    "days": {
+      "pon": "Monday",
+      "uto": "Tuesday",
+      "sre": "Wednesday",
+      "cet": "Thursday",
+      "pet": "Friday",
+      "sub": "Saturday",
+      "ned": "Sunday"
+    },
     "deleteReview": "Delete",
     "deleteReviewConfirm": "Are you sure you want to delete this review?",
     "deleteReviewSuccess": "Review deleted successfully.",

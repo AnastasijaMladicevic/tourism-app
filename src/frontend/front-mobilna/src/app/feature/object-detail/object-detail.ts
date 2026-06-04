@@ -722,6 +722,8 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
     }
   }
 
+  showHoursModal = false;
+
   getWorkingHours(): string {
     if (!this.object?.workingHours) return this.translationService.translate('object.workingHoursNotAvailable');
 
@@ -735,6 +737,44 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
     } catch {
       return this.object.workingHours;
     }
+  }
+
+  getFullWeekSchedule(): { key: string; dayName: string; hours: string; isToday: boolean }[] {
+    const allKeys = ['pon', 'uto', 'sre', 'cet', 'pet', 'sub', 'ned'];
+    const jsDayToKey = ['ned', 'pon', 'uto', 'sre', 'cet', 'pet', 'sub'];
+    const todayKey = jsDayToKey[new Date().getDay()];
+    const todayIndex = allKeys.indexOf(todayKey);
+
+    const ordered = [
+      ...allKeys.slice(todayIndex),
+      ...allKeys.slice(0, todayIndex),
+    ];
+
+    let parsed: Record<string, string> = {};
+    try {
+      if (this.object?.workingHours) {
+        parsed = JSON.parse(this.object.workingHours) as Record<string, string>;
+      }
+    } catch { /* ignore */ }
+
+    const closed = this.translationService.translate('object.closed');
+
+    return ordered.map((key) => ({
+      key,
+      dayName: this.translationService.translate(`object.days.${key}`),
+      hours: parsed[key] || closed,
+      isToday: key === todayKey,
+    }));
+  }
+
+  openHoursModal(): void {
+    this.showHoursModal = true;
+    document.body.style.overflow = 'hidden';
+  }
+
+  closeHoursModal(): void {
+    this.showHoursModal = false;
+    document.body.style.overflow = '';
   }
 
   formatReviewDate(dateStr: string): string {

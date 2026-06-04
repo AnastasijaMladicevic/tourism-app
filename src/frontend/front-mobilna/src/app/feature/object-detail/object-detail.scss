@@ -1080,25 +1080,91 @@ button:hover {
 }
 
 /* ALL REVIEWS MODAL */
+.view-full-hours-btn {
+  background: none;
+  border: none;
+  padding: 2px 0 0 28px;
+  font-size: 12px;
+  color: var(--primary, #1976d2);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-align: left;
+  display: block;
+}
+
+.view-full-hours-btn:hover {
+  opacity: 0.75;
+}
+
+.hours-schedule {
+  padding: 8px 20px 20px;
+  overflow-y: auto;
+}
+
+.hours-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 15px;
+  color: var(--text-secondary);
+}
+
+.hours-row:last-child {
+  border-bottom: none;
+}
+
+.hours-row--today {
+  color: var(--text-dark);
+  font-weight: 700;
+}
+
+.hours-day {
+  text-transform: capitalize;
+}
+
+.hours-value {
+  font-variant-numeric: tabular-nums;
+}
+
 .all-reviews-modal {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.9);
+  background: rgba(0, 0, 0, 0.75);
   z-index: 10000;
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 76px 16px 16px;
+}
+
+.hours-modal-backdrop {
+  padding-top: 30px;
 }
 
 .modal-content-reviews {
   width: 100%;
-  max-width: 600px;
-  height: 90vh;
+  max-width: 480px;
+  max-height: calc(100vh - 92px);
   background: var(--surface-strong);
   border-radius: 20px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  flex-shrink: 0;
+}
+
+.hours-modal-content {
+  width: 100%;
+  max-width: 380px;
+  background: var(--surface-strong);
+  border-radius: 20px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
 }
 
 .modal-header {
@@ -1106,6 +1172,7 @@ button:hover {
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
 }
 

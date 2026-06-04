@@ -1081,6 +1081,18 @@
     "ownerReply": "Odgovor vlasnika",
     "editReview": "Izmeni recenziju",
     "workingHoursNotAvailable": "Radno vreme nije navedeno",
+    "fullWorkingHours": "Radno vreme cele nedelje",
+    "viewFullHours": "Pogledaj kompletno radno vreme",
+    "closed": "Zatvoreno",
+    "days": {
+      "pon": "ponedeljak",
+      "uto": "utorak",
+      "sre": "sreda",
+      "cet": "četvrtak",
+      "pet": "petak",
+      "sub": "subota",
+      "ned": "nedjelja"
+    },
     "deleteReview": "Obriši",
     "deleteReviewConfirm": "Da li ste sigurni da želite da obrišete recenziju?",
     "deleteReviewSuccess": "Recenzija je uspešno obrisana.",
