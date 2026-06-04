@@ -70,6 +70,8 @@ export class ManagerEventsComponent implements OnInit, OnDestroy {
   categoryFilter = 'all';
   sortBy = 'status';
   sortOrder: 'asc' | 'desc' = 'desc';
+  rangeStartDate = '';
+  rangeEndDate = '';
   pageSize = 5;
   readonly pageSizeOptions = [5, 10, 20, 50];
   filterPanelOpen = true;
@@ -140,7 +142,9 @@ export class ManagerEventsComponent implements OnInit, OnDestroy {
       statusFilter: this.statusFilter,
       categoryFilter: this.categoryFilter,
       sortBy: this.sortBy,
-      sortOrder: this.sortOrder
+      sortOrder: this.sortOrder,
+      startDate: this.rangeStartDate || null,
+      endDate: this.rangeEndDate || null,
     };
 
     const query: EventQueryDto = buildEventQueryDto(filterState, {
@@ -148,7 +152,7 @@ export class ManagerEventsComponent implements OnInit, OnDestroy {
       pageSize: this.pageSize,
       includeStatus: true,
       includeCategoryAsType: true,
-      includeDateFilters: false
+      includeDateFilters: true
     });
 
     this.eventService.getForManager(query).subscribe({
@@ -196,6 +200,14 @@ export class ManagerEventsComponent implements OnInit, OnDestroy {
     this.loadEvents();
   }
 
+  onDateRangeChange(): void {
+    if (this.rangeStartDate && this.rangeEndDate && this.rangeStartDate > this.rangeEndDate) {
+      [this.rangeStartDate, this.rangeEndDate] = [this.rangeEndDate, this.rangeStartDate];
+    }
+    this.currentPage = 1;
+    this.loadEvents();
+  }
+
   onResetFilters(): void {
     this.searchQuery = '';
     this.draftSearchQuery = '';
@@ -203,6 +215,8 @@ export class ManagerEventsComponent implements OnInit, OnDestroy {
     this.categoryFilter = 'all';
     this.sortBy = 'status';
     this.sortOrder = 'desc';
+    this.rangeStartDate = '';
+    this.rangeEndDate = '';
     this.pageSize = 5;
     this.currentPage = 1;
     this.loadEvents();

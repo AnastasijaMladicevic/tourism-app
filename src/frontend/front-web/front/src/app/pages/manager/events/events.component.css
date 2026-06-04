@@ -89,6 +89,58 @@
 	white-space: nowrap;
 }
 
+.date-range-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  min-width: 0;
+  flex: 1;
+  padding: 6px 10px;
+  border: 1px solid #dbe1ea;
+  border-radius: 12px;
+  background: #fff;
+  color: #374151;
+}
+
+.date-range-icon {
+  font-size: 18px;
+  color: #64748b;
+  flex-shrink: 0;
+}
+
+.date-range-inputs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  flex: 1;
+}
+
+.date-range-input {
+  min-width: 0;
+  flex: 1 1 0;
+  max-width: 132px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #111827;
+  padding: 6px 8px;
+  font: inherit;
+  font-size: 12px;
+  outline: none;
+}
+
+.date-range-input:focus {
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 3px rgba(147, 197, 253, 0.3);
+}
+
+.date-range-separator {
+  color: #64748b;
+  font-weight: 600;
+}
+
 .filters-panel {
 	display: grid;
 	grid-template-columns: repeat(4, minmax(0, 1fr)) auto auto;
