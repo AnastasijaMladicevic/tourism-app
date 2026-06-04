@@ -625,10 +625,16 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
 
   private getType(): string {
     const typeName = (this.object?.objectTypeName ?? '').toLowerCase();
-    if (typeName.includes('hotel')) return 'hotel';
-    if (typeName.includes('restoran')) return 'restaurant';
-    if (typeName.includes('kafana')) return 'kafana';
-    return 'object';
+    if (typeName.includes('hotel') || typeName.includes('resort') || typeName.includes('hostel') || typeName.includes('motel')) return 'hotel';
+    if (typeName.includes('apartman') || typeName.includes('apartment') || typeName.includes('villa')) return 'apartment';
+    if (typeName.includes('bar') || typeName.includes('club') || typeName.includes('klub') || typeName.includes('kafana') || typeName.includes('vinarija')) return 'kafana';
+    if (typeName.includes('restoran') || typeName.includes('restaurant') || typeName.includes('kafic') || typeName.includes('kafe')) return 'restaurant';
+    if (typeName.includes('pumpa') || typeName.includes('gas') || typeName.includes('fuel')) return 'gas_station';
+    if (typeName.includes('apoteka') || typeName.includes('pharmacy')) return 'pharmacy';
+    if (typeName.includes('bolnica') || typeName.includes('hospital') || typeName.includes('clinic')) return 'hospital';
+    if (typeName.includes('mall')) return 'mall';
+    if (typeName.includes('shop') || typeName.includes('store') || typeName.includes('market')) return 'shop';
+    return 'destination';
   }
 
   viewOnMap(): void {

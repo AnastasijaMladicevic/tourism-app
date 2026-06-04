@@ -813,11 +813,17 @@ export class MapComponent implements OnInit, AfterViewInit, OnDestroy {
         result.category === 'event'
       ) {
         this.clearTemporarySearchMarker();
+        const markerType = result.category === 'object'
+          ? this.normalizeMarkerType(result.markerType)
+          : result.category;
+        this.selectedItem = result;
+        this.selectedType = markerType;
+        this.cdr.detectChanges();
         setTimeout(() => {
-          const markerType = result.category === 'object'
-            ? this.normalizeMarkerType(result.markerType)
-            : result.category;
-          this.mapService.triggerMarkerClick(markerType, Number(result.id));
+          this.ngZone.run(() => {
+            this.mapService.highlightMarker(markerType, Number(result.id));
+            this.cdr.detectChanges();
+          });
         }, 600);
       }
       if (this.isRoutePlannerOpen) {
