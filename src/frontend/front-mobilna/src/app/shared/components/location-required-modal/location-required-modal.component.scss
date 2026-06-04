@@ -1,7 +1,7 @@
 .loc-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(15, 23, 42, 0.45);
   z-index: 1000;
   display: flex;
   align-items: center;
@@ -10,39 +10,38 @@
 }
 
 .loc-modal {
-  background: var(--surface, #fff);
-  border-radius: 20px;
-  padding: 28px 24px 24px;
+  background: var(--surface-strong);
+  border: 1px solid rgba(208, 234, 240, 0.95);
+  border-radius: 22px;
+  padding: 20px 18px 18px;
   width: 100%;
   max-width: 340px;
   display: flex;
   flex-direction: column;
-  align-items: center;
   gap: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 24px 48px rgba(15, 23, 42, 0.22);
 }
 
 .loc-modal__icon-wrap {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background: rgba(var(--primary-rgb, 0, 161, 164), 0.12);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 4px;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: rgba(22, 138, 173, 0.12);
+  display: grid;
+  place-items: center;
+  color: #168AAD;
 }
 
 .loc-modal__icon {
-  font-size: 32px;
-  width: 32px;
-  height: 32px;
-  color: var(--primary, #00a1a4);
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+  color: #168AAD;
 }
 
 .loc-modal__title {
-  font-size: 17px;
-  font-weight: 700;
+  font-size: 18px;
+  font-weight: 800;
   color: var(--emperor, #333);
   text-align: center;
   margin: 0;
@@ -50,28 +49,29 @@
 }
 
 .loc-modal__body {
-  font-size: 13px;
-  color: var(--text-secondary, #666);
+  font-size: 14px;
+  color: rgba(77, 99, 112, 0.92);
   text-align: center;
   margin: 0;
-  line-height: 1.5;
+  line-height: 1.55;
 }
 
 .loc-modal__actions {
-  display: flex;
-  gap: 12px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
   width: 100%;
-  margin-top: 8px;
 }
 
 .loc-modal__btn {
-  flex: 1;
-  height: 44px;
-  border-radius: 10px;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
+  min-height: 44px;
   border: none;
+  border-radius: 14px;
+  background: #168AAD;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
   transition: opacity 0.15s;
 
   &:active {
@@ -79,13 +79,14 @@
   }
 
   &--cancel {
-    background: transparent;
-    border: 1.5px solid var(--border, #ddd);
-    color: var(--emperor, #333);
+    background: rgba(22, 138, 173, 0.08);
+    color: #168AAD;
+    border: 1px solid rgba(22, 138, 173, 0.18);
   }
 
   &--confirm {
-    background: var(--primary, #00a1a4);
+    background: #168AAD;
     color: #fff;
+    border: none;
   }
 }

@@ -1735,7 +1735,22 @@
       "manager": { "title": "Manager", "desc": "Controllo amministrativo completo su team, hub e fatturazione." },
       "admin": { "title": "Admin", "desc": "Accesso amministrativo a tutta la piattaforma, inclusa la gestione di utenti e ruoli." }
     },
-    "countries": { "UnitedStates": "Stati Uniti", "UnitedKingdom": "Regno Unito", "Canada": "Canada", "Germany": "Germania", "France": "Francia", "Croatia": "Croazia", "Spain": "Spagna", "Italy": "Italia" },
+    "countries": {
+      "Albania": "Albania", "Argentina": "Argentina", "Australia": "Australia",
+      "Austria": "Austria", "Belgium": "Belgio", "BosniaandHerzegovina": "Bosnia ed Erzegovina",
+      "Brazil": "Brasile", "Bulgaria": "Bulgaria", "Canada": "Canada",
+      "China": "Cina", "Croatia": "Croazia", "CzechRepublic": "Repubblica Ceca",
+      "Denmark": "Danimarca", "Finland": "Finlandia", "France": "Francia",
+      "Germany": "Germania", "Greece": "Grecia", "Hungary": "Ungheria",
+      "India": "India", "Italy": "Italia", "Japan": "Giappone",
+      "Kosovo": "Kosovo", "Mexico": "Messico", "Montenegro": "Montenegro",
+      "CrnaGora": "Montenegro", "Netherlands": "Paesi Bassi", "NorthMacedonia": "Macedonia del Nord",
+      "Norway": "Norvegia", "Poland": "Polonia", "Portugal": "Portogallo",
+      "Romania": "Romania", "Russia": "Russia", "Serbia": "Serbia",
+      "Slovakia": "Slovacchia", "Slovenia": "Slovenia", "Spain": "Spagna",
+      "Sweden": "Svezia", "Switzerland": "Svizzera", "Turkey": "Turchia",
+      "Ukraine": "Ucraina", "UnitedKingdom": "Regno Unito", "UnitedStates": "Stati Uniti"
+    },
     "languages": { "Serbian": "Serbo/Montenegrino", "EnglishUS": "Inglese (USA)", "EnglishUK": "Inglese (UK)", "Spanish": "Spagnolo", "Italian": "Italiano" },
     "regions": { "NorthAmericaEast": "Nord America — Est", "NorthAmericaWest": "Nord America — Ovest", "EuropeanUnionCentral": "Unione Europea — Centrale", "EuropeanUnionMediterranean": "Unione Europea — Mediterraneo", "AsiaPacific": "Asia-Pacifico" },
     "errors": {

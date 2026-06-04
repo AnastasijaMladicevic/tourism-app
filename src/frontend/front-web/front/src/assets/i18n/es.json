@@ -1735,7 +1735,22 @@
       "manager": { "title": "Manager", "desc": "Control administrativo total sobre equipos, hubs y facturación." },
       "admin": { "title": "Admin", "desc": "Acceso administrativo global, incluida la gestión de usuarios y roles." }
     },
-    "countries": { "UnitedStates": "Estados Unidos", "UnitedKingdom": "Reino Unido", "Canada": "Canadá", "Germany": "Alemania", "France": "Francia", "Croatia": "Croacia", "Spain": "España", "Italy": "Italia" },
+    "countries": {
+      "Albania": "Albania", "Argentina": "Argentina", "Australia": "Australia",
+      "Austria": "Austria", "Belgium": "Bélgica", "BosniaandHerzegovina": "Bosnia y Herzegovina",
+      "Brazil": "Brasil", "Bulgaria": "Bulgaria", "Canada": "Canadá",
+      "China": "China", "Croatia": "Croacia", "CzechRepublic": "República Checa",
+      "Denmark": "Dinamarca", "Finland": "Finlandia", "France": "Francia",
+      "Germany": "Alemania", "Greece": "Grecia", "Hungary": "Hungría",
+      "India": "India", "Italy": "Italia", "Japan": "Japón",
+      "Kosovo": "Kosovo", "Mexico": "México", "Montenegro": "Montenegro",
+      "CrnaGora": "Montenegro", "Netherlands": "Países Bajos", "NorthMacedonia": "Macedonia del Norte",
+      "Norway": "Noruega", "Poland": "Polonia", "Portugal": "Portugal",
+      "Romania": "Rumanía", "Russia": "Rusia", "Serbia": "Serbia",
+      "Slovakia": "Eslovaquia", "Slovenia": "Eslovenia", "Spain": "España",
+      "Sweden": "Suecia", "Switzerland": "Suiza", "Turkey": "Turquía",
+      "Ukraine": "Ucrania", "UnitedKingdom": "Reino Unido", "UnitedStates": "Estados Unidos"
+    },
     "languages": { "Serbian": "Serbio/Montenegrino", "EnglishUS": "Inglés (EE. UU.)", "EnglishUK": "Inglés (RU)", "Spanish": "Español", "Italian": "Italiano" },
     "regions": { "NorthAmericaEast": "Norteamérica — Este", "NorthAmericaWest": "Norteamérica — Oeste", "EuropeanUnionCentral": "Unión Europea — Centro", "EuropeanUnionMediterranean": "Unión Europea — Mediterráneo", "AsiaPacific": "Asia-Pacífico" },
     "errors": {

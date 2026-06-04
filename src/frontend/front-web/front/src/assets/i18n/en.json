@@ -1747,14 +1747,20 @@
       }
     },
     "countries": {
-      "UnitedStates": "United States",
-      "UnitedKingdom": "United Kingdom",
-      "Canada": "Canada",
-      "Germany": "Germany",
-      "France": "France",
-      "Croatia": "Croatia",
-      "Spain": "Spain",
-      "Italy": "Italy"
+      "Albania": "Albania", "Argentina": "Argentina", "Australia": "Australia",
+      "Austria": "Austria", "Belgium": "Belgium", "BosniaandHerzegovina": "Bosnia and Herzegovina",
+      "Brazil": "Brazil", "Bulgaria": "Bulgaria", "Canada": "Canada",
+      "China": "China", "Croatia": "Croatia", "CzechRepublic": "Czech Republic",
+      "Denmark": "Denmark", "Finland": "Finland", "France": "France",
+      "Germany": "Germany", "Greece": "Greece", "Hungary": "Hungary",
+      "India": "India", "Italy": "Italy", "Japan": "Japan",
+      "Kosovo": "Kosovo", "Mexico": "Mexico", "Montenegro": "Montenegro",
+      "CrnaGora": "Montenegro", "Netherlands": "Netherlands", "NorthMacedonia": "North Macedonia",
+      "Norway": "Norway", "Poland": "Poland", "Portugal": "Portugal",
+      "Romania": "Romania", "Russia": "Russia", "Serbia": "Serbia",
+      "Slovakia": "Slovakia", "Slovenia": "Slovenia", "Spain": "Spain",
+      "Sweden": "Sweden", "Switzerland": "Switzerland", "Turkey": "Turkey",
+      "Ukraine": "Ukraine", "UnitedKingdom": "United Kingdom", "UnitedStates": "United States"
     },
     "languages": {
       "Serbian": "Serbian",

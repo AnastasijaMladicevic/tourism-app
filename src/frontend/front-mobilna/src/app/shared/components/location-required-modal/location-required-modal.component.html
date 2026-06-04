@@ -1,10 +1,6 @@
 @if (show) {
   <div class="loc-modal-overlay" (click)="dismissed.emit()">
     <div class="loc-modal" (click)="$event.stopPropagation()">
-      <div class="loc-modal__icon-wrap">
-        <mat-icon class="loc-modal__icon">my_location</mat-icon>
-      </div>
-
       <h2 class="loc-modal__title">{{ 'common.locationModalTitle' | translate }}</h2>
       <p class="loc-modal__body">{{ 'common.locationModalBody' | translate }}</p>
 

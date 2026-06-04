@@ -1735,7 +1735,22 @@
       "manager": { "title": "Menadžer", "desc": "Puna administrativna kontrola nad timovima, hubovima i naplatom." },
       "admin": { "title": "Admin", "desc": "Administrativni pristup celoj platformi, uključujući korisnike i uloge." }
     },
-    "countries": { "UnitedStates": "Sjedinjene Države", "UnitedKingdom": "Ujedinjeno Kraljevstvo", "Canada": "Kanada", "Germany": "Nemačka", "France": "Francuska", "Croatia": "Hrvatska", "Spain": "Španija", "Italy": "Italija" },
+    "countries": {
+      "Albania": "Albanija", "Argentina": "Argentina", "Australia": "Australija",
+      "Austria": "Austrija", "Belgium": "Belgija", "BosniaandHerzegovina": "Bosna i Hercegovina",
+      "Brazil": "Brazil", "Bulgaria": "Bugarska", "Canada": "Kanada",
+      "China": "Kina", "Croatia": "Hrvatska", "CzechRepublic": "Češka",
+      "Denmark": "Danska", "Finland": "Finska", "France": "Francuska",
+      "Germany": "Nemačka", "Greece": "Grčka", "Hungary": "Mađarska",
+      "India": "Indija", "Italy": "Italija", "Japan": "Japan",
+      "Kosovo": "Kosovo", "Mexico": "Meksiko", "Montenegro": "Crna Gora",
+      "CrnaGora": "Crna Gora", "Netherlands": "Holandija", "NorthMacedonia": "Severna Makedonija",
+      "Norway": "Norveška", "Poland": "Poljska", "Portugal": "Portugalija",
+      "Romania": "Rumunija", "Russia": "Rusija", "Serbia": "Srbija",
+      "Slovakia": "Slovačka", "Slovenia": "Slovenija", "Spain": "Španija",
+      "Sweden": "Švedska", "Switzerland": "Švajcarska", "Turkey": "Turska",
+      "Ukraine": "Ukrajina", "UnitedKingdom": "Ujedinjeno Kraljevstvo", "UnitedStates": "Sjedinjene Države"
+    },
     "languages": { "Serbian": "Srpski/Crnogorski", "EnglishUS": "Engleski (SAD)", "EnglishUK": "Engleski (UK)", "Spanish": "Španski", "Italian": "Italijanski" },
     "regions": { "NorthAmericaEast": "Severna Amerika — Istok", "NorthAmericaWest": "Severna Amerika — Zapad", "EuropeanUnionCentral": "Evropska unija — Centralni deo", "EuropeanUnionMediterranean": "Evropska unija — Mediteran", "AsiaPacific": "Azija-Pacifik" },
     "errors": {
