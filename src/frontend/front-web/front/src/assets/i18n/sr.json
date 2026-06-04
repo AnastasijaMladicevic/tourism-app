@@ -2455,6 +2455,15 @@
       "saturday": "Subota",
       "sunday": "Nedelja"
     },
+    "dayShort": {
+      "monday": "Pon",
+      "tuesday": "Uto",
+      "wednesday": "Sre",
+      "thursday": "Čet",
+      "friday": "Pet",
+      "saturday": "Sub",
+      "sunday": "Ned"
+    },
     "delete": {
       "requestTitle": "Zatraži brisanje objekta",
       "confirmTitle": "Obriši objekat",

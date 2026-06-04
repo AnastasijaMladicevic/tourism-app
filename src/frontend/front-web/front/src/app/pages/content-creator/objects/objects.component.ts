@@ -378,14 +378,14 @@ export class ContentCreatorObjectsComponent implements OnInit, OnDestroy {
 
       const dayOrder = ['pon', 'uto', 'sre', 'cet', 'čet', 'pet', 'sub', 'ned'] as const;
       const dayLabels: Record<string, string> = {
-        pon: this.translationService.translate('contentCreatorObjectForm.days.monday'),
-        uto: this.translationService.translate('contentCreatorObjectForm.days.tuesday'),
-        sre: this.translationService.translate('contentCreatorObjectForm.days.wednesday'),
-        cet: this.translationService.translate('contentCreatorObjectForm.days.thursday'),
-        'čet': this.translationService.translate('contentCreatorObjectForm.days.thursday'),
-        pet: this.translationService.translate('contentCreatorObjectForm.days.friday'),
-        sub: this.translationService.translate('contentCreatorObjectForm.days.saturday'),
-        ned: this.translationService.translate('contentCreatorObjectForm.days.sunday')
+        pon: this.translationService.translate('contentCreatorObjectForm.dayShort.monday'),
+        uto: this.translationService.translate('contentCreatorObjectForm.dayShort.tuesday'),
+        sre: this.translationService.translate('contentCreatorObjectForm.dayShort.wednesday'),
+        cet: this.translationService.translate('contentCreatorObjectForm.dayShort.thursday'),
+        'čet': this.translationService.translate('contentCreatorObjectForm.dayShort.thursday'),
+        pet: this.translationService.translate('contentCreatorObjectForm.dayShort.friday'),
+        sub: this.translationService.translate('contentCreatorObjectForm.dayShort.saturday'),
+        ned: this.translationService.translate('contentCreatorObjectForm.dayShort.sunday')
       };
 
       return dayOrder

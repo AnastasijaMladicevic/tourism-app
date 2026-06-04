@@ -76,13 +76,13 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
   isDeletingObject = false;
 
   readonly workingDays: Array<{ key: WorkingDayKey; labelKey: string }> = [
-    { key: 'pon', labelKey: 'contentCreatorObjectForm.days.monday' },
-    { key: 'uto', labelKey: 'contentCreatorObjectForm.days.tuesday' },
-    { key: 'sre', labelKey: 'contentCreatorObjectForm.days.wednesday' },
-    { key: 'cet', labelKey: 'contentCreatorObjectForm.days.thursday' },
-    { key: 'pet', labelKey: 'contentCreatorObjectForm.days.friday' },
-    { key: 'sub', labelKey: 'contentCreatorObjectForm.days.saturday' },
-    { key: 'ned', labelKey: 'contentCreatorObjectForm.days.sunday' }
+    { key: 'pon', labelKey: 'contentCreatorObjectForm.dayShort.monday' },
+    { key: 'uto', labelKey: 'contentCreatorObjectForm.dayShort.tuesday' },
+    { key: 'sre', labelKey: 'contentCreatorObjectForm.dayShort.wednesday' },
+    { key: 'cet', labelKey: 'contentCreatorObjectForm.dayShort.thursday' },
+    { key: 'pet', labelKey: 'contentCreatorObjectForm.dayShort.friday' },
+    { key: 'sub', labelKey: 'contentCreatorObjectForm.dayShort.saturday' },
+    { key: 'ned', labelKey: 'contentCreatorObjectForm.dayShort.sunday' }
   ];
 
   objectTypes: ObjectTypeOption[] = [];

@@ -2677,6 +2677,15 @@
       "saturday": "Saturday",
       "sunday": "Sunday"
     },
+    "dayShort": {
+      "monday": "Mon",
+      "tuesday": "Tue",
+      "wednesday": "Wed",
+      "thursday": "Thu",
+      "friday": "Fri",
+      "saturday": "Sat",
+      "sunday": "Sun"
+    },
     "delete": {
       "requestTitle": "Request object deletion",
       "confirmTitle": "Delete object",

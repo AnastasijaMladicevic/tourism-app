@@ -2641,6 +2641,15 @@
       "saturday": "Sábado",
       "sunday": "Domingo"
     },
+    "dayShort": {
+      "monday": "Lun",
+      "tuesday": "Mar",
+      "wednesday": "Mié",
+      "thursday": "Jue",
+      "friday": "Vie",
+      "saturday": "Sáb",
+      "sunday": "Dom"
+    },
     "delete": {
       "requestTitle": "Solicitar eliminación del objeto",
       "confirmTitle": "Eliminar objeto",
