@@ -710,7 +710,14 @@ body.route-add-stop-open .filter-chips {
   }
 
   &:hover {
-    background: rgba(27, 55, 69, 0.72);
+    background: rgba(0, 0, 0, 0.055);
+  }
+}
+
+.dark .route-suggestion-item,
+.dark-theme .route-suggestion-item {
+  &:hover {
+    background: rgba(22, 138, 173, 0.18);
   }
 }
 
@@ -3033,8 +3040,14 @@ body.route-navigation-active app-floating-ai-assistant {
 }
 
 .add-stop-panel__result:hover {
-  background: rgba(30, 66, 82, 0.9) !important;
-  border-color: rgba(77, 194, 255, 0.55) !important;
+  background: rgba(0, 0, 0, 0.055) !important;
+  border-color: var(--border) !important;
+}
+
+.dark .add-stop-panel__result:hover,
+.dark-theme .add-stop-panel__result:hover {
+  background: rgba(22, 138, 173, 0.18) !important;
+  border-color: rgba(22, 138, 173, 0.35) !important;
 }
 
 .add-stop-panel__result--selected {
