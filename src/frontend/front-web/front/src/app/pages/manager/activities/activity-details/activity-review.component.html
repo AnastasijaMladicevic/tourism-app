@@ -24,7 +24,7 @@
       </button>
       <button
         type="button"
-        class="primary-btn"
+        class="primary-btn review-approve-btn"
         [class.approved-locked]="reviewStatusKey === 'approved'"
         [attr.title]="reviewStatusKey === 'approved' ? ('manager.activityReview.alreadyApproved' | translate) : null"
         (click)="approveActivity()"
@@ -45,23 +45,30 @@
   }
 
   @if (activity) {
-    <section class="review-shell">
-      <app-review-media-gallery
-        [images]="activityImages"
-        [selectedUrl]="selectedImageUrl"
-        [previewBroken]="isImagePreviewBroken"
-        (selectedUrlChange)="selectImage($event)"
-        (previewBrokenChange)="isImagePreviewBroken = $event"
-      />
-
       <form class="review-layout" [formGroup]="form">
-        <fieldset class="review-fieldset">
-          <div class="review-main">
-            <section class="card section-card">
-              <div class="section-title">
-                <h2>{{ 'manager.activityReview.coreDetails' | translate }}</h2>
-                <p>{{ 'manager.activityReview.coreDetailsHint' | translate }}</p>
+        <fieldset class="review-fieldset manager-review-fieldset">
+          <div class="review-main manager-review-main">
+            <section class="review-step-card section-block--gallery">
+              <div class="gallery-card-head">
+                <span class="step-tag">{{ 'contentCreatorObjectForm.step1' | translate }}</span>
+                <h2>{{ 'manager.reviewMediaGallery.title' | translate }}</h2>
+                <p class="gallery-intro">{{ 'manager.reviewMediaGallery.subtitle' | translate }}</p>
               </div>
+
+              <app-review-media-gallery
+                [embedded]="true"
+                [images]="activityImages"
+                [selectedUrl]="selectedImageUrl"
+                [previewBroken]="isImagePreviewBroken"
+                (selectedUrlChange)="selectImage($event)"
+                (previewBrokenChange)="isImagePreviewBroken = $event"
+              />
+            </section>
+
+            <section class="review-step-card">
+              <span class="step-tag">{{ 'contentCreatorObjectForm.step2' | translate }}</span>
+              <h2>{{ 'manager.activityReview.coreDetails' | translate }}</h2>
+              <p class="gallery-intro">{{ 'manager.activityReview.coreDetailsHint' | translate }}</p>
 
               <div class="field-grid two-columns">
                 <label class="form-field full-width">
@@ -91,11 +98,10 @@
               </label>
             </section>
 
-            <section class="card section-card schedule-card">
-              <div class="section-title">
-                <h2>{{ 'manager.activityReview.logistics' | translate }}</h2>
-                <p>{{ 'manager.activityReview.logisticsHint' | translate }}</p>
-              </div>
+            <section class="review-step-card schedule-card">
+              <span class="step-tag">{{ 'contentCreatorObjectForm.step3' | translate }}</span>
+              <h2>{{ 'manager.activityReview.logistics' | translate }}</h2>
+              <p class="gallery-intro">{{ 'manager.activityReview.logisticsHint' | translate }}</p>
 
               <div class="field-grid schedule-grid">
                 <label class="form-field half-width">
@@ -131,12 +137,13 @@
             </section>
           </div>
 
-          <aside class="review-side">
+          <aside class="review-side manager-review-side">
             <section class="card section-card highlighted-card">
-              <div class="section-title compact">
-                <h2>{{ 'manager.activityReview.locationIntelligence' | translate }}</h2>
-                <p>{{ 'manager.activityReview.locationIntelligenceHint' | translate }}</p>
-              </div>
+              <header class="side-header">
+                <span class="material-symbols-outlined">my_location</span>
+                <h3>{{ 'manager.activityReview.locationIntelligence' | translate }}</h3>
+              </header>
+              <p class="gallery-intro">{{ 'manager.activityReview.locationIntelligenceHint' | translate }}</p>
 
               <app-map
                 [lat]="latitudeNumber ?? 42.424"
@@ -225,7 +232,6 @@
           </aside>
         </fieldset>
       </form>
-    </section>
   } @else if (isLoading) {
     <section class="card loading-shell" [attr.aria-label]="'manager.activityReview.loadingAria' | translate">
       <div class="loading-surface loading-surface-lg"></div>

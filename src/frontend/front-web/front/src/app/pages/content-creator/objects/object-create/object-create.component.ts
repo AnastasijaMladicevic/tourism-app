@@ -52,7 +52,8 @@ type WorkingDayKey = 'pon' | 'uto' | 'sre' | 'cet' | 'pet' | 'sub' | 'ned';
   styleUrls: [
     './object-create.component.css',
     '../../../admin/shared/admin-page-title.css',
-    '../../shared/cc-list-page-header.css'
+    '../../shared/cc-list-page-header.css',
+    '../../../manager/shared/manager-review-approve-btn.css'
   ]
 })
 export class ObjectCreateComponent implements OnInit, OnDestroy {

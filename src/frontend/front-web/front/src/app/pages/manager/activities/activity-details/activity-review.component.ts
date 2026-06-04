@@ -26,7 +26,9 @@ import { TranslationService } from '../../../../services/translation.service';
     './activity-review.component.css',
     '../../../admin/shared/admin-page-title.css',
     '../../shared/manager-list-page-header.css',
-    '../../shared/manager-list-page-responsive.css'
+    '../../shared/manager-list-page-responsive.css',
+    '../../shared/manager-review-step-layout.css',
+    '../../shared/manager-review-approve-btn.css'
   ]
 })
 export class ManagerActivityReviewComponent implements OnInit, OnDestroy {
