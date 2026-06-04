@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { MapComponent } from '../../../../shared/components/map/map';
+import { ReviewMediaGalleryComponent } from '../../../../shared/components/review-media-gallery/review-media-gallery.component';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import { CommonModule } from '@angular/common';
 import { FormArray, FormBuilder, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
@@ -27,7 +28,7 @@ interface RelatedActivity {
 @Component({
   selector: 'app-manager-event-form',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, MapComponent, TranslatePipe],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, MapComponent, ReviewMediaGalleryComponent, TranslatePipe],
   templateUrl: './event-form.component.html',
   styleUrls: [
     './event-form.component.css',

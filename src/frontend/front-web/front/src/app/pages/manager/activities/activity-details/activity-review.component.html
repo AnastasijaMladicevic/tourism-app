@@ -46,41 +46,13 @@
 
   @if (activity) {
     <section class="review-shell">
-      <section class="card media-card">
-        <div class="section-title">
-          <h2>{{ 'manager.activityReview.images' | translate }}</h2>
-          <p>{{ 'manager.activityReview.imagesHint' | translate }}</p>
-        </div>
-
-        <div class="media-layout" [attr.aria-label]="'manager.activityReview.imageGalleryAria' | translate">
-          <div class="media-preview" [attr.aria-label]="'manager.activityReview.mainImageAria' | translate">
-            @if (imagePreviewUrl && !isImagePreviewBroken) {
-              <img [src]="imagePreviewUrl" [alt]="'manager.activityReview.previewAlt' | translate" (error)="onImagePreviewError()" />
-            } @else {
-              <div class="upload-placeholder">
-                <span class="material-symbols-outlined">image</span>
-                <strong>{{ 'manager.activityReview.noImage' | translate }}</strong>
-                <p>{{ 'manager.activityReview.noImageHint' | translate }}</p>
-                <small>{{ mainImageCountLabel }}</small>
-              </div>
-            }
-          </div>
-
-          <div class="media-strip">
-            @if (sideGalleryImages.length > 0) {
-              <div class="media-thumbnails">
-                @for (image of sideGalleryImages; track image.url) {
-                  <button type="button" class="media-thumb" (click)="selectImage(image.url)">
-                    <img [src]="image.url" [alt]="image.altText || ('manager.activityReview.thumbnailAlt' | translate)" />
-                  </button>
-                }
-              </div>
-            } @else {
-              <div class="media-empty">{{ 'manager.activityReview.noAdditionalImages' | translate }}</div>
-            }
-          </div>
-        </div>
-      </section>
+      <app-review-media-gallery
+        [images]="activityImages"
+        [selectedUrl]="selectedImageUrl"
+        [previewBroken]="isImagePreviewBroken"
+        (selectedUrlChange)="selectImage($event)"
+        (previewBrokenChange)="isImagePreviewBroken = $event"
+      />
 
       <form class="review-layout" [formGroup]="form">
         <fieldset class="review-fieldset">

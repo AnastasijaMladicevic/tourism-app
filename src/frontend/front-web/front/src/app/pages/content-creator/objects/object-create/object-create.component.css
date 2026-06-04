@@ -113,6 +113,10 @@
   align-items: start;
 }
 
+.step-card .review-media-gallery__embedded {
+  width: 100%;
+}
+
 .card {
   background: #fff;
   border: 1px solid #e5e7eb;
@@ -120,11 +124,19 @@
   box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
 }
 
-.form-column {
-  padding: 16px;
+.form-column,
+.create-form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
+}
+
+.step-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  background: #ffffff;
+  padding: 14px;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
 }
 
 .section-block {
@@ -807,16 +819,19 @@ textarea:focus {
 }
 
 .side-stack {
-  position: sticky;
-  top: calc(var(--app-navbar-height, 72px) + 12px);
   align-self: start;
-  max-height: calc(100vh - var(--app-navbar-height, 72px) - 24px);
-  overflow-y: auto;
-  overscroll-behavior: contain;
   display: flex;
   flex-direction: column;
   gap: 12px;
   min-width: 0;
+}
+
+.side-stack--pinned {
+  position: sticky;
+  top: calc(var(--app-navbar-height, 72px) + 12px);
+  max-height: calc(100vh - var(--app-navbar-height, 72px) - 24px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .side-column {
@@ -1419,11 +1434,14 @@ textarea:focus {
     overflow: visible;
   }
 
-  .side-stack {
+  .side-stack--pinned {
     position: static;
     top: auto;
     max-height: none;
     overflow: visible;
+  }
+
+  .side-stack {
     gap: 10px;
   }
 }

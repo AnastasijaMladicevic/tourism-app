@@ -11,6 +11,7 @@ import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { catchError, finalize, of } from 'rxjs';
 import { MapComponent } from '../../../../shared/components/map/map';
+import { ReviewMediaGalleryComponent } from '../../../../shared/components/review-media-gallery/review-media-gallery.component';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import { ActivitiesService, ActivityDto, ActivityImageDto, ApproveActivityDto } from '../../../../services/activities';
 import { environment } from '../../../../../environment/environment';
@@ -19,7 +20,7 @@ import { TranslationService } from '../../../../services/translation.service';
 @Component({
   selector: 'app-manager-activity-review',
   standalone: true,
-  imports: [CommonModule, FormsModule, ReactiveFormsModule, MapComponent, TranslatePipe],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, MapComponent, ReviewMediaGalleryComponent, TranslatePipe],
   templateUrl: './activity-review.component.html',
   styleUrls: [
     './activity-review.component.css',

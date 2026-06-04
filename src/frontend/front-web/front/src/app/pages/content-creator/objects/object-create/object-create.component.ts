@@ -23,6 +23,10 @@ import { AuthService } from '../../../../services/auth.service';
 import { ReviewDto, ReviewService } from '../../../../services/review';
 import { RegionDto, RegionService } from '../../../../services/region';
 import { MapComponent as SharedMapComponent } from '../../../../shared/components/map/map';
+import {
+  ReviewMediaGalleryComponent,
+  ReviewMediaGalleryItem
+} from '../../../../shared/components/review-media-gallery/review-media-gallery.component';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import { mapReviewDtosToObjectThreads } from '../../../manager/shared/manager-object-review.mapper';
 import {
@@ -35,7 +39,15 @@ type WorkingDayKey = 'pon' | 'uto' | 'sre' | 'cet' | 'pet' | 'sub' | 'ned';
 @Component({
   selector: 'app-object-create',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, RouterModule, SharedMapComponent, TranslatePipe],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    FormsModule,
+    RouterModule,
+    SharedMapComponent,
+    ReviewMediaGalleryComponent,
+    TranslatePipe
+  ],
   templateUrl: './object-create.component.html',
   styleUrls: [
     './object-create.component.css',
@@ -109,6 +121,7 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
   editableImageUrls: string[] = [];
   private readonly pendingImageFiles = new Map<string, File>();
   selectedReviewImageUrl = '';
+  isReviewImagePreviewBroken = false;
 
   /** Last-known server image rows for this object (used to delete/update on save). */
   imagesSnapshot: ObjectImageDto[] = [];
@@ -700,6 +713,11 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
 
   selectReviewImage(url: string): void {
     this.selectedReviewImageUrl = url?.trim() ?? '';
+    this.isReviewImagePreviewBroken = false;
+  }
+
+  get reviewGalleryImages(): ReviewMediaGalleryItem[] {
+    return this.imageUrls.map((url) => ({ url }));
   }
 
   trackByReviewId(_: number, review: ReviewDto): number {

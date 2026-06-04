@@ -63,9 +63,28 @@
   </header>
 
   <div class="create-layout">
-    <form id="create-object-form" class="form-column card" [formGroup]="form" (ngSubmit)="submit()">
-      <section class="section-block">
-        <span class="step-tag">{{ 'contentCreatorObjectForm.step1' | translate }}</span>
+    <form id="create-object-form" class="form-column create-form" [formGroup]="form" (ngSubmit)="submit()">
+      @if (isManagerReview) {
+        <section class="section-block section-block--gallery step-card">
+          <div class="gallery-card-head">
+            <span class="step-tag">{{ 'contentCreatorObjectForm.step1' | translate }}</span>
+            <h2>{{ 'contentCreatorObjectForm.mediaGallery' | translate }}</h2>
+            <p class="gallery-intro">{{ 'contentCreatorObjectForm.review.readOnlyGallery' | translate }}</p>
+          </div>
+
+          <app-review-media-gallery
+            [embedded]="true"
+            [images]="reviewGalleryImages"
+            [selectedUrl]="selectedReviewImageUrl"
+            [previewBroken]="isReviewImagePreviewBroken"
+            (selectedUrlChange)="selectReviewImage($event)"
+            (previewBrokenChange)="isReviewImagePreviewBroken = $event"
+          />
+        </section>
+      }
+
+      <section class="section-block step-card">
+        <span class="step-tag">{{ (isManagerReview ? 'contentCreatorObjectForm.step2' : 'contentCreatorObjectForm.step1') | translate }}</span>
         <h2>{{ 'contentCreatorObjectForm.generalInformation' | translate }}</h2>
         <div class="grid-2">
           <label>
@@ -135,8 +154,8 @@
         </div>
       </section>
 
-      <section class="section-block">
-        <span class="step-tag">{{ 'contentCreatorObjectForm.step2' | translate }}</span>
+      <section class="section-block step-card">
+        <span class="step-tag">{{ (isManagerReview ? 'contentCreatorObjectForm.step3' : 'contentCreatorObjectForm.step2') | translate }}</span>
         <h2>{{ 'contentCreatorObjectForm.story' | translate }}</h2>
         <label>
           <span>{{ 'contentCreatorObjectForm.fullDescription' | translate }}</span>
@@ -144,8 +163,8 @@
         </label>
       </section>
 
-      <section class="section-block">
-        <span class="step-tag">{{ 'contentCreatorObjectForm.step3' | translate }}</span>
+      <section class="section-block step-card">
+        <span class="step-tag">{{ (isManagerReview ? 'contentCreatorObjectForm.step4' : 'contentCreatorObjectForm.step3') | translate }}</span>
         <h2>{{ 'contentCreatorObjectForm.amenitiesContact' | translate }}</h2>
         <label>
           <span>{{ 'contentCreatorObjectForm.amenities' | translate }}</span>
@@ -153,8 +172,8 @@
         </label>
       </section>
 
-      <section class="section-block">
-        <span class="step-tag">{{ 'contentCreatorObjectForm.step4' | translate }}</span>
+      <section class="section-block step-card">
+        <span class="step-tag">{{ (isManagerReview ? 'contentCreatorObjectForm.step5' : 'contentCreatorObjectForm.step4') | translate }}</span>
         <h2>{{ 'contentCreatorObjectForm.openingHours' | translate }}</h2>
         <div class="hours-grid">
           <div class="hour-row" *ngFor="let day of workingDays">
@@ -176,20 +195,14 @@
         </div>
       </section>
 
-      <section class="section-block section-block--gallery">
+      @if (!isManagerReview) {
+      <section class="section-block section-block--gallery step-card">
         <div class="gallery-card-head">
           <span class="step-tag">{{ 'contentCreatorObjectForm.step5' | translate }}</span>
           <h2>{{ 'contentCreatorObjectForm.mediaGallery' | translate }} <span class="required-star" aria-hidden="true">*</span></h2>
-          <p class="gallery-intro">
-            @if (isManagerReview) {
-              {{ 'contentCreatorObjectForm.review.readOnlyGallery' | translate }}
-            } @else {
-              {{ 'contentCreatorObjectForm.galleryIntro' | translate }}
-            }
-          </p>
+          <p class="gallery-intro">{{ 'contentCreatorObjectForm.galleryIntro' | translate }}</p>
         </div>
 
-        @if (!isManagerReview) {
           <div class="gallery-dropzone">
             <p class="dropzone-title">{{ 'contentCreatorObjectForm.addPhotos' | translate }}</p>
             <p class="dropzone-copy">{{ 'contentCreatorObjectForm.dropzoneCopy' | translate }}</p>
@@ -211,30 +224,8 @@
               />
             </div>
           </div>
-        }
 
-        @if (isManagerReview ? imageUrls.length > 0 : hasEditableImages) {
-          @if (isManagerReview) {
-            <div class="media-layout" [attr.aria-label]="'contentCreatorObjectForm.review.imageGalleryAria' | translate">
-              <div class="media-preview" [attr.aria-label]="'contentCreatorObjectForm.review.mainImageAria' | translate">
-                <img [src]="reviewImagePreviewUrl" [alt]="'contentCreatorObjectForm.review.previewAlt' | translate" />
-              </div>
-
-              <div class="media-strip">
-                @if (sideReviewImages.length > 0) {
-                  <div class="media-thumbnails">
-                    @for (imageUrl of sideReviewImages; track imageUrl) {
-                      <button type="button" class="media-thumb" (click)="selectReviewImage(imageUrl)">
-                        <img [src]="imageUrl" [alt]="'contentCreatorObjectForm.review.thumbnailAlt' | translate" />
-                      </button>
-                    }
-                  </div>
-                } @else {
-                  <div class="media-empty">{{ 'contentCreatorObjectForm.review.noAdditionalImages' | translate }}</div>
-                }
-              </div>
-            </div>
-          } @else {
+        @if (hasEditableImages) {
             <div class="gallery-grid">
               <article class="gallery-item" *ngFor="let imageUrl of editableImageUrls; let index = index">
                 <img [src]="imageUrl" [alt]="'contentCreatorObjectForm.galleryPreviewAlt' | translate" />
@@ -248,20 +239,14 @@
                 </div>
               </article>
             </div>
-          }
         } @else {
           <div class="image-preview-empty">
             <span class="material-symbols-outlined">image</span>
-            <p>
-              @if (isManagerReview) {
-                {{ 'contentCreatorObjectForm.review.noImagesSubmitted' | translate }}
-              } @else {
-                {{ 'contentCreatorObjectForm.noImagesHelp' | translate }}
-              }
-            </p>
+            <p>{{ 'contentCreatorObjectForm.noImagesHelp' | translate }}</p>
           </div>
         }
       </section>
+      }
 
       @if (galleryErrorMessage) {
         <p class="error-msg inline-field-error">{{ galleryErrorMessage }}</p>
@@ -273,77 +258,81 @@
 
     </form>
 
-    <div class="side-stack">
-    <aside class="side-column card" [formGroup]="form">
-      <header class="side-header">
-        <span class="material-symbols-outlined">my_location</span>
-        <h3>{{ 'contentCreatorObjectForm.locationIntelligence' | translate }}</h3>
-      </header>
+    <ng-template #locationAside>
+      <aside class="side-column card" [formGroup]="form">
+        <header class="side-header">
+          <span class="material-symbols-outlined">my_location</span>
+          <h3>{{ 'contentCreatorObjectForm.locationIntelligence' | translate }}</h3>
+        </header>
 
-      <div class="map-shell">
-        <app-map
-          [lat]="mapLat"
-          [lng]="mapLng"
-          [zoom]="14"
-          [popupText]="form.controls.name.value || ('contentCreatorObjectForm.newObject' | translate)"
-          [interactive]="!isManagerReview"
-          [showMarker]="hasMapCoordinates"
-          mapId="create-object-map"
-          (locationSelected)="onMapLocationSelected($event)"
-        ></app-map>
-      </div>
-
-      <div class="coord-editor">
-        <div>
-          <span class="coord-label">{{ 'common.latitude' | translate }}</span>
-          <div class="coord-input-wrap">
-            <input type="number" formControlName="latitude" min="-90" max="90" step="0.000001" placeholder="42.4240" />
-            <span class="coord-input-suffix">{{ latitudeDirection }}</span>
-          </div>
-        </div>
-        <div>
-          <span class="coord-label">{{ 'common.longitude' | translate }}</span>
-          <div class="coord-input-wrap">
-            <input type="number" formControlName="longitude" min="-180" max="180" step="0.000001" placeholder="18.7710" />
-            <span class="coord-input-suffix">{{ longitudeDirection }}</span>
-          </div>
-        </div>
-      </div>
-
-      @if (editSidebar) {
-        <div class="review-snapshot">
-          <span>{{ 'contentCreatorObjectForm.review.snapshot' | translate }}</span>
-          <div class="review-row">
-            <strong>{{ ratingAverageDisplay(editSidebar.averageRating) }}</strong>
-            <span class="stars" aria-hidden="true">{{ ratingStarsVisual(editSidebar.averageRating) }}</span>
-            <span class="review-count">{{ 'contentCreatorObjectForm.reviews.count' | translate:{ count: editSidebar.reviewCount } }}</span>
-          </div>
+        <div class="map-shell">
+          <app-map
+            [lat]="mapLat"
+            [lng]="mapLng"
+            [zoom]="14"
+            [popupText]="form.controls.name.value || ('contentCreatorObjectForm.newObject' | translate)"
+            [interactive]="!isManagerReview"
+            [showMarker]="hasMapCoordinates"
+            mapId="create-object-map"
+            (locationSelected)="onMapLocationSelected($event)"
+          ></app-map>
         </div>
 
-        <article class="creator-card">
-          <div class="creator-avatar">{{ editSidebar.creatorInitials }}</div>
+        <div class="coord-editor">
           <div>
-            @if (editSidebar.creatorFullName) {
-              <strong>{{ 'contentCreatorObjectForm.createdBy' | translate:{ name: editSidebar.creatorFullName } }}</strong>
-            } @else {
-              <strong>{{ 'contentCreatorObjectForm.creator' | translate }}</strong>
-              <p class="sidebar-muted">{{ 'contentCreatorObjectForm.nameNotAvailable' | translate }}</p>
-            }
-            @if (editSidebar.createdUpdatedLine) {
-              <p>{{ editSidebar.createdUpdatedLine }}</p>
-            }
+            <span class="coord-label">{{ 'common.latitude' | translate }}</span>
+            <div class="coord-input-wrap">
+              <input type="number" formControlName="latitude" min="-90" max="90" step="0.000001" placeholder="42.4240" />
+              <span class="coord-input-suffix">{{ latitudeDirection }}</span>
+            </div>
           </div>
-        </article>
-      }
+          <div>
+            <span class="coord-label">{{ 'common.longitude' | translate }}</span>
+            <div class="coord-input-wrap">
+              <input type="number" formControlName="longitude" min="-180" max="180" step="0.000001" placeholder="18.7710" />
+              <span class="coord-input-suffix">{{ longitudeDirection }}</span>
+            </div>
+          </div>
+        </div>
 
-      @if (isManagerReview) {
-        <p class="sidebar-note">{{ 'contentCreatorObjectForm.review.sidebarNote' | translate }}</p>
-      } @else {
-        <p class="sidebar-note">{{ 'contentCreatorObjectForm.sidebarNote' | translate }}</p>
-      }
-    </aside>
+        @if (editSidebar) {
+          <div class="review-snapshot">
+            <span>{{ 'contentCreatorObjectForm.review.snapshot' | translate }}</span>
+            <div class="review-row">
+              <strong>{{ ratingAverageDisplay(editSidebar.averageRating) }}</strong>
+              <span class="stars" aria-hidden="true">{{ ratingStarsVisual(editSidebar.averageRating) }}</span>
+              <span class="review-count">{{ 'contentCreatorObjectForm.reviews.count' | translate:{ count: editSidebar.reviewCount } }}</span>
+            </div>
+          </div>
 
-    @if (showCcReviewsPreview) {
+          <article class="creator-card">
+            <div class="creator-avatar">{{ editSidebar.creatorInitials }}</div>
+            <div>
+              @if (editSidebar.creatorFullName) {
+                <strong>{{ 'contentCreatorObjectForm.createdBy' | translate:{ name: editSidebar.creatorFullName } }}</strong>
+              } @else {
+                <strong>{{ 'contentCreatorObjectForm.creator' | translate }}</strong>
+                <p class="sidebar-muted">{{ 'contentCreatorObjectForm.nameNotAvailable' | translate }}</p>
+              }
+              @if (editSidebar.createdUpdatedLine) {
+                <p>{{ editSidebar.createdUpdatedLine }}</p>
+              }
+            </div>
+          </article>
+        }
+
+        @if (isManagerReview) {
+          <p class="sidebar-note">{{ 'contentCreatorObjectForm.review.sidebarNote' | translate }}</p>
+        } @else {
+          <p class="sidebar-note">{{ 'contentCreatorObjectForm.sidebarNote' | translate }}</p>
+        }
+      </aside>
+    </ng-template>
+
+    <div class="side-stack" [class.side-stack--pinned]="!isManagerReview">
+      <ng-container *ngTemplateOutlet="locationAside" />
+
+      @if (showCcReviewsPreview) {
       <section class="cc-reviews-preview card" aria-labelledby="cc-reviews-preview-title">
         <header class="cc-reviews-preview-head">
           <div>
@@ -391,7 +380,7 @@
           </button>
         }
       </section>
-    }
+      }
     </div>
   </div>
 

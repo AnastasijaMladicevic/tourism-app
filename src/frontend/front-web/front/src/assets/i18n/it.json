@@ -1383,6 +1383,19 @@
           "nameNotAvailable": "Nome non disponibile in questa vista."
         }
       },
+      "reviewMediaGallery": {
+        "title": "Galleria multimediale",
+        "subtitle": "Galleria in sola lettura mostrata prima dei dettagli della revisione.",
+        "imageGalleryAria": "Galleria multimediale",
+        "mainImageAria": "Anteprima immagine principale",
+        "previewAlt": "Immagine di anteprima",
+        "thumbnailAlt": "Miniatura galleria",
+        "noPreview": "Nessuna anteprima utilizzabile",
+        "noPreviewHint": "Non c'è un URL immagine principale valido oppure l'immagine non è stata caricata.",
+        "noAdditionalImages": "Non ci sono altre immagini nella galleria.",
+        "noImagesSubmitted": "Nessuna immagine inviata.",
+        "imageCount": "{{count}} immagine/i nella galleria"
+      },
       "map": {
         "searchPlaceholder": "Cerca oggetti, eventi, attività..."
       },

@@ -37,40 +37,13 @@
   }
 
   <section class="review-shell">
-    <section class="card media-card">
-        <div class="section-title">
-        <h2>{{ 'manager.eventReview.eventImages' | translate }}</h2>
-        <p>{{ 'manager.eventReview.eventImagesHint' | translate }}</p>
-      </div>
-
-      <div class="media-layout" [attr.aria-label]="'manager.eventReview.imageGalleryAria' | translate">
-        <div class="media-preview" [attr.aria-label]="'manager.eventReview.mainImagePreviewAria' | translate">
-          @if (imagePreviewUrl && !isImagePreviewBroken) {
-            <img [src]="imagePreviewUrl" [alt]="'manager.eventReview.eventPreviewAlt' | translate" (error)="onImagePreviewError()" />
-          } @else {
-            <div class="upload-placeholder">
-              <span class="material-symbols-outlined">image</span>
-              <strong>{{ 'manager.eventReview.noUsableImage' | translate }}</strong>
-              <p>{{ 'manager.eventReview.noUsableImageHint' | translate }}</p>
-            </div>
-          }
-        </div>
-
-        <div class="media-strip">
-          @if (sideGalleryImages.length > 0) {
-            <div class="media-thumbnails">
-              @for (image of sideGalleryImages; track image.id) {
-                <button type="button" class="media-thumb" (click)="selectReviewImage(image.url)">
-                  <img [src]="image.url" [alt]="image.altText || translationService.translate('manager.eventReview.eventThumbnailAlt')" />
-                </button>
-              }
-            </div>
-          } @else {
-            <div class="media-empty">{{ 'manager.eventReview.noAdditionalImages' | translate }}</div>
-          }
-        </div>
-      </div>
-    </section>
+    <app-review-media-gallery
+      [images]="eventImages"
+      [selectedUrl]="selectedReviewImageUrl"
+      [previewBroken]="isImagePreviewBroken"
+      (selectedUrlChange)="selectReviewImage($event)"
+      (previewBrokenChange)="isImagePreviewBroken = $event"
+    />
   </section>
 
   <form class="form-layout" [formGroup]="form">

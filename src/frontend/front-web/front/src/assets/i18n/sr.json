@@ -1383,6 +1383,19 @@
           "nameNotAvailable": "Ime nije dostupno u ovom prikazu."
         }
       },
+      "reviewMediaGallery": {
+        "title": "Medijska galerija",
+        "subtitle": "Galerija samo za pregled, prikazana pre detalja recenzije.",
+        "imageGalleryAria": "Medijska galerija",
+        "mainImageAria": "Pregled glavne slike",
+        "previewAlt": "Pregled slike",
+        "thumbnailAlt": "Sličica galerije",
+        "noPreview": "Pregled slike još nije dostupan",
+        "noPreviewHint": "Nema važećeg URL-a glavne slike ili se slika nije učitala.",
+        "noAdditionalImages": "Nema dodatnih slika u galeriji.",
+        "noImagesSubmitted": "Nijedna slika nije poslata.",
+        "imageCount": "{{count}} slika u galeriji"
+      },
       "map": {
         "searchPlaceholder": "Pretraži objekte, događaje, aktivnosti..."
       },
