@@ -320,11 +320,17 @@ tbody tr:hover,
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 6px;
   min-width: 84px;
   padding: 6px 12px;
   border-radius: 999px;
   font-size: 12px;
   font-weight: 700;
+}
+
+.chip-dot {
+  font-size: 9px;
+  line-height: 1;
 }
 
 .badge-approved {
@@ -1085,6 +1091,10 @@ tbody tr:hover,
     padding: 4px 8px;
     font-size: 10px;
     flex-shrink: 0;
+  }
+
+  .status-chip--compact .chip-dot {
+    display: none;
   }
 
   .event-mobile-card__date,

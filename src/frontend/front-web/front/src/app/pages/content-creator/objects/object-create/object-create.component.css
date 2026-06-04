@@ -6,7 +6,7 @@
   color: #1f2937;
 }
 
-.object-create-page--read-only .form-column :is(input, select, textarea):disabled {
+.object-create-page--read-only .step-card :is(input, select, textarea):disabled {
   opacity: 1;
   color: #374151;
   -webkit-text-fill-color: #374151;
@@ -114,18 +114,18 @@
   gap: 14px;
 }
 
+.section-block {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 .step-card {
   border: 1px solid #e5e7eb;
   border-radius: 14px;
   background: #ffffff;
   padding: 14px;
   box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
-}
-
-.section-block {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
 }
 
 .section-block h2 {

@@ -177,6 +177,7 @@
                 >
                   <td>
                     <span class="status-chip" [ngClass]="getStatusBadgeClass(event.status)">
+                      <span class="chip-dot" aria-hidden="true">&#9679;</span>
                       {{ humanizeStatus(event.status) }}
                     </span>
                   </td>
