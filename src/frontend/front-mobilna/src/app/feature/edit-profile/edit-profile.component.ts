@@ -50,6 +50,7 @@ export class EditProfileComponent implements OnInit {
   protected readonly country = signal('');
   protected readonly email = signal('');
   protected readonly phone = signal('');
+  protected readonly dateOfBirth = signal('');
   protected readonly isSaving = signal(false);
   protected readonly isLanguageMenuOpen = signal(false);
   protected readonly countryMenuOpen = signal(false);
@@ -395,6 +396,16 @@ export class EditProfileComponent implements OnInit {
     this.country.set(EditProfileComponent.normalizeCountry(user.country));
     this.email.set(user.email ?? '');
     this.phone.set(user.phoneNumber ?? '');
+
+    const raw = user.dateOfBirth?.trim();
+    if (raw) {
+      const d = new Date(raw);
+      this.dateOfBirth.set(
+        isNaN(d.getTime()) ? '' : d.toLocaleDateString('sr-Latn-RS', { day: 'numeric', month: 'long', year: 'numeric' })
+      );
+    } else {
+      this.dateOfBirth.set('');
+    }
   }
 
   private setFeedback(message: string, tone: 'success' | 'error' | 'neutral'): void {

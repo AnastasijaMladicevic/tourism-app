@@ -57,6 +57,7 @@ export interface UserDto {
   banReason?: string | null;
   banExpiresAtUtc?: string | null;
   bannedAtUtc?: string | null;
+  dateOfBirth?: string | null;
 }
 
 export interface AuthResponseDto {

@@ -760,6 +760,8 @@
     "country": "Država",
     "email": "Email adresa",
     "phone": "Broj telefona",
+    "dateOfBirth": "Datum rođenja",
+    "dateOfBirthNotSet": "Datum rođenja nije naveden",
     "interests": "Tvoja interesovanja",
     "selectedCount": "Izabrano: {{count}}",
     "appLanguage": "Jezik aplikacije",

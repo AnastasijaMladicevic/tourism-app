@@ -758,6 +758,8 @@
     "country": "Paese",
     "email": "Indirizzo email",
     "phone": "Numero di telefono",
+    "dateOfBirth": "Data di nascita",
+    "dateOfBirthNotSet": "Data di nascita non fornita",
     "interests": "I tuoi interessi",
     "selectedCount": "Selezionati: {{count}}",
     "appLanguage": "Lingua dell'app",

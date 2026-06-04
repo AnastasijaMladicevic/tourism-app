@@ -123,6 +123,14 @@ export class ProfileComponent implements OnInit {
     return this.user?.email?.trim() || this.translationService.translate('common.emailNotAvailable');
   }
 
+  protected get formattedDateOfBirth(): string | null {
+    const raw = this.user?.dateOfBirth?.trim();
+    if (!raw) return null;
+    const date = new Date(raw);
+    if (isNaN(date.getTime())) return null;
+    return date.toLocaleDateString('sr-Latn-RS', { day: 'numeric', month: 'long', year: 'numeric' });
+  }
+
   protected get editLabel(): string {
     return this.translationService.translate('profile.edit');
   }

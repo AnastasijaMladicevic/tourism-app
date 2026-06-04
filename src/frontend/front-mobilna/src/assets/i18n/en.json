@@ -760,6 +760,8 @@
     "country": "Country",
     "email": "Email address",
     "phone": "Phone number",
+    "dateOfBirth": "Date of birth",
+    "dateOfBirthNotSet": "Date of birth not provided",
     "interests": "Your interests",
     "selectedCount": "Selected: {{count}}",
     "appLanguage": "App language",

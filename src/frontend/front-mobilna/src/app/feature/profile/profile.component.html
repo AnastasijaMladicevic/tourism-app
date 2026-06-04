@@ -29,6 +29,9 @@
       <div class="hero-card__content">
         <h2>{{ fullName }}</h2>
         <p>{{ email }}</p>
+        @if (formattedDateOfBirth) {
+          <p class="hero-card__dob">{{ formattedDateOfBirth }}</p>
+        }
         <div class="status-pill">{{ activityLabel }}</div>
       </div>
     </section>

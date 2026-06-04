@@ -39,8 +39,6 @@ export class CreateTeamMemberComponent {
 
   country = 'United States';
   preferredLanguage = 'English (US)';
-  regionAssignment = '';
-
   readonly countries = [
     'Albania', 'Argentina', 'Australia', 'Austria', 'Belgium',
     'Bosnia and Herzegovina', 'Brazil', 'Bulgaria', 'Canada', 'China',
@@ -59,14 +57,6 @@ export class CreateTeamMemberComponent {
     'English (UK)',
     'Spanish',
     'Italian'
-  ];
-
-  readonly regionOptions = [
-    'North America — East',
-    'North America — West',
-    'European Union — Central',
-    'European Union — Mediterranean',
-    'Asia-Pacific'
   ];
 
   /** Maps UI labels to API `language` codes (max 5 chars per backend). */
@@ -234,10 +224,4 @@ export class CreateTeamMemberComponent {
     return this.t(`adminTeamMemberCreate.languages.${key}`);
   }
 
-  regionLabel(region: string): string {
-    const key = region
-      .replace(/\s+/g, '')
-      .replace(/[^A-Za-z]/g, '');
-    return this.t(`adminTeamMemberCreate.regions.${key}`);
-  }
 }

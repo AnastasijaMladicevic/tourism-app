@@ -66,8 +66,6 @@ export class EditTeamMemberComponent {
 
   country = 'United States';
   preferredLanguage = 'English (US)';
-  regionAssignment = '';
-
   isModerating = false;
   moderationError = '';
   moderationSuccess = '';
@@ -104,13 +102,7 @@ export class EditTeamMemberComponent {
     'Italian'
   ];
 
-  readonly regionOptions = [
-    'North America — East',
-    'North America — West',
-    'European Union — Central',
-    'European Union — Mediterranean',
-    'Asia-Pacific'
-  ];
+
 
   /** Maps UI labels to API `language` codes (max 5 chars per backend). */
   private readonly languageCodes: Record<string, string> = {
@@ -802,10 +794,4 @@ export class EditTeamMemberComponent {
     return this.t(`adminTeamMemberCreate.languages.${key}`);
   }
 
-  regionLabel(region: string): string {
-    const key = region
-      .replace(/\s+/g, '')
-      .replace(/[^A-Za-z]/g, '');
-    return this.t(`adminTeamMemberCreate.regions.${key}`);
-  }
 }

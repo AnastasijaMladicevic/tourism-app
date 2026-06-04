@@ -280,14 +280,6 @@
         </label>
       </div>
 
-      <label class="field">
-        <span class="field-label">{{ t('adminTeamMemberCreate.regionAssignment') }} <span class="optional">({{ t('common.optional') }})</span></span>
-        <select class="input-control select-control select-control--full" [(ngModel)]="regionAssignment" [disabled]="isEditBlocked || isSubmitting">
-          <option value="">{{ t('adminTeamMemberCreate.regionAssignmentPlaceholder') }}</option>
-          <option *ngFor="let r of regionOptions" [ngValue]="r">{{ regionLabel(r) }}</option>
-        </select>
-        <p class="field-hint">{{ t('adminTeamMemberCreate.regionAssignmentHint') }}</p>
-      </label>
     </section>
 
     <section class="form-section">

@@ -178,6 +178,11 @@
     color: var(--text-gray);
     font-size: var(--font-size-body);
     font-weight: var(--font-weight-semibold);
+    margin-bottom: 4px;
+  }
+
+  .hero-card__dob {
+    font-size: 13px;
     margin-bottom: 12px;
   }
 }
