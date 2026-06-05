@@ -552,8 +552,9 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
         }
 
         const managedObjectIds = new Set(objectContext.keys());
+        console.log(managedObjectIds);
         const scopedReviews = reviews.filter((review) => managedObjectIds.has(review.objectId));
-
+        console.log(reviews);
         return this.mapReviewsToThreads(scopedReviews, objectContext);
       }),
     );
@@ -616,6 +617,7 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
     reviews: ReviewDto[],
     objectContext: Map<number, ObjectReviewContext>,
   ): ManagerReviewThread[] {
+    console.log(reviews);
     const threads = reviews.map((review) => {
       const context = objectContext.get(review.objectId);
       const creatorId = context?.creatorId ?? 0;

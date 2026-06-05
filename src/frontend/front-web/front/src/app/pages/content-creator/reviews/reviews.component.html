@@ -1,9 +1,9 @@
 <section class="reviews-page">
   <header class="page-header">
     <div>
-      <h1>Review Moderation</h1>
+      <h1>{{ 'contentCreator.reviews.title' | translate }}</h1>
       <p class="page-subtitle">
-        Queue: {{ queueCountLabel }}
+        {{ 'contentCreator.reviews.queue' | translate }}: {{ queueCountLabel }}
         @if (objectFilterId != null) {
           <span class="subtitle-sep">·</span> {{ selectedObjectFilterLabel }}
         }
@@ -15,7 +15,7 @@
     <div class="chip-group">
         <button class="chip" type="button" [class.active]="isAllRatingsSelected" (click)="selectAllRatings()">
           <span class="material-symbols-outlined" aria-hidden="true">language</span>
-          All ratings
+          {{ 'contentCreator.reviews.filters.allRatings' | translate }}
         </button>
         <button class="chip chip-rating" type="button" [class.active]="isRatingSelected(5)" (click)="toggleRating(5)">5★</button>
         <button class="chip chip-rating" type="button" [class.active]="isRatingSelected(4)" (click)="toggleRating(4)">4★</button>
@@ -30,9 +30,9 @@
             [ngModel]="objectFilterId"
             (ngModelChange)="onObjectFilterChange($event)"
             [disabled]="isLoading"
-            aria-label="Filter by object"
+            [attr.aria-label]="'contentCreator.reviews.filters.filterByObject' | translate"
           >
-            <option [ngValue]="null">All objects</option>
+            <option [ngValue]="null">{{ 'contentCreator.reviews.filters.allObjects' | translate }}</option>
             @for (object of creatorObjects; track object.id) {
               <option [ngValue]="object.id">{{ object.name }}</option>
             }
@@ -41,19 +41,19 @@
         </label>
         <span class="chip-divider" aria-hidden="true"></span>
         <button class="chip" type="button" [class.active]="responseFilter === 'all'" (click)="responseFilter = 'all'; onFilterChange()">
-          All
+          {{ 'contentCreator.reviews.filters.all' | translate }}
         </button>
         <button class="chip" type="button" [class.active]="responseFilter === 'pending'" (click)="responseFilter = 'pending'; onFilterChange()">
           <span class="material-symbols-outlined" aria-hidden="true">mark_chat_unread</span>
-          No reply yet
+          {{ 'contentCreator.reviews.filters.pendingReply' | translate }}
         </button>
         <button class="chip" type="button" [class.active]="responseFilter === 'responded'" (click)="responseFilter = 'responded'; onFilterChange()">
           <span class="material-symbols-outlined" aria-hidden="true">mark_chat_read</span>
-          With CC reply
+          {{ 'contentCreator.reviews.filters.responded' | translate }}
         </button>
         <span class="chip-divider" aria-hidden="true"></span>
         <button class="chip reset" type="button" (click)="resetFilters()">
-          Reset
+          {{ 'contentCreator.reviews.filters.reset' | translate }}
         </button>
     </div>
 
@@ -61,7 +61,7 @@
       <span class="material-symbols-outlined search-icon" aria-hidden="true">search</span>
       <input
         type="search"
-        placeholder="Search reviewer, object, content..."
+        [placeholder]="'contentCreator.reviews.filters.searchPlaceholder' | translate"
         [ngModel]="searchTerm"
         (ngModelChange)="onSearchChange($event)"
       />
@@ -79,7 +79,7 @@
   <div class="moderation-grid">
     <aside class="queue-panel card">
       @if (isLoading) {
-        <p class="empty-note">Loading reviews...</p>
+        <p class="empty-note">{{ 'contentCreator.reviews.loading' | translate }}</p>
       } @else if (filteredReviews.length === 0) {
         <p class="empty-note">{{ emptyQueueMessage }}</p>
       } @else {
@@ -92,7 +92,7 @@
                   <span>{{ formatDate(review.createdAt) }}</span>
                 </div>
                 <span class="status" [class.approved]="review.creatorResponse" [class.pending]="!review.creatorResponse">
-                  {{ review.creatorResponse ? 'Responded' : 'Awaiting reply' }}
+                  {{ review.creatorResponse ? ('contentCreator.reviews.status.responded' | translate) : ('contentCreator.reviews.status.awaitingReply' | translate) }}
                 </span>
               </div>
               <p class="queue-item-preview">{{ review.text }}</p>
@@ -119,12 +119,12 @@
       @if (selectedReview) {
         <div class="case-header">
           <div>
-            <h2>Review: #{{ selectedReview.id }}</h2>
-            <p>Status: {{ selectedReviewHasResponse ? 'Responded' : 'Awaiting reply' }}</p>
+            <h2>{{ 'contentCreator.reviews.reviewLabel' | translate:{ id: selectedReview.id } }}</h2>
+            <p>{{ 'contentCreator.reviews.statusLabel' | translate }}: {{ selectedReviewHasResponse ? ('contentCreator.reviews.status.responded' | translate) : ('contentCreator.reviews.status.awaitingReply' | translate) }}</p>
           </div>
           <div class="case-actions">
             <button class="ghost danger" type="button" (click)="deleteResponse()" [disabled]="!selectedReviewHasResponse || isSubmitting">
-              Delete Response
+              {{ 'contentCreator.reviews.deleteResponse' | translate }}
             </button>
           </div>
         </div>
@@ -139,22 +139,22 @@
           </div>
 
           <div class="reviewed-item">
-            <span>Reviewing item</span>
+            <span>{{ 'contentCreator.reviews.reviewingItem' | translate }}</span>
             <h4>{{ selectedReview.objectName }} <span class="stars-filled">{{ filledStars(selectedReview.rating) }}</span><span class="stars-empty">{{ emptyStars(selectedReview.rating) }}</span></h4>
           </div>
 
           <p class="review-text">{{ selectedReview.text }}</p>
 
           <div class="attachments">
-            <h5>Object images ({{ selectedObjectImages.length }})</h5>
+            <h5>{{ 'contentCreator.reviews.objectImages' | translate:{ count: selectedObjectImages.length } }}</h5>
             @if (isLoadingImages) {
-              <p class="empty-note">Loading images...</p>
+              <p class="empty-note">{{ 'contentCreator.reviews.loadingImages' | translate }}</p>
             } @else if (selectedObjectImages.length === 0) {
-              <p class="empty-note">No object images available.</p>
+              <p class="empty-note">{{ 'contentCreator.reviews.noImages' | translate }}</p>
             } @else {
               <div class="attachment-grid">
                 @for (image of selectedObjectImages.slice(0, 4); track image.id) {
-                  <img class="attachment-real-img" [src]="image.url" [alt]="image.altText || 'Object image'" />
+                  <img class="attachment-real-img" [src]="image.url" [alt]="image.altText || ('contentCreator.reviews.objectImageAlt' | translate)" />
                 }
               </div>
             }
@@ -163,23 +163,23 @@
 
         <section class="response-composer">
           <div class="composer-tabs">
-            <button class="tab" type="button" (click)="responseText = 'Thank you for your feedback and for visiting our location.'">Thank you</button>
-            <button class="tab" type="button" (click)="responseText = 'Thank you for your feedback. We are already working on the mentioned issue.'">Addressing issues</button>
-            <button class="tab" type="button" (click)="responseText = 'Thank you for your feedback. We would love to investigate this in more detail.'">Need details</button>
+            <button class="tab" type="button" (click)="responseText = translationService.translate('contentCreator.reviews.templates.thankYouText')">{{ 'contentCreator.reviews.templates.thankYou' | translate }}</button>
+            <button class="tab" type="button" (click)="responseText = translationService.translate('contentCreator.reviews.templates.addressingIssuesText')">{{ 'contentCreator.reviews.templates.addressingIssues' | translate }}</button>
+            <button class="tab" type="button" (click)="responseText = translationService.translate('contentCreator.reviews.templates.needDetailsText')">{{ 'contentCreator.reviews.templates.needDetails' | translate }}</button>
           </div>
-          <textarea [(ngModel)]="responseText" placeholder="Write your professional response to the tourist here..." maxlength="1000"></textarea>
+          <textarea [(ngModel)]="responseText" [placeholder]="'contentCreator.reviews.responsePlaceholder' | translate" maxlength="1000"></textarea>
           <div class="composer-footer">
-            <span>Character count: {{ responseText.length }} / 1000</span>
+            <span>{{ 'contentCreator.reviews.characterCount' | translate:{ count: responseText.length } }}</span>
             <div class="composer-buttons">
               <button class="primary" type="button" (click)="sendResponse()" [disabled]="isSubmitting">
-                {{ selectedReviewHasResponse ? 'Update Response' : 'Send Response' }}
+                {{ selectedReviewHasResponse ? ('contentCreator.reviews.updateResponse' | translate) : ('contentCreator.reviews.sendResponse' | translate) }}
               </button>
             </div>
           </div>
         </section>
       } @else {
         <section class="review-content">
-          <p class="empty-note">Select a review from the queue to see details and respond.</p>
+          <p class="empty-note">{{ 'contentCreator.reviews.empty.thread' | translate }}</p>
         </section>
       }
     </main>
@@ -187,22 +187,22 @@
     <aside class="insight-panel card">
       @if (selectedReview) {
         <section>
-          <h3>Reviewer Insight</h3>
+          <h3>{{ 'contentCreator.reviews.reviewerInsight' | translate }}</h3>
           <div class="note-box">
             <p>{{ ratingStars(selectedReview.rating) }} ({{ selectedReview.rating }}/5)</p>
-            <p>Reviewer: {{ selectedReview.userFullName }}</p>
+            <p>{{ 'contentCreator.reviews.reviewer' | translate }}: {{ selectedReview.userFullName }}</p>
           </div>
         </section>
 
         <section class="metrics">
-          <h4>Review Details</h4>
-          <div class="metric-row"><span>Review ID</span><strong>#{{ selectedReview.id }}</strong></div>
-          <div class="metric-row"><span>Created</span><strong>{{ formatDate(selectedReview.createdAt) }}</strong></div>
-          <div class="metric-row"><span>Status</span><strong>{{ selectedReviewHasResponse ? 'Responded' : 'Awaiting reply' }}</strong></div>
+          <h4>{{ 'contentCreator.reviews.reviewDetails' | translate }}</h4>
+          <div class="metric-row"><span>{{ 'contentCreator.reviews.reviewId' | translate }}</span><strong>#{{ selectedReview.id }}</strong></div>
+          <div class="metric-row"><span>{{ 'contentCreator.reviews.created' | translate }}</span><strong>{{ formatDate(selectedReview.createdAt) }}</strong></div>
+          <div class="metric-row"><span>{{ 'contentCreator.reviews.statusLabel' | translate }}</span><strong>{{ selectedReviewHasResponse ? ('contentCreator.reviews.status.responded' | translate) : ('contentCreator.reviews.status.awaitingReply' | translate) }}</strong></div>
         </section>
 
         <section class="checks">
-          <h4>Object</h4>
+          <h4>{{ 'contentCreator.reviews.object' | translate }}</h4>
           <p>{{ selectedReview.objectName }}</p>
           @if (selectedObject?.address) {
             <p>{{ selectedObject?.address }}</p>
@@ -210,19 +210,19 @@
         </section>
 
         <section class="decision-log">
-          <h4>Response Log</h4>
+          <h4>{{ 'contentCreator.reviews.responseLog' | translate }}</h4>
           @if (selectedReview.creatorResponse?.trim()) {
-            <p><strong>Response:</strong></p>
+            <p><strong>{{ 'contentCreator.reviews.response' | translate }}:</strong></p>
             <p>{{ selectedReview.creatorResponse }}</p>
             @if (selectedReview.creatorResponseAt) {
-              <p><strong>Sent:</strong> {{ formatDate(selectedReview.creatorResponseAt) }}</p>
+              <p><strong>{{ 'contentCreator.reviews.sent' | translate }}:</strong> {{ formatDate(selectedReview.creatorResponseAt) }}</p>
             }
           } @else {
-            <p>No response submitted yet.</p>
+            <p>{{ 'contentCreator.reviews.noResponseYet' | translate }}</p>
           }
         </section>
       } @else {
-        <p class="empty-note">Reviewer insights will appear after selecting a review.</p>
+        <p class="empty-note">{{ 'contentCreator.reviews.empty.context' | translate }}</p>
       }
     </aside>
   </div>

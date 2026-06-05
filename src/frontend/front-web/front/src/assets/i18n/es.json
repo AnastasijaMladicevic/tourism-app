@@ -44,7 +44,20 @@
     "contentItems": "elementos de contenido",
     "objects": "Objetos",
     "events": "Eventos",
-    "activities": "Actividades"
+    "activities": "Actividades",
+    "object": "Objeto",
+    "activity": "Actividad",
+    "edit": "Editar",
+    "userFallbackInitial": "U",
+    "time": {
+      "justNow": "ahora mismo",
+      "minutesAgoShort": "hace {{count}}m",
+      "hoursAgoShort": "hace {{count}}h",
+      "daysAgoShort": "hace {{count}}d",
+      "weeksAgoShort": "hace {{count}}sem",
+      "monthsAgoShort": "hace {{count}}mes",
+      "yearsAgoShort": "hace {{count}}a"
+    }
   },
   "paginator": {
     "of": "de",
@@ -573,12 +586,14 @@
       "topContent": "Contenido destacado",
       "topContentSubtitle": "Objetos, eventos y actividades con la mayor puntuación de interacción",
       "manageContent": "Administrar contenido",
+      "scoreValue": "puntuación {{score}}",
       "noDestination": "Sin destino",
       "noRegion": "Sin región",
       "favorites": "favoritos",
       "plannerAdds": "añadidos al planificador",
       "reviews": "reseñas",
       "avgRating": "calificación media",
+      "averageRatingAria": "Calificación media {{rating}} de 5",
       "noContentEngagement": "No hay datos de interacción de contenido disponibles para este período.",
       "topDestinations": "Destinos principales",
       "topDestinationsSubtitle": "Rendimiento de destinos a partir de tu contenido",
@@ -586,7 +601,8 @@
       "upcomingEvents": "Próximos eventos",
       "upcomingEventsSubtitle": "{{count7}} en los próximos 7 días · {{count30}} en los próximos 30 días",
       "openEvents": "Abrir eventos",
-      "noUpcomingEvents": "No hay eventos aprobados próximos en los próximos 30 días."
+      "noUpcomingEvents": "No hay eventos aprobados próximos en los próximos 30 días.",
+      "loadError": "No se pudieron cargar los datos del panel del creador de contenido en este momento."
     }
   },
   "auth": {
@@ -738,6 +754,26 @@
       "reviewDeletionRequestsDetail": "Ve y revisa las solicitudes de eliminación del destino gestionado.",
       "manageReportsLabel": "Gestionar informes del gerente",
       "manageReportsDetail": "Crea informes, ve tus propios informes y retira tus propios informes."
+    }
+  },
+  "contentCreatorProfile": {
+    "permissions": {
+      "createContentLabel": "Crear objetos, eventos y actividades",
+      "createContentDetail": "Crea nuevos objetos, eventos y actividades que entran en el flujo de revisión del gerente.",
+      "editPublishedLabel": "Editar contenido propio publicado",
+      "editPublishedDetail": "Actualiza solo tus propios objetos, eventos y actividades publicados o pendientes.",
+      "deletePendingLabel": "Eliminar contenido propio no publicado",
+      "deletePendingDetail": "Elimina tu propio contenido antes de que llegue al estado aprobado.",
+      "manageImagesLabel": "Gestionar imágenes del contenido",
+      "manageImagesDetail": "Añade y organiza imágenes para tus propios objetos, eventos y actividades.",
+      "respondReviewsLabel": "Responder a las reseñas",
+      "respondReviewsDetail": "Responde a las reseñas de tus propios objetos y gestiona esas respuestas.",
+      "requestDeletionLabel": "Solicitar eliminaciones",
+      "requestDeletionDetail": "Solicita la eliminación de tus propios objetos, eventos y actividades aprobados.",
+      "viewDeletionRequestsLabel": "Ver tus propias solicitudes de eliminación",
+      "viewDeletionRequestsDetail": "Sigue el estado de las solicitudes de eliminación que ya has enviado.",
+      "viewDashboardLabel": "Ver el panel general",
+      "viewDashboardDetail": "Abre la vista general del panel del creador de contenido."
     }
   },
     "manager": {
@@ -2054,6 +2090,517 @@
     "setPasswordHeading": "Establecer nueva contraseña"
 
   },
+  "contentCreator": {
+    "objects": {
+      "eyebrow": "Gestión de objetos",
+      "title": "Objetos",
+      "createObject": "Crear objeto",
+      "searchPlaceholder": "Buscar por nombre, categoría o región...",
+      "loading": "Cargando objetos...",
+      "totalCount": "Total: {{count}} objetos",
+      "details": "Detalles",
+      "destination": "Destino",
+      "locality": "Localidad",
+      "description": "Descripción",
+      "reviews": "Reseñas",
+      "selectedObject": "Objeto seleccionado",
+      "featuredObject": "Objeto destacado",
+      "noDescription": "No hay descripción para este objeto.",
+      "noCoordinates": "Las coordenadas no están disponibles para este objeto.",
+      "filters": {
+        "status": "Estado",
+        "type": "Tipo",
+        "rating": "Valoración",
+        "sortBy": "Ordenar por",
+        "order": "Orden",
+        "ascending": "Ascendente",
+        "descending": "Descendente",
+        "apply": "Aplicar",
+        "reset": "Restablecer",
+        "allStatuses": "Todos los estados",
+        "allTypes": "Todos los tipos",
+        "anyRating": "Cualquier valoración",
+        "name": "Nombre",
+        "createdDate": "Fecha de creación"
+      },
+      "stats": {
+        "totalObjects": "Total de objetos",
+        "matchingFilters": "Coincide con los filtros activos",
+        "onThisPage": "En esta página",
+        "visibleRows": "Filas visibles",
+        "averageRating": "Valoración media",
+        "acrossPage": "En la página actual"
+      },
+      "table": {
+        "status": "Estado",
+        "objectDetails": "Detalles del objeto",
+        "type": "Tipo",
+        "destination": "Destino",
+        "rating": "Valoración",
+        "action": "Acción"
+      },
+      "empty": {
+        "filtered": "No se encontraron objetos con los filtros seleccionados.",
+        "pickObjectBody": "Selecciona un objeto de la tabla para ver los detalles."
+      },
+      "status": {
+        "published": "Publicado",
+        "approved": "Aprobado",
+        "pending": "Pendiente",
+        "draft": "Borrador",
+        "rejected": "Rechazado"
+      },
+      "error": {
+        "load": "No se pudieron cargar los objetos."
+      }
+    },
+    "events": {
+      "eyebrow": "Gestión de eventos",
+      "title": "Eventos y horarios",
+      "createEvent": "Crear nuevo evento",
+      "searchPlaceholder": "Buscar eventos, objetos u organizadores...",
+      "dateRangeFilter": "Filtro de rango de fechas",
+      "fromDate": "Desde la fecha",
+      "toDate": "Hasta la fecha",
+      "loading": "Cargando eventos...",
+      "selectedEvent": "Evento seleccionado",
+      "featuredEvent": "Evento destacado",
+      "rejectionReason": "Motivo del rechazo",
+      "capacity": "Capacidad",
+      "description": "Descripción",
+      "noDescription": "Evento destacado del espacio del creador. Usa este panel para revisar horario, medios y detalles del evento.",
+      "noCoordinates": "Las coordenadas no están disponibles para este evento.",
+      "uncategorized": "Sin categoría",
+      "primaryDestination": "Destino principal",
+      "capacityMax": "{{count}} máx",
+      "totalCount": "Total: {{count}} eventos",
+      "filters": {
+        "status": "Estado",
+        "category": "Categoría",
+        "allStatuses": "Todos los estados",
+        "allCategories": "Todas las categorías",
+        "sortBy": "Ordenar por",
+        "startDate": "Fecha de inicio",
+        "name": "Nombre",
+        "order": "Orden",
+        "ascending": "Ascendente",
+        "descending": "Descendente",
+        "apply": "Aplicar",
+        "reset": "Restablecer"
+      },
+      "categories": {
+        "festival": "Festival",
+        "workshop": "Taller",
+        "sports": "Deportes",
+        "cultural": "Cultural",
+        "exhibition": "Exposición",
+        "concert": "Concierto"
+      },
+      "stats": {
+        "upcomingThisWeek": "Próximos esta semana",
+        "next7DaysHint": "Eventos publicados en los próximos 7 días",
+        "publishedOnPage": "Publicados en la página",
+        "pageVisibilityHint": "Eventos publicados o aprobados en la página actual de la tabla",
+        "capacityConfigured": "Capacidad configurada",
+        "capacityConfiguredHint": "Porcentaje de eventos visibles con aforo máximo configurado"
+      },
+      "table": {
+        "status": "Estado",
+        "eventDetails": "Detalles del evento",
+        "destination": "Destino",
+        "category": "Categoría",
+        "capacity": "Capacidad",
+        "action": "Acción"
+      },
+      "schedule": {
+        "title": "Horario",
+        "starts": "Empieza",
+        "ends": "Termina",
+        "location": "Ubicación",
+        "category": "Categoría"
+      },
+      "empty": {
+        "noEventSelected": "No hay evento seleccionado",
+        "pickEventTitle": "Elige un evento de la tabla",
+        "pickEventBody": "Selecciona una fila para revisar medios, horario y detalles en el panel derecho."
+      },
+      "status": {
+        "published": "Publicado",
+        "approved": "Aprobado",
+        "pending": "Pendiente",
+        "draft": "Borrador",
+        "rejected": "Rechazado",
+        "cancelled": "Cancelado"
+      },
+      "error": {
+        "load": "No se pudieron cargar los eventos."
+      }
+    },
+    "activities": {
+      "eyebrow": "Gestión de actividades",
+      "title": "Actividades",
+      "createActivity": "Agregar actividad",
+      "searchPlaceholder": "Buscar actividades, tipos o destinos...",
+      "loading": "Cargando actividades...",
+      "selectedActivity": "Actividad seleccionada",
+      "featuredActivity": "Actividad destacada",
+      "duration": "Duración",
+      "activityInfo": "Información de la actividad",
+      "destination": "Destino",
+      "locality": "Localidad",
+      "object": "Objeto",
+      "coordinates": "Coordenadas",
+      "created": "Creado",
+      "updated": "Actualizado",
+      "description": "Descripción",
+      "noDescription": "Actividad destacada del espacio del creador. Usa este panel para revisar ubicación, logística y metadatos de la actividad.",
+      "noCoordinates": "Las coordenadas no están disponibles para esta actividad.",
+      "oneHour": "1 hora",
+      "hours": "{{count}} horas",
+      "hoursMinutes": "{{hours}}h {{minutes}}m",
+      "totalCount": "Total: {{count}} actividades",
+      "filters": {
+        "status": "Estado",
+        "allStatuses": "Todos los estados",
+        "type": "Tipo",
+        "destination": "Destino",
+        "sortBy": "Ordenar por",
+        "createdDate": "Fecha de creación",
+        "order": "Orden",
+        "ascending": "Ascendente",
+        "descending": "Descendente",
+        "apply": "Aplicar",
+        "reset": "Restablecer",
+        "allTypes": "Todos los tipos",
+        "allDestinations": "Todos los destinos"
+      },
+      "stats": {
+        "totalActivities": "Total de actividades",
+        "matchingFilters": "Coincide con los filtros activos",
+        "onThisPage": "En esta página",
+        "visibleRows": "Filas visibles",
+        "pendingReview": "Pendiente de revisión"
+      },
+      "table": {
+        "status": "Estado",
+        "activityDetails": "Detalles de la actividad",
+        "type": "Tipo",
+        "destination": "Destino",
+        "duration": "Duración",
+        "action": "Acción"
+      },
+      "empty": {
+        "noActivitySelected": "No hay actividad seleccionada",
+        "pickActivityTitle": "Elige una actividad de la tabla",
+        "pickActivityBody": "Selecciona una fila para revisar medios, horario y logística en el panel derecho."
+      },
+      "status": {
+        "published": "Publicado",
+        "approved": "Aprobado",
+        "pending": "Pendiente",
+        "draft": "Borrador",
+        "archived": "Archivado",
+        "rejected": "Rechazado"
+      },
+      "error": {
+        "load": "No se pudieron cargar las actividades."
+      }
+    },
+    "reviews": {
+      "title": "Moderación de reseñas",
+      "queue": "Cola",
+      "count": "{{count}} reseñas",
+      "loading": "Cargando reseñas...",
+      "loadingImages": "Cargando imágenes...",
+      "reviewLabel": "Reseña #{{id}}",
+      "statusLabel": "Estado",
+      "deleteResponse": "Eliminar respuesta",
+      "reviewingItem": "Elemento reseñado",
+      "objectImages": "Imágenes del objeto ({{count}})",
+      "objectImageAlt": "Imagen del objeto",
+      "responsePlaceholder": "Escribe aquí tu respuesta profesional al turista...",
+      "characterCount": "Cantidad de caracteres: {{count}} / 1000",
+      "sendResponse": "Enviar respuesta",
+      "updateResponse": "Actualizar respuesta",
+      "reviewerInsight": "Información del autor",
+      "reviewer": "Autor",
+      "reviewDetails": "Detalles de la reseña",
+      "reviewId": "ID de reseña",
+      "created": "Creado",
+      "object": "Objeto",
+      "responseLog": "Registro de respuestas",
+      "response": "Respuesta",
+      "sent": "Enviado",
+      "noResponseYet": "Aún no se envió ninguna respuesta.",
+      "filters": {
+        "allRatings": "Todas las valoraciones",
+        "filterByObject": "Filtrar por objeto",
+        "allObjects": "Todos los objetos",
+        "all": "Todo",
+        "pendingReply": "Sin respuesta",
+        "responded": "Con respuesta del creador",
+        "reset": "Restablecer",
+        "searchPlaceholder": "Buscar autor, objeto o contenido..."
+      },
+      "status": {
+        "responded": "Respondida",
+        "awaitingReply": "Esperando respuesta"
+      },
+      "templates": {
+        "thankYou": "Gracias",
+        "thankYouText": "Gracias por tus comentarios y por visitar nuestra ubicación.",
+        "addressingIssues": "Estamos trabajando en ello",
+        "addressingIssuesText": "Gracias por tus comentarios. Ya estamos trabajando en el problema mencionado.",
+        "needDetails": "Necesitamos más detalles",
+        "needDetailsText": "Gracias por tus comentarios. Nos gustaría investigarlo con más detalle."
+      },
+      "empty": {
+        "forObjectNamed": "No se encontraron reseñas para {{name}}.",
+        "forObject": "No se encontraron reseñas para este objeto.",
+        "none": "No se encontraron reseñas para tus objetos.",
+        "thread": "Selecciona una reseña de la cola para ver los detalles y responder.",
+        "context": "La información del autor aparecerá después de seleccionar una reseña."
+      },
+      "fallback": {
+        "object": "Objeto #{{id}}"
+      },
+      "success": {
+        "responseSent": "La respuesta se envió correctamente.",
+        "responseDeleted": "La respuesta se eliminó correctamente."
+      },
+      "error": {
+        "load": "No se pudieron cargar las reseñas.",
+        "responseRequired": "La respuesta no puede estar vacía.",
+        "responseSend": "No se pudo enviar la respuesta.",
+        "responseDelete": "No se pudo eliminar la respuesta."
+      },
+      "noImages": "No hay imágenes disponibles del objeto."
+    },
+    "eventForm": {
+      "createTitle": "Crear evento",
+      "editTitle": "Editar evento",
+      "createAction": "Crear evento",
+      "updateAction": "Actualizar evento",
+      "subtitle": "Crea la página del evento, gestiona los datos de ubicación y prepara el calendario dentro del espacio del creador.",
+      "step1": "PASO 1",
+      "step2": "PASO 2",
+      "step3": "PASO 3",
+      "step4": "PASO 4",
+      "step5": "PASO 5",
+      "generalInformation": "Información general",
+      "generalInformationIntro": "Detalles esenciales sobre tu próximo evento.",
+      "eventTitle": "Título del evento",
+      "eventTitlePlaceholder": "p. ej. Festival de Jazz de Verano 2024",
+      "eventType": "Tipo de evento",
+      "selectType": "Selecciona un tipo",
+      "organizer": "Organizador",
+      "region": "Región",
+      "allRegions": "Todas las regiones",
+      "destination": "Destino",
+      "selectDestination": "Selecciona destino",
+      "selectRegionFirst": "Primero selecciona una región",
+      "object": "Objeto",
+      "selectObject": "Selecciona objeto",
+      "selectDestinationFirst": "Primero selecciona un destino",
+      "noObjectsForDestination": "No se encontraron objetos para el destino seleccionado.",
+      "fullDescription": "Descripción completa",
+      "descriptionPlaceholder": "Escribe una descripción detallada e incluye qué pueden esperar los invitados...",
+      "schedule": "Horario",
+      "scheduleIntro": "Cuándo y con qué frecuencia se celebra este evento.",
+      "startDateTime": "Fecha y hora de inicio",
+      "endDateTime": "Fecha y hora de finalización",
+      "timezone": "Zona horaria",
+      "ticketingCapacity": "Entradas y aforo",
+      "capacity": "Aforo",
+      "capacityPlaceholder": "500",
+      "categorization": "Categorización y restricciones",
+      "categorizationIntro": "Etiquetas y controles de acceso para la ficha del evento.",
+      "tagsCategories": "Etiquetas y categorías",
+      "addTagPlaceholder": "Añadir etiqueta...",
+      "ageRestriction": "Restricción de edad",
+      "selectRestriction": "Selecciona restricción",
+      "mediaGallery": "Galería multimedia",
+      "mediaGalleryIntro": "Sube hasta 8 imágenes y elige una imagen principal de portada.",
+      "addPhotos": "Añadir fotos",
+      "dropzoneCopy": "Elige archivos de imagen locales o arrástralos aquí. Se subirán después de guardar el evento.",
+      "imagesSelected": "{{count}} imagen(es) seleccionada(s)",
+      "selectImageFiles": "Selecciona uno o más archivos de imagen...",
+      "addPhoto": "Añadir foto",
+      "eventImageAlt": "Vista previa de la imagen del evento",
+      "primary": "Principal",
+      "setPrimary": "Establecer como principal",
+      "noImagesHelp": "Añade una o más imágenes arriba. Se guardarán al crear o actualizar el evento.",
+      "locationIntelligence": "Inteligencia de objeto y ubicación",
+      "locationIntelligenceHint": "Elige un objeto vinculado y marca el lugar exacto del evento en el mapa.",
+      "linkedObjectLabel": "Objeto vinculado:",
+      "linkedObject": "Objeto vinculado",
+      "noLinkedObjectSelected": "No hay objeto vinculado seleccionado",
+      "noAddressAvailable": "No hay dirección disponible",
+      "usingDestinationCoordinates": "Usando las coordenadas del destino para {{destination}}.",
+      "locationHint": "Selecciona un destino y, opcionalmente, un objeto para previsualizar el mapa de la derecha.",
+      "creatorTips": "Consejos para el creador",
+      "learnMore": "Más información sobre eventos",
+      "activityDurationMinutes": "{{count}} min",
+      "tips": {
+        "tip1": "Los eventos con banners de alta resolución generan más interacción.",
+        "tip2": "Vincula tu evento a un objeto específico para mostrar direcciones automáticas.",
+        "tip3": "Horas de inicio y fin claras ayudan con los calendarios exportados."
+      },
+      "playbookTitle": "Guía del creador de eventos",
+      "playbookBody": "Usa eventos vinculados a objetos con coordenadas precisas para que los invitados puedan llegar directamente al punto del evento. Mantén alineados el título, el horario y la información de entradas con tus actividades relacionadas para mejorar el descubrimiento.",
+      "playbookTips": {
+        "tip1": "Siempre que sea posible, utiliza la misma combinación de destino/objeto que en las actividades relacionadas.",
+        "tip2": "Coloca el marcador del mapa cerca de la entrada real, no solo del centro de la ciudad.",
+        "tip3": "Añade al menos una actividad relacionada para crear una sugerencia de plan diario completa."
+      },
+      "delete": {
+        "requestTitle": "Solicitar eliminación",
+        "confirmTitle": "Confirmar eliminación",
+        "requestDescription": "Este evento está aprobado, así que para quitarlo se requiere una solicitud de eliminación al manager.",
+        "confirmDescription": "Este evento aún está pendiente, así que puede eliminarse de inmediato.",
+        "managerReviewNote": "Un manager revisará la solicitud antes de eliminar el evento.",
+        "cannotUndo": "Esta acción no se puede deshacer.",
+        "requestAction": "Solicitar eliminación",
+        "requested": "Eliminación solicitada",
+        "alreadyRequested": "Ya solicitado",
+        "submitting": "Enviando...",
+        "deleting": "Eliminando...",
+        "deleteAction": "Eliminar",
+        "deleteEventAction": "Eliminar evento"
+      },
+      "success": {
+        "created": "¡Evento creado correctamente!",
+        "updated": "¡Evento actualizado correctamente!",
+        "deleted": "Evento eliminado correctamente.",
+        "deletionRequested": "Solicitud de eliminación enviada. Un manager debe revisarla antes de eliminar el evento."
+      },
+      "errors": {
+        "loadEditFailed": "No se encontró el evento o no tienes permiso para editarlo.",
+        "uploadLimit": "Puedes subir hasta {{count}} imágenes por evento.",
+        "duplicateImages": "Se omitieron imágenes duplicadas: {{files}}",
+        "partialUpload": "Solo se añadieron las primeras {{accepted}} imágenes. Cada evento puede tener hasta {{count}} imágenes.",
+        "imageRequired": "Se requiere al menos una imagen antes de guardar.",
+        "endAfterStart": "La fecha y hora de fin deben ser posteriores a la fecha y hora de inicio.",
+        "endAfterStartShort": "La fecha de fin debe ser posterior al inicio.",
+        "saveFailed": "No se pudo guardar el evento",
+        "imageUploadAfterCreate": "El evento se creó, pero falló la subida de imágenes. Añádelas desde Editar.",
+        "deletionRequestFailed": "No se pudo enviar la solicitud de eliminación",
+        "deleteFailed": "No se pudo eliminar el evento"
+      }
+    },
+    "activityForm": {
+      "createTitle": "Crear actividad",
+      "editTitle": "Editar actividad",
+      "createAction": "Crear actividad",
+      "updateAction": "Actualizar actividad",
+      "creating": "Creando...",
+      "updating": "Actualizando...",
+      "subtitle": "Crea y gestiona actividades con datos de ubicación, logística y galería.",
+      "step1": "PASO 1",
+      "step2": "PASO 2",
+      "step3": "PASO 3",
+      "coreDetails": "Detalles básicos",
+      "coreDetailsIntro": "Define la identidad básica de tu experiencia.",
+      "activityName": "Nombre de la actividad",
+      "activityNamePlaceholder": "p. ej. Vuelo en globo al amanecer sobre Capadocia",
+      "description": "Descripción",
+      "descriptionPlaceholder": "Describe la experiencia en detalle. Destaca qué la hace única, qué incluye y qué deben esperar los viajeros.",
+      "logistics": "Logística y clasificación",
+      "logisticsIntro": "Define dónde, cuándo y cuánto.",
+      "activityType": "Tipo de actividad",
+      "selectActivityType": "Selecciona tipo de actividad",
+      "enterActivityTypeId": "Introduce el ID del tipo de actividad",
+      "region": "Región",
+      "allRegions": "Todas las regiones",
+      "destination": "Destino",
+      "selectDestination": "Selecciona destino",
+      "selectRegionFirst": "Primero selecciona una región",
+      "locality": "Localidad",
+      "selectLocality": "Selecciona localidad",
+      "selectDestinationFirst": "Primero selecciona un destino",
+      "touristObject": "Objeto turístico",
+      "minutesShort": "MIN",
+      "mediaGallery": "Galería multimedia",
+      "mediaGalleryIntro": "Sube hasta 8 imágenes y elige una imagen principal de portada.",
+      "addPhotos": "Añadir fotos",
+      "dropzoneCopy": "Elige archivos de imagen locales. Se subirán después de guardar la actividad.",
+      "imagesSelected": "{{count}} imagen(es) seleccionada(s)",
+      "selectImageFiles": "Selecciona uno o más archivos de imagen...",
+      "addPhoto": "Añadir foto",
+      "activityImageAlt": "Vista previa de la imagen de la actividad",
+      "primary": "Principal",
+      "setPrimary": "Establecer como principal",
+      "locationIntelligence": "Inteligencia de ubicación",
+      "locationContextPlaceholder": "Configura destino/localidad para el contexto de ubicación",
+      "locationContextAria": "Buscar un lugar para establecer el contexto del mapa",
+      "delete": {
+        "requestTitle": "Solicitar eliminación",
+        "confirmTitle": "Confirmar eliminación",
+        "requestDescription": "Esta actividad está aprobada, así que para quitarla se requiere una solicitud de eliminación al manager.",
+        "confirmDescription": "Esta actividad aún está pendiente, así que puede eliminarse de inmediato.",
+        "managerReviewNote": "Un manager revisará la solicitud antes de eliminar la actividad.",
+        "cannotUndo": "Esta acción no se puede deshacer.",
+        "requestAction": "Solicitar eliminación",
+        "requested": "Eliminación solicitada",
+        "alreadyRequested": "Ya solicitado",
+        "submitting": "Enviando...",
+        "deleting": "Eliminando...",
+        "deleteAction": "Eliminar"
+      },
+      "success": {
+        "created": "Actividad creada correctamente.",
+        "updated": "Actividad actualizada correctamente.",
+        "partialImageUpload": "La actividad se guardó, pero no se pudieron adjuntar algunas imágenes.",
+        "deleted": "Actividad eliminada correctamente.",
+        "deletionRequested": "Solicitud de eliminación enviada. Un manager debe revisarla antes de eliminar la actividad."
+      },
+      "errors": {
+        "nameInvalid": "El nombre de la actividad es obligatorio y debe tener como máximo 150 caracteres.",
+        "locationRequired": "Selecciona al menos un destino o una localidad.",
+        "typeRequired": "El tipo de actividad es obligatorio.",
+        "imageRequired": "Se requiere al menos una imagen antes de guardar.",
+        "uploadLimit": "Puedes subir hasta {{count}} imágenes por actividad.",
+        "duplicateImages": "Se omitieron imágenes duplicadas: {{files}}",
+        "partialUpload": "Solo se añadieron las primeras {{accepted}} imágenes. Cada actividad puede tener hasta {{count}} imágenes.",
+        "saveFailed": "No se pudo guardar la actividad.",
+        "deletionRequestFailed": "No se pudo enviar la solicitud de eliminación",
+        "deleteFailed": "No se pudo eliminar la actividad.",
+        "loadEditFailed": "No se pudo cargar la actividad para editarla."
+      }
+    },
+    "map": {
+      "searchPlaceholder": "Buscar objetos, eventos, actividades...",
+      "filters": {
+        "hotels": "Hoteles",
+        "restaurants": "Restaurantes",
+        "bars": "Bares"
+      }
+    },
+    "eventDetails": {
+      "pageEyebrow": "Eventos > Detalles del evento",
+      "titleFallback": "Detalles del evento",
+      "pageIntro": "Revisa el resumen del evento, el horario y el contexto de los organizadores dentro del espacio del creador.",
+      "back": "Volver",
+      "share": "Compartir",
+      "loading": "Cargando detalles del evento...",
+      "featuredEvent": "Evento destacado",
+      "rejectionReason": "Motivo del rechazo",
+      "quickFacts": "Datos rápidos",
+      "about": "Sobre este evento",
+      "schedule": "Programa",
+      "organizers": "Organizadores",
+      "objectSection": "Objeto",
+      "linkedObject": "Objeto vinculado",
+      "locationContextNote": "El contexto de ubicación está vinculado desde los datos del evento.",
+      "invalidId": "ID de evento no válido.",
+      "notFound": "No se encontró el evento o no tienes permiso para verlo.",
+      "startDate": "Fecha de inicio",
+      "endDate": "Fecha de finalización",
+      "capacity": "Aforo",
+      "guests": "{{count}} invitados",
+      "summaryFallback": "Esta vista del evento para el creador resume en un solo lugar el calendario, los medios y la información de los organizadores."
+    }
+  },
   "contentCreatorObjectForm": {
     "eyebrow": "Estudio del objeto",
     "createTitle": "Crear objeto",
@@ -2102,6 +2649,7 @@
     "setPrimary": "Establecer como principal",
     "noImagesHelp": "Sube al menos una imagen para que el objeto pueda revisarse y publicarse.",
     "locationIntelligence": "Información de ubicación",
+    "locationContextPlaceholder": "Selecciona un destino o una localidad para el contexto de ubicación",
     "newObject": "Nuevo objeto",
     "createdBy": "Creado por {{name}}",
     "creator": "Creador",
@@ -2115,6 +2663,15 @@
       "friday": "Viernes",
       "saturday": "Sábado",
       "sunday": "Domingo"
+    },
+    "dayShort": {
+      "monday": "Lun",
+      "tuesday": "Mar",
+      "wednesday": "Mié",
+      "thursday": "Jue",
+      "friday": "Vie",
+      "saturday": "Sáb",
+      "sunday": "Dom"
     },
     "delete": {
       "requestTitle": "Solicitar eliminación del objeto",
@@ -2166,6 +2723,10 @@
       "concerning": "Preocupante",
       "creatorNoReply": "El creador todavía no ha respondido.",
       "reportCreatorName": "Reportar a {{name}}",
+      "timeline": {
+        "edited": "{{created}}, editado {{updated}}",
+        "updatedOnly": "Actualizado {{updated}}"
+      },
       "declineTitle": "Rechazar objeto",
       "declineDescription": "Explica qué debe corregirse antes de que este objeto pueda aprobarse.",
       "declinePlaceholder": "Escribe el motivo para rechazar este objeto...",
@@ -2187,7 +2748,8 @@
       "imageRequired": "Añade al menos una imagen antes de enviar el objeto.",
       "destinationRequired": "Selecciona un destino antes de enviar el objeto.",
       "saveFailed": "No se pudo guardar el objeto.",
-      "loadFailed": "No se pudo cargar el objeto."
+      "loadFailed": "No se pudo cargar el objeto.",
+      "imageUploadAfterCreate": "El objeto se creó, pero falló la subida de imágenes. Añádelas abajo."
     }
   },
   "__literals": {

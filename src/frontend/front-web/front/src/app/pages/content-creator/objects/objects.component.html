@@ -1,13 +1,13 @@
 <section class="objects-page">
   <header class="page-header">
     <div class="page-header-copy">
-      <p class="eyebrow page-header-eyebrow">Objects management</p>
-      <h1>Objects</h1>
-      <p class="page-subtitle">Total: {{ objectsCountLabel }}</p>
+      <p class="eyebrow page-header-eyebrow">{{ 'contentCreator.objects.eyebrow' | translate }}</p>
+      <h1>{{ 'contentCreator.objects.title' | translate }}</h1>
+      <p class="page-subtitle">{{ objectsCountLabel }}</p>
     </div>
     <button type="button" class="primary-btn page-header-cta" (click)="onCreateObject()">
       <span class="material-symbols-outlined">add</span>
-      <span class="page-header-cta-label">Create Object</span>
+      <span class="page-header-cta-label">{{ 'contentCreator.objects.createObject' | translate }}</span>
     </button>
   </header>
 
@@ -19,7 +19,7 @@
         class="toolbar-input"
         [(ngModel)]="draftSearchQuery"
         (keyup)="onSearchEnter($event)"
-        placeholder="Search by name, category or region..."
+        [placeholder]="'contentCreator.objects.searchPlaceholder' | translate"
       />
     </div>
   </div>
@@ -27,53 +27,53 @@
   @if (filterPanelOpen) {
     <div class="filters-panel card">
       <label>
-        <span>Status</span>
+        <span>{{ 'contentCreator.objects.filters.status' | translate }}</span>
         <select [(ngModel)]="statusFilter" (ngModelChange)="onFilterChange()">
-          <option value="all">All Statuses</option>
+          <option value="all">{{ 'contentCreator.objects.filters.allStatuses' | translate }}</option>
           <option *ngFor="let option of statusOptions" [value]="option.value">
-            {{ option.label }}
+            {{ translateOptionLabel(option) }}
           </option>
         </select>
       </label>
 
       <label>
-        <span>Type</span>
+        <span>{{ 'contentCreator.objects.filters.type' | translate }}</span>
         <select [(ngModel)]="typeFilter" (ngModelChange)="onFilterChange()">
-          <option value="all">All Types</option>
+          <option value="all">{{ 'contentCreator.objects.filters.allTypes' | translate }}</option>
           <option *ngFor="let option of typeOptions" [value]="option.value">{{ option.label }}</option>
         </select>
       </label>
 
       <label>
-        <span>Rating</span>
+        <span>{{ 'contentCreator.objects.filters.rating' | translate }}</span>
         <select [(ngModel)]="ratingFilter" (ngModelChange)="onFilterChange()">
-          <option *ngFor="let option of ratingOptions" [value]="option.value">{{ option.label }}</option>
+          <option *ngFor="let option of ratingOptions" [value]="option.value">{{ translateOptionLabel(option) }}</option>
         </select>
       </label>
 
       <label>
-        <span>Sort by</span>
+        <span>{{ 'contentCreator.objects.filters.sortBy' | translate }}</span>
         <select [(ngModel)]="sortBy" (ngModelChange)="onFilterChange()">
           <option *ngFor="let option of sortByOptions" [value]="option.value">
-            {{ option.label }}
+            {{ translateOptionLabel(option) }}
           </option>
         </select>
       </label>
 
       <label>
-        <span>Order</span>
+        <span>{{ 'contentCreator.objects.filters.order' | translate }}</span>
         <select [(ngModel)]="sortOrder" (ngModelChange)="onFilterChange()">
-          <option value="asc">Ascending</option>
-          <option value="desc">Descending</option>
+          <option value="asc">{{ 'contentCreator.objects.filters.ascending' | translate }}</option>
+          <option value="desc">{{ 'contentCreator.objects.filters.descending' | translate }}</option>
         </select>
       </label>
 
       <div class="filter-actions">
         <button type="button" class="primary-btn filter-btn" (click)="onApplyFilters()">
-          Apply
+          {{ 'contentCreator.objects.filters.apply' | translate }}
         </button>
         <button type="button" class="ghost-btn filter-btn secondary" (click)="onResetFilters()">
-          Reset
+          {{ 'contentCreator.objects.filters.reset' | translate }}
         </button>
       </div>
     </div>
@@ -83,29 +83,29 @@
     <div class="main-column">
       <div class="insights-grid">
         <article class="insight-card card" data-tone="blue">
-          <p>Total objects</p>
+          <p>{{ 'contentCreator.objects.stats.totalObjects' | translate }}</p>
           <strong>{{ totalCount }}</strong>
-          <span>Matching active filters</span>
+          <span>{{ 'contentCreator.objects.stats.matchingFilters' | translate }}</span>
         </article>
         <article class="insight-card card" data-tone="green">
-          <p>On this page</p>
+          <p>{{ 'contentCreator.objects.stats.onThisPage' | translate }}</p>
           <strong>{{ pagedObjects.length }}</strong>
-          <span>Visible rows</span>
+          <span>{{ 'contentCreator.objects.stats.visibleRows' | translate }}</span>
         </article>
         <article class="insight-card card" data-tone="amber">
-          <p>Average rating</p>
+          <p>{{ 'contentCreator.objects.stats.averageRating' | translate }}</p>
           <strong>{{ averageRatingDisplay }}</strong>
-          <span>Across current page</span>
+          <span>{{ 'contentCreator.objects.stats.acrossPage' | translate }}</span>
         </article>
       </div>
 
       <div class="table-card">
         @if (isLoading) {
-          <div class="state state-loading">Loading objects...</div>
+          <div class="state state-loading">{{ 'contentCreator.objects.loading' | translate }}</div>
         } @else if (errorMessage) {
           <div class="state state-error">{{ errorMessage }}</div>
         } @else if (!pagedObjects.length) {
-          <div class="state">No objects found for the selected filters.</div>
+          <div class="state">{{ 'contentCreator.objects.empty.filtered' | translate }}</div>
         } @else {
         <div class="objects-mobile-list">
           @for (object of pagedObjects; track object.id) {
@@ -124,13 +124,13 @@
                 </div>
                 <p class="object-mobile-card__location">
                   <span class="material-symbols-outlined" aria-hidden="true">location_on</span>
-                  {{ object.destinationName || object.localityName || 'N/A' }}
-                  @if (getObjectTableSubline(object) !== '—') {
+                  {{ object.destinationName || object.localityName || ('common.notAvailable' | translate) }}
+                  @if (getObjectTableSubline(object) !== ('common.notAvailable' | translate)) {
                     <span class="object-mobile-card__location-sub">· {{ getObjectTableSubline(object) }}</span>
                   }
                 </p>
                 <div class="object-mobile-card__meta">
-                  <span class="object-mobile-card__type">{{ object.objectTypeName || 'N/A' }}</span>
+                  <span class="object-mobile-card__type">{{ object.objectTypeName || ('common.notAvailable' | translate) }}</span>
                   <span class="object-mobile-card__rating">
                     <span class="material-symbols-outlined" aria-hidden="true">star</span>
                     {{ (object.averageRating ?? 0).toFixed(1) }}
@@ -140,7 +140,7 @@
               <button
                 type="button"
                 class="object-mobile-card__edit"
-                title="Edit"
+                [title]="'common.edit' | translate"
                 (click)="onEditObject(object); $event.stopPropagation()"
               >
                 <span class="material-symbols-outlined">edit</span>
@@ -153,12 +153,12 @@
           <table class="objects-table">
             <thead>
               <tr>
-                <th>Status</th>
-                <th>Object Details</th>
-                <th>Type</th>
-                <th>Destination</th>
-                <th>Rating</th>
-                <th class="col-actions">Action</th>
+                <th>{{ 'contentCreator.objects.table.status' | translate }}</th>
+                <th>{{ 'contentCreator.objects.table.objectDetails' | translate }}</th>
+                <th>{{ 'contentCreator.objects.table.type' | translate }}</th>
+                <th>{{ 'contentCreator.objects.table.destination' | translate }}</th>
+                <th>{{ 'contentCreator.objects.table.rating' | translate }}</th>
+                <th class="col-actions">{{ 'contentCreator.objects.table.action' | translate }}</th>
               </tr>
             </thead>
             <tbody>
@@ -167,28 +167,28 @@
                 [class.active-row]="selectedObject?.id === object.id"
                 (click)="selectObject(object)"
               >
-                <td data-label="Status">
+                <td [attr.data-label]="'contentCreator.objects.table.status' | translate">
                   <span class="status-chip" [ngClass]="getStatusBadgeClass(object.status)">
                     <span class="chip-dot">●</span>
                     {{ formatStatus(object.status) }}
                   </span>
                 </td>
-                <td class="object-details-cell" data-label="Object Details">
+                <td class="object-details-cell" [attr.data-label]="'contentCreator.objects.table.objectDetails' | translate">
                   <div class="item-cell item-cell-with-media">
                     <div class="media-thumb" [ngStyle]="getMediaStyle(object)"></div>
                     <strong>{{ object.name }}</strong>
                   </div>
                 </td>
-                <td class="type-cell" data-label="Type">{{ object.objectTypeName || 'N/A' }}</td>
-                <td data-label="Destination">
+                <td class="type-cell" [attr.data-label]="'contentCreator.objects.table.type' | translate">{{ object.objectTypeName || ('common.notAvailable' | translate) }}</td>
+                <td [attr.data-label]="'contentCreator.objects.table.destination' | translate">
                   <div class="table-activity-cell">
-                    <strong>{{ object.destinationName || object.localityName || 'N/A' }}</strong>
+                    <strong>{{ object.destinationName || object.localityName || ('common.notAvailable' | translate) }}</strong>
                     <span>{{ getObjectTableSubline(object) }}</span>
                   </div>
                 </td>
-                <td class="rating-cell" data-label="Rating">{{ (object.averageRating ?? 0).toFixed(1) }}</td>
-                <td class="col-actions" data-label="Action">
-                  <button type="button" class="icon-btn plain" title="Edit" (click)="onEditObject(object); $event.stopPropagation()">
+                <td class="rating-cell" [attr.data-label]="'contentCreator.objects.table.rating' | translate">{{ (object.averageRating ?? 0).toFixed(1) }}</td>
+                <td class="col-actions" [attr.data-label]="'contentCreator.objects.table.action' | translate">
+                  <button type="button" class="icon-btn plain" [title]="'common.edit' | translate" (click)="onEditObject(object); $event.stopPropagation()">
                     <span class="material-symbols-outlined">edit</span>
                   </button>
                 </td>
@@ -215,7 +215,7 @@
 
     <aside class="detail-column card" [class.has-selection]="!!selectedObject">
       @if (selectedObject) {
-        <p class="detail-sheet-label">Selected object</p>
+        <p class="detail-sheet-label">{{ 'contentCreator.objects.selectedObject' | translate }}</p>
         <div class="object-hero">
           <div class="hero-media" [class.has-slides]="heroImageUrls.length > 0">
             <div class="hero-media-slides" aria-hidden="true">
@@ -227,10 +227,10 @@
                 ></div>
               }
             </div>
-            <span class="hero-badge">{{ selectedObject.objectTypeName || 'Object' }}</span>
+            <span class="hero-badge">{{ selectedObject.objectTypeName || ('common.object' | translate) }}</span>
           </div>
           <div class="hero-copy">
-            <p class="hero-eyebrow">Featured object</p>
+            <p class="hero-eyebrow">{{ 'contentCreator.objects.featuredObject' | translate }}</p>
             <h2>{{ selectedObject.name }}</h2>
             <p class="hero-meta">{{ getSidebarMetaLine(selectedObject) }}</p>
             <span class="publish-badge" [ngClass]="'status-' + getStatusBadgeClass(selectedObject.status)">
@@ -245,22 +245,22 @@
             <strong>{{ formatPrice(selectedObject.price, selectedObject.objectTypeName) }}</strong>
           </div>
           <div class="metric-card">
-            <span>Reviews</span>
+            <span>{{ 'contentCreator.objects.reviews' | translate }}</span>
             <strong>{{ selectedObject.reviewCount ?? 0 }}</strong>
           </div>
         </div>
 
         <section class="detail-section">
           <div class="section-head">
-            <h3>Details</h3>
+            <h3>{{ 'contentCreator.objects.details' | translate }}</h3>
           </div>
           <div class="schedule-item">
-            <span>Destination</span>
-            <strong>{{ selectedObject.destinationName || 'N/A' }}</strong>
+            <span>{{ 'contentCreator.objects.destination' | translate }}</span>
+            <strong>{{ selectedObject.destinationName || ('common.notAvailable' | translate) }}</strong>
           </div>
           <div class="schedule-item">
-            <span>Locality</span>
-            <strong>{{ selectedObject.localityName || 'N/A' }}</strong>
+            <span>{{ 'contentCreator.objects.locality' | translate }}</span>
+            <strong>{{ selectedObject.localityName || ('common.notAvailable' | translate) }}</strong>
           </div>
           <div class="schedule-item">
             <ng-container *ngIf="getWorkingHoursRows(selectedObject.workingHours) as workingHoursRows">
@@ -274,17 +274,17 @@
               </div>
             </ng-container>
             <ng-template #noWorkingHours>
-              <strong class="working-hours-fallback">N/A</strong>
+              <strong class="working-hours-fallback">{{ 'common.notAvailable' | translate }}</strong>
             </ng-template>
           </div>
         </section>
 
         <section class="detail-section">
-          <h3>Description</h3>
+          <h3>{{ 'contentCreator.objects.description' | translate }}</h3>
           <p class="description-copy">
             {{
               selectedObject.description ||
-                'No description provided for this object.'
+                ('contentCreator.objects.noDescription' | translate)
             }}
           </p>
         </section>
@@ -304,7 +304,7 @@
             } @else {
               <div class="map-empty-state">
                 <span class="material-symbols-outlined">location_off</span>
-                <p>Coordinates are not available for this object.</p>
+                <p>{{ 'contentCreator.objects.noCoordinates' | translate }}</p>
               </div>
             }
           </div>
@@ -312,14 +312,14 @@
 
         <section class="detail-section reviews-preview-section">
           <div class="reviews-preview-head">
-            <h3>Reviews</h3>
+            <h3>{{ 'contentCreatorObjectForm.reviews.recentTitle' | translate }}</h3>
             @if (hasPreviewReviews) {
               <span class="reviews-count-pill">{{ previewReviewsCountLabel }}</span>
             }
           </div>
 
           @if (isLoadingPreviewReviews) {
-            <div class="state">Loading reviews...</div>
+            <div class="state">{{ 'contentCreatorObjectForm.reviews.loading' | translate }}</div>
           } @else if (hasPreviewReviews) {
             <div class="reviews-preview-list">
               <article class="review-preview-card" *ngFor="let review of previewReviews; trackBy: trackByReviewId">
@@ -338,15 +338,15 @@
             </div>
             @if (showViewMoreReviews) {
               <button type="button" class="text-btn view-more-btn" (click)="onViewMoreReviews()">
-                View more
+                {{ 'contentCreatorObjectForm.reviews.viewMore' | translate }}
               </button>
             }
           } @else {
-            <div class="state">No reviews available for this object yet.</div>
+            <div class="state">{{ 'contentCreatorObjectForm.reviews.noneForObject' | translate }}</div>
           }
         </section>
       } @else {
-        <div class="state">Select an object from the table to view details.</div>
+        <div class="state">{{ 'contentCreator.objects.empty.pickObjectBody' | translate }}</div>
       }
     </aside>
   </div>

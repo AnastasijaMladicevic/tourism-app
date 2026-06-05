@@ -15,6 +15,7 @@ import { TranslationService } from '../../../services/translation.service';
 import { MapComponent as SharedMapComponent } from '../../../shared/components/map/map';
 import { ReviewDto, ReviewService } from '../../../services/review';
 import { HERO_IMAGE_ROTATION_INTERVAL_MS } from '../../../shared/constants/hero-image-rotation';
+import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 
 interface WorkingHoursRow {
   day: string;
@@ -22,10 +23,16 @@ interface WorkingHoursRow {
   close: string;
 }
 
+interface ObjectFilterOption {
+  value: string;
+  label?: string;
+  labelKey?: string;
+}
+
 @Component({
   selector: 'app-content-creator-objects',
   standalone: true,
-  imports: [CommonModule, FormsModule, SharedMapComponent, PaginatorComponent],
+  imports: [CommonModule, FormsModule, SharedMapComponent, PaginatorComponent, TranslatePipe],
   templateUrl: './objects.component.html',
   styleUrls: [
     './objects.component.css',
@@ -75,14 +82,14 @@ export class ContentCreatorObjectsComponent implements OnInit, OnDestroy {
   readonly pageSizeOptions = [5, 10, 20, 50];
 
   readonly sortByOptions = [
-    { value: 'name', label: 'Name' },
-    { value: 'averageRating', label: 'Rating' },
-    { value: 'status', label: 'Status' },
-    { value: 'createdAt', label: 'Created date' }
+    { value: 'name', labelKey: 'contentCreator.objects.filters.name' },
+    { value: 'averageRating', labelKey: 'contentCreator.objects.filters.rating' },
+    { value: 'status', labelKey: 'contentCreator.objects.filters.status' },
+    { value: 'createdAt', labelKey: 'contentCreator.objects.filters.createdDate' }
   ];
 
   readonly ratingOptions = [
-    { value: 'all', label: 'Any Rating' },
+    { value: 'all', labelKey: 'contentCreator.objects.filters.anyRating' },
     { value: '1', label: '1.0+' },
     { value: '2', label: '2.0+' },
     { value: '3', label: '3.0+' },
@@ -91,15 +98,24 @@ export class ContentCreatorObjectsComponent implements OnInit, OnDestroy {
     { value: '4.5', label: '4.5+' }
   ];
 
-  private readonly fallbackStatusOptions: FilterOption[] = [
-    { value: 'published', label: 'Published' },
-    { value: 'approved', label: 'Approved' },
-    { value: 'pending', label: 'Pending' },
-    { value: 'rejected', label: 'Rejected' }
+  private readonly fallbackStatusOptions: ObjectFilterOption[] = [
+    { value: 'published', labelKey: 'contentCreator.objects.status.published' },
+    { value: 'approved', labelKey: 'contentCreator.objects.status.approved' },
+    { value: 'pending', labelKey: 'contentCreator.objects.status.pending' },
+    { value: 'draft', labelKey: 'contentCreator.objects.status.draft' },
+    { value: 'rejected', labelKey: 'contentCreator.objects.status.rejected' }
   ];
 
-  statusOptions: FilterOption[] = [...this.fallbackStatusOptions];
+  statusOptions: ObjectFilterOption[] = [...this.fallbackStatusOptions];
   typeOptions: FilterOption[] = [];
+
+  translateOptionLabel(option: { label?: string; labelKey?: string }): string {
+    if (option.labelKey) {
+      return this.translationService.translate(option.labelKey);
+    }
+
+    return option.label ?? '';
+  }
 
   ngOnInit(): void {
     this.loadFilterOptions();
@@ -143,7 +159,7 @@ export class ContentCreatorObjectsComponent implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       },
       error: (error) => {
-        this.errorMessage = error?.error?.message ?? 'Failed to load objects';
+        this.errorMessage = error?.error?.message ?? this.translationService.translate('contentCreator.objects.error.load');
         this.objects = [];
         this.pagedObjects = [];
         this.setSelectedObject(null);
@@ -290,7 +306,7 @@ export class ContentCreatorObjectsComponent implements OnInit, OnDestroy {
       return `${destination} · ${region}`;
     }
 
-    return addr || locality || destination || region || '—';
+    return addr || locality || destination || region || this.translationService.translate('common.notAvailable');
   }
 
   get objectsCountLabel(): string {
@@ -298,8 +314,7 @@ export class ContentCreatorObjectsComponent implements OnInit, OnDestroy {
       return '…';
     }
 
-    const count = this.totalCount;
-    return `${count} object${count === 1 ? '' : 's'}`;
+    return this.translationService.translate('contentCreator.objects.totalCount', { count: this.totalCount });
   }
 
   get pageStart(): number {
@@ -316,10 +331,13 @@ export class ContentCreatorObjectsComponent implements OnInit, OnDestroy {
 
   formatStatus(status?: string): string {
     if (!status) {
-      return 'Draft';
+      return this.translationService.translate('contentCreator.objects.status.draft');
     }
-
-    return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
+    const normalized = status.trim().toLowerCase();
+    const translated = this.translationService.translate(`contentCreator.objects.status.${normalized}`);
+    return translated === `contentCreator.objects.status.${normalized}`
+      ? status.charAt(0).toUpperCase() + status.slice(1).toLowerCase()
+      : translated;
   }
 
   /** Secondary line under destination (matches activities location column). */
@@ -330,7 +348,7 @@ export class ContentCreatorObjectsComponent implements OnInit, OnDestroy {
     if (object.regionName) {
       return object.regionName;
     }
-    return '—';
+    return this.translationService.translate('common.notAvailable');
   }
 
   formatPrice(price?: number | null, typeName?: string | null): string {
@@ -360,14 +378,14 @@ export class ContentCreatorObjectsComponent implements OnInit, OnDestroy {
 
       const dayOrder = ['pon', 'uto', 'sre', 'cet', 'čet', 'pet', 'sub', 'ned'] as const;
       const dayLabels: Record<string, string> = {
-        pon: 'Mon',
-        uto: 'Tue',
-        sre: 'Wed',
-        cet: 'Thu',
-        'čet': 'Thu',
-        pet: 'Fri',
-        sub: 'Sat',
-        ned: 'Sun'
+        pon: this.translationService.translate('contentCreatorObjectForm.dayShort.monday'),
+        uto: this.translationService.translate('contentCreatorObjectForm.dayShort.tuesday'),
+        sre: this.translationService.translate('contentCreatorObjectForm.dayShort.wednesday'),
+        cet: this.translationService.translate('contentCreatorObjectForm.dayShort.thursday'),
+        'čet': this.translationService.translate('contentCreatorObjectForm.dayShort.thursday'),
+        pet: this.translationService.translate('contentCreatorObjectForm.dayShort.friday'),
+        sub: this.translationService.translate('contentCreatorObjectForm.dayShort.saturday'),
+        ned: this.translationService.translate('contentCreatorObjectForm.dayShort.sunday')
       };
 
       return dayOrder
@@ -425,7 +443,7 @@ export class ContentCreatorObjectsComponent implements OnInit, OnDestroy {
 
   get selectedObjectLocationLabel(): string {
     if (!this.selectedObject) {
-      return 'Selected object';
+      return this.translationService.translate('contentCreator.objects.selectedObject');
     }
 
     const location = this.selectedObject.localityName || this.selectedObject.destinationName || this.selectedObject.regionName;
@@ -448,17 +466,21 @@ export class ContentCreatorObjectsComponent implements OnInit, OnDestroy {
   get previewReviewsCountLabel(): string {
     const total = this.selectedObject?.reviewCount ?? this.previewReviews.length;
     if (total > this.previewReviews.length) {
-      return `Showing ${this.previewReviews.length} of ${total}`;
+      return this.translationService.translate('contentCreatorObjectForm.reviews.showingOf', {
+        shown: this.previewReviews.length,
+        total,
+      });
     }
 
-    const count = this.previewReviews.length;
-    return `${count} review${count === 1 ? '' : 's'}`;
+    return this.translationService.translate('contentCreatorObjectForm.reviews.count', {
+      count: this.previewReviews.length,
+    });
   }
 
   getReviewInitials(review: ReviewDto): string {
     const fullName = review.userFullName?.trim();
     if (!fullName) {
-      return 'U';
+      return this.translationService.translate('common.userFallbackInitial');
     }
 
     const parts = fullName.split(/\s+/).filter(Boolean);
@@ -481,34 +503,34 @@ export class ContentCreatorObjectsComponent implements OnInit, OnDestroy {
 
     const minutes = Math.max(0, Math.floor((Date.now() - createdAt) / 60000));
     if (minutes < 1) {
-      return 'just now';
+      return this.translationService.translate('common.time.justNow');
     }
     if (minutes < 60) {
-      return `${minutes}m ago`;
+      return this.translationService.translate('common.time.minutesAgoShort', { count: minutes });
     }
 
     const hours = Math.floor(minutes / 60);
     if (hours < 24) {
-      return `${hours}h ago`;
+      return this.translationService.translate('common.time.hoursAgoShort', { count: hours });
     }
 
     const days = Math.floor(hours / 24);
     if (days < 7) {
-      return `${days}d ago`;
+      return this.translationService.translate('common.time.daysAgoShort', { count: days });
     }
 
     const weeks = Math.floor(days / 7);
     if (weeks < 5) {
-      return `${weeks}w ago`;
+      return this.translationService.translate('common.time.weeksAgoShort', { count: weeks });
     }
 
     const months = Math.floor(days / 30);
     if (months < 12) {
-      return `${months}mo ago`;
+      return this.translationService.translate('common.time.monthsAgoShort', { count: months });
     }
 
     const years = Math.floor(days / 365);
-    return `${years}y ago`;
+    return this.translationService.translate('common.time.yearsAgoShort', { count: years });
   }
 
   onViewMoreReviews(): void {

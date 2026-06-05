@@ -94,7 +94,7 @@ export class EventFormComponent implements OnInit, OnDestroy {
   imageUrls: string[] = [];
   imagesSnapshot: EventImageDto[] = [];
   eventStatus = '';
-  organizerName = 'Current Content Creator';
+  organizerName = '';
   selectedActivityIds = new Set<number>();
   isLoadingRelatedActivities = false;
   showAllRelatedActivities = false;
@@ -162,6 +162,34 @@ export class EventFormComponent implements OnInit, OnDestroy {
 
   readonly tags = ['Outdoor', 'Live Music', 'Summer'];
   pendingTag = '';
+
+  get pageTitle(): string {
+    return this.translationService.translate(
+      this.isEditMode ? 'contentCreator.eventForm.editTitle' : 'contentCreator.eventForm.createTitle',
+    );
+  }
+
+  get submitLabel(): string {
+    return this.translationService.translate(
+      this.isEditMode ? 'contentCreator.eventForm.updateAction' : 'contentCreator.eventForm.createAction',
+    );
+  }
+
+  get cancelLabel(): string {
+    return this.translationService.translate('common.cancel');
+  }
+
+  get deleteActionLabel(): string {
+    if (this.isApprovedEvent) {
+      return this.translationService.translate(
+        this.hasPendingDeletionRequest
+          ? 'contentCreator.eventForm.delete.requested'
+          : 'contentCreator.eventForm.delete.requestAction',
+      );
+    }
+
+    return this.translationService.translate('contentCreator.eventForm.delete.deleteAction');
+  }
 
   get selectedDestinationId(): number | null {
     return this.toNumber(this.form.controls.destinationId.value);
@@ -233,11 +261,11 @@ export class EventFormComponent implements OnInit, OnDestroy {
     if (this.loadedEvent?.objectId === selectedObjectId) {
       return {
         id: selectedObjectId,
-        name: this.loadedEvent.objectName?.trim() || 'Linked object',
+        name: this.loadedEvent.objectName?.trim() || this.translationService.translate('contentCreator.eventForm.linkedObject'),
         address: [
           this.loadedEvent.localityName?.trim(),
           this.loadedEvent.destinationName?.trim()
-        ].filter((value): value is string => !!value).join(', ') || 'No address available',
+        ].filter((value): value is string => !!value).join(', ') || this.translationService.translate('contentCreator.eventForm.noAddressAvailable'),
         destinationId: this.loadedEvent.destinationId ?? 0,
         latitude: this.loadedEvent.latitude ?? undefined,
         longitude: this.loadedEvent.longitude ?? undefined
@@ -257,7 +285,7 @@ export class EventFormComponent implements OnInit, OnDestroy {
   }
 
   get linkedLocationTitle(): string {
-    return this.selectedVenue?.name || 'No linked object selected';
+    return this.selectedVenue?.name || this.translationService.translate('contentCreator.eventForm.noLinkedObjectSelected');
   }
 
   get linkedLocationDescription(): string {
@@ -266,10 +294,12 @@ export class EventFormComponent implements OnInit, OnDestroy {
     }
 
     if (this.selectedDestination?.name?.trim()) {
-      return `Using destination coordinates for ${this.selectedDestination.name.trim()}.`;
+      return this.translationService.translate('contentCreator.eventForm.usingDestinationCoordinates', {
+        destination: this.selectedDestination.name.trim(),
+      });
     }
 
-    return 'Select a destination and, optionally, an object to preview the right-side map.';
+    return this.translationService.translate('contentCreator.eventForm.locationHint');
   }
 
   get hasTicketTypes(): boolean {
@@ -341,7 +371,7 @@ export class EventFormComponent implements OnInit, OnDestroy {
         map((response) => response.items.map((item) => ({
           id: item.id,
           name: item.name,
-          address: item.address ?? 'No address available',
+          address: item.address ?? this.translationService.translate('contentCreator.eventForm.noAddressAvailable'),
           destinationId: item.destinationId,
           latitude: (item as unknown as { latitude?: number }).latitude,
           longitude: (item as unknown as { longitude?: number }).longitude
@@ -388,7 +418,7 @@ export class EventFormComponent implements OnInit, OnDestroy {
   private buildActivityMeta(activity: { durationMinutes?: number; price?: number }): string {
     const activityLabel = this.translationService.translate('activity.label');
     const duration = activity.durationMinutes
-      ? `${activity.durationMinutes} mins`
+      ? this.translationService.translate('contentCreator.eventForm.activityDurationMinutes', { count: activity.durationMinutes })
       : this.translationService.translate('common.notAvailable');
     const price = activity.price != null
       ? `$${Number(activity.price).toFixed(0)}`
@@ -514,7 +544,7 @@ export class EventFormComponent implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       },
       error: (error: any) => {
-        this.errorMessage = error?.error?.message ?? 'Event not found or you do not have permission to edit it.';
+        this.errorMessage = error?.error?.message ?? this.translationService.translate('contentCreator.eventForm.errors.loadEditFailed');
         this.isLoading = false;
         this.cdr.detectChanges();
       }
@@ -603,7 +633,9 @@ export class EventFormComponent implements OnInit, OnDestroy {
 
     const remainingSlots = this.maxImageCount - this.imageUrls.length;
     if (remainingSlots <= 0) {
-      this.galleryErrorMessage = `You can upload up to ${this.maxImageCount} images per event.`;
+      this.galleryErrorMessage = this.translationService.translate('contentCreator.eventForm.errors.uploadLimit', {
+        count: this.maxImageCount,
+      });
       input.value = '';
       return;
     }
@@ -625,9 +657,14 @@ export class EventFormComponent implements OnInit, OnDestroy {
     }
 
     if (duplicateNames.length > 0) {
-      this.galleryErrorMessage = `Duplicate image(s) skipped: ${duplicateNames.join(', ')}`;
+      this.galleryErrorMessage = this.translationService.translate('contentCreator.eventForm.errors.duplicateImages', {
+        files: duplicateNames.join(', '),
+      });
     } else if (acceptedFiles.length < selectedFiles.length) {
-      this.galleryErrorMessage = `Only the first ${remainingSlots} images were added. Each event can have up to ${this.maxImageCount} images.`;
+      this.galleryErrorMessage = this.translationService.translate('contentCreator.eventForm.errors.partialUpload', {
+        accepted: remainingSlots,
+        count: this.maxImageCount,
+      });
     } else {
       this.galleryErrorMessage = '';
     }
@@ -660,12 +697,12 @@ export class EventFormComponent implements OnInit, OnDestroy {
     }
 
     if (this.imageUrls.length === 0) {
-      this.galleryErrorMessage = 'At least one image is required before saving.';
+      this.galleryErrorMessage = this.translationService.translate('contentCreator.eventForm.errors.imageRequired');
       return;
     }
 
     if (this.endDateBeforeStart) {
-      this.errorMessage = 'End date and time must be after start date and time.';
+      this.errorMessage = this.translationService.translate('contentCreator.eventForm.errors.endAfterStart');
       return;
     }
 
@@ -718,11 +755,13 @@ export class EventFormComponent implements OnInit, OnDestroy {
       )
       .subscribe({
         next: () => {
-          this.successMessage = this.isEditMode ? 'Event updated successfully!' : 'Event created successfully!';
+          this.successMessage = this.translationService.translate(
+            this.isEditMode ? 'contentCreator.eventForm.success.updated' : 'contentCreator.eventForm.success.created',
+          );
           setTimeout(() => this.router.navigate(['/content-creator/events']), 1200);
         },
         error: (error: any) => {
-          this.errorMessage = error?.error?.message ?? 'Failed to save event';
+          this.errorMessage = error?.error?.message ?? this.translationService.translate('contentCreator.eventForm.errors.saveFailed');
           this.cdr.detectChanges();
         }
       });
@@ -736,7 +775,7 @@ export class EventFormComponent implements OnInit, OnDestroy {
     return this.uploadPendingImages(created.id, this.imageUrls, 0).pipe(
       map(() => created),
       catchError((error) => {
-        this.errorMessage = error?.error?.message ?? 'Event created but image upload failed. Please add images via Edit.';
+        this.errorMessage = error?.error?.message ?? this.translationService.translate('contentCreator.eventForm.errors.imageUploadAfterCreate');
         return of(created);
       })
     );
@@ -832,17 +871,21 @@ export class EventFormComponent implements OnInit, OnDestroy {
   }
 
   get deleteButtonLabel(): string {
-    return this.isApprovedEvent ? 'Request Deletion' : 'Delete Event';
+    return this.translationService.translate(
+      this.isApprovedEvent ? 'contentCreator.eventForm.delete.requestAction' : 'contentCreator.eventForm.delete.deleteEventAction',
+    );
   }
 
   get deleteModalTitle(): string {
-    return this.isApprovedEvent ? 'Request deletion' : 'Confirm deletion';
+    return this.translationService.translate(
+      this.isApprovedEvent ? 'contentCreator.eventForm.delete.requestTitle' : 'contentCreator.eventForm.delete.confirmTitle',
+    );
   }
 
   get deleteModalDescription(): string {
     return this.isApprovedEvent
-      ? 'This event is approved, so removal requires a manager deletion request.'
-      : 'This event is still pending, so it can be removed immediately.';
+      ? this.translationService.translate('contentCreator.eventForm.delete.requestDescription')
+      : this.translationService.translate('contentCreator.eventForm.delete.confirmDescription');
   }
 
   get hasPendingDeletionRequest(): boolean {
@@ -878,11 +921,11 @@ export class EventFormComponent implements OnInit, OnDestroy {
           this.loadedEvent.hasPendingDeletionRequest = true;
         }
         this.showDeleteModal = false;
-        this.successMessage = 'Deletion request submitted. A manager must review it before event removal.';
+        this.successMessage = this.translationService.translate('contentCreator.eventForm.success.deletionRequested');
         setTimeout(() => this.router.navigate(['/content-creator/events']), 1200);
       },
       error: (error: any) => {
-        this.errorMessage = error?.error?.message ?? 'Failed to submit deletion request';
+        this.errorMessage = error?.error?.message ?? this.translationService.translate('contentCreator.eventForm.errors.deletionRequestFailed');
       }
     });
   }
@@ -904,11 +947,11 @@ export class EventFormComponent implements OnInit, OnDestroy {
     ).subscribe({
       next: () => {
         this.showDeleteModal = false;
-        this.successMessage = 'Event deleted successfully.';
+        this.successMessage = this.translationService.translate('contentCreator.eventForm.success.deleted');
         setTimeout(() => this.router.navigate(['/content-creator/events']), 1200);
       },
       error: (error: any) => {
-        this.errorMessage = error?.error?.message ?? 'Failed to delete event';
+        this.errorMessage = error?.error?.message ?? this.translationService.translate('contentCreator.eventForm.errors.deleteFailed');
       }
     });
   }
@@ -924,7 +967,9 @@ export class EventFormComponent implements OnInit, OnDestroy {
 
     const remainingSlots = this.maxImageCount - this.imageUrls.length;
     if (remainingSlots <= 0) {
-      this.galleryErrorMessage = `You can upload up to ${this.maxImageCount} images per event.`;
+      this.galleryErrorMessage = this.translationService.translate('contentCreator.eventForm.errors.uploadLimit', {
+        count: this.maxImageCount,
+      });
       return;
     }
 
@@ -937,7 +982,10 @@ export class EventFormComponent implements OnInit, OnDestroy {
 
     this.errorMessage =
       acceptedFiles.length < droppedFiles.length
-        ? `Only the first ${remainingSlots} images were added. Each event can have up to ${this.maxImageCount} images.`
+        ? this.translationService.translate('contentCreator.eventForm.errors.partialUpload', {
+          accepted: remainingSlots,
+          count: this.maxImageCount,
+        })
         : '';
     this.cdr.detectChanges();
   }

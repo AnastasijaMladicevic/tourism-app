@@ -548,7 +548,7 @@ textarea:focus {
 
 .hour-row {
   display: grid;
-  grid-template-columns: 90px 1fr auto 1fr auto;
+  grid-template-columns: 48px 1fr auto 1fr auto;
   align-items: center;
   gap: 8px;
 }
@@ -556,6 +556,11 @@ textarea:focus {
 .hour-row span {
   font-size: 12px;
   color: #475569;
+}
+
+.hour-row > span:first-child {
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 .hour-row input {

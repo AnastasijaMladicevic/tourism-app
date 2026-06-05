@@ -44,7 +44,20 @@
     "contentItems": "content items",
     "objects": "Objects",
     "events": "Events",
-    "activities": "Activities"
+    "activities": "Activities",
+    "object": "Object",
+    "activity": "Activity",
+    "edit": "Edit",
+    "userFallbackInitial": "U",
+    "time": {
+      "justNow": "just now",
+      "minutesAgoShort": "{{count}}m ago",
+      "hoursAgoShort": "{{count}}h ago",
+      "daysAgoShort": "{{count}}d ago",
+      "weeksAgoShort": "{{count}}w ago",
+      "monthsAgoShort": "{{count}}mo ago",
+      "yearsAgoShort": "{{count}}y ago"
+    }
   },
   "paginator": {
     "of": "of",
@@ -573,12 +586,14 @@
       "topContent": "Top Content",
       "topContentSubtitle": "Objects, events and activities with strongest engagement score",
       "manageContent": "Manage content",
+      "scoreValue": "score {{score}}",
       "noDestination": "No destination",
       "noRegion": "No region",
       "favorites": "favorites",
       "plannerAdds": "planner adds",
       "reviews": "reviews",
       "avgRating": "avg rating",
+      "averageRatingAria": "Average rating {{rating}} of 5",
       "noContentEngagement": "No content engagement data is available for this period.",
       "topDestinations": "Top Destinations",
       "topDestinationsSubtitle": "Destination performance from your content",
@@ -586,7 +601,8 @@
       "upcomingEvents": "Upcoming Events",
       "upcomingEventsSubtitle": "{{count7}} in next 7 days · {{count30}} in next 30 days",
       "openEvents": "Open events",
-      "noUpcomingEvents": "No upcoming approved events in the next 30 days."
+      "noUpcomingEvents": "No upcoming approved events in the next 30 days.",
+      "loadError": "Content creator dashboard data could not be loaded right now."
     }
   },
   "auth": {
@@ -740,7 +756,27 @@
       "manageReportsDetail": "Create reports, view your own reports, and withdraw your own reports."
     }
   },
-    "manager": {
+  "contentCreatorProfile": {
+    "permissions": {
+      "createContentLabel": "Create objects, events, and activities",
+      "createContentDetail": "Create new objects, events, and activities that enter the manager review flow.",
+      "editPublishedLabel": "Edit own published content",
+      "editPublishedDetail": "Update only your own published or pending objects, events, and activities.",
+      "deletePendingLabel": "Delete own unpublished content",
+      "deletePendingDetail": "Delete your own content before it reaches the approved state.",
+      "manageImagesLabel": "Manage content images",
+      "manageImagesDetail": "Add and organize images for your own objects, events, and activities.",
+      "respondReviewsLabel": "Respond to reviews",
+      "respondReviewsDetail": "Reply to reviews on your own objects and manage those replies.",
+      "requestDeletionLabel": "Request deletions",
+      "requestDeletionDetail": "Request deletion of your own approved objects, events, and activities.",
+      "viewDeletionRequestsLabel": "View own deletion requests",
+      "viewDeletionRequestsDetail": "Track the status of deletion requests you already submitted.",
+      "viewDashboardLabel": "View dashboard overview",
+      "viewDashboardDetail": "Open the content creator dashboard overview."
+    }
+  },
+  "manager": {
       "events": {
         "searchAria": "Search events",
         "searchPlaceholder": "Search events, objects, or organizers...",
@@ -2089,6 +2125,509 @@
     "setPasswordHeading": "Set New Password"
 
   },
+  "contentCreator": {
+    "objects": {
+      "eyebrow": "Objects management",
+      "title": "Objects",
+      "createObject": "Create object",
+      "searchPlaceholder": "Search by name, category or region...",
+      "loading": "Loading objects...",
+      "totalCount": "Total: {{count}} objects",
+      "details": "Details",
+      "destination": "Destination",
+      "locality": "Locality",
+      "description": "Description",
+      "reviews": "Reviews",
+      "selectedObject": "Selected object",
+      "featuredObject": "Featured object",
+      "noDescription": "No description provided for this object.",
+      "noCoordinates": "Coordinates are not available for this object.",
+      "filters": {
+        "status": "Status",
+        "type": "Type",
+        "rating": "Rating",
+        "sortBy": "Sort by",
+        "order": "Order",
+        "ascending": "Ascending",
+        "descending": "Descending",
+        "apply": "Apply",
+        "reset": "Reset",
+        "allStatuses": "All statuses",
+        "allTypes": "All types",
+        "anyRating": "Any rating",
+        "name": "Name",
+        "createdDate": "Created date"
+      },
+      "stats": {
+        "totalObjects": "Total objects",
+        "matchingFilters": "Matching active filters",
+        "onThisPage": "On this page",
+        "visibleRows": "Visible rows",
+        "averageRating": "Average rating",
+        "acrossPage": "Across current page"
+      },
+      "table": {
+        "status": "Status",
+        "objectDetails": "Object details",
+        "type": "Type",
+        "destination": "Destination",
+        "rating": "Rating",
+        "action": "Action"
+      },
+      "empty": {
+        "filtered": "No objects found for the selected filters.",
+        "pickObjectBody": "Select an object from the table to view details."
+      },
+      "status": {
+        "published": "Published",
+        "approved": "Approved",
+        "pending": "Pending",
+        "draft": "Draft",
+        "rejected": "Rejected"
+      },
+      "error": {
+        "load": "Failed to load objects."
+      }
+    },
+    "events": {
+      "eyebrow": "Events management",
+      "title": "Events & Schedules",
+      "createEvent": "Create new event",
+      "searchPlaceholder": "Search events, objects, or organizers...",
+      "dateRangeFilter": "Date range filter",
+      "fromDate": "From date",
+      "toDate": "To date",
+      "loading": "Loading events...",
+      "selectedEvent": "Selected event",
+      "featuredEvent": "Featured event",
+      "rejectionReason": "Rejection reason",
+      "capacity": "Capacity",
+      "description": "Description",
+      "noDescription": "A featured event selected from the creator workspace. Use this panel to inspect the schedule, media, and staffing for the event.",
+      "noCoordinates": "Coordinates are not available for this event.",
+      "uncategorized": "Uncategorized",
+      "primaryDestination": "Primary destination",
+      "capacityMax": "{{count}} max",
+      "totalCount": "Total: {{count}} events",
+      "filters": {
+        "status": "Status",
+        "category": "Category",
+        "allStatuses": "All statuses",
+        "allCategories": "All categories",
+        "sortBy": "Sort by",
+        "startDate": "Start date",
+        "name": "Name",
+        "order": "Order",
+        "ascending": "Ascending",
+        "descending": "Descending",
+        "apply": "Apply",
+        "reset": "Reset"
+      },
+      "categories": {
+        "festival": "Festival",
+        "workshop": "Workshop",
+        "sports": "Sports",
+        "cultural": "Cultural",
+        "exhibition": "Exhibition",
+        "concert": "Concert"
+      },
+      "stats": {
+        "upcomingThisWeek": "Upcoming this week",
+        "next7DaysHint": "Events published in the next 7 days",
+        "publishedOnPage": "Published on page",
+        "pageVisibilityHint": "Published or approved events in the current table page",
+        "capacityConfigured": "Capacity configured",
+        "capacityConfiguredHint": "Share of visible events with max visitors set"
+      },
+      "table": {
+        "status": "Status",
+        "eventDetails": "Event details",
+        "destination": "Destination",
+        "category": "Category",
+        "capacity": "Capacity",
+        "action": "Action"
+      },
+      "schedule": {
+        "title": "Schedule",
+        "starts": "Starts",
+        "ends": "Ends",
+        "location": "Location",
+        "category": "Category"
+      },
+      "empty": {
+        "noEventSelected": "No event selected",
+        "pickEventTitle": "Pick an event from the table",
+        "pickEventBody": "Select a row to inspect media, schedule, and staffing details in the right-hand panel."
+      },
+      "status": {
+        "published": "Published",
+        "approved": "Approved",
+        "pending": "Pending",
+        "draft": "Draft",
+        "rejected": "Rejected",
+        "cancelled": "Cancelled"
+      },
+      "error": {
+        "load": "Failed to load events."
+      }
+    },
+    "activities": {
+      "eyebrow": "Activities management",
+      "title": "Activities",
+      "createActivity": "Add activity",
+      "searchPlaceholder": "Search activities, types, or destinations...",
+      "loading": "Loading activities...",
+      "selectedActivity": "Selected activity",
+      "featuredActivity": "Featured activity",
+      "duration": "Duration",
+      "activityInfo": "Activity info",
+      "destination": "Destination",
+      "locality": "Locality",
+      "object": "Object",
+      "coordinates": "Coordinates",
+      "created": "Created",
+      "updated": "Updated",
+      "description": "Description",
+      "noDescription": "A featured activity selected from the creator workspace. Use this panel to inspect the location, logistics, and metadata for the activity.",
+      "noCoordinates": "Coordinates are not available for this activity.",
+      "oneHour": "1 hour",
+      "hours": "{{count}} hours",
+      "hoursMinutes": "{{hours}}h {{minutes}}m",
+      "totalCount": "Total: {{count}} activities",
+      "filters": {
+        "status": "Status",
+        "allStatuses": "All statuses",
+        "type": "Type",
+        "destination": "Destination",
+        "sortBy": "Sort by",
+        "createdDate": "Created date",
+        "order": "Order",
+        "ascending": "Ascending",
+        "descending": "Descending",
+        "apply": "Apply",
+        "reset": "Reset",
+        "allTypes": "All types",
+        "allDestinations": "All destinations"
+      },
+      "stats": {
+        "totalActivities": "Total activities",
+        "matchingFilters": "Matching active filters",
+        "onThisPage": "On this page",
+        "visibleRows": "Visible rows",
+        "pendingReview": "Pending review"
+      },
+      "table": {
+        "status": "Status",
+        "activityDetails": "Activity details",
+        "type": "Type",
+        "destination": "Destination",
+        "duration": "Duration",
+        "action": "Action"
+      },
+      "empty": {
+        "noActivitySelected": "No activity selected",
+        "pickActivityTitle": "Pick an activity from the table",
+        "pickActivityBody": "Select a row to inspect media, schedule, and logistics details in the right-hand panel."
+      },
+      "status": {
+        "published": "Published",
+        "approved": "Approved",
+        "pending": "Pending",
+        "draft": "Draft",
+        "archived": "Archived",
+        "rejected": "Rejected"
+      },
+      "error": {
+        "load": "Failed to load activities."
+      }
+    },
+    "reviews": {
+      "title": "Review moderation",
+      "queue": "Queue",
+      "count": "{{count}} reviews",
+      "loading": "Loading reviews...",
+      "loadingImages": "Loading images...",
+      "reviewLabel": "Review #{{id}}",
+      "statusLabel": "Status",
+      "deleteResponse": "Delete response",
+      "reviewingItem": "Reviewing item",
+      "objectImages": "Object images ({{count}})",
+      "objectImageAlt": "Object image",
+      "responsePlaceholder": "Write your professional response to the tourist here...",
+      "characterCount": "Character count: {{count}} / 1000",
+      "sendResponse": "Send response",
+      "updateResponse": "Update response",
+      "reviewerInsight": "Reviewer insight",
+      "reviewer": "Reviewer",
+      "reviewDetails": "Review details",
+      "reviewId": "Review ID",
+      "created": "Created",
+      "object": "Object",
+      "responseLog": "Response log",
+      "response": "Response",
+      "sent": "Sent",
+      "noResponseYet": "No response submitted yet.",
+      "filters": {
+        "allRatings": "All ratings",
+        "filterByObject": "Filter by object",
+        "allObjects": "All objects",
+        "all": "All",
+        "pendingReply": "No reply yet",
+        "responded": "With CC reply",
+        "reset": "Reset",
+        "searchPlaceholder": "Search reviewer, object, content..."
+      },
+      "status": {
+        "responded": "Responded",
+        "awaitingReply": "Awaiting reply"
+      },
+      "templates": {
+        "thankYou": "Thank you",
+        "thankYouText": "Thank you for your feedback and for visiting our location.",
+        "addressingIssues": "Addressing issues",
+        "addressingIssuesText": "Thank you for your feedback. We are already working on the mentioned issue.",
+        "needDetails": "Need details",
+        "needDetailsText": "Thank you for your feedback. We would love to investigate this in more detail."
+      },
+      "empty": {
+        "forObjectNamed": "No reviews found for {{name}}.",
+        "forObject": "No reviews found for this object.",
+        "none": "No reviews found for your objects.",
+        "thread": "Select a review from the queue to see details and respond.",
+        "context": "Reviewer insights will appear after selecting a review."
+      },
+      "fallback": {
+        "object": "Object #{{id}}"
+      },
+      "success": {
+        "responseSent": "Response sent successfully.",
+        "responseDeleted": "Response deleted successfully."
+      },
+      "error": {
+        "load": "Failed to load reviews.",
+        "responseRequired": "Response cannot be empty.",
+        "responseSend": "Failed to send response.",
+        "responseDelete": "Failed to delete response."
+      },
+      "noImages": "No object images available."
+    },
+    "eventForm": {
+      "createTitle": "Create event",
+      "editTitle": "Edit event",
+      "createAction": "Create event",
+      "updateAction": "Update event",
+      "subtitle": "Build the event page, manage location data, and prepare the schedule inside the creator workspace.",
+      "step1": "STEP 1",
+      "step2": "STEP 2",
+      "step3": "STEP 3",
+      "step4": "STEP 4",
+      "step5": "STEP 5",
+      "generalInformation": "General information",
+      "generalInformationIntro": "Essential details about your upcoming event.",
+      "eventTitle": "Event title",
+      "eventTitlePlaceholder": "e.g. Summer Jazz Festival 2024",
+      "eventType": "Event type",
+      "selectType": "Select type",
+      "organizer": "Organizer",
+      "region": "Region",
+      "allRegions": "All regions",
+      "destination": "Destination",
+      "selectDestination": "Select destination",
+      "selectRegionFirst": "Select region first",
+      "object": "Object",
+      "selectObject": "Select object",
+      "selectDestinationFirst": "Select destination first",
+      "noObjectsForDestination": "No objects found for selected destination.",
+      "fullDescription": "Full description",
+      "descriptionPlaceholder": "Write a detailed description including what guests can expect...",
+      "schedule": "Schedule",
+      "scheduleIntro": "When and how often this event takes place.",
+      "startDateTime": "Start date & time",
+      "endDateTime": "End date & time",
+      "timezone": "Timezone",
+      "ticketingCapacity": "Ticketing & capacity",
+      "capacity": "Capacity",
+      "capacityPlaceholder": "500",
+      "categorization": "Categorization & restrictions",
+      "categorizationIntro": "Tags and access controls for the event listing.",
+      "tagsCategories": "Tags & categories",
+      "addTagPlaceholder": "Add tag...",
+      "ageRestriction": "Age restriction",
+      "selectRestriction": "Select restriction",
+      "mediaGallery": "Media gallery",
+      "mediaGalleryIntro": "Upload up to 8 images and choose a primary cover image.",
+      "addPhotos": "Add photos",
+      "dropzoneCopy": "Choose local image files or drop them here. They are uploaded after the event is saved.",
+      "imagesSelected": "{{count}} image(s) selected",
+      "selectImageFiles": "Select one or more image files...",
+      "addPhoto": "Add photo",
+      "eventImageAlt": "Event image preview",
+      "primary": "Primary",
+      "setPrimary": "Set primary",
+      "noImagesHelp": "Add one or more image files above. Images are saved when you create or update the event.",
+      "locationIntelligence": "Object & location intelligence",
+      "locationIntelligenceHint": "Choose a linked object and pin the exact event spot on the map.",
+      "linkedObjectLabel": "Linked object:",
+      "linkedObject": "Linked object",
+      "noLinkedObjectSelected": "No linked object selected",
+      "noAddressAvailable": "No address available",
+      "usingDestinationCoordinates": "Using destination coordinates for {{destination}}.",
+      "locationHint": "Select a destination and, optionally, an object to preview the right-side map.",
+      "creatorTips": "Creator tips",
+      "learnMore": "Learn more about events",
+      "activityDurationMinutes": "{{count}} mins",
+      "tips": { "tip1": "Events with high-resolution banners get more engagement.", "tip2": "Link your event to a specific object to show automated directions.", "tip3": "Clear start and end times help with exported calendars." },
+      "playbookTitle": "Event Creator Playbook",
+      "playbookBody": "Use object-linked events with precise map coordinates so guests can navigate directly to the event pin. Keep title, schedule, and ticketing data aligned with your related activities to improve discovery.",
+      "playbookTips": { "tip1": "Use the same destination/object pairing as related activities whenever possible.", "tip2": "Drop a map pin close to the real entrance location, not just city center.", "tip3": "Add at least one related activity to create a complete day-plan suggestion." },
+      "delete": {
+        "requestTitle": "Request deletion",
+        "confirmTitle": "Confirm deletion",
+        "requestDescription": "This event is approved, so removal requires a manager deletion request.",
+        "confirmDescription": "This event is still pending, so it can be removed immediately.",
+        "managerReviewNote": "A manager will review the request before the event is removed.",
+        "cannotUndo": "This action cannot be undone.",
+        "requestAction": "Request deletion",
+        "requested": "Deletion requested",
+        "alreadyRequested": "Already requested",
+        "submitting": "Submitting...",
+        "deleting": "Deleting...",
+        "deleteAction": "Delete",
+        "deleteEventAction": "Delete event"
+      },
+      "success": {
+        "created": "Event created successfully!",
+        "updated": "Event updated successfully!",
+        "deleted": "Event deleted successfully.",
+        "deletionRequested": "Deletion request submitted. A manager must review it before event removal."
+      },
+      "errors": {
+        "loadEditFailed": "Event not found or you do not have permission to edit it.",
+        "uploadLimit": "You can upload up to {{count}} images per event.",
+        "duplicateImages": "Duplicate image(s) skipped: {{files}}",
+        "partialUpload": "Only the first {{accepted}} images were added. Each event can have up to {{count}} images.",
+        "imageRequired": "At least one image is required before saving.",
+        "endAfterStart": "End date and time must be after start date and time.",
+        "endAfterStartShort": "End date and time must be after start.",
+        "saveFailed": "Failed to save event",
+        "imageUploadAfterCreate": "Event created but image upload failed. Please add images via Edit.",
+        "deletionRequestFailed": "Failed to submit deletion request",
+        "deleteFailed": "Failed to delete event"
+      }
+    },
+    "activityForm": {
+      "createTitle": "Create activity",
+      "editTitle": "Edit activity",
+      "createAction": "Create activity",
+      "updateAction": "Update activity",
+      "creating": "Creating...",
+      "updating": "Updating...",
+      "subtitle": "Build and manage activity listings with location, logistics, and gallery details.",
+      "step1": "STEP 1",
+      "step2": "STEP 2",
+      "step3": "STEP 3",
+      "coreDetails": "Core details",
+      "coreDetailsIntro": "Establish the basic identity of your experience.",
+      "activityName": "Activity name",
+      "activityNamePlaceholder": "e.g. Sunrise Hot Air Balloon over Cappadocia",
+      "description": "Description",
+      "descriptionPlaceholder": "Describe the experience in detail. Highlight what makes it unique, what's included, and what travelers should expect.",
+      "logistics": "Logistics & classification",
+      "logisticsIntro": "Define where, when, and how much.",
+      "activityType": "Activity type",
+      "selectActivityType": "Select activity type",
+      "enterActivityTypeId": "Enter Activity Type ID",
+      "region": "Region",
+      "allRegions": "All regions",
+      "destination": "Destination",
+      "selectDestination": "Select destination",
+      "selectRegionFirst": "Select region first",
+      "locality": "Locality",
+      "selectLocality": "Select locality",
+      "selectDestinationFirst": "Select destination first",
+      "touristObject": "Tourist object",
+      "minutesShort": "MIN",
+      "mediaGallery": "Media gallery",
+      "mediaGalleryIntro": "Upload up to 8 images and choose a primary cover image.",
+      "addPhotos": "Add photos",
+      "dropzoneCopy": "Choose local image files. They are uploaded after the activity is saved.",
+      "imagesSelected": "{{count}} image(s) selected",
+      "selectImageFiles": "Select one or more image files...",
+      "addPhoto": "Add photo",
+      "activityImageAlt": "Activity image preview",
+      "primary": "Primary",
+      "setPrimary": "Set primary",
+      "locationIntelligence": "Location intelligence",
+      "locationContextPlaceholder": "Set destination/locality for location context",
+      "locationContextAria": "Search for a place to set map context",
+      "delete": {
+        "requestTitle": "Request deletion",
+        "confirmTitle": "Confirm deletion",
+        "requestDescription": "This activity is approved, so removal requires a manager deletion request.",
+        "confirmDescription": "This activity is still pending, so it can be removed immediately.",
+        "managerReviewNote": "A manager will review the request before the activity is removed.",
+        "cannotUndo": "This action cannot be undone.",
+        "requestAction": "Request deletion",
+        "requested": "Deletion requested",
+        "alreadyRequested": "Already requested",
+        "submitting": "Submitting...",
+        "deleting": "Deleting...",
+        "deleteAction": "Delete"
+      },
+      "success": {
+        "created": "Activity created successfully.",
+        "updated": "Activity updated successfully.",
+        "partialImageUpload": "Activity saved, but some images could not be attached.",
+        "deleted": "Activity deleted successfully.",
+        "deletionRequested": "Deletion request submitted. A manager must review it before activity removal."
+      },
+      "errors": {
+        "nameInvalid": "Activity name is required and must have at most 150 characters.",
+        "locationRequired": "Select at least destination or locality.",
+        "typeRequired": "Activity type is required.",
+        "imageRequired": "At least one image is required before saving.",
+        "uploadLimit": "You can upload up to {{count}} images per activity.",
+        "duplicateImages": "Duplicate image(s) skipped: {{files}}",
+        "partialUpload": "Only the first {{accepted}} images were added. Each activity can have up to {{count}} images.",
+        "saveFailed": "Failed to save activity.",
+        "deletionRequestFailed": "Failed to submit deletion request",
+        "deleteFailed": "Failed to delete activity.",
+        "loadEditFailed": "Failed to load activity for editing."
+      }
+    },
+    "map": {
+      "searchPlaceholder": "Search objects, events, activities...",
+      "filters": {
+        "hotels": "Hotels",
+        "restaurants": "Restaurants",
+        "bars": "Bars"
+      }
+    },
+    "eventDetails": {
+      "pageEyebrow": "Events > Event Details",
+      "titleFallback": "Event Details",
+      "pageIntro": "Review the event summary, schedule, and organizer context inside the creator workspace.",
+      "back": "Back",
+      "share": "Share",
+      "loading": "Loading event details...",
+      "featuredEvent": "Featured event",
+      "rejectionReason": "Rejection reason",
+      "quickFacts": "Quick facts",
+      "about": "About this event",
+      "schedule": "Schedule",
+      "organizers": "Organizers",
+      "objectSection": "Object",
+      "linkedObject": "Linked object",
+      "locationContextNote": "Location context is linked from the event payload.",
+      "invalidId": "Invalid event id.",
+      "notFound": "Event not found or you do not have permission to view it.",
+      "startDate": "Start date",
+      "endDate": "End date",
+      "capacity": "Capacity",
+      "guests": "{{count}} guests",
+      "summaryFallback": "This creator-facing event view summarizes the schedule, media, and organizer information in one place."
+    }
+  },
   "contentCreatorObjectForm": {
     "eyebrow": "Object studio",
     "createTitle": "Create object",
@@ -2137,6 +2676,7 @@
     "setPrimary": "Set primary",
     "noImagesHelp": "Upload at least one image so the object can be reviewed and published.",
     "locationIntelligence": "Location intelligence",
+    "locationContextPlaceholder": "Select a destination or locality for location context",
     "newObject": "New object",
     "createdBy": "Created by {{name}}",
     "creator": "Creator",
@@ -2150,6 +2690,15 @@
       "friday": "Friday",
       "saturday": "Saturday",
       "sunday": "Sunday"
+    },
+    "dayShort": {
+      "monday": "Mon",
+      "tuesday": "Tue",
+      "wednesday": "Wed",
+      "thursday": "Thu",
+      "friday": "Fri",
+      "saturday": "Sat",
+      "sunday": "Sun"
     },
     "delete": {
       "requestTitle": "Request object deletion",
@@ -2201,6 +2750,10 @@
       "concerning": "Concerning",
       "creatorNoReply": "The creator has not replied yet.",
       "reportCreatorName": "Report {{name}}",
+      "timeline": {
+        "edited": "{{created}}, edited {{updated}}",
+        "updatedOnly": "Updated {{updated}}"
+      },
       "declineTitle": "Decline object",
       "declineDescription": "Explain what needs to be fixed before this object can be approved.",
       "declinePlaceholder": "Write the reason for declining this object...",
@@ -2222,7 +2775,8 @@
       "imageRequired": "Add at least one image before submitting the object.",
       "destinationRequired": "Select a destination before submitting the object.",
       "saveFailed": "The object could not be saved.",
-      "loadFailed": "The object could not be loaded."
+      "loadFailed": "The object could not be loaded.",
+      "imageUploadAfterCreate": "Object was created but image upload failed. Please add images below."
     }
   },
   "__literals": {

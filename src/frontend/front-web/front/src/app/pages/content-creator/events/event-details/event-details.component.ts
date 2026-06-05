@@ -4,6 +4,7 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { EventService } from '../../../../services/event.service';
 import { EventDto } from '../../../../models/event.model';
 import { TranslationService } from '../../../../services/translation.service';
+import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 
 interface DetailItem {
   label: string;
@@ -13,7 +14,7 @@ interface DetailItem {
 @Component({
   selector: 'app-event-details',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, TranslatePipe],
   templateUrl: './event-details.component.html',
   styleUrls: [
     './event-details.component.css',
@@ -38,7 +39,7 @@ export class EventDetailsComponent implements OnInit {
   ngOnInit(): void {
     const id = Number(this.route.snapshot.paramMap.get('id'));
     if (!id) {
-      this.errorMessage = 'Invalid event id';
+      this.errorMessage = this.translationService.translate('contentCreator.eventDetails.invalidId');
       this.isLoading = false;
       return;
     }
@@ -50,7 +51,7 @@ export class EventDetailsComponent implements OnInit {
         this.cdr.detectChanges();
       },
       error: (error: any) => {
-        this.errorMessage = error?.error?.message ?? 'Event not found or you do not have permission to view it.';
+        this.errorMessage = error?.error?.message ?? this.translationService.translate('contentCreator.eventDetails.notFound');
         this.isLoading = false;
         this.cdr.detectChanges();
       }
@@ -74,11 +75,16 @@ export class EventDetailsComponent implements OnInit {
   }
 
   get categoryLabel(): string {
-    return this.event?.eventTypeName || 'Festival';
+    return this.event?.eventTypeName || this.translationService.translate('event.title');
   }
 
   get statusLabel(): string {
-    return this.event?.status || 'Draft';
+    const status = (this.event?.status ?? '').trim().toLowerCase();
+    if (!status) {
+      return this.translationService.translate('contentCreator.events.status.draft');
+    }
+
+    return this.translationService.translate(`contentCreator.events.statuses.${status}`);
   }
 
   getStatusBadgeClass(status: string | undefined): string {
@@ -115,22 +121,29 @@ export class EventDetailsComponent implements OnInit {
     }
 
     return [
-      { label: 'Start date', value: this.formatDate(this.event.startDate) },
-      { label: 'End date', value: this.formatDate(this.event.endDate ?? this.event.startDate) },
+      { label: this.translationService.translate('contentCreator.eventDetails.startDate'), value: this.formatDate(this.event.startDate) },
+      { label: this.translationService.translate('contentCreator.eventDetails.endDate'), value: this.formatDate(this.event.endDate ?? this.event.startDate) },
       {
         label: this.translationService.translate('event.ticketPrice'),
-        value: this.event.price ? `$${this.event.price.toFixed(2)}` : this.translationService.translate('event.free')
+        value: this.event.price ? `EUR ${this.event.price.toFixed(2)}` : this.translationService.translate('event.free')
       },
-      { label: 'Capacity', value: this.event.maxVisitors ? `${this.event.maxVisitors.toLocaleString('en-US')} guests` : '—' }
+      {
+        label: this.translationService.translate('contentCreator.eventDetails.capacity'),
+        value: this.event.maxVisitors
+          ? this.translationService.translate('contentCreator.eventDetails.guests', {
+              count: this.event.maxVisitors.toLocaleString(this.translationService.currentLocale()),
+            })
+          : this.translationService.translate('common.notAvailable')
+      }
     ];
   }
 
   formatDate(date: string | Date | undefined): string {
     if (!date) {
-      return '-';
+      return this.translationService.translate('common.notAvailable');
     }
 
-    return new Date(date).toLocaleDateString('en-US', {
+    return new Date(date).toLocaleDateString(this.translationService.currentLocale(), {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
@@ -141,7 +154,7 @@ export class EventDetailsComponent implements OnInit {
 
   get summary(): string {
     if (!this.event?.description) {
-      return 'This creator-facing event view summarizes the schedule, media, and organizer information in one place.';
+      return this.translationService.translate('contentCreator.eventDetails.summaryFallback');
     }
 
     return this.event.description;
