@@ -503,14 +503,6 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
               sortOrder: 'asc',
             }),
           ),
-          reviews: this.getAllPagedItems((page) =>
-            this.reviewService.getAll({
-              page,
-              pageSize,
-              sortBy: 'createdAt',
-              sortOrder: 'desc',
-            }),
-          ),
           myReports: this.getAllPagedItems((page) =>
             this.managerReportsService.getMyReports({
               page,
@@ -521,7 +513,7 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
           ),
         }),
       ),
-      map(({ objects, reviews, myReports }) => {
+      switchMap(({ objects, myReports }) => {
         this.pendingReportCreatorIds.clear();
         for (const report of myReports) {
           if (report.status?.toLowerCase() === 'pending') {
@@ -535,7 +527,6 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
           if (!object.createdByUserId) {
             continue;
           }
-          // Pre-populate creator name from object data to avoid separate user API calls
           const knownName = object.createdByFullName?.trim();
           if (knownName && !this.creatorNameById.has(object.createdByUserId)) {
             this.creatorNameById.set(object.createdByUserId, knownName);
@@ -551,11 +542,18 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
           });
         }
 
-        const managedObjectIds = new Set(objectContext.keys());
-        console.log(managedObjectIds);
-        const scopedReviews = reviews.filter((review) => managedObjectIds.has(review.objectId));
-        console.log(reviews);
-        return this.mapReviewsToThreads(scopedReviews, objectContext);
+        if (objectContext.size === 0) {
+          return of([] as ManagerReviewThread[]);
+        }
+
+        return this.getAllPagedItems((page) =>
+          this.reviewService.getAll({ page, pageSize, sortBy: 'createdAt', sortOrder: 'desc' })
+        ).pipe(
+          map((reviews) => {
+            const filtered = reviews.filter((r) => objectContext.has(r.objectId));
+            return this.mapReviewsToThreads(filtered, objectContext);
+          }),
+        );
       }),
     );
   }

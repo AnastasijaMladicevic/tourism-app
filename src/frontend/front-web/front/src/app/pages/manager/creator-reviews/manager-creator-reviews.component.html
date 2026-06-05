@@ -159,7 +159,7 @@
             [totalCount]="filteredThreads.length"
             [pageSize]="queuePageSize"
             [pageSizeOptions]="queuePageSizeOptions"
-            itemLabel="reviews"
+            [itemLabel]="'common.reviews' | translate"
             (pageChange)="onQueueGoToPage($event)"
             (pageSizeChange)="onQueuePageSizeChange($event)"
           ></app-paginator>

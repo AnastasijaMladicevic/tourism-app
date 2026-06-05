@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, Injector, OnDestroy, OnInit, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PaginatorComponent } from '../../../shared/components/paginator/paginator';
@@ -12,6 +12,7 @@ import {
   forkJoin,
   map,
   of,
+  skip,
   switchMap,
   takeUntil,
   distinctUntilChanged,
@@ -19,6 +20,7 @@ import {
   timer,
   timeout
 } from 'rxjs';
+import { toObservable } from '@angular/core/rxjs-interop';
 import { ObjectDto, ObjectImageDto, ObjectService } from '../../../services/object';
 import { ReviewDto, ReviewQueryParams, ReviewService } from '../../../services/review';
 import { TranslationService } from '../../../services/translation.service';
@@ -37,8 +39,10 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly injector = inject(Injector);
   readonly translationService = inject(TranslationService);
   private readonly destroy$ = new Subject<void>();
+  private readonly currentLanguage = computed(() => this.translationService.language());
 
   allReviews: ReviewDto[] = [];
   filteredReviews: ReviewDto[] = [];
@@ -79,6 +83,18 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
         takeUntil(this.destroy$)
       )
       .subscribe(() => {
+        this.queuePage = 1;
+        this.loadReviews();
+      });
+
+    toObservable(this.currentLanguage, { injector: this.injector })
+      .pipe(
+        skip(1),
+        distinctUntilChanged(),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(() => {
+        this.creatorObjectsLoaded = false;
         this.queuePage = 1;
         this.loadReviews();
       });
@@ -526,23 +542,56 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
           return of({ items: [] as ReviewDto[], totalCount: 0, totalPages: 1 });
         }
 
-        const objectNames = new Map(objects.map((object) => [object.id, object.name] as const));
-
-        return this.reviewService.getForCreator(
-          this.buildCreatorReviewQuery(),
-          { bypassRegion: true }
-        ).pipe(
-          map((result) => ({
-            items: (result.items ?? []).map((review) => ({
+        return forkJoin(objects.map((object) =>
+          this.objectService.getById(object.id).pipe(
+            map((fullObject) => (fullObject.reviews ?? []).map((review) => ({
               ...review,
-              objectName: review.objectName?.trim()
-                ? review.objectName
-                : (objectNames.get(review.objectId)
-                  ?? this.translationService.translate('contentCreator.reviews.fallback.object', { id: review.objectId }))
-            })),
-            totalCount: result.totalCount ?? 0,
-            totalPages: result.totalPages ?? 1
-          }))
+              objectName: review.objectName?.trim() || fullObject.name || '',
+            }))),
+            catchError(() => of([] as ReviewDto[]))
+          )
+        )).pipe(
+          map((reviewArrays) => {
+            let reviews = this.dedupeReviewsById(reviewArrays.flat());
+
+            const { search, objectId, ratings, hasResponse } = this.buildCreatorReviewQuery();
+
+            if (objectId) {
+              reviews = reviews.filter((r) => r.objectId === objectId);
+            }
+
+            if (search?.trim()) {
+              const term = search.trim().toLowerCase();
+              reviews = reviews.filter((r) =>
+                r.userFullName?.toLowerCase().includes(term) ||
+                r.objectName?.toLowerCase().includes(term) ||
+                r.text?.toLowerCase().includes(term)
+              );
+            }
+
+            if (ratings) {
+              const ratingSet = new Set(ratings.split(',').map(Number));
+              reviews = reviews.filter((r) => ratingSet.has(r.rating));
+            }
+
+            if (hasResponse != null) {
+              reviews = reviews.filter((r) => hasResponse ? !!r.creatorResponse : !r.creatorResponse);
+            }
+
+            reviews.sort((a, b) => {
+              const cmp = a.createdAt < b.createdAt ? -1 : a.createdAt > b.createdAt ? 1 : 0;
+              return this.sortOrder === 'asc' ? cmp : -cmp;
+            });
+
+            const totalCount = reviews.length;
+            const page = this.queuePage;
+            const pageSize = this.queuePageSize;
+            const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
+            const start = (page - 1) * pageSize;
+            const items = reviews.slice(start, start + pageSize);
+
+            return { items, totalCount, totalPages };
+          })
         );
       })
     );

@@ -231,7 +231,7 @@
             [totalCount]="totalCount"
             [pageSize]="pageSize"
             [pageSizeOptions]="pageSizeOptions"
-            itemLabel="events"
+            [itemLabel]="'common.events' | translate"
             (pageChange)="onGoToPage($event)"
             (pageSizeChange)="onPageSizeChange($event)"
           ></app-paginator>
