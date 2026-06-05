@@ -200,10 +200,24 @@ export class ManagerEventsComponent implements OnInit, OnDestroy {
     this.loadEvents();
   }
 
-  onDateRangeChange(): void {
+  onStartDateChange(): void {
     if (this.rangeStartDate && this.rangeEndDate && this.rangeStartDate > this.rangeEndDate) {
-      [this.rangeStartDate, this.rangeEndDate] = [this.rangeEndDate, this.rangeStartDate];
+      this.rangeEndDate = '';
     }
+
+    this.applyDateRangeFilter();
+  }
+
+  onEndDateChange(): void {
+    if (this.rangeStartDate && this.rangeEndDate && this.rangeEndDate < this.rangeStartDate) {
+      this.rangeEndDate = '';
+      return;
+    }
+
+    this.applyDateRangeFilter();
+  }
+
+  private applyDateRangeFilter(): void {
     this.currentPage = 1;
     this.loadEvents();
   }

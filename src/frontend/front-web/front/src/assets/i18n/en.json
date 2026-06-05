@@ -1383,6 +1383,19 @@
           "nameNotAvailable": "Name not available in this view."
         }
       },
+      "reviewMediaGallery": {
+        "title": "Media Gallery",
+        "subtitle": "Read-only gallery shown before the review details.",
+        "imageGalleryAria": "Media gallery",
+        "mainImageAria": "Main image preview",
+        "previewAlt": "Preview image",
+        "thumbnailAlt": "Gallery thumbnail",
+        "noPreview": "No usable image preview yet",
+        "noPreviewHint": "There is no valid main image URL, or the image could not be loaded.",
+        "noAdditionalImages": "No additional gallery images are available.",
+        "noImagesSubmitted": "No images were submitted.",
+        "imageCount": "{{count}} image(s) in gallery"
+      },
       "map": {
         "searchPlaceholder": "Search objects, events, activities..."
       },
@@ -1400,7 +1413,7 @@
         "ascending": "Ascending",
         "descending": "Descending",
         "apply": "Apply filters",
-        "reset": "Reset filters"
+        "reset": "Reset"
       },
       "sort": {
         "name": "Name",

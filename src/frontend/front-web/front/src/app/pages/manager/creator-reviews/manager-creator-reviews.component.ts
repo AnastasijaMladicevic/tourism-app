@@ -13,6 +13,8 @@ import { environment } from '../../../../environment/environment';
 import { ManagerReportsService } from '../../../services/manager-reports.service';
 import {
   buildReviewReportReason,
+  detectConcerningReplyKind,
+  getConcerningReportCategory,
   isConcerningCreatorReply,
 } from '../shared/concerning-reply.util';
 import {
@@ -37,7 +39,7 @@ import {
 import { DestinationService } from '../../../services/destination.service';
 import { ManagerDashboardService } from '../../../services/manager-dashboard.service';
 import { ObjectDto, ObjectService } from '../../../services/object';
-import { ReviewDto, ReviewService } from '../../../services/review';
+import { ReviewDto } from '../../../services/review';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../../services/translation.service';
 
@@ -84,11 +86,11 @@ interface ManagerReportNameHint {
     '../../admin/shared/admin-page-title.css',
     '../shared/manager-list-page-header.css',
     '../shared/manager-list-page-responsive.css',
-    '../shared/manager-page-stats-scroll.css'
+    '../shared/manager-page-stats-scroll.css',
+    '../shared/manager-cc-page-parity.css',
   ],
 })
 export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
-  private readonly reviewService = inject(ReviewService);
   private readonly objectService = inject(ObjectService);
   private readonly destinationService = inject(DestinationService);
   private readonly http = inject(HttpClient);
@@ -306,9 +308,12 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const concerning = this.isConcerning(target);
+    const concerningKind = detectConcerningReplyKind({
+      creatorResponse: target.creatorResponse,
+      touristRating: target.rating,
+    });
     this.reportModalCreatorId = target.creatorId;
-    this.reportModalCategory = concerning ? 'unprofessional_conduct' : 'other';
+    this.reportModalCategory = getConcerningReportCategory(concerningKind);
     this.reportModalReason = target.creatorResponse?.trim()
       ? buildReviewReportReason({
           reviewId: target.id,
@@ -318,7 +323,7 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
           creatorName: target.creatorName,
           creatorResponse: target.creatorResponse!,
           category: this.reportModalCategory,
-          autoDetected: concerning,
+          autoDetected: concerningKind != null,
         }, {
           categoryPrefix: this.translationService.translate('manager.reportModal.reason.category'),
           autoDetected: this.translationService.translate('manager.reportModal.reason.autoDetected'),
@@ -542,19 +547,47 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
           });
         }
 
-        if (objectContext.size === 0) {
-          return of([] as ManagerReviewThread[]);
+        const managedObjectIds = [...objectContext.keys()];
+        if (!managedObjectIds.length) {
+          return of(this.mapReviewsToThreads([], objectContext));
         }
 
-        return this.getAllPagedItems((page) =>
-          this.reviewService.getAll({ page, pageSize, sortBy: 'createdAt', sortOrder: 'desc' })
-        ).pipe(
-          map((reviews) => {
-            const filtered = reviews.filter((r) => objectContext.has(r.objectId));
-            return this.mapReviewsToThreads(filtered, objectContext);
-          }),
+        return this.fetchReviewsForManagedObjects(managedObjectIds).pipe(
+          map((reviews) => this.mapReviewsToThreads(reviews, objectContext)),
         );
       }),
+    );
+  }
+
+  /** Loads reviews only for objects in the manager's scope using translated object endpoint. */
+  private fetchReviewsForManagedObjects(objectIds: number[]): Observable<ReviewDto[]> {
+    return forkJoin(
+      objectIds.map((objectId) =>
+        this.objectService.getById(objectId).pipe(catchError(() => of(null)))
+      )
+    ).pipe(
+      map((objectDetails) => {
+        const seen = new Set<number>();
+        const merged: ReviewDto[] = [];
+
+        for (const detail of objectDetails) {
+          if (!detail) {
+            continue;
+          }
+          for (const review of detail.reviews ?? []) {
+            if (seen.has(review.id)) {
+              continue;
+            }
+            seen.add(review.id);
+            merged.push({
+              ...review,
+              objectName: review.objectName?.trim() || detail.name?.trim() || '',
+            });
+          }
+        }
+
+        return merged;
+      })
     );
   }
 

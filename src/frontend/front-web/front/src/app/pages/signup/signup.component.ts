@@ -5,7 +5,6 @@ import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
 import { TranslationService } from '../../services/translation.service';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
-
 @Component({
   selector: 'app-signup',
   standalone: true,

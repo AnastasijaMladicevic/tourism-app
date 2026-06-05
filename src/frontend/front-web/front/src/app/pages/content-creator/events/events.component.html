@@ -3,7 +3,6 @@
     <div class="page-header-copy">
       <p class="eyebrow page-header-eyebrow">{{ 'contentCreator.events.eyebrow' | translate }}</p>
       <h1>{{ 'contentCreator.events.title' | translate }}</h1>
-      <p class="page-subtitle">{{ eventsCountLabel }}</p>
     </div>
 
     <button type="button" class="primary-btn page-header-cta" (click)="onCreateEvent()">
@@ -32,7 +31,8 @@
             type="date"
             class="date-range-input"
             [(ngModel)]="rangeStartDate"
-            (ngModelChange)="onDateRangeChange()"
+            [max]="rangeEndDate || null"
+            (ngModelChange)="onStartDateChange()"
             [attr.aria-label]="'contentCreator.events.fromDate' | translate"
           />
           <span class="date-range-separator" aria-hidden="true">–</span>
@@ -40,7 +40,8 @@
             type="date"
             class="date-range-input"
             [(ngModel)]="rangeEndDate"
-            (ngModelChange)="onDateRangeChange()"
+            [min]="rangeStartDate || null"
+            (ngModelChange)="onEndDateChange()"
             [attr.aria-label]="'contentCreator.events.toDate' | translate"
           />
         </div>
@@ -53,7 +54,7 @@
     <div class="filters-panel card">
       <label>
         <span>{{ 'contentCreator.events.filters.status' | translate }}</span>
-        <select [(ngModel)]="statusFilter">
+        <select [(ngModel)]="statusFilter" (ngModelChange)="onApplyFilters()">
           <option *ngFor="let option of statusOptions" [value]="option.value">
             {{ translateOptionLabel(option) }}
           </option>
@@ -62,7 +63,7 @@
 
       <label>
         <span>{{ 'contentCreator.events.filters.category' | translate }}</span>
-        <select [(ngModel)]="categoryFilter">
+        <select [(ngModel)]="categoryFilter" (ngModelChange)="onApplyFilters()">
           <option *ngFor="let option of categoryOptions" [value]="option.value">
             {{ translateOptionLabel(option) }}
           </option>
@@ -71,7 +72,7 @@
 
       <label>
         <span>{{ 'contentCreator.events.filters.sortBy' | translate }}</span>
-        <select [(ngModel)]="sortBy">
+        <select [(ngModel)]="sortBy" (ngModelChange)="onApplyFilters()">
           <option value="startDate">{{ 'contentCreator.events.filters.startDate' | translate }}</option>
           <option value="name">{{ 'contentCreator.events.filters.name' | translate }}</option>
           <option value="status">{{ 'contentCreator.events.filters.status' | translate }}</option>
@@ -80,16 +81,13 @@
 
       <label>
         <span>{{ 'contentCreator.events.filters.order' | translate }}</span>
-        <select [(ngModel)]="sortOrder">
+        <select [(ngModel)]="sortOrder" (ngModelChange)="onApplyFilters()">
           <option value="asc">{{ 'contentCreator.events.filters.ascending' | translate }}</option>
           <option value="desc">{{ 'contentCreator.events.filters.descending' | translate }}</option>
         </select>
       </label>
 
       <div class="filter-actions">
-        <button type="button" class="primary-btn filter-btn" (click)="onApplyFilters()">
-          {{ 'contentCreator.events.filters.apply' | translate }}
-        </button>
         <button type="button" class="ghost-btn filter-btn secondary" (click)="onResetFilters()">
           {{ 'contentCreator.events.filters.reset' | translate }}
         </button>
@@ -177,6 +175,7 @@
                 >
                   <td>
                     <span class="status-chip" [ngClass]="getStatusBadgeClass(event.status)">
+                      <span class="chip-dot" aria-hidden="true">&#9679;</span>
                       {{ humanizeStatus(event.status) }}
                     </span>
                   </td>

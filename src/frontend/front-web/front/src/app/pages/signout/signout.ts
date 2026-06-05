@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { TranslatePipe } from '../../shared/pipes/translate.pipe';
-
 @Component({
   selector: 'app-signout',
   standalone: true,

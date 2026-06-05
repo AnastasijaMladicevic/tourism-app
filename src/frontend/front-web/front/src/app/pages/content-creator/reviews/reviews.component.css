@@ -19,12 +19,9 @@
 .filters-row {
   display: flex;
   flex-direction: column;
-  gap: 10px;
   margin-bottom: 14px;
   background: #ffffff;
   border: 1px solid #e5e7eb;
-  border-radius: 16px;
-  padding: 12px;
 }
 
 .object-filter-inline {
@@ -120,6 +117,15 @@
 
 .feedback.success {
   color: #166534;
+}
+
+.feedback.warning {
+  color: #b45309;
+}
+
+.response-composer.policy-warning textarea {
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.15);
 }
 
 .chip {

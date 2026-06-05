@@ -41,7 +41,8 @@ interface EventFilterOption {
     '../shared/cc-list-page-header.css',
     '../shared/cc-list-detail-layout.css',
     '../shared/cc-page-stats-scroll.css',
-    '../shared/cc-stat-cards.css'
+    '../shared/cc-stat-cards.css',
+    '../shared/cc-filters-parity.css'
   ]
 })
 export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
@@ -260,15 +261,26 @@ export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
     this.onResetFilters();
   }
 
-  onDateRangeChange(): void {
-    if (!this.rangeStartDate || !this.rangeEndDate) {
+  onStartDateChange(): void {
+    if (this.rangeStartDate && this.rangeEndDate && this.rangeStartDate > this.rangeEndDate) {
+      this.rangeEndDate = '';
+    }
+
+    this.applyDateRangeFilter();
+  }
+
+  onEndDateChange(): void {
+    if (this.rangeStartDate && this.rangeEndDate && this.rangeEndDate < this.rangeStartDate) {
+      this.rangeEndDate = '';
       return;
     }
 
-    if (this.rangeStartDate > this.rangeEndDate) {
-      const originalStart = this.rangeStartDate;
-      this.rangeStartDate = this.rangeEndDate;
-      this.rangeEndDate = originalStart;
+    this.applyDateRangeFilter();
+  }
+
+  private applyDateRangeFilter(): void {
+    if (!this.rangeStartDate || !this.rangeEndDate) {
+      return;
     }
 
     this.currentPage = 1;
@@ -285,10 +297,6 @@ export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
     this.sortOrder = value;
     this.currentPage = 1;
     this.loadEvents();
-  }
-
-  onFilterChange(): void {
-    // Filter changes are applied explicitly via the panel's Apply button.
   }
 
   onPageSizeChange(value: number | string): void {

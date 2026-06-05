@@ -16,37 +16,6 @@
   width: 100%;
 }
 
-.breadcrumb {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-bottom: 14px;
-  font-size: 12px;
-  color: #9ca3af;
-}
-
-.breadcrumb-link {
-  cursor: pointer;
-  color: #9ca3af;
-  transition: color 0.2s ease;
-}
-
-.breadcrumb-link:hover {
-  color: #6b7280;
-}
-
-.breadcrumb-icon {
-  width: 15px;
-  height: 15px;
-  font-size: 15px;
-  color: #c5cad3;
-}
-
-.breadcrumb-current {
-  color: #111827;
-  font-weight: 600;
-}
-
 .profile-header-card,
 .profile-form-card {
   background: #ffffff;

@@ -2,7 +2,6 @@
   <header class="page-head">
     <div>
       <h1>{{ 'layout.events' | translate }}</h1>
-      <p class="page-subtitle">{{ eventsCountLabel }}</p>
     </div>
   </header>
 
@@ -24,7 +23,8 @@
           type="date"
           class="date-range-input"
           [(ngModel)]="rangeStartDate"
-          (ngModelChange)="onDateRangeChange()"
+          [max]="rangeEndDate || null"
+          (ngModelChange)="onStartDateChange()"
           aria-label="From date"
         />
         <span class="date-range-separator" aria-hidden="true">–</span>
@@ -32,7 +32,8 @@
           type="date"
           class="date-range-input"
           [(ngModel)]="rangeEndDate"
-          (ngModelChange)="onDateRangeChange()"
+          [min]="rangeStartDate || null"
+          (ngModelChange)="onEndDateChange()"
           aria-label="To date"
         />
       </div>
@@ -44,7 +45,7 @@
     <div class="filters-panel card">
       <label>
         <span>{{ 'manager.events.filters.status' | translate }}</span>
-        <select [(ngModel)]="statusFilter">
+        <select [(ngModel)]="statusFilter" (ngModelChange)="onApplyFilters()">
           <option value="all">{{ 'manager.events.filters.allStatuses' | translate }}</option>
           <option value="approved">{{ 'manager.events.status.approved' | translate }}</option>
           <option value="pending">{{ 'manager.events.status.pending' | translate }}</option>
@@ -54,7 +55,7 @@
 
       <label>
         <span>{{ 'manager.events.filters.category' | translate }}</span>
-        <select [(ngModel)]="categoryFilter">
+        <select [(ngModel)]="categoryFilter" (ngModelChange)="onApplyFilters()">
           <option value="all">{{ 'manager.events.filters.allCategories' | translate }}</option>
           <option *ngFor="let option of categoryOptions" [value]="option.value">{{ option.label | translate }}</option>
         </select>
@@ -62,7 +63,7 @@
 
       <label>
         <span>{{ 'manager.events.filters.sortBy' | translate }}</span>
-        <select [(ngModel)]="sortBy">
+        <select [(ngModel)]="sortBy" (ngModelChange)="onApplyFilters()">
           <option value="startDate">{{ 'manager.events.filters.startDate' | translate }}</option>
           <option value="name">{{ 'manager.events.filters.name' | translate }}</option>
           <option value="status">{{ 'manager.events.filters.status' | translate }}</option>
@@ -71,16 +72,13 @@
 
       <label>
         <span>{{ 'manager.events.filters.order' | translate }}</span>
-        <select [(ngModel)]="sortOrder">
+        <select [(ngModel)]="sortOrder" (ngModelChange)="onApplyFilters()">
           <option value="asc">{{ 'manager.events.filters.ascending' | translate }}</option>
           <option value="desc">{{ 'manager.events.filters.descending' | translate }}</option>
         </select>
       </label>
 
       <div class="filter-actions">
-        <button type="button" class="primary-btn filter-btn" (click)="onApplyFilters()">
-          {{ 'manager.events.filters.apply' | translate }}
-        </button>
         <button type="button" class="ghost-btn filter-btn secondary" (click)="onResetFilters()">
           {{ 'manager.events.filters.reset' | translate }}
         </button>

@@ -40,7 +40,8 @@ interface ObjectFilterOption {
     '../shared/cc-list-page-header.css',
     '../shared/cc-list-detail-layout.css',
     '../shared/cc-page-stats-scroll.css',
-    '../shared/cc-stat-cards.css'
+    '../shared/cc-stat-cards.css',
+    '../shared/cc-filters-parity.css'
   ]
 })
 export class ContentCreatorObjectsComponent implements OnInit, OnDestroy {
@@ -175,10 +176,6 @@ export class ContentCreatorObjectsComponent implements OnInit, OnDestroy {
     this.searchQuery = this.draftSearchQuery.trim();
     this.currentPage = 1;
     this.loadObjects();
-  }
-
-  onFilterChange(): void {
-    // Filters are applied explicitly through Apply Filters.
   }
 
   onMoreFilters(): void {

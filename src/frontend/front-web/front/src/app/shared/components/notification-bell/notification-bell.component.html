@@ -6,10 +6,12 @@
     [attr.aria-label]="'layout.notifications' | translate"
     [attr.aria-expanded]="isOpen()"
     (click)="togglePanel()">
-    <svg width="18" height="18" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.8">
-      <path d="M11 3a7 7 0 017 7c0 4 1.5 5 1.5 5h-17S4 14 4 10a7 7 0 017-7z"/>
-      <path d="M9 18a2 2 0 004 0"/>
-    </svg>
+    <span
+      class="material-symbols-outlined bell-icon"
+      [class.bell-icon--unread]="hasUnread()"
+      aria-hidden="true">
+      {{ hasUnread() ? 'notifications_active' : 'notifications' }}
+    </span>
     <span class="badge" *ngIf="hasUnread()">{{ unreadBadgeLabel() }}</span>
   </button>
 

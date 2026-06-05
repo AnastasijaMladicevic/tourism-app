@@ -16,7 +16,7 @@
       </button>
       <button
         type="button"
-        class="primary-btn"
+        class="primary-btn review-approve-btn"
         [class.approved-locked]="reviewStatus === 'Approved'"
         [attr.title]="reviewStatus === 'Approved' ? translationService.translate('manager.eventReview.alreadyApproved') : null"
         (click)="approveEvent()"
@@ -36,51 +36,30 @@
     <div class="alert alert-success">{{ successMessage }}</div>
   }
 
-  <section class="review-shell">
-    <section class="card media-card">
-        <div class="section-title">
-        <h2>{{ 'manager.eventReview.eventImages' | translate }}</h2>
-        <p>{{ 'manager.eventReview.eventImagesHint' | translate }}</p>
-      </div>
-
-      <div class="media-layout" [attr.aria-label]="'manager.eventReview.imageGalleryAria' | translate">
-        <div class="media-preview" [attr.aria-label]="'manager.eventReview.mainImagePreviewAria' | translate">
-          @if (imagePreviewUrl && !isImagePreviewBroken) {
-            <img [src]="imagePreviewUrl" [alt]="'manager.eventReview.eventPreviewAlt' | translate" (error)="onImagePreviewError()" />
-          } @else {
-            <div class="upload-placeholder">
-              <span class="material-symbols-outlined">image</span>
-              <strong>{{ 'manager.eventReview.noUsableImage' | translate }}</strong>
-              <p>{{ 'manager.eventReview.noUsableImageHint' | translate }}</p>
-            </div>
-          }
-        </div>
-
-        <div class="media-strip">
-          @if (sideGalleryImages.length > 0) {
-            <div class="media-thumbnails">
-              @for (image of sideGalleryImages; track image.id) {
-                <button type="button" class="media-thumb" (click)="selectReviewImage(image.url)">
-                  <img [src]="image.url" [alt]="image.altText || translationService.translate('manager.eventReview.eventThumbnailAlt')" />
-                </button>
-              }
-            </div>
-          } @else {
-            <div class="media-empty">{{ 'manager.eventReview.noAdditionalImages' | translate }}</div>
-          }
-        </div>
-      </div>
-    </section>
-  </section>
-
   <form class="form-layout" [formGroup]="form">
-    <fieldset class="review-fieldset">
-    <div class="form-main">
-      <section class="card section-card">
-        <div class="section-title">
-          <h2>{{ 'manager.eventReview.generalInformation' | translate }}</h2>
-          <p>{{ 'manager.eventReview.generalInformationHint' | translate }}</p>
+    <fieldset class="review-fieldset manager-review-fieldset">
+    <div class="form-main manager-review-main">
+      <section class="review-step-card section-block--gallery">
+        <div class="gallery-card-head">
+          <span class="step-tag">{{ 'contentCreatorObjectForm.step1' | translate }}</span>
+          <h2>{{ 'manager.reviewMediaGallery.title' | translate }}</h2>
+          <p class="gallery-intro">{{ 'manager.reviewMediaGallery.subtitle' | translate }}</p>
         </div>
+
+        <app-review-media-gallery
+          [embedded]="true"
+          [images]="eventImages"
+          [selectedUrl]="selectedReviewImageUrl"
+          [previewBroken]="isImagePreviewBroken"
+          (selectedUrlChange)="selectReviewImage($event)"
+          (previewBrokenChange)="isImagePreviewBroken = $event"
+        />
+      </section>
+
+      <section class="review-step-card">
+        <span class="step-tag">{{ 'contentCreatorObjectForm.step2' | translate }}</span>
+        <h2>{{ 'manager.eventReview.generalInformation' | translate }}</h2>
+        <p class="gallery-intro">{{ 'manager.eventReview.generalInformationHint' | translate }}</p>
 
         <div class="field-grid two-columns">
           <label class="form-field full-width">
@@ -124,11 +103,10 @@
         </label>
       </section>
 
-      <section class="card section-card schedule-card">
-        <div class="section-title">
-          <h2>{{ 'manager.eventReview.schedule' | translate }}</h2>
-          <p>{{ 'manager.eventReview.scheduleHint' | translate }}</p>
-        </div>
+      <section class="review-step-card schedule-card">
+        <span class="step-tag">{{ 'contentCreatorObjectForm.step3' | translate }}</span>
+        <h2>{{ 'manager.eventReview.schedule' | translate }}</h2>
+        <p class="gallery-intro">{{ 'manager.eventReview.scheduleHint' | translate }}</p>
 
         <div class="field-grid schedule-grid">
           <label class="form-field half-width">
@@ -167,11 +145,10 @@
         </div>
       </section>
 
-      <section class="card section-card">
-        <div class="section-title">
-          <h2>{{ 'manager.eventReview.ticketingCapacity' | translate }}</h2>
-          <p>{{ 'event.ticketTypesHelp' | translate }}</p>
-        </div>
+      <section class="review-step-card">
+        <span class="step-tag">{{ 'contentCreatorObjectForm.step4' | translate }}</span>
+        <h2>{{ 'manager.eventReview.ticketingCapacity' | translate }}</h2>
+        <p class="gallery-intro">{{ 'event.ticketTypesHelp' | translate }}</p>
 
         <div class="field-grid ticket-grid">
           <div class="form-field full-width ticket-types-block" formArrayName="ticketTypes">
@@ -233,11 +210,10 @@
         </div>
       </section>
 
-      <section class="card section-card highlighted-card">
-        <div class="section-title">
-          <h2>{{ 'manager.eventReview.categorization' | translate }}</h2>
-          <p>{{ 'manager.eventReview.categorizationHint' | translate }}</p>
-        </div>
+      <section class="review-step-card">
+        <span class="step-tag">{{ 'contentCreatorObjectForm.step5' | translate }}</span>
+        <h2>{{ 'manager.eventReview.categorization' | translate }}</h2>
+        <p class="gallery-intro">{{ 'manager.eventReview.categorizationHint' | translate }}</p>
 
         <label class="form-field full-width">
           <span>{{ 'manager.eventReview.tagsCategories' | translate }}</span>
@@ -266,12 +242,13 @@
       </section>
     </div>
 
-    <aside class="form-side">
+    <aside class="form-side manager-review-side">
       <section class="card side-card">
-        <div class="section-title compact">
-          <h2>{{ 'manager.eventReview.locationIntelligence' | translate }}</h2>
-          <p>{{ 'manager.eventReview.locationIntelligenceHint' | translate }}</p>
-        </div>
+        <header class="side-header">
+          <span class="material-symbols-outlined">my_location</span>
+          <h3>{{ 'manager.eventReview.locationIntelligence' | translate }}</h3>
+        </header>
+        <p class="gallery-intro">{{ 'manager.eventReview.locationIntelligenceHint' | translate }}</p>
 
         <app-map
           [lat]="toNumber(form.controls.latitude.value) ?? 42.424"

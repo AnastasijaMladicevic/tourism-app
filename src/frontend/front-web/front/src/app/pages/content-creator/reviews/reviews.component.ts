@@ -1,8 +1,9 @@
-import { ChangeDetectorRef, Component, Injector, OnDestroy, OnInit, computed, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, Injector, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PaginatorComponent } from '../../../shared/components/paginator/paginator';
 import { ActivatedRoute, Router } from '@angular/router';
+import { toObservable } from '@angular/core/rxjs-interop';
 import {
   Subject,
   Observable,
@@ -20,18 +21,26 @@ import {
   timer,
   timeout
 } from 'rxjs';
-import { toObservable } from '@angular/core/rxjs-interop';
 import { ObjectDto, ObjectImageDto, ObjectService } from '../../../services/object';
 import { ReviewDto, ReviewQueryParams, ReviewService } from '../../../services/review';
 import { TranslationService } from '../../../services/translation.service';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
+import {
+  detectConcerningReplyKind,
+  isConcerningCreatorReply,
+  isSevereConcerningReply,
+} from '../../manager/shared/concerning-reply.util';
 
 @Component({
   selector: 'app-content-creator-reviews',
   standalone: true,
   imports: [CommonModule, FormsModule, PaginatorComponent, TranslatePipe],
   templateUrl: './reviews.component.html',
-  styleUrls: ['./reviews.component.css', '../../admin/shared/admin-page-title.css']
+  styleUrls: [
+    './reviews.component.css',
+    '../../admin/shared/admin-page-title.css',
+    '../shared/cc-filters-parity.css'
+  ]
 })
 export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
   private readonly reviewService = inject(ReviewService);
@@ -42,7 +51,6 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
   private readonly injector = inject(Injector);
   readonly translationService = inject(TranslationService);
   private readonly destroy$ = new Subject<void>();
-  private readonly currentLanguage = computed(() => this.translationService.language());
 
   allReviews: ReviewDto[] = [];
   filteredReviews: ReviewDto[] = [];
@@ -87,19 +95,15 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
         this.loadReviews();
       });
 
-    toObservable(this.currentLanguage, { injector: this.injector })
-      .pipe(
-        skip(1),
-        distinctUntilChanged(),
-        takeUntil(this.destroy$)
-      )
+    this.loadReviews();
+
+    toObservable(this.translationService.translationsVersion, { injector: this.injector })
+      .pipe(skip(1), distinctUntilChanged(), takeUntil(this.destroy$))
       .subscribe(() => {
         this.creatorObjectsLoaded = false;
         this.queuePage = 1;
         this.loadReviews();
       });
-
-    this.loadReviews();
 
     this.route.queryParamMap
       .pipe(
@@ -320,6 +324,34 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
     this.loadSelectedObjectDetails(review.objectId);
   }
 
+  get responsePolicyWarning(): string {
+    const content = this.responseText.trim();
+    if (!content) {
+      return '';
+    }
+
+    const kind = detectConcerningReplyKind({ creatorResponse: content });
+    if (!kind) {
+      return '';
+    }
+
+    if (isSevereConcerningReply(kind)) {
+      return 'This reply contains harmful or threatening language and cannot be sent. Please rewrite it in a professional, respectful tone.';
+    }
+
+    return 'This reply may be flagged as unprofessional or inappropriate. Managers can report it — please use respectful language.';
+  }
+
+  get isResponsePolicyBlocked(): boolean {
+    const content = this.responseText.trim();
+    if (!content) {
+      return false;
+    }
+
+    const kind = detectConcerningReplyKind({ creatorResponse: content });
+    return isSevereConcerningReply(kind);
+  }
+
   sendResponse(): void {
     if (!this.selectedReview || this.isSubmitting) {
       return;
@@ -330,6 +362,14 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
       this.errorMessage = this.translationService.translate('contentCreator.reviews.error.responseRequired');
       this.successMessage = '';
       return;
+    }
+
+    if (isConcerningCreatorReply({ creatorResponse: content })) {
+      if (this.isResponsePolicyBlocked) {
+        this.errorMessage = this.responsePolicyWarning;
+        this.successMessage = '';
+        return;
+      }
     }
 
     const reviewId = this.selectedReview.id;
@@ -542,53 +582,66 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
           return of({ items: [] as ReviewDto[], totalCount: 0, totalPages: 1 });
         }
 
-        return forkJoin(objects.map((object) =>
-          this.objectService.getById(object.id).pipe(
-            map((fullObject) => (fullObject.reviews ?? []).map((review) => ({
-              ...review,
-              objectName: review.objectName?.trim() || fullObject.name || '',
-            }))),
-            catchError(() => of([] as ReviewDto[]))
-          )
-        )).pipe(
-          map((reviewArrays) => {
-            let reviews = this.dedupeReviewsById(reviewArrays.flat());
+        const objectsToFetch = this.objectFilterId != null
+          ? objects.filter((o) => o.id === this.objectFilterId)
+          : objects;
 
-            const { search, objectId, ratings, hasResponse } = this.buildCreatorReviewQuery();
+        if (objectsToFetch.length === 0) {
+          return of({ items: [] as ReviewDto[], totalCount: 0, totalPages: 1 });
+        }
 
-            if (objectId) {
-              reviews = reviews.filter((r) => r.objectId === objectId);
+        return forkJoin(objectsToFetch.map((o) => this.objectService.getById(o.id).pipe(catchError(() => of(null))))).pipe(
+          map((objectDetails) => {
+            const seen = new Set<number>();
+            const allReviews: ReviewDto[] = [];
+
+            for (const detail of objectDetails) {
+              if (!detail) {
+                continue;
+              }
+              for (const review of detail.reviews ?? []) {
+                if (seen.has(review.id)) {
+                  continue;
+                }
+                seen.add(review.id);
+                allReviews.push({
+                  ...review,
+                  objectName: review.objectName?.trim() || detail.name?.trim() || '',
+                });
+              }
             }
 
-            if (search?.trim()) {
-              const term = search.trim().toLowerCase();
-              reviews = reviews.filter((r) =>
-                r.userFullName?.toLowerCase().includes(term) ||
-                r.objectName?.toLowerCase().includes(term) ||
-                r.text?.toLowerCase().includes(term)
+            let filtered = allReviews;
+
+            if (this.searchTerm.trim()) {
+              const q = this.searchTerm.trim().toLowerCase();
+              filtered = filtered.filter((r) =>
+                r.text?.toLowerCase().includes(q)
+                || r.userFullName?.toLowerCase().includes(q)
+                || r.objectName?.toLowerCase().includes(q)
               );
             }
 
-            if (ratings) {
-              const ratingSet = new Set(ratings.split(',').map(Number));
-              reviews = reviews.filter((r) => ratingSet.has(r.rating));
+            if (this.selectedRatings.length > 0) {
+              filtered = filtered.filter((r) => this.selectedRatings.includes(r.rating));
             }
 
-            if (hasResponse != null) {
-              reviews = reviews.filter((r) => hasResponse ? !!r.creatorResponse : !r.creatorResponse);
+            if (this.responseFilter === 'responded') {
+              filtered = filtered.filter((r) => r.creatorResponse?.trim());
+            } else if (this.responseFilter === 'pending') {
+              filtered = filtered.filter((r) => !r.creatorResponse?.trim());
             }
 
-            reviews.sort((a, b) => {
-              const cmp = a.createdAt < b.createdAt ? -1 : a.createdAt > b.createdAt ? 1 : 0;
-              return this.sortOrder === 'asc' ? cmp : -cmp;
-            });
+            if (this.sortOrder === 'desc') {
+              filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+            } else {
+              filtered.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+            }
 
-            const totalCount = reviews.length;
-            const page = this.queuePage;
-            const pageSize = this.queuePageSize;
-            const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
-            const start = (page - 1) * pageSize;
-            const items = reviews.slice(start, start + pageSize);
+            const totalCount = filtered.length;
+            const totalPages = Math.max(1, Math.ceil(totalCount / this.queuePageSize));
+            const start = (this.queuePage - 1) * this.queuePageSize;
+            const items = filtered.slice(start, start + this.queuePageSize);
 
             return { items, totalCount, totalPages };
           })
