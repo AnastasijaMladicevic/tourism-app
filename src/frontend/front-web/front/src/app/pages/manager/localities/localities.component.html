@@ -2,7 +2,6 @@
   <header class="page-head">
     <div>
       <h1>{{ 'layout.localities' | translate }}</h1>
-      <p class="page-subtitle">{{ localitiesCountLabel }}</p>
     </div>
     <button type="button" class="primary-btn page-header-cta" (click)="onCreateLocation()">
       <span class="material-symbols-outlined">add</span>
@@ -27,7 +26,7 @@
     <div class="filters-panel card">
       <label>
         <span>{{ 'manager.localities.filters.status' | translate }}</span>
-        <select [(ngModel)]="statusFilter">
+        <select [(ngModel)]="statusFilter" (ngModelChange)="onApplyFilters()">
           <option value="all">{{ 'manager.localities.filters.allStatuses' | translate }}</option>
           <option *ngFor="let option of statusOptions" [value]="option.value">{{ option.label }}</option>
         </select>
@@ -35,7 +34,7 @@
 
       <label>
         <span>{{ 'manager.localities.destination' | translate }}</span>
-        <select [(ngModel)]="destinationFilter">
+        <select [(ngModel)]="destinationFilter" (ngModelChange)="onApplyFilters()">
           <option value="all">{{ 'manager.localities.filters.allDestinations' | translate }}</option>
           <option *ngFor="let option of destinationOptions" [value]="option.value">{{ option.label }}</option>
         </select>
@@ -43,7 +42,7 @@
 
       <label>
         <span>{{ 'manager.localities.type' | translate }}</span>
-        <select [(ngModel)]="typeFilter">
+        <select [(ngModel)]="typeFilter" (ngModelChange)="onApplyFilters()">
           <option value="all">{{ 'manager.localities.filters.allTypes' | translate }}</option>
           <option *ngFor="let option of typeOptions" [value]="option.value">{{ option.label }}</option>
         </select>
@@ -51,7 +50,7 @@
 
       <label>
         <span>{{ 'manager.localities.filters.sortBy' | translate }}</span>
-        <select [(ngModel)]="sortBy">
+        <select [(ngModel)]="sortBy" (ngModelChange)="onApplyFilters()">
           <option value="name">{{ 'manager.localities.filters.name' | translate }}</option>
           <option value="destination">{{ 'manager.localities.destination' | translate }}</option>
           <option value="type">{{ 'manager.localities.type' | translate }}</option>
@@ -61,14 +60,13 @@
 
       <label>
         <span>{{ 'manager.localities.filters.order' | translate }}</span>
-        <select [(ngModel)]="sortOrder">
+        <select [(ngModel)]="sortOrder" (ngModelChange)="onApplyFilters()">
           <option value="asc">{{ 'manager.localities.filters.ascending' | translate }}</option>
           <option value="desc">{{ 'manager.localities.filters.descending' | translate }}</option>
         </select>
       </label>
 
       <div class="filter-actions">
-        <button type="button" class="primary-btn filter-btn" (click)="onApplyFilters()">{{ 'manager.localities.filters.apply' | translate }}</button>
         <button type="button" class="ghost-btn filter-btn secondary" (click)="onResetFilters()">{{ 'manager.localities.filters.reset' | translate }}</button>
       </div>
     </div>

@@ -20,9 +20,76 @@
 }
 
 .manager-list-page .toolbar.card,
-.manager-list-page .filters-panel.card {
+.manager-list-page .filters-panel.card,
+.manager-list-page .filters-bar.card {
   border-radius: 14px;
   box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
+}
+
+/* Unified filter container sizing across manager list pages */
+.manager-list-page .filters-panel,
+.manager-list-page .filters-bar {
+  gap: 10px;
+  padding: 12px;
+}
+
+.manager-list-page .filters-panel {
+  align-items: end;
+}
+
+.manager-list-page .filters-bar {
+  display: flex;
+  flex-direction: column;
+}
+
+.manager-list-page .filters-panel label,
+.manager-list-page .filters-bar .creator-select {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.manager-list-page .filters-panel select,
+.manager-list-page .filters-bar .creator-select select {
+  width: 100%;
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #fff;
+  font: inherit;
+  color: #111827;
+}
+
+.manager-list-page .filter-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  align-self: end;
+  justify-self: end;
+  white-space: nowrap;
+}
+
+.manager-list-page .filter-actions .filter-btn,
+.manager-list-page .filters-bar .filter-row-secondary .ghost-btn,
+.manager-list-page .filters-bar .filter-row-secondary .small-btn {
+  min-height: 42px;
+  padding-inline: 16px;
+}
+
+.manager-list-page .filter-actions .filter-btn.secondary {
+  color: #334155;
+  border-color: #dbe1ea;
+  background: #fff;
+}
+
+.manager-list-page .filters-bar .filter-row-secondary .search-field {
+  min-height: 42px;
+  border-radius: 10px;
 }
 
 .manager-list-page .table-card,

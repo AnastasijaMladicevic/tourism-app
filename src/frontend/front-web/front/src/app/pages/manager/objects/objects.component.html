@@ -2,7 +2,6 @@
   <header class="page-head">
     <div>
       <h1>{{ 'layout.objects' | translate }}</h1>
-      <p class="page-subtitle">{{ objectsCountLabel }}</p>
     </div>
   </header>
 
@@ -60,7 +59,6 @@
       </label>
 
       <div class="filter-actions">
-        <button type="button" class="primary-btn filter-btn" (click)="onApplyFilters()">{{ 'manager.objects.filter.apply' | translate }}</button>
         <button type="button" class="ghost-btn filter-btn secondary" (click)="onResetFilters()">{{ 'manager.objects.filter.reset' | translate }}</button>
       </div>
     </div>

@@ -817,7 +817,7 @@
           "ascending": "Ascending",
           "descending": "Descending",
           "apply": "Apply",
-          "reset": "Reset"
+          "reset": "Reset Filters"
         },
         "table": {
           "status": "Status",
@@ -892,7 +892,7 @@
           "ascending": "Ascending",
           "descending": "Descending",
           "apply": "Apply",
-          "reset": "Reset"
+          "reset": "Reset Filters"
         },
         "stats": {
           "totalActivities": "Total activities",
@@ -954,7 +954,7 @@
           "ascending": "Ascending",
           "descending": "Descending",
           "apply": "Apply",
-          "reset": "Reset"
+          "reset": "Reset Filters"
         },
         "stats": {
           "totalLocalities": "Total localities",
@@ -1141,7 +1141,7 @@
         "filters": {
           "status": "Status",
           "allStatuses": "All statuses",
-          "reset": "Reset"
+          "reset": "Reset Filters"
         },
         "stats": {
           "pendingReview": "Pending review",
@@ -1226,7 +1226,7 @@
           "creator": "Content Creator",
           "allCreators": "All creators",
           "searchPlaceholder": "Search tourist, object, review text, reply...",
-          "reset": "Reset"
+          "reset": "Reset Filters"
         },
         "stats": {
           "threads": "Threads in destination",
@@ -1413,7 +1413,7 @@
         "ascending": "Ascending",
         "descending": "Descending",
         "apply": "Apply filters",
-        "reset": "Reset filters"
+        "reset": "Reset Filters"
       },
       "sort": {
         "name": "Name",

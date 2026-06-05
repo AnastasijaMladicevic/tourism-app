@@ -34,7 +34,11 @@ import {
   standalone: true,
   imports: [CommonModule, FormsModule, PaginatorComponent, TranslatePipe],
   templateUrl: './reviews.component.html',
-  styleUrls: ['./reviews.component.css', '../../admin/shared/admin-page-title.css']
+  styleUrls: [
+    './reviews.component.css',
+    '../../admin/shared/admin-page-title.css',
+    '../shared/cc-filters-parity.css'
+  ]
 })
 export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
   private readonly reviewService = inject(ReviewService);

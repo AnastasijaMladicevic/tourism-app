@@ -3,7 +3,6 @@
     <div class="page-header-copy">
       <p class="eyebrow page-header-eyebrow">{{ 'contentCreator.objects.eyebrow' | translate }}</p>
       <h1>{{ 'contentCreator.objects.title' | translate }}</h1>
-      <p class="page-subtitle">{{ objectsCountLabel }}</p>
     </div>
     <button type="button" class="primary-btn page-header-cta" (click)="onCreateObject()">
       <span class="material-symbols-outlined">add</span>
@@ -28,7 +27,7 @@
     <div class="filters-panel card">
       <label>
         <span>{{ 'contentCreator.objects.filters.status' | translate }}</span>
-        <select [(ngModel)]="statusFilter" (ngModelChange)="onFilterChange()">
+        <select [(ngModel)]="statusFilter" (ngModelChange)="onApplyFilters()">
           <option value="all">{{ 'contentCreator.objects.filters.allStatuses' | translate }}</option>
           <option *ngFor="let option of statusOptions" [value]="option.value">
             {{ translateOptionLabel(option) }}
@@ -38,7 +37,7 @@
 
       <label>
         <span>{{ 'contentCreator.objects.filters.type' | translate }}</span>
-        <select [(ngModel)]="typeFilter" (ngModelChange)="onFilterChange()">
+        <select [(ngModel)]="typeFilter" (ngModelChange)="onApplyFilters()">
           <option value="all">{{ 'contentCreator.objects.filters.allTypes' | translate }}</option>
           <option *ngFor="let option of typeOptions" [value]="option.value">{{ option.label }}</option>
         </select>
@@ -46,14 +45,14 @@
 
       <label>
         <span>{{ 'contentCreator.objects.filters.rating' | translate }}</span>
-        <select [(ngModel)]="ratingFilter" (ngModelChange)="onFilterChange()">
+        <select [(ngModel)]="ratingFilter" (ngModelChange)="onApplyFilters()">
           <option *ngFor="let option of ratingOptions" [value]="option.value">{{ translateOptionLabel(option) }}</option>
         </select>
       </label>
 
       <label>
         <span>{{ 'contentCreator.objects.filters.sortBy' | translate }}</span>
-        <select [(ngModel)]="sortBy" (ngModelChange)="onFilterChange()">
+        <select [(ngModel)]="sortBy" (ngModelChange)="onApplyFilters()">
           <option *ngFor="let option of sortByOptions" [value]="option.value">
             {{ translateOptionLabel(option) }}
           </option>
@@ -62,16 +61,13 @@
 
       <label>
         <span>{{ 'contentCreator.objects.filters.order' | translate }}</span>
-        <select [(ngModel)]="sortOrder" (ngModelChange)="onFilterChange()">
+        <select [(ngModel)]="sortOrder" (ngModelChange)="onApplyFilters()">
           <option value="asc">{{ 'contentCreator.objects.filters.ascending' | translate }}</option>
           <option value="desc">{{ 'contentCreator.objects.filters.descending' | translate }}</option>
         </select>
       </label>
 
       <div class="filter-actions">
-        <button type="button" class="primary-btn filter-btn" (click)="onApplyFilters()">
-          {{ 'contentCreator.objects.filters.apply' | translate }}
-        </button>
         <button type="button" class="ghost-btn filter-btn secondary" (click)="onResetFilters()">
           {{ 'contentCreator.objects.filters.reset' | translate }}
         </button>

@@ -817,7 +817,7 @@
           "ascending": "Ascendente",
           "descending": "Descendente",
           "apply": "Aplicar",
-          "reset": "Restablecer"
+          "reset": "Restablecer filtros"
         },
         "table": {
           "status": "Estado",
@@ -892,7 +892,7 @@
           "ascending": "Ascendente",
           "descending": "Descendente",
           "apply": "Aplicar",
-          "reset": "Restablecer"
+          "reset": "Restablecer filtros"
         },
         "stats": {
           "totalActivities": "Total de actividades",
@@ -954,7 +954,7 @@
           "ascending": "Ascendente",
           "descending": "Descendente",
           "apply": "Aplicar",
-          "reset": "Restablecer"
+          "reset": "Restablecer filtros"
         },
         "stats": {
           "totalLocalities": "Total de localidades",
@@ -1141,7 +1141,7 @@
         "filters": {
           "status": "Estado",
           "allStatuses": "Todos los estados",
-          "reset": "Restablecer"
+          "reset": "Restablecer filtros"
         },
         "stats": {
           "pendingReview": "Pendiente de revisión",
@@ -1226,7 +1226,7 @@
           "creator": "Creador de contenido",
           "allCreators": "Todos los creadores",
           "searchPlaceholder": "Buscar turista, objeto, texto de reseña, respuesta...",
-          "reset": "Restablecer"
+          "reset": "Restablecer filtros"
         },
         "stats": {
           "threads": "Hilos en el destino",

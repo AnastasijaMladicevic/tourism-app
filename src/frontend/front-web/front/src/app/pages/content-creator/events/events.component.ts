@@ -41,7 +41,8 @@ interface EventFilterOption {
     '../shared/cc-list-page-header.css',
     '../shared/cc-list-detail-layout.css',
     '../shared/cc-page-stats-scroll.css',
-    '../shared/cc-stat-cards.css'
+    '../shared/cc-stat-cards.css',
+    '../shared/cc-filters-parity.css'
   ]
 })
 export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
@@ -285,10 +286,6 @@ export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
     this.sortOrder = value;
     this.currentPage = 1;
     this.loadEvents();
-  }
-
-  onFilterChange(): void {
-    // Filter changes are applied explicitly via the panel's Apply button.
   }
 
   onPageSizeChange(value: number | string): void {

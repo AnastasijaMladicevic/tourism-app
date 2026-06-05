@@ -817,7 +817,7 @@
           "ascending": "Rastuće",
           "descending": "Opadajuće",
           "apply": "Primeni",
-          "reset": "Resetuj"
+          "reset": "Resetuj filtere"
         },
         "table": {
           "status": "Status",
@@ -892,7 +892,7 @@
           "ascending": "Rastuće",
           "descending": "Opadajuće",
           "apply": "Primeni",
-          "reset": "Resetuj"
+          "reset": "Resetuj filtere"
         },
         "stats": {
           "totalActivities": "Ukupno aktivnosti",
@@ -954,7 +954,7 @@
           "ascending": "Rastuće",
           "descending": "Opadajuće",
           "apply": "Primeni",
-          "reset": "Resetuj"
+          "reset": "Resetuj filtere"
         },
         "stats": {
           "totalLocalities": "Ukupno lokaliteta",
@@ -1141,7 +1141,7 @@
         "filters": {
           "status": "Status",
           "allStatuses": "Svi statusi",
-          "reset": "Resetuj"
+          "reset": "Resetuj filtere"
         },
         "stats": {
           "pendingReview": "Čeka pregled",
@@ -1226,7 +1226,7 @@
           "creator": "Kreator sadržaja",
           "allCreators": "Svi kreatori",
           "searchPlaceholder": "Pretraži turistu, objekat, tekst recenzije, odgovor...",
-          "reset": "Resetuj"
+          "reset": "Resetuj filtere"
         },
         "stats": {
           "threads": "Razgovori u destinaciji",
@@ -1413,7 +1413,7 @@
         "ascending": "Rastuce",
         "descending": "Opadajuce",
         "apply": "Primeni",
-        "reset": "Resetuj"
+        "reset": "Resetuj filtere"
       },
       "sort": {
         "name": "Naziv",

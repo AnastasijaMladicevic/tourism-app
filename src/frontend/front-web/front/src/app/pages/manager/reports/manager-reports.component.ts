@@ -53,8 +53,7 @@ interface ManagerReportNameHint {
     '../../admin/shared/admin-page-title.css',
     '../shared/manager-list-page-header.css',
     '../shared/manager-list-page-responsive.css',
-    '../shared/manager-page-stats-scroll.css',
-    '../shared/manager-stat-cards.css'
+    '../shared/manager-cc-page-parity.css',
   ],
 })
 export class ManagerReportsComponent implements OnInit {
@@ -79,7 +78,6 @@ export class ManagerReportsComponent implements OnInit {
   draftSearchQuery = '';
   searchQuery = '';
   statusFilter: 'all' | ReportStatus = 'all';
-  filterPanelOpen = true;
 
   reportModalOpen = false;
   reportModalCreatorId: number | null = null;
@@ -190,30 +188,28 @@ export class ManagerReportsComponent implements OnInit {
       });
   }
 
-  onSearchEnter(event: Event): void {
-    event.preventDefault();
-    this.searchQuery = this.draftSearchQuery.trim();
-    if (this.selectedReport && !this.filteredReports.some((r) => r.id === this.selectedReport!.id)) {
-      this.selectedReport = this.filteredReports[0] ?? null;
-    }
+  onSearchChange(value: string): void {
+    this.draftSearchQuery = value;
+    this.searchQuery = value.trim();
+    this.syncSelectedReport();
   }
 
-  onApplyFilters(): void {
-    this.filterPanelOpen = false;
-    if (this.selectedReport && !this.filteredReports.some((r) => r.id === this.selectedReport!.id)) {
-      this.selectedReport = this.filteredReports[0] ?? null;
-    }
+  setStatusFilter(filter: 'all' | ReportStatus): void {
+    this.statusFilter = filter;
+    this.syncSelectedReport();
   }
 
   onResetFilters(): void {
     this.statusFilter = 'all';
     this.draftSearchQuery = '';
     this.searchQuery = '';
-    this.filterPanelOpen = false;
+    this.syncSelectedReport();
   }
 
-  toggleFilters(): void {
-    this.filterPanelOpen = !this.filterPanelOpen;
+  private syncSelectedReport(): void {
+    if (this.selectedReport && !this.filteredReports.some((r) => r.id === this.selectedReport!.id)) {
+      this.selectedReport = this.filteredReports[0] ?? null;
+    }
   }
 
   selectReport(report: ManagerReportRow): void {

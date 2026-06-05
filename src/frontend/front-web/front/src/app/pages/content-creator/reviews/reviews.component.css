@@ -19,12 +19,9 @@
 .filters-row {
   display: flex;
   flex-direction: column;
-  gap: 10px;
   margin-bottom: 14px;
   background: #ffffff;
   border: 1px solid #e5e7eb;
-  border-radius: 16px;
-  padding: 12px;
 }
 
 .object-filter-inline {

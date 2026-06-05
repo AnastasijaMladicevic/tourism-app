@@ -89,7 +89,8 @@ interface ManagerReportNameHint {
     '../../admin/shared/admin-page-title.css',
     '../shared/manager-list-page-header.css',
     '../shared/manager-list-page-responsive.css',
-    '../shared/manager-page-stats-scroll.css'
+    '../shared/manager-page-stats-scroll.css',
+    '../shared/manager-cc-page-parity.css',
   ],
 })
 export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {

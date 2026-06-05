@@ -175,7 +175,7 @@
 
 .filters-panel {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr)) auto auto;
+    grid-template-columns: repeat(5, minmax(0, 1fr)) auto;
     gap: 12px;
     padding: 14px;
     align-items: end;
