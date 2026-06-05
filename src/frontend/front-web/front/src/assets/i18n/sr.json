@@ -4286,5 +4286,88 @@
     "Nueva destinación": "Nova destinacija",
     "Nuova destinazione": "Nova destinacija",
     "Nova destinacija": "Nova destinacija"
+  },
+  "login": {
+    "title": "Prijavite se",
+    "subtitle": "Unesite administrativne podatke za pristup SpireGO kontrolnoj tabli.",
+    "email": "Email",
+    "emailError": "Unesite važeću email adresu.",
+    "password": "Lozinka",
+    "passwordError": "Lozinka je obavezna.",
+    "rememberMe": "Ostavi me prijavljenim 30 dana",
+    "forgot": "Zaboravili?",
+    "loggingIn": "Prijavljivanje...",
+    "logIn": "Prijavi se",
+    "hidePassword": "Sakrij lozinku",
+    "showPassword": "Prikaži lozinku",
+    "invalidCredentials": "Neispravni email ili lozinka.",
+    "portalComingSoon": "portal uskoro dolazi. Proverite ponovo."
+  },
+  "signup": {
+    "welcome": "Dobrodošli",
+    "firstName": "Ime",
+    "lastName": "Prezime",
+    "dateOfBirth": "Datum rođenja",
+    "email": "Email",
+    "password": "Lozinka",
+    "confirmPassword": "Potvrdi lozinku",
+    "signUp": "Registrujte se",
+    "helpText": "Potrebna vam je tehnička podrška?",
+    "contactHelpdesk": "Kontaktirajte IT podršku",
+    "passwordsDoNotMatch": "Lozinke se ne podudaraju",
+    "registrationSuccessful": "Registracija uspešna!",
+    "registrationFailed": "Registracija neuspešna"
+  },
+  "forgotPassword": {
+    "email": {
+      "title": "Resetujte lozinku",
+      "subtitle": "Unesite email i poslaćemo vam verifikacioni kod.",
+      "emailLabel": "Email",
+      "emailError": "Unesite važeću email adresu.",
+      "sending": "Slanje...",
+      "sendCode": "Pošalji kod",
+      "backToLogin": "Nazad na prijavu",
+      "codeSentMessage": "Verifikacioni kod je poslat na vaš email."
+    },
+    "code": {
+      "title": "Proverite email",
+      "subtitle": "Unesite 6-cifreni kod poslan na",
+      "codeLabel": "Verifikacioni kod",
+      "codeError": "Unesite važeći 6-cifreni kod.",
+      "verifying": "Verifikacija...",
+      "verifyCode": "Verifikuj kod",
+      "changeEmail": "Promeni email"
+    },
+    "password": {
+      "title": "Postavite novu lozinku",
+      "subtitle": "Kreirajte novu lozinku za vaš nalog.",
+      "newPasswordLabel": "Nova lozinka",
+      "confirmPasswordLabel": "Potvrdi lozinku",
+      "saving": "Čuvanje...",
+      "savePassword": "Sačuvaj novu lozinku",
+      "backToCode": "Nazad na kod"
+    },
+    "success": {
+      "title": "Lozinka ažurirana",
+      "subtitle": "Vaša lozinka je promenjena. Sada se možete prijaviti.",
+      "backToLogin": "Nazad na prijavu"
+    },
+    "errors": {
+      "unableToSend": "Nije moguće poslati kod za resetovanje.",
+      "invalidCode": "Nevažeći ili istekli kod.",
+      "noToken": "Token sesije nije vraćen. Zatražite novi kod.",
+      "sessionExpired": "Sesija istekla. Zatražite novi kod.",
+      "passwordsDoNotMatch": "Lozinke se ne podudaraju.",
+      "passwordRequirements": "Lozinka mora sadržati jedno veliko slovo i jedan broj ili simbol.",
+      "unableToReset": "Nije moguće resetovati lozinku."
+    }
+  },
+  "signout": {
+    "title": "Potvrdi odjavu?",
+    "description": "Da li ste sigurni da želite da završite sesiju i napustite platformu?",
+    "signOut": "Odjavi se",
+    "keepSignedIn": "Ostani prijavljen",
+    "sessionSecurity": "Bezbednost sesije",
+    "sessionSecurityDesc": "Za vašu zaštitu, sesije se automatski prekidaju nakon 30 minuta neaktivnosti."
   }
 }

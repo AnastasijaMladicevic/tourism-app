@@ -4,13 +4,15 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { finalize } from 'rxjs';
 import { AuthService } from '../../services/auth.service';
+import { TranslationService } from '../../services/translation.service';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 type ForgotPasswordStep = 'email' | 'code' | 'password' | 'success';
 
 @Component({
   selector: 'app-forgot-password',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, TranslatePipe],
   templateUrl: './forgot-password.html',
   styleUrl: './forgot-password.css',
 })
@@ -19,6 +21,7 @@ export class ForgotPasswordComponent {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly translationService = inject(TranslationService);
 
   readonly emailForm = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
@@ -81,12 +84,12 @@ export class ForgotPasswordComponent {
       .subscribe({
         next: () => {
           this.step = 'code';
-          this.message = 'A verification code has been sent to your email.';
+          this.message = this.translationService.translate('forgotPassword.email.codeSentMessage');
           this.codeForm.reset();
           this.cdr.detectChanges();
         },
         error: (error: any) => {
-          this.errorMessage = error?.error?.message ?? 'Unable to send reset code.';
+          this.errorMessage = error?.error?.message ?? this.translationService.translate('forgotPassword.errors.unableToSend');
           this.step = 'email';
           this.cdr.detectChanges();
         },
@@ -115,7 +118,7 @@ export class ForgotPasswordComponent {
           const resetSessionToken = this.extractResetSessionToken(response);
 
           if (!resetSessionToken) {
-            this.errorMessage = 'Reset session token was not returned. Please request a new code.';
+            this.errorMessage = this.translationService.translate('forgotPassword.errors.noToken');
             return;
           }
 
@@ -126,7 +129,7 @@ export class ForgotPasswordComponent {
           this.cdr.detectChanges();
         },
         error: (error: any) => {
-          this.errorMessage = error?.error?.message ?? 'Invalid or expired reset code.';
+          this.errorMessage = error?.error?.message ?? this.translationService.translate('forgotPassword.errors.invalidCode');
           this.cdr.detectChanges();
         },
       });
@@ -142,17 +145,17 @@ export class ForgotPasswordComponent {
     const confirmPassword = this.confirmPassword?.value ?? '';
 
     if (newPassword !== confirmPassword) {
-      this.errorMessage = 'Passwords do not match.';
+      this.errorMessage = this.translationService.translate('forgotPassword.errors.passwordsDoNotMatch');
       return;
     }
 
     if (!/[A-Z]/.test(newPassword) || !/[\d\W]/.test(newPassword)) {
-      this.errorMessage = 'Password must include one uppercase letter and one number or symbol.';
+      this.errorMessage = this.translationService.translate('forgotPassword.errors.passwordRequirements');
       return;
     }
 
     if (!this.resetEmail || !this.resetCode || !this.resetSessionToken) {
-      this.errorMessage = 'Reset session expired. Please request a new code.';
+      this.errorMessage = this.translationService.translate('forgotPassword.errors.sessionExpired');
       this.step = 'email';
       this.codeForm.reset();
       this.passwordForm.reset();
@@ -177,11 +180,11 @@ export class ForgotPasswordComponent {
       .subscribe({
         next: () => {
           this.step = 'success';
-          this.message = 'Your password has been reset successfully.';
+          this.message = this.translationService.translate('forgotPassword.success.subtitle');
           this.cdr.detectChanges();
         },
         error: (error: any) => {
-          this.errorMessage = error?.error?.message ?? 'Unable to reset password.';
+          this.errorMessage = error?.error?.message ?? this.translationService.translate('forgotPassword.errors.unableToReset');
           this.cdr.detectChanges();
         },
       });

@@ -1,12 +1,14 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { CommonModule } from '@angular/common';
+import { TranslationService } from '../../services/translation.service';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 @Component({
   selector: 'app-signup',
   standalone: true,
-  imports: [FormsModule, CommonModule],
+  imports: [FormsModule, CommonModule, TranslatePipe],
   templateUrl: './signup.component.html',
   styleUrl: './signup.component.css'
 })
@@ -25,6 +27,8 @@ successMessage = '';
   showPassword = false;
   showConfirmPassword = false;
 
+  private readonly translationService = inject(TranslationService);
+
   togglePassword() {
     this.showPassword = !this.showPassword;
   }
@@ -36,7 +40,7 @@ successMessage = '';
 
   onSignUp() {
   if (this.password !== this.confirmPassword) {
-    this.errorMessage = 'Passwords do not match';
+    this.errorMessage = this.translationService.translate('signup.passwordsDoNotMatch');
     return;
   }
 
@@ -51,11 +55,11 @@ successMessage = '';
     language: this.language
   }).subscribe({
     next: () => {
-      this.successMessage = 'Registration successful!';
+      this.successMessage = this.translationService.translate('signup.registrationSuccessful');
       setTimeout(() => this.router.navigate(['/login']), 1500);
     },
     error: (err) => {
-      this.errorMessage = err.error?.message || 'Registration failed';
+      this.errorMessage = err.error?.message || this.translationService.translate('signup.registrationFailed');
     }
   });
 }

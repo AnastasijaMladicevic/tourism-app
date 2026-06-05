@@ -3,12 +3,14 @@ import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
+import { TranslationService } from '../../services/translation.service';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, TranslatePipe],
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
@@ -17,6 +19,7 @@ export class Login {
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly translationService = inject(TranslationService);
 
   form = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
@@ -68,7 +71,7 @@ export class Login {
 
         if (role === 'tourist') {
           this.authService.logout();
-          this.errorMessage = `${role} portal is coming soon. Please check back later.`;
+          this.errorMessage = `${role} ${this.translationService.translate('login.portalComingSoon')}`;
           return;
         }
 
@@ -81,7 +84,7 @@ export class Login {
         this.router.navigateByUrl(targetRoute);
       },
       error: (error: any) => {
-        this.errorMessage = error?.error?.message ?? 'Invalid email or password.';
+        this.errorMessage = error?.error?.message ?? this.translationService.translate('login.invalidCredentials');
         return;
       },
     });

@@ -6,29 +6,29 @@
       <span class="material-symbols-outlined">logout</span>
     </div>
 
-    <h2>Confirm Sign Out?</h2>
+    <h2>{{ 'signout.title' | translate }}</h2>
 
     <p class="desc">
-      Are you sure you want to end your current session and leave the platform?
+      {{ 'signout.description' | translate }}
     </p>
 
     <div class="actions">
       <button type="button" class="logout" (click)="confirmSignOut()">
-        Sign Out
+        {{ 'signout.signOut' | translate }}
       </button>
 
       <button type="button" class="cancel" (click)="cancel()">
         <span class="material-symbols-outlined" aria-hidden="true">arrow_back</span>
-        Keep me signed in
+        {{ 'signout.keepSignedIn' | translate }}
       </button>
     </div>
 
     <div class="info">
       <span class="material-symbols-outlined shield" aria-hidden="true">shield</span>
       <div>
-        <strong>Session Security</strong>
+        <strong>{{ 'signout.sessionSecurity' | translate }}</strong>
         <p>
-          For your protection, sessions are automatically terminated after 30 minutes of inactivity.
+          {{ 'signout.sessionSecurityDesc' | translate }}
         </p>
       </div>
     </div>

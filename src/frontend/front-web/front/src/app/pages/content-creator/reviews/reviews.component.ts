@@ -1,8 +1,9 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, Injector, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PaginatorComponent } from '../../../shared/components/paginator/paginator';
 import { ActivatedRoute, Router } from '@angular/router';
+import { toObservable } from '@angular/core/rxjs-interop';
 import {
   Subject,
   Observable,
@@ -12,6 +13,7 @@ import {
   forkJoin,
   map,
   of,
+  skip,
   switchMap,
   takeUntil,
   distinctUntilChanged,
@@ -46,6 +48,7 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly injector = inject(Injector);
   readonly translationService = inject(TranslationService);
   private readonly destroy$ = new Subject<void>();
 
@@ -93,6 +96,13 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
       });
 
     this.loadReviews();
+
+    toObservable(this.translationService.translationsVersion, { injector: this.injector })
+      .pipe(skip(1), distinctUntilChanged(), takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.creatorObjectsLoaded = false;
+        this.loadReviews();
+      });
 
     this.route.queryParamMap
       .pipe(
@@ -571,23 +581,69 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
           return of({ items: [] as ReviewDto[], totalCount: 0, totalPages: 1 });
         }
 
-        const objectNames = new Map(objects.map((object) => [object.id, object.name] as const));
+        const objectsToFetch = this.objectFilterId != null
+          ? objects.filter((o) => o.id === this.objectFilterId)
+          : objects;
 
-        return this.reviewService.getForCreator(
-          this.buildCreatorReviewQuery(),
-          { bypassRegion: true }
-        ).pipe(
-          map((result) => ({
-            items: (result.items ?? []).map((review) => ({
-              ...review,
-              objectName: review.objectName?.trim()
-                ? review.objectName
-                : (objectNames.get(review.objectId)
-                  ?? this.translationService.translate('contentCreator.reviews.fallback.object', { id: review.objectId }))
-            })),
-            totalCount: result.totalCount ?? 0,
-            totalPages: result.totalPages ?? 1
-          }))
+        if (objectsToFetch.length === 0) {
+          return of({ items: [] as ReviewDto[], totalCount: 0, totalPages: 1 });
+        }
+
+        return forkJoin(objectsToFetch.map((o) => this.objectService.getById(o.id).pipe(catchError(() => of(null))))).pipe(
+          map((objectDetails) => {
+            const seen = new Set<number>();
+            const allReviews: ReviewDto[] = [];
+
+            for (const detail of objectDetails) {
+              if (!detail) {
+                continue;
+              }
+              for (const review of detail.reviews ?? []) {
+                if (seen.has(review.id)) {
+                  continue;
+                }
+                seen.add(review.id);
+                allReviews.push({
+                  ...review,
+                  objectName: review.objectName?.trim() || detail.name?.trim() || '',
+                });
+              }
+            }
+
+            let filtered = allReviews;
+
+            if (this.searchTerm.trim()) {
+              const q = this.searchTerm.trim().toLowerCase();
+              filtered = filtered.filter((r) =>
+                r.text?.toLowerCase().includes(q)
+                || r.userFullName?.toLowerCase().includes(q)
+                || r.objectName?.toLowerCase().includes(q)
+              );
+            }
+
+            if (this.selectedRatings.length > 0) {
+              filtered = filtered.filter((r) => this.selectedRatings.includes(r.rating));
+            }
+
+            if (this.responseFilter === 'responded') {
+              filtered = filtered.filter((r) => r.creatorResponse?.trim());
+            } else if (this.responseFilter === 'pending') {
+              filtered = filtered.filter((r) => !r.creatorResponse?.trim());
+            }
+
+            if (this.sortOrder === 'desc') {
+              filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+            } else {
+              filtered.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+            }
+
+            const totalCount = filtered.length;
+            const totalPages = Math.max(1, Math.ceil(totalCount / this.queuePageSize));
+            const start = (this.queuePage - 1) * this.queuePageSize;
+            const items = filtered.slice(start, start + this.queuePageSize);
+
+            return { items, totalCount, totalPages };
+          })
         );
       })
     );

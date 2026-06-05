@@ -27,22 +27,19 @@ import {
   catchError,
   finalize,
   forkJoin,
-  from,
   map,
-  mergeMap,
   of,
   switchMap,
   takeUntil,
   throwError,
   timer,
   timeout,
-  toArray,
   Observable,
 } from 'rxjs';
 import { DestinationService } from '../../../services/destination.service';
 import { ManagerDashboardService } from '../../../services/manager-dashboard.service';
 import { ObjectDto, ObjectService } from '../../../services/object';
-import { ReviewDto, ReviewService } from '../../../services/review';
+import { ReviewDto } from '../../../services/review';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../../services/translation.service';
 
@@ -94,7 +91,6 @@ interface ManagerReportNameHint {
   ],
 })
 export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
-  private readonly reviewService = inject(ReviewService);
   private readonly objectService = inject(ObjectService);
   private readonly destinationService = inject(DestinationService);
   private readonly http = inject(HttpClient);
@@ -564,45 +560,35 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
     );
   }
 
-  /** Loads reviews only for objects in the manager's scope (avoids fetching the full review catalog). */
+  /** Loads reviews only for objects in the manager's scope using translated object endpoint. */
   private fetchReviewsForManagedObjects(objectIds: number[]): Observable<ReviewDto[]> {
-    const pageSize = 100;
-    const reviewRequestOptions = { bypassLanguage: true, bypassRegion: true };
-
-    return from(objectIds).pipe(
-      mergeMap(
-        (objectId) =>
-          this.getAllPagedItems((page) =>
-            this.reviewService.getAll(
-              {
-                objectId,
-                page,
-                pageSize,
-                sortBy: 'createdAt',
-                sortOrder: 'desc',
-              },
-              reviewRequestOptions,
-            ),
-          ).pipe(catchError(() => of([] as ReviewDto[]))),
-        6,
-      ),
-      toArray(),
-      map((reviewLists) => {
+    return forkJoin(
+      objectIds.map((objectId) =>
+        this.objectService.getById(objectId).pipe(catchError(() => of(null)))
+      )
+    ).pipe(
+      map((objectDetails) => {
         const seen = new Set<number>();
         const merged: ReviewDto[] = [];
 
-        for (const reviews of reviewLists) {
-          for (const review of reviews) {
+        for (const detail of objectDetails) {
+          if (!detail) {
+            continue;
+          }
+          for (const review of detail.reviews ?? []) {
             if (seen.has(review.id)) {
               continue;
             }
             seen.add(review.id);
-            merged.push(review);
+            merged.push({
+              ...review,
+              objectName: review.objectName?.trim() || detail.name?.trim() || '',
+            });
           }
         }
 
         return merged;
-      }),
+      })
     );
   }
 

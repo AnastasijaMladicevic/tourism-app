@@ -4473,5 +4473,88 @@
     "Nueva destinación": "Nuova destinazione",
     "Nuova destinazione": "Nuova destinazione",
     "Nova destinacija": "Nuova destinazione"
+  },
+  "login": {
+    "title": "Accedi",
+    "subtitle": "Inserisci le tue credenziali amministrative per accedere al pannello di controllo di SpireGO.",
+    "email": "Email",
+    "emailError": "Inserisci un indirizzo email valido.",
+    "password": "Password",
+    "passwordError": "La password è obbligatoria.",
+    "rememberMe": "Mantienimi connesso per 30 giorni",
+    "forgot": "Dimenticato?",
+    "loggingIn": "Accesso in corso...",
+    "logIn": "Accedi",
+    "hidePassword": "Nascondi password",
+    "showPassword": "Mostra password",
+    "invalidCredentials": "Email o password non validi.",
+    "portalComingSoon": "portal in arrivo. Riprova più tardi."
+  },
+  "signup": {
+    "welcome": "Benvenuto",
+    "firstName": "Nome",
+    "lastName": "Cognome",
+    "dateOfBirth": "Data di nascita",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Conferma password",
+    "signUp": "Registrati",
+    "helpText": "Hai bisogno di supporto tecnico?",
+    "contactHelpdesk": "Contatta l'helpdesk IT",
+    "passwordsDoNotMatch": "Le password non coincidono",
+    "registrationSuccessful": "Registrazione avvenuta con successo!",
+    "registrationFailed": "Registrazione fallita"
+  },
+  "forgotPassword": {
+    "email": {
+      "title": "Reimposta la password",
+      "subtitle": "Inserisci la tua email e ti invieremo un codice di verifica.",
+      "emailLabel": "Email",
+      "emailError": "Inserisci un indirizzo email valido.",
+      "sending": "Invio in corso...",
+      "sendCode": "Invia codice",
+      "backToLogin": "Torna al login",
+      "codeSentMessage": "È stato inviato un codice di verifica alla tua email."
+    },
+    "code": {
+      "title": "Controlla la tua email",
+      "subtitle": "Inserisci il codice a 6 cifre inviato a",
+      "codeLabel": "Codice di verifica",
+      "codeError": "Inserisci un codice a 6 cifre valido.",
+      "verifying": "Verifica in corso...",
+      "verifyCode": "Verifica codice",
+      "changeEmail": "Cambia email"
+    },
+    "password": {
+      "title": "Imposta nuova password",
+      "subtitle": "Crea una nuova password per il tuo account.",
+      "newPasswordLabel": "Nuova password",
+      "confirmPasswordLabel": "Conferma password",
+      "saving": "Salvataggio...",
+      "savePassword": "Salva nuova password",
+      "backToCode": "Torna al codice"
+    },
+    "success": {
+      "title": "Password aggiornata",
+      "subtitle": "La tua password è stata modificata. Ora puoi accedere.",
+      "backToLogin": "Torna al login"
+    },
+    "errors": {
+      "unableToSend": "Impossibile inviare il codice di reimpostazione.",
+      "invalidCode": "Codice non valido o scaduto.",
+      "noToken": "Il token di sessione di reimpostazione non è stato restituito. Richiedi un nuovo codice.",
+      "sessionExpired": "Sessione di reimpostazione scaduta. Richiedi un nuovo codice.",
+      "passwordsDoNotMatch": "Le password non coincidono.",
+      "passwordRequirements": "La password deve includere una lettera maiuscola e un numero o simbolo.",
+      "unableToReset": "Impossibile reimpostare la password."
+    }
+  },
+  "signout": {
+    "title": "Conferma disconnessione?",
+    "description": "Sei sicuro di voler terminare la sessione corrente e uscire dalla piattaforma?",
+    "signOut": "Disconnetti",
+    "keepSignedIn": "Rimani connesso",
+    "sessionSecurity": "Sicurezza della sessione",
+    "sessionSecurityDesc": "Per la tua protezione, le sessioni vengono automaticamente terminate dopo 30 minuti di inattività."
   }
 }
