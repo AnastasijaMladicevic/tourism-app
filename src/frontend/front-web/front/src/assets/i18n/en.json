@@ -4487,5 +4487,88 @@
     "Nueva destinación": "New destination",
     "Nuova destinazione": "New destination",
     "Nova destinacija": "New destination"
+  },
+  "login": {
+    "title": "Log in",
+    "subtitle": "Enter your administrative credentials to access the SpireGO control panel.",
+    "email": "Email",
+    "emailError": "Enter a valid email address.",
+    "password": "Password",
+    "passwordError": "Password is required.",
+    "rememberMe": "Keep me logged in for 30 days",
+    "forgot": "Forgot?",
+    "loggingIn": "Logging in...",
+    "logIn": "Log In",
+    "hidePassword": "Hide password",
+    "showPassword": "Show password",
+    "invalidCredentials": "Invalid email or password.",
+    "portalComingSoon": "portal is coming soon. Please check back later."
+  },
+  "signup": {
+    "welcome": "Welcome",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "dateOfBirth": "Date of Birth",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "signUp": "Sign Up",
+    "helpText": "Need technical support?",
+    "contactHelpdesk": "Contact IT Helpdesk",
+    "passwordsDoNotMatch": "Passwords do not match",
+    "registrationSuccessful": "Registration successful!",
+    "registrationFailed": "Registration failed"
+  },
+  "forgotPassword": {
+    "email": {
+      "title": "Reset your password",
+      "subtitle": "Enter your email and we will send you a verification code.",
+      "emailLabel": "Email",
+      "emailError": "Enter a valid email address.",
+      "sending": "Sending...",
+      "sendCode": "Send code",
+      "backToLogin": "Back to login",
+      "codeSentMessage": "A verification code has been sent to your email."
+    },
+    "code": {
+      "title": "Check your email",
+      "subtitle": "Enter the 6-digit code sent to",
+      "codeLabel": "Verification code",
+      "codeError": "Enter a valid 6-digit code.",
+      "verifying": "Verifying...",
+      "verifyCode": "Verify code",
+      "changeEmail": "Change email"
+    },
+    "password": {
+      "title": "Set new password",
+      "subtitle": "Create a new password for your account.",
+      "newPasswordLabel": "New password",
+      "confirmPasswordLabel": "Confirm password",
+      "saving": "Saving...",
+      "savePassword": "Save new password",
+      "backToCode": "Back to code"
+    },
+    "success": {
+      "title": "Password updated",
+      "subtitle": "Your password has been changed. You can now log in.",
+      "backToLogin": "Back to login"
+    },
+    "errors": {
+      "unableToSend": "Unable to send reset code.",
+      "invalidCode": "Invalid or expired reset code.",
+      "noToken": "Reset session token was not returned. Please request a new code.",
+      "sessionExpired": "Reset session expired. Please request a new code.",
+      "passwordsDoNotMatch": "Passwords do not match.",
+      "passwordRequirements": "Password must include one uppercase letter and one number or symbol.",
+      "unableToReset": "Unable to reset password."
+    }
+  },
+  "signout": {
+    "title": "Confirm Sign Out?",
+    "description": "Are you sure you want to end your current session and leave the platform?",
+    "signOut": "Sign Out",
+    "keepSignedIn": "Keep me signed in",
+    "sessionSecurity": "Session Security",
+    "sessionSecurityDesc": "For your protection, sessions are automatically terminated after 30 minutes of inactivity."
   }
 }

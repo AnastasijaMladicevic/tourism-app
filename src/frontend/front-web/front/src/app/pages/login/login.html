@@ -17,23 +17,22 @@
 
       <!-- DESNA STRANA -->
       <div class="right">
-        <h2>Log in</h2>
+        <h2>{{ 'login.title' | translate }}</h2>
         <p class="subtitle">
-          Enter your administrative credentials to access
-          the SpireGO control panel.
+          {{ 'login.subtitle' | translate }}
         </p>
 
         <form [formGroup]="form" (ngSubmit)="submit()">
-          <label>Email</label>
+          <label>{{ 'login.email' | translate }}</label>
           <div class="input">
             <span class="icon">mail</span>
             <input type="email" placeholder="email@spirego.com" formControlName="email">
           </div>
           @if (email?.touched && email?.invalid) {
-            <p class="field-error">Enter a valid email address.</p>
+            <p class="field-error">{{ 'login.emailError' | translate }}</p>
           }
 
-          <label>Password</label>
+          <label>{{ 'login.password' | translate }}</label>
           <div class="input">
             <span class="icon">lock</span>
             <input [type]="showPassword ? 'text' : 'password'" placeholder="••••••••••••" formControlName="password">
@@ -41,26 +40,26 @@
               class="eye"
               type="button"
               (click)="togglePassword()"
-              [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+              [attr.aria-label]="showPassword ? ('login.hidePassword' | translate) : ('login.showPassword' | translate)"
             >
               {{ showPassword ? 'visibility_off' : 'visibility' }}
             </button>
           </div>
           @if (password?.touched && password?.invalid) {
-            <p class="field-error">Password is required.</p>
+            <p class="field-error">{{ 'login.passwordError' | translate }}</p>
           }
 
           <div class="options">
             <label class="remember">
               <input type="checkbox" formControlName="rememberMe">
-              Keep me logged in for 30 days
+              {{ 'login.rememberMe' | translate }}
             </label>
 
-            <button class="forgot-btn" type="button" (click)="goToForgotPassword()">Forgot?</button>
+            <button class="forgot-btn" type="button" (click)="goToForgotPassword()">{{ 'login.forgot' | translate }}</button>
           </div>
 
           <button class="btn" type="submit" [disabled]="form.invalid || isLoading">
-            {{ isLoading ? 'Logging in...' : 'Log In' }}
+            {{ isLoading ? ('login.loggingIn' | translate) : ('login.logIn' | translate) }}
           </button>
         </form>
 

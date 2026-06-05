@@ -4460,5 +4460,88 @@
     "Nueva destinación": "Nueva destinación",
     "Nuova destinazione": "Nueva destinación",
     "Nova destinacija": "Nueva destinación"
+  },
+  "login": {
+    "title": "Iniciar sesión",
+    "subtitle": "Ingresa tus credenciales administrativas para acceder al panel de control de SpireGO.",
+    "email": "Correo electrónico",
+    "emailError": "Ingresa una dirección de correo electrónico válida.",
+    "password": "Contraseña",
+    "passwordError": "La contraseña es obligatoria.",
+    "rememberMe": "Mantenerme conectado por 30 días",
+    "forgot": "¿Olvidaste?",
+    "loggingIn": "Iniciando sesión...",
+    "logIn": "Iniciar sesión",
+    "hidePassword": "Ocultar contraseña",
+    "showPassword": "Mostrar contraseña",
+    "invalidCredentials": "Correo electrónico o contraseña inválidos.",
+    "portalComingSoon": "portal próximamente. Vuelve a comprobarlo más tarde."
+  },
+  "signup": {
+    "welcome": "Bienvenido",
+    "firstName": "Nombre",
+    "lastName": "Apellido",
+    "dateOfBirth": "Fecha de nacimiento",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "confirmPassword": "Confirmar contraseña",
+    "signUp": "Registrarse",
+    "helpText": "¿Necesitas soporte técnico?",
+    "contactHelpdesk": "Contactar con el servicio de asistencia informática",
+    "passwordsDoNotMatch": "Las contraseñas no coinciden",
+    "registrationSuccessful": "¡Registro exitoso!",
+    "registrationFailed": "El registro falló"
+  },
+  "forgotPassword": {
+    "email": {
+      "title": "Restablecer contraseña",
+      "subtitle": "Introduce tu correo y te enviaremos un código de verificación.",
+      "emailLabel": "Correo electrónico",
+      "emailError": "Ingresa una dirección de correo electrónico válida.",
+      "sending": "Enviando...",
+      "sendCode": "Enviar código",
+      "backToLogin": "Volver al inicio de sesión",
+      "codeSentMessage": "Se ha enviado un código de verificación a tu correo."
+    },
+    "code": {
+      "title": "Revisa tu correo",
+      "subtitle": "Introduce el código de 6 dígitos enviado a",
+      "codeLabel": "Código de verificación",
+      "codeError": "Introduce un código de 6 dígitos válido.",
+      "verifying": "Verificando...",
+      "verifyCode": "Verificar código",
+      "changeEmail": "Cambiar correo"
+    },
+    "password": {
+      "title": "Establecer nueva contraseña",
+      "subtitle": "Crea una nueva contraseña para tu cuenta.",
+      "newPasswordLabel": "Nueva contraseña",
+      "confirmPasswordLabel": "Confirmar contraseña",
+      "saving": "Guardando...",
+      "savePassword": "Guardar nueva contraseña",
+      "backToCode": "Volver al código"
+    },
+    "success": {
+      "title": "Contraseña actualizada",
+      "subtitle": "Tu contraseña ha sido cambiada. Ahora puedes iniciar sesión.",
+      "backToLogin": "Volver al inicio de sesión"
+    },
+    "errors": {
+      "unableToSend": "No se puede enviar el código de restablecimiento.",
+      "invalidCode": "Código inválido o expirado.",
+      "noToken": "El token de sesión de restablecimiento no fue devuelto. Solicita un nuevo código.",
+      "sessionExpired": "La sesión de restablecimiento expiró. Solicita un nuevo código.",
+      "passwordsDoNotMatch": "Las contraseñas no coinciden.",
+      "passwordRequirements": "La contraseña debe incluir una letra mayúscula y un número o símbolo.",
+      "unableToReset": "No se puede restablecer la contraseña."
+    }
+  },
+  "signout": {
+    "title": "¿Confirmar cierre de sesión?",
+    "description": "¿Estás seguro de que deseas finalizar tu sesión actual y salir de la plataforma?",
+    "signOut": "Cerrar sesión",
+    "keepSignedIn": "Mantenerme conectado",
+    "sessionSecurity": "Seguridad de sesión",
+    "sessionSecurityDesc": "Para tu protección, las sesiones se terminan automáticamente después de 30 minutos de inactividad."
   }
 }
