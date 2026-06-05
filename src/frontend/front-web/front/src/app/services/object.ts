@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, forkJoin } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../environment/environment';
 import { ReviewDto } from './review';
@@ -344,7 +344,7 @@ export class ObjectService {
   }
 
   /** Objects assigned to the signed-in manager's destinations (server-scoped; do not apply client region filter). */
-  getForManager(query?: ObjectQueryParams): Observable<PagedResultDto<ObjectDto>> {
+  getForManager(query?: ObjectQueryParams, options?: RegionRequestOptions): Observable<PagedResultDto<ObjectDto>> {
     let params = new HttpParams();
 
     if (query) {
@@ -355,29 +355,43 @@ export class ObjectService {
       });
     }
 
-    params = this.addLang(params);
+    params = this.addLang(params, options);
     return this.http.get<PagedResultDto<ObjectDto>>(`${this.url}/manager`, { params }).pipe(
       map((response) => this.normalizePagedObjects(response))
     );
   }
 
   getManagerFilterOptions(): Observable<{ typeOptions: FilterOption[]; statusOptions: FilterOption[] }> {
-    return this.getForManager({
-      page: 1,
-      pageSize: 500,
-      sortBy: 'name',
-      sortOrder: 'asc'
-    }).pipe(
-      map((response) => {
-        const items = response?.items ?? [];
+    const query = { page: 1, pageSize: 500, sortBy: 'name', sortOrder: 'asc' };
+    return forkJoin([
+      this.getForManager(query),
+      this.getForManager(query, { bypassLanguage: true })
+    ]).pipe(
+      map(([translatedResponse, originalResponse]) => {
+        const translatedItems = translatedResponse?.items ?? [];
+        const originalItems = originalResponse?.items ?? [];
 
-        const typeOptions = this.toUniqueOptions(
-          items.map((item) => item.objectTypeName),
-          (value) => value
-        );
+        const originalNameById = new Map<number, string>();
+        for (const item of originalItems) {
+          if (item.objectTypeId && !originalNameById.has(item.objectTypeId)) {
+            originalNameById.set(item.objectTypeId, item.objectTypeName);
+          }
+        }
+
+        const typeOptionMap = new Map<number, FilterOption>();
+        for (const item of translatedItems) {
+          if (item.objectTypeId && !typeOptionMap.has(item.objectTypeId)) {
+            typeOptionMap.set(item.objectTypeId, {
+              value: originalNameById.get(item.objectTypeId) || item.objectTypeName,
+              label: item.objectTypeName
+            });
+          }
+        }
+        const typeOptions = Array.from(typeOptionMap.values())
+          .sort((a, b) => a.label.localeCompare(b.label));
 
         const statusOptions = this.toUniqueOptions(
-          items.map((item) => item.status),
+          translatedItems.map((item) => item.status),
           (value) => this.toTitleCase(value ?? '')
         );
 
@@ -387,22 +401,36 @@ export class ObjectService {
   }
 
   getMyFilterOptions(): Observable<{ typeOptions: FilterOption[]; statusOptions: FilterOption[] }> {
-    return this.getMy({
-      page: 1,
-      pageSize: 500,
-      sortBy: 'name',
-      sortOrder: 'asc'
-    }, { bypassRegion: true }).pipe(
-      map((response) => {
-        const items = response?.items ?? [];
+    const query = { page: 1, pageSize: 500, sortBy: 'name', sortOrder: 'asc' };
+    return forkJoin([
+      this.getMy(query, { bypassRegion: true }),
+      this.getMy(query, { bypassRegion: true, bypassLanguage: true })
+    ]).pipe(
+      map(([translatedResponse, originalResponse]) => {
+        const translatedItems = translatedResponse?.items ?? [];
+        const originalItems = originalResponse?.items ?? [];
 
-        const typeOptions = this.toUniqueOptions(
-          items.map((item) => item.objectTypeName),
-          (value) => value
-        );
+        const originalNameById = new Map<number, string>();
+        for (const item of originalItems) {
+          if (item.objectTypeId && !originalNameById.has(item.objectTypeId)) {
+            originalNameById.set(item.objectTypeId, item.objectTypeName);
+          }
+        }
+
+        const typeOptionMap = new Map<number, FilterOption>();
+        for (const item of translatedItems) {
+          if (item.objectTypeId && !typeOptionMap.has(item.objectTypeId)) {
+            typeOptionMap.set(item.objectTypeId, {
+              value: originalNameById.get(item.objectTypeId) || item.objectTypeName,
+              label: item.objectTypeName
+            });
+          }
+        }
+        const typeOptions = Array.from(typeOptionMap.values())
+          .sort((a, b) => a.label.localeCompare(b.label));
 
         const statusOptions = this.toUniqueOptions(
-          items.map((item) => item.status),
+          translatedItems.map((item) => item.status),
           (value) => this.toTitleCase(value)
         );
 

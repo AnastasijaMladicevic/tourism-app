@@ -246,7 +246,7 @@ export class ManagerActivitiesComponent implements OnInit {
     }
 
     const option = this.activityTypeOptions.find((t) => t.id === typeId);
-    const name = option?.name?.trim();
+    const name = option?.originalName?.trim() || option?.name?.trim();
     return name || undefined;
   }
 

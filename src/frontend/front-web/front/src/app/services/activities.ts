@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable, from, map, of } from 'rxjs';
+import { Observable, forkJoin, from, map, of } from 'rxjs';
 import { concatMap, toArray } from 'rxjs/operators';
 import { environment } from '../../environment/environment';
 import { normalizeEntityMedia, normalizeMediaRow, normalizeMediaRows } from '../shared/utils/media-url';
@@ -73,6 +73,7 @@ export interface ActivityQueryResponse {
 export interface ActivityTypeOption {
   id: number;
   name: string;
+  originalName: string;
 }
 
 export interface LocalityOption {
@@ -278,33 +279,40 @@ export class ActivitiesService {
   }
 
   getActivityTypeOptions(): Observable<ActivityTypeOption[]> {
-    const params = new HttpParams()
+    const baseParams = new HttpParams()
       .set('page', '1')
       .set('pageSize', '200')
       .set('sortBy', 'activityTypeName')
       .set('sortOrder', 'asc');
 
-    return this.http
-      .get<PagedResponse<ActivityDto> | ActivityDto[]>(this.apiUrl, { params: this.addLang(params) })
-      .pipe(map((response) => {
-        const items = this.extractItems(response);
-        const unique = new Map<number, ActivityTypeOption>();
+    return forkJoin([
+      this.http.get<PagedResponse<ActivityDto> | ActivityDto[]>(this.apiUrl, { params: this.addLang(baseParams) }),
+      this.http.get<PagedResponse<ActivityDto> | ActivityDto[]>(this.apiUrl, { params: baseParams })
+    ]).pipe(map(([translatedResp, originalResp]) => {
+      const translatedItems = this.extractItems(translatedResp);
+      const originalItems = this.extractItems(originalResp);
 
-        for (const item of items) {
-          if (!item.activityTypeId) {
-            continue;
-          }
-
-          if (!unique.has(item.activityTypeId)) {
-            unique.set(item.activityTypeId, {
-              id: item.activityTypeId,
-              name: item.activityTypeName || `Type #${item.activityTypeId}`
-            });
-          }
+      const originalNameById = new Map<number, string>();
+      for (const item of originalItems) {
+        if (item.activityTypeId && !originalNameById.has(item.activityTypeId)) {
+          originalNameById.set(item.activityTypeId, item.activityTypeName || `Type #${item.activityTypeId}`);
         }
+      }
 
-        return Array.from(unique.values()).sort((a, b) => a.name.localeCompare(b.name));
-      }));
+      const unique = new Map<number, ActivityTypeOption>();
+      for (const item of translatedItems) {
+        if (!item.activityTypeId || unique.has(item.activityTypeId)) {
+          continue;
+        }
+        unique.set(item.activityTypeId, {
+          id: item.activityTypeId,
+          name: item.activityTypeName || `Type #${item.activityTypeId}`,
+          originalName: originalNameById.get(item.activityTypeId) || item.activityTypeName || `Type #${item.activityTypeId}`
+        });
+      }
+
+      return Array.from(unique.values()).sort((a, b) => a.name.localeCompare(b.name));
+    }));
   }
 
   getLocalityOptions(): Observable<LocalityOption[]> {

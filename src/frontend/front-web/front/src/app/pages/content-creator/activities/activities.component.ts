@@ -493,7 +493,7 @@ export class ContentCreatorActivitiesComponent implements OnInit, OnDestroy {
         )
     }).subscribe({
       next: ({ activityTypes, destinations }) => {
-        this.typeOptions = this.toFilterOptions(activityTypes.map((type) => type.name));
+        this.typeOptions = activityTypes.map((type) => ({ value: type.originalName, label: type.name }));
         this.destinationOptions = this.toFilterOptions(destinations.map((destination) => destination.name));
 
         if (this.typeFilter !== 'all' && !this.typeOptions.some((option) => option.value === this.typeFilter)) {

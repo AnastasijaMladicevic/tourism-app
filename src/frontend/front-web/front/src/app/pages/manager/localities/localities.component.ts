@@ -1,4 +1,5 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { forkJoin } from 'rxjs';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -210,19 +211,36 @@ export class ManagerLocalitiesComponent implements OnInit, OnDestroy {
   }
 
   loadFilterOptions(): void {
-    this.localityService.getAll({
-      page: 1,
-      pageSize: 500,
-      sortBy: 'name',
-      sortOrder: 'asc'
-    }, { bypassRegion: true }).subscribe({
-      next: (response) => {
-        const scopedItems = this.applyManagerScopeFilters(response?.items ?? []);
-        const destinationOptions = this.toUniqueOptions(scopedItems.map((item) => item.destinationName));
-        const typeOptions = this.toUniqueOptions(scopedItems.map((item) => item.localityTypeName));
-        const statusOptions = this.toUniqueOptions(
-          scopedItems.map((item) => this.getStatusLabel(item))
-        );
+    const query = { page: 1, pageSize: 500, sortBy: 'name', sortOrder: 'asc' };
+    forkJoin([
+      this.localityService.getAll(query, { bypassRegion: true }),
+      this.localityService.getAll(query, { bypassRegion: true, bypassLanguage: true })
+    ]).subscribe({
+      next: ([translatedResponse, originalResponse]) => {
+        const translatedItems = this.applyManagerScopeFilters(translatedResponse?.items ?? []);
+        const originalItems = this.applyManagerScopeFilters(originalResponse?.items ?? []);
+
+        const originalTypeById = new Map<number, string>();
+        for (const item of originalItems) {
+          if (item.localityTypeId && !originalTypeById.has(item.localityTypeId)) {
+            originalTypeById.set(item.localityTypeId, item.localityTypeName);
+          }
+        }
+
+        const typeOptionMap = new Map<number, FilterOption>();
+        for (const item of translatedItems) {
+          if (item.localityTypeId && !typeOptionMap.has(item.localityTypeId)) {
+            typeOptionMap.set(item.localityTypeId, {
+              value: originalTypeById.get(item.localityTypeId) || item.localityTypeName,
+              label: item.localityTypeName
+            });
+          }
+        }
+        const typeOptions = Array.from(typeOptionMap.values())
+          .sort((a, b) => a.label.localeCompare(b.label));
+
+        const destinationOptions = this.toUniqueOptions(translatedItems.map((item) => item.destinationName));
+        const statusOptions = this.toUniqueOptions(translatedItems.map((item) => this.getStatusLabel(item)));
 
         this.destinationOptions = destinationOptions;
         this.typeOptions = typeOptions;
