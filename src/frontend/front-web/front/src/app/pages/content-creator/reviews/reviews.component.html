@@ -161,17 +161,20 @@
           </div>
         </section>
 
-        <section class="response-composer">
+        <section class="response-composer" [class.policy-warning]="!!responsePolicyWarning">
           <div class="composer-tabs">
             <button class="tab" type="button" (click)="responseText = translationService.translate('contentCreator.reviews.templates.thankYouText')">{{ 'contentCreator.reviews.templates.thankYou' | translate }}</button>
             <button class="tab" type="button" (click)="responseText = translationService.translate('contentCreator.reviews.templates.addressingIssuesText')">{{ 'contentCreator.reviews.templates.addressingIssues' | translate }}</button>
             <button class="tab" type="button" (click)="responseText = translationService.translate('contentCreator.reviews.templates.needDetailsText')">{{ 'contentCreator.reviews.templates.needDetails' | translate }}</button>
           </div>
           <textarea [(ngModel)]="responseText" [placeholder]="'contentCreator.reviews.responsePlaceholder' | translate" maxlength="1000"></textarea>
+          @if (responsePolicyWarning) {
+            <p class="feedback warning">{{ responsePolicyWarning }}</p>
+          }
           <div class="composer-footer">
             <span>{{ 'contentCreator.reviews.characterCount' | translate:{ count: responseText.length } }}</span>
             <div class="composer-buttons">
-              <button class="primary" type="button" (click)="sendResponse()" [disabled]="isSubmitting">
+              <button class="primary" type="button" (click)="sendResponse()" [disabled]="isSubmitting || isResponsePolicyBlocked">
                 {{ selectedReviewHasResponse ? ('contentCreator.reviews.updateResponse' | translate) : ('contentCreator.reviews.sendResponse' | translate) }}
               </button>
             </div>

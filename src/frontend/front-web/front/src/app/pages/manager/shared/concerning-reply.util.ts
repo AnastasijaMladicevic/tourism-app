@@ -3,62 +3,277 @@ export interface ConcerningReplyContext {
   touristRating?: number;
 }
 
-/** English + Serbian/Croatian/Bosnian phrases indicating unprofessional or abusive replies. */
-const CONCERNING_PHRASES = [
-  // English — dismissive / hostile
-  'not our problem',
-  'your fault',
-  'read the listing',
-  'cannot follow',
-  'complaining',
-  'deal with it',
-  'grow up',
-  'shut up',
-  'stupid tourist',
-  'idiot',
-  'moron',
-  'go away',
-  'never come back',
-  // English — profanity (common)
-  'fuck you',
-  'fuck off',
-  'bitch',
-  'asshole',
-  'bastard',
-  // Serbian / Croatian / Bosnian — profanity & insults
-  'pusi kurac',
-  'pusi kur',
-  'jebi se',
-  'jebem ti',
-  'jebem te',
-  'idiote',
-  'budalo',
-  'retardu',
-  'picka',
-  'pička',
-  'kurac',
-  'kurcu',
-  'govno',
-  'sranje',
-  'smrdi',
-  'ubij se',
-  'mrzi',
-  'glup',
-  'glupa',
-  'debil',
-  'kreten',
-  'svinjo',
-  'prostak',
-  'nisi normal',
-  'nisi normalan',
-  'nije nas problem',
-  'nije nas posao',
-  'tvoja krivica',
-  'sami krivi',
-  'citaj oglas',
-  'procitaj oglas',
-  'zalite se',
-  'ne znam citati',
+export type ConcerningReplyKind =
+  | 'self_harm_encouragement'
+  | 'violence_threat'
+  | 'hate_discrimination'
+  | 'sexual_harassment'
+  | 'harassment'
+  | 'spam_scam'
+  | 'profanity_insult'
+  | 'dismissive_hostile';
+
+type PhraseRule = {
+  kind: ConcerningReplyKind;
+  phrases: string[];
+};
+
+type RegexRule = {
+  kind: ConcerningReplyKind;
+  pattern: RegExp;
+};
+
+/** Most severe kinds win when multiple rules match. */
+const KIND_PRIORITY: ConcerningReplyKind[] = [
+  'self_harm_encouragement',
+  'violence_threat',
+  'hate_discrimination',
+  'sexual_harassment',
+  'harassment',
+  'spam_scam',
+  'profanity_insult',
+  'dismissive_hostile',
+];
+
+const REPORT_CATEGORY_BY_KIND: Record<ConcerningReplyKind, string> = {
+  self_harm_encouragement: 'inappropriate_content',
+  violence_threat: 'inappropriate_content',
+  hate_discrimination: 'inappropriate_content',
+  sexual_harassment: 'inappropriate_content',
+  harassment: 'inappropriate_content',
+  spam_scam: 'spam_abuse',
+  profanity_insult: 'unprofessional_conduct',
+  dismissive_hostile: 'unprofessional_conduct',
+};
+
+const PHRASE_RULES: PhraseRule[] = [
+  {
+    kind: 'self_harm_encouragement',
+    phrases: [
+      'kill yourself',
+      'kill urself',
+      'kill ur self',
+      'kys',
+      'hang yourself',
+      'hang urself',
+      'hang ur self',
+      'neck yourself',
+      'go die',
+      'go kill yourself',
+      'you should die',
+      'you should kill yourself',
+      'drop dead',
+      'die already',
+      'hope you die',
+      'wish you were dead',
+      'wish you dead',
+      'end yourself',
+      'end your life',
+      'slit your wrists',
+      'slit wrists',
+      'nobody wants you',
+      'no one wants you',
+      'better off dead',
+      'do everyone a favor and die',
+      'ubij se',
+      'ubij sebe',
+      'objesi se',
+      'objesi',
+      'obesi se',
+      'visi se',
+      'visi',
+      'skoči',
+      'skoci',
+      'umri',
+      'umri vec',
+      'najbolje da umres',
+      'bolje da umres',
+      'nema te nikome',
+      'nikom nisi potreban',
+      'nikom nisi potrebna',
+    ],
+  },
+  {
+    kind: 'violence_threat',
+    phrases: [
+      'i will kill you',
+      'ill kill you',
+      "i'll kill you",
+      'gonna kill you',
+      'going to kill you',
+      'watch your back',
+      'youll regret',
+      "you'll regret",
+      'i know where you live',
+      'know where you live',
+      'see you in court',
+      'gonna hurt you',
+      'going to hurt you',
+      'beat you up',
+      'ubicu te',
+      'ubi cu te',
+      'nadjem te',
+      'naci cu te',
+      'naći ću te',
+      'prebit cu te',
+      'prebiću te',
+      'sacekaj me',
+      'sačekaj me',
+    ],
+  },
+  {
+    kind: 'hate_discrimination',
+    phrases: [
+      'go back to your country',
+      'go back where you came from',
+      'go back home',
+      'your kind',
+      'you people always',
+      'typical tourist',
+      'dirty tourist',
+      'we dont want your kind',
+      'vrati se u svoju zemlju',
+      'vrati se odakle si dosao',
+      'vrati se odakle si došao',
+      'tvoja sorta',
+      'takvi kao ti',
+      'prljavi turisti',
+    ],
+  },
+  {
+    kind: 'sexual_harassment',
+    phrases: [
+      'send nudes',
+      'show me your',
+      'what are you wearing',
+      'come to my room',
+      'sleep with me',
+      'pošalji slike',
+      'posalji slike',
+      'goliju se',
+      'goliju',
+    ],
+  },
+  {
+    kind: 'harassment',
+    phrases: [
+      'stalker',
+      'stop harassing',
+      'leave us alone or',
+      'dont come back',
+      "don't come back",
+      'we will ban you',
+      'reporting you to police',
+      'dox you',
+      'doxx you',
+      'creep',
+      'pervert',
+      'loser',
+      'pathetic',
+      'worthless',
+      'disgusting person',
+      'nenormalan si',
+      'nenormalna si',
+      'nisi normal',
+      'nisi normalan',
+      'gnjida',
+      'odvratan',
+      'odvratna',
+    ],
+  },
+  {
+    kind: 'spam_scam',
+    phrases: [
+      'whatsapp me',
+      'contact me on whatsapp',
+      'send me your card',
+      'bank details',
+      'click this link',
+      'free refund',
+      'telegram me',
+      'viber me',
+      'posalji mi karticu',
+      'pošalji mi karticu',
+      'broj kartice',
+    ],
+  },
+  {
+    kind: 'profanity_insult',
+    phrases: [
+      'fuck you',
+      'fuck off',
+      'bitch',
+      'asshole',
+      'bastard',
+      'dickhead',
+      'cunt',
+      'motherfucker',
+      'shithead',
+      'pusi kurac',
+      'pusi kur',
+      'jebi se',
+      'jebem ti',
+      'jebem te',
+      'idiote',
+      'budalo',
+      'retardu',
+      'picka',
+      'pička',
+      'kurac',
+      'kurcu',
+      'govno',
+      'sranje',
+      'debil',
+      'kreten',
+      'svinjo',
+      'prostak',
+      'glup',
+      'glupa',
+      'stupid tourist',
+      'idiot',
+      'moron',
+    ],
+  },
+  {
+    kind: 'dismissive_hostile',
+    phrases: [
+      'not our problem',
+      'your fault',
+      'read the listing',
+      'cannot follow',
+      'complaining',
+      'deal with it',
+      'grow up',
+      'shut up',
+      'go away',
+      'never come back',
+      'nije nas problem',
+      'nije nas posao',
+      'tvoja krivica',
+      'sami krivi',
+      'citaj oglas',
+      'procitaj oglas',
+      'zalite se',
+      'ne znam citati',
+      'mrzi',
+    ],
+  },
+];
+
+const REGEX_RULES: RegexRule[] = [
+  { kind: 'self_harm_encouragement', pattern: /\bkill\s*(your|ur|u)\s*self\b/ },
+  { kind: 'self_harm_encouragement', pattern: /\bhang\s*(your|ur|u)\s*self\b/ },
+  { kind: 'self_harm_encouragement', pattern: /\bk\s*y\s*s\b/ },
+  { kind: 'self_harm_encouragement', pattern: /\bgo\s+die\b/ },
+  { kind: 'self_harm_encouragement', pattern: /\b(hope|wish)\s+you\s+(die|dead)\b/ },
+  { kind: 'self_harm_encouragement', pattern: /\bend\s+(your|ur)\s*life\b/ },
+  { kind: 'self_harm_encouragement', pattern: /\bubij\s*se\b/ },
+  { kind: 'self_harm_encouragement', pattern: /\bobjesi(\s+se)?\b/ },
+  { kind: 'self_harm_encouragement', pattern: /\bvisi(\s+se)?\b/ },
+  { kind: 'violence_threat', pattern: /\b(i|ill|i'll)\s*(will|ll)?\s*kill\s+you\b/ },
+  { kind: 'violence_threat', pattern: /\b(gonna|going)\s+to\s+kill\s+you\b/ },
+  { kind: 'hate_discrimination', pattern: /\bgo\s+back\s+to\s+(your|ur)\s+country\b/ },
+  { kind: 'spam_scam', pattern: /\b(send|share)\s+(me\s+)?(your\s+)?(card|bank)\b/ },
 ];
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -88,28 +303,76 @@ export function compactReplyTextForMatch(text: string): string {
   return normalizeReplyTextForMatch(text).replace(/\s+/g, '');
 }
 
-export function isConcerningCreatorReply(context: ConcerningReplyContext): boolean {
+function collectMatchingKinds(normalized: string, compact: string): Set<ConcerningReplyKind> {
+  const matches = new Set<ConcerningReplyKind>();
+
+  for (const rule of PHRASE_RULES) {
+    for (const phrase of rule.phrases) {
+      const phraseNorm = normalizeReplyTextForMatch(phrase);
+      const phraseCompact = phraseNorm.replace(/\s+/g, '');
+      if (
+        normalized.includes(phraseNorm) ||
+        compact.includes(phraseCompact) ||
+        normalized.includes(phraseCompact)
+      ) {
+        matches.add(rule.kind);
+        break;
+      }
+    }
+  }
+
+  for (const rule of REGEX_RULES) {
+    if (rule.pattern.test(normalized) || rule.pattern.test(compact)) {
+      matches.add(rule.kind);
+    }
+  }
+
+  return matches;
+}
+
+function pickHighestPriorityKind(matches: Set<ConcerningReplyKind>): ConcerningReplyKind | null {
+  for (const kind of KIND_PRIORITY) {
+    if (matches.has(kind)) {
+      return kind;
+    }
+  }
+  return null;
+}
+
+export function detectConcerningReplyKind(context: ConcerningReplyContext): ConcerningReplyKind | null {
   const raw = context.creatorResponse?.trim();
   if (!raw) {
-    return false;
+    return null;
   }
 
   const normalized = normalizeReplyTextForMatch(raw);
   const compact = compactReplyTextForMatch(raw);
-
   if (!normalized) {
-    return false;
+    return null;
   }
 
-  return CONCERNING_PHRASES.some((phrase) => {
-    const phraseNorm = normalizeReplyTextForMatch(phrase);
-    const phraseCompact = phraseNorm.replace(/\s+/g, '');
-    return (
-      normalized.includes(phraseNorm) ||
-      compact.includes(phraseCompact) ||
-      normalized.includes(phraseCompact)
-    );
-  });
+  const matches = collectMatchingKinds(normalized, compact);
+  return pickHighestPriorityKind(matches);
+}
+
+export function isConcerningCreatorReply(context: ConcerningReplyContext): boolean {
+  return detectConcerningReplyKind(context) != null;
+}
+
+export function getConcerningReportCategory(kind: ConcerningReplyKind | null): string {
+  if (!kind) {
+    return 'other';
+  }
+  return REPORT_CATEGORY_BY_KIND[kind];
+}
+
+export function isSevereConcerningReply(kind: ConcerningReplyKind | null): boolean {
+  return (
+    kind === 'self_harm_encouragement' ||
+    kind === 'violence_threat' ||
+    kind === 'hate_discrimination' ||
+    kind === 'sexual_harassment'
+  );
 }
 
 export interface ReviewReportReasonInput {

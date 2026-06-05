@@ -23,6 +23,11 @@ import { ObjectDto, ObjectImageDto, ObjectService } from '../../../services/obje
 import { ReviewDto, ReviewQueryParams, ReviewService } from '../../../services/review';
 import { TranslationService } from '../../../services/translation.service';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
+import {
+  detectConcerningReplyKind,
+  isConcerningCreatorReply,
+  isSevereConcerningReply,
+} from '../../manager/shared/concerning-reply.util';
 
 @Component({
   selector: 'app-content-creator-reviews',
@@ -304,6 +309,34 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
     this.loadSelectedObjectDetails(review.objectId);
   }
 
+  get responsePolicyWarning(): string {
+    const content = this.responseText.trim();
+    if (!content) {
+      return '';
+    }
+
+    const kind = detectConcerningReplyKind({ creatorResponse: content });
+    if (!kind) {
+      return '';
+    }
+
+    if (isSevereConcerningReply(kind)) {
+      return 'This reply contains harmful or threatening language and cannot be sent. Please rewrite it in a professional, respectful tone.';
+    }
+
+    return 'This reply may be flagged as unprofessional or inappropriate. Managers can report it — please use respectful language.';
+  }
+
+  get isResponsePolicyBlocked(): boolean {
+    const content = this.responseText.trim();
+    if (!content) {
+      return false;
+    }
+
+    const kind = detectConcerningReplyKind({ creatorResponse: content });
+    return isSevereConcerningReply(kind);
+  }
+
   sendResponse(): void {
     if (!this.selectedReview || this.isSubmitting) {
       return;
@@ -314,6 +347,14 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
       this.errorMessage = this.translationService.translate('contentCreator.reviews.error.responseRequired');
       this.successMessage = '';
       return;
+    }
+
+    if (isConcerningCreatorReply({ creatorResponse: content })) {
+      if (this.isResponsePolicyBlocked) {
+        this.errorMessage = this.responsePolicyWarning;
+        this.successMessage = '';
+        return;
+      }
     }
 
     const reviewId = this.selectedReview.id;

@@ -122,6 +122,15 @@
   color: #166534;
 }
 
+.feedback.warning {
+  color: #b45309;
+}
+
+.response-composer.policy-warning textarea {
+  border-color: #f59e0b;
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.15);
+}
+
 .chip {
   border: 1px solid #d1d5db;
   background: #f8fafc;

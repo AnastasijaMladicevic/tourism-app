@@ -13,6 +13,8 @@ import { environment } from '../../../../environment/environment';
 import { ManagerReportsService } from '../../../services/manager-reports.service';
 import {
   buildReviewReportReason,
+  detectConcerningReplyKind,
+  getConcerningReportCategory,
   isConcerningCreatorReply,
 } from '../shared/concerning-reply.util';
 import {
@@ -25,13 +27,16 @@ import {
   catchError,
   finalize,
   forkJoin,
+  from,
   map,
+  mergeMap,
   of,
   switchMap,
   takeUntil,
   throwError,
   timer,
   timeout,
+  toArray,
   Observable,
 } from 'rxjs';
 import { DestinationService } from '../../../services/destination.service';
@@ -306,9 +311,12 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const concerning = this.isConcerning(target);
+    const concerningKind = detectConcerningReplyKind({
+      creatorResponse: target.creatorResponse,
+      touristRating: target.rating,
+    });
     this.reportModalCreatorId = target.creatorId;
-    this.reportModalCategory = concerning ? 'unprofessional_conduct' : 'other';
+    this.reportModalCategory = getConcerningReportCategory(concerningKind);
     this.reportModalReason = target.creatorResponse?.trim()
       ? buildReviewReportReason({
           reviewId: target.id,
@@ -318,7 +326,7 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
           creatorName: target.creatorName,
           creatorResponse: target.creatorResponse!,
           category: this.reportModalCategory,
-          autoDetected: concerning,
+          autoDetected: concerningKind != null,
         }, {
           categoryPrefix: this.translationService.translate('manager.reportModal.reason.category'),
           autoDetected: this.translationService.translate('manager.reportModal.reason.autoDetected'),
@@ -503,14 +511,6 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
               sortOrder: 'asc',
             }),
           ),
-          reviews: this.getAllPagedItems((page) =>
-            this.reviewService.getAll({
-              page,
-              pageSize,
-              sortBy: 'createdAt',
-              sortOrder: 'desc',
-            }),
-          ),
           myReports: this.getAllPagedItems((page) =>
             this.managerReportsService.getMyReports({
               page,
@@ -521,7 +521,7 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
           ),
         }),
       ),
-      map(({ objects, reviews, myReports }) => {
+      switchMap(({ objects, myReports }) => {
         this.pendingReportCreatorIds.clear();
         for (const report of myReports) {
           if (report.status?.toLowerCase() === 'pending') {
@@ -551,11 +551,56 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
           });
         }
 
-        const managedObjectIds = new Set(objectContext.keys());
-        console.log(managedObjectIds);
-        const scopedReviews = reviews.filter((review) => managedObjectIds.has(review.objectId));
-        console.log(reviews);
-        return this.mapReviewsToThreads(scopedReviews, objectContext);
+        const managedObjectIds = [...objectContext.keys()];
+        if (!managedObjectIds.length) {
+          return of(this.mapReviewsToThreads([], objectContext));
+        }
+
+        return this.fetchReviewsForManagedObjects(managedObjectIds).pipe(
+          map((reviews) => this.mapReviewsToThreads(reviews, objectContext)),
+        );
+      }),
+    );
+  }
+
+  /** Loads reviews only for objects in the manager's scope (avoids fetching the full review catalog). */
+  private fetchReviewsForManagedObjects(objectIds: number[]): Observable<ReviewDto[]> {
+    const pageSize = 100;
+    const reviewRequestOptions = { bypassLanguage: true, bypassRegion: true };
+
+    return from(objectIds).pipe(
+      mergeMap(
+        (objectId) =>
+          this.getAllPagedItems((page) =>
+            this.reviewService.getAll(
+              {
+                objectId,
+                page,
+                pageSize,
+                sortBy: 'createdAt',
+                sortOrder: 'desc',
+              },
+              reviewRequestOptions,
+            ),
+          ).pipe(catchError(() => of([] as ReviewDto[]))),
+        6,
+      ),
+      toArray(),
+      map((reviewLists) => {
+        const seen = new Set<number>();
+        const merged: ReviewDto[] = [];
+
+        for (const reviews of reviewLists) {
+          for (const review of reviews) {
+            if (seen.has(review.id)) {
+              continue;
+            }
+            seen.add(review.id);
+            merged.push(review);
+          }
+        }
+
+        return merged;
       }),
     );
   }
