@@ -817,7 +817,7 @@
           "ascending": "Crescente",
           "descending": "Decrescente",
           "apply": "Applica",
-          "reset": "Reimposta filtri"
+          "reset": "Reimposta"
         },
         "table": {
           "status": "Stato",
@@ -892,7 +892,7 @@
           "ascending": "Crescente",
           "descending": "Decrescente",
           "apply": "Applica",
-          "reset": "Reimposta filtri"
+          "reset": "Reimposta"
         },
         "stats": {
           "totalActivities": "Totale attività",
@@ -954,7 +954,7 @@
           "ascending": "Crescente",
           "descending": "Decrescente",
           "apply": "Applica",
-          "reset": "Reimposta filtri"
+          "reset": "Reimposta"
         },
         "stats": {
           "totalLocalities": "Totale località",
@@ -1141,7 +1141,7 @@
         "filters": {
           "status": "Stato",
           "allStatuses": "Tutti gli stati",
-          "reset": "Reimposta filtri"
+          "reset": "Reimposta"
         },
         "stats": {
           "pendingReview": "In attesa di revisione",
@@ -1226,7 +1226,7 @@
           "creator": "Creatore di contenuti",
           "allCreators": "Tutti i creatori",
           "searchPlaceholder": "Cerca turista, oggetto, testo recensione, risposta...",
-          "reset": "Reimposta filtri"
+          "reset": "Reimposta"
         },
         "stats": {
           "threads": "Thread nella destinazione",
@@ -1413,7 +1413,7 @@
         "ascending": "Crescente",
         "descending": "Decrescente",
         "apply": "Applica filtri",
-        "reset": "Reimposta filtri"
+        "reset": "Reimposta"
       },
       "sort": {
         "name": "Nome",
