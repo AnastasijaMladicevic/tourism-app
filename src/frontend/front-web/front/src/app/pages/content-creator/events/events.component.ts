@@ -261,15 +261,26 @@ export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
     this.onResetFilters();
   }
 
-  onDateRangeChange(): void {
-    if (!this.rangeStartDate || !this.rangeEndDate) {
+  onStartDateChange(): void {
+    if (this.rangeStartDate && this.rangeEndDate && this.rangeStartDate > this.rangeEndDate) {
+      this.rangeEndDate = '';
+    }
+
+    this.applyDateRangeFilter();
+  }
+
+  onEndDateChange(): void {
+    if (this.rangeStartDate && this.rangeEndDate && this.rangeEndDate < this.rangeStartDate) {
+      this.rangeEndDate = '';
       return;
     }
 
-    if (this.rangeStartDate > this.rangeEndDate) {
-      const originalStart = this.rangeStartDate;
-      this.rangeStartDate = this.rangeEndDate;
-      this.rangeEndDate = originalStart;
+    this.applyDateRangeFilter();
+  }
+
+  private applyDateRangeFilter(): void {
+    if (!this.rangeStartDate || !this.rangeEndDate) {
+      return;
     }
 
     this.currentPage = 1;

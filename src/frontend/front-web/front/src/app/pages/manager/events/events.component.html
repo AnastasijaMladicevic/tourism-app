@@ -23,7 +23,8 @@
           type="date"
           class="date-range-input"
           [(ngModel)]="rangeStartDate"
-          (ngModelChange)="onDateRangeChange()"
+          [max]="rangeEndDate || null"
+          (ngModelChange)="onStartDateChange()"
           aria-label="From date"
         />
         <span class="date-range-separator" aria-hidden="true">–</span>
@@ -31,7 +32,8 @@
           type="date"
           class="date-range-input"
           [(ngModel)]="rangeEndDate"
-          (ngModelChange)="onDateRangeChange()"
+          [min]="rangeStartDate || null"
+          (ngModelChange)="onEndDateChange()"
           aria-label="To date"
         />
       </div>
