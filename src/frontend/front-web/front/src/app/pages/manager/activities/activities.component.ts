@@ -310,10 +310,6 @@ export class ManagerActivitiesComponent implements OnInit {
     this.loadActivities();
   }
 
-  onFilterChange(): void {
-    // Filters are applied explicitly via the panel's Apply button.
-  }
-
   onGoToPage(page: number): void {
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;

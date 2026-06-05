@@ -36,7 +36,7 @@
     <div class="filters-panel card">
       <label>
         <span>{{ t('adminDestinations.filters.status') }}</span>
-        <select [(ngModel)]="statusFilter">
+        <select [(ngModel)]="statusFilter" (ngModelChange)="onApplyFilters()">
           <option *ngFor="let option of statusOptions" [value]="option.value">
             {{ t(option.labelKey) }}
           </option>
@@ -45,7 +45,7 @@
 
       <label>
         <span>{{ t('adminDestinations.filters.region') }}</span>
-        <select [(ngModel)]="regionFilter">
+        <select [(ngModel)]="regionFilter" (ngModelChange)="onApplyFilters()">
           <option *ngFor="let option of regionFilterOptions" [value]="option.value">
             {{ option.label }}
           </option>
@@ -54,7 +54,7 @@
 
       <label>
         <span>{{ t('adminDestinations.filters.sortBy') }}</span>
-        <select [(ngModel)]="sortBy">
+        <select [(ngModel)]="sortBy" (ngModelChange)="onApplyFilters()">
           <option *ngFor="let option of sortByOptions" [value]="option.value">
             {{ t(option.labelKey) }}
           </option>
@@ -63,16 +63,13 @@
 
       <label>
         <span>{{ t('adminDestinations.filters.order') }}</span>
-        <select [(ngModel)]="sortOrder">
+        <select [(ngModel)]="sortOrder" (ngModelChange)="onApplyFilters()">
           <option value="asc">{{ t('adminDestinations.filters.ascending') }}</option>
           <option value="desc">{{ t('adminDestinations.filters.descending') }}</option>
         </select>
       </label>
 
       <div class="filter-actions">
-        <button type="button" class="primary-btn filter-btn" (click)="onApplyFilters()">
-          {{ t('adminDestinations.filters.apply') }}
-        </button>
         <button type="button" class="ghost-btn filter-btn secondary" (click)="onResetFilters()">
           {{ t('adminDestinations.filters.reset') }}
         </button>

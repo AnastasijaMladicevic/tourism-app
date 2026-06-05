@@ -24,7 +24,7 @@
     <div class="filters-panel card">
       <label>
         <span>{{ 'manager.activities.filters.status' | translate }}</span>
-        <select [(ngModel)]="statusFilter">
+        <select [(ngModel)]="statusFilter" (ngModelChange)="onApplyFilters()">
           <option *ngFor="let option of statusOptions" [value]="option.value">
             {{ option.label | translate }}
           </option>
@@ -33,7 +33,7 @@
 
       <label>
         <span>{{ 'manager.activities.filters.activityType' | translate }}</span>
-        <select [(ngModel)]="typeFilter" [disabled]="isLoadingTypes">
+        <select [(ngModel)]="typeFilter" [disabled]="isLoadingTypes" (ngModelChange)="onApplyFilters()">
           <option value="all">{{ 'manager.activities.filters.allTypes' | translate }}</option>
           <option *ngFor="let type of activityTypeOptions" [value]="type.id">
             {{ type.name }}
@@ -43,7 +43,7 @@
 
       <label>
         <span>{{ 'manager.activities.filters.sortBy' | translate }}</span>
-        <select [(ngModel)]="sortBy">
+        <select [(ngModel)]="sortBy" (ngModelChange)="onApplyFilters()">
           <option *ngFor="let option of sortByOptions" [value]="option.value">
             {{ option.label | translate }}
           </option>
@@ -52,16 +52,13 @@
 
       <label>
         <span>{{ 'manager.activities.filters.order' | translate }}</span>
-        <select [(ngModel)]="sortOrder">
+        <select [(ngModel)]="sortOrder" (ngModelChange)="onApplyFilters()">
           <option value="asc">{{ 'manager.activities.filters.ascending' | translate }}</option>
           <option value="desc">{{ 'manager.activities.filters.descending' | translate }}</option>
         </select>
       </label>
 
       <div class="filter-actions">
-        <button type="button" class="primary-btn filter-btn" (click)="onApplyFilters()">
-          {{ 'manager.activities.filters.apply' | translate }}
-        </button>
         <button type="button" class="ghost-btn filter-btn secondary" (click)="onResetFilters()">
           {{ 'manager.activities.filters.reset' | translate }}
         </button>
