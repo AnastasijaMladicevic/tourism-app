@@ -1519,8 +1519,7 @@
     "itemsLabel": "destinations",
     "status": {
       "published": "Published",
-      "draft": "Draft",
-      "rejected": "Rejected"
+      "unpublished": "Unpublished"
     },
     "columns": {
       "status": "Status",
@@ -2022,6 +2021,7 @@
       "atLeastOneImage": "At least one image is required before saving.",
       "maxImagesDestination": "A destination can have at most {{count}} images.",
       "selectManager": "Please select a manager.",
+      "managerAlreadyAssigned": "This manager already manages \"{{destination}}\". Each manager can manage only one destination.",
       "assignManagerFailed": "Destination was saved, but assigning the manager failed.",
       "anotherAdminEditing": "Another admin is currently editing this destination.",
       "saveFailed": "Save failed. Please check fields and try again."

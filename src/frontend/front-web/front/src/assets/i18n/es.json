@@ -1519,8 +1519,7 @@
     "itemsLabel": "destinos",
     "status": {
       "published": "Publicado",
-      "draft": "Borrador",
-      "rejected": "Rechazado"
+      "unpublished": "No publicado"
     },
     "columns": {
       "status": "Estado",
@@ -1987,6 +1986,7 @@
       "atLeastOneImage": "Se requiere al menos una imagen antes de guardar.",
       "maxImagesDestination": "Un destino puede tener como máximo {{count}} imágenes.",
       "selectManager": "Selecciona un manager.",
+      "managerAlreadyAssigned": "Este manager ya gestiona \"{{destination}}\". Cada manager solo puede gestionar un destino.",
       "assignManagerFailed": "El destino se guardó, pero falló la asignación del manager.",
       "anotherAdminEditing": "Otro admin está editando actualmente este destino.",
       "saveFailed": "Error al guardar. Revisa los campos e inténtalo de nuevo."

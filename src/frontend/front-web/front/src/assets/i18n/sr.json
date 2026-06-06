@@ -1519,8 +1519,7 @@
     "itemsLabel": "destinacija",
     "status": {
       "published": "Objavljeno",
-      "draft": "Nacrt",
-      "rejected": "Odbijeno"
+      "unpublished": "Neobjavljeno"
     },
     "columns": {
       "status": "Status",
@@ -1987,6 +1986,7 @@
       "atLeastOneImage": "Najmanje jedna slika je obavezna pre čuvanja.",
       "maxImagesDestination": "Destinacija može imati najviše {{count}} slika.",
       "selectManager": "Izaberite menadžera.",
+      "managerAlreadyAssigned": "Ovaj menadžer već upravlja destinacijom \"{{destination}}\". Svaki menadžer može da upravlja samo jednom destinacijom.",
       "assignManagerFailed": "Destinacija je sačuvana, ali dodela menadžera nije uspela.",
       "anotherAdminEditing": "Drugi admin trenutno menja ovu destinaciju.",
       "saveFailed": "Čuvanje nije uspelo. Proverite polja i pokušajte ponovo."

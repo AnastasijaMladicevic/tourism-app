@@ -20,8 +20,6 @@ import { environment } from '../../../../environment/environment';
 import { HERO_IMAGE_ROTATION_INTERVAL_MS } from '../../../shared/constants/hero-image-rotation';
 import { TranslationService } from '../../../services/translation.service';
 
-export type AdminDestinationStatus = 'active' | 'draft' | 'archived';
-
 export interface AdminDestinationRow {
   id: number;
   name: string;
@@ -31,7 +29,8 @@ export interface AdminDestinationRow {
   region: string;
   country: string;
   code: string;
-  status: AdminDestinationStatus;
+  /** Mirrors backend DestinationDto.isActive — published vs hidden. */
+  isPublished: boolean;
   localityCount: number;
   /** Objects count for the Inventory column (building + "N Objects"). */
   objectCount: number;
@@ -48,8 +47,8 @@ export interface AdminDestinationRow {
 interface DestinationInsightCard {
   label: string;
   value: string;
-  hint: string;
-  tone: 'blue' | 'green' | 'amber';
+  pill: string;
+  cardClass: 'kpi-dest-a' | 'kpi-dest-b' | 'kpi-dest-c';
   icon: string;
 }
 
@@ -100,12 +99,6 @@ export class DestinationsComponent implements OnInit, OnDestroy {
   currentHeroImageIndex = 0;
   private heroRotationTimerId: ReturnType<typeof setInterval> | null = null;
 
-  readonly statusOptions = [
-    { value: 'all', labelKey: 'adminDestinations.filters.allStatuses' },
-    { value: 'active', labelKey: 'adminDestinations.status.published' },
-    { value: 'archived', labelKey: 'adminDestinations.status.rejected' }
-  ];
-
   readonly sortByOptions = [
     { value: 'name', labelKey: 'adminDestinations.columns.destination' },
     { value: 'region', labelKey: 'adminDestinations.columns.region' },
@@ -127,6 +120,21 @@ export class DestinationsComponent implements OnInit, OnDestroy {
     this.stopHeroImageRotation();
   }
 
+  get statusFilterOptions(): { value: string; label: string }[] {
+    const options = [{ value: 'all', label: this.t('adminDestinations.filters.allStatuses') }];
+    const hasPublished = this.allDestinations.some((d) => d.isPublished);
+    const hasUnpublished = this.allDestinations.some((d) => !d.isPublished);
+
+    if (hasPublished) {
+      options.push({ value: 'published', label: this.t('adminDestinations.status.published') });
+    }
+    if (hasUnpublished) {
+      options.push({ value: 'unpublished', label: this.t('adminDestinations.status.unpublished') });
+    }
+
+    return options;
+  }
+
   get regionFilterOptions(): { value: string; label: string }[] {
     const names = new Set(
       this.allDestinations.map((d) => d.region).filter((r) => r && r.trim())
@@ -140,27 +148,32 @@ export class DestinationsComponent implements OnInit, OnDestroy {
 
   get insightCards(): DestinationInsightCard[] {
     const filtered = this.applyFiltersToAll();
-    const published = filtered.filter((d) => d.status === 'active').length;
+    const published = filtered.filter((d) => d.isPublished).length;
+    const filteredCount = filtered.length;
+    const pageShare =
+      filteredCount > 0 ? Math.round((this.visibleDestinations.length / filteredCount) * 100) : 0;
+    const publishedShare = filteredCount > 0 ? Math.round((published / filteredCount) * 100) : 0;
+
     return [
       {
         label: this.t('adminDestinations.insights.totalDestinations'),
-        value: String(filtered.length),
-        hint: this.t('adminDestinations.insights.matchingCurrentFilters'),
-        tone: 'blue',
+        value: String(filteredCount),
+        pill: String(this.allDestinations.length),
+        cardClass: 'kpi-dest-a',
         icon: 'public'
       },
       {
         label: this.t('adminDestinations.insights.onThisPage'),
         value: String(this.visibleDestinations.length),
-        hint: this.t('adminDestinations.insights.visibleRows'),
-        tone: 'green',
+        pill: `${pageShare}%`,
+        cardClass: 'kpi-dest-b',
         icon: 'view_list'
       },
       {
         label: this.t('adminDestinations.status.published'),
         value: String(published),
-        hint: this.t('adminDestinations.insights.matchingCurrentFilters'),
-        tone: 'amber',
+        pill: `${publishedShare}%`,
+        cardClass: 'kpi-dest-c',
         icon: 'check_circle'
       }
     ];
@@ -452,61 +465,22 @@ export class DestinationsComponent implements OnInit, OnDestroy {
     return this.t('adminDestinations.editLockedBy', { name: lockedBy });
   }
 
-  formatStatus(status: AdminDestinationStatus): string {
-    return status.charAt(0).toUpperCase() + status.slice(1);
+  formatTableStatus(isPublished: boolean): string {
+    return isPublished
+      ? this.t('adminDestinations.status.published')
+      : this.t('adminDestinations.status.unpublished');
   }
 
-  /** Table status labels to match the admin destinations design (Published / Draft). */
-  formatTableStatus(status: AdminDestinationStatus): string {
-    switch (status) {
-      case 'active':
-        return this.t('adminDestinations.status.published');
-      case 'draft':
-        return this.t('adminDestinations.status.draft');
-      case 'archived':
-        return this.t('adminDestinations.status.rejected');
-      default:
-        return this.formatStatus(status);
-    }
+  getStatusClass(isPublished: boolean): string {
+    return isPublished ? 'status-published' : 'status-draft';
   }
 
-  getStatusClass(status: AdminDestinationStatus): string {
-    switch (status) {
-      case 'active':
-        return 'status-published';
-      case 'draft':
-        return 'status-draft';
-      case 'archived':
-        return 'status-archived';
-      default:
-        return 'status-draft';
-    }
+  getTableStatusClass(isPublished: boolean): string {
+    return isPublished ? 'table-status-published' : 'table-status-draft';
   }
 
-  getTableStatusClass(status: AdminDestinationStatus): string {
-    switch (status) {
-      case 'active':
-        return 'table-status-published';
-      case 'draft':
-        return 'table-status-draft';
-      case 'archived':
-        return 'table-status-archived';
-      default:
-        return 'table-status-draft';
-    }
-  }
-
-  getStatusBadgeClass(status: AdminDestinationStatus): string {
-    switch (status) {
-      case 'active':
-        return 'published';
-      case 'draft':
-        return 'draft';
-      case 'archived':
-        return 'rejected';
-      default:
-        return 'draft';
-    }
+  getStatusBadgeClass(isPublished: boolean): string {
+    return isPublished ? 'published' : 'draft';
   }
 
   destinationLocationText(row: AdminDestinationRow): string {
@@ -561,6 +535,7 @@ export class DestinationsComponent implements OnInit, OnDestroy {
       )
       .subscribe((rows) => {
         this.allDestinations = rows;
+        this.syncStatusFilterWithData();
         if (!this.loadError) {
           this.syncSelectionAfterFilter();
         } else {
@@ -636,7 +611,7 @@ export class DestinationsComponent implements OnInit, OnDestroy {
       region: dto.regionName?.trim() ?? '',
       country: '',
       code: dto.regionCode?.trim() ?? '',
-      status: this.mapApiStatus(dto),
+      isPublished: Boolean(dto.isActive),
       localityCount,
       objectCount,
       featured: false,
@@ -650,18 +625,11 @@ export class DestinationsComponent implements OnInit, OnDestroy {
     };
   }
 
-  private mapApiStatus(dto: DestinationDto): AdminDestinationStatus {
-    const raw = (dto.status ?? '').trim().toLowerCase();
-    if (raw === 'rejected') {
-      return 'archived';
+  private syncStatusFilterWithData(): void {
+    const validValues = new Set(this.statusFilterOptions.map((option) => option.value));
+    if (!validValues.has(this.statusFilter)) {
+      this.statusFilter = 'all';
     }
-    if (raw === 'pending') {
-      return 'draft';
-    }
-    if (raw === 'approved') {
-      return dto.isActive ? 'active' : 'draft';
-    }
-    return dto.isActive ? 'active' : 'draft';
   }
 
   private loadDestinationsPage(
@@ -747,8 +715,10 @@ export class DestinationsComponent implements OnInit, OnDestroy {
       );
     }
 
-    if (this.statusFilter !== 'all') {
-      rows = rows.filter((d) => d.status === this.statusFilter);
+    if (this.statusFilter === 'published') {
+      rows = rows.filter((d) => d.isPublished);
+    } else if (this.statusFilter === 'unpublished') {
+      rows = rows.filter((d) => !d.isPublished);
     }
 
     if (this.regionFilter !== 'all') {
@@ -766,7 +736,7 @@ export class DestinationsComponent implements OnInit, OnDestroy {
           cmp = a.localityCount - b.localityCount;
           break;
         case 'status':
-          cmp = a.status.localeCompare(b.status);
+          cmp = Number(a.isPublished) - Number(b.isPublished);
           break;
         case 'updatedAt':
           cmp = new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime();

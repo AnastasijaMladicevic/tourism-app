@@ -16,7 +16,7 @@
 
 /* Three stat cards (destinations, users KPI grids). */
 @container admin-stats-host-3 (max-width: 699px) {
-  .destinations-page .insights-grid,
+  .destinations-page .kpi-grid,
   .users-page .dashboard-overview-main .kpi-grid,
   .users-page .small-kpis {
     display: flex;
@@ -35,26 +35,26 @@
     grid-template-columns: none;
   }
 
-  .destinations-page .insights-grid::after,
+  .destinations-page .kpi-grid::after,
   .users-page .dashboard-overview-main .kpi-grid::after,
   .users-page .small-kpis::after {
     content: '';
     flex: 0 0 4px;
   }
 
-  .destinations-page .insights-grid::-webkit-scrollbar,
+  .destinations-page .kpi-grid::-webkit-scrollbar,
   .users-page .dashboard-overview-main .kpi-grid::-webkit-scrollbar,
   .users-page .small-kpis::-webkit-scrollbar {
     display: none;
   }
 
-  .destinations-page .insights-grid .insight-card:last-child,
+  .destinations-page .kpi-grid .kpi-card:last-child,
   .users-page .dashboard-overview-main .kpi-grid .kpi-card:last-child,
   .users-page .small-kpis .mini-kpi-card:last-child {
     grid-column: auto;
   }
 
-  .destinations-page .insight-card.card,
+  .destinations-page .kpi-grid .kpi-card,
   .users-page .dashboard-overview-main .kpi-card,
   .users-page .small-kpis .mini-kpi-card {
     flex: 0 0 min(260px, 78%);
@@ -64,7 +64,7 @@
 }
 
 @container admin-stats-host-3 (min-width: 700px) {
-  .destinations-page .insights-grid,
+  .destinations-page .kpi-grid,
   .users-page .dashboard-overview-main .kpi-grid,
   .users-page .small-kpis {
     display: grid;
@@ -74,7 +74,7 @@
     scroll-snap-type: none;
   }
 
-  .destinations-page .insight-card.card,
+  .destinations-page .kpi-grid .kpi-card,
   .users-page .dashboard-overview-main .kpi-card,
   .users-page .small-kpis .mini-kpi-card {
     flex: unset;
@@ -134,23 +134,13 @@
 
 @media (max-width: 920px) {
   @container admin-stats-host-3 (max-width: 699px) {
-    .destinations-page .insight-card.card {
-      min-height: auto;
+    .destinations-page .kpi-grid .kpi-card {
       padding: 12px;
       border-radius: 16px;
     }
 
-    .destinations-page .insight-card strong {
-      font-size: 22px;
-      margin: 6px 0 2px;
-    }
-
-    .destinations-page .insight-title {
-      font-size: 10px;
-    }
-
-    .destinations-page .insight-card span {
-      font-size: 11px;
+    .destinations-page .kpi-value {
+      font-size: 28px;
     }
 
     .users-page .dashboard-overview-main .kpi-value {

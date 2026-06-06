@@ -37,8 +37,8 @@
       <label>
         <span>{{ t('adminDestinations.filters.status') }}</span>
         <select [(ngModel)]="statusFilter" (ngModelChange)="onApplyFilters()">
-          <option *ngFor="let option of statusOptions" [value]="option.value">
-            {{ t(option.labelKey) }}
+          <option *ngFor="let option of statusFilterOptions" [value]="option.value">
+            {{ option.label }}
           </option>
         </select>
       </label>
@@ -79,18 +79,14 @@
 
   <div class="destinations-layout">
     <div class="main-column">
-      <div class="insights-grid">
-        <article
-          *ngFor="let insight of insightCards"
-          class="insight-card card"
-          [attr.data-tone]="insight.tone"
-        >
-          <p class="insight-title">
-            <span class="material-symbols-outlined insight-icon--title">{{ insight.icon }}</span>
-            {{ insight.label }}
-          </p>
-          <strong>{{ insight.value }}</strong>
-          <span>{{ insight.hint }}</span>
+      <div class="kpi-grid">
+        <article *ngFor="let insight of insightCards" class="kpi-card" [ngClass]="insight.cardClass">
+          <div class="kpi-top">
+            <span class="kpi-icon material-symbols-outlined">{{ insight.icon }}</span>
+            <span class="kpi-pill">{{ insight.pill }}</span>
+          </div>
+          <p class="kpi-label">{{ insight.label }}</p>
+          <p class="kpi-value">{{ insight.value }}</p>
         </article>
       </div>
 
@@ -116,8 +112,8 @@
                 <div class="destination-mobile-card__content">
                   <div class="destination-mobile-card__head">
                     <h3>{{ row.name }}</h3>
-                    <span class="status-chip status-chip--compact" [ngClass]="getStatusBadgeClass(row.status)">
-                      {{ formatTableStatus(row.status) }}
+                    <span class="status-chip status-chip--compact" [ngClass]="getStatusBadgeClass(row.isPublished)">
+                      {{ formatTableStatus(row.isPublished) }}
                     </span>
                   </div>
                   <p class="destination-mobile-card__location">
@@ -164,8 +160,8 @@
                   (click)="selectDestination(row)"
                 >
                   <td>
-                    <span class="table-status" [ngClass]="getTableStatusClass(row.status)">
-                      {{ formatTableStatus(row.status) }}
+                    <span class="table-status" [ngClass]="getTableStatusClass(row.isPublished)">
+                      {{ formatTableStatus(row.isPublished) }}
                     </span>
                   </td>
                   <td>
@@ -250,8 +246,8 @@
             <p class="eyebrow">{{ t('adminDestinations.destinationPreview') }}</p>
             <h2>{{ selectedDestination.name }}</h2>
             <p class="hero-meta">{{ detailMetaLabel(selectedDestination) }}</p>
-            <span class="detail-status" [ngClass]="getStatusClass(selectedDestination.status)">
-              {{ formatTableStatus(selectedDestination.status) }}
+            <span class="detail-status" [ngClass]="getStatusClass(selectedDestination.isPublished)">
+              {{ formatTableStatus(selectedDestination.isPublished) }}
             </span>
           </div>
         </div>

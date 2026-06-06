@@ -1519,8 +1519,7 @@
     "itemsLabel": "destinazioni",
     "status": {
       "published": "Pubblicata",
-      "draft": "Bozza",
-      "rejected": "Rifiutata"
+      "unpublished": "Non pubblicata"
     },
     "columns": {
       "status": "Stato",
@@ -1987,6 +1986,7 @@
       "atLeastOneImage": "È richiesta almeno un'immagine prima del salvataggio.",
       "maxImagesDestination": "Una destinazione può avere al massimo {{count}} immagini.",
       "selectManager": "Seleziona un manager.",
+      "managerAlreadyAssigned": "Questo manager gestisce già \"{{destination}}\". Ogni manager può gestire una sola destinazione.",
       "assignManagerFailed": "La destinazione è stata salvata, ma l'assegnazione del manager non è riuscita.",
       "anotherAdminEditing": "Un altro admin sta modificando questa destinazione.",
       "saveFailed": "Salvataggio non riuscito. Controlla i campi e riprova."
