@@ -2173,7 +2173,7 @@
     "events": {
       "eyebrow": "Upravljanje događajima",
       "title": "Događaji i rasporedi",
-      "createEvent": "Kreiraj novi događaj",
+      "createEvent": "Kreiraj događaj",
       "searchPlaceholder": "Pretraži događaje, objekte ili organizatore...",
       "dateRangeFilter": "Filter opsega datuma",
       "fromDate": "Od datuma",
@@ -2255,7 +2255,7 @@
     "activities": {
       "eyebrow": "Upravljanje aktivnostima",
       "title": "Aktivnosti",
-      "createActivity": "Dodaj aktivnost",
+      "createActivity": "Kreiraj aktivnost",
       "searchPlaceholder": "Pretraži aktivnosti, tipove ili destinacije...",
       "loading": "Učitavanje aktivnosti...",
       "selectedActivity": "Izabrana aktivnost",

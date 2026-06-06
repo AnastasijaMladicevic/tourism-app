@@ -175,6 +175,33 @@ export class EventFormComponent implements OnInit, OnDestroy {
     );
   }
 
+  get isSubmitDisabled(): boolean {
+    return this.isSubmitting || !this.hasRequiredCreateFields;
+  }
+
+  get hasRequiredCreateFields(): boolean {
+    const values = this.form.getRawValue();
+    const name = values.name?.trim();
+    const eventTypeId = this.toNumber(values.eventTypeId);
+    const destinationId = this.toNumber(values.destinationId);
+    const startDate = values.startDate?.trim();
+    const endDate = values.endDate?.trim();
+    const maxVisitors = this.toNumber(values.maxVisitors);
+
+    return Boolean(
+      name &&
+      eventTypeId &&
+      this.organizerName.trim() &&
+      destinationId &&
+      startDate &&
+      endDate &&
+      maxVisitors != null &&
+      maxVisitors >= 1 &&
+      this.imageUrls.length > 0 &&
+      !this.endDateBeforeStart
+    );
+  }
+
   get cancelLabel(): string {
     return this.translationService.translate('common.cancel');
   }

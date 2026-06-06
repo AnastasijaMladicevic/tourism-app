@@ -32,7 +32,7 @@
   font-size: 14px;
 }
 
-.header-actions,
+.top-actions,
 .field-grid,
 .activity-row,
 .section-title,
@@ -41,9 +41,15 @@
   display: flex;
 }
 
-.header-actions {
+.top-actions {
+  align-items: center;
+  justify-content: flex-end;
   gap: 10px;
   flex-wrap: wrap;
+}
+
+.top-actions .material-symbols-outlined {
+  font-size: 18px;
 }
 
 .card {
@@ -929,19 +935,164 @@
   line-height: 1.5;
 }
 
-.tips-modal {
-  text-align: left;
+.tips-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(15, 23, 42, 0.52);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
 }
 
-.tips-modal h3 {
-  margin-bottom: 10px;
+.playbook-modal {
+  width: min(100%, 520px);
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow: 0 28px 80px rgba(15, 23, 42, 0.28);
+  overflow: hidden;
+  animation: playbook-modal-in 220ms ease-out;
 }
 
-.tips-modal-list {
-  margin: 8px 0 18px 18px;
-  color: #475569;
+@keyframes playbook-modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.playbook-modal__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 24px 24px 22px;
+  background: linear-gradient(135deg, #312e81 0%, #4f46e5 52%, #6366f1 100%);
+  color: #ffffff;
+}
+
+.playbook-modal__header-copy {
+  min-width: 0;
+}
+
+.playbook-modal__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.playbook-modal__header h3 {
+  margin: 10px 0 0;
+  font-size: 24px;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: #ffffff;
+}
+
+.playbook-modal__close {
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 160ms ease;
+}
+
+.playbook-modal__close:hover {
+  background: rgba(255, 255, 255, 0.24);
+}
+
+.playbook-modal__close .material-symbols-outlined {
+  font-size: 20px;
+}
+
+.playbook-modal__body {
+  padding: 22px 24px 8px;
+}
+
+.playbook-modal__intro {
+  margin: 0 0 18px;
+  color: #64748b;
   font-size: 14px;
-  line-height: 1.5;
+  line-height: 1.6;
+}
+
+.playbook-modal__tips {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.playbook-tip {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 14px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  background: #f8fafc;
+}
+
+.playbook-tip__icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: #e0e7ff;
+  color: #4338ca;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.playbook-tip__icon .material-symbols-outlined {
+  font-size: 22px;
+}
+
+.playbook-tip p {
+  margin: 0;
+  color: #334155;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.playbook-modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 16px 24px 24px;
+}
+
+.playbook-modal__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 120px;
+  min-height: 42px;
+  border-radius: 12px;
+  font-weight: 600;
+  text-align: center;
 }
 
 @media (max-width: 1180px) {
@@ -964,12 +1115,13 @@
     flex-direction: column;
   }
 
-  .header-actions {
+  .top-actions {
     width: 100%;
   }
 
-  .header-actions .ghost-btn,
-  .header-actions .primary-btn {
+  .top-actions .ghost-btn,
+  .top-actions .primary-btn,
+  .top-actions .danger-btn {
     flex: 1 1 100%;
     justify-content: center;
   }

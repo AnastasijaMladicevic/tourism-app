@@ -2110,7 +2110,7 @@
     "objects": {
       "eyebrow": "Gestión de objetos",
       "title": "Objetos",
-      "createObject": "Crear objeto",
+      "createObject": "Crear Objeto",
       "searchPlaceholder": "Buscar por nombre, categoría o región...",
       "loading": "Cargando objetos...",
       "totalCount": "Total: {{count}} objetos",
@@ -2173,7 +2173,7 @@
     "events": {
       "eyebrow": "Gestión de eventos",
       "title": "Eventos y horarios",
-      "createEvent": "Crear nuevo evento",
+      "createEvent": "Crear Evento",
       "searchPlaceholder": "Buscar eventos, objetos u organizadores...",
       "dateRangeFilter": "Filtro de rango de fechas",
       "fromDate": "Desde la fecha",
@@ -2255,7 +2255,7 @@
     "activities": {
       "eyebrow": "Gestión de actividades",
       "title": "Actividades",
-      "createActivity": "Agregar actividad",
+      "createActivity": "Crear Actividad",
       "searchPlaceholder": "Buscar actividades, tipos o destinos...",
       "loading": "Cargando actividades...",
       "selectedActivity": "Actividad seleccionada",
@@ -2395,7 +2395,7 @@
     "eventForm": {
       "createTitle": "Crear evento",
       "editTitle": "Editar evento",
-      "createAction": "Crear evento",
+      "createAction": "Crear Evento",
       "updateAction": "Actualizar evento",
       "subtitle": "Crea la página del evento, gestiona los datos de ubicación y prepara el calendario dentro del espacio del creador.",
       "step1": "PASO 1",
@@ -2507,7 +2507,7 @@
     "activityForm": {
       "createTitle": "Crear actividad",
       "editTitle": "Editar actividad",
-      "createAction": "Crear actividad",
+      "createAction": "Crear Actividad",
       "updateAction": "Actualizar actividad",
       "creating": "Creando...",
       "updating": "Actualizando...",
@@ -2622,7 +2622,7 @@
     "createTitle": "Crear objeto",
     "editTitle": "Editar objeto",
     "createSubtitle": "Configura los datos principales, la ubicación en el mapa, las comodidades y la galería de este objeto.",
-    "createAction": "Crear objeto",
+    "createAction": "Crear Objeto",
     "creating": "Creando...",
     "step1": "PASO 1",
     "step2": "PASO 2",

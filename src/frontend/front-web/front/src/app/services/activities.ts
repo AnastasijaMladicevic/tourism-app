@@ -4,6 +4,7 @@ import { Observable, forkJoin, from, map, of } from 'rxjs';
 import { concatMap, toArray } from 'rxjs/operators';
 import { environment } from '../../environment/environment';
 import { normalizeEntityMedia, normalizeMediaRow, normalizeMediaRows } from '../shared/utils/media-url';
+import { FilterOption } from './object';
 import { TranslationService } from './translation.service';
 
 export interface ActivityDto {
@@ -153,6 +154,18 @@ export class ActivitiesService {
     const params = this.addLang(this.buildActivityQueryParams(query));
     return this.http.get<ActivityQueryResponse>(`${this.apiUrl}/my`, { params }).pipe(
       map((response) => this.normalizeActivityResponse(response))
+    );
+  }
+
+  getMyFilterOptions(): Observable<{ statusOptions: FilterOption[] }> {
+    const query = { page: 1, pageSize: 500, sortBy: 'name', sortOrder: 'asc' };
+    return this.getMyActivities(query).pipe(
+      map((response) => ({
+        statusOptions: this.toUniqueOptions(
+          (response?.items ?? []).map((item) => item.status),
+          (value) => this.toTitleCase(value)
+        )
+      }))
     );
   }
 
@@ -354,5 +367,27 @@ export class ActivitiesService {
       ...response,
       items: (response?.items ?? []).map((activity) => this.normalizeActivity(activity))
     };
+  }
+
+  private toUniqueOptions(values: Array<string | undefined>, mapLabel: (value: string) => string): FilterOption[] {
+    const unique = values
+      .map((value) => value?.trim())
+      .filter((value): value is string => !!value)
+      .filter((value, index, all) => all.findIndex((x) => x.toLowerCase() === value.toLowerCase()) === index)
+      .sort((a, b) => a.localeCompare(b));
+
+    return unique.map((value) => ({
+      value,
+      label: mapLabel(value)
+    }));
+  }
+
+  private toTitleCase(value: string): string {
+    return value
+      .toLowerCase()
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
   }
 }

@@ -34,11 +34,16 @@
   color: #6b7280;
 }
 
-.header-actions {
+.top-actions {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 10px;
   flex-wrap: wrap;
+}
+
+.top-actions .material-symbols-outlined {
+  font-size: 18px;
 }
 
 .card {
@@ -707,12 +712,14 @@ select:focus {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .header-actions {
+  .top-actions {
     width: 100%;
   }
 
-  .header-actions .ghost-btn,
-  .header-actions .primary-btn {
+  .top-actions .ghost-btn,
+  .top-actions .primary-btn,
+  .top-actions .danger-btn {
     flex: 1;
+    justify-content: center;
   }
 }

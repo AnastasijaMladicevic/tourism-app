@@ -181,6 +181,23 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
     );
   }
 
+  get isSubmitDisabled(): boolean {
+    return this.isSubmitting || this.isLoadingOptions || !this.hasRequiredCreateFields;
+  }
+
+  get hasRequiredCreateFields(): boolean {
+    const name = this.form.controls.name.value?.trim();
+    const activityTypeId =
+      this.form.controls.activityTypeId.value ?? this.form.controls.fallbackActivityTypeId.value;
+
+    return Boolean(
+      name &&
+      activityTypeId != null &&
+      activityTypeId >= 1 &&
+      this.imageUrls.length > 0
+    );
+  }
+
   get isApprovedActivity(): boolean {
     return (this.loadedActivity?.status ?? '').toLowerCase() === 'approved';
   }

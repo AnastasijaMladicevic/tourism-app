@@ -2145,7 +2145,7 @@
     "objects": {
       "eyebrow": "Objects management",
       "title": "Objects",
-      "createObject": "Create object",
+      "createObject": "Create Object",
       "searchPlaceholder": "Search by name, category or region...",
       "loading": "Loading objects...",
       "totalCount": "Total: {{count}} objects",
@@ -2208,7 +2208,7 @@
     "events": {
       "eyebrow": "Events management",
       "title": "Events & Schedules",
-      "createEvent": "Create new event",
+      "createEvent": "Create Event",
       "searchPlaceholder": "Search events, objects, or organizers...",
       "dateRangeFilter": "Date range filter",
       "fromDate": "From date",
@@ -2290,7 +2290,7 @@
     "activities": {
       "eyebrow": "Activities management",
       "title": "Activities",
-      "createActivity": "Add activity",
+      "createActivity": "Create Activity",
       "searchPlaceholder": "Search activities, types, or destinations...",
       "loading": "Loading activities...",
       "selectedActivity": "Selected activity",
@@ -2430,7 +2430,7 @@
     "eventForm": {
       "createTitle": "Create event",
       "editTitle": "Edit event",
-      "createAction": "Create event",
+      "createAction": "Create Event",
       "updateAction": "Update event",
       "subtitle": "Build the event page, manage location data, and prepare the schedule inside the creator workspace.",
       "step1": "STEP 1",
@@ -2534,7 +2534,7 @@
     "activityForm": {
       "createTitle": "Create activity",
       "editTitle": "Edit activity",
-      "createAction": "Create activity",
+      "createAction": "Create Activity",
       "updateAction": "Update activity",
       "creating": "Creating...",
       "updating": "Updating...",
@@ -2649,7 +2649,7 @@
     "createTitle": "Create object",
     "editTitle": "Edit object",
     "createSubtitle": "Set up the core details, map location, amenities, and gallery for this object.",
-    "createAction": "Create object",
+    "createAction": "Create Object",
     "creating": "Creating...",
     "step1": "STEP 1",
     "step2": "STEP 2",

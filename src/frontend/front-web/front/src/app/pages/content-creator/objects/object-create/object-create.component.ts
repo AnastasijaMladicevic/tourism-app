@@ -291,6 +291,26 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
       : this.translationService.translate('contentCreatorObjectForm.eyebrow');
   }
 
+  get isSubmitDisabled(): boolean {
+    if (this.isManagerReview) {
+      return true;
+    }
+
+    return this.isSubmitting || this.isLoadingOptions || !this.hasRequiredCreateFields;
+  }
+
+  get hasRequiredCreateFields(): boolean {
+    const name = this.form.controls.name.value?.trim();
+    const objectTypeId = this.form.controls.objectTypeId.value;
+
+    return Boolean(
+      name &&
+      objectTypeId != null &&
+      objectTypeId >= 1 &&
+      this.editableImageUrls.length > 0
+    );
+  }
+
   get reviewStatusKey(): string {
     return this.normalizeReviewStatusKey(this.reviewObjectStatus);
   }

@@ -2110,7 +2110,7 @@
     "objects": {
       "eyebrow": "Gestione oggetti",
       "title": "Oggetti",
-      "createObject": "Crea oggetto",
+      "createObject": "Crea Oggetto",
       "searchPlaceholder": "Cerca per nome, categoria o regione...",
       "loading": "Caricamento oggetti...",
       "totalCount": "Totale: {{count}} oggetti",
@@ -2173,7 +2173,7 @@
     "events": {
       "eyebrow": "Gestione eventi",
       "title": "Eventi e programmi",
-      "createEvent": "Crea nuovo evento",
+      "createEvent": "Crea Evento",
       "searchPlaceholder": "Cerca eventi, oggetti o organizzatori...",
       "dateRangeFilter": "Filtro intervallo date",
       "fromDate": "Dalla data",
@@ -2255,7 +2255,7 @@
     "activities": {
       "eyebrow": "Gestione attività",
       "title": "Attività",
-      "createActivity": "Aggiungi attività",
+      "createActivity": "Crea Attività",
       "searchPlaceholder": "Cerca attività, tipi o destinazioni...",
       "loading": "Caricamento attività...",
       "selectedActivity": "Attività selezionata",
@@ -2395,7 +2395,7 @@
     "eventForm": {
       "createTitle": "Crea evento",
       "editTitle": "Modifica evento",
-      "createAction": "Crea evento",
+      "createAction": "Crea Evento",
       "updateAction": "Aggiorna evento",
       "subtitle": "Crea la pagina dell'evento, gestisci i dati di posizione e prepara il calendario nell'area del creator.",
       "step1": "PASSAGGIO 1",
@@ -2507,7 +2507,7 @@
     "activityForm": {
       "createTitle": "Crea attività",
       "editTitle": "Modifica attività",
-      "createAction": "Crea attività",
+      "createAction": "Crea Attività",
       "updateAction": "Aggiorna attività",
       "creating": "Creazione in corso...",
       "updating": "Aggiornamento in corso...",
@@ -2622,7 +2622,7 @@
     "createTitle": "Crea oggetto",
     "editTitle": "Modifica oggetto",
     "createSubtitle": "Configura i dettagli principali, la posizione sulla mappa, i servizi e la galleria di questo oggetto.",
-    "createAction": "Crea oggetto",
+    "createAction": "Crea Oggetto",
     "creating": "Creazione in corso...",
     "step1": "PASSAGGIO 1",
     "step2": "PASSAGGIO 2",
