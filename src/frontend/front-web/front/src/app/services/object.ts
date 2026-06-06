@@ -40,6 +40,9 @@ export interface ObjectDto {
   updatedAt?: string;
   status?: string;
   hasPendingDeletionRequest?: boolean;
+  approvedAt?: string;
+  approvedByUserId?: number;
+  rejectionReason?: string;
   distanceKm?: number;
   distanceMeters?: number;
   isActive: boolean;
@@ -554,7 +557,58 @@ export class ObjectService {
   }
 
   private normalizeObject(item: ObjectDto): ObjectDto {
-    return normalizeEntityMedia(item);
+    return normalizeEntityMedia({
+      ...item,
+      status: this.resolveObjectStatus(item)
+    });
+  }
+
+  private resolveObjectStatus(item: ObjectDto & { Status?: string | number }): string | undefined {
+    const raw = item.status ?? item.Status;
+    if (raw == null || raw === '') {
+      if (item.approvedAt) {
+        return 'Approved';
+      }
+      if (item.rejectionReason?.trim()) {
+        return 'Rejected';
+      }
+      return item.status;
+    }
+
+    if (typeof raw === 'number') {
+      switch (raw) {
+        case 1:
+          return 'Approved';
+        case 2:
+          return 'Rejected';
+        default:
+          return 'Pending';
+      }
+    }
+
+    const text = String(raw).trim();
+    if (!text) {
+      if (item.approvedAt) {
+        return 'Approved';
+      }
+      if (item.rejectionReason?.trim()) {
+        return 'Rejected';
+      }
+      return undefined;
+    }
+
+    if (/^\d+$/.test(text)) {
+      switch (Number(text)) {
+        case 1:
+          return 'Approved';
+        case 2:
+          return 'Rejected';
+        default:
+          return 'Pending';
+      }
+    }
+
+    return text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
   }
 
   private normalizePagedObjects(response: PagedResultDto<ObjectDto>): PagedResultDto<ObjectDto> {

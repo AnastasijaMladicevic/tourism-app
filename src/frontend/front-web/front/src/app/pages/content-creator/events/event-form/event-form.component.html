@@ -5,7 +5,7 @@
       <p class="page-intro">{{ 'contentCreator.eventForm.subtitle' | translate }}</p>
     </div>
 
-    <div class="header-actions">
+    <div class="top-actions">
       @if (isEditMode) {
         <button
           type="button"
@@ -13,18 +13,18 @@
           (click)="openDeleteModal()"
           [disabled]="isSubmitting || isDeleting || hasPendingDeletionRequest"
         >
-          <span class="material-symbols-outlined">delete</span>
+          <span class="material-symbols-outlined" aria-hidden="true">delete</span>
           {{ deleteActionLabel }}
         </button>
       }
 
-      <button type="button" class="ghost-btn" (click)="cancel()">
-        <span class="material-symbols-outlined">close</span>
-        {{ cancelLabel }}
-      </button>
-      <button type="button" class="primary-btn" (click)="submit()" [disabled]="isSubmitting">
-        <span class="material-symbols-outlined">check_circle</span>
+      <button type="button" class="primary-btn" (click)="submit()" [disabled]="isSubmitDisabled">
+        <span class="material-symbols-outlined" aria-hidden="true">check_circle</span>
         {{ submitLabel }}
+      </button>
+      <button type="button" class="ghost-btn" (click)="cancel()">
+        <span class="material-symbols-outlined" aria-hidden="true">close</span>
+        {{ cancelLabel }}
       </button>
     </div>
   </div>
@@ -361,27 +361,59 @@
   </div>
 
   @if (showTipsModal) {
-    <div class="event-delete-backdrop" (click)="closeTipsModal()">
+    <div class="tips-backdrop" (click)="closeTipsModal()">
       <section
-        class="card event-delete-modal tips-modal"
+        class="playbook-modal"
         role="dialog"
         aria-modal="true"
         aria-labelledby="tips-modal-title"
         (click)="$event.stopPropagation()"
       >
-        <h3 id="tips-modal-title">{{ 'contentCreator.eventForm.playbookTitle' | translate }}</h3>
-        <p>
-          {{ 'contentCreator.eventForm.playbookBody' | translate }}
-        </p>
-        <ul class="tips-modal-list">
-          <li>{{ 'contentCreator.eventForm.playbookTips.tip1' | translate }}</li>
-          <li>{{ 'contentCreator.eventForm.playbookTips.tip2' | translate }}</li>
-          <li>{{ 'contentCreator.eventForm.playbookTips.tip3' | translate }}</li>
-        </ul>
+        <header class="playbook-modal__header">
+          <div class="playbook-modal__header-copy">
+            <span class="playbook-modal__eyebrow">{{ 'contentCreator.eventForm.creatorTips' | translate }}</span>
+            <h3 id="tips-modal-title">{{ 'contentCreator.eventForm.playbookTitle' | translate }}</h3>
+          </div>
+          <button
+            type="button"
+            class="playbook-modal__close"
+            (click)="closeTipsModal()"
+            [attr.aria-label]="'common.close' | translate"
+          >
+            <span class="material-symbols-outlined" aria-hidden="true">close</span>
+          </button>
+        </header>
 
-        <div class="event-delete-modal-actions">
-          <button type="button" class="primary-btn" (click)="closeTipsModal()">{{ 'common.close' | translate }}</button>
+        <div class="playbook-modal__body">
+          <p class="playbook-modal__intro">{{ 'contentCreator.eventForm.playbookBody' | translate }}</p>
+
+          <ul class="playbook-modal__tips">
+            <li class="playbook-tip">
+              <span class="playbook-tip__icon" aria-hidden="true">
+                <span class="material-symbols-outlined">hub</span>
+              </span>
+              <p>{{ 'contentCreator.eventForm.playbookTips.tip1' | translate }}</p>
+            </li>
+            <li class="playbook-tip">
+              <span class="playbook-tip__icon" aria-hidden="true">
+                <span class="material-symbols-outlined">pin_drop</span>
+              </span>
+              <p>{{ 'contentCreator.eventForm.playbookTips.tip2' | translate }}</p>
+            </li>
+            <li class="playbook-tip">
+              <span class="playbook-tip__icon" aria-hidden="true">
+                <span class="material-symbols-outlined">event_available</span>
+              </span>
+              <p>{{ 'contentCreator.eventForm.playbookTips.tip3' | translate }}</p>
+            </li>
+          </ul>
         </div>
+
+        <footer class="playbook-modal__footer">
+          <button type="button" class="primary-btn playbook-modal__cta" (click)="closeTipsModal()">
+            {{ 'common.close' | translate }}
+          </button>
+        </footer>
       </section>
     </div>
   }

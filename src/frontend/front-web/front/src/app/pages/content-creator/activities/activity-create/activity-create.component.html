@@ -5,17 +5,21 @@
       <p class="intro">{{ 'contentCreator.activityForm.subtitle' | translate }}</p>
     </div>
 
-    <div class="header-actions">
+    <div class="top-actions">
       @if (isEditMode) {
         <button type="button" class="danger-btn" (click)="openDeleteModal()" [disabled]="isSubmitting || isDeleting || hasPendingDeletionRequest">
-          <span class="material-symbols-outlined">delete</span>
+          <span class="material-symbols-outlined" aria-hidden="true">delete</span>
           {{ isApprovedActivity ? (hasPendingDeletionRequest ? ('contentCreator.activityForm.delete.requested' | translate) : ('contentCreator.activityForm.delete.requestAction' | translate)) : ('contentCreator.activityForm.delete.deleteAction' | translate) }}
         </button>
       }
 
-      <button type="button" class="ghost-btn" (click)="cancel()">{{ 'common.cancel' | translate }}</button>
-      <button type="button" class="primary-btn" [disabled]="isSubmitting" (click)="submit()">
+      <button type="button" class="primary-btn" [disabled]="isSubmitDisabled" (click)="submit()">
+        <span class="material-symbols-outlined" aria-hidden="true">check_circle</span>
         {{ isSubmitting ? (isEditMode ? ('contentCreator.activityForm.updating' | translate) : ('contentCreator.activityForm.creating' | translate)) : (isEditMode ? ('contentCreator.activityForm.updateAction' | translate) : ('contentCreator.activityForm.createAction' | translate)) }}
+      </button>
+      <button type="button" class="ghost-btn" (click)="cancel()">
+        <span class="material-symbols-outlined" aria-hidden="true">close</span>
+        {{ 'common.cancel' | translate }}
       </button>
     </div>
   </header>

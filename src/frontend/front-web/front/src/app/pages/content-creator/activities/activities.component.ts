@@ -77,14 +77,14 @@ export class ContentCreatorActivitiesComponent implements OnInit, OnDestroy {
   statsTotalCount: number | null = null;
   statsPendingCount: number | null = null;
 
-  readonly statusOptions = [
+  private readonly fallbackStatusOptions: ActivityFilterOption[] = [
     { value: 'all', labelKey: 'contentCreator.activities.filters.allStatuses' },
-    { value: 'published', labelKey: 'contentCreator.activities.status.published' },
-    { value: 'draft', labelKey: 'contentCreator.activities.status.draft' },
-    { value: 'pending', labelKey: 'contentCreator.activities.status.pending' },
-    { value: 'approved', labelKey: 'contentCreator.activities.status.approved' },
-    { value: 'archived', labelKey: 'contentCreator.activities.status.archived' }
+    { value: 'Approved', labelKey: 'contentCreator.activities.status.approved' },
+    { value: 'Pending', labelKey: 'contentCreator.activities.status.pending' },
+    { value: 'Rejected', labelKey: 'contentCreator.activities.status.rejected' }
   ];
+
+  statusOptions: ActivityFilterOption[] = [...this.fallbackStatusOptions];
 
   readonly sortByOptions = [
     { value: 'name', labelKey: 'contentCreator.objects.filters.name' },
@@ -523,11 +523,13 @@ export class ContentCreatorActivitiesComponent implements OnInit, OnDestroy {
             return Array.isArray(response) ? response : (response.items ?? []);
           }),
           catchError(() => of([] as DestinationDto[]))
-        )
+        ),
+      statuses: this.activitiesService.getMyFilterOptions().pipe(catchError(() => of({ statusOptions: [] })))
     }).subscribe({
-      next: ({ activityTypes, destinations }) => {
+      next: ({ activityTypes, destinations, statuses }) => {
         this.typeOptions = activityTypes.map((type) => ({ value: type.originalName, label: type.name }));
         this.destinationOptions = this.toFilterOptions(destinations.map((destination) => destination.name));
+        this.statusOptions = this.buildStatusFilterOptions(statuses.statusOptions);
 
         if (this.typeFilter !== 'all' && !this.typeOptions.some((option) => option.value === this.typeFilter)) {
           this.typeFilter = 'all';
@@ -540,14 +542,33 @@ export class ContentCreatorActivitiesComponent implements OnInit, OnDestroy {
           this.destinationFilter = 'all';
         }
 
+        if (this.statusFilter !== 'all' && !this.statusOptions.some((option) => option.value === this.statusFilter)) {
+          this.statusFilter = 'all';
+        }
+
         this.cdr.detectChanges();
       },
       error: () => {
         this.typeOptions = [];
         this.destinationOptions = [];
+        this.statusOptions = [...this.fallbackStatusOptions];
         this.cdr.detectChanges();
       }
     });
+  }
+
+  private buildStatusFilterOptions(statusOptions: Array<{ value: string }>): ActivityFilterOption[] {
+    if (statusOptions.length === 0) {
+      return [...this.fallbackStatusOptions];
+    }
+
+    return [
+      { value: 'all', labelKey: 'contentCreator.activities.filters.allStatuses' },
+      ...statusOptions.map((option) => ({
+        value: option.value,
+        labelKey: `contentCreator.activities.status.${option.value.trim().toLowerCase()}`
+      }))
+    ];
   }
 
   private setSelectedActivity(activity: ActivityDto | null): void {

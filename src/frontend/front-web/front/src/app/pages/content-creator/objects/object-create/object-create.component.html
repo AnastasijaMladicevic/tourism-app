@@ -24,7 +24,8 @@
             }}
           </button>
         }
-        <button type="submit" class="primary-btn" [disabled]="isSubmitting || isLoadingOptions" form="create-object-form">
+        <button type="submit" class="primary-btn" [disabled]="isSubmitDisabled" form="create-object-form">
+          <span class="material-symbols-outlined" aria-hidden="true">check_circle</span>
           {{
             isSubmitting
               ? (isEditMode ? ('common.saving' | translate) : ('contentCreatorObjectForm.creating' | translate))
@@ -50,14 +51,18 @@
           type="button"
           class="primary-btn review-approve-btn"
           (click)="approveObject()"
+          [class.approved-locked]="isReviewApproved"
+          [attr.title]="isReviewApproved ? ('manager.eventReview.alreadyApproved' | translate) : null"
           [disabled]="approveActionDisabled"
-          [class.approved-locked]="reviewStatusKey === 'approved'"
         >
           <span class="material-symbols-outlined" aria-hidden="true">thumb_up</span>
           {{ 'contentCreatorObjectForm.review.approve' | translate }}
         </button>
       } @else {
-        <button type="button" class="ghost-btn" [routerLink]="objectsListPath">{{ 'common.cancel' | translate }}</button>
+        <button type="button" class="ghost-btn" [routerLink]="objectsListPath">
+          <span class="material-symbols-outlined" aria-hidden="true">close</span>
+          {{ 'common.cancel' | translate }}
+        </button>
       }
     </div>
   </header>

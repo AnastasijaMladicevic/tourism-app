@@ -97,11 +97,9 @@ export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
 
   private readonly fallbackStatusOptions: EventFilterOption[] = [
     { value: 'all', labelKey: 'contentCreator.events.filters.allStatuses' },
-    { value: 'published', labelKey: 'contentCreator.events.status.published' },
-    { value: 'draft', labelKey: 'contentCreator.events.status.draft' },
-    { value: 'pending', labelKey: 'contentCreator.events.status.pending' },
-    { value: 'approved', labelKey: 'contentCreator.events.status.approved' },
-    { value: 'cancelled', labelKey: 'contentCreator.events.status.cancelled' }
+    { value: 'Approved', labelKey: 'contentCreator.events.status.approved' },
+    { value: 'Pending', labelKey: 'contentCreator.events.status.pending' },
+    { value: 'Rejected', labelKey: 'contentCreator.events.status.rejected' }
   ];
 
   categoryOptions = [...this.fallbackCategoryOptions];
@@ -117,6 +115,7 @@ export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadCategoryOptions();
+    this.loadStatusOptions();
     this.loadEvents();
     this.loadUpcomingThisWeekStat();
   }
@@ -702,15 +701,53 @@ export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
     });
   }
 
+  private loadStatusOptions(): void {
+    this.eventService.getMyFilterOptions().subscribe({
+      next: ({ statusOptions }) => {
+        this.applyStatusFilterOptions(statusOptions);
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.statusOptions = [...this.fallbackStatusOptions];
+      }
+    });
+  }
+
   private syncStatusOptionsFromEvents(): void {
-    const dynamicStatuses = this.events
-      .map((event) => event.status?.trim())
+    const existingValues = new Set(
+      this.statusOptions
+        .filter((option) => option.value !== 'all')
+        .map((option) => option.value.toLowerCase())
+    );
+
+    const mergedStatuses = [...this.statusOptions.filter((option) => option.value !== 'all')];
+
+    for (const event of this.events) {
+      const status = event.status?.trim();
+      if (!status || existingValues.has(status.toLowerCase())) {
+        continue;
+      }
+
+      existingValues.add(status.toLowerCase());
+      mergedStatuses.push({
+        value: status,
+        labelKey: `contentCreator.events.status.${status.toLowerCase()}`
+      });
+    }
+
+    mergedStatuses.sort((a, b) => a.value.localeCompare(b.value));
+    this.applyStatusFilterOptions(mergedStatuses.map((option) => ({ value: option.value, label: option.value })));
+  }
+
+  private applyStatusFilterOptions(statusOptions: Array<{ value: string; label?: string }>): void {
+    const dynamicStatuses = statusOptions
+      .map((option) => option.value?.trim())
       .filter((status): status is string => !!status)
       .filter((status, index, all) => all.findIndex((x) => x.toLowerCase() === status.toLowerCase()) === index)
       .sort((a, b) => a.localeCompare(b))
       .map((status) => ({
-        value: status.toLowerCase(),
-        label: this.humanizeStatus(status)
+        value: status,
+        labelKey: `contentCreator.events.status.${status.toLowerCase()}`
       }));
 
     this.statusOptions = dynamicStatuses.length > 0

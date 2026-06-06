@@ -656,7 +656,7 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
 
   onRowAction(obj: ObjectDto, event: Event): void {
     event.stopPropagation();
-    this.router.navigate(['/manager/objects/review', obj.id]);
+    this.navigateToObjectReview(obj);
   }
 
   onOpenSelectedObjectReview(): void {
@@ -664,7 +664,13 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.router.navigate(['/manager/objects/review', this.selectedObject.id]);
+    this.navigateToObjectReview(this.selectedObject);
+  }
+
+  private navigateToObjectReview(obj: ObjectDto): void {
+    this.router.navigate(['/manager/objects/review', obj.id], {
+      state: { objectStatus: obj.status ?? '' }
+    });
   }
 
   get selectedObjectReviewsPreview(): ManagerObjectReviewThread[] {

@@ -412,6 +412,10 @@
             </ul>
           }
 
+          @if (managerErrorMessage) {
+            <div class="alert alert-error inline-field-error" role="alert">{{ managerErrorMessage }}</div>
+          }
+
           @if (selectedManager) {
             <div class="selected-managers">
               <div class="selected-manager-card">

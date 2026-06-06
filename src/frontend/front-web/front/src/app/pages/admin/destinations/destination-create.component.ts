@@ -93,6 +93,9 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
   managerSuggestionsOpen = false;
   managerSuggestionsLoading = false;
   selectedManager: AdminUserListItemDto | null = null;
+  managerErrorMessage = '';
+  private managerAssignments = new Map<number, { destinationId: number; destinationName: string }>();
+  private managerAssignmentsLoaded = false;
   locationLookupState: 'idle' | 'loading' | 'resolved' | 'not_found' | 'error' = 'idle';
   locationLookupMessage = '';
 
@@ -224,18 +227,12 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
         this.scrollPageToTop();
       });
 
+    this.loadManagerAssignments();
+
     this.managerSearchInput$
       .pipe(
         switchMap((term) => {
           const q = term.trim();
-          if (!q) {
-            this.managerSuggestions = [];
-            this.managerSuggestionsLoading = false;
-            this.managerSuggestionsOpen = false;
-            this.cdr.detectChanges();
-            return of(null);
-          }
-
           this.managerSuggestionsOpen = true;
           this.managerSuggestionsLoading = true;
           this.cdr.detectChanges();
@@ -259,9 +256,6 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
         takeUntil(this.destroy$)
       )
       .subscribe((page) => {
-        if (!page) {
-          return;
-        }
         this.managerSuggestions = this.filterManagerSuggestions(page.items, this.managerSearch);
         this.managerSuggestionsOpen = true;
         this.cdr.detectChanges();
@@ -472,20 +466,79 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
   }
 
   onManagerSearchInput(value: string): void {
-    const normalized = value.trim();
-    this.managerSuggestionsOpen = normalized.length > 0;
-    this.managerSuggestionsLoading = normalized.length > 0;
     this.managerSearchInput$.next(value);
   }
 
   onManagerSearchFocus(): void {
-    const q = this.managerSearch.trim();
-    if (!q) {
-      this.onManagerSearchInput('');
+    this.managerSuggestionsOpen = true;
+    this.managerSearchInput$.next(this.managerSearch);
+  }
+
+  private loadManagerAssignments(): void {
+    if (this.managerAssignmentsLoaded) {
       return;
     }
-    this.managerSuggestionsOpen = true;
-    this.onManagerSearchInput(q);
+    this.destinationService
+      .getAll({ page: 1, pageSize: 500, sortBy: 'name', sortOrder: 'asc' }, { bypassRegion: true })
+      .pipe(
+        catchError(() => of([] as DestinationDto[])),
+        takeUntil(this.destroy$)
+      )
+      .subscribe((destinations) => {
+        this.managerAssignmentsLoaded = true;
+        this.managerAssignments.clear();
+        for (const destination of destinations) {
+          const managerId = destination.managedByUserId;
+          if (managerId == null) {
+            continue;
+          }
+          this.managerAssignments.set(managerId, {
+            destinationId: destination.id,
+            destinationName: destination.name
+          });
+        }
+        this.cdr.detectChanges();
+      });
+  }
+
+  private validateManagerAssignment(user: AdminUserListItemDto): string | null {
+    const assignment = this.managerAssignments.get(user.id);
+    if (!assignment) {
+      return null;
+    }
+
+    if (this.isEditMode && assignment.destinationId === this.editDestinationId) {
+      return null;
+    }
+
+    return this.t('adminDestinationForm.errors.managerAlreadyAssigned', {
+      destination: assignment.destinationName
+    });
+  }
+
+  private setManagerError(message: string): void {
+    this.managerErrorMessage = message;
+    this.errorMessage = message;
+    this.cdr.detectChanges();
+    this.scrollPageToTop();
+  }
+
+  private showFormError(message: string): void {
+    this.errorMessage = message;
+    this.managerErrorMessage = '';
+    this.cdr.detectChanges();
+    this.scrollPageToTop();
+  }
+
+  private clearManagerError(): void {
+    if (!this.managerErrorMessage) {
+      return;
+    }
+    const previousMessage = this.managerErrorMessage;
+    this.managerErrorMessage = '';
+    if (this.errorMessage === previousMessage) {
+      this.errorMessage = '';
+    }
   }
 
   private filterManagerSuggestions(
@@ -513,14 +566,25 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
   }
 
   selectManager(user: AdminUserListItemDto): void {
+    const managerError = this.validateManagerAssignment(user);
+    if (managerError) {
+      this.setManagerError(managerError);
+      return;
+    }
+
+    this.managerErrorMessage = '';
+    this.errorMessage = '';
     this.selectedManager = user;
     this.managerSearch = '';
     this.managerSuggestions = [];
     this.managerSuggestionsOpen = false;
+    this.cdr.detectChanges();
   }
 
   clearSelectedManager(): void {
     this.selectedManager = null;
+    this.clearManagerError();
+    this.cdr.detectChanges();
   }
 
   displayName(user: AdminUserListItemDto): string {
@@ -885,7 +949,13 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
       this.errorMessage = this.t('adminDestinationForm.errors.selectManager');
       return false;
     }
+    const managerError = this.validateManagerAssignment(this.selectedManager);
+    if (managerError) {
+      this.setManagerError(managerError);
+      return false;
+    }
     this.errorMessage = '';
+    this.managerErrorMessage = '';
     return true;
   }
 
@@ -962,15 +1032,19 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
             )
           );
         }),
-        finalize(() => (this.isSubmitting = false))
+        finalize(() => {
+          this.isSubmitting = false;
+          this.cdr.detectChanges();
+        })
       )
       .subscribe({
         next: (out) => {
           if (!out.assigned) {
-            if (!out.imageUploadFailed) {
-              this.resetPendingImages();
-            }
-            this.router.navigate(['/admin/destinations']);
+            const assignError =
+              'assignError' in out && typeof out.assignError === 'string'
+                ? out.assignError
+                : this.t('adminDestinationForm.errors.assignManagerFailed');
+            this.setManagerError(assignError);
             return;
           }
           this.router.navigate(['/admin/destinations']);
@@ -980,10 +1054,16 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
           if (lockState) {
             this.applyEditLockState(lockState);
             this.errorMessage = '';
+            this.managerErrorMessage = '';
             this.cdr.detectChanges();
             return;
           }
-          this.errorMessage = this.extractApiErrorMessage(err);
+          const message = this.extractApiErrorMessage(err);
+          if (this.isManagerAssignmentError(err, message)) {
+            this.setManagerError(message);
+            return;
+          }
+          this.showFormError(message);
         }
       });
   }
@@ -1049,6 +1129,23 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
     this.imageFiles = [];
     this.imagePreviews = [];
     this.primaryPreviewImageIndex = this.destinationImages.length > 0 ? null : 0;
+  }
+
+  private isManagerAssignmentError(err: unknown, message: string): boolean {
+    const status = (err as { status?: number })?.status;
+    if (status === 422) {
+      return true;
+    }
+    const normalized = message.trim().toLowerCase();
+    return (
+      normalized.includes('already assigned') ||
+      normalized.includes('already manages') ||
+      normalized.includes('menadžer već') ||
+      normalized.includes('menadzer vec') ||
+      normalized.includes('manages only one') ||
+      normalized.includes('jedan menadzer') ||
+      normalized.includes('jedan menadžer')
+    );
   }
 
   private extractLockState(err: unknown): DestinationEditLockDto | null {

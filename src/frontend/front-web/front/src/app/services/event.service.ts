@@ -17,6 +17,7 @@ import {
 import { environment } from '../../environment/environment';
 import { ActiveRegionService, RegionRequestOptions } from './active-region';
 import { normalizeEntityMedia, normalizeMediaRow, normalizeMediaRows } from '../shared/utils/media-url';
+import { FilterOption } from './object';
 import { TranslationService } from './translation.service';
 export interface EventImageDto {
   id: number;
@@ -186,6 +187,18 @@ export class EventService {
     );
   }
 
+  getMyFilterOptions(): Observable<{ statusOptions: FilterOption[] }> {
+    const query = { page: 1, pageSize: 500, sortBy: 'status', sortOrder: 'asc' };
+    return this.getMy(query).pipe(
+      map((response) => ({
+        statusOptions: this.toUniqueOptions(
+          (response?.items ?? []).map((item) => item.status),
+          (value) => this.toTitleCase(value)
+        )
+      }))
+    );
+  }
+
   /**
    * Get event by ID
    */
@@ -348,5 +361,27 @@ export class EventService {
       ...response,
       items: (response?.items ?? []).map((event) => this.normalizeEvent(event))
     };
+  }
+
+  private toUniqueOptions(values: Array<string | undefined>, mapLabel: (value: string) => string): FilterOption[] {
+    const unique = values
+      .map((value) => value?.trim())
+      .filter((value): value is string => !!value)
+      .filter((value, index, all) => all.findIndex((x) => x.toLowerCase() === value.toLowerCase()) === index)
+      .sort((a, b) => a.localeCompare(b));
+
+    return unique.map((value) => ({
+      value,
+      label: mapLabel(value)
+    }));
+  }
+
+  private toTitleCase(value: string): string {
+    return value
+      .toLowerCase()
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
   }
 }

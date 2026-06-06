@@ -100,11 +100,9 @@ export class ContentCreatorObjectsComponent implements OnInit, OnDestroy {
   ];
 
   private readonly fallbackStatusOptions: ObjectFilterOption[] = [
-    { value: 'published', labelKey: 'contentCreator.objects.status.published' },
-    { value: 'approved', labelKey: 'contentCreator.objects.status.approved' },
-    { value: 'pending', labelKey: 'contentCreator.objects.status.pending' },
-    { value: 'draft', labelKey: 'contentCreator.objects.status.draft' },
-    { value: 'rejected', labelKey: 'contentCreator.objects.status.rejected' }
+    { value: 'Approved', labelKey: 'contentCreator.objects.status.approved' },
+    { value: 'Pending', labelKey: 'contentCreator.objects.status.pending' },
+    { value: 'Rejected', labelKey: 'contentCreator.objects.status.rejected' }
   ];
 
   statusOptions: ObjectFilterOption[] = [...this.fallbackStatusOptions];
@@ -690,12 +688,16 @@ export class ContentCreatorObjectsComponent implements OnInit, OnDestroy {
 
   private loadFilterOptions(): void {
     this.objectService.getMyFilterOptions().subscribe({
-      next: ({ typeOptions }) => {
+      next: ({ typeOptions, statusOptions }) => {
         this.typeOptions = typeOptions;
-        this.statusOptions = [...this.fallbackStatusOptions];
+        this.statusOptions = this.buildStatusFilterOptions(statusOptions);
 
         if (this.typeFilter !== 'all' && !this.typeOptions.some((option) => option.value === this.typeFilter)) {
           this.typeFilter = 'all';
+        }
+
+        if (this.statusFilter !== 'all' && !this.statusOptions.some((option) => option.value === this.statusFilter)) {
+          this.statusFilter = 'all';
         }
 
         this.cdr.detectChanges();
@@ -705,5 +707,16 @@ export class ContentCreatorObjectsComponent implements OnInit, OnDestroy {
         this.statusOptions = [...this.fallbackStatusOptions];
       }
     });
+  }
+
+  private buildStatusFilterOptions(statusOptions: FilterOption[]): ObjectFilterOption[] {
+    if (statusOptions.length === 0) {
+      return [...this.fallbackStatusOptions];
+    }
+
+    return statusOptions.map((option) => ({
+      value: option.value,
+      labelKey: `contentCreator.objects.status.${option.value.trim().toLowerCase()}`
+    }));
   }
 }
