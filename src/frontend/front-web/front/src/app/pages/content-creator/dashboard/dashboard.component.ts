@@ -269,13 +269,13 @@ export class ContentCreatorDashboardComponent implements OnInit {
     }
   }
 
-  getTopDestinationMapQuery(item: DestinationPerformance): { destinationId: number } | null {
+  getTopDestinationMapQuery(item: DestinationPerformance): { destinationId: number; destinationName: string } | null {
     const destinationId = Number(item.destinationId);
     if (!Number.isFinite(destinationId) || destinationId <= 0) {
       return null;
     }
 
-    return { destinationId };
+    return { destinationId, destinationName: item.destinationName ?? '' };
   }
 
   getUpcomingEventRoute(event: ContentCreatorDashboardUpcomingEventItemDto): Array<string | number> | null {

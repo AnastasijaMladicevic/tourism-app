@@ -94,6 +94,7 @@ export class ContentCreatorMapComponent implements OnInit, AfterViewInit, OnDest
 
   private allItems: SearchResult[] = [];
   private readonly focusedDestinationId: number | null;
+  private readonly focusedDestinationName: string | null;
   private readonly markerClickHandler = (event: Event) => {
     const customEvent = event as CustomEvent<{ data: any; type: string }>;
 
@@ -121,6 +122,7 @@ export class ContentCreatorMapComponent implements OnInit, AfterViewInit, OnDest
     private translationService: TranslationService,
   ) {
     this.focusedDestinationId = this.parsePositiveInt(this.route.snapshot.queryParamMap.get('destinationId'));
+    this.focusedDestinationName = this.route.snapshot.queryParamMap.get('destinationName');
   }
 
   ngOnInit(): void {
@@ -526,10 +528,10 @@ export class ContentCreatorMapComponent implements OnInit, AfterViewInit, OnDest
               this.cdr.detectChanges();
             });
           }, 100);
-        } else if (this.focusedDestinationId) {
+        } else if (this.focusedDestinationId || this.focusedDestinationName) {
           setTimeout(() => {
             this.ngZone.run(() => {
-              this.focusDestinationContent(this.focusedDestinationId!);
+              this.focusDestinationContent(this.focusedDestinationId ?? 0, this.focusedDestinationName);
               this.cdr.detectChanges();
             });
           }, 100);
@@ -591,10 +593,17 @@ export class ContentCreatorMapComponent implements OnInit, AfterViewInit, OnDest
     };
   }
 
-  private focusDestinationContent(destinationId: number): void {
+  private focusDestinationContent(destinationId: number, destinationName: string | null = null): void {
+    const nameLower = destinationName?.toLowerCase() ?? null;
     const matches = this.allItems.filter((item) => {
-      const itemDestinationId = Number(item.raw?.destinationId ?? 0);
-      return itemDestinationId === destinationId && item.lat != null && item.lng != null;
+      if (item.lat == null || item.lng == null) return false;
+      const itemDestId = Number(item.raw?.destinationId ?? 0);
+      if (destinationId > 0 && itemDestId === destinationId) return true;
+      if (nameLower) {
+        const rawName = (item.raw?.destinationName ?? '').toLowerCase();
+        if (rawName && rawName === nameLower) return true;
+      }
+      return false;
     });
 
     if (!matches.length) {
