@@ -39,6 +39,10 @@ export class DestinationDetailComponent implements OnInit, OnDestroy {
   private favoritePendingIds = new Set<number>();
   private touchStartX = 0;
   private touchEndX = 0;
+  private readonly handleFavoriteObject = (event: any): void => {
+    const obj = event.detail;
+    if (obj) { this.toggleFavorite(obj, new Event('click')); }
+  };
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -82,16 +86,12 @@ export class DestinationDetailComponent implements OnInit, OnDestroy {
       }
     });
     window.addEventListener('focus', this.handleWindowFocus);
-    window.addEventListener('favorite-object', (event: any) => {
-      const obj = event.detail;
-      if (obj) {
-        this.toggleFavorite(obj, new Event('click'));
-      }
-    });
+    window.addEventListener('favorite-object', this.handleFavoriteObject);
     this.cdr.detectChanges();
   }
   ngOnDestroy(): void {
     window.removeEventListener('focus', this.handleWindowFocus);
+    window.removeEventListener('favorite-object', this.handleFavoriteObject);
     this.titleObserver?.disconnect();
   }
 

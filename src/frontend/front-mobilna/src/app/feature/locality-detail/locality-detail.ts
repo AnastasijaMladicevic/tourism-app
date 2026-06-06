@@ -1,6 +1,7 @@
-import { ChangeDetectorRef, Component, ElementRef, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { catchError, forkJoin, of } from 'rxjs';
+import { catchError, forkJoin, of, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 import { LocalityService, LocalityDto, PagedLocalityResultDto } from '../../services/locality';
 import { ImageService, ImageDto } from '../../services/image';
@@ -20,7 +21,7 @@ import { QrLinkDto, QrLinkService } from '../../services/qr-link';
   templateUrl: './locality-detail.html',
   styleUrl: './locality-detail.scss',
 })
-export class LocalityDetailComponent implements OnInit {
+export class LocalityDetailComponent implements OnInit, OnDestroy {
   showGalleryModal = false;
   currentImageIndex = 0;
   locality: LocalityDto | null = null;
@@ -40,6 +41,11 @@ export class LocalityDetailComponent implements OnInit {
   private favoritePendingIds = new Set<number>();
   private touchStartX = 0;
   private touchEndX = 0;
+  private readonly destroy$ = new Subject<void>();
+  private readonly handleFavoriteObject = (event: any): void => {
+    const obj = event.detail;
+    if (obj) { this.toggleFavorite(obj, new Event('click')); }
+  };
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -55,7 +61,7 @@ export class LocalityDetailComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.route.paramMap.subscribe(params => {
+    this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
       const id = Number(params.get('id'));
 
       if (!id) return;
@@ -63,16 +69,14 @@ export class LocalityDetailComponent implements OnInit {
       this.loadLocality(id);
     });
     window.addEventListener('focus', this.handleWindowFocus);
-    window.addEventListener('favorite-object', (event: any) => {
-      const obj = event.detail;
-      if (obj) {
-        this.toggleFavorite(obj, new Event('click'));
-      }
-    });
+    window.addEventListener('favorite-object', this.handleFavoriteObject);
     this.cdr.detectChanges();
   }
   ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
     window.removeEventListener('focus', this.handleWindowFocus);
+    window.removeEventListener('favorite-object', this.handleFavoriteObject);
     this.titleObserver?.disconnect();
   }
 

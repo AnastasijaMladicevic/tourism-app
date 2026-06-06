@@ -3,7 +3,8 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { catchError, forkJoin, of } from 'rxjs';
+import { catchError, forkJoin, of, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 import {
   EventDto,
@@ -50,6 +51,11 @@ export class EventDetailComponent implements OnInit, OnDestroy {
   private observerSetup = false;
   private touchStartX = 0;
   private touchEndX = 0;
+  private readonly destroy$ = new Subject<void>();
+  private readonly handleAddToPlanner = (event: any): void => {
+    const obj = event.detail;
+    if (obj) { this.addToPlanner(); }
+  };
 
   get ticketTypesForDisplay(): Array<{ name: string; price?: number }> {
     if (!this.event) {
@@ -90,24 +96,22 @@ export class EventDetailComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
-    this.route.paramMap.subscribe(params => {
+    this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
       const id = Number(params.get('id'));
       if (!id) return;
 
       this.loadEvent(id);
     });
     window.addEventListener('focus', this.handleWindowFocus);
-    window.addEventListener('add-to-planner', (event: any) => {
-      const obj = event.detail;
-      if (obj) {
-        this.addToPlanner();
-      }
-    });
+    window.addEventListener('add-to-planner', this.handleAddToPlanner);
     this.cdr.detectChanges();
   }
 
   ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
     window.removeEventListener('focus', this.handleWindowFocus);
+    window.removeEventListener('add-to-planner', this.handleAddToPlanner);
     this.titleObserver?.disconnect();
   }
 
