@@ -1034,6 +1034,7 @@ export class EventFormComponent implements OnInit, OnDestroy {
   private refreshSubmitDisabled(): void {
     this.submitDisabled =
       this.isSubmitting ||
+      this.form.invalid ||
       !this.hasRequiredCreateFields;
   }
 
