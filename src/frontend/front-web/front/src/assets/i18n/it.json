@@ -2017,6 +2017,7 @@
     "passwordSecurityHint": "Si consiglia di aggiornare regolarmente la password per la sicurezza dell'account.",
     "changePassword": "Cambia password",
     "changesSaved": "Modifiche salvate",
+    "saveError": "Salvataggio delle modifiche non riuscito. Riprovare.",
     "saving": "Salvataggio...",
     "saveChanges": "Salva modifiche",
     "rolePermissions": "Permessi del ruolo",

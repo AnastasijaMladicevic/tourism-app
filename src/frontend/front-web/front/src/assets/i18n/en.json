@@ -2052,6 +2052,7 @@
     "passwordSecurityHint": "Regular password updates are recommended for account security.",
     "changePassword": "Change Password",
     "changesSaved": "Changes saved",
+    "saveError": "Failed to save changes. Please try again.",
     "saving": "Saving...",
     "saveChanges": "Save Changes",
     "rolePermissions": "Role permissions",

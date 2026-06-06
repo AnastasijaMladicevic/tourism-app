@@ -2017,6 +2017,7 @@
     "passwordSecurityHint": "Redovno ažuriranje lozinke se preporučuje radi bezbednosti naloga.",
     "changePassword": "Promeni lozinku",
     "changesSaved": "Izmene su sačuvane",
+    "saveError": "Čuvanje izmena nije uspelo. Pokušajte ponovo.",
     "saving": "Čuvanje...",
     "saveChanges": "Sačuvaj izmene",
     "rolePermissions": "Dozvole uloge",
