@@ -319,8 +319,12 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
     return this.reviewStatusKey === 'approved';
   }
 
+  get isReviewRejected(): boolean {
+    return this.reviewStatusKey === 'rejected';
+  }
+
   get approveActionDisabled(): boolean {
-    return this.isReviewSubmitting || !this.objectId || this.isReviewApproved;
+    return this.isReviewSubmitting || !this.objectId || this.isReviewApproved || this.isReviewRejected;
   }
 
   get declineActionDisabled(): boolean {
