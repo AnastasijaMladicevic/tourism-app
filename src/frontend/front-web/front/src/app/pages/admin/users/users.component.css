@@ -608,6 +608,7 @@
   filter: drop-shadow(0 2px 10px rgba(15, 23, 42, 0.07));
 }
 
+
 .origin-pie-legend {
   list-style: none;
   margin: 0;
@@ -638,6 +639,21 @@
 .origin-pie-legend-name {
   font-weight: 600;
   color: #111827;
+}
+
+.origin-pie-legend-name--link {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-weight: 600;
+  color: #111827;
+  text-align: left;
+  transition: color 0.15s ease;
+}
+
+.origin-pie-legend-name--link:hover {
+  color: #1976d2;
   min-width: 0;
 }
 

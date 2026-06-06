@@ -313,8 +313,8 @@
               <ul class="origin-pie-legend">
                 <li *ngFor="let slice of originsPieSlices" class="origin-pie-legend-row">
                   <span class="origin-pie-swatch" [style.background]="slice.color"></span>
-                  <span class="origin-pie-legend-name">{{ slice.name }}</span>
-                  <span class="origin-pie-legend-meta">{{ slice.users }} Â· {{ slice.shareLabel }}</span>
+                  <button class="origin-pie-legend-name origin-pie-legend-name--link" (click)="onOriginNameClick(slice.name)">{{ slice.name }}</button>
+                  <span class="origin-pie-legend-meta">{{ slice.users }} · {{ slice.shareLabel }}</span>
                 </li>
               </ul>
             </div>
