@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { finalize } from 'rxjs';
+import { finalize, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { UserDto } from '../../../models/user.model';
 import { AuthService } from '../../../services/auth.service';
 import {
@@ -106,12 +107,13 @@ const ADMIN_DASHBOARD_PERIOD_STORAGE_KEY = 'admin-dashboard-selected-period';
     '../shared/admin-page-stats-scroll.css'
   ],
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
   private readonly authService = inject(AuthService);
   private readonly adminDashboardService = inject(AdminDashboardService);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly translationService = inject(TranslationService);
   private readonly router = inject(Router);
+  private readonly destroy$ = new Subject<void>();
 
   readonly periodOptions = PERIOD_OPTIONS;
 
@@ -148,6 +150,11 @@ export class DashboardComponent implements OnInit {
     this.user = this.authService.getUser();
     this.selectedPeriod = this.readSavedPeriod();
     this.loadOverview();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   selectPeriod(period: DashboardPeriod): void {
@@ -201,6 +208,7 @@ export class DashboardComponent implements OnInit {
     this.adminDashboardService
       .getOverview(this.selectedPeriod)
       .pipe(
+        takeUntil(this.destroy$),
         finalize(() => {
           this.isLoading = false;
           this.cdr.detectChanges();

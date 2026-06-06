@@ -4,8 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { PaginatorComponent } from '../../../shared/components/paginator/paginator';
 import { ActivatedRoute, Router } from '@angular/router';
-import { forkJoin, Observable, of } from 'rxjs';
-import { catchError, finalize, map, switchMap } from 'rxjs/operators';
+import { forkJoin, Observable, of, Subject } from 'rxjs';
+import { catchError, finalize, map, switchMap, takeUntil } from 'rxjs/operators';
 import { MapComponent as SharedMapComponent } from '../../../shared/components/map/map';
 import { AdminUserListItemDto, AdminUsersService } from '../../../services/admin-users.service';
 import {
@@ -75,6 +75,7 @@ export class DestinationsComponent implements OnInit, OnDestroy {
   private readonly translationService = inject(TranslationService);
 
   private readonly objectsUrl = `${environment.apiUrl}/objects`;
+  private readonly destroy$ = new Subject<void>();
 
   private allDestinations: AdminDestinationRow[] = [];
 
@@ -118,6 +119,8 @@ export class DestinationsComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     this.stopHeroImageRotation();
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   get statusFilterOptions(): { value: string; label: string }[] {
@@ -302,8 +305,12 @@ export class DestinationsComponent implements OnInit, OnDestroy {
       this.normalizeImageUrl(this.selectedDestination.mainImageUrl) ||
       this.normalizeImageUrl('/assets/pozadina.png');
 
-    this.destinationService.getImages(this.selectedDestination.id).subscribe({
+    const requestedId = this.selectedDestination.id;
+    this.destinationService.getImages(requestedId).pipe(takeUntil(this.destroy$)).subscribe({
       next: (images: DestinationImageDto[]) => {
+        if (this.selectedDestination?.id !== requestedId) {
+          return;
+        }
         const orderedUrls = (images ?? [])
           .slice()
           .sort((a, b) => Number(b.isMain) - Number(a.isMain))
@@ -321,6 +328,9 @@ export class DestinationsComponent implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       },
       error: () => {
+        if (this.selectedDestination?.id !== requestedId) {
+          return;
+        }
         this.heroImageUrls = fallbackUrl ? [fallbackUrl] : [];
         this.currentHeroImageIndex = 0;
         this.cdr.detectChanges();

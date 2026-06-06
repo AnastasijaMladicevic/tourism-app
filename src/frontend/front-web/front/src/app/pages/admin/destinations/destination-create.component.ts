@@ -314,7 +314,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
     this.primaryPreviewImageIndex = this.destinationImages.length > 0 ? null : 0;
 
     if (destination.managedByUserId) {
-      this.adminUsersService.getUserById(destination.managedByUserId).subscribe({
+      this.adminUsersService.getUserById(destination.managedByUserId).pipe(takeUntil(this.destroy$)).subscribe({
         next: (user) => {
           this.selectedManager = {
             id: Number(user.id ?? destination.managedByUserId),
