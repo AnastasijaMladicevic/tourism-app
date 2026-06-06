@@ -648,7 +648,7 @@ export class UsersComponent implements OnInit {
       id: u.id,
       name: `${u.firstName} ${u.lastName}`.trim(),
       email: u.email,
-      origin: (u.country ?? '').trim() || this.t('adminUsers.unknown'),
+      origin: this.normalizeCountryName((u.country ?? '').trim() || this.t('adminUsers.unknown')),
       status: u.isBanned ? 'banned' : (u.isActive ? 'active' : 'inactive'),
       joinedDate: this.formatDate(u.createdAt),
       profileImageUrl: (u.profileImageUrl ?? '').trim() || null,
@@ -1299,10 +1299,19 @@ export class UsersComponent implements OnInit {
   }
 
   /** Country histogram for a user list (tourists or internal team). */
+  private normalizeCountryName(raw: string): string {
+    const lower = raw.toLowerCase();
+    if (lower === 'montenegro' || lower === 'crna gora') {
+      return 'Crna Gora';
+    }
+    return raw;
+  }
+
   private buildTopOrigins(users: AdminUserListItemDto[]): { name: string; users: number; barPercent: number }[] {
     const counts = new Map<string, number>();
     for (const user of users) {
-      const country = (user.country ?? '').trim() || this.t('adminUsers.unknown');
+      const raw = (user.country ?? '').trim() || this.t('adminUsers.unknown');
+      const country = this.normalizeCountryName(raw);
       counts.set(country, (counts.get(country) ?? 0) + 1);
     }
     const rows = [...counts.entries()]
