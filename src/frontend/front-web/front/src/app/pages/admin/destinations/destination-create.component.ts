@@ -659,29 +659,8 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
     if (!query || query.length < 2) {
       this.locationLookupState = 'idle';
       this.locationLookupMessage = '';
-      return;
     }
-
-    this.locationLookupState = 'loading';
-    this.locationLookupMessage = this.t('adminDestinationForm.locationLookup.searching');
-    this.lookupCoordinatesByName(query).subscribe((result) => {
-      if (!result) {
-        return;
-      }
-      if (result.kind === 'resolved') {
-        this.form.latitude = Number(result.lat.toFixed(6));
-        this.form.longitude = Number(result.lng.toFixed(6));
-        this.locationLookupState = 'resolved';
-        this.locationLookupMessage = this.t('adminDestinationForm.locationLookup.matched', { label: result.label });
-      } else if (result.kind === 'not_found') {
-        this.locationLookupState = 'not_found';
-        this.locationLookupMessage = this.t('adminDestinationForm.locationLookup.notFound');
-      } else {
-        this.locationLookupState = 'error';
-        this.locationLookupMessage = this.t('adminDestinationForm.locationLookup.unavailable');
-      }
-      this.cdr.detectChanges();
-    });
+    this.destinationNameInput$.next(value);
   }
 
   onRegionChange(): void {
