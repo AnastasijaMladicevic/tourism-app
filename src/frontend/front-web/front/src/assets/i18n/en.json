@@ -662,6 +662,8 @@
     "noEngagement": "No engagement activity was recorded for this period.",
     "favoritesInPeriod": "Favorites in period",
     "plannerAdds": "Planner adds",
+    "favorites": "Favorites",
+    "reviews": "Reviews",
     "newReviews": "New reviews",
     "contentStatus": "Content status",
     "contentStatusHint": "Published, pending and rejected across your destination",

@@ -662,6 +662,8 @@
     "noEngagement": "No se registró actividad de interacción en este período.",
     "favoritesInPeriod": "Favoritos en el período",
     "plannerAdds": "Añadidos al planificador",
+    "favorites": "Favoritos",
+    "reviews": "Reseñas",
     "newReviews": "Nuevas reseñas",
     "contentStatus": "Estado del contenido",
     "contentStatusHint": "Publicado, pendiente y rechazado en tu destino",
