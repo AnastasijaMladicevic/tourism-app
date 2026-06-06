@@ -1,5 +1,6 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angular/core';
-import { forkJoin } from 'rxjs';
+import { Subject, forkJoin } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -67,12 +68,15 @@ export class ManagerLocalitiesComponent implements OnInit, OnDestroy {
   readonly pageSizeOptions = [5, 10, 20, 50];
   private managedDestinationIds = new Set<number>();
   private readonly creatorNameById = new Map<number, string>();
+  private readonly destroy$ = new Subject<void>();
 
   ngOnInit(): void {
     this.loadManagedDestinationScope();
   }
 
   ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
     this.stopHeroImageRotation();
   }
 
@@ -148,6 +152,7 @@ export class ManagerLocalitiesComponent implements OnInit, OnDestroy {
         sortBy: this.sortBy,
         sortOrder: this.sortOrder
       }, { bypassRegion: true })
+      .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
           const scopedItems = this.applyManagerScopeFilters(response?.items ?? []);
@@ -188,6 +193,7 @@ export class ManagerLocalitiesComponent implements OnInit, OnDestroy {
   private loadManagedDestinationScope(): void {
     this.destinationService
       .getAll({ page: 1, pageSize: 200, sortBy: 'name', sortOrder: 'asc' }, { bypassRegion: true })
+      .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response: unknown) => {
           const list = Array.isArray(response) ? response : (response as { items?: unknown[] })?.items ?? [];
@@ -215,7 +221,7 @@ export class ManagerLocalitiesComponent implements OnInit, OnDestroy {
     forkJoin([
       this.localityService.getAll(query, { bypassRegion: true }),
       this.localityService.getAll(query, { bypassRegion: true, bypassLanguage: true })
-    ]).subscribe({
+    ]).pipe(takeUntil(this.destroy$)).subscribe({
       next: ([translatedResponse, originalResponse]) => {
         const translatedItems = this.applyManagerScopeFilters(translatedResponse?.items ?? []);
         const originalItems = this.applyManagerScopeFilters(originalResponse?.items ?? []);
@@ -356,7 +362,7 @@ export class ManagerLocalitiesComponent implements OnInit, OnDestroy {
 
     const fallbackUrl = this.normalizeImageUrl(this.selectedLocality.mainImageUrl);
 
-    this.localityService.getImages(this.selectedLocality.id).subscribe({
+    this.localityService.getImages(this.selectedLocality.id).pipe(takeUntil(this.destroy$)).subscribe({
       next: (images: LocalityImageDto[]) => {
         const orderedUrls = (images ?? [])
           .slice()
@@ -502,7 +508,7 @@ export class ManagerLocalitiesComponent implements OnInit, OnDestroy {
         continue;
       }
 
-      this.authService.getById(userId).subscribe({
+      this.authService.getById(userId).pipe(takeUntil(this.destroy$)).subscribe({
         next: (user) => {
           const fullName = `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim();
           this.creatorNameById.set(userId, fullName || this.translationService.translate('manager.localities.userFallback', { id: userId }));

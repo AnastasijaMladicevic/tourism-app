@@ -102,6 +102,7 @@ export class ManagerActivitiesComponent implements OnInit {
   private loadManagedCityLabel(): void {
     this.destinationService
       .getAll({ page: 1, pageSize: 100, sortBy: 'name', sortOrder: 'asc' }, { bypassRegion: true })
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (response: unknown) => {
           const list = Array.isArray(response) ? response : (response as { items?: unknown[] })?.items ?? [];

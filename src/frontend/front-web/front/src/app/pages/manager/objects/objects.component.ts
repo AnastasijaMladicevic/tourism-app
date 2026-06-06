@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { PaginatorComponent } from '../../../shared/components/paginator/paginator';
-import { of } from 'rxjs';
-import { catchError, finalize } from 'rxjs/operators';
+import { Subject, of } from 'rxjs';
+import { catchError, finalize, takeUntil } from 'rxjs/operators';
 import { DestinationService } from '../../../services/destination.service';
 import {
   FilterOption,
@@ -63,6 +63,7 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
   heroImageUrls: string[] = [];
   currentHeroImageIndex = 0;
   private heroRotationTimerId: ReturnType<typeof setInterval> | null = null;
+  private readonly destroy$ = new Subject<void>();
   selectedObjectReviews: ManagerObjectReviewThread[] = [];
   reviewsLoading = false;
   private reviewsRequestToken = 0;
@@ -121,12 +122,15 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
     this.stopHeroImageRotation();
   }
 
   loadManagedCityLabel(): void {
     this.destinationService
       .getAll({ page: 1, pageSize: 100, sortBy: 'name', sortOrder: 'asc' }, { bypassRegion: true })
+      .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response: unknown) => {
           const list = Array.isArray(response) ? response : (response as { items?: unknown[] })?.items ?? [];
@@ -165,6 +169,7 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
         sortBy: this.sortBy,
         sortOrder: this.sortOrder
       })
+      .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
           const items = response?.items ?? [];
@@ -199,7 +204,7 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
   }
 
   loadFilterOptions(): void {
-    this.objectService.getManagerFilterOptions().subscribe({
+    this.objectService.getManagerFilterOptions().pipe(takeUntil(this.destroy$)).subscribe({
       next: ({ typeOptions }) => {
         this.typeOptions = typeOptions;
         this.statusOptions = [...this.fallbackStatusOptions];
@@ -392,7 +397,7 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
 
     const fallbackUrl = this.getHeroFallbackUrl(this.selectedObject);
 
-    this.objectService.getImages(this.selectedObject.id).subscribe({
+    this.objectService.getImages(this.selectedObject.id).pipe(takeUntil(this.destroy$)).subscribe({
       next: (images: ObjectImageDto[]) => {
         const orderedUrls = (images ?? [])
           .slice()
@@ -477,6 +482,7 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
     this.reviewService
       .getAll({ objectId: object.id, sortBy: 'createdAt', sortOrder: 'desc', pageSize: 100 })
       .pipe(
+        takeUntil(this.destroy$),
         catchError(() => of({ items: [] as ReviewDto[], page: 1, pageSize: 0, totalCount: 0, totalPages: 1 })),
         finalize(() => {
           if (token === this.reviewsRequestToken) {

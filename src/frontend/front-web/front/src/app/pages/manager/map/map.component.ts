@@ -104,6 +104,15 @@ export class ManagerMapComponent implements OnInit, AfterViewInit, OnDestroy {
       this.cdr.detectChanges();
     });
   };
+  private readonly mapClickHandler = () => this.closeCard();
+  private readonly mapMoveHandler = () => {
+    if (this.selectedItem) {
+      this.ngZone.run(() => {
+        this.updateCardPosition();
+        this.cdr.detectChanges();
+      });
+    }
+  };
 
   constructor(
     private mapService: MapService,
@@ -138,19 +147,17 @@ export class ManagerMapComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const map = this.mapService['map'];
     if (map) {
-      map.on('click', () => this.closeCard());
-      map.on('move zoom', () => {
-        if (this.selectedItem) {
-          this.ngZone.run(() => {
-            this.updateCardPosition();
-            this.cdr.detectChanges();
-          });
-        }
-      });
+      map.on('click', this.mapClickHandler);
+      map.on('move zoom', this.mapMoveHandler);
     }
   }
 
   ngOnDestroy(): void {
+    const map = this.mapService['map'];
+    if (map) {
+      map.off('click', this.mapClickHandler);
+      map.off('move zoom', this.mapMoveHandler);
+    }
     window.removeEventListener('map-marker-clicked', this.markerClickHandler as EventListener);
     this.stopTracking();
     this.mapService.destroyMap();

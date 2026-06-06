@@ -9,7 +9,8 @@ import {
 import { HttpClient } from '@angular/common/http';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { catchError, finalize, of } from 'rxjs';
+import { Subject, catchError, finalize, of } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { MapComponent } from '../../../../shared/components/map/map';
 import { ReviewMediaGalleryComponent } from '../../../../shared/components/review-media-gallery/review-media-gallery.component';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
@@ -53,6 +54,7 @@ export class ManagerActivityReviewComponent implements OnInit, OnDestroy {
   rejectionReason = '';
   isImagePreviewBroken = false;
   createdByName = '';
+  private readonly destroy$ = new Subject<void>();
 
   form = this.fb.group({
     name: [''],
@@ -89,7 +91,10 @@ export class ManagerActivityReviewComponent implements OnInit, OnDestroy {
     this.loadActivity();
   }
 
-  ngOnDestroy(): void { }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
   loadActivity(): void {
     if (!this.activityId) {
@@ -102,6 +107,7 @@ export class ManagerActivityReviewComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
 
     this.activitiesService.getById(this.activityId).pipe(
+      takeUntil(this.destroy$),
       finalize(() => {
         this.isLoading = false;
         this.cdr.detectChanges();
@@ -139,7 +145,7 @@ export class ManagerActivityReviewComponent implements OnInit, OnDestroy {
 
   private loadActivityImages(activityId: number, fallbackImageUrl?: string): void {
     this.activitiesService.getImages(activityId)
-      .pipe(catchError(() => of([] as ActivityImageDto[])))
+      .pipe(catchError(() => of([] as ActivityImageDto[])), takeUntil(this.destroy$))
       .subscribe((images) => {
         const normalizedImages = Array.isArray(images) ? images : [];
         this.activityImages = normalizedImages
@@ -209,7 +215,7 @@ export class ManagerActivityReviewComponent implements OnInit, OnDestroy {
 
     this.http
       .get<{ firstName?: string; lastName?: string }>(`${environment.apiUrl}/users/${approverId}`)
-      .pipe(catchError(() => of(null)))
+      .pipe(catchError(() => of(null)), takeUntil(this.destroy$))
       .subscribe((user) => {
         const first = user?.firstName?.trim() ?? '';
         const last = user?.lastName?.trim() ?? '';
@@ -237,7 +243,7 @@ export class ManagerActivityReviewComponent implements OnInit, OnDestroy {
 
     this.http
       .get<{ firstName?: string; lastName?: string }>(`${environment.apiUrl}/users/${activity.createdByUserId}`)
-      .pipe(catchError(() => of(null)))
+      .pipe(catchError(() => of(null)), takeUntil(this.destroy$))
       .subscribe((user) => {
         const first = user?.firstName?.trim() ?? '';
         const last = user?.lastName?.trim() ?? '';
@@ -274,6 +280,7 @@ export class ManagerActivityReviewComponent implements OnInit, OnDestroy {
     const dto: ApproveActivityDto = { approve: true };
 
     this.activitiesService.approve(this.activityId, dto).pipe(
+      takeUntil(this.destroy$),
       finalize(() => {
         this.isSubmitting = false;
         this.cdr.detectChanges();
@@ -341,6 +348,7 @@ export class ManagerActivityReviewComponent implements OnInit, OnDestroy {
     };
 
     this.activitiesService.approve(this.activityId, dto).pipe(
+      takeUntil(this.destroy$),
       finalize(() => {
         this.isSubmitting = false;
         this.cdr.detectChanges();

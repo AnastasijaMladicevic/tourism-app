@@ -362,7 +362,7 @@ export class EventFormComponent implements OnInit, OnDestroy {
 
     this.refreshSubmitDisabled();
 
-    this.route.params.subscribe((params) => {
+    this.route.params.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
       if (params['id']) {
         this.isEditMode = true;
         this.eventId = Number(params['id']);

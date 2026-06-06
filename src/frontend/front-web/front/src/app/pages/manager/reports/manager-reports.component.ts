@@ -1,8 +1,9 @@
-import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { catchError, finalize, forkJoin, map, of, switchMap } from 'rxjs';
+import { Subject, catchError, finalize, forkJoin, map, of, switchMap } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { DestinationService } from '../../../services/destination.service';
 import { ObjectDto, ObjectService } from '../../../services/object';
 import {
@@ -56,7 +57,7 @@ interface ManagerReportNameHint {
     '../shared/manager-cc-page-parity.css',
   ],
 })
-export class ManagerReportsComponent implements OnInit {
+export class ManagerReportsComponent implements OnInit, OnDestroy {
   private readonly managerReportsService = inject(ManagerReportsService);
   private readonly objectService = inject(ObjectService);
   private readonly destinationService = inject(DestinationService);
@@ -66,6 +67,7 @@ export class ManagerReportsComponent implements OnInit {
   readonly translationService = inject(TranslationService);
 
   private readonly creatorNameById = new Map<number, string>();
+  private readonly destroy$ = new Subject<void>();
 
   managedDestination = '';
   allReports: ManagerReportRow[] = [];
@@ -86,11 +88,16 @@ export class ManagerReportsComponent implements OnInit {
 
   selectedReport: ManagerReportRow | null = null;
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   ngOnInit(): void {
     this.loadManagedDestinationLabel();
     this.loadPageData();
 
-    this.route.queryParamMap.subscribe((params) => {
+    this.route.queryParamMap.pipe(takeUntil(this.destroy$)).subscribe((params) => {
       const creatorId = Number(params.get('creatorId'));
       const openReport = params.get('openReport') === '1' || params.get('openReport') === 'true';
       const reason = params.get('reason')?.trim() ?? '';

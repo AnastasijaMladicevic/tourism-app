@@ -6,7 +6,8 @@ import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import { CommonModule } from '@angular/common';
 import { FormArray, FormBuilder, ReactiveFormsModule, Validators, FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { catchError, finalize, of } from 'rxjs';
+import { Subject, catchError, finalize, of } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { AuthService } from '../../../../services/auth.service';
 import { EventImageDto, EventService } from '../../../../services/event.service';
 import { ApproveContentDto, EventDto, EventTicketTypeInputDto } from '../../../../models/event.model';
@@ -92,6 +93,7 @@ export class ManagerEventFormComponent implements OnInit, OnDestroy {
   selectedActivityIds = new Set<number>([2]);
   loadedEvent: EventDto | null = null;
   createdByName = '';
+  private readonly destroy$ = new Subject<void>();
 
   readonly eventTypes = [
     { id: 1, name: 'Festival' },
@@ -199,7 +201,7 @@ export class ManagerEventFormComponent implements OnInit, OnDestroy {
       this.organizerName = `${user.firstName} ${user.lastName}`.trim();
     }
 
-    this.route.params.subscribe((params) => {
+    this.route.params.pipe(takeUntil(this.destroy$)).subscribe((params) => {
       if (params['id']) {
         this.isEditMode = true;
         this.eventId = Number(params['id']);
@@ -210,7 +212,10 @@ export class ManagerEventFormComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnDestroy(): void { }
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
   loadEvent(): void {
     if (!this.eventId) {
@@ -218,7 +223,7 @@ export class ManagerEventFormComponent implements OnInit, OnDestroy {
     }
 
     this.isLoading = true;
-    this.eventService.getById(this.eventId).subscribe({
+    this.eventService.getById(this.eventId).pipe(takeUntil(this.destroy$)).subscribe({
       next: (event: EventDto) => {
         this.populateForm(event);
         this.loadEventImages(event.id, event.mainImageUrl);
@@ -314,7 +319,7 @@ export class ManagerEventFormComponent implements OnInit, OnDestroy {
 
     this.http
       .get<{ firstName?: string; lastName?: string }>(`${environment.apiUrl}/users/${event.createdByUserId}`)
-      .pipe(catchError(() => of(null)))
+      .pipe(catchError(() => of(null)), takeUntil(this.destroy$))
       .subscribe((user) => {
         const first = user?.firstName?.trim() ?? '';
         const last = user?.lastName?.trim() ?? '';
@@ -326,7 +331,7 @@ export class ManagerEventFormComponent implements OnInit, OnDestroy {
   private loadEventImages(eventId: number, fallbackImageUrl?: string): void {
     this.eventService
       .getImages(eventId)
-      .pipe(catchError(() => of([] as EventImageDto[])))
+      .pipe(catchError(() => of([] as EventImageDto[])), takeUntil(this.destroy$))
       .subscribe((images) => {
         this.eventImages = this.normalizeEventImages(images, fallbackImageUrl);
 
@@ -394,6 +399,7 @@ export class ManagerEventFormComponent implements OnInit, OnDestroy {
     const dto: ApproveContentDto = { approve: true };
 
     this.eventService.approve(this.eventId, dto).pipe(
+      takeUntil(this.destroy$),
       finalize(() => {
         this.isSubmitting = false;
         this.cdr.detectChanges();
@@ -450,6 +456,7 @@ export class ManagerEventFormComponent implements OnInit, OnDestroy {
     };
 
     this.eventService.approve(this.eventId, dto).pipe(
+      takeUntil(this.destroy$),
       finalize(() => {
         this.isSubmitting = false;
         this.cdr.detectChanges();
