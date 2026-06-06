@@ -63,18 +63,18 @@ export class EventFormComponent implements OnInit, OnDestroy {
     eventTypeId: ['', Validators.required],
     startDate: ['', Validators.required],
     startTime: ['18:30'],
-    endDate: [''],
+    endDate: ['', Validators.required],
     endTime: ['22:00'],
     timezone: ['Europe/Belgrade'],
     recurringEvent: [false],
     recurrencePattern: [''],
     ticketTypes: this.fb.array([]),
-    maxVisitors: [''],
+    maxVisitors: ['', [Validators.required, Validators.min(1)]],
     externalLink: [''],
     longitude: [''],
     latitude: [''],
     localityId: [''],
-    destinationId: [''],
+    destinationId: ['', Validators.required],
     objectId: [''],
     ageRestriction: [''],
     tagsInput: ['']
@@ -87,6 +87,7 @@ export class EventFormComponent implements OnInit, OnDestroy {
   galleryErrorMessage = '';
   successMessage = '';
   isSubmitting = false;
+  submitDisabled = true;
   isDeleting = false;
   showDeleteModal = false;
   isImageDropActive = false;
@@ -176,10 +177,10 @@ export class EventFormComponent implements OnInit, OnDestroy {
   }
 
   get isSubmitDisabled(): boolean {
-    return this.isSubmitting || !this.hasRequiredCreateFields;
+    return this.submitDisabled;
   }
 
-  get hasRequiredCreateFields(): boolean {
+  private get hasRequiredCreateFields(): boolean {
     const values = this.form.getRawValue();
     const name = values.name?.trim();
     const eventTypeId = this.toNumber(values.eventTypeId);
@@ -355,6 +356,11 @@ export class EventFormComponent implements OnInit, OnDestroy {
     this.loadDropdownOptions();
     this.loadRelatedActivities();
     this.setupDestinationObjectSync();
+    this.form.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.refreshSubmitDisabled());
+
+    this.refreshSubmitDisabled();
 
     this.route.params.subscribe((params) => {
       if (params['id']) {
@@ -622,6 +628,7 @@ export class EventFormComponent implements OnInit, OnDestroy {
     // Sync the selection and map display
     this.syncObjectSelectionWithDestination();
     this.applyLocationFromSelection();
+    this.refreshSubmitDisabled();
     this.cdr.detectChanges();
   }
 
@@ -697,6 +704,8 @@ export class EventFormComponent implements OnInit, OnDestroy {
     }
 
     input.value = '';
+    this.refreshSubmitDisabled();
+    this.cdr.detectChanges();
   }
 
   removeImage(index: number): void {
@@ -706,6 +715,8 @@ export class EventFormComponent implements OnInit, OnDestroy {
 
     const [removedUrl] = this.imageUrls.splice(index, 1);
     this.revokePendingPreview(removedUrl);
+    this.refreshSubmitDisabled();
+    this.cdr.detectChanges();
   }
 
   setPrimaryImage(index: number): void {
@@ -718,7 +729,7 @@ export class EventFormComponent implements OnInit, OnDestroy {
   }
 
   submit(): void {
-    if (this.form.invalid || this.isSubmitting) {
+    if (this.submitDisabled) {
       this.form.markAllAsTouched();
       return;
     }
@@ -734,6 +745,7 @@ export class EventFormComponent implements OnInit, OnDestroy {
     }
 
     this.isSubmitting = true;
+    this.refreshSubmitDisabled();
     this.errorMessage = '';
     this.successMessage = '';
 
@@ -777,6 +789,7 @@ export class EventFormComponent implements OnInit, OnDestroy {
         }),
         finalize(() => {
           this.isSubmitting = false;
+          this.refreshSubmitDisabled();
           this.cdr.detectChanges();
         })
       )
@@ -1014,7 +1027,14 @@ export class EventFormComponent implements OnInit, OnDestroy {
           count: this.maxImageCount,
         })
         : '';
+    this.refreshSubmitDisabled();
     this.cdr.detectChanges();
+  }
+
+  private refreshSubmitDisabled(): void {
+    this.submitDisabled =
+      this.isSubmitting ||
+      !this.hasRequiredCreateFields;
   }
 
   onGalleryDragOver(event: DragEvent): void {
