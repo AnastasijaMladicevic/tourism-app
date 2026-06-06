@@ -366,7 +366,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
         return;
       }
 
-      this.destinationService.refreshEditLock(this.editDestinationId).subscribe({
+      this.destinationService.refreshEditLock(this.editDestinationId).pipe(takeUntil(this.destroy$)).subscribe({
         next: (lockState) => {
           this.applyEditLockState(lockState);
           this.cdr.detectChanges();
