@@ -68,6 +68,8 @@ export class MapComponent implements OnInit, OnDestroy {
   readonly mapFocusRegion = !history.state?.lat || !history.state?.lng;
 
   private readonly navState = history.state;
+  private readonly mapClickHandler = () => this.closeCard();
+  private readonly mapMoveHandler = () => this.updateCardPosition();
   private readonly markerClickHandler = (event: Event) => {
     const customEvent = event as CustomEvent<{ data: AdminMapDestination }>;
 
@@ -92,13 +94,18 @@ export class MapComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {
     window.removeEventListener('map-marker-clicked', this.markerClickHandler as EventListener);
+    const map = this.mapService.getMap();
+    if (map) {
+      map.off('click', this.mapClickHandler);
+      map.off('move zoom resize', this.mapMoveHandler);
+    }
   }
 
   onPlatformMapReady(): void {
     const map = this.mapService.getMap();
     if (map) {
-      map.on('click', () => this.closeCard());
-      map.on('move zoom resize', () => this.updateCardPosition());
+      map.on('click', this.mapClickHandler);
+      map.on('move zoom resize', this.mapMoveHandler);
     }
   }
 
