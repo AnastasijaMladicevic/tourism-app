@@ -110,7 +110,7 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
         }
       })
     );
-    this.route.queryParams.subscribe(params => {
+    this.subscriptions.add(this.route.queryParams.subscribe(params => {
 
       if (
         params['openReview'] === 'true' &&
@@ -130,14 +130,9 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
           this.openWriteReview();
         }, 100);
       }
-    });
+    }));
     window.addEventListener('focus', this.handleWindowFocus);
-    window.addEventListener('favorite-object', (event: any) => {
-      const obj = event.detail;
-      if (obj) {
-        this.toggleFavorite(obj, new Event('click'));
-      }
-    });
+    window.addEventListener('favorite-object', this.handleFavoriteObject);
     this.cdr.detectChanges();
   }
 
@@ -145,6 +140,7 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
     this.subscriptions.unsubscribe();
     document.body.style.overflow = 'visible';
     window.removeEventListener('focus', this.handleWindowFocus);
+    window.removeEventListener('favorite-object', this.handleFavoriteObject);
     this.titleObserver?.disconnect();
   }
 
@@ -568,6 +564,10 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
   }
   private readonly handleWindowFocus = (): void => {
     this.syncFavoriteState();
+  };
+  private readonly handleFavoriteObject = (event: any): void => {
+    const obj = event.detail;
+    if (obj) { this.toggleFavorite(obj, new Event('click')); }
   };
   private syncFavoriteState(): void {
     if (!this.object?.id || !this.authService.isLoggedIn()) {

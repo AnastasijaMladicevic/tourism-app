@@ -3,6 +3,7 @@ import {
   Component,
   ElementRef,
   HostListener,
+  OnDestroy,
   OnInit,
   ViewChild,
 } from '@angular/core';
@@ -11,7 +12,8 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { catchError, firstValueFrom, of } from 'rxjs';
+import { catchError, firstValueFrom, of, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { AuthService } from '../../services/auth';
 import { ImageDto, ImageService } from '../../services/image';
 import { LocationTrackingService } from '../../services/location-tracking';
@@ -58,7 +60,7 @@ export interface View extends UnifiedSearchItem {
   templateUrl: './results.html',
   styleUrl: './results.scss',
 })
-export class ResultsComponent implements OnInit {
+export class ResultsComponent implements OnInit, OnDestroy {
   searchQuery = '';
   currentPage = 1;
   isLoading = true;
@@ -84,6 +86,11 @@ export class ResultsComponent implements OnInit {
   showPageSizeMenu = false;
   private readonly favoritePendingKeys = new Set<string>();
   private readonly plannerMap = new Map<number, number>();
+  private readonly destroy$ = new Subject<void>();
+  private readonly handleFavoriteObject = (event: any): void => {
+    const obj = event.detail;
+    if (obj) { this.toggleFavorite(obj, new Event('click')); }
+  };
 
   mode: 'recommended' | 'popular' | 'search' = 'recommended';
   private imageCache = new Map<string, ImageDto[]>();
@@ -111,7 +118,7 @@ export class ResultsComponent implements OnInit {
     const rawItems = state?.items ?? [];
 
     const normalized = rawItems.map((x: any) => this.normalizeFromHome(x));
-    this.locationTrackingService.trackingEnabled$.subscribe(enabled => {
+    this.locationTrackingService.trackingEnabled$.pipe(takeUntil(this.destroy$)).subscribe(enabled => {
       this.isTracking = enabled;
 
       if (!enabled) {
@@ -122,7 +129,7 @@ export class ResultsComponent implements OnInit {
       }
     });
 
-    this.locationTrackingService.location$.subscribe(loc => {
+    this.locationTrackingService.location$.pipe(takeUntil(this.destroy$)).subscribe(loc => {
       this.userLocation = loc
         ? { lat: loc.latitude, lng: loc.longitude }
         : null;
@@ -136,14 +143,16 @@ export class ResultsComponent implements OnInit {
       this.cdr.detectChanges();
     });
     this.loadResolvedItems(normalized);
-    window.addEventListener('favorite-object', (event: any) => {
-      const obj = event.detail;
-      if (obj) {
-        this.toggleFavorite(obj, new Event('click'));
-      }
-    });
+    window.addEventListener('favorite-object', this.handleFavoriteObject);
     this.cdr.detectChanges();
   }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+    window.removeEventListener('favorite-object', this.handleFavoriteObject);
+  }
+
   private async loadResolvedItems(items: UnifiedSearchItem[]): Promise<void> {
     this.isLoading = true;
 
