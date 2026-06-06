@@ -183,6 +183,7 @@ export class UsersComponent implements OnInit {
   adminDirectorySearch = '';
   adminRoleFilter = 'all';
   adminStatusFilter = 'all';
+  adminCountryFilter = 'all';
   adminDateFrom = '';
   adminDateTo = '';
   touristSearch = '';
@@ -308,9 +309,11 @@ export class UsersComponent implements OnInit {
 
   onOriginNameClick(name: string): void {
     if (this.usersViewTab === 'internal') {
-      this.adminDirectorySearch = name;
+      this.adminCountryFilter = name;
+      this.adminCurrentPage = 1;
     } else {
-      this.touristSearch = name;
+      this.touristOriginFilter = name;
+      this.touristCurrentPage = 1;
     }
     const panelId = this.usersViewTab === 'internal' ? 'users-panel-internal' : 'users-panel-tourists';
     document.getElementById(panelId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -710,6 +713,9 @@ export class UsersComponent implements OnInit {
     if (this.adminStatusFilter !== 'all') {
       result = result.filter((m) => m.status.toLowerCase() === this.adminStatusFilter.toLowerCase());
     }
+    if (this.adminCountryFilter !== 'all') {
+      result = result.filter((m) => m.country === this.adminCountryFilter);
+    }
     if (this.adminDateFrom) {
       result = result.filter((m) => m.lastLoginRaw >= this.adminDateFrom);
     }
@@ -717,6 +723,10 @@ export class UsersComponent implements OnInit {
       result = result.filter((m) => m.lastLoginRaw <= this.adminDateTo);
     }
     return result;
+  }
+
+  get adminCountryOptions(): string[] {
+    return [...new Set(this.adminMembers.map((m) => m.country).filter(Boolean))].sort();
   }
 
   get adminRoleOptions(): { value: string; label: string }[] {
@@ -1024,6 +1034,7 @@ export class UsersComponent implements OnInit {
     this.adminDirectorySearch = '';
     this.adminRoleFilter = 'all';
     this.adminStatusFilter = 'all';
+    this.adminCountryFilter = 'all';
     this.adminDateFrom = '';
     this.adminDateTo = '';
     this.adminCurrentPage = 1;

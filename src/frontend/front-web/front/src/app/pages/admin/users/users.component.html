@@ -382,18 +382,22 @@
           <option value="inactive">{{ t('adminUsers.filters.inactive') }}</option>
           <option value="banned">{{ t('adminUsers.filters.banned') }}</option>
         </select>
+        <select class="table-filter-select" [(ngModel)]="adminCountryFilter" (ngModelChange)="adminCurrentPage = 1">
+          <option value="all">{{ t('adminUsers.filters.allOrigins') }}</option>
+          <option *ngFor="let c of adminCountryOptions" [value]="c">{{ c }}</option>
+        </select>
         <div class="table-date-range">
           <input type="date" class="table-date-input" [(ngModel)]="adminDateFrom" [max]="adminDateTo || null" (ngModelChange)="adminCurrentPage = 1" />
           <span class="table-date-sep">–</span>
           <input type="date" class="table-date-input" [(ngModel)]="adminDateTo" [min]="adminDateFrom || null" (ngModelChange)="adminCurrentPage = 1" />
         </div>
-        <span class="table-filter-meta" *ngIf="adminMembers.length && (adminDirectorySearch.trim() || adminRoleFilter !== 'all' || adminStatusFilter !== 'all' || adminDateFrom || adminDateTo)">
+        <span class="table-filter-meta" *ngIf="adminMembers.length && (adminDirectorySearch.trim() || adminRoleFilter !== 'all' || adminStatusFilter !== 'all' || adminCountryFilter !== 'all' || adminDateFrom || adminDateTo)">
           {{ t('adminUsers.matchesOf', { matches: filteredAdminDirectory.length, total: adminMembers.length }) }}
         </span>
         <button
           type="button"
           class="table-search-clear"
-          *ngIf="adminDirectorySearch.trim() || adminRoleFilter !== 'all' || adminStatusFilter !== 'all' || adminDateFrom || adminDateTo"
+          *ngIf="adminDirectorySearch.trim() || adminRoleFilter !== 'all' || adminStatusFilter !== 'all' || adminCountryFilter !== 'all' || adminDateFrom || adminDateTo"
           (click)="clearAdminSearch()"
         >
           {{ t('adminUsers.clear') }}
