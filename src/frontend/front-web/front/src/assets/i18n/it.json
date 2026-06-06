@@ -1595,6 +1595,7 @@
     "filters": {
       "allRoles": "Tutti i ruoli",
       "allStatuses": "Tutti gli stati",
+      "allOrigins": "Tutti i paesi",
       "active": "Attivo",
       "inactive": "Inattivo",
       "banned": "Bannato"

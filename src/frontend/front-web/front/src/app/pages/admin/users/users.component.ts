@@ -163,6 +163,7 @@ export class UsersComponent implements OnInit {
     role: string;
     country: string;
     lastLogin: string;
+    lastLoginRaw: string;
     status: 'Active' | 'Inactive' | 'Banned';
     editLock?: UserEditLockDto | null;
   }[] = [];
@@ -173,6 +174,7 @@ export class UsersComponent implements OnInit {
     origin: string;
     status: 'active' | 'inactive' | 'banned';
     joinedDate: string;
+    joinedDateRaw: string;
     profileImageUrl: string | null;
     initials: string;
     editLock?: UserEditLockDto | null;
@@ -181,7 +183,13 @@ export class UsersComponent implements OnInit {
   adminDirectorySearch = '';
   adminRoleFilter = 'all';
   adminStatusFilter = 'all';
+  adminDateFrom = '';
+  adminDateTo = '';
   touristSearch = '';
+  touristOriginFilter = 'all';
+  touristStatusFilter = 'all';
+  touristDateFrom = '';
+  touristDateTo = '';
 
   /** Internal Team vs Tourist accounts. */
   usersViewTab: UsersPageViewTab = 'internal';
@@ -631,6 +639,7 @@ export class UsersComponent implements OnInit {
       role: u.roleName || this.t('adminUsers.unknown'),
       country: (u.country ?? '').trim() || this.t('adminUsers.unknown'),
       lastLogin: this.formatDate(u.createdAt),
+      lastLoginRaw: (u.createdAt ?? '').slice(0, 10),
       status: u.isBanned ? 'Banned' : (u.isActive ? 'Active' : 'Inactive'),
       editLock: u.editLock ?? null
     }));
@@ -651,6 +660,7 @@ export class UsersComponent implements OnInit {
       origin: this.normalizeCountryName((u.country ?? '').trim() || this.t('adminUsers.unknown')),
       status: u.isBanned ? 'banned' : (u.isActive ? 'active' : 'inactive'),
       joinedDate: this.formatDate(u.createdAt),
+      joinedDateRaw: (u.createdAt ?? '').slice(0, 10),
       profileImageUrl: (u.profileImageUrl ?? '').trim() || null,
       initials: this.getInitials(u.firstName, u.lastName),
       editLock: u.editLock ?? null
@@ -700,6 +710,12 @@ export class UsersComponent implements OnInit {
     if (this.adminStatusFilter !== 'all') {
       result = result.filter((m) => m.status.toLowerCase() === this.adminStatusFilter.toLowerCase());
     }
+    if (this.adminDateFrom) {
+      result = result.filter((m) => m.lastLoginRaw >= this.adminDateFrom);
+    }
+    if (this.adminDateTo) {
+      result = result.filter((m) => m.lastLoginRaw <= this.adminDateTo);
+    }
     return result;
   }
 
@@ -716,7 +732,18 @@ export class UsersComponent implements OnInit {
       t.status,
       t.joinedDate,
       t.initials
-    ]);
+    ]).filter((t) => {
+      if (this.touristOriginFilter !== 'all' && t.origin !== this.touristOriginFilter) return false;
+      if (this.touristStatusFilter !== 'all' && t.status !== this.touristStatusFilter) return false;
+      if (this.touristDateFrom && t.joinedDateRaw < this.touristDateFrom) return false;
+      if (this.touristDateTo && t.joinedDateRaw > this.touristDateTo) return false;
+      return true;
+    });
+  }
+
+  get touristOriginOptions(): string[] {
+    const origins = [...new Set(this.tourists.map((t) => t.origin).filter(Boolean))].sort();
+    return origins;
   }
 
   get filteredBannedUsers(): BannedUserRow[] {
@@ -997,11 +1024,17 @@ export class UsersComponent implements OnInit {
     this.adminDirectorySearch = '';
     this.adminRoleFilter = 'all';
     this.adminStatusFilter = 'all';
+    this.adminDateFrom = '';
+    this.adminDateTo = '';
     this.adminCurrentPage = 1;
   }
 
   clearTouristSearch(): void {
     this.touristSearch = '';
+    this.touristOriginFilter = 'all';
+    this.touristStatusFilter = 'all';
+    this.touristDateFrom = '';
+    this.touristDateTo = '';
     this.touristCurrentPage = 1;
   }
 

@@ -835,6 +835,35 @@
   white-space: nowrap;
 }
 
+.table-date-range {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 6px 10px;
+  background: #f9fafb;
+}
+
+.table-date-input {
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  color: #111827;
+  outline: none;
+  cursor: pointer;
+  width: 130px;
+}
+
+.table-date-input:focus {
+  color: #2563eb;
+}
+
+.table-date-sep {
+  font-size: 13px;
+  color: #9ca3af;
+}
+
 .table-search-clear {
   border: 1px solid #e5e7eb;
   background: #ffffff;

@@ -1595,6 +1595,7 @@
     "filters": {
       "allRoles": "Sve uloge",
       "allStatuses": "Svi statusi",
+      "allOrigins": "Sve države",
       "active": "Aktivan",
       "inactive": "Neaktivan",
       "banned": "Banovan"
