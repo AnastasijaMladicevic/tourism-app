@@ -869,6 +869,10 @@
   font-size: 16px;
 }
 
+.save-feedback--error {
+  color: #ef4444;
+}
+
 .spinner {
   display: inline-block;
   width: 14px;

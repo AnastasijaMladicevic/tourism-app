@@ -254,6 +254,11 @@
                 <span>{{ 'adminProfile.changesSaved' | translate }}</span>
               </div>
 
+              <div class="save-feedback save-feedback--error save-feedback--inline" [class.visible]="saveError">
+                <mat-icon fontSet="material-icons-outlined">error_outline</mat-icon>
+                <span>{{ saveError }}</span>
+              </div>
+
               <div class="form-card-footer__actions">
                 <button class="profile-action-btn profile-action-btn--secondary" type="button" (click)="cancel()">
                   <mat-icon fontSet="material-icons-outlined">close</mat-icon>
