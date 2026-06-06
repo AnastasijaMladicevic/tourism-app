@@ -1059,7 +1059,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
             return;
           }
           const message = this.extractApiErrorMessage(err);
-          if (this.isManagerAssignmentError(message)) {
+          if (this.isManagerAssignmentError(err, message)) {
             this.setManagerError(message);
             return;
           }
@@ -1131,12 +1131,20 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
     this.primaryPreviewImageIndex = this.destinationImages.length > 0 ? null : 0;
   }
 
-  private isManagerAssignmentError(message: string): boolean {
+  private isManagerAssignmentError(err: unknown, message: string): boolean {
+    const status = (err as { status?: number })?.status;
+    if (status === 422) {
+      return true;
+    }
     const normalized = message.trim().toLowerCase();
     return (
-      normalized.includes('manager') ||
-      normalized.includes('menadžer') ||
-      normalized.includes('menadzer')
+      normalized.includes('already assigned') ||
+      normalized.includes('already manages') ||
+      normalized.includes('menadžer već') ||
+      normalized.includes('menadzer vec') ||
+      normalized.includes('manages only one') ||
+      normalized.includes('jedan menadzer') ||
+      normalized.includes('jedan menadžer')
     );
   }
 
