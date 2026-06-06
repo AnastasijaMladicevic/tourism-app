@@ -12,6 +12,7 @@ import { FormBuilder, ReactiveFormsModule, Validators, AbstractControl, Validati
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable, catchError, finalize, forkJoin, from, map, of, switchMap } from 'rxjs';
 import { concatMap, toArray } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MapComponent } from '../../../../shared/components/map/map';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import {
@@ -157,16 +158,16 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
       this.loadActivity();
     }
 
-    this.form.controls.destinationId.valueChanges.subscribe(() => {
+    this.form.controls.destinationId.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       this.syncDependentSelections();
       this.applyLocationFromSelection();
     });
 
-    this.form.controls.localityId.valueChanges.subscribe(() => {
+    this.form.controls.localityId.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       this.applyLocationFromSelection();
     });
 
-    this.form.controls.objectId.valueChanges.subscribe(() => {
+    this.form.controls.objectId.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
       this.applyLocationFromSelection();
     });
   }

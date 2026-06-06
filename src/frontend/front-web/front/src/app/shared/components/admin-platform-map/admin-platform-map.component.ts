@@ -12,7 +12,8 @@ import {
   inject,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { forkJoin, map, of, switchMap } from 'rxjs';
+import { forkJoin, map, of, Subject, switchMap } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import {
   DestinationDto,
   DestinationService,
@@ -75,6 +76,7 @@ export class AdminPlatformMapComponent implements AfterViewInit, OnChanges, OnDe
 
   private mapBootstrapped = false;
   private resizeObserver: ResizeObserver | null = null;
+  private readonly destroy$ = new Subject<void>();
 
   ngAfterViewInit(): void {
     this.bootstrapMap();
@@ -92,6 +94,8 @@ export class AdminPlatformMapComponent implements AfterViewInit, OnChanges, OnDe
   }
 
   ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
     this.resizeObserver?.disconnect();
     this.resizeObserver = null;
     this.mapService.destroyMap();
@@ -115,7 +119,7 @@ export class AdminPlatformMapComponent implements AfterViewInit, OnChanges, OnDe
     if (this.destinations !== null) {
       this.placeMarkers(this.destinations);
     } else {
-      this.loadAllDestinations().subscribe({
+      this.loadAllDestinations().pipe(takeUntil(this.destroy$)).subscribe({
         next: (items) => this.placeMarkers(items),
         error: (err) => console.error('Failed to load map destinations:', err),
       });
@@ -193,7 +197,7 @@ export class AdminPlatformMapComponent implements AfterViewInit, OnChanges, OnDe
       ? this.regionService.getById(activeRegionId)
       : this.regionService.getDefault();
 
-    regionRequest.subscribe({
+    regionRequest.pipe(takeUntil(this.destroy$)).subscribe({
       next: (region) => {
         if (region.centerLatitude == null || region.centerLongitude == null) {
           return;

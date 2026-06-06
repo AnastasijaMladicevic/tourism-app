@@ -3,8 +3,8 @@ import { ChangeDetectorRef, Component, NgZone, OnDestroy, OnInit, inject } from 
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { EMPTY, forkJoin, from, Observable, of } from 'rxjs';
-import { catchError, concatMap, finalize, map, switchMap, tap, toArray } from 'rxjs/operators';
+import { EMPTY, forkJoin, from, Observable, of, Subject } from 'rxjs';
+import { catchError, concatMap, finalize, map, switchMap, takeUntil, tap, toArray } from 'rxjs/operators';
 import { ApproveContentDto } from '../../../../models/event.model';
 import {
   CreateObjectDto,
@@ -174,7 +174,11 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
     nedClose: this.fb.nonNullable.control('')
   });
 
+  private readonly destroy$ = new Subject<void>();
+
   ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
     this.releasePendingImagePreviews();
   }
 
@@ -200,15 +204,15 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
       this.loadOptions();
     }
 
-    this.form.controls.destinationId.valueChanges.subscribe(() => {
+    this.form.controls.destinationId.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
       this.applyLocationFromSelection();
     });
 
-    this.form.controls.localityId.valueChanges.subscribe(() => {
+    this.form.controls.localityId.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
       this.applyLocationFromSelection();
     });
 
-    this.form.controls.objectTypeId.valueChanges.subscribe(() => {
+    this.form.controls.objectTypeId.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
       this.syncPriceFieldForSelectedType();
     });
 

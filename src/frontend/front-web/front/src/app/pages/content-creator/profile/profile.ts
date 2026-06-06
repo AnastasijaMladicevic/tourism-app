@@ -108,6 +108,7 @@ export class ProfileComponentContentCreator implements OnInit, OnDestroy {
   private passwordModalCloseTimerId: number | null = null;
   private otpExpiryTimerId: number | null = null;
   private otpResendTimerId: number | null = null;
+  private saveSuccessTimerId: ReturnType<typeof setTimeout> | null = null;
   private forgotResetSessionToken = '';
 
   private static readonly OTP_EXPIRY_SECONDS = 300;
@@ -141,6 +142,10 @@ export class ProfileComponentContentCreator implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    if (this.saveSuccessTimerId !== null) {
+      clearTimeout(this.saveSuccessTimerId);
+      this.saveSuccessTimerId = null;
+    }
     this.revokeCropPreviewUrl();
     this.clearPermissionsModalTimer();
     this.clearOtpTimers();
@@ -728,9 +733,13 @@ export class ProfileComponentContentCreator implements OnInit, OnDestroy {
   }
 
   private showSaveSuccess(): void {
+    if (this.saveSuccessTimerId !== null) {
+      clearTimeout(this.saveSuccessTimerId);
+    }
     this.saveSuccess = true;
-    setTimeout(() => {
+    this.saveSuccessTimerId = setTimeout(() => {
       this.saveSuccess = false;
+      this.saveSuccessTimerId = null;
     }, 2500);
   }
 
