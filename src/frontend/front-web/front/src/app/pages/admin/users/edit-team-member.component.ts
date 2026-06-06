@@ -4,7 +4,7 @@ import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { TimeoutError, forkJoin, of } from 'rxjs';
+import { Subject, TimeoutError, forkJoin, of } from 'rxjs';
 import {
   catchError,
   filter,
@@ -12,6 +12,7 @@ import {
   map,
   startWith,
   switchMap,
+  takeUntil,
   timeout
 } from 'rxjs/operators';
 import { ChangePasswordDto, UpdateUserDto, UserDto, UserEditLockDto } from '../../../models/user.model';
@@ -81,6 +82,7 @@ export class EditTeamMemberComponent {
   editLockState: UserEditLockDto | null = null;
   isEditBlocked = false;
   private editLockHeartbeatId: number | null = null;
+  private readonly destroy$ = new Subject<void>();
 
   readonly countries = [
     'Albania', 'Argentina', 'Australia', 'Austria', 'Belgium',
@@ -368,6 +370,8 @@ export class EditTeamMemberComponent {
   }
 
   ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
     this.stopEditLockHeartbeat();
     this.releaseOwnedEditLock();
   }
@@ -410,6 +414,7 @@ export class EditTeamMemberComponent {
     this.adminUsers
       .banUser(this.userId, dto)
       .pipe(
+        takeUntil(this.destroy$),
         finalize(() => {
           this.isModerating = false;
           this.cdr.markForCheck();
@@ -450,6 +455,7 @@ export class EditTeamMemberComponent {
     this.adminUsers
       .unbanUser(this.userId)
       .pipe(
+        takeUntil(this.destroy$),
         finalize(() => {
           this.isModerating = false;
           this.cdr.markForCheck();
@@ -539,6 +545,7 @@ export class EditTeamMemberComponent {
           }
           return this.adminUsers.demoteCreatorRole(this.userId);
         }),
+        takeUntil(this.destroy$),
         finalize(() => {
           this.isSubmitting = false;
           this.cdr.markForCheck();
@@ -681,7 +688,7 @@ export class EditTeamMemberComponent {
     }
 
     this.editLockHeartbeatId = window.setInterval(() => {
-      this.adminUsers.refreshEditLock(this.userId).subscribe({
+      this.adminUsers.refreshEditLock(this.userId).pipe(takeUntil(this.destroy$)).subscribe({
         next: (lockState) => {
           this.applyEditLockState(lockState);
           this.cdr.detectChanges();

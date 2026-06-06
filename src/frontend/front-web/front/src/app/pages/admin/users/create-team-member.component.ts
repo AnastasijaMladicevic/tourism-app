@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, inject } from '@angular/core';
+import { Component, OnDestroy, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { finalize } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import { finalize, takeUntil } from 'rxjs/operators';
+import { Observable, Subject } from 'rxjs';
 import { CreateUserDto, UserDto } from '../../../models/user.model';
 import { AdminUsersService } from '../../../services/admin-users.service';
 import { TranslationService } from '../../../services/translation.service';
@@ -18,10 +18,11 @@ export type TeamMemberRole = 'manager' | 'admin';
   templateUrl: './create-team-member.component.html',
   styleUrls: ['./create-team-member.component.css', '../shared/admin-page-title.css']
 })
-export class CreateTeamMemberComponent {
+export class CreateTeamMemberComponent implements OnDestroy {
   private readonly router = inject(Router);
   private readonly adminUsers = inject(AdminUsersService);
   private readonly translationService = inject(TranslationService);
+  private readonly destroy$ = new Subject<void>();
 
   isSubmitting = false;
   submitError = '';
@@ -124,6 +125,11 @@ export class CreateTeamMemberComponent {
     return this.password !== this.confirmPassword;
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   onCancel(): void {
     void this.router.navigate(['/admin/users']);
   }
@@ -154,7 +160,7 @@ export class CreateTeamMemberComponent {
       this.selectedRole === 'admin' ? this.adminUsers.createAdmin(dto) : this.adminUsers.createManager(dto);
 
     request$
-      .pipe(finalize(() => (this.isSubmitting = false)))
+      .pipe(takeUntil(this.destroy$), finalize(() => (this.isSubmitting = false)))
       .subscribe({
         next: () => void this.router.navigate(['/admin/users']),
         error: (err: unknown) => {
