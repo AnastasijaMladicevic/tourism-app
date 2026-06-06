@@ -9,7 +9,8 @@ import { AuthService, UpdateUserDto, ChangePasswordDto } from '../../../services
 import { UserDto } from '../../../models/user.model';
 import { TranslationService } from '../../../services/translation.service';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
-import { timeout } from 'rxjs';
+import { Subject, timeout } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 type PermissionItem = {
   labelKey: string;
   detailKey: string;
@@ -104,6 +105,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   private cropPreviewUrl: string | null = null;
   private pendingCroppedBlob: Blob | null = null;
+  private readonly destroy$ = new Subject<void>();
   private permissionsModalCloseTimerId: number | null = null;
   private passwordModalCloseTimerId: number | null = null;
   private otpExpiryTimerId: number | null = null;
@@ -130,7 +132,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
     this.syncUserState(userData);
 
-    this.authService.getById(userData.id).subscribe({
+    this.authService.getById(userData.id).pipe(takeUntil(this.destroy$)).subscribe({
       next: (fullUser) => {
         this.syncUserState(fullUser);
       },
@@ -141,8 +143,11 @@ export class ProfileComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
     this.revokeCropPreviewUrl();
     this.clearPermissionsModalTimer();
+    this.clearPasswordModalTimer();
     this.clearOtpTimers();
     this.unlockBodyScroll();
   }
@@ -744,8 +749,10 @@ export class ProfileComponent implements OnInit, OnDestroy {
       this.otpSecondsRemaining = Math.max(0, this.otpSecondsRemaining - 1);
       if (this.otpSecondsRemaining === 0) {
         this.passwordError = 'The verification code has expired. Resend it to continue.';
-        window.clearInterval(this.otpExpiryTimerId!);
-        this.otpExpiryTimerId = null;
+        if (this.otpExpiryTimerId !== null) {
+          window.clearInterval(this.otpExpiryTimerId);
+          this.otpExpiryTimerId = null;
+        }
       }
       this.cdr.detectChanges();
     }, 1000);
@@ -753,8 +760,10 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.otpResendTimerId = window.setInterval(() => {
       this.otpResendSecondsRemaining = Math.max(0, this.otpResendSecondsRemaining - 1);
       if (this.otpResendSecondsRemaining === 0) {
-        window.clearInterval(this.otpResendTimerId!);
-        this.otpResendTimerId = null;
+        if (this.otpResendTimerId !== null) {
+          window.clearInterval(this.otpResendTimerId);
+          this.otpResendTimerId = null;
+        }
       }
       this.cdr.detectChanges();
     }, 1000);
@@ -783,6 +792,13 @@ export class ProfileComponent implements OnInit, OnDestroy {
     if (this.permissionsModalCloseTimerId !== null) {
       window.clearTimeout(this.permissionsModalCloseTimerId);
       this.permissionsModalCloseTimerId = null;
+    }
+  }
+
+  private clearPasswordModalTimer(): void {
+    if (this.passwordModalCloseTimerId !== null) {
+      window.clearTimeout(this.passwordModalCloseTimerId);
+      this.passwordModalCloseTimerId = null;
     }
   }
 
