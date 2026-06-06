@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit, inject } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { finalize } from 'rxjs';
 import { UserDto } from '../../../models/user.model';
 import { AuthService } from '../../../services/auth.service';
@@ -111,6 +111,7 @@ export class DashboardComponent implements OnInit {
   private readonly adminDashboardService = inject(AdminDashboardService);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly translationService = inject(TranslationService);
+  private readonly router = inject(Router);
 
   readonly periodOptions = PERIOD_OPTIONS;
 
@@ -438,6 +439,14 @@ export class DashboardComponent implements OnInit {
     this.selectedMapDestination = null;
     this.mapRenderVersion += 1;
     this.mapComponentId = `admin-dashboard-map-${this.mapRenderVersion}`;
+  }
+
+  onRoleLegendClick(slice: RoleDonutSlice): void {
+    if (slice.role === 'Tourist') {
+      this.router.navigate(['/admin/users'], { queryParams: { tab: 'tourists' } });
+    } else {
+      this.router.navigate(['/admin/users'], { queryParams: { tab: 'internal', role: slice.role } });
+    }
   }
 
   private humanizeRole(role: string): string {

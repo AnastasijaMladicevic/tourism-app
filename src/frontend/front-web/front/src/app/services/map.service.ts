@@ -157,7 +157,7 @@ export class MapService {
     const marker = L.marker([lat, lng], { icon: customIcon }).addTo(this.map);
 
     if (popupText) {
-      marker.bindPopup(popupText, {
+      marker.bindPopup(`<div style="text-align:center">${popupText}</div>`, {
         closeButton: false,
         offset: [0, -10],
       });

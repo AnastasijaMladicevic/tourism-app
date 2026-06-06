@@ -155,7 +155,7 @@
         <ul class="donut-legend">
           <li *ngFor="let slice of roleDonutSlices">
             <span class="legend-dot" [style.background]="slice.color"></span>
-            <span class="donut-legend-name">{{ slice.label }}</span>
+            <button type="button" class="donut-legend-name donut-legend-name--link" (click)="onRoleLegendClick(slice)">{{ slice.label }}</button>
             <span class="donut-legend-meta">{{ slice.count | number }} · {{ slice.percent }}%</span>
           </li>
         </ul>

@@ -269,6 +269,16 @@ export class UsersComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((params) => {
         this.applyTabFromQuery(params.get('tab'));
+        const roleParam = params.get('role');
+        const hasDeepLink = !!params.get('tab') || !!roleParam;
+        if (roleParam) {
+          this.adminRoleFilter = roleParam;
+          this.adminCurrentPage = 1;
+        }
+        if (hasDeepLink) {
+          const panelId = this.usersViewTab === 'tourists' ? 'users-panel-tourists' : 'users-panel-internal';
+          setTimeout(() => document.getElementById(panelId)?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 300);
+        }
         const reportId = this.parsePositiveIntParam(params.get('reportId'));
         const reportedUserId = this.parsePositiveIntParam(params.get('reportedUserId'));
         if (reportId || reportedUserId) {

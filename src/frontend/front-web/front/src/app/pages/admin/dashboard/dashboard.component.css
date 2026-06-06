@@ -460,6 +460,21 @@
   color: #334155;
 }
 
+.donut-legend-name--link {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-size: inherit;
+  font-family: inherit;
+  text-align: left;
+  transition: color 0.15s;
+}
+
+.donut-legend-name--link:hover {
+  color: #2563eb;
+}
+
 .donut-legend-meta {
   color: #94a3b8;
   font-size: 11px;
