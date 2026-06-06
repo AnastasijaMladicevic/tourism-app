@@ -50,8 +50,9 @@
           type="button"
           class="primary-btn review-approve-btn"
           (click)="approveObject()"
+          [class.approved-locked]="isReviewApproved"
+          [attr.title]="isReviewApproved ? ('manager.eventReview.alreadyApproved' | translate) : null"
           [disabled]="approveActionDisabled"
-          [class.approved-locked]="reviewStatusKey === 'approved'"
         >
           <span class="material-symbols-outlined" aria-hidden="true">thumb_up</span>
           {{ 'contentCreatorObjectForm.review.approve' | translate }}

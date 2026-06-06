@@ -248,10 +248,17 @@ tbody tr:hover,
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  min-width: 84px;
   border-radius: 999px;
-  padding: 5px 10px;
-  font-size: 11px;
+  padding: 6px 12px;
+  font-size: 12px;
   font-weight: 700;
+}
+
+.chip-dot {
+  font-size: 9px;
+  line-height: 1;
+  margin-right: 6px;
 }
 
 .status-chip.published {
@@ -277,14 +284,21 @@ tbody tr:hover,
 }
 
 .icon-btn {
-  width: 30px;
-  height: 30px;
-  border: 1px solid #dbe1ea;
-  border-radius: 8px;
+  width: auto;
+  height: auto;
+  padding: 4px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   color: #475569;
+}
+
+.icon-btn:hover {
+  color: #111827;
+  background: transparent;
 }
 
 .table-footer {

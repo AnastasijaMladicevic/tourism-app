@@ -212,23 +212,57 @@
   @if (showTipsModal) {
     <div class="tips-backdrop" (click)="closeTipsModal()">
       <section
-        class="card tips-modal"
+        class="playbook-modal"
         role="dialog"
         aria-modal="true"
         aria-labelledby="locality-tips-modal-title"
         (click)="$event.stopPropagation()"
       >
-        <h3 id="locality-tips-modal-title">{{ 'manager.localityForm.playbookTitle' | translate }}</h3>
-        <p>{{ 'manager.localityForm.playbookBody' | translate }}</p>
-        <ul class="tips-modal-list">
-          <li>{{ 'manager.localityForm.playbookTips.tip1' | translate }}</li>
-          <li>{{ 'manager.localityForm.playbookTips.tip2' | translate }}</li>
-          <li>{{ 'manager.localityForm.playbookTips.tip3' | translate }}</li>
-        </ul>
+        <header class="playbook-modal__header">
+          <div class="playbook-modal__header-copy">
+            <span class="playbook-modal__eyebrow">{{ 'manager.localityForm.createTips' | translate }}</span>
+            <h3 id="locality-tips-modal-title">{{ 'manager.localityForm.playbookTitle' | translate }}</h3>
+          </div>
+          <button
+            type="button"
+            class="playbook-modal__close"
+            (click)="closeTipsModal()"
+            [attr.aria-label]="'common.close' | translate"
+          >
+            <span class="material-symbols-outlined" aria-hidden="true">close</span>
+          </button>
+        </header>
 
-        <div class="tips-modal-actions">
-          <button type="button" class="primary-btn" (click)="closeTipsModal()">{{ 'common.close' | translate }}</button>
+        <div class="playbook-modal__body">
+          <p class="playbook-modal__intro">{{ 'manager.localityForm.playbookBody' | translate }}</p>
+
+          <ul class="playbook-modal__tips">
+            <li class="playbook-tip">
+              <span class="playbook-tip__icon" aria-hidden="true">
+                <span class="material-symbols-outlined">travel_explore</span>
+              </span>
+              <p>{{ 'manager.localityForm.playbookTips.tip1' | translate }}</p>
+            </li>
+            <li class="playbook-tip">
+              <span class="playbook-tip__icon" aria-hidden="true">
+                <span class="material-symbols-outlined">pin_drop</span>
+              </span>
+              <p>{{ 'manager.localityForm.playbookTips.tip2' | translate }}</p>
+            </li>
+            <li class="playbook-tip">
+              <span class="playbook-tip__icon" aria-hidden="true">
+                <span class="material-symbols-outlined">photo_library</span>
+              </span>
+              <p>{{ 'manager.localityForm.playbookTips.tip3' | translate }}</p>
+            </li>
+          </ul>
         </div>
+
+        <footer class="playbook-modal__footer">
+          <button type="button" class="primary-btn playbook-modal__cta" (click)="closeTipsModal()">
+            {{ 'common.close' | translate }}
+          </button>
+        </footer>
       </section>
     </div>
   }

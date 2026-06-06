@@ -183,6 +183,10 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
 
     const idFromRoute = Number(this.route.snapshot.paramMap.get('id'));
     if (this.isManagerReview) {
+      const presetStatus = this.readNavigationObjectStatus();
+      if (presetStatus) {
+        this.reviewObjectStatus = presetStatus;
+      }
       if (Number.isFinite(idFromRoute) && idFromRoute > 0) {
         this.isEditMode = true;
         this.objectId = idFromRoute;
@@ -288,17 +292,15 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
   }
 
   get reviewStatusKey(): string {
-    return (this.reviewObjectStatus ?? '').toLowerCase();
+    return this.normalizeReviewStatusKey(this.reviewObjectStatus);
+  }
+
+  get isReviewApproved(): boolean {
+    return this.reviewStatusKey === 'approved';
   }
 
   get approveActionDisabled(): boolean {
-    const s = this.reviewStatusKey;
-    return (
-      this.isReviewSubmitting ||
-      !this.objectId ||
-      s === 'approved' ||
-      s === 'rejected'
-    );
+    return this.isReviewSubmitting || !this.objectId || this.isReviewApproved;
   }
 
   get declineActionDisabled(): boolean {
@@ -1138,6 +1140,9 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
         this.mergeOptionsFromLoadedObject(merged);
         this.applyFormFromObject(merged);
         this.loadCcPreviewReviews(merged.id);
+        if (this.isManagerReview) {
+          this.cdr.detectChanges();
+        }
       },
       error: (error) => {
         this.errorMessage =
@@ -1309,7 +1314,7 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
     }
 
     this.patchWorkingHours(objectItem.workingHours);
-    this.reviewObjectStatus = (objectItem.status ?? '').trim();
+    this.reviewObjectStatus = this.resolveObjectReviewStatus(objectItem);
     this.applyManagerReadOnlyState();
     if (this.isManagerReview && this.objectId) {
       this.loadManagerGuestReviews(this.objectId, creatorName, objectItem.createdByUserId);
@@ -1533,6 +1538,52 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
   private optionalTrimmed(value: string | null | undefined): string | undefined {
     const trimmed = value?.trim();
     return trimmed ? trimmed : undefined;
+  }
+
+  private readNavigationObjectStatus(): string {
+    const state = (history.state ?? {}) as { objectStatus?: string };
+    return (state.objectStatus ?? '').trim();
+  }
+
+  private resolveObjectReviewStatus(objectItem: ObjectDto): string {
+    const normalized = this.normalizeReviewStatusKey(objectItem.status);
+    if (normalized === 'approved' || normalized === 'rejected' || normalized === 'pending') {
+      return objectItem.status?.trim() || this.formatReviewStatusLabel(normalized);
+    }
+
+    if (objectItem.approvedAt) {
+      return 'Approved';
+    }
+
+    if (objectItem.rejectionReason?.trim()) {
+      return 'Rejected';
+    }
+
+    return (this.reviewObjectStatus ?? objectItem.status ?? '').trim();
+  }
+
+  private normalizeReviewStatusKey(raw?: string | null): string {
+    const value = (raw ?? '').trim().toLowerCase();
+    if (value === 'approved' || value === 'rejected' || value === 'pending') {
+      return value;
+    }
+    if (value === '1') {
+      return 'approved';
+    }
+    if (value === '2') {
+      return 'rejected';
+    }
+    if (value === '0') {
+      return 'pending';
+    }
+    return value;
+  }
+
+  private formatReviewStatusLabel(statusKey: string): string {
+    if (!statusKey) {
+      return '';
+    }
+    return statusKey.charAt(0).toUpperCase() + statusKey.slice(1);
   }
 
   private applyManagerReadOnlyState(): void {
