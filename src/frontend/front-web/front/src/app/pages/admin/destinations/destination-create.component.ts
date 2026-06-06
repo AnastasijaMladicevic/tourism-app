@@ -95,6 +95,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
   selectedManager: AdminUserListItemDto | null = null;
   managerErrorMessage = '';
   private managerAssignments = new Map<number, { destinationId: number; destinationName: string }>();
+  private managerAssignmentsLoaded = false;
   locationLookupState: 'idle' | 'loading' | 'resolved' | 'not_found' | 'error' = 'idle';
   locationLookupMessage = '';
 
@@ -474,6 +475,9 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
   }
 
   private loadManagerAssignments(): void {
+    if (this.managerAssignmentsLoaded) {
+      return;
+    }
     this.destinationService
       .getAll({ page: 1, pageSize: 500, sortBy: 'name', sortOrder: 'asc' }, { bypassRegion: true })
       .pipe(
@@ -481,6 +485,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
         takeUntil(this.destroy$)
       )
       .subscribe((destinations) => {
+        this.managerAssignmentsLoaded = true;
         this.managerAssignments.clear();
         for (const destination of destinations) {
           const managerId = destination.managedByUserId;
