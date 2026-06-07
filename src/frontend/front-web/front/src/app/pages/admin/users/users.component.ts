@@ -650,7 +650,7 @@ export class UsersComponent implements OnInit {
       name: `${u.firstName} ${u.lastName}`.trim(),
       email: u.email,
       role: u.roleName || this.t('adminUsers.unknown'),
-      country: (u.country ?? '').trim() || this.t('adminUsers.unknown'),
+      country: this.normalizeCountryName((u.country ?? '').trim() || this.t('adminUsers.unknown')),
       lastLogin: this.formatDate(u.createdAt),
       lastLoginRaw: (u.createdAt ?? '').slice(0, 10),
       status: u.isBanned ? 'Banned' : (u.isActive ? 'Active' : 'Inactive'),
@@ -1352,12 +1352,22 @@ export class UsersComponent implements OnInit {
     });
   }
 
-  /** Country histogram for a user list (tourists or internal team). */
   private normalizeCountryName(raw: string): string {
-    const lower = raw.toLowerCase();
-    if (lower === 'montenegro' || lower === 'crna gora') {
+    const lower = raw.toLowerCase().trim();
+
+    if (['serbia', 'srbija', 'serbie', 'serbien', 'serbi'].includes(lower)) {
+      return 'Srbija';
+    }
+    if (['montenegro', 'crna gora', 'crna_gora', 'monténégro', 'montenegro'].includes(lower)) {
       return 'Crna Gora';
     }
+    if (['spain', 'španija', 'spanja', 'españa', 'espana', 'spagna', 'espagne', 'spanien', 'spanija'].includes(lower)) {
+      return 'Španija';
+    }
+    if (['italy', 'italija', 'italia', 'italie', 'italien'].includes(lower)) {
+      return 'Italija';
+    }
+
     return raw;
   }
 
