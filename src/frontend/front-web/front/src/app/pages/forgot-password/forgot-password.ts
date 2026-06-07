@@ -80,13 +80,13 @@ export class ForgotPasswordComponent {
       .forgotPassword(email)
       .pipe(finalize(() => {
         this.isLoading = false;
+        this.cdr.detectChanges();
       }))
       .subscribe({
         next: () => {
           this.step = 'code';
           this.message = this.translationService.translate('forgotPassword.email.codeSentMessage');
           this.codeForm.reset();
-          this.cdr.detectChanges();
         },
         error: (error: any) => {
           this.errorMessage = error?.error?.message ?? this.translationService.translate('forgotPassword.errors.unableToSend');
@@ -112,6 +112,7 @@ export class ForgotPasswordComponent {
       .verifyResetCode({ email: this.resetEmail, code })
       .pipe(finalize(() => {
         this.isLoading = false;
+        this.cdr.detectChanges();
       }))
       .subscribe({
         next: (response: { resetSessionToken?: string; ResetSessionToken?: string; token?: string } | string) => {
@@ -126,11 +127,9 @@ export class ForgotPasswordComponent {
           this.resetSessionToken = resetSessionToken;
           this.step = 'password';
           this.passwordForm.reset();
-          this.cdr.detectChanges();
         },
         error: (error: any) => {
           this.errorMessage = error?.error?.message ?? this.translationService.translate('forgotPassword.errors.invalidCode');
-          this.cdr.detectChanges();
         },
       });
   }
@@ -176,16 +175,15 @@ export class ForgotPasswordComponent {
       )
       .pipe(finalize(() => {
         this.isLoading = false;
+        this.cdr.detectChanges();
       }))
       .subscribe({
         next: () => {
           this.step = 'success';
           this.message = this.translationService.translate('forgotPassword.success.subtitle');
-          this.cdr.detectChanges();
         },
         error: (error: any) => {
           this.errorMessage = error?.error?.message ?? this.translationService.translate('forgotPassword.errors.unableToReset');
-          this.cdr.detectChanges();
         },
       });
   }
