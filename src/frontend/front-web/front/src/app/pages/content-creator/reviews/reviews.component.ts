@@ -97,9 +97,13 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
 
     this.loadReviews();
 
+    let lastLang = this.translationService.language();
     toObservable(this.translationService.translationsVersion, { injector: this.injector })
       .pipe(skip(1), distinctUntilChanged(), takeUntil(this.destroy$))
       .subscribe(() => {
+        const currentLang = this.translationService.language();
+        if (currentLang === lastLang) return;
+        lastLang = currentLang;
         this.creatorObjectsLoaded = false;
         this.queuePage = 1;
         this.loadReviews();
@@ -582,69 +586,12 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
           return of({ items: [] as ReviewDto[], totalCount: 0, totalPages: 1 });
         }
 
-        const objectsToFetch = this.objectFilterId != null
-          ? objects.filter((o) => o.id === this.objectFilterId)
-          : objects;
-
-        if (objectsToFetch.length === 0) {
-          return of({ items: [] as ReviewDto[], totalCount: 0, totalPages: 1 });
-        }
-
-        return forkJoin(objectsToFetch.map((o) => this.objectService.getById(o.id).pipe(catchError(() => of(null))))).pipe(
-          map((objectDetails) => {
-            const seen = new Set<number>();
-            const allReviews: ReviewDto[] = [];
-
-            for (const detail of objectDetails) {
-              if (!detail) {
-                continue;
-              }
-              for (const review of detail.reviews ?? []) {
-                if (seen.has(review.id)) {
-                  continue;
-                }
-                seen.add(review.id);
-                allReviews.push({
-                  ...review,
-                  objectName: review.objectName?.trim() || detail.name?.trim() || '',
-                });
-              }
-            }
-
-            let filtered = allReviews;
-
-            if (this.searchTerm.trim()) {
-              const q = this.searchTerm.trim().toLowerCase();
-              filtered = filtered.filter((r) =>
-                r.text?.toLowerCase().includes(q)
-                || r.userFullName?.toLowerCase().includes(q)
-                || r.objectName?.toLowerCase().includes(q)
-              );
-            }
-
-            if (this.selectedRatings.length > 0) {
-              filtered = filtered.filter((r) => this.selectedRatings.includes(r.rating));
-            }
-
-            if (this.responseFilter === 'responded') {
-              filtered = filtered.filter((r) => r.creatorResponse?.trim());
-            } else if (this.responseFilter === 'pending') {
-              filtered = filtered.filter((r) => !r.creatorResponse?.trim());
-            }
-
-            if (this.sortOrder === 'desc') {
-              filtered.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-            } else {
-              filtered.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
-            }
-
-            const totalCount = filtered.length;
-            const totalPages = Math.max(1, Math.ceil(totalCount / this.queuePageSize));
-            const start = (this.queuePage - 1) * this.queuePageSize;
-            const items = filtered.slice(start, start + this.queuePageSize);
-
-            return { items, totalCount, totalPages };
-          })
+        return this.reviewService.getForCreator(this.buildCreatorReviewQuery()).pipe(
+          map((result) => ({
+            items: result.items ?? [],
+            totalCount: result.totalCount ?? 0,
+            totalPages: result.totalPages ?? 1
+          }))
         );
       })
     );
