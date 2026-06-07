@@ -358,7 +358,7 @@
 .results-bar__count {
   font-size: 12px;
   font-weight: 600;
-  color: var(--emperor);
+  color: #168aad;
   text-transform: uppercase;
   letter-spacing: 0.4px;
 }
@@ -697,9 +697,12 @@
   .icon-btn,
   .card__name,
   .card__destination,
-  .card__rating,
-  .results-bar__count {
+  .card__rating {
     color: var(--text-dark);
+  }
+
+  .results-bar__count {
+    color: #4dc2ff;
   }
 
   .search-bar,

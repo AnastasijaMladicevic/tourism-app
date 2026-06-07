@@ -358,7 +358,7 @@
 .results-bar__count {
   font-size: 12px;
   font-weight: 600;
-  color: var(--emperor);
+  color: #168aad;
   text-transform: uppercase;
   letter-spacing: 0.4px;
 }
@@ -744,9 +744,12 @@
 
   .card__type,
   .card__desc,
-  .card__reviews,
-  .results-bar__count {
+  .card__reviews {
     color: var(--text-gray);
+  }
+
+  .results-bar__count {
+    color: #4dc2ff;
   }
 
   .card__fav {
@@ -821,6 +824,10 @@
 }
 
 :root[data-theme='dark'] {
+
+  .results-bar__count {
+    color: #4dc2ff !important;
+  }
 
   .sort-menu,
   .page-size-menu {

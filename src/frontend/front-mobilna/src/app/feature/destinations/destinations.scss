@@ -786,7 +786,7 @@
   }
 
   .results-bar__count {
-    color: #4dc2ff;
+    color: #4dc2ff !important;
   }
 
   .card__fav {
@@ -870,6 +870,10 @@
 }
 
 :root[data-theme='dark'] {
+
+  .results-bar__count {
+    color: #4dc2ff !important;
+  }
 
   .sort-menu,
   .page-size-menu {
