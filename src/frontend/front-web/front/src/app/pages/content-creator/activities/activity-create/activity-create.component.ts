@@ -65,7 +65,8 @@ interface NominatimReverseResponse {
   templateUrl: './activity-create.component.html',
   styleUrls: [
     './activity-create.component.css',
-    '../../../admin/shared/admin-page-title.css'
+    '../../../admin/shared/admin-page-title.css',
+    '../../../shared/location-sidebar.css'
   ]
 })
 export class ActivityCreateComponent implements OnInit, OnDestroy {

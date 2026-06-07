@@ -281,14 +281,14 @@
 
         <div class="coord-editor">
           <div>
-            <span class="coord-label">{{ 'Latitude' | translate }}</span>
+            <span class="coord-label">{{ 'common.latitude' | translate }}</span>
             <div class="coord-input-wrap">
               <input type="number" step="0.000001" min="-90" max="90" [(ngModel)]="form.latitude" placeholder="42.4240" />
               <span class="coord-input-suffix">{{ latitudeDirection }}</span>
             </div>
           </div>
           <div>
-            <span class="coord-label">{{ 'Longitude' | translate }}</span>
+            <span class="coord-label">{{ 'common.longitude' | translate }}</span>
             <div class="coord-input-wrap">
               <input type="number" step="0.000001" min="-180" max="180" [(ngModel)]="form.longitude" placeholder="18.7710" />
               <span class="coord-input-suffix">{{ longitudeDirection }}</span>

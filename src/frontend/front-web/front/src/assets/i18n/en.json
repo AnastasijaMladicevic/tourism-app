@@ -1015,7 +1015,7 @@
         "primary": "Primary",
         "saved": "Saved",
         "setPrimary": "Set Primary",
-        "localityIntelligence": "Locality Intelligence",
+        "localityIntelligence": "Location information",
         "createTips": "Create Tips",
         "learnMore": "Learn more about localities",
         "playbookTitle": "Locality Creator Playbook",
@@ -1096,7 +1096,7 @@
         "addTagPlaceholder": "Add tag...",
         "ageRestriction": "Age Restriction",
         "selectRestriction": "Select restriction",
-        "locationIntelligence": "Location Intelligence",
+        "locationIntelligence": "Location information",
         "locationIntelligenceHint": "Map preview and coordinates for the linked location.",
         "createdBy": "Created by {{name}}",
         "creator": "Creator",
@@ -1330,7 +1330,7 @@
         "touristObject": "Tourist Object",
         "listingState": "Listing State",
         "duration": "Duration",
-        "locationIntelligence": "Location Intelligence",
+        "locationIntelligence": "Location information",
         "locationIntelligenceHint": "Map preview and coordinates for the linked location.",
         "createdByName": "Created by {{name}}",
         "creator": "Creator",
@@ -2488,7 +2488,7 @@
       "primary": "Primary",
       "setPrimary": "Set primary",
       "noImagesHelp": "Add one or more image files above. Images are saved when you create or update the event.",
-      "locationIntelligence": "Object & location intelligence",
+      "locationIntelligence": "Location information",
       "locationIntelligenceHint": "Choose a linked object and pin the exact event spot on the map.",
       "linkedObjectLabel": "Linked object:",
       "linkedObject": "Linked object",
@@ -2580,7 +2580,7 @@
       "activityImageAlt": "Activity image preview",
       "primary": "Primary",
       "setPrimary": "Set primary",
-      "locationIntelligence": "Location intelligence",
+      "locationIntelligence": "Location information",
       "locationContextPlaceholder": "Set destination/locality for location context",
       "locationContextAria": "Search for a place to set map context",
       "delete": {
@@ -2623,7 +2623,11 @@
       "filters": {
         "hotels": "Hotels",
         "restaurants": "Restaurants",
-        "bars": "Bars"
+        "bars": "Bars",
+        "locality": "Localities",
+        "object": "Objects",
+        "event": "Events",
+        "activity": "Activities"
       }
     },
     "eventDetails": {
@@ -2698,7 +2702,7 @@
     "primary": "Primary",
     "setPrimary": "Set primary",
     "noImagesHelp": "Upload at least one image so the object can be reviewed and published.",
-    "locationIntelligence": "Location intelligence",
+    "locationIntelligence": "Location information",
     "locationContextPlaceholder": "Select a destination or locality for location context",
     "newObject": "New object",
     "createdBy": "Created by {{name}}",

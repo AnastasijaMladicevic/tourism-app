@@ -30,7 +30,8 @@ interface DestinationOption {
     './locality-create.component.css',
     '../../../admin/shared/admin-page-title.css',
     '../../shared/manager-list-page-header.css',
-    '../../shared/manager-list-page-responsive.css'
+    '../../shared/manager-list-page-responsive.css',
+    '../../../shared/location-sidebar.css'
   ]
 })
 export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {

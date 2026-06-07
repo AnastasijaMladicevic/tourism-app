@@ -72,10 +72,10 @@ export class ManagerMapComponent implements OnInit, AfterViewInit, OnDestroy {
 
   activeFilters: string[] = [];
   filterChips: FilterChip[] = [
-    { key: 'locality', label: 'Localities', icon: '🏙️' },
-    { key: 'object', label: 'Objects', icon: '🏨' },
-    { key: 'event', label: 'Events', icon: '🎉' },
-    { key: 'activity', label: 'Activities', icon: '🏃' },
+    { key: 'locality', label: 'manager.map.filters.locality', icon: '🏙️' },
+    { key: 'object', label: 'manager.map.filters.object', icon: '🏨' },
+    { key: 'event', label: 'manager.map.filters.event', icon: '🎉' },
+    { key: 'activity', label: 'manager.map.filters.activity', icon: '🏃' },
   ];
 
   selectedItem: any = null;

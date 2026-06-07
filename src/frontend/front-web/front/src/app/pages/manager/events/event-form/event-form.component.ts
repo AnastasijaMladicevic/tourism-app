@@ -37,7 +37,8 @@ interface RelatedActivity {
     '../../shared/manager-list-page-header.css',
     '../../shared/manager-list-page-responsive.css',
     '../../shared/manager-review-step-layout.css',
-    '../../shared/manager-review-approve-btn.css'
+    '../../shared/manager-review-approve-btn.css',
+    '../../../shared/location-sidebar.css'
   ]
 })
 export class ManagerEventFormComponent implements OnInit, OnDestroy {

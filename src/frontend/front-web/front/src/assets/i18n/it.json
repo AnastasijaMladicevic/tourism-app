@@ -1015,7 +1015,7 @@
         "primary": "Principale",
         "saved": "Salvato",
         "setPrimary": "Imposta principale",
-        "localityIntelligence": "Informazioni sulla località",
+        "localityIntelligence": "Informazioni sulla posizione",
         "createTips": "Suggerimenti di creazione",
         "learnMore": "Scopri di più sulle località",
         "playbookTitle": "Guida alla creazione delle località",
@@ -2453,7 +2453,7 @@
       "primary": "Principale",
       "setPrimary": "Imposta come principale",
       "noImagesHelp": "Aggiungi una o più immagini qui sopra. Le immagini verranno salvate quando crei o aggiorni l'evento.",
-      "locationIntelligence": "Intelligenza su oggetto e posizione",
+      "locationIntelligence": "Informazioni sulla posizione",
       "locationIntelligenceHint": "Scegli un oggetto collegato e fissa il punto esatto dell'evento sulla mappa.",
       "linkedObjectLabel": "Oggetto collegato:",
       "linkedObject": "Oggetto collegato",
@@ -2553,7 +2553,7 @@
       "activityImageAlt": "Anteprima immagine attività",
       "primary": "Principale",
       "setPrimary": "Imposta come principale",
-      "locationIntelligence": "Intelligenza della posizione",
+      "locationIntelligence": "Informazioni sulla posizione",
       "locationContextPlaceholder": "Imposta destinazione/località per il contesto della posizione",
       "locationContextAria": "Cerca un luogo per impostare il contesto della mappa",
       "delete": {
@@ -2596,7 +2596,11 @@
       "filters": {
         "hotels": "Hotel",
         "restaurants": "Ristoranti",
-        "bars": "Bar"
+        "bars": "Bar",
+        "locality": "Località",
+        "object": "Oggetti",
+        "event": "Eventi",
+        "activity": "Attività"
       }
     },
     "eventDetails": {

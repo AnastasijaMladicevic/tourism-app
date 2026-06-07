@@ -47,7 +47,7 @@ import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
   standalone: true,
   imports: [CommonModule, FormsModule, RouterLink, SharedMapComponent, TranslatePipe],
   templateUrl: './destination-create.component.html',
-  styleUrls: ['./destination-create.component.css', '../shared/admin-page-title.css']
+  styleUrls: ['./destination-create.component.css', '../shared/admin-page-title.css', '../../shared/location-sidebar.css']
 })
 export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
   private readonly destinationService = inject(DestinationService);

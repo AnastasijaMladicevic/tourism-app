@@ -305,10 +305,11 @@
 
     <aside class="form-side">
       <section class="card side-card">
-        <div class="section-title compact">
-          <h2>{{ 'contentCreator.eventForm.locationIntelligence' | translate }}</h2>
-          <p>{{ 'contentCreator.eventForm.locationIntelligenceHint' | translate }}</p>
-        </div>
+        <header class="side-header">
+          <span class="material-symbols-outlined">my_location</span>
+          <h3>{{ 'contentCreator.eventForm.locationIntelligence' | translate }}</h3>
+        </header>
+        <p class="gallery-intro">{{ 'contentCreator.eventForm.locationIntelligenceHint' | translate }}</p>
 
         <app-map
           [lat]="toNumber(form.controls.latitude.value) ?? 42.424"
