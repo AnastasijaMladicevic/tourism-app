@@ -1,9 +1,9 @@
 import { CommonModule, Location } from '@angular/common';
-import { ChangeDetectorRef, Component, ElementRef, HostListener, NgZone, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, effect, ElementRef, HostListener, NgZone, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { catchError, finalize, forkJoin, of, Subscription } from 'rxjs';
+import { catchError, forkJoin, of, Subscription } from 'rxjs';
 import { environment } from '../../../environment/environment';
 import { EventDto, EventService } from '../../services/event';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -95,6 +95,24 @@ export class EventsComponent implements OnInit, OnDestroy {
     const obj = event.detail;
     if (obj) this.togglePlanner(obj, new Event('click'));
   };
+  private hasInitializedLanguageWatcher = false;
+  private lastLanguage = 'sr';
+
+  constructor() {
+    effect(() => {
+      const language = this.translationService.language();
+      if (!this.hasInitializedLanguageWatcher) {
+        this.lastLanguage = language;
+        this.hasInitializedLanguageWatcher = true;
+        return;
+      }
+      if (language === this.lastLanguage) return;
+      this.lastLanguage = language;
+      this.currentPage = 1;
+      this.loadEvents();
+    });
+  }
+
   @ViewChild('top') top!: ElementRef;
   ngOnInit(): void {
     this.locationSubs.add(
@@ -440,7 +458,8 @@ export class EventsComponent implements OnInit, OnDestroy {
     this.isLoading = true;
 
     const regionId = this.activeRegionService.getActiveRegionId() ?? 0;
-    const cacheKey = `events-list:r${regionId}`;
+    const lang = this.translationService.language();
+    const cacheKey = `events-list:r${regionId}:l${lang}`;
     const cached = this.dataCacheService.get<EventDto[]>(cacheKey);
     if (cached) {
       this.isLoading = false;
@@ -448,13 +467,32 @@ export class EventsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    this.eventService.getAllItems({ sortBy: 'startDate', sortOrder: 'asc' }).subscribe({
-      next: (events) => {
-        const rawList = this.toArray<EventDto>(events);
-        this.dataCacheService.set(cacheKey, rawList);
-        this.applyEventsData(rawList);
+    const pageSize = 100;
+    this.eventService.getPage({ page: 1, pageSize, sortBy: 'startDate', sortOrder: 'asc' }).subscribe({
+      next: (firstPage) => {
+        const firstItems = firstPage.items ?? [];
+        const totalPages = Math.max(1, firstPage.totalPages ?? 1);
+
         this.isLoading = false;
-        this.flushUi();
+        this.applyEventsData(firstItems);
+
+        if (totalPages <= 1) {
+          this.dataCacheService.set(cacheKey, firstItems);
+          return;
+        }
+
+        forkJoin(
+          Array.from({ length: totalPages - 1 }, (_, i) =>
+            this.eventService.getPage({ page: i + 2, pageSize, sortBy: 'startDate', sortOrder: 'asc' })
+          )
+        ).subscribe({
+          next: (pages) => {
+            const all = [...firstItems, ...pages.flatMap(p => p.items ?? [])];
+            this.dataCacheService.set(cacheKey, all);
+            this.applyEventsData(all);
+          },
+          error: () => { /* first page already shown */ }
+        });
       },
       error: () => {
         this.events = [];

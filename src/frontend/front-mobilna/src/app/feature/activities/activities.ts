@@ -386,7 +386,7 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
       return mainImage?.url || activity.images[0].url;
     }
 
-    return this.activity?.mainImageUrl || '';
+    return activity.mainImageUrl || '';
   }
 
   onImageError(event: Event): void {
@@ -400,9 +400,10 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
 
     try {
-      await this.ensureFavoritesLoaded();
-
-      const allActivities = await this.fetchAllActivities();   // učitavamo SVE
+      const [allActivities] = await Promise.all([
+        this.fetchAllActivities(),
+        this.ensureFavoritesLoaded(),
+      ]);
 
       if (currentToken !== this.loadToken) return;
 
@@ -446,29 +447,24 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
     const cached = this.dataCacheService.get<ActivityDto[]>(cacheKey);
     if (cached) return cached;
 
-    const all: ActivityDto[] = [];
-    let page = 1;
     const pageSize = 100;
+    const firstPage = await firstValueFrom(
+      this.activityService.getPage({ page: 1, pageSize, sortBy: 'name', sortOrder: 'asc' })
+    );
+    const firstItems = firstPage.items ?? [];
+    const totalPages = Math.max(1, firstPage.totalPages ?? 1);
 
-    while (true) {
-      const response = await firstValueFrom(
-        this.activityService.getPage({
-          page,
-          pageSize,
-          search: undefined,
-          type: undefined,
-          sortBy: 'name',
-          sortOrder: 'asc',
-        })
-      );
-
-      const items = response.items ?? [];
-      all.push(...items);
-
-      if (items.length < pageSize) break;
-      page++;
+    if (totalPages <= 1) {
+      this.dataCacheService.set(cacheKey, firstItems);
+      return firstItems;
     }
 
+    const remainingPages = await Promise.all(
+      Array.from({ length: totalPages - 1 }, (_, i) =>
+        firstValueFrom(this.activityService.getPage({ page: i + 2, pageSize, sortBy: 'name', sortOrder: 'asc' }))
+      )
+    );
+    const all = [...firstItems, ...remainingPages.flatMap(p => p.items ?? [])];
     this.dataCacheService.set(cacheKey, all);
     return all;
   }
@@ -520,19 +516,12 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
     const startIndex = (this.currentPage - 1) * this.pageSize;
     const pageItems = list.slice(startIndex, startIndex + this.pageSize);
 
-    Promise.all(
-      pageItems.map(async (item) => ({
-        ...item,
-        images: await this.getActivityImages(item),
-      }))
-    ).then((loadedItems) => {
-      this.visibleActivities = loadedItems;
-      this.favoriteStateService.applyToList(this.visibleActivities, (item) => ({
-        type: 'activity',
-        entityId: item.id,
-      }));
-      this.cdr.detectChanges();
-    });
+    this.visibleActivities = pageItems;
+    this.favoriteStateService.applyToList(this.visibleActivities, (item) => ({
+      type: 'activity',
+      entityId: item.id,
+    }));
+    this.cdr.detectChanges();
   }
   private async ensureFavoritesLoaded(): Promise<void> {
     if (this.favoritesLoaded || !this.authService.isLoggedIn()) {

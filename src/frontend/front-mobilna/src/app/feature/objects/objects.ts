@@ -270,9 +270,10 @@ export class ObjectsComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
 
     try {
-      await this.ensureFavoritesLoaded();
-
-      const allObjects = await this.fetchAllObjects();
+      const [allObjects] = await Promise.all([
+        this.fetchAllObjects(),
+        this.ensureFavoritesLoaded(),
+      ]);
 
       if (currentToken !== this.loadToken) return;
 
@@ -319,34 +320,29 @@ export class ObjectsComponent implements OnInit, OnDestroy {
   }
   private async fetchAllObjects(): Promise<ObjectDto[]> {
     const regionId = this.activeRegionService.getActiveRegionId() ?? 0;
-    const cacheKey = `objects:r${regionId}`;
+    const lang = this.translationService.language();
+    const cacheKey = `objects:r${regionId}:l${lang}`;
     const cached = this.dataCacheService.get<ObjectDto[]>(cacheKey);
     if (cached) return cached;
 
-    const all: ObjectDto[] = [];
-    let page = 1;
-    const batchSize = 100;
+    const pageSize = 100;
+    const firstPage = await firstValueFrom(
+      this.objectService.getPage({ page: 1, pageSize, sortBy: 'name', sortOrder: 'asc' })
+    );
+    const firstItems = firstPage.items ?? [];
+    const totalPages = Math.max(1, firstPage.totalPages ?? 1);
 
-    while (true) {
-      const response = await firstValueFrom(
-        this.objectService.getPage({
-          page,
-          pageSize: batchSize,
-          search: undefined,
-          type: undefined,
-          minRating: undefined,
-          sortBy: 'name',
-          sortOrder: 'asc',
-        })
-      );
-
-      const items = response.items ?? [];
-      all.push(...items);
-
-      if (items.length < batchSize) break;
-      page++;
+    if (totalPages <= 1) {
+      this.dataCacheService.set(cacheKey, firstItems);
+      return firstItems;
     }
 
+    const remainingPages = await Promise.all(
+      Array.from({ length: totalPages - 1 }, (_, i) =>
+        firstValueFrom(this.objectService.getPage({ page: i + 2, pageSize, sortBy: 'name', sortOrder: 'asc' }))
+      )
+    );
+    const all = [...firstItems, ...remainingPages.flatMap(p => p.items ?? [])];
     this.dataCacheService.set(cacheKey, all);
     return all;
   }
