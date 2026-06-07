@@ -862,17 +862,24 @@
   display: flex;
   flex: 1;
   flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .card__desc {
-  margin-bottom: 12px;
+  flex-shrink: 1;
+  min-height: 0;
+  overflow: hidden;
+  margin-bottom: 8px;
 }
 
 .card__footer {
+  flex-shrink: 0;
   margin-top: auto;
   display: flex;
   justify-content: flex-end;
   align-items: center;
+  padding-bottom: 2px;
 }
 
 .card__details {
