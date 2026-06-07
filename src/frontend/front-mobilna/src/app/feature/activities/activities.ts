@@ -430,17 +430,25 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
         return;
       }
 
-      const remainingPages = await Promise.all(
-        Array.from({ length: totalPages - 1 }, (_, i) =>
-          firstValueFrom(this.activityService.getPage({ page: i + 2, pageSize, sortBy: 'name', sortOrder: 'asc' }))
-        )
-      );
+      const batchSize = 5;
+      let allItems = [...firstItems];
+      for (let start = 2; start <= totalPages; start += batchSize) {
+        if (currentToken !== this.loadToken) return;
+        const end = Math.min(start + batchSize - 1, totalPages);
+        const batch = await Promise.all(
+          Array.from({ length: end - start + 1 }, (_, i) =>
+            firstValueFrom(
+              this.activityService.getPage({ page: start + i, pageSize, sortBy: 'name', sortOrder: 'asc' })
+            ).catch(() => ({ items: [] as ActivityDto[], totalPages, page: start + i, pageSize, totalCount: 0 }))
+          )
+        );
+        allItems = [...allItems, ...batch.flatMap(p => p.items ?? [])];
+        if (currentToken === this.loadToken) {
+          this.applyActivitiesData(allItems);
+        }
+      }
 
-      if (currentToken !== this.loadToken) return;
-
-      const all = [...firstItems, ...remainingPages.flatMap(p => p.items ?? [])];
-      this.dataCacheService.set(cacheKey, all);
-      this.applyActivitiesData(all);
+      this.dataCacheService.set(cacheKey, allItems);
     } catch (err) {
       if (currentToken !== this.loadToken) return;
       console.error(err);
