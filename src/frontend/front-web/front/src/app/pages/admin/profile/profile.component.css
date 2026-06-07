@@ -1106,16 +1106,16 @@
 
 .crop-modal__body {
   padding: 20px 24px 12px;
+}
 
-  image-cropper {
-    display: block;
-    width: 100%;
-    min-height: 340px;
-    --cropper-outline-color: rgba(37, 99, 235, 0.18);
-    --cropper-overlay-color: rgba(15, 23, 42, 0.48);
-    --cropper-color: #2563eb;
-    --cropper-resize-square-bg: #ffffff;
-  }
+.crop-modal__body image-cropper {
+  display: block;
+  width: 100%;
+  min-height: 340px;
+  --cropper-outline-color: rgba(37, 99, 235, 0.18);
+  --cropper-overlay-color: rgba(15, 23, 42, 0.48);
+  --cropper-color: #2563eb;
+  --cropper-resize-square-bg: #ffffff;
 }
 
 .crop-modal__footer {

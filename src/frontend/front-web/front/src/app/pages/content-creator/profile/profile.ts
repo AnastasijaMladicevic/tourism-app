@@ -84,6 +84,7 @@ export class ProfileComponentContentCreator implements OnInit, OnDestroy {
   pendingCropFile: File | null = null;
   isSaving = false;
   saveSuccess = false;
+  saveError = '';
   permissionsModalState: ModalState = 'closed';
   passwordModalState: ModalState = 'closed';
   passwordChangeMode: 'direct' | 'forgot-otp' | 'forgot-password' = 'direct';
@@ -299,6 +300,7 @@ export class ProfileComponentContentCreator implements OnInit, OnDestroy {
     };
 
     this.isSaving = true;
+    this.saveError = '';
     this.cdr.detectChanges();
     this.authService.update(this.user.id, dto).subscribe({
       next: (updated) => {
@@ -306,11 +308,12 @@ export class ProfileComponentContentCreator implements OnInit, OnDestroy {
         this.syncUserState(mergedUser);
         this.authService.setCurrentUser(mergedUser);
         this.translationService.setLanguage(mergedUser.language);
+        this.saveError = '';
         this.showSaveSuccess();
         window.dispatchEvent(new Event('storage'));
       },
       error: (err) => {
-        console.error('Save failed', err);
+        this.saveError = err?.error?.message?.trim() || this.translationService.translate('adminProfile.saveError');
       },
     }).add(() => {
       this.isSaving = false;
