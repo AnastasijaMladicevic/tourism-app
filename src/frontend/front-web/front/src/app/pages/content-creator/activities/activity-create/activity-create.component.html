@@ -217,6 +217,7 @@
           [lng]="form.controls.longitude.value ?? 18.771"
           [zoom]="form.controls.latitude.value && form.controls.longitude.value ? 15 : 13"
           [popupText]="form.controls.name.value || ('common.activity' | translate)"
+          [zoomable]="true"
           (mapClick)="selectLocation($event.lat, $event.lng)">
         </app-map>
 

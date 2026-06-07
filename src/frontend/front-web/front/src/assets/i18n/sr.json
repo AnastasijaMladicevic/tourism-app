@@ -169,7 +169,7 @@
     "favoritesCount": "{{count}} favorita",
     "plannerAddsCount": "{{count}} dodavanja u planer",
     "reviewsCount": "{{count}} recenzija",
-    "avgRating": "{{rating}} prosecna ocena",
+    "avgRating": "{{rating}} prosečna ocena",
     "noDestinationEngagement": "Nema zabeleženog angažovanja destinacija za ovaj period.",
     "regionEngagement": "Angažovanje regiona",
     "regionEngagementPeriod": "Najangažovaniji regioni u {{period}}",
@@ -450,36 +450,36 @@
       },
       "2": {
         "title": "Sadrzaj i informacije",
-        "body": "Prikazani podaci zavise od dostupnih API odgovora. Frontend prikazuje ono sto backend trenutno vraca i ne garantuje dodatne funkcionalnosti koje nisu podrzane rutama sistema."
+        "body": "Prikazani podaci zavise od dostupnih API odgovora. Frontend prikazuje ono što backend trenutno vraža i ne garantuje dodatne funkcionalnosti koje nisu podržne rutama sistema."
       },
       "3": {
         "title": "Nalog i bezbednost",
-        "body": "Odjava, izmena osnovnih podataka i promena fotografije koriste postojece nalog mehanizme. Za dodatne nalog akcije potrebna je posebna backend podrska."
+        "body": "Odjava, izmena osnovnih podataka i promena fotografije koriste postojeće nalog mehanizme. Za dodatne nalog akcije potrebna je posebna backend podrška."
       }
     },
     "note": {
       "1": "Favoriti, recenzije i profilni podaci vezani su za trenutno ulogovan nalog.",
-      "2": "Lokalno sacuvani planer radi samo na uredjaju na kom je kreiran.",
-      "3": "Za pravne i produkcione verzije uslova potrebno je uskladjivanje sa timom i backend specifikacijom."
+      "2": "Lokalno sačuvani planer radi samo na uređaju na kom je kreiran.",
+      "3": "Za pravne i produkcione verzije uslova potrebno je usklađivanje sa timom i backend specifikacijom."
     }
   },
   "map": {
-    "searchPlaceholder": "Pretrazi objekte, rute...",
-    "geoUnsupported": "Geolokacija nije podrzana u ovom browseru.",
-    "geoDenied": "Dozvolite pristup lokaciji u podesavanjima browsera.",
+    "searchPlaceholder": "Pretraži objekte, rute...",
+    "geoUnsupported": "Geolokacija nije podržana u ovom browseru.",
+    "geoDenied": "Dozvolite pristup lokaciji u podešavanjima browsera.",
     "geoUnavailable": "Lokacija trenutno nije dostupna.",
-    "geoFailed": "Nije moguce dobiti vasu lokaciju."
+    "geoFailed": "Nije moguće dobiti vašu lokaciju."
   },
   "event": {
-    "title": "Dogadjaj",
+    "title": "Događaj",
     "ticketPrice": "Cena karte",
-    "loadingError": "Greska pri ucitavanju dogadjaja.",
-    "addedToPlanner": "Dogadjaj je dodat u Planner",
+    "loadingError": "Greška pri ucitavanju događaja.",
+    "addedToPlanner": "Događaj je dodat u Planner",
     "free": "Besplatno",
     "buyTicket": "Kupi kartu",
     "ticketAlert": "Kupovina karte - Cena: {{price}}",
     "addToPlanner": "Dodaj u Planner",
-    "about": "O dogadjaju",
+    "about": "O događaju",
     "descriptionFallback": "Opis nije dostupan.",
     "availableTickets": "Dostupne ulaznice",
       "standardTicket": "Standardna ulaznica",
@@ -489,7 +489,7 @@
       "ticketTypeName": "Naziv karte",
       "ticketTypeNamePlaceholder": "VIP, Regular, Early bird...",
       "ticketPricePlaceholder": "45.00",
-      "noTicketTypesHint": "Ostavi prazno ako je dogadjaj besplatan.",
+      "noTicketTypesHint": "Ostavi prazno ako je događaj besplatan.",
       "select": "Odaberi"
   },
   "object": {
@@ -498,10 +498,10 @@
       "starting": "Cena od"
     },
     "titleFallback": "Objekat",
-    "loadingError": "Greska pri ucitavanju objekta.",
+    "loadingError": "Greška pri učitavanju objekta.",
     "about": "O {{name}}",
-    "amenitiesSoon": "Sadrzaji ce biti dostupni uskoro.",
-    "writeReviewSoon": "Forma za novu recenziju je jos u izradi.",
+    "amenitiesSoon": "Sadržaji ce biti dostupni uskoro.",
+    "writeReviewSoon": "Forma za novu recenziju je još u izradi.",
     "workingHoursMissing": "Radno vreme nije navedeno",
     "nearbyNone": "Nema drugih {{name}}a u istoj lokaciji.",
     "allReviews": "Sve recenzije",
@@ -509,26 +509,26 @@
   },
   "restaurant": {
     "title": "Restoran",
-    "loadingError": "Greska pri ucitavanju restorana.",
+    "loadingError": "Greška pri učitavanju restorana.",
     "about": "O restoranu",
-    "writeReviewSoon": "Forma za novu recenziju je jos u izradi."
+    "writeReviewSoon": "Forma za novu recenziju je još u izradi."
   },
   "hotel": {
-    "loadingError": "Greska pri ucitavanju hotela.",
+    "loadingError": "Greška pri učitavanju hotela.",
     "bookingSoon": "Booking sistem ce biti integrisan kasnije.",
     "addedToPlanner": "Hotel je dodat u Planner",
     "phoneMissing": "Broj telefona nije dostupan",
     "galleryEmpty": "Nema dostupnih slika",
     "reviewTitle": "Recenzije",
-    "showLess": "Prikazi manje >",
+    "showLess": "Prikaži manje >",
     "reviewAria": "Ocena recenzije",
     "responseLabel": "Odgovor hotela",
-    "reviewsPending": "Recenzije ce biti prikazane kada stignu sa backenda.",
-    "nearbyTitle": "Obliznji hoteli",
+    "reviewsPending": "Recenzije će biti prikazane kada stignu sa backenda.",
+    "nearbyTitle": "Obližnji hoteli",
     "nearbyEmpty": "Nema drugih hotela u istoj lokaciji.",
     "visitWebsite": "Poseti sajt",
     "aboutTitle": "O hotelu",
-    "aboutFallback": "Detaljnije informacije o ovom hotelu bice prikazane ovde.",
+    "aboutFallback": "Detaljnije informacije o ovom hotelu biće prikazane ovde.",
     "locationMontenegro": "Crna Gora"
   },
   "time": {
@@ -552,39 +552,39 @@
         "mainMenu": "Glavni meni",
         "dashboard": "Kontrolna tabla"
       },
-      "title": "Kontrolna tabla kreatora sadrzaja",
-      "subtitle": "Pregled performansi sadrzaja, recenzija i dogadjaja koji slede.",
-      "loading": "Ucitavanje kontrolne table kreatora sadrzaja...",
+      "title": "Kontrolna tabla kreatora sadržaja",
+      "subtitle": "Pregled performansi sadržaja, recenzija i događaja koji slede.",
+      "loading": "Ucitavanje kontrolne table kreatora sadržaja...",
       "retry": "Pokusaj ponovo",
-      "totalContent": "Ukupan sadrzaj",
+      "totalContent": "Ukupan sadržaj",
       "newReviews": "Nove recenzije",
-      "averageRating": "Prosecna ocena",
+      "averageRating": "Prosečna ocena",
       "upcoming30": "Narednih 30 dana",
-      "publishedContent": "Objavljen sadrzaj",
-      "pendingContent": "Na cekanju",
-      "rejectedContent": "Odbijen sadrzaj",
-      "waitingForModeration": "Ceka moderatorski pregled",
+      "publishedContent": "Objavljen sadržaj",
+      "pendingContent": "Na čekanju",
+      "rejectedContent": "Odbijen sadržaj",
+      "waitingForModeration": "Čeka moderatorski pregled",
       "needsEdits": "Potrebne izmene pre ponovnog slanja",
       "during": "Tokom {{period}}",
       "savedIntoPlans": "Sacuvano u planovima putovanja turista",
-      "replySoon": "Odgovori uskoro za veci kredibilitet",
+      "replySoon": "Odgovori uskoro za veći kredibilitet",
       "engagementTrend": "Trend angažovanja",
       "reviewOpen": "Otvori recenzije",
-      "noEngagement": "Nije zabelezena aktivnost angazovanja za ovaj period.",
+      "noEngagement": "Nije zabeležena aktivnost angažovanja za ovaj period.",
       "acrossReviews": "Tokom recenzija u {{period}}",
       "totalReviews": "Ukupno recenzija u izabranom periodu",
       "ratingDistribution": "Raspodela ocena",
       "oneToFiveStars": "Od jedne do pet zvezdica",
       "noRatings": "Za ovaj period nema ocena.",
-      "contentStatusSplit": "Raspodela statusa sadrzaja",
-      "contentStatusSubtitle": "Ukupno, objekti, dogadjaji i aktivnosti",
+      "contentStatusSplit": "Raspodela statusa sadržaja",
+      "contentStatusSubtitle": "Ukupno, objekti, događaji i aktivnosti",
       "total": "ukupno",
       "published": "objavljeno",
-      "pending": "na cekanju",
+      "pending": "na čekanju",
       "rejected": "odbijeno",
       "noContentStatus": "Status sadrzaja trenutno nije dostupan.",
       "topContent": "Najuspesniji sadrzaj",
-      "topContentSubtitle": "Objekti, dogadjaji i aktivnosti sa najjacim angažovanjem",
+      "topContentSubtitle": "Objekti, događaji i aktivnosti sa najjacim angažovanjem",
       "manageContent": "Upravljaj sadrzajem",
       "scoreValue": "rezultat {{score}}",
       "noDestination": "Nema destinacije",
@@ -592,16 +592,16 @@
       "favorites": "omiljene stavke",
       "plannerAdds": "dodavanja u planer",
       "reviews": "recenzije",
-      "avgRating": "prosecna ocena",
+      "avgRating": "prosečna ocena",
       "averageRatingAria": "Prosečna ocena {{rating}} od 5",
       "noContentEngagement": "Nema dostupnih podataka o angazovanju za ovaj period.",
       "topDestinations": "Najuspesnije destinacije",
       "topDestinationsSubtitle": "Ucinak destinacija iz tvojeg sadrzaja",
       "noDestinationPerformance": "Za ovaj period nema podataka o ucinaku destinacija.",
-      "upcomingEvents": "Naredni dogadjaji",
+      "upcomingEvents": "Naredni događaji",
       "upcomingEventsSubtitle": "{{count7}} u narednih 7 dana · {{count30}} u narednih 30 dana",
-      "openEvents": "Otvori dogadjaje",
-      "noUpcomingEvents": "Nema odobrenih dogadjaja u narednih 30 dana.",
+      "openEvents": "Otvori događaje",
+      "noUpcomingEvents": "Nema odobrenih događaja u narednih 30 dana.",
       "loadError": "Podaci kontrolne table kreatora sadržaja trenutno ne mogu da se učitaju."
     }
   },
@@ -1442,7 +1442,7 @@
         "matchingFilters": "Odgovara aktivnim filterima",
         "onThisPage": "Na ovoj stranici",
         "visibleRows": "Vidljivi redovi",
-        "averageRating": "Prosecna ocena",
+        "averageRating": "Prosečna ocena",
         "acrossPage": "Na trenutnoj stranici"
       },
       "loading": "Ucitavanje objekata...",
@@ -1453,7 +1453,7 @@
         "filtered": "Nema objekata za izabrane filtere.",
         "noObjectSelected": "Nijedan objekat nije izabran",
         "pickObjectTitle": "Izaberi objekat iz tabele",
-        "pickObjectBody": "Izaberi red da pregledas medije, lokaciju i status odobrenja pre otvaranja kompletnog pregleda."
+        "pickObjectBody": "Izaberi red da pregledaš medije, lokaciju i status odobrenja pre otvaranja kompletnog pregleda."
       },
       "reviewObject": "Pregledaj objekat",
       "table": {
@@ -1466,9 +1466,9 @@
       },
       "pagination": {
         "showing": "Prikazano {{start}} do {{end}} od {{total}} objekata",
-        "pageSize": "Velicina stranice",
+        "pageSize": "Veličina stranice",
         "previous": "Prethodno",
-        "next": "Sledece"
+        "next": "Sledeće"
       },
       "selectedObject": "Izabrani objekat",
       "featuredObject": "Izdvojeni objekat",
@@ -1479,10 +1479,10 @@
       "guestReviews": "Recenzije gostiju",
       "reviewsTotal": "{{count}} ukupno",
       "reviewsHint": "Turisti ocenjuju samo ovaj objekat. Ispod su njihove ocene i eventualni odgovori kreatora sadrzaja.",
-      "loadingGuestReviews": "Ucitavanje recenzija gostiju…",
-      "noGuestReviews": "Jos nema recenzija gostiju za ovaj objekat.",
+      "loadingGuestReviews": "Učitavanje recenzija gostiju…",
+      "noGuestReviews": "Još nema recenzija gostiju za ovaj objekat.",
       "ccReply": "Odgovor kreatora",
-      "noCreatorReply": "Kreator jos nije odgovorio",
+      "noCreatorReply": "Kreator još nije odgovorio",
       "viewAllReviews": "Pogledaj svih {{count}} recenzija na stranici objekta",
       "reportCreator": "Prijavi kreatora",
       "noCoordinates": "Koordinate nisu dostupne za ovaj objekat.",
@@ -1490,7 +1490,7 @@
       "totalCount": "Ukupno: {{count}} objekata",
       "status": {
         "approved": "Odobreno",
-        "pending": "Na cekanju",
+        "pending": "Na čekanju",
         "rejected": "Odbijeno"
       }
     }

@@ -21,6 +21,7 @@ import { CreateEventDto, EventDto, EventTicketTypeInputDto, UpdateEventDto } fro
 import { MapComponent } from '../../../../shared/components/map/map';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../../../services/translation.service';
+import { formatDurationCompact } from '../../../../utils/duration';
 
 interface VenueOption {
   id: number;
@@ -451,7 +452,7 @@ export class EventFormComponent implements OnInit, OnDestroy {
   private buildActivityMeta(activity: { durationMinutes?: number; price?: number }): string {
     const activityLabel = this.translationService.translate('activity.label');
     const duration = activity.durationMinutes
-      ? this.translationService.translate('contentCreator.eventForm.activityDurationMinutes', { count: activity.durationMinutes })
+      ? formatDurationCompact(activity.durationMinutes)
       : this.translationService.translate('common.notAvailable');
     const price = activity.price != null
       ? `$${Number(activity.price).toFixed(0)}`

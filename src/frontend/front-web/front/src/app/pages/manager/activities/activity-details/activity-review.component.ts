@@ -17,6 +17,7 @@ import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import { ActivitiesService, ActivityDto, ActivityImageDto, ApproveActivityDto } from '../../../../services/activities';
 import { environment } from '../../../../../environment/environment';
 import { TranslationService } from '../../../../services/translation.service';
+import { formatDurationCompact } from '../../../../utils/duration';
 
 @Component({
   selector: 'app-manager-activity-review',
@@ -549,18 +550,7 @@ export class ManagerActivityReviewComponent implements OnInit, OnDestroy {
       return this.translationService.translate('manager.activityReview.fallback.notAvailable');
     }
 
-    const hours = Math.floor(minutes / 60);
-    const remainingMinutes = minutes % 60;
-
-    if (hours > 0 && remainingMinutes > 0) {
-      return `${hours}h ${remainingMinutes}m`;
-    }
-
-    if (hours > 0) {
-      return `${hours}h`;
-    }
-
-    return `${remainingMinutes}m`;
+    return formatDurationCompact(minutes);
   }
 
   getStatusLabel(status: string | undefined): string {

@@ -10,6 +10,7 @@ import { MapComponent as SharedMapComponent } from '../../../shared/components/m
 import { HERO_IMAGE_ROTATION_INTERVAL_MS } from '../../../shared/constants/hero-image-rotation';
 import { TranslationService } from '../../../services/translation.service';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
+import { formatDurationCompact } from '../../../utils/duration';
 
 interface ActivityInsightCard {
   label: string;
@@ -356,23 +357,7 @@ export class ContentCreatorActivitiesComponent implements OnInit, OnDestroy {
       return this.translationService.translate('common.notAvailable');
     }
 
-    if (minutes < 60) {
-      return `${minutes} min`;
-    }
-
-    const hours = Math.floor(minutes / 60);
-    const remainingMinutes = minutes % 60;
-
-    if (remainingMinutes === 0) {
-      return hours === 1
-        ? this.translationService.translate('contentCreator.activities.oneHour')
-        : this.translationService.translate('contentCreator.activities.hours', { count: hours });
-    }
-
-    return this.translationService.translate('contentCreator.activities.hoursMinutes', {
-      hours,
-      minutes: remainingMinutes,
-    });
+    return formatDurationCompact(minutes);
   }
 
   formatParticipationFee(price?: number | null): string {

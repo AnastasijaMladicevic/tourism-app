@@ -16,6 +16,7 @@ import { MapComponent as SharedMapComponent } from '../../../shared/components/m
 import { HERO_IMAGE_ROTATION_INTERVAL_MS } from '../../../shared/constants/hero-image-rotation';
 import { TranslationService } from '../../../services/translation.service';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
+import { formatDurationCompact } from '../../../utils/duration';
 
 @Component({
   selector: 'app-manager-activities',
@@ -481,21 +482,7 @@ export class ManagerActivitiesComponent implements OnInit {
       return this.translationService.translate('common.notAvailable');
     }
 
-    if (minutes < 60) {
-      return this.translationService.translate('manager.activities.durationMinutes', { count: minutes });
-    }
-
-    const hours = Math.floor(minutes / 60);
-    const remainingMinutes = minutes % 60;
-
-    if (remainingMinutes === 0) {
-      return this.translationService.translate(hours === 1 ? 'manager.activities.oneHour' : 'manager.activities.hours', { count: hours });
-    }
-
-    return this.translationService.translate('manager.activities.hoursMinutes', {
-      hours,
-      minutes: remainingMinutes
-    });
+    return formatDurationCompact(minutes);
   }
 
   formatParticipationFee(price?: number | null): string {
