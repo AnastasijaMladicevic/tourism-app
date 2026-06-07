@@ -269,43 +269,48 @@ export class ObjectsComponent implements OnInit, OnDestroy {
     this.errorMessage = '';
     this.cdr.detectChanges();
 
+    const regionId = this.activeRegionService.getActiveRegionId() ?? 0;
+    const lang = this.translationService.language();
+    const cacheKey = `objects:r${regionId}:l${lang}`;
+
     try {
-      const [allObjects] = await Promise.all([
-        this.fetchAllObjects(),
+      const cached = this.dataCacheService.get<ObjectDto[]>(cacheKey);
+      if (cached) {
+        await this.ensureFavoritesLoaded();
+        if (currentToken !== this.loadToken) return;
+        this.applyObjectsData(cached);
+        return;
+      }
+
+      const pageSize = 100;
+      const [firstPage] = await Promise.all([
+        firstValueFrom(this.objectService.getPage({ page: 1, pageSize, sortBy: 'name', sortOrder: 'asc' })),
         this.ensureFavoritesLoaded(),
       ]);
 
       if (currentToken !== this.loadToken) return;
 
-      this.objects = allObjects.map((obj) => {
-        const raw = obj as unknown as Record<string, unknown>;
-        return {
-          ...obj,
-          latitude: this.readOptionalNumber(raw, ['latitude', 'Latitude']),
-          longitude: this.readOptionalNumber(raw, ['longitude', 'Longitude']),
-          distanceMeters: this.readOptionalNumber(raw, ['distanceMeters', 'DistanceMeters']),
-          averageRating: this.readOptionalNumber(raw, ['averageRating', 'AverageRating']),
-          reviewCount: this.readOptionalNumber(raw, ['reviewCount', 'ReviewCount']),
-          isFavorite: false,
-          favoriteId: undefined,
-        };
-      });
+      const firstItems = firstPage.items ?? [];
+      const totalPages = Math.max(1, firstPage.totalPages ?? 1);
 
-      if (this.userLocation && this.sortOption !== 'distance') {
-        this.updateDistances();
-      } else if (!this.userLocation && this.sortOption !== 'distance') {
-        this.clearDistances();
+      this.applyObjectsData(firstItems);
+
+      if (totalPages <= 1) {
+        this.dataCacheService.set(cacheKey, firstItems);
+        return;
       }
 
-      this.favoriteStateService.applyToList(this.objects, (object) => ({
-        type: 'object',
-        entityId: object.id,
-      }));
+      const remainingPages = await Promise.all(
+        Array.from({ length: totalPages - 1 }, (_, i) =>
+          firstValueFrom(this.objectService.getPage({ page: i + 2, pageSize, sortBy: 'name', sortOrder: 'asc' }))
+        )
+      );
 
-      this.refreshVisibleObjects();
+      if (currentToken !== this.loadToken) return;
 
-      this.isLoading = false;
-      this.cdr.detectChanges();
+      const all = [...firstItems, ...remainingPages.flatMap(p => p.items ?? [])];
+      this.dataCacheService.set(cacheKey, all);
+      this.applyObjectsData(all);
     } catch (err) {
       if (currentToken !== this.loadToken) return;
       console.error(err);
@@ -318,33 +323,36 @@ export class ObjectsComponent implements OnInit, OnDestroy {
       this.cdr.detectChanges();
     }
   }
-  private async fetchAllObjects(): Promise<ObjectDto[]> {
-    const regionId = this.activeRegionService.getActiveRegionId() ?? 0;
-    const lang = this.translationService.language();
-    const cacheKey = `objects:r${regionId}:l${lang}`;
-    const cached = this.dataCacheService.get<ObjectDto[]>(cacheKey);
-    if (cached) return cached;
 
-    const pageSize = 100;
-    const firstPage = await firstValueFrom(
-      this.objectService.getPage({ page: 1, pageSize, sortBy: 'name', sortOrder: 'asc' })
-    );
-    const firstItems = firstPage.items ?? [];
-    const totalPages = Math.max(1, firstPage.totalPages ?? 1);
+  private applyObjectsData(allObjects: ObjectDto[]): void {
+    this.objects = allObjects.map((obj) => {
+      const raw = obj as unknown as Record<string, unknown>;
+      return {
+        ...obj,
+        latitude: this.readOptionalNumber(raw, ['latitude', 'Latitude']),
+        longitude: this.readOptionalNumber(raw, ['longitude', 'Longitude']),
+        distanceMeters: this.readOptionalNumber(raw, ['distanceMeters', 'DistanceMeters']),
+        averageRating: this.readOptionalNumber(raw, ['averageRating', 'AverageRating']),
+        reviewCount: this.readOptionalNumber(raw, ['reviewCount', 'ReviewCount']),
+        isFavorite: false,
+        favoriteId: undefined,
+      };
+    });
 
-    if (totalPages <= 1) {
-      this.dataCacheService.set(cacheKey, firstItems);
-      return firstItems;
+    if (this.userLocation && this.sortOption !== 'distance') {
+      this.updateDistances();
+    } else if (!this.userLocation && this.sortOption !== 'distance') {
+      this.clearDistances();
     }
 
-    const remainingPages = await Promise.all(
-      Array.from({ length: totalPages - 1 }, (_, i) =>
-        firstValueFrom(this.objectService.getPage({ page: i + 2, pageSize, sortBy: 'name', sortOrder: 'asc' }))
-      )
-    );
-    const all = [...firstItems, ...remainingPages.flatMap(p => p.items ?? [])];
-    this.dataCacheService.set(cacheKey, all);
-    return all;
+    this.favoriteStateService.applyToList(this.objects, (object) => ({
+      type: 'object',
+      entityId: object.id,
+    }));
+
+    this.refreshVisibleObjects();
+    this.isLoading = false;
+    this.cdr.detectChanges();
   }
 
 

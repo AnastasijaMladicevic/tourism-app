@@ -399,37 +399,48 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
     this.errorMessage = '';
     this.cdr.detectChanges();
 
+    const regionId = this.activeRegionService.getActiveRegionId() ?? 0;
+    const lang = this.translationService.language();
+    const cacheKey = `activities:r${regionId}:l${lang}`;
+
     try {
-      const [allActivities] = await Promise.all([
-        this.fetchAllActivities(),
+      const cached = this.dataCacheService.get<ActivityDto[]>(cacheKey);
+      if (cached) {
+        await this.ensureFavoritesLoaded();
+        if (currentToken !== this.loadToken) return;
+        this.applyActivitiesData(cached);
+        return;
+      }
+
+      const pageSize = 100;
+      const [firstPage] = await Promise.all([
+        firstValueFrom(this.activityService.getPage({ page: 1, pageSize, sortBy: 'name', sortOrder: 'asc' })),
         this.ensureFavoritesLoaded(),
       ]);
 
       if (currentToken !== this.loadToken) return;
 
-      this.activities = allActivities.map((activity) => ({
-        ...this.normalizeActivity(activity),
-        images: activity.images ?? this.imageCache.get(activity.id) ?? [],
-        isFavorite: false,
-        favoriteId: undefined,
-      }));
+      const firstItems = firstPage.items ?? [];
+      const totalPages = Math.max(1, firstPage.totalPages ?? 1);
 
-      this.mergeActivityTypes(this.activities);
-      this.favoriteStateService.applyToList(this.activities, (item) => ({
-        type: 'activity',
-        entityId: item.id,
-      }));
+      this.applyActivitiesData(firstItems);
 
-      if (this.userLocation && this.sortOption !== 'distance') {
-        this.updateDistances();
-      } else if (!this.userLocation && this.sortOption !== 'distance') {
-        this.clearDistances();
+      if (totalPages <= 1) {
+        this.dataCacheService.set(cacheKey, firstItems);
+        return;
       }
 
-      this.refreshVisibleActivities();
+      const remainingPages = await Promise.all(
+        Array.from({ length: totalPages - 1 }, (_, i) =>
+          firstValueFrom(this.activityService.getPage({ page: i + 2, pageSize, sortBy: 'name', sortOrder: 'asc' }))
+        )
+      );
 
-      this.isLoading = false;
-      this.cdr.detectChanges();
+      if (currentToken !== this.loadToken) return;
+
+      const all = [...firstItems, ...remainingPages.flatMap(p => p.items ?? [])];
+      this.dataCacheService.set(cacheKey, all);
+      this.applyActivitiesData(all);
     } catch (err) {
       if (currentToken !== this.loadToken) return;
       console.error(err);
@@ -440,33 +451,30 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
       this.cdr.detectChanges();
     }
   }
-  private async fetchAllActivities(): Promise<ActivityDto[]> {
-    const regionId = this.activeRegionService.getActiveRegionId() ?? 0;
-    const lang = this.translationService.language();
-    const cacheKey = `activities:r${regionId}:l${lang}`;
-    const cached = this.dataCacheService.get<ActivityDto[]>(cacheKey);
-    if (cached) return cached;
 
-    const pageSize = 100;
-    const firstPage = await firstValueFrom(
-      this.activityService.getPage({ page: 1, pageSize, sortBy: 'name', sortOrder: 'asc' })
-    );
-    const firstItems = firstPage.items ?? [];
-    const totalPages = Math.max(1, firstPage.totalPages ?? 1);
+  private applyActivitiesData(allActivities: ActivityDto[]): void {
+    this.activities = allActivities.map((activity) => ({
+      ...this.normalizeActivity(activity),
+      images: activity.images ?? this.imageCache.get(activity.id) ?? [],
+      isFavorite: false,
+      favoriteId: undefined,
+    }));
 
-    if (totalPages <= 1) {
-      this.dataCacheService.set(cacheKey, firstItems);
-      return firstItems;
+    this.mergeActivityTypes(this.activities);
+    this.favoriteStateService.applyToList(this.activities, (item) => ({
+      type: 'activity',
+      entityId: item.id,
+    }));
+
+    if (this.userLocation && this.sortOption !== 'distance') {
+      this.updateDistances();
+    } else if (!this.userLocation && this.sortOption !== 'distance') {
+      this.clearDistances();
     }
 
-    const remainingPages = await Promise.all(
-      Array.from({ length: totalPages - 1 }, (_, i) =>
-        firstValueFrom(this.activityService.getPage({ page: i + 2, pageSize, sortBy: 'name', sortOrder: 'asc' }))
-      )
-    );
-    const all = [...firstItems, ...remainingPages.flatMap(p => p.items ?? [])];
-    this.dataCacheService.set(cacheKey, all);
-    return all;
+    this.refreshVisibleActivities();
+    this.isLoading = false;
+    this.cdr.detectChanges();
   }
 
   private refreshVisibleActivities(): void {
