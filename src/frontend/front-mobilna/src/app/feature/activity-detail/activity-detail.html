@@ -107,11 +107,17 @@
         </div>
         <div class="card">
           <h2>{{ 'activity.participationFee' | translate }}</h2>
-
-          <div class="ticket-card">
-            <div>
-              <span class="ticket-type">{{ 'activity.participationFee' | translate }}</span>
-              <span class="ticket-price">{{ getParticipationFee() }}</span>
+          <div class="price-ticket">
+            <div class="price-ticket__icon-wrap">
+              <mat-icon>local_activity</mat-icon>
+            </div>
+            <div class="price-ticket__info">
+              <span class="price-ticket__label">{{ 'common.admissionFee' | translate }}</span>
+              <span class="price-ticket__amount">{{ getParticipationFee() }}</span>
+              <span class="price-ticket__per">
+                <mat-icon>person_outline</mat-icon>
+                {{ 'common.perPerson' | translate }}
+              </span>
             </div>
           </div>
         </div>

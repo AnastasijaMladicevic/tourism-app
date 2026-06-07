@@ -514,7 +514,10 @@ export class EventsComponent implements OnInit, OnDestroy {
         .sort((a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime());
 
       const now = new Date();
-      const futureOnly = active.filter((event) => new Date(event.startDate) >= now);
+      const futureOnly = active.filter((event) => {
+        if (event.endDate) return new Date(event.endDate) >= now;
+        return new Date(event.startDate) >= now;
+      });
       const source = futureOnly.length ? futureOnly : active;
 
       this.events = source.map((event) => ({

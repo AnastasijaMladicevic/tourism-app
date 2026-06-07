@@ -78,6 +78,117 @@ body {
   background: var(--bg);
 }
 
+/* ====================== PRICE TICKET (globalno) ====================== */
+.price-ticket {
+  display: flex;
+  align-items: center;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: 16px;
+  padding: 0;
+  margin-top: 14px;
+  overflow: visible;
+  position: relative;
+  transition: transform 0.2s;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: -13px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 26px;
+    height: 26px;
+    background: var(--surface-strong);
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    z-index: 1;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    right: -13px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 26px;
+    height: 26px;
+    background: var(--surface-strong);
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    z-index: 1;
+  }
+}
+
+.price-ticket__icon-wrap {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: var(--primary-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin: 20px 0 20px 22px;
+
+  mat-icon {
+    font-size: 36px;
+    width: 36px;
+    height: 36px;
+    color: var(--primary);
+  }
+}
+
+.price-ticket__info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 28px 20px 22px;
+  border-left: 2px dashed var(--border);
+  margin-left: 22px;
+}
+
+.price-ticket__label {
+  font-size: 14px;
+  color: var(--text-gray);
+  margin-bottom: 2px;
+  font-weight: 500;
+}
+
+.price-ticket__amount {
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--primary);
+  line-height: 1.1;
+  margin-bottom: 8px;
+}
+
+.price-ticket__per {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 14px;
+  color: var(--text-gray);
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+:root[data-theme='dark'] {
+  .price-ticket::before,
+  .price-ticket::after {
+    background: var(--surface-strong);
+    border-color: var(--border);
+  }
+
+  .price-ticket__icon-wrap {
+    background: var(--primary-light);
+  }
+}
+
 html {
   height: 100%;
   @include mat.theme(

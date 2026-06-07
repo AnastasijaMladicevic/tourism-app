@@ -213,23 +213,31 @@
           </div>
         </div>
         @if (showObjectPriceCard) {
-        <div class="section">
-          <div class="card price-card">
-            <div class="price-header">
+          <div class="section">
+            <div class="card">
               <h2>{{ 'common.price' | translate }}</h2>
-            </div>
-            <div class="price">
-              <p class="price-tag">
-                @if (usesTicketPricing) {
-                  {{ 'event.standardTicket' | translate }} <strong>{{ object.price }}$</strong>
-                } @else {
-                  {{ 'common.startingFrom' | translate }} <strong>{{ object.price }}$</strong>
-                }
-              </p>
+              <div class="price-ticket">
+                <div class="price-ticket__icon-wrap">
+                  <mat-icon>local_activity</mat-icon>
+                </div>
+                <div class="price-ticket__info">
+                  <span class="price-ticket__label">
+                    @if (usesTicketPricing) {
+                      {{ 'event.standardTicket' | translate }}
+                    } @else {
+                      {{ 'common.admissionFee' | translate }}
+                    }
+                  </span>
+                  <span class="price-ticket__amount">{{ object.price }} €</span>
+                  <span class="price-ticket__per">
+                    <mat-icon>person_outline</mat-icon>
+                    {{ 'common.perPerson' | translate }}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      }
+        }
 
         <!-- Recenzije -->
         <div class="card reviews-card">
