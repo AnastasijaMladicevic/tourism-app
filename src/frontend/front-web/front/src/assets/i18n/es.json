@@ -780,6 +780,7 @@
   },
     "manager": {
       "events": {
+        "eyebrow": "Vista de eventos",
         "searchAria": "Buscar eventos",
         "searchPlaceholder": "Buscar eventos, objetos u organizadores...",
         "dateRangeFilter": "Filtro de rango de fechas",
@@ -857,6 +858,7 @@
         }
       },
       "activities": {
+        "eyebrow": "Vista de actividades",
         "searchPlaceholder": "Buscar actividades, tipos o destinos...",
         "loading": "Cargando actividades...",
         "reviewActivity": "Revisar actividad",
@@ -924,6 +926,7 @@
         }
       },
       "localities": {
+        "eyebrow": "Gestión de localidades",
         "searchAria": "Buscar localidades",
         "searchPlaceholder": "Buscar por localidad, destino o región...",
         "createLocality": "Crear localidad",
@@ -1408,6 +1411,7 @@
         }
       },
       "objects": {
+      "eyebrow": "Vista de objetos",
       "searchAria": "Buscar objetos",
       "searchPlaceholder": "Buscar por nombre, categoría o región...",
       "filter": {
@@ -1496,6 +1500,7 @@
     }
   },
   "adminDestinations": {
+    "eyebrow": "Gestión de destinos",
     "title": "Destinos",
     "subtitle": "Organiza los destinos regionales, mantén ordenadas las jerarquías de localidades y previsualiza cómo aparece cada destino en la plataforma.",
     "addDestination": "Agregar destino",

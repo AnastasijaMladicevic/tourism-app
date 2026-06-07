@@ -780,6 +780,7 @@
   },
   "manager": {
       "events": {
+        "eyebrow": "Pregled događaja",
         "searchAria": "Pretraži događaje",
         "searchPlaceholder": "Pretraži događaje, objekte ili organizatore...",
         "dateRangeFilter": "Filter opsega datuma",
@@ -857,6 +858,7 @@
         }
       },
       "activities": {
+        "eyebrow": "Pregled aktivnosti",
         "searchPlaceholder": "Pretraži aktivnosti, tipove ili destinacije...",
         "loading": "Učitavanje aktivnosti...",
         "reviewActivity": "Pregledaj aktivnost",
@@ -924,6 +926,7 @@
         }
       },
       "localities": {
+        "eyebrow": "Upravljanje lokalitetima",
         "searchAria": "Pretraži lokalitete",
         "searchPlaceholder": "Pretraži po lokalitetu, destinaciji ili regionu...",
         "createLocality": "Kreiraj lokalitet",
@@ -1408,6 +1411,7 @@
         }
       },
       "objects": {
+      "eyebrow": "Pregled objekata",
       "searchAria": "Pretrazi objekte",
       "searchPlaceholder": "Pretrazi po nazivu, kategoriji ili regionu...",
       "filter": {
@@ -1496,6 +1500,7 @@
     }
   },
   "adminDestinations": {
+    "eyebrow": "Upravljanje destinacijama",
     "title": "Destinacije",
     "subtitle": "Uređujte regionalne destinacije, održavajte hijerarhiju lokaliteta i pregledajte kako se svaka destinacija prikazuje na platformi.",
     "addDestination": "Dodaj destinaciju",

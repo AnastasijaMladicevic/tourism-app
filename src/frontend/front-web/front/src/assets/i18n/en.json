@@ -780,6 +780,7 @@
   },
   "manager": {
       "events": {
+        "eyebrow": "Event overview",
         "searchAria": "Search events",
         "searchPlaceholder": "Search events, objects, or organizers...",
         "dateRangeFilter": "Date range filter",
@@ -857,6 +858,7 @@
         }
       },
       "activities": {
+        "eyebrow": "Activity overview",
         "searchPlaceholder": "Search activities, types, or destinations...",
         "loading": "Loading activities...",
         "reviewActivity": "Review activity",
@@ -924,6 +926,7 @@
         }
       },
       "localities": {
+        "eyebrow": "Locality management",
         "searchAria": "Search localities",
         "searchPlaceholder": "Search by locality, destination or region...",
         "createLocality": "Create locality",
@@ -1408,6 +1411,7 @@
         }
       },
       "objects": {
+      "eyebrow": "Object overview",
       "searchAria": "Search objects",
       "searchPlaceholder": "Search by name, category or region...",
       "filter": {
@@ -1496,6 +1500,7 @@
     }
   },
   "adminDestinations": {
+    "eyebrow": "Destination management",
     "title": "Destinations",
     "subtitle": "Curate regional destinations, keep locality hierarchies organized, and preview how each destination appears across the platform.",
     "addDestination": "Add destination",
