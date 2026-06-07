@@ -256,6 +256,7 @@ export const routes: Routes = [
   },
   {
     path: 'event-planner-preview',
+    canActivate: [profileAuthGuard],
     loadComponent: () =>
       import('./feature/event-planner-preview/event-planner-preview.component').then(
         (m) => m.EventPlannerPreviewComponent,
@@ -330,6 +331,7 @@ export const routes: Routes = [
   },
   {
     path: 'planner/add',
+    canActivate: [profileAuthGuard],
     loadComponent: () =>
       import('./feature/add-to-planner/add-to-planner.component').then(
         (m) => m.AddToPlannerComponent,
