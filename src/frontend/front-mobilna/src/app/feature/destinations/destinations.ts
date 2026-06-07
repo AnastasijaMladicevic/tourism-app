@@ -544,42 +544,40 @@ export class DestinationsComponent implements OnInit, OnDestroy {
     const cached = this.dataCacheService.get<DestinationDto[]>(cacheKey);
     if (cached) return cached;
 
-    const allDestinations: DestinationDto[] = [];
-    const seenIds = new Set<number>();
+    const pageSize = this.fetchPageSize;
+    const firstPage = await firstValueFrom(
+      this.destinationService.getPage({ page: 1, pageSize })
+    );
+    const firstItems = (firstPage.items ?? []).map(d => this.normalizeDestination(d));
+    const totalPages = Math.min(
+      Math.max(1, firstPage.totalPages ?? 1),
+      this.maxFetchPages,
+    );
 
-    for (let page = 1; page <= this.maxFetchPages; page++) {
-      const response = await firstValueFrom(
-        this.destinationService.getAll({
-          page,
-          pageSize: this.fetchPageSize,
-        }),
-      );
-      const items = this.toArray<DestinationDto>(response).map((destination) =>
-        this.normalizeDestination(destination),
-      );
+    if (totalPages <= 1) {
+      this.dataCacheService.set(cacheKey, firstItems);
+      return firstItems;
+    }
 
-      const newItems = items.filter((item) => {
-        if (seenIds.has(item.id)) {
-          return false;
+    const remainingPages = await Promise.all(
+      Array.from({ length: totalPages - 1 }, (_, i) =>
+        firstValueFrom(this.destinationService.getPage({ page: i + 2, pageSize }))
+      )
+    );
+    const seenIds = new Set(firstItems.map(d => d.id));
+    const all = [...firstItems];
+    for (const page of remainingPages) {
+      for (const item of page.items ?? []) {
+        const normalized = this.normalizeDestination(item);
+        if (!seenIds.has(normalized.id)) {
+          seenIds.add(normalized.id);
+          all.push(normalized);
         }
-
-        seenIds.add(item.id);
-        return true;
-      });
-
-      if (!newItems.length) {
-        break;
-      }
-
-      allDestinations.push(...newItems);
-
-      if (items.length < this.fetchPageSize) {
-        break;
       }
     }
 
-    this.dataCacheService.set(cacheKey, allDestinations);
-    return allDestinations;
+    this.dataCacheService.set(cacheKey, all);
+    return all;
   }
 
   private async refreshVisibleDestinations(): Promise<void> {

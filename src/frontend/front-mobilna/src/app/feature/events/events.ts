@@ -533,7 +533,7 @@ export class EventsComponent implements OnInit, OnDestroy {
         longitude: event.longitude,
         eventTypeName: event.eventTypeName ?? '',
         eventTypeId: event.eventTypeId ?? 0,
-        description: this.getShortDescription(event.description, 1),
+        description: event.description,
         startDate: event.startDate,
         endDate: event.endDate,
       }));
@@ -550,17 +550,6 @@ export class EventsComponent implements OnInit, OnDestroy {
     this.flushUi();
   }
 
-  private getShortDescription(text?: string, maxSentences = 2): string {
-    if (!text) return '';
-
-    const sentences = text
-      .replace(/\s+/g, ' ')
-      .match(/[^.!?]+[.!?]+/g);
-
-    if (!sentences) return text;
-
-    return sentences.slice(0, maxSentences).join(' ').trim();
-  }
   private extractUniqueTypes(events: EventCard[]): { id: number; name: string }[] {
     const map = new Map<string, { id: number; name: string }>();
 

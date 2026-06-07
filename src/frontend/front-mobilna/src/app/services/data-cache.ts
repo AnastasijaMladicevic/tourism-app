@@ -8,7 +8,7 @@ interface CacheEntry<T> {
 @Injectable({ providedIn: 'root' })
 export class DataCacheService {
   private readonly cache = new Map<string, CacheEntry<unknown>>();
-  private readonly defaultTtlMs = 2 * 60 * 1000; // 2 minuta
+  private readonly defaultTtlMs = 10 * 60 * 1000; // 10 minuta
 
   get<T>(key: string): T | null {
     const entry = this.cache.get(key);

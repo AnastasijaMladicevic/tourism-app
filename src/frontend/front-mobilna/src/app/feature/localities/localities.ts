@@ -394,29 +394,24 @@ export class LocalitiesComponent implements OnInit, OnDestroy {
     const cached = this.dataCacheService.get<LocalityDto[]>(cacheKey);
     if (cached) return cached;
 
-    const all: LocalityDto[] = [];
-    let page = 1;
     const pageSize = 100;
+    const firstPage = await firstValueFrom(
+      this.localityService.getPage({ page: 1, pageSize, sortBy: 'name', sortOrder: 'asc' })
+    );
+    const firstItems = firstPage.items ?? [];
+    const totalPages = Math.max(1, firstPage.totalPages ?? 1);
 
-    while (true) {
-      const response = await firstValueFrom(
-        this.localityService.getPage({
-          page,
-          pageSize,
-          search: undefined,
-          type: undefined,
-          sortBy: 'name',
-          sortOrder: 'asc',
-        })
-      );
-
-      const items = response.items ?? [];
-      all.push(...items);
-
-      if (items.length < pageSize) break;
-      page++;
+    if (totalPages <= 1) {
+      this.dataCacheService.set(cacheKey, firstItems);
+      return firstItems;
     }
 
+    const remainingPages = await Promise.all(
+      Array.from({ length: totalPages - 1 }, (_, i) =>
+        firstValueFrom(this.localityService.getPage({ page: i + 2, pageSize, sortBy: 'name', sortOrder: 'asc' }))
+      )
+    );
+    const all = [...firstItems, ...remainingPages.flatMap(p => p.items ?? [])];
     this.dataCacheService.set(cacheKey, all);
     return all;
   }
