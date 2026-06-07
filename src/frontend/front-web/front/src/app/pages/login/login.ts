@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
@@ -14,7 +14,7 @@ import { finalize } from 'rxjs';
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
-export class Login {
+export class Login implements OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
@@ -31,13 +31,20 @@ export class Login {
   errorMessage = '';
   successMessage = '';
   showPassword = false;
+  isShaking = false;
 
-  get email() {
-    return this.form.get('email');
-  }
+  private shakeTimer: ReturnType<typeof setTimeout> | null = null;
 
-  get password() {
-    return this.form.get('password');
+  get email() { return this.form.get('email'); }
+  get password() { return this.form.get('password'); }
+
+  private triggerShake() {
+    if (this.shakeTimer) clearTimeout(this.shakeTimer);
+    this.isShaking = false;
+    setTimeout(() => {
+      this.isShaking = true;
+      this.shakeTimer = setTimeout(() => { this.isShaking = false; }, 700);
+    }, 10);
   }
 
   togglePassword(): void {
@@ -47,6 +54,7 @@ export class Login {
   submit(): void {
     if (this.form.invalid || this.isLoading) {
       this.form.markAllAsTouched();
+      this.triggerShake();
       return;
     }
 
@@ -72,6 +80,7 @@ export class Login {
         if (role === 'tourist') {
           this.authService.logout();
           this.errorMessage = `${role} ${this.translationService.translate('login.portalComingSoon')}`;
+          this.triggerShake();
           return;
         }
 
@@ -85,7 +94,7 @@ export class Login {
       },
       error: (error: any) => {
         this.errorMessage = error?.error?.message ?? this.translationService.translate('login.invalidCredentials');
-        return;
+        this.triggerShake();
       },
     });
   }
@@ -96,5 +105,9 @@ export class Login {
 
   goToForgotPassword(): void {
     this.router.navigate(['/forgot-password']);
+  }
+
+  ngOnDestroy() {
+    if (this.shakeTimer) clearTimeout(this.shakeTimer);
   }
 }
