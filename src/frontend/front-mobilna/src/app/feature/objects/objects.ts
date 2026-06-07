@@ -276,17 +276,21 @@ export class ObjectsComponent implements OnInit, OnDestroy {
     try {
       const cached = this.dataCacheService.get<ObjectDto[]>(cacheKey);
       if (cached) {
-        await this.ensureFavoritesLoaded();
-        if (currentToken !== this.loadToken) return;
         this.applyObjectsData(cached);
+        void this.ensureFavoritesLoaded().then(() => {
+          if (currentToken !== this.loadToken) return;
+          this.favoriteStateService.applyToList(this.objects, (o) => ({ type: 'object', entityId: o.id }));
+          this.favoriteStateService.applyToList(this.visibleObjects, (o) => ({ type: 'object', entityId: o.id }));
+          this.cdr.detectChanges();
+        });
         return;
       }
 
       const pageSize = 100;
-      const [firstPage] = await Promise.all([
-        firstValueFrom(this.objectService.getPage({ page: 1, pageSize, sortBy: 'name', sortOrder: 'asc' })),
-        this.ensureFavoritesLoaded(),
-      ]);
+      const favoritesPromise = this.ensureFavoritesLoaded();
+      const firstPage = await firstValueFrom(
+        this.objectService.getPage({ page: 1, pageSize, sortBy: 'name', sortOrder: 'asc' })
+      );
 
       if (currentToken !== this.loadToken) return;
 
@@ -294,6 +298,13 @@ export class ObjectsComponent implements OnInit, OnDestroy {
       const totalPages = Math.max(1, firstPage.totalPages ?? 1);
 
       this.applyObjectsData(firstItems);
+
+      void favoritesPromise.then(() => {
+        if (currentToken !== this.loadToken) return;
+        this.favoriteStateService.applyToList(this.objects, (o) => ({ type: 'object', entityId: o.id }));
+        this.favoriteStateService.applyToList(this.visibleObjects, (o) => ({ type: 'object', entityId: o.id }));
+        this.cdr.detectChanges();
+      });
 
       if (totalPages <= 1) {
         this.dataCacheService.set(cacheKey, firstItems);

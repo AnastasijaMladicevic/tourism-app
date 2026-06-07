@@ -406,17 +406,21 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
     try {
       const cached = this.dataCacheService.get<ActivityDto[]>(cacheKey);
       if (cached) {
-        await this.ensureFavoritesLoaded();
-        if (currentToken !== this.loadToken) return;
         this.applyActivitiesData(cached);
+        void this.ensureFavoritesLoaded().then(() => {
+          if (currentToken !== this.loadToken) return;
+          this.favoriteStateService.applyToList(this.activities, (a) => ({ type: 'activity', entityId: a.id }));
+          this.favoriteStateService.applyToList(this.visibleActivities, (a) => ({ type: 'activity', entityId: a.id }));
+          this.cdr.detectChanges();
+        });
         return;
       }
 
       const pageSize = 100;
-      const [firstPage] = await Promise.all([
-        firstValueFrom(this.activityService.getPage({ page: 1, pageSize, sortBy: 'name', sortOrder: 'asc' })),
-        this.ensureFavoritesLoaded(),
-      ]);
+      const favoritesPromise = this.ensureFavoritesLoaded();
+      const firstPage = await firstValueFrom(
+        this.activityService.getPage({ page: 1, pageSize, sortBy: 'name', sortOrder: 'asc' })
+      );
 
       if (currentToken !== this.loadToken) return;
 
@@ -424,6 +428,13 @@ export class ActivitiesComponent implements OnInit, OnDestroy {
       const totalPages = Math.max(1, firstPage.totalPages ?? 1);
 
       this.applyActivitiesData(firstItems);
+
+      void favoritesPromise.then(() => {
+        if (currentToken !== this.loadToken) return;
+        this.favoriteStateService.applyToList(this.activities, (a) => ({ type: 'activity', entityId: a.id }));
+        this.favoriteStateService.applyToList(this.visibleActivities, (a) => ({ type: 'activity', entityId: a.id }));
+        this.cdr.detectChanges();
+      });
 
       if (totalPages <= 1) {
         this.dataCacheService.set(cacheKey, firstItems);

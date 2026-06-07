@@ -348,8 +348,7 @@ export class LocalitiesComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
 
     try {
-      await this.ensureFavoritesLoaded();
-
+      const favoritesPromise = this.ensureFavoritesLoaded();
       const allLocalities = await this.fetchAllLocalities();
 
       if (currentToken !== this.loadToken) return;
@@ -377,6 +376,13 @@ export class LocalitiesComponent implements OnInit, OnDestroy {
 
       this.isLoading = false;
       this.cdr.detectChanges();
+
+      void favoritesPromise.then(() => {
+        if (currentToken !== this.loadToken) return;
+        this.favoriteStateService.applyToList(this.localities, (item) => ({ type: 'locality', entityId: item.id }));
+        this.favoriteStateService.applyToList(this.visibleLocalities, (item) => ({ type: 'locality', entityId: item.id }));
+        this.cdr.detectChanges();
+      });
     } catch (err) {
       if (currentToken !== this.loadToken) return;
       console.error(err);
