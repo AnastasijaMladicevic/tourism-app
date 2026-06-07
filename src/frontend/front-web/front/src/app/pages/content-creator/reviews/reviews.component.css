@@ -426,6 +426,14 @@
   border-radius: 8px;
   padding: 7px 12px;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.ghost:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 .ghost.danger {
@@ -582,12 +590,32 @@ textarea {
   border: 1px solid #d1d5db;
   padding: 7px 12px;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .primary {
   background: #1d4ed8;
   border-color: #1d4ed8;
   color: #fff;
+}
+
+.primary:disabled,
+.secondary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.btn-spinner {
+  font-size: 16px;
+  line-height: 1;
+  animation: spin 0.75s linear infinite;
 }
 
 .insight-panel {

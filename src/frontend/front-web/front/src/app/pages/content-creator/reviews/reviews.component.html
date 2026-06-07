@@ -118,6 +118,9 @@
           </div>
           <div class="case-actions">
             <button class="ghost danger" type="button" (click)="deleteResponse()" [disabled]="!selectedReviewHasResponse || isSubmitting">
+              @if (submittingAction === 'delete') {
+                <span class="material-symbols-outlined btn-spinner" aria-hidden="true">sync</span>
+              }
               {{ 'contentCreator.reviews.deleteResponse' | translate }}
             </button>
           </div>
@@ -169,6 +172,9 @@
             <span>{{ 'contentCreator.reviews.characterCount' | translate:{ count: responseText.length } }}</span>
             <div class="composer-buttons">
               <button class="primary" type="button" (click)="sendResponse()" [disabled]="isSubmitting || isResponsePolicyBlocked">
+                @if (submittingAction === 'send') {
+                  <span class="material-symbols-outlined btn-spinner" aria-hidden="true">sync</span>
+                }
                 {{ selectedReviewHasResponse ? ('contentCreator.reviews.updateResponse' | translate) : ('contentCreator.reviews.sendResponse' | translate) }}
               </button>
             </div>

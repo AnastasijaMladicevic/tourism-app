@@ -62,6 +62,7 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
 
   isLoading = true;
   isSubmitting = false;
+  submittingAction: 'send' | 'delete' | null = null;
   isLoadingImages = false;
   errorMessage = '';
   successMessage = '';
@@ -378,6 +379,7 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
 
     const reviewId = this.selectedReview.id;
     this.isSubmitting = true;
+    this.submittingAction = 'send';
     this.errorMessage = '';
     this.successMessage = '';
 
@@ -387,13 +389,10 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
 
     action$
       .pipe(
-        switchMap((updated) =>
-          this.reviewService.getById(updated.id).pipe(
-            catchError(() => of(updated))
-          )
-        ),
         finalize(() => {
           this.isSubmitting = false;
+          this.submittingAction = null;
+          this.triggerViewUpdate();
         })
       )
       .subscribe({
@@ -401,7 +400,7 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
           this.updateReviewInCollections(fresh);
           localStorage.removeItem(this.getDraftKey(fresh.id));
           this.successMessage = this.translationService.translate('contentCreator.reviews.success.responseSent');
-          this.loadReviews(true);
+          this.triggerViewUpdate();
         },
         error: (error: any) => {
           this.errorMessage = error?.error?.message ?? this.translationService.translate('contentCreator.reviews.error.responseSend');
@@ -415,6 +414,7 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
     }
 
     this.isSubmitting = true;
+    this.submittingAction = 'delete';
     this.errorMessage = '';
     this.successMessage = '';
 
@@ -422,13 +422,15 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
       .deleteResponse(this.selectedReview.id)
       .pipe(finalize(() => {
         this.isSubmitting = false;
+        this.submittingAction = null;
+        this.triggerViewUpdate();
       }))
       .subscribe({
         next: (updated) => {
           this.updateReviewInCollections(updated);
           this.responseText = '';
           this.successMessage = this.translationService.translate('contentCreator.reviews.success.responseDeleted');
-          this.loadReviews(true);
+          this.triggerViewUpdate();
         },
         error: (error: any) => {
           this.errorMessage = error?.error?.message ?? this.translationService.translate('contentCreator.reviews.error.responseDelete');
