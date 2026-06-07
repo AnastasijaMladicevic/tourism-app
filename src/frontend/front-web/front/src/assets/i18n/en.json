@@ -1930,7 +1930,13 @@
   },
   "adminMap": {
     "searchPlaceholder": "Search destinations...",
-    "destination": "Destination"
+    "destination": "Destination",
+    "regions": {
+      "es": "Spain",
+      "it": "Italy",
+      "rs": "Serbia",
+      "me": "Montenegro"
+    }
   },
   "adminDestinationForm": {
     "destinations": "Destinations",

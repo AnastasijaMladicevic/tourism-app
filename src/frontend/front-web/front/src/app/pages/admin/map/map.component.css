@@ -179,6 +179,60 @@ app-admin-platform-map.admin-platform-map--full :is(.leaflet-container, .leaflet
   font-size: 12px;
 }
 
+.region-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.region-chip {
+  display: inline-flex;
+  align-items: center;
+  height: 34px;
+  padding: 0 16px;
+  border: 1.5px solid rgba(255, 255, 255, 0.7);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.1);
+  color: var(--text-primary);
+  font-family: var(--font-base);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.18s ease,
+    color 0.18s ease,
+    border-color 0.18s ease,
+    box-shadow 0.18s ease;
+  white-space: nowrap;
+}
+
+.region-chip:hover {
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.14);
+}
+
+.region-chip--active {
+  background: linear-gradient(135deg, #168aad 0%, #0f6f8c 100%);
+  border-color: transparent;
+  color: #ffffff;
+  box-shadow: 0 6px 18px rgba(22, 138, 173, 0.35);
+}
+
+.region-chip--active:hover {
+  background: linear-gradient(135deg, #1a9bc2 0%, #1280a3 100%);
+}
+
+.region-chip__flag {
+  width: 20px;
+  height: 14px;
+  object-fit: cover;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
 .map-controls {
   position: absolute;
   top: 50%;
@@ -410,6 +464,12 @@ app-admin-platform-map.admin-platform-map--full :is(.leaflet-container, .leaflet
 @media (max-width: 900px) {
   .map-page__toolbar {
     padding: 10px 12px 8px;
+  }
+
+  .region-chip {
+    height: 30px;
+    padding: 0 12px;
+    font-size: 12px;
   }
 
   .map-controls {

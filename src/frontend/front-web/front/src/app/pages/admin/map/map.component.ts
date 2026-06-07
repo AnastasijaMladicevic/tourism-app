@@ -18,6 +18,7 @@ import * as L from 'leaflet';
 import { MatIconModule } from '@angular/material/icon';
 import { DestinationDto } from '../../../services/destination.service';
 import { MapService } from '../../../services/map.service';
+import { RegionDto, RegionService } from '../../../services/region';
 import { TranslationService } from '../../../services/translation.service';
 import { AdminPlatformMapComponent } from '../../../shared/components/admin-platform-map/admin-platform-map.component';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
@@ -39,6 +40,8 @@ interface AdminMapDestination extends DestinationDto {
   workingHours?: string | Record<string, string>;
 }
 
+const REGION_FILTER_CODES = ['es', 'it', 'rs', 'me'] as const;
+
 @Component({
   selector: 'app-map',
   standalone: true,
@@ -50,6 +53,7 @@ interface AdminMapDestination extends DestinationDto {
 export class MapComponent implements OnInit, OnDestroy {
   private static readonly TARGET_DETAIL_ZOOM = 15;
   private readonly translationService = inject(TranslationService);
+  private readonly regionService = inject(RegionService);
   @ViewChild('cardElement') private cardElementRef?: ElementRef<HTMLElement>;
   @ViewChild('mapPage') private mapPageRef?: ElementRef<HTMLElement>;
 
@@ -61,6 +65,9 @@ export class MapComponent implements OnInit, OnDestroy {
   isCardVisible = false;
   cardPosition = { left: 16, top: 16 };
   allItems: SearchResult[] = [];
+
+  regionFilters: RegionDto[] = [];
+  activeRegionFilter: number | null = null;
 
   readonly mapInitialLat = history.state?.lat ?? 42.424;
   readonly mapInitialLng = history.state?.lng ?? 18.771;
@@ -90,6 +97,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     window.addEventListener('map-marker-clicked', this.markerClickHandler as EventListener);
+    this.loadRegionFilters();
   }
 
   ngOnDestroy(): void {
@@ -99,6 +107,7 @@ export class MapComponent implements OnInit, OnDestroy {
       map.off('click', this.mapClickHandler);
       map.off('move zoom resize', this.mapMoveHandler);
     }
+    this.activeRegionFilter = null;
   }
 
   onPlatformMapReady(): void {
@@ -231,6 +240,45 @@ export class MapComponent implements OnInit, OnDestroy {
 
   zoomOut(): void {
     this.mapService.getMap()?.zoomOut();
+  }
+
+  selectRegionFilter(region: RegionDto): void {
+    if (this.activeRegionFilter === region.id) {
+      this.activeRegionFilter = null;
+      return;
+    }
+
+    this.activeRegionFilter = region.id;
+
+    if (region.centerLatitude != null && region.centerLongitude != null) {
+      this.mapService.flyTo(
+        region.centerLatitude,
+        region.centerLongitude,
+        Math.round(region.defaultMapZoom ?? 7),
+      );
+    }
+  }
+
+  getRegionLabel(region: RegionDto): string {
+    const code = region.code?.toLowerCase();
+    return this.t(`adminMap.regions.${code}`) || region.name;
+  }
+
+  getRegionFlagUrl(region: RegionDto): string {
+    const code = region.code?.toLowerCase();
+    return `https://flagcdn.com/w40/${code}.png`;
+  }
+
+  private loadRegionFilters(): void {
+    this.regionService.getAll().subscribe({
+      next: (regions) => {
+        const ordered = REGION_FILTER_CODES.map((code) =>
+          regions.find((r) => r.code?.toLowerCase() === code),
+        ).filter((r): r is RegionDto => r != null);
+        this.regionFilters = ordered;
+        this.cdr.detectChanges();
+      },
+    });
   }
 
   private matchesAllTerms(item: SearchResult, terms: string[]): boolean {

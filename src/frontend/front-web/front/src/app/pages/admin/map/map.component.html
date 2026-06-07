@@ -39,6 +39,21 @@
         </div>
       }
     </div>
+
+    @if (regionFilters.length > 0) {
+      <div class="region-filters">
+        @for (region of regionFilters; track region.id) {
+          <button
+            class="region-chip"
+            [class.region-chip--active]="activeRegionFilter === region.id"
+            (click)="selectRegionFilter(region)"
+          >
+            <img class="region-chip__flag" [src]="getRegionFlagUrl(region)" [alt]="getRegionLabel(region)" /> &nbsp;
+            {{ getRegionLabel(region) }}
+          </button>
+        }
+      </div>
+    }
   </div>
 
   <div class="map-page__canvas">

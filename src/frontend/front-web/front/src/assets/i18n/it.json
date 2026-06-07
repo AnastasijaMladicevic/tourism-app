@@ -1895,7 +1895,13 @@
   },
   "adminMap": {
     "searchPlaceholder": "Cerca destinazioni...",
-    "destination": "Destinazione"
+    "destination": "Destinazione",
+    "regions": {
+      "es": "Spagna",
+      "it": "Italia",
+      "rs": "Serbia",
+      "me": "Montenegro"
+    }
   },
   "adminDestinationForm": {
     "destinations": "Destinazioni",
