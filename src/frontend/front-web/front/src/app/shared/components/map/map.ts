@@ -36,8 +36,21 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
       return;
     }
 
-    if ((changes['lat'] || changes['lng']) && !changes['lat']?.firstChange) {
-      this.animateToLocation();
+    const latOrLngChanged = (changes['lat'] || changes['lng']) && !changes['lat']?.firstChange;
+    const showMarkerBecomingTrue =
+      changes['showMarker']?.previousValue === false && changes['showMarker']?.currentValue === true;
+
+    if (latOrLngChanged) {
+      if (showMarkerBecomingTrue) {
+        // Initial data load (marker was hidden, now shows): jump without animation
+        const map = this.mapService['map'] as L.Map | null;
+        if (map) {
+          map.setView([this.lat, this.lng], this.zoom, { animate: false });
+          this.renderMarker();
+        }
+      } else {
+        this.animateToLocation();
+      }
       return;
     }
 

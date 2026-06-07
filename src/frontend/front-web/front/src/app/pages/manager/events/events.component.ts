@@ -164,7 +164,7 @@ export class ManagerEventsComponent implements OnInit, OnDestroy {
         this.currentPage = response.page;
 
         if (!this.selectedEvent || !this.pagedEvents.some((event) => event.id === this.selectedEvent?.id)) {
-          this.selectedEvent = this.pagedEvents[0] ?? null;
+          this.setSelectedEvent(this.pagedEvents[0] ?? null);
         }
 
         this.isLoading = false;

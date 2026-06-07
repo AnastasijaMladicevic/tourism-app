@@ -372,12 +372,9 @@
 }
 
 .review-side {
-  width: min(440px, 100%);
   display: flex;
   flex-direction: column;
   gap: 16px;
-  position: sticky;
-  top: 80px;
 }
 
 .upload-card {

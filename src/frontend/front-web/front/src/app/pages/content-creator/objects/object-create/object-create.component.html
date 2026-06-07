@@ -277,6 +277,7 @@
             [zoom]="14"
             [popupText]="form.controls.name.value || ('contentCreatorObjectForm.newObject' | translate)"
             [interactive]="!isManagerReview"
+            [zoomable]="isManagerReview"
             [showMarker]="hasMapCoordinates"
             mapId="create-object-map"
             (locationSelected)="onMapLocationSelected($event)"

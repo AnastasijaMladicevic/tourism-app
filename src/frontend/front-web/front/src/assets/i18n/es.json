@@ -1399,7 +1399,13 @@
         "imageCount": "{{count}} imagen(es) en la galería"
       },
       "map": {
-        "searchPlaceholder": "Buscar objetos, eventos, actividades..."
+        "searchPlaceholder": "Buscar objetos, eventos, actividades...",
+        "filters": {
+          "locality": "Localidades",
+          "object": "Objetos",
+          "event": "Eventos",
+          "activity": "Actividades"
+        }
       },
       "objects": {
       "searchAria": "Buscar objetos",

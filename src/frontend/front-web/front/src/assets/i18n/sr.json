@@ -1399,7 +1399,13 @@
         "imageCount": "{{count}} slika u galeriji"
       },
       "map": {
-        "searchPlaceholder": "Pretraži objekte, događaje, aktivnosti..."
+        "searchPlaceholder": "Pretraži objekte, događaje, aktivnosti...",
+        "filters": {
+          "locality": "Lokaliteti",
+          "object": "Objekti",
+          "event": "Događaji",
+          "activity": "Aktivnosti"
+        }
       },
       "objects": {
       "searchAria": "Pretrazi objekte",
