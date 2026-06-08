@@ -346,6 +346,12 @@
   border-color: #fca5a5;
 }
 
+.danger-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.72;
+  filter: saturate(0.15) grayscale(0.35);
+}
+
 .form-layout {
   display: flex;
   gap: 16px;
