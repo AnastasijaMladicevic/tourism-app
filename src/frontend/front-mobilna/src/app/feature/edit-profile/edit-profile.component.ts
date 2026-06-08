@@ -97,8 +97,16 @@ export class EditProfileComponent implements OnInit {
    * meaning the "Remove photo" button should be hidden.
    */
   protected readonly isDefaultPhoto = computed(() => {
-    const raw = this.userSignal()?.profileImageUrl?.trim() || DEFAULT_PHOTO_PATH;
-    return raw === DEFAULT_PHOTO_PATH || raw === '';
+    const raw = this.userSignal()?.profileImageUrl?.trim();
+  
+    if (!raw) return true;
+  
+    const normalized = raw
+      .replace(/^https?:\/\/[^/]+/i, '')
+      .split('?')[0]
+      .toLowerCase();
+  
+    return normalized.endsWith('/images/profiles/default_icon.png');
   });
 
   protected readonly interests = signal<InterestOption[]>([
