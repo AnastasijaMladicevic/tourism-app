@@ -627,3 +627,21 @@
       </div>
     </div>
 }
+
+@if (showInfoModal) {
+  <div class="custom-modal-backdrop" (click)="closeInfo()">
+    <div class="custom-modal custom-modal-info" (click)="$event.stopImmediatePropagation()">
+      <div class="info-icon">
+        <mat-icon>info</mat-icon>
+      </div>
+
+      <h3>{{ 'common.notification' | translate }}</h3>
+
+      <p>{{ infoMessageKey | translate: infoMessageParams }}</p>
+
+      <button class="modal-btn modal-btn-primary" (click)="closeInfo()">
+        {{ 'common.ok' | translate }}
+      </button>
+    </div>
+  </div>
+}

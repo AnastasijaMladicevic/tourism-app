@@ -62,7 +62,16 @@
     "lowestPrice": "Precio más bajo",
     "enable": "Activar",
     "locationModalTitle": "Activa la ubicación para usar el orden",
-    "locationModalBody": "El seguimiento de ubicación está desactivado. Toca abajo para abrir ajustes y activar el permiso de ubicación."
+    "locationModalBody": "El seguimiento de ubicación está desactivado. Toca abajo para abrir ajustes y activar el permiso de ubicación.",
+    "notification": "Notificación"
+  },
+  "reviewImages": {
+    "maxImages": "Puedes añadir hasta 5 imágenes.",
+    "onlyOneImageLeft": "Solo puedes añadir 1 imagen más.",
+    "imagesLeft": "Solo puedes añadir {{count}} imágenes más.",
+    "fileNotImage": "El archivo \"{{fileName}}\" no es una imagen.",
+    "imageTooLarge": "La imagen \"{{fileName}}\" pesa más de 5MB.",
+    "imageAlreadyAdded": "La imagen \"{{fileName}}\" ya ha sido añadida."
   },
   "results": {
     "title": "Resultados",

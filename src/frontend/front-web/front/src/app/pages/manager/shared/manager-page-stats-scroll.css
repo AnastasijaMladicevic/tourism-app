@@ -234,3 +234,23 @@
     max-width: 100%;
   }
 }
+
+@media (max-width: 920px) {
+  .manager-list-page.manager-objects-page .insights-grid,
+  .manager-list-page.manager-events-page .insights-grid,
+  .activities-page.manager-list-page .insights-grid,
+  .manager-list-page.manager-localities-page .insights-grid {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    overflow-x: visible !important;
+    flex-wrap: unset !important;
+  }
+
+  .manager-list-page.manager-objects-page .insight-card,
+  .manager-list-page.manager-events-page .insight-card,
+  .activities-page.manager-list-page .insight-card,
+  .manager-list-page.manager-localities-page .insight-card {
+    flex: unset !important;
+    width: 100% !important;
+  }
+}

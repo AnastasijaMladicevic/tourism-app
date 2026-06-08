@@ -62,7 +62,16 @@
     "lowestPrice": "Lowest Price",
     "enable": "Enable",
     "locationModalTitle": "Enable location to use sorting",
-    "locationModalBody": "Location tracking is currently off. Tap below to open settings and enable location access."
+    "locationModalBody": "Location tracking is currently off. Tap below to open settings and enable location access.",
+    "notification": "Notification"
+  },
+  "reviewImages": {
+    "maxImages": "You can add up to 5 images.",
+    "onlyOneImageLeft": "You can add only 1 more image.",
+    "imagesLeft": "You can add only {{count}} more images.",
+    "fileNotImage": "File \"{{fileName}}\" is not an image.",
+    "imageTooLarge": "Image \"{{fileName}}\" is larger than 5MB.",
+    "imageAlreadyAdded": "Image \"{{fileName}}\" has already been added."
   },
   "results": {
     "title": "Results",

@@ -1979,6 +1979,24 @@ textarea {
   text-align: center;
 }
 
+.custom-modal-info .info-icon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+
+.custom-modal-info mat-icon {
+  font-size: 54px;
+  width: 54px;
+  height: 54px;
+  color: var(--primary);
+}
+
+.custom-modal-info .modal-btn {
+  margin-top: 22px;
+  width: 160px;
+}
+
 .custom-modal h3 {
   margin: 0 0 12px;
   font-size: 22px;
@@ -2049,6 +2067,11 @@ textarea {
 }
 
 :host-context(:root[data-theme='dark']) {
+
+  .custom-modal-info mat-icon {
+    color: #4dc2ff;
+  }
+  
   .meta-chip {
     background: var(--surface-soft);
     border-color: var(--border);

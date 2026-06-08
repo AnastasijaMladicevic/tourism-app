@@ -62,7 +62,16 @@
     "lowestPrice": "Najniža cena",
     "enable": "Uključi",
     "locationModalTitle": "Uključi lokaciju da bi sortiranje radilo",
-    "locationModalBody": "Praćenje lokacije trenutno nije uključeno. Klikni ispod i otvori podešavanja da uključiš saglasnost za praćenje lokacije."
+    "locationModalBody": "Praćenje lokacije trenutno nije uključeno. Klikni ispod i otvori podešavanja da uključiš saglasnost za praćenje lokacije.",
+    "notification": "Obaveštenje"
+  },
+  "reviewImages": {
+    "maxImages": "Možete dodati najviše 5 slika.",
+    "onlyOneImageLeft": "Možete dodati još samo 1 sliku.",
+    "imagesLeft": "Možete dodati još samo {{count}} slike.",
+    "fileNotImage": "Fajl \"{{fileName}}\" nije slika.",
+    "imageTooLarge": "Slika \"{{fileName}}\" je veća od 5MB.",
+    "imageAlreadyAdded": "Slika \"{{fileName}}\" je već dodata."
   },
   "results": {
     "title": "Rezultati",

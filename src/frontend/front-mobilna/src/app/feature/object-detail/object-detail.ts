@@ -42,6 +42,9 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
 
   showSuccessModal = false;
   successMessage = '';
+  showInfoModal = false;
+  infoMessageKey = '';
+  infoMessageParams: Record<string, any> = {};
 
   showReviewImagesModal = false;
   selectedReviewImagesForModal: ImageDto[] = [];
@@ -681,6 +684,26 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
     document.body.style.overflow = 'visible';
   }
 
+  openInfo(messageKey: string, params: Record<string, any> = {}): void {
+    this.infoMessageKey = messageKey;
+    this.infoMessageParams = params;
+    this.showInfoModal = true;
+    document.body.style.overflow = 'hidden';
+    this.cdr.detectChanges();
+  }
+  
+  closeInfo(): void {
+    this.showInfoModal = false;
+  
+    if (this.showWriteReviewModal || this.showGalleryModal || this.showAllReviewsModal || this.showReviewImagesModal || this.showHoursModal) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'visible';
+    }
+  
+    this.cdr.detectChanges();
+  }
+
   openGallery(index = 0): void {
     if (!this.images || this.images.length === 0) return;
     this.currentImageIndex = index;
@@ -902,50 +925,64 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
   }
 
   onReviewImagesSelected(event: any): void {
-    const files: FileList = event.target.files;
+    const input = event.target as HTMLInputElement;
+    const files: FileList | null = input.files;
+  
     if (!files?.length) return;
-
+  
     const maxImages = 5;
     const maxSizePerImage = 5 * 1024 * 1024; // 5MB
-
+  
     const currentCount = this.existingReviewImages.length + this.selectedReviewImages.length;
     const availableSlots = maxImages - currentCount;
-
+  
     if (availableSlots <= 0) {
-      alert('Možete dodati najviše 5 slika.');
-      event.target.value = '';
+      this.openInfo('reviewImages.maxImages');
+      input.value = '';
       return;
     }
-
+  
+    if (files.length > availableSlots) {
+      this.openInfo(
+        availableSlots === 1
+          ? 'reviewImages.onlyOneImageLeft'
+          : 'reviewImages.imagesLeft',
+        { count: availableSlots }
+      );
+  
+      input.value = '';
+      return;
+    }
+  
     const selectedFileKeys = new Set(
       this.selectedReviewImages.map(file =>
         `${file.name}_${file.size}_${file.lastModified}`
       )
     );
-
-    const pickedFiles = Array.from(files).slice(0, availableSlots);
-
+  
+    const pickedFiles = Array.from(files);
+  
     for (const file of pickedFiles) {
       const fileKey = `${file.name}_${file.size}_${file.lastModified}`;
-
+  
       if (!file.type.startsWith('image/')) {
-        alert(`Fajl "${file.name}" nije slika.`);
+        this.openInfo('reviewImages.fileNotImage', { fileName: file.name });
         continue;
       }
-
+  
       if (file.size > maxSizePerImage) {
-        alert(`Slika "${file.name}" je veća od 5MB.`);
+        this.openInfo('reviewImages.imageTooLarge', { fileName: file.name });
         continue;
       }
-
+  
       if (selectedFileKeys.has(fileKey)) {
-        alert(`Slika "${file.name}" je već dodata.`);
+        this.openInfo('reviewImages.imageAlreadyAdded', { fileName: file.name });
         continue;
       }
-
+  
       selectedFileKeys.add(fileKey);
       this.selectedReviewImages.push(file);
-
+  
       const reader = new FileReader();
       reader.onload = () => {
         this.reviewImagePreviews.push(reader.result as string);
@@ -953,8 +990,8 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
       };
       reader.readAsDataURL(file);
     }
-
-    event.target.value = '';
+  
+    input.value = '';
   }
 
   deleteExistingReviewImage(imageId: number): void {

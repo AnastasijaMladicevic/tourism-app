@@ -62,7 +62,16 @@
     "lowestPrice": "Prezzo più basso",
     "enable": "Attiva",
     "locationModalTitle": "Attiva la posizione per usare l'ordinamento",
-    "locationModalBody": "Il rilevamento della posizione è disattivato. Tocca qui sotto per aprire le impostazioni e attivare il consenso alla posizione."
+    "locationModalBody": "Il rilevamento della posizione è disattivato. Tocca qui sotto per aprire le impostazioni e attivare il consenso alla posizione.",
+    "notification": "Notifica"
+  },
+  "reviewImages": {
+    "maxImages": "Puoi aggiungere fino a 5 immagini.",
+    "onlyOneImageLeft": "Puoi aggiungere solo 1 altra immagine.",
+    "imagesLeft": "Puoi aggiungere solo altre {{count}} immagini.",
+    "fileNotImage": "Il file \"{{fileName}}\" non è un'immagine.",
+    "imageTooLarge": "L'immagine \"{{fileName}}\" supera i 5MB.",
+    "imageAlreadyAdded": "L'immagine \"{{fileName}}\" è già stata aggiunta."
   },
   "results": {
     "title": "Risultati",

@@ -835,6 +835,24 @@
   white-space: nowrap;
 }
 
+.filter-row-inline {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+  flex-wrap: nowrap;
+}
+
+.filter-row-inline .table-filter-select {
+  flex-shrink: 0;
+}
+
+.filter-row-inline .table-date-range {
+  flex: 1;
+  min-width: 0;
+}
+
 .table-date-range {
   display: flex;
   align-items: center;
@@ -862,6 +880,13 @@
 .table-date-sep {
   font-size: 13px;
   color: #9ca3af;
+  flex-shrink: 0;
+}
+
+.filter-row-inline .table-date-input {
+  width: 100%;
+  min-width: 0;
+  flex: 1;
 }
 
 .table-search-clear {
