@@ -87,11 +87,20 @@ export class ImageService {
   uploadReviewImages(reviewId: number, files: File[]) {
     const formData = new FormData();
     files.forEach(file => formData.append('Files', file));
-    return this.http.post(`${environment.apiUrl}/reviews/${reviewId}/images`, formData);
+  
+    return this.http
+      .post(`${environment.apiUrl}/reviews/${reviewId}/images`, formData)
+      .pipe(
+        tap(() => this.invalidateReviewImages(reviewId))
+      );
   }
 
   deleteReviewImage(reviewId: number, imageId: number): Observable<void> {
-    return this.http.delete<void>(`${environment.apiUrl}/reviews/${reviewId}/images/${imageId}`);
+    return this.http
+      .delete<void>(`${environment.apiUrl}/reviews/${reviewId}/images/${imageId}`)
+      .pipe(
+        tap(() => this.invalidateReviewImages(reviewId))
+      );
   }
 
   invalidateReviewImages(reviewId: number): void {

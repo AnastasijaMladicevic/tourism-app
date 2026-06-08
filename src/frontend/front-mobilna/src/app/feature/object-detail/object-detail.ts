@@ -226,17 +226,43 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
       setTimeout(() => this.tryOpenPendingReview(), 600);
     }
   }
+
   private openWriteReviewFromExisting(review: ReviewDto): void {
+    this.userReview = review;
+  
     this.newReview = {
       rating: review.rating,
       text: review.text || '',
       images: []
     };
-
+  
+    this.selectedReviewImages = [];
+    this.reviewImagePreviews = [];
+    this.existingReviewImages = [];
+  
+    this.imageService.invalidateReviewImages(review.id);
+  
+    this.imageService.getForReview(review.id).subscribe({
+      next: images => {
+        this.existingReviewImages = images.map(img => ({
+          ...img,
+          url: this.resolveMediaUrl(img.url) ?? ''
+        }));
+  
+        this.cdr.detectChanges();
+      },
+      error: err => {
+        console.error('Failed to load review images', err);
+        this.existingReviewImages = [];
+        this.cdr.detectChanges();
+      }
+    });
+  
     this.showWriteReviewModal = true;
     document.body.style.overflow = 'hidden';
     this.cdr.detectChanges();
   }
+
   private loadNearbyObjects(currentObject: ObjectDto): void {
     if (currentObject.latitude == null || currentObject.longitude == null) {
       this.nearbyObjects = [];
@@ -1084,6 +1110,7 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
     this.selectedReviewImages.splice(index, 1);
     this.cdr.detectChanges();
   }
+
   submitReview(): void {
     if (this.newReview.rating === 0 || !this.newReview.text.trim() || !this.object?.id) {
       alert('Molimo unesite ocenu (1-5) i komentar.');
@@ -1171,10 +1198,12 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
             this.imageService.uploadReviewImages(savedReview.id, this.selectedReviewImages)
               .subscribe({
                 next: () => {
+                  this.imageService.invalidateReviewImages(savedReview.id);
                   finish();
                 },
                 error: (err) => {
                   console.error('Failed to upload review images', err);
+                  this.imageService.invalidateReviewImages(savedReview.id);
                   finish();
                 }
               });

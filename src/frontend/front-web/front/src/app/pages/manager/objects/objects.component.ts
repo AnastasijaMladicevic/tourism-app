@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { PaginatorComponent } from '../../../shared/components/paginator/paginator';
 import { Subject, of } from 'rxjs';
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
@@ -53,8 +53,11 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
   private readonly destinationService = inject(DestinationService);
   private readonly reviewService = inject(ReviewService);
   private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
   private readonly cdr = inject(ChangeDetectorRef);
   readonly translationService = inject(TranslationService);
+
+  private pendingSelectObjectId: number | null = null;
 
   private static readonly DEFAULT_BANNER_URL = '/assets/pozadina.png';
 
@@ -116,6 +119,10 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
   typeOptions: FilterOption[] = [];
 
   ngOnInit(): void {
+    const idParam = this.route.snapshot.queryParamMap.get('objectId');
+    if (idParam) {
+      this.pendingSelectObjectId = Number(idParam);
+    }
     this.loadManagedCityLabel();
     this.loadFilterOptions();
     this.loadObjects();
@@ -180,10 +187,17 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
           this.pageSize = response?.pageSize ?? this.pageSize;
           this.totalPages = response?.totalPages ?? Math.max(1, Math.ceil(this.totalCount / this.pageSize));
 
-          const nextSelected =
-            !this.selectedObject || !sorted.some((item) => item.id === this.selectedObject?.id)
-              ? sorted[0] ?? null
-              : this.selectedObject;
+          let nextSelected: ObjectDto | null;
+          if (this.pendingSelectObjectId !== null) {
+            const target = sorted.find((item) => item.id === this.pendingSelectObjectId) ?? sorted[0] ?? null;
+            this.pendingSelectObjectId = null;
+            nextSelected = target;
+          } else {
+            nextSelected =
+              !this.selectedObject || !sorted.some((item) => item.id === this.selectedObject?.id)
+                ? sorted[0] ?? null
+                : this.selectedObject;
+          }
           this.setSelectedObject(nextSelected);
 
           this.loadSelectedObjectReviews();

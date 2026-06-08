@@ -256,7 +256,7 @@
           <h3>{{ 'manager.creatorReviews.context.object' | translate }}</h3>
           <p class="context-title">{{ selectedThread.objectName }}</p>
           <p class="context-sub">{{ selectedThread.localityName }}</p>
-          <a class="text-link" routerLink="/manager/objects">{{ 'manager.creatorReviews.context.openInObjects' | translate }}</a>
+          <a class="text-link" routerLink="/manager/objects" [queryParams]="{ objectId: selectedThread.objectId }">{{ 'manager.creatorReviews.context.openInObjects' | translate }}</a>
         </section>
 
         <section class="context-block creator-block">
