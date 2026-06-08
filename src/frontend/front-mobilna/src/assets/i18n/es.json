@@ -1263,7 +1263,13 @@
     "searchPlaceholder": "Buscar destinos...",
     "foundCount": "{{count}} destinos encontrados",
     "empty": "No se encontraron destinos.",
-    "loadError": "No se pudieron cargar los destinos."
+    "loadError": "No se pudieron cargar los destinos.",
+    "exploreTitle": "Explorar",
+    "exploreSubtitle": "Descubre lo que tiene para ofrecer",
+    "exploreAttractions": "Atracciones",
+    "exploreActivities": "Actividades",
+    "exploreAccommodation": "Alojamiento",
+    "exploreGastronomy": "Gastronomía"
   },
   "activity": {
     "title": "Actividad",

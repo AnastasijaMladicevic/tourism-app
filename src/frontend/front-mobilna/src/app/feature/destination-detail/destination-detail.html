@@ -37,10 +37,10 @@
 
   <div class="content">
     <div class="left">
-      <div class="card">
+      <div class="card dest-header-card">
         <div class="title-row">
           <h1 class="title">{{ destination?.name }}</h1>
-            <button
+          <button
             class="fav-btn"
             type="button"
             (click)="toggleFavorite(destination, $event)"
@@ -50,21 +50,25 @@
             <mat-icon>{{ isFavorite ? 'favorite' : 'favorite_border' }}</mat-icon>
           </button>
         </div>
-        <div class="summary-meta">
-          @if (destination?.regionName) {
-            <p class="summary-location">{{ destination?.regionName }}</p>
-          }
-
-          @if (destination?.destinationTypeName) {
-            <div class="summary-tags">
-              <span class="summary-type-chip">{{ destination?.destinationTypeName }}</span>
-            </div>
-          }
-        </div>
+        @if (destination?.regionName) {
+          <p class="dest-region">
+            <mat-icon>location_on</mat-icon>{{ destination?.regionName }}
+          </p>
+        }
+        @if (destination?.destinationTypeName) {
+          <div class="dest-chips">
+            <span class="dest-type-chip">
+              <mat-icon>place</mat-icon>{{ destination?.destinationTypeName }}
+            </span>
+          </div>
+        }
       </div>
 
-      <div class="card">
-        <h2>{{ 'common.aboutDestination' | translate }}</h2>
+      <div class="card about-card">
+        <div class="about-header">
+          <div class="about-icon"><mat-icon>map</mat-icon></div>
+          <h2>{{ 'common.aboutDestination' | translate }}</h2>
+        </div>
         <p class="description">
           {{ destination?.description || ('destination.descriptionFallback' | translate) }}
         </p>
@@ -73,7 +77,10 @@
       <div class="section">
         <div class="card gallery-card">
           <div class="gallery-header">
-            <h2>{{ 'common.gallery' | translate }}</h2>
+            <div class="gallery-header-left">
+              <mat-icon class="gallery-header-icon">photo_camera</mat-icon>
+              <h2>{{ 'common.gallery' | translate }}</h2>
+            </div>
             <button class="see-all-btn" (click)="openGallery(0)">{{ 'common.seeAll' | translate }}</button>
           </div>
 
@@ -113,6 +120,24 @@
           </a>
         </div>
       }
+      <div class="card explore-card">
+        <h2>{{ 'destination.exploreTitle' | translate }} {{ destination?.name }}</h2>
+        <p class="explore-subtitle">{{ 'destination.exploreSubtitle' | translate }}</p>
+        <div class="explore-chips">
+          <button class="explore-chip" (click)="navigateTo('/objects')">
+            <mat-icon>museum</mat-icon>{{ 'destination.exploreAttractions' | translate }}
+          </button>
+          <button class="explore-chip" (click)="navigateTo('/activities')">
+            <mat-icon>hiking</mat-icon>{{ 'destination.exploreActivities' | translate }}
+          </button>
+          <button class="explore-chip" (click)="navigateTo('/hotels')">
+            <mat-icon>hotel</mat-icon>{{ 'destination.exploreAccommodation' | translate }}
+          </button>
+          <button class="explore-chip" (click)="navigateTo('/restaurants')">
+            <mat-icon>restaurant</mat-icon>{{ 'destination.exploreGastronomy' | translate }}
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </div>

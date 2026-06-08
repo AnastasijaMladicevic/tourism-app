@@ -1270,7 +1270,13 @@
     "searchPlaceholder": "Pretraži destinacije...",
     "foundCount": "{{count}} pronađenih destinacija",
     "empty": "Nema pronađenih destinacija.",
-    "loadError": "Neuspešno učitavanje destinacija."
+    "loadError": "Neuspešno učitavanje destinacija.",
+    "exploreTitle": "Istraži",
+    "exploreSubtitle": "Otkrijte šta nudi",
+    "exploreAttractions": "Atrakcije",
+    "exploreActivities": "Aktivnosti",
+    "exploreAccommodation": "Smještaj",
+    "exploreGastronomy": "Gastronomija"
   },
   "activity": {
     "title": "Aktivnost",

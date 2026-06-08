@@ -23,72 +23,72 @@
     </div>
   }
 
-  @if (activity) {
-    <div class="hero">
-      @if (mainImage) {
-        <img [src]="mainImage" [alt]="activity.name" />
-      } @else {
-        <div class="hero-placeholder">
-          <mat-icon>place</mat-icon>
-        </div>
-      }
-
-      <button class="fav-btn" [class.card__fav--active]="isFavorite" [disabled]="isFavoritePending(activity.id)"(click)="toggleFavorite(activity, $event)">
-        <mat-icon>{{ isFavorite ? 'favorite' : 'favorite_border' }}</mat-icon>
-      </button>
-    </div>
-  }
-
   <div class="content">
     <div class="left">
-      <div class="card">
-        <div class="title-row">
-          <h1 class="title">{{ activity?.name }}</h1>
-          <button
-            class="fav-btn fav-btn--desktop"
-            (click)="toggleFavorite(activity, $event)"
-            [class.fav-btn--active]="isFavorite"
-            [disabled]="isFavoritePending(activity?.id)"
-          >
-            <mat-icon>{{ isFavorite ? 'favorite' : 'favorite_border' }}</mat-icon>
-          </button>
-        </div>
-        @if (activity?.regionName && activity?.destinationName) {
-          <p class="location-bold">{{ activity?.destinationName }}, {{ activity?.regionName }}</p>
-        } @else if (activity?.destinationName) {
-          <p class="location-bold">{{ activity?.destinationName }}</p>
-        } @else if (activity?.regionName) {
-          <p class="location-bold">{{ activity?.regionName }}</p>
-        }
-
-        @if (activity?.localityName) {
-          <p class="venue"><mat-icon>location_on</mat-icon>{{ activity?.localityName }}</p>
-        }
-      </div>
-
-      <div class="card">
-        <h2>{{ 'common.aboutActivity' | translate }}</h2>
-        <p class="description">
-          {{ activity?.description || ('activity.descriptionFallback' | translate) }}
-        </p>
-      </div>
-
-      <div class="section">
-        <div class="card gallery-card">
-          <div class="gallery-header">
-            <h2>{{ 'common.gallery' | translate }}</h2>
-            <button class="see-all-btn" (click)="openGallery(0)">{{ 'common.seeAll' | translate }} ></button>
+      <!-- Title card -->
+      @if (activity) {
+        <div class="card activity-header-card">
+          <div class="title-row">
+            <h1 class="title">{{ activity.name }}</h1>
+            <button
+              class="fav-btn fav-btn--desktop"
+              (click)="toggleFavorite(activity, $event)"
+              [class.fav-btn--active]="isFavorite"
+              [disabled]="isFavoritePending(activity.id)"
+            >
+              <mat-icon>{{ isFavorite ? 'favorite' : 'favorite_border' }}</mat-icon>
+            </button>
           </div>
+          @if (activity.localityName) {
+            <p class="activity-location-line">
+              <mat-icon>location_on</mat-icon>{{ activity.localityName }}
+            </p>
+          }
 
-          <div class="gallery-scroll">
-            @for (img of images; track img.id; let i = $index) {
-              <div class="gallery-item" (click)="openGallery(i)">
-                <img [src]="img.url" [alt]="img.altText || ''" (error)="onImageError($event)" />
+          @if (activity.activityTypeName) {
+            <div class="activity-chips">
+              <span class="activity-type-chip">
+                <mat-icon>{{ getActivityTypeIcon(activity.activityTypeName) }}</mat-icon>
+                {{ activity.activityTypeName }}
+              </span>
+            </div>
+          }
+        </div>
+
+        <!-- About -->
+        <div class="card about-card">
+          <div class="about-header">
+            <div class="about-icon">
+              <mat-icon>{{ getActivityTypeIcon(activity.activityTypeName || '') }}</mat-icon>
+            </div>
+            <h2>{{ 'common.aboutActivity' | translate }}</h2>
+          </div>
+          <p class="description">
+            {{ activity.description || ('activity.descriptionFallback' | translate) }}
+          </p>
+        </div>
+
+        <!-- Gallery -->
+        <div class="section">
+          <div class="card gallery-card">
+            <div class="gallery-header">
+              <div class="gallery-header-left">
+                <mat-icon class="gallery-header-icon">photo_camera</mat-icon>
+                <h2>{{ 'common.gallery' | translate }}</h2>
               </div>
-            }
+              <button class="see-all-btn" (click)="openGallery(0)">{{ 'common.seeAll' | translate }}</button>
+            </div>
+
+            <div class="gallery-scroll">
+              @for (img of images; track img.id; let i = $index) {
+                <div class="gallery-item" (click)="openGallery(i)">
+                  <img [src]="img.url" [alt]="img.altText || ''" (error)="onImageError($event)" />
+                </div>
+              }
+            </div>
           </div>
         </div>
-      </div>
+      }
     </div>
 
     <div class="right">

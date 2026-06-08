@@ -908,6 +908,138 @@ button:hover {
   }
 }
 
+.dest-header-card {
+  padding: 20px 20px 16px;
+}
+
+.dest-region {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 4px 0 10px;
+  color: var(--text-gray);
+  font-size: 14px;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.dest-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.dest-type-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 14px 5px 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--primary) 10%, white);
+  border: 1px solid color-mix(in srgb, var(--primary) 16%, white);
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 700;
+
+  mat-icon {
+    font-size: 15px;
+    width: 15px;
+    height: 15px;
+  }
+}
+
+.about-card {
+  padding: 20px;
+}
+
+.about-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+
+  h2 {
+    margin: 0;
+  }
+}
+
+.about-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--primary) 12%, white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  mat-icon {
+    color: var(--primary);
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.gallery-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.gallery-header-icon {
+  color: var(--primary);
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.explore-card {
+  padding: 20px;
+}
+
+.explore-subtitle {
+  color: var(--text-gray);
+  font-size: 13px;
+  margin: 4px 0 14px;
+}
+
+.explore-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.explore-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--primary) 8%, white);
+  border: 1px solid color-mix(in srgb, var(--primary) 16%, white);
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+
+  &:hover {
+    background: color-mix(in srgb, var(--primary) 15%, white);
+  }
+}
+
 :host-context(:root[data-theme='dark']) {
 
   .header,
@@ -992,5 +1124,28 @@ button:hover {
     background: var(--surface);
     border-color: var(--border);
     box-shadow: none;
+  }
+
+  .dest-type-chip,
+  .explore-chip {
+    background: rgba(77, 194, 255, 0.1);
+    border-color: rgba(77, 194, 255, 0.2);
+    color: #4dc2ff;
+  }
+
+  .about-icon {
+    background: rgba(77, 194, 255, 0.1);
+
+    mat-icon {
+      color: #4dc2ff;
+    }
+  }
+
+  .dest-region {
+    color: var(--text-gray);
+  }
+
+  .explore-subtitle {
+    color: var(--text-gray);
   }
 }

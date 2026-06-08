@@ -115,11 +115,104 @@ button:hover {
   display: flex;
   flex-direction: column;
   gap: 20px;
-  padding: 20px 12px 50px;
+  padding: 16px 12px 50px;
   background: var(--bg);
-  border-radius: 25px;
-  position: relative;
-  z-index: 1;
+}
+
+/* ====================== ACTIVITY HEADER CARD ====================== */
+.activity-header-card {
+  padding-bottom: 20px;
+}
+
+.activity-location-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  color: var(--text-gray);
+  margin: 0 0 6px;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: #e74c3c;
+    flex-shrink: 0;
+  }
+}
+
+.activity-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.activity-type-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  background: var(--primary-light);
+  border: 1px solid rgba(22, 138, 173, 0.2);
+  color: var(--primary);
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+/* ====================== ABOUT CARD ====================== */
+.about-card {
+  .about-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 12px;
+
+    h2 {
+      margin: 0;
+    }
+  }
+}
+
+.about-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--primary-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  mat-icon {
+    color: var(--primary);
+    font-size: 22px;
+    width: 22px;
+    height: 22px;
+  }
+}
+
+/* ====================== GALLERY HEADER WITH ICON ====================== */
+.gallery-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  h2 { margin: 0; }
+}
+
+.gallery-header-icon {
+  color: var(--primary);
+  font-size: 22px;
+  width: 22px;
+  height: 22px;
 }
 
 .card {

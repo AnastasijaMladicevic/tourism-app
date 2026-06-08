@@ -326,14 +326,18 @@ export class LocalityDetailComponent implements OnInit, OnDestroy {
       });
   }
 
+  navigateTo(path: string): void {
+    this.router.navigate([path]);
+  }
+
   goBack(): void {
     const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
-  
+
     if (returnUrl?.startsWith('/')) {
       this.router.navigateByUrl(returnUrl);
       return;
     }
-  
+
     this.routerHistory.goBack('/localities');
   }
 

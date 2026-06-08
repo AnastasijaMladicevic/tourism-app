@@ -1263,7 +1263,13 @@
     "searchPlaceholder": "Cerca destinazioni...",
     "foundCount": "{{count}} destinazioni trovate",
     "empty": "Nessuna destinazione trovata.",
-    "loadError": "Impossibile caricare le destinazioni."
+    "loadError": "Impossibile caricare le destinazioni.",
+    "exploreTitle": "Esplora",
+    "exploreSubtitle": "Scopri cosa ha da offrire",
+    "exploreAttractions": "Attrazioni",
+    "exploreActivities": "Attività",
+    "exploreAccommodation": "Alloggio",
+    "exploreGastronomy": "Gastronomia"
   },
   "activity": {
     "participationFee": "Quota di partecipazione",

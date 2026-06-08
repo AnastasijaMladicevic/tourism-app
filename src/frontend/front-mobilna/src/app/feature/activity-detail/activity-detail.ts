@@ -225,6 +225,25 @@ export class ActivityDetailComponent implements OnInit, OnDestroy {
   openNearbyActivity(activityId: number): void {
     this.router.navigate(['/activity', activityId]);
   }
+
+  getActivityTypeIcon(typeName: string): string {
+    const t = (typeName || '').toLowerCase()
+      .normalize('NFD').replace(/[̀-ͯ]/g, '');
+    if (t.includes('gastro') || t.includes('hrana') || t.includes('food') || t.includes('kulinar') || t.includes('degustac')) return 'restaurant';
+    if (t.includes('plivanje') || t.includes('swim') || t.includes('bazen') || t.includes('voda') || t.includes('water')) return 'pool';
+    if (t.includes('pješ') || t.includes('pjes') || t.includes('hiking') || t.includes('trek') || t.includes('planin')) return 'hiking';
+    if (t.includes('bicikl') || t.includes('cycling') || t.includes('bike')) return 'directions_bike';
+    if (t.includes('kajak') || t.includes('kayak') || t.includes('veslan') || t.includes('rowing')) return 'rowing';
+    if (t.includes('fudbal') || t.includes('football') || t.includes('soccer')) return 'sports_soccer';
+    if (t.includes('tenis') || t.includes('tennis')) return 'sports_tennis';
+    if (t.includes('sport') || t.includes('fitnes') || t.includes('gym')) return 'fitness_center';
+    if (t.includes('muzik') || t.includes('music') || t.includes('ples') || t.includes('dance')) return 'music_note';
+    if (t.includes('kultura') || t.includes('culture') || t.includes('muzej') || t.includes('museum')) return 'museum';
+    if (t.includes('foto') || t.includes('photo')) return 'photo_camera';
+    if (t.includes('more') || t.includes('sea') || t.includes('ocean') || t.includes('ribolov') || t.includes('fish')) return 'waves';
+    if (t.includes('adrenali') || t.includes('adrenalin') || t.includes('xtreme') || t.includes('skydiv')) return 'bolt';
+    return 'local_activity';
+  }
   getNearbyActivityImage(activity: ActivityDto): string | undefined {
     return this.resolveMediaUrl(activity.mainImageUrl);
   }

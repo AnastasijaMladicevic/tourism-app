@@ -1269,7 +1269,13 @@
     "searchPlaceholder": "Search destinations...",
     "foundCount": "{{count}} destinations found",
     "empty": "No destinations found.",
-    "loadError": "Failed to load destinations."
+    "loadError": "Failed to load destinations.",
+    "exploreTitle": "Explore",
+    "exploreSubtitle": "Discover what it has to offer",
+    "exploreAttractions": "Attractions",
+    "exploreActivities": "Activities",
+    "exploreAccommodation": "Accommodation",
+    "exploreGastronomy": "Gastronomy"
   },
   "activity": {
     "title": "Activity",
