@@ -76,6 +76,10 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
   private touchEndX = 0;
   private readonly subscriptions = new Subscription();
   private pendingOpenReviewId: number | null = null;
+  private reviewImagesScrollY = 0;
+  private galleryScrollY = 0;
+  private savedPageScrollY = 0;
+  private isPageScrollLocked = false;
   constructor(
     private route: ActivatedRoute,
     private router: Router,
@@ -350,6 +354,47 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
 
   get usesTicketPricing(): boolean {
     return this.getObjectPriceMode(this.object?.objectTypeName) === 'ticket';
+  }
+
+  private lockPageScroll(): void {
+    if (this.isPageScrollLocked) return;
+  
+    this.savedPageScrollY = window.scrollY || document.documentElement.scrollTop || 0;
+    this.isPageScrollLocked = true;
+  
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${this.savedPageScrollY}px`;
+    document.body.style.left = '0';
+    document.body.style.right = '0';
+    document.body.style.width = '100%';
+    document.body.style.overflow = 'hidden';
+  }
+  
+  private unlockPageScrollIfNoModalOpen(): void {
+    if (
+      this.showGalleryModal ||
+      this.showAllReviewsModal ||
+      this.showWriteReviewModal ||
+      this.showReviewImagesModal ||
+      this.showHoursModal ||
+      this.showInfoModal ||
+      this.showSuccessModal
+    ) {
+      return;
+    }
+  
+    const scrollY = this.savedPageScrollY;
+  
+    this.isPageScrollLocked = false;
+  
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.left = '';
+    document.body.style.right = '';
+    document.body.style.width = '';
+    document.body.style.overflow = '';
+  
+    window.scrollTo(0, scrollY);
   }
 
   private getObjectPriceMode(typeName?: string | null): 'hidden' | 'ticket' | 'starting' {
@@ -732,14 +777,15 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
 
   openGallery(index = 0): void {
     if (!this.images || this.images.length === 0) return;
+  
     this.currentImageIndex = index;
     this.showGalleryModal = true;
-    document.body.style.overflow = 'hidden';
+    this.lockPageScroll();
   }
-
+  
   closeGallery(): void {
     this.showGalleryModal = false;
-    document.body.style.overflow = 'visible';
+    this.unlockPageScrollIfNoModalOpen();
   }
 
   nextImage(): void {
@@ -875,17 +921,18 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
 
   openAllReviews(): void {
     this.showAllReviewsModal = true;
-    document.body.style.overflow = 'hidden';
+    this.lockPageScroll();
   }
-
+  
   closeAllReviews(): void {
     this.showAllReviewsModal = false;
-    document.body.style.overflow = 'visible';
+    this.unlockPageScrollIfNoModalOpen();
   }
 
   openNearbyObjects(objectId: number): void {
     this.router.navigate(['/object', objectId]);
   }
+
   openWriteReview(): void {
     if (!this.authService.isLoggedIn()) {
       this.router.navigate(['/login'], {
@@ -927,19 +974,21 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
 
     setTimeout(() => {
       this.showWriteReviewModal = true;
-      document.body.style.overflow = 'hidden';
+      this.lockPageScroll();
       this.cdr.detectChanges();
     }, 50);
   }
 
   closeWriteReview(): void {
     this.showWriteReviewModal = false;
-    document.body.style.overflow = 'visible';
+  
     this.resetNewReview();
     this.isSubmittingReview = false;
     this.existingReviewImages = [];
     this.selectedReviewImages = [];
     this.reviewImagePreviews = [];
+  
+    this.unlockPageScrollIfNoModalOpen();
   }
 
   private resetNewReview(): void {
@@ -1062,18 +1111,19 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
 
   openReviewImages(review: ReviewDto): void {
     if (!review.images?.length) return;
-
+  
     this.selectedReviewImagesForModal = review.images;
     this.selectedReviewImageIndex = 0;
     this.showReviewImagesModal = true;
-    document.body.style.overflow = 'hidden';
+    this.lockPageScroll();
   }
-
+  
   closeReviewImages(): void {
     this.showReviewImagesModal = false;
     this.selectedReviewImagesForModal = [];
     this.selectedReviewImageIndex = 0;
-    document.body.style.overflow = this.showAllReviewsModal ? 'hidden' : 'visible';
+  
+    this.unlockPageScrollIfNoModalOpen();
   }
 
   nextReviewImage(): void {

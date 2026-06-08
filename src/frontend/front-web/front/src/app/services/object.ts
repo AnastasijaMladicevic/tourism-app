@@ -443,29 +443,37 @@ export class ObjectService {
   }
 
   getObjectTypeOptions(): Observable<ObjectTypeOption[]> {
-    return this.getAll({
-      page: 1,
-      pageSize: 500,
-      sortBy: 'objectTypeName',
-      sortOrder: 'asc'
-    }, { bypassRegion: true }).pipe(
-      map((response) => {
-        const items = Array.isArray(response)
-          ? response
-          : ((response as unknown as { items?: ObjectDto[] })?.items ?? []);
+    const baseParams = new HttpParams()
+      .set('page', '1')
+      .set('pageSize', '500')
+      .set('sortBy', 'objectTypeName')
+      .set('sortOrder', 'asc');
+
+    const extractItems = (resp: PagedResultDto<ObjectDto> | ObjectDto[]): ObjectDto[] =>
+      Array.isArray(resp) ? resp : (resp as PagedResultDto<ObjectDto>)?.items ?? [];
+
+    return forkJoin([
+      this.http.get<PagedResultDto<ObjectDto> | ObjectDto[]>(this.url, { params: this.addLang(baseParams) }),
+      this.http.get<PagedResultDto<ObjectDto> | ObjectDto[]>(this.url, { params: baseParams })
+    ]).pipe(
+      map(([translatedResp, originalResp]) => {
+        const translatedItems = extractItems(translatedResp);
+        const originalItems = extractItems(originalResp);
+
+        const originalNameById = new Map<number, string>();
+        for (const item of originalItems) {
+          if (item.objectTypeId && !originalNameById.has(item.objectTypeId)) {
+            originalNameById.set(item.objectTypeId, item.objectTypeName);
+          }
+        }
+
         const unique = new Map<number, ObjectTypeOption>();
-
-        for (const item of items) {
-          if (!item.objectTypeId) {
-            continue;
-          }
-
-          if (!unique.has(item.objectTypeId)) {
-            unique.set(item.objectTypeId, {
-              id: item.objectTypeId,
-              name: item.objectTypeName || `Type #${item.objectTypeId}`
-            });
-          }
+        for (const item of translatedItems) {
+          if (!item.objectTypeId || unique.has(item.objectTypeId)) continue;
+          unique.set(item.objectTypeId, {
+            id: item.objectTypeId,
+            name: item.objectTypeName || originalNameById.get(item.objectTypeId) || `Type #${item.objectTypeId}`
+          });
         }
 
         return Array.from(unique.values()).sort((a, b) => a.name.localeCompare(b.name));
