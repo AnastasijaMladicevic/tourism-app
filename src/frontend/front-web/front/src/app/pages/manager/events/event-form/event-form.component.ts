@@ -419,7 +419,7 @@ export class ManagerEventFormComponent implements OnInit, OnDestroy {
   }
 
   openDeclineModal(): void {
-    if (!this.eventId || this.isSubmitting) {
+    if (!this.eventId || this.isSubmitting || this.reviewStatus === 'Approved' || this.reviewStatus === 'Declined') {
       return;
     }
 

@@ -1002,4 +1002,22 @@ textarea {
   .title-row {
     flex-direction: column;
   }
+
+  .title-actions {
+    width: 100%;
+    flex-wrap: nowrap;
+  }
+
+  .title-actions .btn {
+    flex: 1 1 0;
+    min-width: 0;
+    justify-content: center;
+    padding: 9px 8px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  .title-actions .btn .material-symbols-outlined {
+    display: none;
+  }
 }

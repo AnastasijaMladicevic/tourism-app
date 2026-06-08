@@ -1126,13 +1126,22 @@
 
   .top-actions {
     width: 100%;
+    flex-wrap: nowrap;
   }
 
   .top-actions .ghost-btn,
   .top-actions .primary-btn,
   .top-actions .danger-btn {
-    flex: 1 1 100%;
+    flex: 1 1 0;
+    min-width: 0;
     justify-content: center;
+    white-space: nowrap;
+    font-size: 12px;
+    padding: 9px 8px;
+  }
+
+  .top-actions .material-symbols-outlined {
+    display: none;
   }
 
   .two-columns .form-field,

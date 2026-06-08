@@ -15,10 +15,10 @@
 
     <div class="header-actions">
       <button type="button" class="ghost-btn" (click)="cancel()">
-        <span class="material-symbols-outlined">close</span>
+        <span class="material-symbols-outlined">arrow_back</span>
         {{ 'common.back' | translate }}
       </button>
-      <button type="button" class="danger-btn" (click)="openDeclineModal()" [disabled]="isSubmitting || !activity">
+      <button type="button" class="danger-btn" (click)="openDeclineModal()" [disabled]="isSubmitting || !activity || reviewStatusKey === 'approved' || reviewStatusKey === 'rejected'">
         <span class="material-symbols-outlined">thumb_down</span>
         {{ 'manager.activityReview.decline' | translate }}
       </button>

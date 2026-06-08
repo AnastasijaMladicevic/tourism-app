@@ -1794,8 +1794,8 @@
     "termsOfService": "Uslovi korišćenja",
     "passwordStrength": { "weak": "SLABA", "fair": "SOLIDNA", "good": "DOBRA", "strong": "JAKA" },
     "roles": {
-      "manager": { "title": "Menadžer", "desc": "Puna administrativna kontrola nad timovima, hubovima i naplatom." },
-      "admin": { "title": "Admin", "desc": "Administrativni pristup celoj platformi, uključujući korisnike i uloge." }
+      "manager": { "title": "Menadžer", "desc": "Administrativna kontrola nad dodeljenom destinacijom i njenim lokalitetima." },
+      "admin": { "title": "Admin", "desc": "Najviši administrativni pristup, uključuje upravljanje korisnicima." }
     },
     "countries": {
       "Albania": "Albanija", "Argentina": "Argentina", "Australia": "Australija",
