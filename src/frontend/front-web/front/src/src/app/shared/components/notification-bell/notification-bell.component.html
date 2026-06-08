@@ -1,0 +1,62 @@
+<div class="notification-bell">
+  <button
+    class="icon-btn bell-btn"
+    type="button"
+    [attr.title]="'layout.notifications' | translate"
+    [attr.aria-label]="'layout.notifications' | translate"
+    [attr.aria-expanded]="isOpen()"
+    (click)="togglePanel()">
+    <span
+      class="material-symbols-outlined bell-icon"
+      [class.bell-icon--unread]="hasUnread()"
+      aria-hidden="true">
+      {{ hasUnread() ? 'notifications_active' : 'notifications' }}
+    </span>
+    <span class="badge" *ngIf="hasUnread()">{{ unreadBadgeLabel() }}</span>
+  </button>
+
+  <section class="notification-panel" *ngIf="isOpen()">
+    <header class="panel-header">
+      <div>
+        <h3>{{ 'layout.notifications' | translate }}</h3>
+        <p>{{ unreadCount() }} {{ 'layout.unread' | translate }}</p>
+      </div>
+      <button
+        class="panel-action"
+        type="button"
+        [disabled]="!hasUnread() || isMarkingAll()"
+        (click)="markAllAsRead($event)">
+        {{ 'layout.markAllRead' | translate }}
+      </button>
+    </header>
+
+    <div class="panel-body" *ngIf="!isLoading(); else loadingState">
+      <button
+        class="notification-row"
+        type="button"
+        *ngFor="let notification of notifications()"
+        [class.notification-row--unread]="!notification.isRead"
+        (click)="openNotification(notification)">
+        <span class="notification-accent" [attr.data-kind]="notificationKind(notification)"></span>
+        <div class="notification-copy">
+          <div class="notification-meta">
+            <strong>{{ notification.title }}</strong>
+            <span>{{ formatRelativeTime(notification.createdAt) }}</span>
+          </div>
+          <p>{{ notification.message }}</p>
+        </div>
+      </button>
+
+      <div class="empty-state" *ngIf="!notifications().length">
+        <strong>{{ 'layout.allCaughtUp' | translate }}</strong>
+        <p>{{ 'layout.noNotifications' | translate }}</p>
+      </div>
+    </div>
+
+    <ng-template #loadingState>
+      <div class="empty-state empty-state--loading">
+        <strong>{{ 'layout.loadingNotifications' | translate }}</strong>
+      </div>
+    </ng-template>
+  </section>
+</div>

@@ -1,0 +1,454 @@
+<section class="admin-dashboard">
+  <div class="page-head">
+    <div>
+      <h1 class="page-title">{{ t('adminDashboard.title') }}</h1>
+      <p class="subtle-text">
+        {{ t('adminDashboard.welcomeBack', { name: user?.firstName ? ', ' + user?.firstName : '' }) }}
+      </p>
+    </div>
+    <div class="head-actions">
+      <div class="period-filter" role="group" [attr.aria-label]="t('adminDashboard.period')">
+        <button
+          type="button"
+          *ngFor="let opt of periodOptions"
+          class="period-btn"
+          [class.active]="selectedPeriod === opt.key"
+          (click)="selectPeriod(opt.key)"
+        >
+          {{ opt.label }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <p class="state-banner error" *ngIf="loadError">{{ loadError }}</p>
+  <p class="state-banner loading" *ngIf="isLoading && !loadError">{{ t('adminDashboard.loading') }}</p>
+
+  <ng-container *ngIf="!isLoading && overview">
+    <div class="kpi-row">
+      <article class="kpi-card card kpi-card--teal">
+        <div class="kpi-icon">
+          <span class="material-symbols-outlined">groups</span>
+        </div>
+        <span class="kpi-label">{{ t('adminDashboard.totalTourists') }}</span>
+        <span class="kpi-value">{{ overview.summary.totalTourists | number }}</span>
+        <span class="kpi-meta positive" *ngIf="overview.summary.newTouristsInPeriod > 0">
+          {{ t('adminDashboard.createdInPeriod', { count: '+' + (overview.summary.newTouristsInPeriod | number), period: overview.periodKey }) }}
+        </span>
+      </article>
+
+      <article class="kpi-card card kpi-card--blue">
+        <div class="kpi-icon">
+          <span class="material-symbols-outlined">travel_explore</span>
+        </div>
+        <span class="kpi-label">{{ t('adminDashboard.activeDestinations') }}</span>
+        <span class="kpi-value">{{ overview.summary.activeDestinations | number }}</span>
+        <span class="kpi-meta positive" *ngIf="overview.summary.newDestinationsInPeriod > 0">
+          {{ t('adminDashboard.newInPeriod', { count: '+' + (overview.summary.newDestinationsInPeriod | number), period: overview.periodKey }) }}
+        </span>
+      </article>
+
+      <article class="kpi-card card kpi-card--amber" [class.kpi-card--alert]="overview.summary.pendingCreatorRequests > 0">
+        <div class="kpi-icon">
+          <span class="material-symbols-outlined">hourglass_top</span>
+        </div>
+        <span class="kpi-label">{{ t('adminDashboard.pendingCcRequests') }}</span>
+        <span class="kpi-value">{{ overview.summary.pendingCreatorRequests | number }}</span>
+        <span class="kpi-meta muted">{{ t('adminDashboard.currentPendingQueue') }}</span>
+      </article>
+
+      <article class="kpi-card card kpi-card--red">
+        <div class="kpi-icon">
+          <span class="material-symbols-outlined">report</span>
+        </div>
+        <span class="kpi-label">{{ t('adminDashboard.openReports') }}</span>
+        <span class="kpi-value">{{ overview.summary.openReports | number }}</span>
+        <span class="kpi-meta muted">{{ t('adminDashboard.reportsCreatedInPeriod', { count: overview.reports.total, period: overview.periodKey }) }}</span>
+      </article>
+
+      <article class="kpi-card card kpi-card--purple">
+        <div class="kpi-icon">
+          <span class="material-symbols-outlined">distance</span>
+        </div>
+        <span class="kpi-label">{{ t('adminDashboard.geocodedDestinations') }}</span>
+        <span class="kpi-value">{{ overview.geospatialOverview.totalActiveDestinationsWithCoordinates | number }}</span>
+        <span class="kpi-meta muted">{{ t('adminDashboard.regionsRepresentedCount', { count: overview.geospatialOverview.regionsRepresented }) }}</span>
+      </article>
+    </div>
+
+    <div class="top-grid">
+      <article class="card panel panel--wide">
+        <div class="section-head">
+          <div>
+            <h3>{{ t('adminDashboard.userGrowth') }}</h3>
+            <p>{{ granularityHint }} · {{ t('adminDashboard.growthLegend') }}</p>
+          </div>
+          <a class="section-link" routerLink="/admin/users">{{ t('adminDashboard.allUsers') }}</a>
+        </div>
+
+        <div class="chart-legend chart-legend--inline">
+          <span *ngFor="let series of userGrowthSeries" class="legend-item">
+            <span class="legend-dot" [style.background]="series.color"></span>
+            {{ series.label }}
+          </span>
+        </div>
+
+        <div class="chart-wrap">
+          <div class="chart-y-axis" aria-hidden="true">
+            <span>{{ userGrowthYTop }}</span>
+            <span>{{ userGrowthYMid }}</span>
+            <span>0</span>
+          </div>
+          <div class="chart-surface">
+            <svg viewBox="0 0 100 100" preserveAspectRatio="none" class="chart-svg chart-svg--multi">
+              <path
+                *ngFor="let series of userGrowthSeries"
+                [attr.d]="series.linePath"
+                class="chart-line-multi"
+                fill="none"
+                [attr.stroke]="series.color"
+              ></path>
+              <rect
+                *ngFor="let zone of userGrowthHoverZones"
+                class="chart-hover-zone"
+                [attr.x]="zone.x"
+                y="0"
+                [attr.width]="zone.width"
+                height="100"
+              >
+                <title>{{ zone.title }}</title>
+              </rect>
+            </svg>
+            <p class="chart-empty" *ngIf="userGrowthIsEmpty">{{ t('adminDashboard.noSignups') }}</p>
+          </div>
+        </div>
+
+        <div class="chart-labels">
+          <span *ngFor="let label of userGrowthXLabels">{{ label.label }}</span>
+        </div>
+      </article>
+
+      <article class="card panel">
+        <div class="section-head">
+          <div>
+            <h3>{{ t('adminDashboard.roleDistribution') }}</h3>
+            <p>{{ t('adminDashboard.currentPlatformRoles') }}</p>
+          </div>
+        </div>
+
+        <div class="donut-wrap" *ngIf="roleDonutSlices.length; else emptyRoleDonut">
+          <svg viewBox="0 0 100 100" class="donut-svg" aria-hidden="true">
+            <path *ngFor="let slice of roleDonutSlices" [attr.d]="slice.path" [attr.fill]="slice.color">
+              <title>{{ slice.label }}: {{ slice.count | number }} users ({{ slice.percent }}%)</title>
+            </path>
+          </svg>
+          <div class="donut-center">
+            <span class="donut-center-val">{{ roleDonutTotal | number }}</span>
+            <span class="donut-center-label">{{ t('adminDashboard.users') }}</span>
+          </div>
+        </div>
+
+        <ng-template #emptyRoleDonut>
+          <p class="empty-note">{{ t('adminDashboard.noRoleData') }}</p>
+        </ng-template>
+
+        <ul class="donut-legend">
+          <li *ngFor="let slice of roleDonutSlices">
+            <span class="legend-dot" [style.background]="slice.color"></span>
+            <button type="button" class="donut-legend-name donut-legend-name--link" (click)="onRoleLegendClick(slice)">{{ slice.label }}</button>
+            <span class="donut-legend-meta">{{ slice.count | number }} · {{ slice.percent }}%</span>
+          </li>
+        </ul>
+      </article>
+
+      <article class="card panel">
+        <div class="section-head">
+          <div>
+            <h3>{{ t('adminDashboard.bannedUsers') }}</h3>
+            <p>{{ t('adminDashboard.bansByRegion') }}</p>
+          </div>
+        </div>
+
+        <div class="creator-summary">
+          <div class="creator-stat creator-stat--pending">
+            <span class="creator-stat-val">{{ overview.banOverview.totalBanned | number }}</span>
+            <span class="creator-stat-label">{{ t('adminDashboard.totalBanned') }}</span>
+          </div>
+          <div class="creator-stat">
+            <span class="creator-stat-val">{{ overview.banOverview.temporarilyBanned | number }}</span>
+            <span class="creator-stat-label">{{ t('adminDashboard.temporary') }}</span>
+          </div>
+          <div class="creator-stat">
+            <span class="creator-stat-val">{{ overview.banOverview.permanentlyBanned | number }}</span>
+            <span class="creator-stat-label">{{ t('adminDashboard.permanent') }}</span>
+          </div>
+        </div>
+
+        <div *ngIf="banRegionRows.length; else emptyBanRegions" class="region-list">
+          <div *ngFor="let row of banRegionRows" class="region-row">
+            <div class="region-row-head">
+              <a
+                class="region-name dashboard-item-link"
+                routerLink="/admin/destinations"
+                [queryParams]="{ region: row.regionName }"
+              >
+                {{ row.regionName }}
+              </a>
+              <span class="region-code">{{ row.regionCode }}</span>
+            </div>
+            <div
+              class="region-bar-track"
+              [title]="t('adminDashboard.banRegionTitle', { total: row.totalBanned, temporary: row.temporarilyBanned, permanent: row.permanentlyBanned })"
+            >
+              <div class="region-bar-fill region-bar-fill--ban" [style.width.%]="row.barPercent"></div>
+            </div>
+            <div class="region-stats">
+              <span>{{ t('adminDashboard.totalCount', { count: row.totalBanned }) }}</span>
+              <span>{{ t('adminDashboard.temporaryCount', { count: row.temporarilyBanned }) }}</span>
+              <span>{{ t('adminDashboard.permanentCount', { count: row.permanentlyBanned }) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <ng-template #emptyBanRegions>
+          <p class="empty-note">{{ t('adminDashboard.noBannedUsersByRegion') }}</p>
+        </ng-template>
+      </article>
+    </div>
+
+    <div class="middle-grid">
+      <article class="card panel panel--regions">
+        <div class="section-head">
+          <div>
+            <h3>{{ t('adminDashboard.destinationsByRegion') }}</h3>
+            <p>{{ t('adminDashboard.currentCoverageByRegion') }}</p>
+          </div>
+          <a class="section-link" routerLink="/admin/destinations">{{ t('adminDashboard.manage') }}</a>
+        </div>
+
+        <ul class="region-list" *ngIf="regionRows.length; else emptyRegions">
+          <li *ngFor="let row of regionRows" class="region-row">
+            <div class="region-row-head">
+              <a
+                class="region-name dashboard-item-link"
+                routerLink="/admin/destinations"
+                [queryParams]="{ region: row.name }"
+              >
+                {{ row.name }}
+              </a>
+              <span class="region-code">{{ row.code }}</span>
+            </div>
+            <div class="region-bar-track">
+              <div
+                class="region-bar-fill"
+                [style.width.%]="row.barPercent"
+                [title]="t('adminDashboard.regionCoverageTitle', { region: row.name, total: row.total, active: row.active, mapped: row.geocoded })"
+              ></div>
+            </div>
+            <div class="region-stats">
+              <span>{{ t('adminDashboard.totalCount', { count: row.total }) }}</span>
+              <span>{{ t('adminDashboard.activeCount', { count: row.active }) }}</span>
+              <span class="region-geocoded">
+                <span class="material-symbols-outlined">pin_drop</span>
+                {{ t('adminDashboard.mappedCount', { count: row.geocoded }) }}
+              </span>
+            </div>
+          </li>
+        </ul>
+
+        <ng-template #emptyRegions>
+          <p class="empty-note">{{ t('adminDashboard.noDestinationCoverage') }}</p>
+        </ng-template>
+      </article>
+
+      <article class="card panel panel--creator">
+        <div class="section-head">
+          <div>
+            <h3>{{ t('adminDashboard.creatorRequestStatus') }}</h3>
+            <p>{{ t('adminDashboard.processedInPeriod', { count: overview.creatorRequests.totalSubmitted, period: overview.periodKey }) }}</p>
+          </div>
+          <a class="section-link" routerLink="/admin/users" [queryParams]="{ tab: 'tourists' }">{{ t('adminDashboard.review') }}</a>
+        </div>
+
+        <div class="creator-summary">
+          <div class="creator-stat creator-stat--pending">
+            <span class="creator-stat-val">{{ overview.creatorRequests.pending | number }}</span>
+            <span class="creator-stat-label">{{ t('adminDashboard.pending') }}</span>
+          </div>
+          <div class="creator-stat">
+            <span class="creator-stat-val">{{ overview.creatorRequests.approved | number }}</span>
+            <span class="creator-stat-label">{{ t('adminDashboard.approved') }}</span>
+          </div>
+          <div class="creator-stat">
+            <span class="creator-stat-val">{{ overview.creatorRequests.rejected | number }}</span>
+            <span class="creator-stat-label">{{ t('adminDashboard.rejected') }}</span>
+          </div>
+        </div>
+
+        <div class="stacked-bar stacked-bar--tall">
+          <ng-container *ngFor="let slice of creatorSlices">
+            <span
+              *ngIf="slice.count > 0"
+              class="stack-segment"
+              [style.width.%]="slice.percent"
+              [style.background]="slice.color"
+              [title]="slice.label + ': ' + (slice.count | number)"
+            ></span>
+          </ng-container>
+        </div>
+
+        <ul class="legend-list">
+          <li *ngFor="let slice of creatorSlices">
+            <span class="legend-dot" [style.background]="slice.color"></span>
+            {{ slice.label }} · {{ slice.count | number }}
+          </li>
+        </ul>
+
+        <p class="creator-footnote">
+          <span class="material-symbols-outlined">info</span>
+          {{ t('adminDashboard.pendingRequestsFootnote') }}
+        </p>
+      </article>
+    </div>
+
+    <div class="bottom-grid">
+      <article class="card panel panel--visits panel--wide">
+        <div class="section-head">
+          <div>
+            <h3>{{ t('adminDashboard.destinationEngagement') }}</h3>
+            <p>{{ t('adminDashboard.destinationEngagementPeriod', { period: overview.periodKey }) }}</p>
+          </div>
+        </div>
+
+        <div class="visit-summary">
+          <div class="visit-summary-card">
+            <span class="visit-summary-label">{{ t('adminDashboard.favoriteAdds') }}</span>
+            <span class="visit-summary-value">{{ overview.destinationEngagement.totalFavoriteAdds | number }}</span>
+          </div>
+          <div class="visit-summary-card">
+            <span class="visit-summary-label">{{ t('adminDashboard.plannerAdds') }}</span>
+            <span class="visit-summary-value">{{ overview.destinationEngagement.totalPlannerAdds | number }}</span>
+          </div>
+          <div class="visit-summary-card">
+            <span class="visit-summary-label">{{ t('adminDashboard.ratedDestinations') }}</span>
+            <span class="visit-summary-value">{{ overview.destinationEngagement.ratedDestinations | number }}</span>
+          </div>
+        </div>
+
+        <div *ngIf="hasVisitData; else emptyVisits" class="visit-list">
+          <div *ngFor="let row of topDestinationRows" class="visit-row">
+            <div class="visit-row-head">
+              <div>
+                <a class="visit-name dashboard-item-link" [routerLink]="['/admin/destinations/edit', row.destinationId]">
+                  {{ row.destinationName }}
+                </a>
+                <div class="visit-subtle">{{ row.regionName }} · {{ row.regionCode }}</div>
+              </div>
+              <div class="visit-count">{{ t('adminDashboard.scoreValue', { score: row.engagementScore }) }}</div>
+            </div>
+            <div class="region-bar-track">
+              <div
+                class="region-bar-fill region-bar-fill--teal"
+                [style.width.%]="row.barPercent"
+                [title]="t('adminDashboard.destinationEngagementTitle', { name: row.destinationName, score: row.engagementScore, favorites: row.favoriteAdds, planner: row.plannerAdds, reviews: row.reviewCount, avg: row.averageRating })"
+              ></div>
+            </div>
+            <div class="visit-meta">
+              <span>{{ t('adminDashboard.favoritesCount', { count: row.favoriteAdds }) }}</span>
+              <span>{{ t('adminDashboard.plannerAddsCount', { count: row.plannerAdds }) }}</span>
+              <span>{{ t('adminDashboard.reviewsCount', { count: row.reviewCount }) }}</span>
+              <span>{{ t('adminDashboard.avgRating', { rating: row.averageRating }) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <ng-template #emptyVisits>
+          <p class="empty-note">{{ t('adminDashboard.noDestinationEngagement') }}</p>
+        </ng-template>
+      </article>
+
+      <article class="card panel">
+        <div class="section-head">
+          <div>
+            <h3>{{ t('adminDashboard.regionEngagement') }}</h3>
+            <p>{{ t('adminDashboard.regionEngagementPeriod', { period: overview.periodKey }) }}</p>
+          </div>
+        </div>
+
+        <div *ngIf="regionVisitRows.length; else emptyRegionVisits" class="region-list">
+          <div *ngFor="let row of regionVisitRows" class="region-row">
+            <div class="region-row-head">
+              <a
+                class="region-name dashboard-item-link"
+                routerLink="/admin/destinations"
+                [queryParams]="{ region: row.regionName }"
+              >
+                {{ row.regionName }}
+              </a>
+              <span class="region-code">{{ row.regionCode }}</span>
+            </div>
+            <div class="region-bar-track">
+              <div
+                class="region-bar-fill region-bar-fill--teal"
+                [style.width.%]="row.barPercent"
+                [title]="t('adminDashboard.regionEngagementTitle', { name: row.regionName, score: row.engagementScore, favorites: row.favoriteAdds, planner: row.plannerAdds, reviews: row.reviewCount, destinations: row.engagedDestinations, avg: row.averageRating })"
+              ></div>
+            </div>
+            <div class="region-stats">
+              <span>{{ t('adminDashboard.favoritesCount', { count: row.favoriteAdds }) }}</span>
+              <span>{{ t('adminDashboard.plannerAddsCount', { count: row.plannerAdds }) }}</span>
+              <span>{{ t('adminDashboard.reviewsCount', { count: row.reviewCount }) }}</span>
+              <span>{{ t('adminDashboard.destinationsCount', { count: row.engagedDestinations }) }}</span>
+              <span>{{ t('adminDashboard.avgRating', { rating: row.averageRating }) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <ng-template #emptyRegionVisits>
+          <p class="empty-note">{{ t('adminDashboard.noRegionEngagement') }}</p>
+        </ng-template>
+      </article>
+
+      <article class="card panel panel--map">
+        <div class="section-head">
+          <div>
+            <h3>{{ t('adminDashboard.geospatialOverview') }}</h3>
+            <p>{{ t('adminDashboard.currentActiveDestinationsWithMapCoordinates') }}</p>
+          </div>
+        </div>
+
+        <div class="geo-summary">
+          <div class="geo-summary-item">
+            <span class="geo-summary-value">{{ overview.geospatialOverview.totalActiveDestinationsWithCoordinates | number }}</span>
+            <span class="geo-summary-label">{{ t('adminDashboard.mappedDestinations') }}</span>
+          </div>
+          <div class="geo-summary-item">
+            <span class="geo-summary-value">{{ overview.geospatialOverview.regionsRepresented | number }}</span>
+            <span class="geo-summary-label">{{ t('adminDashboard.regionsRepresented') }}</span>
+          </div>
+          <div class="geo-summary-item">
+            <span class="geo-summary-value">{{ overview.geospatialOverview.displayedPoints | number }}</span>
+            <span class="geo-summary-label">{{ t('adminDashboard.displayedMarkers') }}</span>
+          </div>
+        </div>
+
+        <div class="map-container">
+          <ng-container *ngIf="mapDestinations.length; else emptyMapPreview">
+            <app-admin-platform-map
+              [compact]="true"
+              [focusRegion]="false"
+              [enableClustering]="true"
+              [destinations]="mapDestinations"
+              [mapId]="mapComponentId"
+              (markerSelected)="onMapDestinationSelected($event)"
+            ></app-admin-platform-map>
+          </ng-container>
+          <ng-template #emptyMapPreview>
+            <p class="empty-note empty-note--map">{{ t('adminDashboard.noMappedPoints') }}</p>
+          </ng-template>
+        </div>
+
+      </article>
+    </div>
+  </ng-container>
+</section>

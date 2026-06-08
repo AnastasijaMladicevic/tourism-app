@@ -1,0 +1,354 @@
+<section class="manager-events-page manager-list-page">
+  <header class="page-head">
+    <div class="page-header-copy">
+      <p class="eyebrow page-header-eyebrow">{{ 'manager.events.eyebrow' | translate }}</p>
+      <h1>{{ 'layout.events' | translate }}</h1>
+    </div>
+  </header>
+
+  <div class="toolbar card">
+    <label class="search-field" [attr.aria-label]="'manager.events.searchAria' | translate">
+      <span class="material-symbols-outlined">search</span>
+      <input
+        type="text"
+        [(ngModel)]="draftSearchQuery"
+        (keyup)="onSearchChange()"
+        [placeholder]="'manager.events.searchPlaceholder' | translate"
+      />
+    </label>
+
+    <div class="date-range-pill" [attr.aria-label]="'manager.events.dateRangeFilter' | translate">
+      <span class="material-symbols-outlined date-range-icon" aria-hidden="true">calendar_month</span>
+      <div class="date-range-inputs">
+        <input
+          type="date"
+          class="date-range-input"
+          [(ngModel)]="rangeStartDate"
+          [max]="rangeEndDate || null"
+          (ngModelChange)="onStartDateChange()"
+          aria-label="From date"
+        />
+        <span class="date-range-separator" aria-hidden="true">–</span>
+        <input
+          type="date"
+          class="date-range-input"
+          [(ngModel)]="rangeEndDate"
+          [min]="rangeStartDate || null"
+          (ngModelChange)="onEndDateChange()"
+          aria-label="To date"
+        />
+      </div>
+    </div>
+
+  </div>
+
+  @if (filterPanelOpen) {
+    <div class="filters-panel card">
+      <label>
+        <span>{{ 'manager.events.filters.status' | translate }}</span>
+        <select [(ngModel)]="statusFilter" (ngModelChange)="onApplyFilters()">
+          <option value="all">{{ 'manager.events.filters.allStatuses' | translate }}</option>
+          <option value="approved">{{ 'manager.events.status.approved' | translate }}</option>
+          <option value="pending">{{ 'manager.events.status.pending' | translate }}</option>
+          <option value="rejected">{{ 'manager.events.status.rejected' | translate }}</option>
+        </select>
+      </label>
+
+      <label>
+        <span>{{ 'manager.events.filters.category' | translate }}</span>
+        <select [(ngModel)]="categoryFilter" (ngModelChange)="onApplyFilters()">
+          <option value="all">{{ 'manager.events.filters.allCategories' | translate }}</option>
+          <option *ngFor="let option of categoryOptions" [value]="option.value">{{ option.label | translate }}</option>
+        </select>
+      </label>
+
+      <label>
+        <span>{{ 'manager.events.filters.sortBy' | translate }}</span>
+        <select [(ngModel)]="sortBy" (ngModelChange)="onApplyFilters()">
+          <option value="startDate">{{ 'manager.events.filters.startDate' | translate }}</option>
+          <option value="name">{{ 'manager.events.filters.name' | translate }}</option>
+          <option value="status">{{ 'manager.events.filters.status' | translate }}</option>
+        </select>
+      </label>
+
+      <label>
+        <span>{{ 'manager.events.filters.order' | translate }}</span>
+        <select [(ngModel)]="sortOrder" (ngModelChange)="onApplyFilters()">
+          <option value="asc">{{ 'manager.events.filters.ascending' | translate }}</option>
+          <option value="desc">{{ 'manager.events.filters.descending' | translate }}</option>
+        </select>
+      </label>
+
+      <div class="filter-actions">
+        <button type="button" class="ghost-btn filter-btn secondary" (click)="onResetFilters()">
+          {{ 'manager.events.filters.reset' | translate }}
+        </button>
+      </div>
+    </div>
+  }
+
+  <div class="event-content-grid">
+    <div class="event-main-column">
+      <div class="insights-grid">
+        <article class="insight-card card" *ngFor="let stat of stats" [attr.data-tone]="stat.tone === 'neutral' ? 'amber' : stat.tone">
+          <p>{{ stat.label }}</p>
+          <strong>{{ stat.value }}</strong>
+          <span>{{ stat.hint }}</span>
+        </article>
+      </div>
+
+      <section class="event-table-wrap card">
+        @if (isLoading) {
+          <div class="state">{{ 'manager.events.loading' | translate }}</div>
+        } @else if (errorMessage) {
+          <div class="state state-error">{{ errorMessage }}</div>
+        } @else {
+          <div class="events-mobile-list">
+            @for (event of pagedEvents; track event.id) {
+              <article
+                class="event-mobile-card"
+                [class.is-active]="selectedEvent?.id === event.id"
+                (click)="onViewEvent(event)"
+              >
+                <span
+                  class="event-mobile-card__media"
+                  [style.background-image]="event.mainImageUrl ? 'url(' + event.mainImageUrl + ')' : ''"
+                ></span>
+                <div class="event-mobile-card__content">
+                  <div class="event-mobile-card__head">
+                    <h3>{{ event.name }}</h3>
+                    <span class="status-chip status-chip--compact" [ngClass]="getStatusBadgeClass(event.status)">
+                      {{ formatStatus(event.status) }}
+                    </span>
+                  </div>
+                  <p class="event-mobile-card__date">
+                    <span class="material-symbols-outlined" aria-hidden="true">event</span>
+                    {{ formatDate(event.startDate) }}
+                  </p>
+                  <p class="event-mobile-card__location">
+                    <span class="material-symbols-outlined" aria-hidden="true">location_on</span>
+                    {{ getLocationLabel(event) }}
+                  </p>
+                  <div class="event-mobile-card__meta">
+                    <span class="event-mobile-card__type">{{ getCategoryLabel(event) }}</span>
+                    <span class="event-mobile-card__capacity">{{ getCapacityLabel(event) }}</span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  class="event-mobile-card__edit"
+                  [title]="'manager.events.reviewEvent' | translate"
+                  (click)="onEditEvent(event); $event.stopPropagation()"
+                >
+                  <span class="material-symbols-outlined">edit</span>
+                </button>
+              </article>
+            }
+          </div>
+
+          <div class="table-scroll events-table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>{{ 'manager.events.table.status' | translate }}</th>
+                  <th>{{ 'manager.events.table.eventDetails' | translate }}</th>
+                  <th>{{ 'manager.events.table.locality' | translate }}</th>
+                  <th>{{ 'manager.events.table.category' | translate }}</th>
+                  <th>{{ 'manager.events.table.capacity' | translate }}</th>
+                  <th>{{ 'manager.events.table.action' | translate }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  *ngFor="let event of pagedEvents; trackBy: trackByEventId"
+                  [class.active-row]="selectedEvent?.id === event.id"
+                  (click)="onViewEvent(event)"
+                >
+                  <td>
+                    <span class="status-chip" [ngClass]="getStatusBadgeClass(event.status)">
+                      <span class="chip-dot">●</span>
+                      {{ formatStatus(event.status) }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="table-event-details">
+                      <span
+                        class="event-thumb"
+                        [style.background-image]="event.mainImageUrl ? 'url(' + event.mainImageUrl + ')' : ''"
+                      ></span>
+                      <div class="table-event-cell">
+                        <strong>{{ event.name }}</strong>
+                        <span>
+                          <span class="material-symbols-outlined tiny-icon">calendar_month</span>
+                          {{ formatDate(event.startDate) }}
+                        </span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="table-event-cell">
+                      <strong>{{ getLocationLabel(event) }}</strong>
+                      <span>{{ getLocationSubLabel(event) }}</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="category-pill">
+                      <span class="material-symbols-outlined tiny-icon">{{
+                        getCategoryIcon(event)
+                      }}</span>
+                      {{ getCategoryLabel(event) }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="capacity-cell">
+                      <div class="capacity-bar">
+                        <span [style.width.%]="getCapacityProgress(event)"></span>
+                      </div>
+                      <small>{{ getCapacityLabel(event) }}</small>
+                    </div>
+                  </td>
+                  <td>
+                    <button
+                      type="button"
+                      class="icon-btn"
+                      [title]="'manager.events.reviewEvent' | translate"
+                      (click)="onEditEvent(event); $event.stopPropagation()"
+                    >
+                      <span class="material-symbols-outlined">open_in_new</span>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <app-paginator
+            [currentPage]="currentPage"
+            [totalPages]="totalPages"
+            [pageStart]="pageStart"
+            [pageEnd]="pageEnd"
+            [totalCount]="totalCount"
+            [pageSize]="pageSize"
+            [pageSizeOptions]="pageSizeOptions"
+            [itemLabel]="translationService.translate('common.events').toLowerCase()"
+            (pageChange)="onGoToPage($event)"
+            (pageSizeChange)="onPageSizeChange($event)"
+          ></app-paginator>
+        }
+      </section>
+    </div>
+
+    <aside class="detail-column card" [class.has-selection]="!!selectedEvent">
+      @if (selectedEvent) {
+        <p class="detail-sheet-label">{{ 'manager.events.selectedEvent' | translate }}</p>
+        <div class="activity-hero">
+          <div class="hero-media" [class.has-slides]="heroImageUrls.length > 0">
+            <div class="hero-media-slides" aria-hidden="true">
+              @for (url of heroImageUrls; track trackByHeroImage($index, url); let i = $index) {
+                <div
+                  class="hero-media-slide"
+                  [class.is-active]="i === currentHeroImageIndex"
+                  [ngStyle]="getHeroSlideStyle(url)"
+                ></div>
+              }
+            </div>
+            <span class="hero-badge">{{ getCategoryLabel(selectedEvent) }}</span>
+          </div>
+
+          <div class="hero-copy">
+            <p class="eyebrow">{{ 'manager.events.featuredEvent' | translate }}</p>
+            <h2>{{ selectedEvent.name }}</h2>
+            <p class="hero-meta">
+              {{ getLocationLabel(selectedEvent) }} · {{ formatDate(selectedEvent.startDate) }}
+            </p>
+
+            <div
+              class="status-tooltip-wrap"
+              [class.has-tooltip]="hasSelectedEventRejectionReason(selectedEvent)"
+              tabindex="0"
+            >
+              <span class="detail-status" [ngClass]="getStatusBadgeClass(selectedEvent.status)">
+                {{ formatStatus(selectedEvent.status) }}
+              </span>
+
+              @if (hasSelectedEventRejectionReason(selectedEvent)) {
+                <div class="status-tooltip" role="tooltip">
+                  <strong>{{ 'manager.events.rejectionReason' | translate }}</strong>
+                  <p>{{ getSelectedEventRejectionReason(selectedEvent) }}</p>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="detail-metrics">
+          <div class="metric-card">
+            <span>{{ getTicketPriceLabel() }}</span>
+            <strong>{{ formatTicketPrice(selectedEvent.price) }}</strong>
+          </div>
+          <div class="metric-card">
+            <span>{{ 'manager.events.table.capacity' | translate }}</span>
+            <strong>{{
+              selectedEvent.maxVisitors != null
+                ? selectedEvent.maxVisitors.toLocaleString(translationService.currentLocale())
+                : ('common.notAvailable' | translate)
+            }}</strong>
+          </div>
+        </div>
+
+        <section class="detail-section">
+          <div class="section-head">
+            <h3>{{ 'manager.events.schedule.title' | translate }}</h3>
+          </div>
+
+          <div class="schedule-list">
+            <div class="schedule-item" *ngFor="let row of selectedSchedule">
+              <span>{{ row.label }}</span>
+              <strong>{{ row.value }}</strong>
+            </div>
+          </div>
+        </section>
+
+        <section class="detail-section">
+          <h3>{{ 'manager.events.description' | translate }}</h3>
+          <p class="description-copy">{{ getSelectedSummary(selectedEvent) }}</p>
+        </section>
+
+        <section class="detail-section">
+          <div class="map-card">
+            @if (hasSelectedEventCoordinates) {
+              <app-map
+                [lat]="selectedEventLat"
+                [lng]="selectedEventLng"
+                [zoom]="14"
+                [popupText]="selectedEventLocationLabel"
+                [interactive]="false"
+                [zoomable]="true"
+                mapId="manager-event-details-map"
+              ></app-map>
+            } @else {
+              <div class="map-empty-state">
+                <span class="material-symbols-outlined">location_off</span>
+                <p>{{ 'manager.events.noCoordinates' | translate }}</p>
+              </div>
+            }
+          </div>
+        </section>
+
+        <div class="detail-cta">
+          <button type="button" class="primary-btn full-cta sidebar-cta-btn" (click)="onEditEvent(selectedEvent)">
+            <span class="material-symbols-outlined">rate_review</span>
+            {{ 'manager.events.openFullReview' | translate }}
+          </button>
+        </div>
+      } @else {
+        <div class="empty-state">
+          <p class="eyebrow">{{ 'manager.events.empty.noEventSelected' | translate }}</p>
+          <h2>{{ 'manager.events.empty.pickEventTitle' | translate }}</h2>
+          <p>{{ 'manager.events.empty.pickEventBody' | translate }}</p>
+        </div>
+      }
+    </aside>
+  </div>
+</section>
+

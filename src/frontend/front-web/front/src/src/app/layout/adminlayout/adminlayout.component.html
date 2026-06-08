@@ -1,0 +1,110 @@
+<div class="admin-layout" [class.sidebar-open]="sidebarOpen" [class.admin-layout--map]="isMapRoute">
+  <header class="topbar">
+    <button
+      type="button"
+      class="icon-btn menu-toggle"
+      [attr.aria-label]="sidebarOpen ? ('layout.closeMenu' | translate) : ('layout.openMenu' | translate)"
+      [attr.aria-expanded]="sidebarOpen"
+      (click)="toggleSidebar()"
+    >
+      <span class="material-symbols-outlined">{{ sidebarOpen ? 'close' : 'menu' }}</span>
+    </button>
+    <div class="topbar-logo">
+      <img src="assets/logo.png" alt="SpireGO" class="logo-img" />
+    </div>
+
+    <div class="topbar-right">
+      <app-notification-bell></app-notification-bell>
+
+      <div class="topbar-user" routerLink="/admin/profile">
+        <div class="user-meta">
+          <span class="user-name">{{ user.name }}</span>
+          <span class="user-email">{{ user.email }}</span>
+        </div>
+        <div class="user-avatar">
+          @if (user.avatarUrl) {
+            <img [src]="user.avatarUrl" [alt]="user.name" />
+          } @else {
+            <span>{{ user.initials }}</span>
+          }
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <button
+    type="button"
+    class="sidebar-backdrop"
+    [attr.aria-label]="'layout.closeMenu' | translate"
+    [class.is-visible]="sidebarOpen"
+    (click)="closeSidebar()"
+  ></button>
+
+  <div class="layout-shell">
+    <aside class="sidebar" [attr.aria-label]="'layout.mainMenu' | translate">
+      <p class="sidebar-section-label">{{ 'layout.mainMenu' | translate }}</p>
+
+      <a class="nav-item" routerLink="/admin/dashboard" routerLinkActive="active" (click)="closeSidebar()">
+        <svg
+          class="nav-icon"
+          viewBox="0 0 22 22"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+        >
+          <rect x="2" y="2" width="8" height="8" rx="1.5" />
+          <rect x="12" y="2" width="8" height="8" rx="1.5" />
+          <rect x="2" y="12" width="8" height="8" rx="1.5" />
+          <rect x="12" y="12" width="8" height="8" rx="1.5" />
+        </svg>
+        {{ 'layout.dashboard' | translate }}
+      </a>
+
+      <a class="nav-item" routerLink="/admin/destinations" routerLinkActive="active" (click)="closeSidebar()">
+        <span class="material-symbols-outlined">pin_drop</span>
+        {{ 'layout.destinations' | translate }}
+      </a>
+
+      <a class="nav-item" routerLink="/admin/users" routerLinkActive="active" (click)="closeSidebar()">
+        <span class="material-symbols-outlined">group</span>
+        {{ 'layout.usersRoles' | translate }}
+      </a>
+
+      <a class="nav-item" routerLink="/admin/map" routerLinkActive="active" (click)="closeSidebar()">
+        <svg
+          class="nav-icon"
+          viewBox="0 0 22 22"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+        >
+          <polygon points="2,4 8,2 14,4 20,2 20,18 14,20 8,18 2,20" />
+          <line x1="8" y1="2" x2="8" y2="18" />
+          <line x1="14" y1="4" x2="14" y2="20" />
+        </svg>
+        {{ 'layout.mapView' | translate }}
+      </a>
+
+      <a class="sidebar-logout" routerLink="/signout" (click)="closeSidebar()">
+        <svg
+          class="logout-icon"
+          viewBox="0 0 22 22"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+        >
+          <path d="M8 3H5a2 2 0 00-2 2v12a2 2 0 002 2h3" />
+          <path d="M13 7l4 4-4 4" />
+          <line x1="17" y1="11" x2="8" y2="11" />
+        </svg>
+        {{ 'layout.signOut' | translate }}
+      </a>
+    </aside>
+
+    <div class="main">
+      <div class="page-outlet">
+        <router-outlet></router-outlet>
+      </div>
+    </div>
+  </div>
+</div>

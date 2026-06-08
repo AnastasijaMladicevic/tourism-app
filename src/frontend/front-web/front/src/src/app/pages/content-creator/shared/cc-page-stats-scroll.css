@@ -1,0 +1,112 @@
+/* Horizontal scroll for top statistics until the host column fits three cards in one row. */
+
+.activities-page .main-column,
+.events-page .main-column,
+.objects-page .main-column {
+  container-type: inline-size;
+  container-name: cc-stats-host;
+  min-width: 0;
+}
+
+@container cc-stats-host (max-width: 699px) {
+  .activities-page .insights-grid,
+  .events-page .insights-grid,
+  .objects-page .insights-grid {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 10px;
+    width: 100%;
+    max-width: 100%;
+    margin-inline: 0;
+    padding: 0 0 6px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 0;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    grid-template-columns: none;
+  }
+
+  .activities-page .insights-grid::after,
+  .events-page .insights-grid::after,
+  .objects-page .insights-grid::after {
+    content: '';
+    flex: 0 0 4px;
+  }
+
+  .activities-page .insights-grid::-webkit-scrollbar,
+  .events-page .insights-grid::-webkit-scrollbar,
+  .objects-page .insights-grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .activities-page .insights-grid .insight-card:last-child,
+  .events-page .insights-grid .insight-card:last-child,
+  .objects-page .insights-grid .insight-card:last-child {
+    grid-column: auto;
+  }
+
+  .activities-page .insight-card,
+  .events-page .insight-card,
+  .objects-page .insight-card {
+    flex: 0 0 min(260px, 78%);
+    scroll-snap-align: start;
+    min-width: 0;
+  }
+}
+
+@container cc-stats-host (min-width: 700px) {
+  .activities-page .insights-grid,
+  .events-page .insights-grid,
+  .objects-page .insights-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    overflow-x: visible;
+    overflow-y: visible;
+    scroll-snap-type: none;
+  }
+
+  .activities-page .insight-card,
+  .events-page .insight-card,
+  .objects-page .insight-card {
+    flex: unset;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 920px) {
+  @container cc-stats-host (max-width: 699px) {
+    .activities-page .insights-grid,
+    .events-page .insights-grid,
+    .objects-page .insights-grid {
+      scroll-padding-inline: 16px;
+    }
+
+    .activities-page .insight-card,
+    .events-page .insight-card,
+    .objects-page .insight-card {
+      padding: 12px;
+      border-radius: 16px;
+    }
+
+    .activities-page .insight-card strong,
+    .events-page .insight-card strong,
+    .objects-page .insight-card strong {
+      font-size: 22px;
+      margin: 6px 0 2px;
+    }
+
+    .activities-page .insight-card p,
+    .events-page .insight-card p,
+    .objects-page .insight-card p {
+      font-size: 10px;
+    }
+
+    .activities-page .insight-card span,
+    .events-page .insight-card span,
+    .objects-page .insight-card span {
+      font-size: 11px;
+    }
+  }
+}

@@ -1,0 +1,123 @@
+<section class="event-details-page">
+  <div class="page-header">
+    <div>
+      <p class="eyebrow page-header-eyebrow">{{ 'contentCreator.eventDetails.pageEyebrow' | translate }}</p>
+      <h1>{{ event?.name || ('contentCreator.eventDetails.titleFallback' | translate) }}</h1>
+      <p class="page-intro">{{ 'contentCreator.eventDetails.pageIntro' | translate }}</p>
+    </div>
+
+    <div class="header-actions">
+      <button type="button" class="ghost-btn" (click)="goBack()">
+        <span class="material-symbols-outlined">arrow_back</span>
+        {{ 'contentCreator.eventDetails.back' | translate }}
+      </button>
+      <button type="button" class="ghost-btn" (click)="editEvent()" [disabled]="!event">
+        <span class="material-symbols-outlined">edit</span>
+        {{ 'common.edit' | translate }}
+      </button>
+      <button type="button" class="primary-btn">
+        <span class="material-symbols-outlined">share</span>
+        {{ 'contentCreator.eventDetails.share' | translate }}
+      </button>
+    </div>
+  </div>
+
+  @if (isLoading) {
+    <div class="card state">{{ 'contentCreator.eventDetails.loading' | translate }}</div>
+  } @else if (errorMessage) {
+    <div class="card state state-error">{{ errorMessage }}</div>
+  } @else if (event) {
+    <div class="details-grid">
+      <div class="main-column">
+        <article class="hero card">
+          <div class="hero-banner" [style.background-image]="'url(' + bannerUrl + ')'">
+            <span class="hero-tag">{{ categoryLabel }}</span>
+            <span class="hero-status">{{ statusLabel }}</span>
+          </div>
+
+          <div class="hero-content">
+            <p class="eyebrow">{{ 'contentCreator.eventDetails.featuredEvent' | translate }}</p>
+            <h2>{{ event.name }}</h2>
+            <p class="hero-meta">{{ formatDate(event.startDate) }} · {{ formatDate(event.endDate ?? event.startDate) }}</p>
+            <div class="status-tooltip-wrap" [class.has-tooltip]="hasRejectionReason" tabindex="0">
+              <span class="detail-status" [ngClass]="getStatusBadgeClass(event.status)">
+                {{ statusLabel }}
+              </span>
+
+              @if (hasRejectionReason) {
+                <div class="status-tooltip" role="tooltip">
+                  <strong>{{ 'contentCreator.eventDetails.rejectionReason' | translate }}</strong>
+                  <p>{{ rejectionReason }}</p>
+                </div>
+              }
+            </div>
+            <p class="summary">{{ summary }}</p>
+          </div>
+        </article>
+
+        <section class="card section-card">
+          <div class="section-title">
+            <h3>{{ 'contentCreator.eventDetails.quickFacts' | translate }}</h3>
+          </div>
+
+          <div class="facts-grid">
+            <article class="fact-item" *ngFor="let item of detailItems">
+              <span>{{ item.label }}</span>
+              <strong>{{ item.value }}</strong>
+            </article>
+          </div>
+        </section>
+
+        <section class="card section-card">
+          <div class="section-title">
+            <h3>{{ 'contentCreator.eventDetails.about' | translate }}</h3>
+          </div>
+          <p class="body-copy">{{ summary }}</p>
+        </section>
+      </div>
+
+      <aside class="side-column">
+        <section class="card section-card">
+          <div class="section-title compact">
+            <h3>{{ 'contentCreator.eventDetails.schedule' | translate }}</h3>
+          </div>
+
+          <div class="detail-list">
+            <div class="detail-row" *ngFor="let item of detailItems">
+              <span>{{ item.label }}</span>
+              <strong>{{ item.value }}</strong>
+            </div>
+          </div>
+        </section>
+
+        <section class="card section-card">
+          <div class="section-title compact">
+            <h3>{{ 'contentCreator.eventDetails.organizers' | translate }}</h3>
+          </div>
+
+          <div class="organizer-list">
+            <article class="organizer-row" *ngFor="let name of organizerNames; let i = index">
+              <div class="avatar">{{ organizerInitials[i] }}</div>
+              <div>
+                <strong>{{ name }}</strong>
+                <span>{{ 'contentCreatorObjectForm.review.contentCreator' | translate }}</span>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="card section-card">
+          <div class="section-title compact">
+            <h3>{{ 'contentCreator.eventDetails.objectSection' | translate }}</h3>
+          </div>
+
+          <div class="venue-map"></div>
+          <div class="venue-meta">
+            <strong>{{ event.objectName || event.localityName || event.destinationName || ('contentCreator.eventDetails.linkedObject' | translate) }}</strong>
+            <span>{{ 'contentCreator.eventDetails.locationContextNote' | translate }}</span>
+          </div>
+        </section>
+      </aside>
+    </div>
+  }
+</section>

@@ -1,0 +1,349 @@
+<section class="objects-page">
+  <header class="page-header">
+    <div class="page-header-copy">
+      <p class="eyebrow page-header-eyebrow">{{ 'contentCreator.objects.eyebrow' | translate }}</p>
+      <h1>{{ 'contentCreator.objects.title' | translate }}</h1>
+    </div>
+    <button type="button" class="primary-btn page-header-cta" (click)="onCreateObject()">
+      <span class="material-symbols-outlined">add</span>
+      <span class="page-header-cta-label">{{ 'contentCreator.objects.createObject' | translate }}</span>
+    </button>
+  </header>
+
+  <div class="toolbar card">
+    <div class="toolbar-search">
+      <span class="material-symbols-outlined search-icon">search</span>
+      <input
+        type="text"
+        class="toolbar-input"
+        [(ngModel)]="draftSearchQuery"
+        (keyup)="onSearchEnter($event)"
+        [placeholder]="'contentCreator.objects.searchPlaceholder' | translate"
+      />
+    </div>
+  </div>
+
+  @if (filterPanelOpen) {
+    <div class="filters-panel card">
+      <label>
+        <span>{{ 'contentCreator.objects.filters.status' | translate }}</span>
+        <select [(ngModel)]="statusFilter" (ngModelChange)="onApplyFilters()">
+          <option value="all">{{ 'contentCreator.objects.filters.allStatuses' | translate }}</option>
+          <option *ngFor="let option of statusOptions" [value]="option.value">
+            {{ translateOptionLabel(option) }}
+          </option>
+        </select>
+      </label>
+
+      <label>
+        <span>{{ 'contentCreator.objects.filters.type' | translate }}</span>
+        <select [(ngModel)]="typeFilter" (ngModelChange)="onApplyFilters()">
+          <option value="all">{{ 'contentCreator.objects.filters.allTypes' | translate }}</option>
+          <option *ngFor="let option of typeOptions" [value]="option.value">{{ option.label }}</option>
+        </select>
+      </label>
+
+      <label>
+        <span>{{ 'contentCreator.objects.filters.rating' | translate }}</span>
+        <select [(ngModel)]="ratingFilter" (ngModelChange)="onApplyFilters()">
+          <option *ngFor="let option of ratingOptions" [value]="option.value">{{ translateOptionLabel(option) }}</option>
+        </select>
+      </label>
+
+      <label>
+        <span>{{ 'contentCreator.objects.filters.sortBy' | translate }}</span>
+        <select [(ngModel)]="sortBy" (ngModelChange)="onApplyFilters()">
+          <option *ngFor="let option of sortByOptions" [value]="option.value">
+            {{ translateOptionLabel(option) }}
+          </option>
+        </select>
+      </label>
+
+      <label>
+        <span>{{ 'contentCreator.objects.filters.order' | translate }}</span>
+        <select [(ngModel)]="sortOrder" (ngModelChange)="onApplyFilters()">
+          <option value="asc">{{ 'contentCreator.objects.filters.ascending' | translate }}</option>
+          <option value="desc">{{ 'contentCreator.objects.filters.descending' | translate }}</option>
+        </select>
+      </label>
+
+      <div class="filter-actions">
+        <button type="button" class="ghost-btn filter-btn secondary" (click)="onResetFilters()">
+          {{ 'contentCreator.objects.filters.reset' | translate }}
+        </button>
+      </div>
+    </div>
+  }
+
+  <div class="objects-layout">
+    <div class="main-column">
+      <div class="insights-grid">
+        <article class="insight-card card" data-tone="blue">
+          <p>{{ 'contentCreator.objects.stats.totalObjects' | translate }}</p>
+          <strong>{{ totalCount }}</strong>
+          <span>{{ 'contentCreator.objects.stats.matchingFilters' | translate }}</span>
+        </article>
+        <article class="insight-card card" data-tone="green">
+          <p>{{ 'contentCreator.objects.stats.onThisPage' | translate }}</p>
+          <strong>{{ pagedObjects.length }}</strong>
+          <span>{{ 'contentCreator.objects.stats.visibleRows' | translate }}</span>
+        </article>
+        <article class="insight-card card" data-tone="amber">
+          <p>{{ 'contentCreator.objects.stats.averageRating' | translate }}</p>
+          <strong>{{ averageRatingDisplay }}</strong>
+          <span>{{ 'contentCreator.objects.stats.acrossPage' | translate }}</span>
+        </article>
+      </div>
+
+      <div class="table-card">
+        @if (isLoading) {
+          <div class="state state-loading">{{ 'contentCreator.objects.loading' | translate }}</div>
+        } @else if (errorMessage) {
+          <div class="state state-error">{{ errorMessage }}</div>
+        } @else if (!pagedObjects.length) {
+          <div class="state">{{ 'contentCreator.objects.empty.filtered' | translate }}</div>
+        } @else {
+        <div class="objects-mobile-list">
+          @for (object of pagedObjects; track object.id) {
+            <article
+              class="object-mobile-card"
+              [class.is-active]="selectedObject?.id === object.id"
+              (click)="selectObject(object)"
+            >
+              <div class="object-mobile-card__media" [ngStyle]="getMediaStyle(object)"></div>
+              <div class="object-mobile-card__content">
+                <div class="object-mobile-card__head">
+                  <h3>{{ object.name }}</h3>
+                  <span class="status-chip status-chip--compact" [ngClass]="getStatusBadgeClass(object.status)">
+                    {{ formatStatus(object.status) }}
+                  </span>
+                </div>
+                <p class="object-mobile-card__location">
+                  <span class="material-symbols-outlined" aria-hidden="true">location_on</span>
+                  {{ object.destinationName || object.localityName || ('common.notAvailable' | translate) }}
+                  @if (getObjectTableSubline(object) !== ('common.notAvailable' | translate)) {
+                    <span class="object-mobile-card__location-sub">· {{ getObjectTableSubline(object) }}</span>
+                  }
+                </p>
+                <div class="object-mobile-card__meta">
+                  <span class="object-mobile-card__type">{{ object.objectTypeName || ('common.notAvailable' | translate) }}</span>
+                  <span class="object-mobile-card__rating">
+                    <span class="material-symbols-outlined" aria-hidden="true">star</span>
+                    {{ (object.averageRating ?? 0).toFixed(1) }}
+                  </span>
+                </div>
+              </div>
+              <button
+                type="button"
+                class="object-mobile-card__edit"
+                [title]="'common.edit' | translate"
+                (click)="onEditObject(object); $event.stopPropagation()"
+              >
+                <span class="material-symbols-outlined">edit</span>
+              </button>
+            </article>
+          }
+        </div>
+
+        <div class="table-scroll objects-table-wrap">
+          <table class="objects-table">
+            <thead>
+              <tr>
+                <th>{{ 'contentCreator.objects.table.status' | translate }}</th>
+                <th>{{ 'contentCreator.objects.table.objectDetails' | translate }}</th>
+                <th>{{ 'contentCreator.objects.table.type' | translate }}</th>
+                <th>{{ 'contentCreator.objects.table.destination' | translate }}</th>
+                <th>{{ 'contentCreator.objects.table.rating' | translate }}</th>
+                <th class="col-actions">{{ 'contentCreator.objects.table.action' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                *ngFor="let object of pagedObjects; trackBy: trackByObjectId"
+                [class.active-row]="selectedObject?.id === object.id"
+                (click)="selectObject(object)"
+              >
+                <td [attr.data-label]="'contentCreator.objects.table.status' | translate">
+                  <span class="status-chip" [ngClass]="getStatusBadgeClass(object.status)">
+                    <span class="chip-dot">●</span>
+                    {{ formatStatus(object.status) }}
+                  </span>
+                </td>
+                <td class="object-details-cell" [attr.data-label]="'contentCreator.objects.table.objectDetails' | translate">
+                  <div class="item-cell item-cell-with-media">
+                    <div class="media-thumb" [ngStyle]="getMediaStyle(object)"></div>
+                    <strong>{{ object.name }}</strong>
+                  </div>
+                </td>
+                <td class="type-cell" [attr.data-label]="'contentCreator.objects.table.type' | translate">{{ object.objectTypeName || ('common.notAvailable' | translate) }}</td>
+                <td [attr.data-label]="'contentCreator.objects.table.destination' | translate">
+                  <div class="table-activity-cell">
+                    <strong>{{ object.destinationName || object.localityName || ('common.notAvailable' | translate) }}</strong>
+                    <span>{{ getObjectTableSubline(object) }}</span>
+                  </div>
+                </td>
+                <td class="rating-cell" [attr.data-label]="'contentCreator.objects.table.rating' | translate">{{ (object.averageRating ?? 0).toFixed(1) }}</td>
+                <td class="col-actions" [attr.data-label]="'contentCreator.objects.table.action' | translate">
+                  <button type="button" class="icon-btn plain" [title]="'common.edit' | translate" (click)="onEditObject(object); $event.stopPropagation()">
+                    <span class="material-symbols-outlined">edit</span>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <app-paginator
+          [currentPage]="currentPage"
+          [totalPages]="totalPages"
+          [pageStart]="pageStart"
+          [pageEnd]="pageEnd"
+          [totalCount]="totalCount"
+          [pageSize]="pageSize"
+          [pageSizeOptions]="pageSizeOptions"
+          [itemLabel]="'common.objects' | translate"
+          (pageChange)="onGoToPage($event)"
+          (pageSizeChange)="onPageSizeChange($event)"
+        ></app-paginator>
+        }
+      </div>
+    </div>
+
+    <aside class="detail-column card" [class.has-selection]="!!selectedObject">
+      @if (selectedObject) {
+        <p class="detail-sheet-label">{{ 'contentCreator.objects.selectedObject' | translate }}</p>
+        <div class="object-hero">
+          <div class="hero-media" [class.has-slides]="heroImageUrls.length > 0">
+            <div class="hero-media-slides" aria-hidden="true">
+              @for (url of heroImageUrls; track trackByHeroImage($index, url); let i = $index) {
+                <div
+                  class="hero-media-slide"
+                  [class.is-active]="i === currentHeroImageIndex"
+                  [ngStyle]="getHeroSlideStyle(url)"
+                ></div>
+              }
+            </div>
+            <span class="hero-badge">{{ selectedObject.objectTypeName || ('common.object' | translate) }}</span>
+          </div>
+          <div class="hero-copy">
+            <p class="hero-eyebrow">{{ 'contentCreator.objects.featuredObject' | translate }}</p>
+            <h2>{{ selectedObject.name }}</h2>
+            <p class="hero-meta">{{ getSidebarMetaLine(selectedObject) }}</p>
+            <span class="publish-badge" [ngClass]="'status-' + getStatusBadgeClass(selectedObject.status)">
+              {{ formatStatus(selectedObject.status) }}
+            </span>
+          </div>
+        </div>
+
+        <div class="detail-metrics">
+          <div class="metric-card">
+            <span>{{ selectedObjectPriceLabel }}</span>
+            <strong>{{ formatPrice(selectedObject.price, selectedObject.objectTypeName) }}</strong>
+          </div>
+          <div class="metric-card">
+            <span>{{ 'contentCreator.objects.reviews' | translate }}</span>
+            <strong>{{ selectedObject.reviewCount ?? 0 }}</strong>
+          </div>
+        </div>
+
+        <section class="detail-section">
+          <div class="section-head">
+            <h3>{{ 'contentCreator.objects.details' | translate }}</h3>
+          </div>
+          <div class="schedule-item">
+            <span>{{ 'contentCreator.objects.destination' | translate }}</span>
+            <strong>{{ selectedObject.destinationName || ('common.notAvailable' | translate) }}</strong>
+          </div>
+          <div class="schedule-item">
+            <span>{{ 'contentCreator.objects.locality' | translate }}</span>
+            <strong>{{ selectedObject.localityName || ('common.notAvailable' | translate) }}</strong>
+          </div>
+          <div class="schedule-item">
+            <ng-container *ngIf="getWorkingHoursRows(selectedObject.workingHours) as workingHoursRows">
+              <div class="working-hours" *ngIf="workingHoursRows.length; else noWorkingHours">
+                <div class="working-hours-row" *ngFor="let row of workingHoursRows">
+                  <span class="working-day">{{ row.day }}</span>
+                  <span class="working-time">{{ row.open }}</span>
+                  <span class="working-separator">-</span>
+                  <span class="working-time">{{ row.close }}</span>
+                </div>
+              </div>
+            </ng-container>
+            <ng-template #noWorkingHours>
+              <strong class="working-hours-fallback">{{ 'common.notAvailable' | translate }}</strong>
+            </ng-template>
+          </div>
+        </section>
+
+        <section class="detail-section">
+          <h3>{{ 'contentCreator.objects.description' | translate }}</h3>
+          <p class="description-copy">
+            {{
+              selectedObject.description ||
+                ('contentCreator.objects.noDescription' | translate)
+            }}
+          </p>
+        </section>
+
+        <section class="detail-section">
+          <div class="map-card">
+            @if (hasSelectedObjectCoordinates) {
+              <app-map
+                [lat]="selectedObjectLat"
+                [lng]="selectedObjectLng"
+                [zoom]="14"
+                [popupText]="selectedObjectLocationLabel"
+                [interactive]="false"
+                [zoomable]="true"
+                mapId="object-details-map"
+              ></app-map>
+            } @else {
+              <div class="map-empty-state">
+                <span class="material-symbols-outlined">location_off</span>
+                <p>{{ 'contentCreator.objects.noCoordinates' | translate }}</p>
+              </div>
+            }
+          </div>
+        </section>
+
+        <section class="detail-section reviews-preview-section">
+          <div class="reviews-preview-head">
+            <h3>{{ 'contentCreatorObjectForm.reviews.recentTitle' | translate }}</h3>
+            @if (hasPreviewReviews) {
+              <span class="reviews-count-pill">{{ previewReviewsCountLabel }}</span>
+            }
+          </div>
+
+          @if (isLoadingPreviewReviews) {
+            <div class="state">{{ 'contentCreatorObjectForm.reviews.loading' | translate }}</div>
+          } @else if (hasPreviewReviews) {
+            <div class="reviews-preview-list">
+              <article class="review-preview-card" *ngFor="let review of previewReviews; trackBy: trackByReviewId">
+                <div class="review-preview-top">
+                  <div class="reviewer-meta">
+                    <span class="reviewer-avatar">{{ getReviewInitials(review) }}</span>
+                    <div>
+                      <strong>{{ review.userFullName }}</strong>
+                      <span>{{ getReviewTimeAgo(review.createdAt) }}</span>
+                    </div>
+                  </div>
+                  <span class="review-rating">{{ review.rating }}/5</span>
+                </div>
+                <p>{{ review.text }}</p>
+              </article>
+            </div>
+            @if (showViewMoreReviews) {
+              <button type="button" class="text-btn view-more-btn" (click)="onViewMoreReviews()">
+                {{ 'contentCreatorObjectForm.reviews.viewMore' | translate }}
+              </button>
+            }
+          } @else {
+            <div class="state">{{ 'contentCreatorObjectForm.reviews.noneForObject' | translate }}</div>
+          }
+        </section>
+      } @else {
+        <div class="state">{{ 'contentCreator.objects.empty.pickObjectBody' | translate }}</div>
+      }
+    </aside>
+  </div>
+</section>

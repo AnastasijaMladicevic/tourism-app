@@ -1,0 +1,93 @@
+<div class="page">
+  <div class="card">
+
+    <!-- LOGO -->
+    <div class="logo">
+      <img src="assets/logo.png" alt="logo">
+    </div>
+
+    <div class="content">
+
+      <!-- LEVA STRANA -->
+      <div class="left">
+
+        <!-- TRENUTNA SLIKA -->
+        <div class="circle">
+          <img src="assets/turista-sa-mapom.svg" alt="illustration">
+        </div>
+
+        <!--
+          ══════════════════════════════════════════════════
+          GIF PLACEHOLDER — kada budeš spremna, zamijeni
+          gornji .circle blok ovim:
+
+          <div class="gif-wrap" [class.shaking]="isShaking">
+            <img src="assets/NAZIV_GIFA.gif" alt="animation" class="gif-img">
+          </div>
+
+          i ukloni .circle + .circle img stilove iz CSS-a.
+          ══════════════════════════════════════════════════
+        -->
+
+      </div>
+
+      <!-- DESNA STRANA -->
+      <div class="right">
+        <h2>{{ 'login.title' | translate }}</h2>
+        <p class="subtitle">
+          {{ 'login.subtitle' | translate }}
+        </p>
+
+        <form [formGroup]="form" (ngSubmit)="submit()">
+          <label>{{ 'login.email' | translate }}</label>
+          <div class="input">
+            <span class="icon">mail</span>
+            <input type="email" placeholder="email@spirego.com" formControlName="email">
+          </div>
+          @if (email?.touched && email?.invalid) {
+            <p class="field-error">{{ 'login.emailError' | translate }}</p>
+          }
+
+          <label>{{ 'login.password' | translate }}</label>
+          <div class="input">
+            <span class="icon">lock</span>
+            <input [type]="showPassword ? 'text' : 'password'" placeholder="••••••••••••" formControlName="password">
+            <button
+              class="eye"
+              type="button"
+              (click)="togglePassword()"
+              [attr.aria-label]="showPassword ? ('login.hidePassword' | translate) : ('login.showPassword' | translate)"
+            >
+              {{ showPassword ? 'visibility_off' : 'visibility' }}
+            </button>
+          </div>
+          @if (password?.touched && password?.invalid) {
+            <p class="field-error">{{ 'login.passwordError' | translate }}</p>
+          }
+
+          <div class="options">
+            <label class="remember">
+              <input type="checkbox" formControlName="rememberMe">
+              {{ 'login.rememberMe' | translate }}
+            </label>
+
+            <button class="forgot-btn" type="button" (click)="goToForgotPassword()">{{ 'login.forgot' | translate }}</button>
+          </div>
+
+          <button class="btn" type="submit" [disabled]="form.invalid || isLoading">
+            {{ isLoading ? ('login.loggingIn' | translate) : ('login.logIn' | translate) }}
+          </button>
+        </form>
+
+        @if (successMessage) {
+          <p class="success-message">{{ successMessage }}</p>
+        }
+
+        @if (errorMessage) {
+          <p class="field-error">{{ errorMessage }}</p>
+        }
+      </div>
+
+    </div>
+  </div>
+</div>

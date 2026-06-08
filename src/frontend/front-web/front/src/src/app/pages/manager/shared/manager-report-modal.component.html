@@ -1,0 +1,75 @@
+@if (open) {
+  <div class="modal-backdrop" (click)="close()" role="presentation"></div>
+  <div class="report-modal card" role="dialog" aria-labelledby="manager-report-modal-title" aria-modal="true">
+    <header class="modal-header">
+      <div>
+        <h2 id="manager-report-modal-title">{{ 'manager.reportModal.title' | translate }}</h2>
+        <p class="modal-subtitle">{{ 'manager.reportModal.subtitle' | translate }}</p>
+      </div>
+      <button type="button" class="icon-btn" [title]="'common.close' | translate" (click)="close()" [disabled]="isSubmitting">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </header>
+
+    @if (errorMessage) {
+      <div class="modal-banner error" role="alert">{{ errorMessage }}</div>
+    }
+    @if (successMessage) {
+      <div class="modal-banner success" role="status">{{ successMessage }}</div>
+    }
+
+    <form class="modal-body" (ngSubmit)="submit()">
+      <label>
+        <span>{{ 'manager.reportModal.creator' | translate }}</span>
+        <select [(ngModel)]="reportForm.creatorId" name="creatorId" required [disabled]="isSubmitting">
+          <option [ngValue]="null" disabled>{{ 'manager.reportModal.selectCreator' | translate }}</option>
+          @for (creator of availableCreators; track creator.id) {
+            <option [ngValue]="creator.id">{{ creator.name }} — {{ creator.contentSummary }}</option>
+          }
+        </select>
+        @if (!availableCreators.length) {
+          <span class="field-hint">{{ 'manager.reportModal.noCreators' | translate }}</span>
+        }
+      </label>
+
+      <label>
+        <span>{{ 'manager.reportModal.category' | translate }}</span>
+        <select [(ngModel)]="reportForm.category" name="category" [disabled]="isSubmitting">
+          @for (opt of reportCategoryOptions; track opt.value) {
+            <option [value]="opt.value">{{ opt.label }}</option>
+          }
+        </select>
+      </label>
+
+      <label>
+        <span>{{ 'manager.reportModal.description' | translate }} <em>{{ 'manager.reportModal.descriptionHint' | translate }}</em></span>
+        <textarea
+          [(ngModel)]="reportForm.reason"
+          name="reason"
+          rows="5"
+          maxlength="500"
+          [placeholder]="'manager.reportModal.descriptionPlaceholder' | translate"
+          required
+          [disabled]="isSubmitting"
+        ></textarea>
+        <span class="char-count">{{ reportForm.reason.length }} / 500</span>
+      </label>
+
+      <div class="modal-warning">
+        <span class="material-symbols-outlined">warning</span>
+        <p>{{ 'manager.reportModal.warning' | translate }}</p>
+      </div>
+
+      <footer class="modal-footer">
+        <button type="button" class="ghost-btn" (click)="close()" [disabled]="isSubmitting">{{ 'common.cancel' | translate }}</button>
+        <button
+          type="submit"
+          class="primary-btn"
+          [disabled]="isSubmitting || !reportForm.creatorId || !reportForm.reason.trim() || !availableCreators.length"
+        >
+          {{ isSubmitting ? ('manager.reportModal.submitting' | translate) : ('manager.reportModal.submit' | translate) }}
+        </button>
+      </footer>
+    </form>
+  </div>
+}

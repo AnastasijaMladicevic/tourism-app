@@ -1,0 +1,232 @@
+<section class="reviews-page">
+  <header class="page-header">
+    <div>
+      <h1>{{ 'contentCreator.reviews.title' | translate }}</h1>
+    </div>
+  </header>
+
+  <div class="filters-row">
+    <div class="chip-group">
+        <button class="chip" type="button" [class.active]="isAllRatingsSelected" (click)="selectAllRatings()">
+          <span class="material-symbols-outlined" aria-hidden="true">language</span>
+          {{ 'contentCreator.reviews.filters.allRatings' | translate }}
+        </button>
+        <button class="chip chip-rating" type="button" [class.active]="isRatingSelected(5)" (click)="toggleRating(5)">5★</button>
+        <button class="chip chip-rating" type="button" [class.active]="isRatingSelected(4)" (click)="toggleRating(4)">4★</button>
+        <button class="chip chip-rating" type="button" [class.active]="isRatingSelected(3)" (click)="toggleRating(3)">3★</button>
+        <button class="chip chip-rating" type="button" [class.active]="isRatingSelected(2)" (click)="toggleRating(2)">2★</button>
+        <button class="chip chip-rating" type="button" [class.active]="isRatingSelected(1)" (click)="toggleRating(1)">1★</button>
+        <span class="chip-divider" aria-hidden="true"></span>
+        <label class="object-filter-inline" [class.is-active]="objectFilterId != null">
+          <span class="material-symbols-outlined object-filter-icon" aria-hidden="true">location_on</span>
+          <select
+            class="object-filter-select"
+            [ngModel]="objectFilterId"
+            (ngModelChange)="onObjectFilterChange($event)"
+            [disabled]="isLoading"
+            [attr.aria-label]="'contentCreator.reviews.filters.filterByObject' | translate"
+          >
+            <option [ngValue]="null">{{ 'contentCreator.reviews.filters.allObjects' | translate }}</option>
+            @for (object of creatorObjects; track object.id) {
+              <option [ngValue]="object.id">{{ object.name }}</option>
+            }
+          </select>
+          <span class="material-symbols-outlined object-filter-chevron" aria-hidden="true">expand_more</span>
+        </label>
+        <span class="chip-divider" aria-hidden="true"></span>
+        <button class="chip" type="button" [class.active]="responseFilter === 'all'" (click)="responseFilter = 'all'; onFilterChange()">
+          {{ 'contentCreator.reviews.filters.all' | translate }}
+        </button>
+        <button class="chip" type="button" [class.active]="responseFilter === 'pending'" (click)="responseFilter = 'pending'; onFilterChange()">
+          <span class="material-symbols-outlined" aria-hidden="true">mark_chat_unread</span>
+          {{ 'contentCreator.reviews.filters.pendingReply' | translate }}
+        </button>
+        <button class="chip" type="button" [class.active]="responseFilter === 'responded'" (click)="responseFilter = 'responded'; onFilterChange()">
+          <span class="material-symbols-outlined" aria-hidden="true">mark_chat_read</span>
+          {{ 'contentCreator.reviews.filters.responded' | translate }}
+        </button>
+        <span class="chip-divider" aria-hidden="true"></span>
+        <button class="chip reset" type="button" (click)="resetFilters()">
+          {{ 'contentCreator.reviews.filters.reset' | translate }}
+        </button>
+    </div>
+
+    <div class="search-wrap">
+      <span class="material-symbols-outlined search-icon" aria-hidden="true">search</span>
+      <input
+        type="search"
+        [placeholder]="'contentCreator.reviews.filters.searchPlaceholder' | translate"
+        [ngModel]="searchTerm"
+        (ngModelChange)="onSearchChange($event)"
+      />
+    </div>
+  </div>
+
+  @if (errorMessage) {
+    <p class="feedback error">{{ errorMessage }}</p>
+  }
+
+  @if (successMessage) {
+    <p class="feedback success">{{ successMessage }}</p>
+  }
+
+  <div class="moderation-grid">
+    <aside class="queue-panel card">
+      @if (isLoading) {
+        <p class="empty-note">{{ 'contentCreator.reviews.loading' | translate }}</p>
+      } @else if (filteredReviews.length === 0) {
+        <p class="empty-note">{{ emptyQueueMessage }}</p>
+      } @else {
+        <div class="queue-list">
+          @for (review of pagedQueueReviews; track review.id) {
+            <article class="queue-item" [class.active]="selectedReview?.id === review.id" (click)="selectReview(review)">
+              <div class="queue-item-head">
+                <div>
+                  <h3>{{ review.userFullName }}</h3>
+                  <span>{{ formatDate(review.createdAt) }}</span>
+                </div>
+                <span class="status" [class.approved]="review.creatorResponse" [class.pending]="!review.creatorResponse">
+                  {{ review.creatorResponse ? ('contentCreator.reviews.status.responded' | translate) : ('contentCreator.reviews.status.awaitingReply' | translate) }}
+                </span>
+              </div>
+              <p class="queue-item-preview">{{ review.text }}</p>
+              <small>{{ review.objectName }} <span class="stars-filled">{{ filledStars(review.rating) }}</span><span class="stars-empty">{{ emptyStars(review.rating) }}</span></small>
+            </article>
+          }
+        </div>
+        <app-paginator
+          [currentPage]="queuePage"
+          [totalPages]="queueTotalPages"
+          [pageStart]="queuePageStart"
+          [pageEnd]="queuePageEnd"
+          [totalCount]="totalFilteredReviews"
+          [pageSize]="queuePageSize"
+          [pageSizeOptions]="queuePageSizeOptions"
+          [itemLabel]="'common.reviews' | translate"
+          (pageChange)="onQueueGoToPage($event)"
+          (pageSizeChange)="onQueuePageSizeChange($event)"
+        ></app-paginator>
+      }
+    </aside>
+
+    <main class="details-panel card">
+      @if (selectedReview) {
+        <div class="case-header">
+          <div>
+            <h2>{{ 'contentCreator.reviews.reviewLabel' | translate:{ id: selectedReview.id } }}</h2>
+            <p>{{ 'contentCreator.reviews.statusLabel' | translate }}: {{ selectedReviewHasResponse ? ('contentCreator.reviews.status.responded' | translate) : ('contentCreator.reviews.status.awaitingReply' | translate) }}</p>
+          </div>
+          <div class="case-actions">
+            <button class="ghost danger" type="button" (click)="deleteResponse()" [disabled]="!selectedReviewHasResponse || isSubmitting">
+              @if (submittingAction === 'delete') {
+                <span class="material-symbols-outlined btn-spinner" aria-hidden="true">sync</span>
+              }
+              {{ 'contentCreator.reviews.deleteResponse' | translate }}
+            </button>
+          </div>
+        </div>
+
+        <section class="review-content">
+          <div class="review-author">
+            <div class="avatar">{{ selectedReview.userFullName.slice(0, 2).toUpperCase() }}</div>
+            <div>
+              <h3>{{ selectedReview.userFullName }}</h3>
+              <p>{{ formatDate(selectedReview.createdAt) }}</p>
+            </div>
+          </div>
+
+          <div class="reviewed-item">
+            <span>{{ 'contentCreator.reviews.reviewingItem' | translate }}</span>
+            <h4>{{ selectedReview.objectName }} <span class="stars-filled">{{ filledStars(selectedReview.rating) }}</span><span class="stars-empty">{{ emptyStars(selectedReview.rating) }}</span></h4>
+          </div>
+
+          <p class="review-text">{{ selectedReview.text }}</p>
+
+          <div class="attachments">
+            <h5>{{ 'contentCreator.reviews.objectImages' | translate:{ count: selectedObjectImages.length } }}</h5>
+            @if (isLoadingImages) {
+              <p class="empty-note">{{ 'contentCreator.reviews.loadingImages' | translate }}</p>
+            } @else if (selectedObjectImages.length === 0) {
+              <p class="empty-note">{{ 'contentCreator.reviews.noImages' | translate }}</p>
+            } @else {
+              <div class="attachment-grid">
+                @for (image of selectedObjectImages.slice(0, 4); track image.id) {
+                  <img class="attachment-real-img" [src]="image.url" [alt]="image.altText || ('contentCreator.reviews.objectImageAlt' | translate)" />
+                }
+              </div>
+            }
+          </div>
+        </section>
+
+        <section class="response-composer" [class.policy-warning]="!!responsePolicyWarning">
+          <div class="composer-tabs">
+            <button class="tab" type="button" (click)="responseText = translationService.translate('contentCreator.reviews.templates.thankYouText')">{{ 'contentCreator.reviews.templates.thankYou' | translate }}</button>
+            <button class="tab" type="button" (click)="responseText = translationService.translate('contentCreator.reviews.templates.addressingIssuesText')">{{ 'contentCreator.reviews.templates.addressingIssues' | translate }}</button>
+            <button class="tab" type="button" (click)="responseText = translationService.translate('contentCreator.reviews.templates.needDetailsText')">{{ 'contentCreator.reviews.templates.needDetails' | translate }}</button>
+          </div>
+          <textarea [(ngModel)]="responseText" [placeholder]="'contentCreator.reviews.responsePlaceholder' | translate" maxlength="1000"></textarea>
+          @if (responsePolicyWarning) {
+            <p class="feedback warning">{{ responsePolicyWarning }}</p>
+          }
+          <div class="composer-footer">
+            <span>{{ 'contentCreator.reviews.characterCount' | translate:{ count: responseText.length } }}</span>
+            <div class="composer-buttons">
+              <button class="primary" type="button" (click)="sendResponse()" [disabled]="isSubmitting || isResponsePolicyBlocked">
+                @if (submittingAction === 'send') {
+                  <span class="material-symbols-outlined btn-spinner" aria-hidden="true">sync</span>
+                }
+                {{ selectedReviewHasResponse ? ('contentCreator.reviews.updateResponse' | translate) : ('contentCreator.reviews.sendResponse' | translate) }}
+              </button>
+            </div>
+          </div>
+        </section>
+      } @else {
+        <section class="review-content">
+          <p class="empty-note">{{ 'contentCreator.reviews.empty.thread' | translate }}</p>
+        </section>
+      }
+    </main>
+
+    <aside class="insight-panel card">
+      @if (selectedReview) {
+        <section>
+          <h3>{{ 'contentCreator.reviews.reviewerInsight' | translate }}</h3>
+          <div class="note-box">
+            <p>{{ ratingStars(selectedReview.rating) }} ({{ selectedReview.rating }}/5)</p>
+            <p>{{ 'contentCreator.reviews.reviewer' | translate }}: {{ selectedReview.userFullName }}</p>
+          </div>
+        </section>
+
+        <section class="metrics">
+          <h4>{{ 'contentCreator.reviews.reviewDetails' | translate }}</h4>
+          <div class="metric-row"><span>{{ 'contentCreator.reviews.reviewId' | translate }}</span><strong>#{{ selectedReview.id }}</strong></div>
+          <div class="metric-row"><span>{{ 'contentCreator.reviews.created' | translate }}</span><strong>{{ formatDate(selectedReview.createdAt) }}</strong></div>
+          <div class="metric-row"><span>{{ 'contentCreator.reviews.statusLabel' | translate }}</span><strong>{{ selectedReviewHasResponse ? ('contentCreator.reviews.status.responded' | translate) : ('contentCreator.reviews.status.awaitingReply' | translate) }}</strong></div>
+        </section>
+
+        <section class="checks">
+          <h4>{{ 'contentCreator.reviews.object' | translate }}</h4>
+          <p>{{ selectedReview.objectName }}</p>
+          @if (selectedObject?.address) {
+            <p>{{ selectedObject?.address }}</p>
+          }
+        </section>
+
+        <section class="decision-log">
+          <h4>{{ 'contentCreator.reviews.responseLog' | translate }}</h4>
+          @if (selectedReview.creatorResponse?.trim()) {
+            <p><strong>{{ 'contentCreator.reviews.response' | translate }}:</strong></p>
+            <p>{{ selectedReview.creatorResponse }}</p>
+            @if (selectedReview.creatorResponseAt) {
+              <p><strong>{{ 'contentCreator.reviews.sent' | translate }}:</strong> {{ formatDate(selectedReview.creatorResponseAt) }}</p>
+            }
+          } @else {
+            <p>{{ 'contentCreator.reviews.noResponseYet' | translate }}</p>
+          }
+        </section>
+      } @else {
+        <p class="empty-note">{{ 'contentCreator.reviews.empty.context' | translate }}</p>
+      }
+    </aside>
+  </div>
+</section>

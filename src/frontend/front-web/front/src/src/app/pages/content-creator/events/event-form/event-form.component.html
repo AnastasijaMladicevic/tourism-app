@@ -1,0 +1,463 @@
+<section class="event-form-page">
+  <div class="page-header">
+    <div>
+      <h1>{{ pageTitle }}</h1>
+      <p class="page-intro">{{ 'contentCreator.eventForm.subtitle' | translate }}</p>
+    </div>
+
+    <div class="top-actions">
+      @if (isEditMode) {
+        <button
+          type="button"
+          class="danger-btn"
+          (click)="openDeleteModal()"
+          [disabled]="isSubmitting || isDeleting || hasPendingDeletionRequest"
+        >
+          <span class="material-symbols-outlined" aria-hidden="true">delete</span>
+          {{ deleteActionLabel }}
+        </button>
+      }
+
+      <button type="button" class="primary-btn" (click)="submit()" [disabled]="isSubmitDisabled">
+        <span class="material-symbols-outlined" aria-hidden="true">check_circle</span>
+        {{ submitLabel }}
+      </button>
+      <button type="button" class="ghost-btn" (click)="cancel()">
+        <span class="material-symbols-outlined" aria-hidden="true">close</span>
+        {{ cancelLabel }}
+      </button>
+    </div>
+  </div>
+
+  @if (errorMessage) {
+    <div class="alert alert-error">{{ errorMessage }}</div>
+  }
+
+  @if (successMessage) {
+    <div class="alert alert-success">{{ successMessage }}</div>
+  }
+
+  <div class="form-layout">
+    <div class="form-main" [formGroup]="form">
+      <form class="editor-grid" [formGroup]="form" (ngSubmit)="submit()">
+        <section class="card section-card">
+          <div class="section-title">
+            <span class="step-tag">{{ 'contentCreator.eventForm.step1' | translate }}</span>
+            <h2>{{ 'contentCreator.eventForm.generalInformation' | translate }}</h2>
+            <p>{{ 'contentCreator.eventForm.generalInformationIntro' | translate }}</p>
+          </div>
+
+          <div class="field-grid two-columns">
+            <label class="form-field full-width">
+              <span>{{ 'contentCreator.eventForm.eventTitle' | translate }} <span class="required-star" aria-hidden="true">*</span></span>
+              <input class="form-control" type="text" formControlName="name" [placeholder]="'contentCreator.eventForm.eventTitlePlaceholder' | translate" />
+            </label>
+
+            <label class="form-field">
+              <span>{{ 'contentCreator.eventForm.eventType' | translate }} <span class="required-star" aria-hidden="true">*</span></span>
+              <select class="form-control" formControlName="eventTypeId">
+                <option value="">{{ 'contentCreator.eventForm.selectType' | translate }}</option>
+                <option *ngFor="let type of eventTypes" [value]="type.id">{{ type.name }}</option>
+              </select>
+            </label>
+
+            <label class="form-field">
+              <span>{{ 'contentCreator.eventForm.organizer' | translate }} <span class="required-star" aria-hidden="true">*</span></span>
+              <input class="form-control" type="text" [value]="organizerName" readonly />
+            </label>
+
+            <label class="form-field">
+              <span>{{ 'contentCreator.eventForm.region' | translate }}</span>
+              <select
+                class="form-control"
+                [ngModel]="selectedRegionId"
+                [ngModelOptions]="{ standalone: true }"
+                (ngModelChange)="onRegionChange($event || null)"
+              >
+                <option [ngValue]="null">{{ 'contentCreator.eventForm.allRegions' | translate }}</option>
+                <option *ngFor="let region of regions" [ngValue]="region.id">{{ region.name }}</option>
+              </select>
+            </label>
+
+            <label class="form-field">
+              <span>{{ 'contentCreator.eventForm.destination' | translate }} <span class="required-star" aria-hidden="true">*</span></span>
+              <select class="form-control" formControlName="destinationId">
+                <option value="">{{ selectedRegionId ? ('contentCreator.eventForm.selectDestination' | translate) : ('contentCreator.eventForm.selectRegionFirst' | translate) }}</option>
+                <option *ngFor="let destination of destinations" [value]="destination.id">{{ destination.name }}</option>
+              </select>
+            </label>
+
+            <label class="form-field">
+              <span>{{ 'contentCreator.eventForm.object' | translate }}</span>
+              <select class="form-control" formControlName="objectId">
+                <option value="">{{ selectedDestinationId ? ('contentCreator.eventForm.selectObject' | translate) : ('contentCreator.eventForm.selectDestinationFirst' | translate) }}</option>
+                <option *ngFor="let venue of filteredVenueOptions" [value]="venue.id">{{ venue.name }}</option>
+              </select>
+              @if (selectedDestinationId && filteredVenueOptions.length === 0) {
+                <small class="form-field-note">{{ 'contentCreator.eventForm.noObjectsForDestination' | translate }}</small>
+              }
+            </label>
+          </div>
+
+          <label class="form-field full-width description-field">
+            <span>{{ 'contentCreator.eventForm.fullDescription' | translate }}</span>
+            <textarea class="form-control text-area" formControlName="description" rows="8" [placeholder]="'contentCreator.eventForm.descriptionPlaceholder' | translate"></textarea>
+          </label>
+        </section>
+
+        <section class="card section-card schedule-card">
+          <div class="section-title">
+            <span class="step-tag">{{ 'contentCreator.eventForm.step2' | translate }}</span>
+            <h2>{{ 'contentCreator.eventForm.schedule' | translate }}</h2>
+            <p>{{ 'contentCreator.eventForm.scheduleIntro' | translate }}</p>
+          </div>
+
+          <div class="field-grid schedule-grid">
+            <label class="form-field half-width">
+              <span>{{ 'contentCreator.eventForm.startDateTime' | translate }} <span class="required-star" aria-hidden="true">*</span></span>
+              <div class="inline-fields">
+                <input class="form-control" type="date" formControlName="startDate" />
+                <input class="form-control" type="time" formControlName="startTime" />
+              </div>
+            </label>
+
+            <label class="form-field half-width">
+              <span>{{ 'contentCreator.eventForm.endDateTime' | translate }} <span class="required-star" aria-hidden="true">*</span></span>
+              <div class="inline-fields">
+                <input class="form-control" type="date" formControlName="endDate" [min]="minEndDate" />
+                <input class="form-control" type="time" formControlName="endTime" />
+              </div>
+              @if (endDateBeforeStart) {
+                <span class="form-field-error">{{ 'contentCreator.eventForm.errors.endAfterStartShort' | translate }}</span>
+              }
+            </label>
+
+            <label class="form-field full-width">
+              <span>{{ 'contentCreator.eventForm.timezone' | translate }}</span>
+              <select class="form-control" formControlName="timezone">
+                <option *ngFor="let timezone of timezoneOptions" [value]="timezone">{{ timezone }}</option>
+              </select>
+            </label>
+          </div>
+        </section>
+
+        <section class="card section-card">
+          <div class="section-title">
+            <span class="step-tag">{{ 'contentCreator.eventForm.step3' | translate }}</span>
+            <h2>{{ 'contentCreator.eventForm.ticketingCapacity' | translate }}</h2>
+            <p>{{ 'event.ticketTypesHelp' | translate }}</p>
+          </div>
+
+          <div class="field-grid ticket-grid">
+            <div class="form-field full-width ticket-types-block" formArrayName="ticketTypes">
+              <div class="ticket-types-header">
+                <span>{{ 'event.ticketPrice' | translate }}</span>
+                <button type="button" class="ghost-btn small" (click)="addTicketType()">
+                  {{ 'event.addTicketType' | translate }}
+                </button>
+              </div>
+              @if (hasTicketTypes) {
+                <div class="ticket-type-list">
+                  <div class="ticket-type-row" *ngFor="let ticketGroup of ticketTypesArray.controls; let index = index" [formGroupName]="index">
+                    <label class="form-field">
+                      <span>{{ 'event.ticketTypeName' | translate }}</span>
+                      <input
+                        class="form-control"
+                        type="text"
+                        formControlName="name"
+                        [placeholder]="'event.ticketTypeNamePlaceholder' | translate"
+                      />
+                    </label>
+
+                    <label class="form-field">
+                      <span>{{ 'event.ticketPrice' | translate }}</span>
+                      <div class="input-prefix">
+                        <span>EUR</span>
+                        <input
+                          class="form-control"
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          formControlName="price"
+                          [placeholder]="'event.ticketPricePlaceholder' | translate"
+                        />
+                      </div>
+                    </label>
+
+                    <button type="button" class="ghost-btn small danger" (click)="removeTicketType(index)">
+                      {{ 'event.removeTicketType' | translate }}
+                    </button>
+                  </div>
+                </div>
+              } @else {
+                <p class="ticket-types-empty">{{ 'event.noTicketTypesHint' | translate }}</p>
+              }
+            </div>
+
+            <label class="form-field">
+              <span>{{ 'contentCreator.eventForm.capacity' | translate }} <span class="required-star" aria-hidden="true">*</span></span>
+              <div class="input-prefix">
+                <span class="material-symbols-outlined prefix-icon">group</span>
+                <input class="form-control" type="number" min="1" step="1" formControlName="maxVisitors" [placeholder]="'contentCreator.eventForm.capacityPlaceholder' | translate" />
+              </div>
+            </label>
+
+          </div>
+        </section>
+
+        <section class="card section-card highlighted-card">
+          <div class="section-title">
+            <span class="step-tag">{{ 'contentCreator.eventForm.step4' | translate }}</span>
+            <h2>{{ 'contentCreator.eventForm.categorization' | translate }}</h2>
+            <p>{{ 'contentCreator.eventForm.categorizationIntro' | translate }}</p>
+          </div>
+
+          <label class="form-field full-width">
+            <span>{{ 'contentCreator.eventForm.tagsCategories' | translate }}</span>
+            <div class="tag-editor">
+              <span class="tag-chip" *ngFor="let tag of tags">
+                {{ tag }}
+                <button type="button" (click)="removeTag(tag)">×</button>
+              </span>
+              <input
+                class="tag-input"
+                type="text"
+                [(ngModel)]="pendingTag"
+                [ngModelOptions]="{ standalone: true }"
+                [placeholder]="'contentCreator.eventForm.addTagPlaceholder' | translate"
+                (keydown.enter)="$event.preventDefault(); addTag()"
+              />
+            </div>
+          </label>
+
+          <label class="form-field restriction-field">
+            <span>{{ 'contentCreator.eventForm.ageRestriction' | translate }}</span>
+            <select class="form-control" formControlName="ageRestriction">
+              <option value="">{{ 'contentCreator.eventForm.selectRestriction' | translate }}</option>
+              <option *ngFor="let restriction of ageRestrictionOptions" [value]="restriction">{{ restriction }}</option>
+            </select>
+          </label>
+        </section>
+      </form>
+
+      <div
+        class="upload-card card event-media-gallery"
+        [class.image-drop-active]="isImageDropActive"
+        (dragover)="onGalleryDragOver($event)"
+        (dragleave)="onGalleryDragLeave($event)"
+        (drop)="onGalleryDrop($event)"
+      >
+        <div class="gallery-card-head">
+          <span class="step-tag">{{ 'contentCreator.eventForm.step5' | translate }}</span>
+          <h2>{{ 'contentCreator.eventForm.mediaGallery' | translate }} <span class="required-star" aria-hidden="true">*</span></h2>
+          <p class="gallery-intro">{{ 'contentCreator.eventForm.mediaGalleryIntro' | translate }}</p>
+        </div>
+
+        <div class="gallery-dropzone">
+          <p class="dropzone-title">{{ 'contentCreator.eventForm.addPhotos' | translate }}</p>
+          <p class="dropzone-copy">{{ 'contentCreator.eventForm.dropzoneCopy' | translate }}</p>
+
+          <div class="dropzone-input-row">
+            <input
+              type="text"
+              class="form-control"
+              [value]="imageUrls.length ? ('contentCreator.eventForm.imagesSelected' | translate:{ count: imageUrls.length }) : ('contentCreator.eventForm.selectImageFiles' | translate)"
+              readonly
+            />
+            <button type="button" class="primary-btn" (click)="galleryFileInput.click()">{{ 'contentCreator.eventForm.addPhoto' | translate }}</button>
+            <input
+              #galleryFileInput
+              type="file"
+              accept="image/*"
+              multiple
+              hidden
+              (change)="onGalleryFilesSelected($event)"
+            />
+          </div>
+        </div>
+
+        @if (imageUrls.length > 0) {
+          <div class="gallery-grid">
+            <article class="gallery-item" *ngFor="let url of imageUrls; let index = index">
+              <img [src]="url" [alt]="'contentCreator.eventForm.eventImageAlt' | translate" />
+              <div class="gallery-actions">
+                @if (index === 0) {
+                  <span class="primary-badge">{{ 'contentCreator.eventForm.primary' | translate }}</span>
+                } @else {
+                  <button type="button" class="ghost-btn small" (click)="setPrimaryImage(index)">{{ 'contentCreator.eventForm.setPrimary' | translate }}</button>
+                }
+                <button type="button" class="ghost-btn small danger" (click)="removeImage(index)">{{ 'common.remove' | translate }}</button>
+              </div>
+            </article>
+          </div>
+        } @else {
+          <div class="image-preview-empty">
+            <span class="material-symbols-outlined">image</span>
+            <p>{{ 'contentCreator.eventForm.noImagesHelp' | translate }}</p>
+          </div>
+        }
+      </div>
+
+      @if (galleryErrorMessage) {
+        <div class="alert alert-error inline-field-error">{{ galleryErrorMessage }}</div>
+      }
+    </div>
+
+    <aside class="form-side">
+      <section class="card side-card">
+        <header class="side-header">
+          <span class="material-symbols-outlined">my_location</span>
+          <h3>{{ 'contentCreator.eventForm.locationIntelligence' | translate }}</h3>
+        </header>
+        <p class="gallery-intro">{{ 'contentCreator.eventForm.locationIntelligenceHint' | translate }}</p>
+
+        <app-map
+          [lat]="toNumber(form.controls.latitude.value) ?? 42.424"
+          [lng]="toNumber(form.controls.longitude.value) ?? 18.771"
+          [zoom]="15"
+          [popupText]="form.controls.name.value || ('event.title' | translate)"
+          [interactive]="true"
+          [showMarker]="true"
+          (locationSelected)="onMapLocationSelected($event)">
+        </app-map>
+        <br>
+        <div class="coord-editor" [formGroup]="form">
+          <div>
+            <span class="coord-label">{{ 'common.latitude' | translate }}</span>
+            <div class="coord-input-wrap">
+              <input class="form-control" type="number" formControlName="latitude" min="-90" max="90" step="0.000001" placeholder="42.4240" />
+              <span class="coord-input-suffix">{{ latitudeDirection }}</span>
+            </div>
+          </div>
+          <div>
+            <span class="coord-label">{{ 'common.longitude' | translate }}</span>
+            <div class="coord-input-wrap">
+              <input class="form-control" type="number" formControlName="longitude" min="-180" max="180" step="0.000001" placeholder="18.7710" />
+              <span class="coord-input-suffix">{{ longitudeDirection }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="venue-card">
+          <small>{{ 'contentCreator.eventForm.linkedObjectLabel' | translate }}</small>&nbsp; 
+          <strong>{{ linkedLocationTitle }}</strong>
+          <p>{{ linkedLocationDescription }}</p>
+        </div>
+      </section>
+
+      <section class="card side-card tips-card">
+        <div class="section-title compact">
+          <h2>{{ 'contentCreator.eventForm.creatorTips' | translate }}</h2>
+        </div>
+
+        <ul>
+          <li>{{ 'contentCreator.eventForm.tips.tip1' | translate }}</li>
+          <li>{{ 'contentCreator.eventForm.tips.tip2' | translate }}</li>
+          <li>{{ 'contentCreator.eventForm.tips.tip3' | translate }}</li>
+        </ul>
+
+        <button type="button" class="link-btn" (click)="openTipsModal()">{{ 'contentCreator.eventForm.learnMore' | translate }}</button>
+      </section>
+    </aside>
+  </div>
+
+  @if (showTipsModal) {
+    <div class="tips-backdrop" (click)="closeTipsModal()">
+      <section
+        class="playbook-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="tips-modal-title"
+        (click)="$event.stopPropagation()"
+      >
+        <header class="playbook-modal__header">
+          <div class="playbook-modal__header-copy">
+            <span class="playbook-modal__eyebrow">{{ 'contentCreator.eventForm.creatorTips' | translate }}</span>
+            <h3 id="tips-modal-title">{{ 'contentCreator.eventForm.playbookTitle' | translate }}</h3>
+          </div>
+          <button
+            type="button"
+            class="playbook-modal__close"
+            (click)="closeTipsModal()"
+            [attr.aria-label]="'common.close' | translate"
+          >
+            <span class="material-symbols-outlined" aria-hidden="true">close</span>
+          </button>
+        </header>
+
+        <div class="playbook-modal__body">
+          <p class="playbook-modal__intro">{{ 'contentCreator.eventForm.playbookBody' | translate }}</p>
+
+          <ul class="playbook-modal__tips">
+            <li class="playbook-tip">
+              <span class="playbook-tip__icon" aria-hidden="true">
+                <span class="material-symbols-outlined">hub</span>
+              </span>
+              <p>{{ 'contentCreator.eventForm.playbookTips.tip1' | translate }}</p>
+            </li>
+            <li class="playbook-tip">
+              <span class="playbook-tip__icon" aria-hidden="true">
+                <span class="material-symbols-outlined">pin_drop</span>
+              </span>
+              <p>{{ 'contentCreator.eventForm.playbookTips.tip2' | translate }}</p>
+            </li>
+            <li class="playbook-tip">
+              <span class="playbook-tip__icon" aria-hidden="true">
+                <span class="material-symbols-outlined">event_available</span>
+              </span>
+              <p>{{ 'contentCreator.eventForm.playbookTips.tip3' | translate }}</p>
+            </li>
+          </ul>
+        </div>
+
+        <footer class="playbook-modal__footer">
+          <button type="button" class="primary-btn playbook-modal__cta" (click)="closeTipsModal()">
+            {{ 'common.close' | translate }}
+          </button>
+        </footer>
+      </section>
+    </div>
+  }
+
+  @if (showDeleteModal) {
+    <div class="event-delete-backdrop" (click)="closeDeleteModal()">
+      <section
+        class="card event-delete-modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="delete-modal-title"
+        aria-describedby="delete-modal-description"
+        (click)="$event.stopPropagation()"
+      >
+        <div class="event-delete-modal-icon" aria-hidden="true">
+          <span class="material-symbols-outlined">delete</span>
+        </div>
+
+        <h3 id="delete-modal-title">{{ deleteModalTitle }}</h3>
+        <p id="delete-modal-description">
+          {{ deleteModalDescription }}<br />
+          {{ isApprovedEvent ? ('contentCreator.eventForm.delete.managerReviewNote' | translate) : ('contentCreator.eventForm.delete.cannotUndo' | translate) }}
+        </p>
+
+        <div class="event-delete-modal-actions">
+          <button
+            type="button"
+            class="ghost-btn"
+            (click)="closeDeleteModal()"
+            [disabled]="isDeleting"
+          >
+            {{ 'common.cancel' | translate }}
+          </button>
+          <button
+            type="button"
+            class="confirm-delete-btn"
+            (click)="deleteEvent()"
+            [disabled]="isDeleting || (isApprovedEvent && hasPendingDeletionRequest)"
+          >
+            {{ isDeleting ? (isApprovedEvent ? ('contentCreator.eventForm.delete.submitting' | translate) : ('contentCreator.eventForm.delete.deleting' | translate)) : (isApprovedEvent ? (hasPendingDeletionRequest ? ('contentCreator.eventForm.delete.alreadyRequested' | translate) : ('contentCreator.eventForm.delete.requestAction' | translate)) : ('contentCreator.eventForm.delete.deleteAction' | translate)) }}
+          </button>
+        </div>
+      </section>
+    </div>
+  }
+</section>

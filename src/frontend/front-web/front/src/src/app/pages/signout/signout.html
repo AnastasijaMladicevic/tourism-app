@@ -1,0 +1,38 @@
+<div class="page">
+
+  <div class="card">
+
+    <div class="icon" aria-hidden="true">
+      <span class="material-symbols-outlined">logout</span>
+    </div>
+
+    <h2>{{ 'signout.title' | translate }}</h2>
+
+    <p class="desc">
+      {{ 'signout.description' | translate }}
+    </p>
+
+    <div class="actions">
+      <button type="button" class="logout" (click)="confirmSignOut()">
+        {{ 'signout.signOut' | translate }}
+      </button>
+
+      <button type="button" class="cancel" (click)="cancel()">
+        <span class="material-symbols-outlined" aria-hidden="true">arrow_back</span>
+        {{ 'signout.keepSignedIn' | translate }}
+      </button>
+    </div>
+
+    <div class="info">
+      <span class="material-symbols-outlined shield" aria-hidden="true">shield</span>
+      <div>
+        <strong>{{ 'signout.sessionSecurity' | translate }}</strong>
+        <p>
+          {{ 'signout.sessionSecurityDesc' | translate }}
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+</div>

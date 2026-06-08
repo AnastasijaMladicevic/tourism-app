@@ -1,0 +1,525 @@
+/* Mobile list chrome (hidden on desktop; shown at ≤920px). */
+
+.objects-mobile-list,
+.events-mobile-list,
+.activities-mobile-list,
+.localities-mobile-list,
+.reports-mobile-list,
+.detail-sheet-label {
+  display: none;
+}
+
+.object-mobile-card,
+.event-mobile-card,
+.activity-mobile-card,
+.locality-mobile-card,
+.report-mobile-card {
+  display: none;
+}
+
+@media (max-width: 1200px) {
+  .manager-list-page .object-content-grid,
+  .manager-list-page .event-content-grid,
+  .manager-list-page .locality-content-grid,
+  .manager-list-page .activities-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .manager-list-page .detail-column {
+    position: static;
+    max-height: none;
+  }
+}
+
+@media (max-width: 920px) {
+  .manager-list-page {
+    padding: 18px 18px 12px;
+    gap: 12px;
+    min-height: 0;
+  }
+
+  .manager-list-page .breadcrumbs,
+  .manager-list-page .page-header-eyebrow {
+    display: none;
+  }
+
+  .manager-list-page .page-head,
+  .manager-list-page .page-header {
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .manager-list-page .page-head .page-header-cta-label,
+  .manager-list-page .page-header-cta-label {
+    display: none;
+  }
+
+  .manager-list-page .page-head .page-header-cta,
+  .manager-list-page .page-header-cta {
+    min-height: 40px;
+    padding: 0 12px;
+    border-radius: 999px;
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.28);
+  }
+
+  .manager-list-page .page-head .page-header-cta .material-symbols-outlined,
+  .manager-list-page .page-header-cta .material-symbols-outlined {
+    margin: 0;
+    font-size: 22px;
+  }
+
+  .manager-list-page .toolbar {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+    padding: 8px;
+    border: 0;
+    box-shadow: none;
+    background: transparent;
+  }
+
+  .manager-events-page .toolbar {
+    grid-template-columns: 1fr auto;
+  }
+
+  .manager-events-page .toolbar .search-field {
+    grid-column: 1 / -1;
+  }
+
+  .manager-events-page .toolbar .date-pill {
+    font-size: 0;
+    gap: 0;
+    min-width: 44px;
+    justify-content: center;
+  }
+
+  .manager-events-page .toolbar .date-pill .material-symbols-outlined {
+    font-size: 22px;
+    margin: 0;
+  }
+
+  .manager-list-page .toolbar .ghost-btn,
+  .manager-list-page .toolbar .filters-toggle-btn {
+    min-width: 44px;
+    padding: 0 10px;
+    justify-content: center;
+    font-size: 0;
+    gap: 0;
+  }
+
+  .manager-list-page .toolbar .ghost-btn .material-symbols-outlined,
+  .manager-list-page .toolbar .filters-toggle-btn .material-symbols-outlined {
+    font-size: 22px;
+    margin: 0;
+  }
+
+  .manager-list-page .toolbar .filters-toggle-label {
+    display: none;
+  }
+
+  .manager-list-page .filters-panel {
+    grid-template-columns: 1fr;
+    margin-top: 0;
+  }
+
+  .manager-list-page .filter-actions {
+    flex-direction: column;
+    justify-content: stretch;
+    justify-self: stretch;
+    width: 100%;
+  }
+
+  .manager-list-page .filter-actions .filter-btn,
+  .manager-list-page .filter-actions .ghost-btn,
+  .manager-list-page .filter-actions .primary-btn {
+    width: 100%;
+    justify-content: center;
+    font-size: inherit;
+  }
+
+  .manager-list-page .object-main-column,
+  .manager-list-page .event-main-column,
+  .manager-list-page .locality-main-column,
+  .manager-list-page .main-column {
+    gap: 10px;
+    padding-inline: 0;
+  }
+
+  .manager-list-page .object-table-wrap,
+  .manager-list-page .event-table-wrap,
+  .manager-list-page .locality-table-wrap,
+  .manager-list-page .table-card {
+    margin-inline: 0;
+    border-radius: 16px;
+    border: 0;
+    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.06);
+  }
+
+  .manager-list-page .objects-table-wrap,
+  .manager-list-page .events-table-wrap,
+  .manager-list-page .localities-table-wrap,
+  .manager-list-page .activities-table-wrap,
+  .manager-reports-page .reports-table-wrap.table-scroll {
+    display: none;
+  }
+
+  .manager-list-page .objects-mobile-list,
+  .manager-list-page .events-mobile-list,
+  .manager-list-page .activities-mobile-list,
+  .manager-list-page .localities-mobile-list,
+  .manager-reports-page .reports-mobile-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 0 12px 12px;
+  }
+
+  .manager-list-page .object-mobile-card,
+  .manager-list-page .event-mobile-card,
+  .manager-list-page .activity-mobile-card,
+  .manager-list-page .locality-mobile-card,
+  .manager-reports-page .report-mobile-card {
+    display: grid;
+    grid-template-columns: 56px minmax(0, 1fr) auto;
+    gap: 12px;
+    align-items: center;
+    padding: 12px;
+    border-radius: 16px;
+    background: #fff;
+    border: 1px solid #e8edf3;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+    cursor: pointer;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .manager-list-page .object-mobile-card:active,
+  .manager-list-page .event-mobile-card:active,
+  .manager-list-page .activity-mobile-card:active,
+  .manager-list-page .locality-mobile-card:active,
+  .manager-reports-page .report-mobile-card:active {
+    transform: scale(0.99);
+  }
+
+  .manager-list-page .object-mobile-card.is-active,
+  .manager-list-page .event-mobile-card.is-active,
+  .manager-list-page .activity-mobile-card.is-active,
+  .manager-list-page .locality-mobile-card.is-active,
+  .manager-reports-page .report-mobile-card.is-active {
+    border-color: #60a5fa;
+    background: #f8fbff;
+    box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.35);
+  }
+
+  .manager-list-page [class*='-mobile-card__media'] {
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+    background-size: cover;
+    background-position: center;
+    flex-shrink: 0;
+  }
+
+  .manager-list-page [class*='-mobile-card__content'] {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .manager-list-page [class*='-mobile-card__head'] {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .manager-list-page [class*='-mobile-card__head'] h3 {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.25;
+    font-weight: 700;
+    color: #0f172a;
+    word-break: break-word;
+  }
+
+  .manager-list-page .status-chip--compact {
+    min-width: 0;
+    padding: 4px 8px;
+    font-size: 10px;
+    flex-shrink: 0;
+  }
+
+  .manager-list-page .status-chip--compact .chip-dot {
+    display: none;
+  }
+
+  .manager-list-page [class*='-mobile-card__location'],
+  .manager-list-page [class*='-mobile-card__date'] {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 2px;
+    margin: 0;
+    font-size: 12px;
+    color: #64748b;
+    line-height: 1.35;
+  }
+
+  .manager-list-page [class*='-mobile-card__location'] .material-symbols-outlined,
+  .manager-list-page [class*='-mobile-card__date'] .material-symbols-outlined {
+    font-size: 15px;
+    color: #94a3b8;
+  }
+
+  .manager-list-page [class*='-mobile-card__meta'] {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .manager-list-page [class*='-mobile-card__type'] {
+    font-size: 11px;
+    font-weight: 600;
+    color: #475569;
+    background: #f1f5f9;
+    padding: 3px 8px;
+    border-radius: 999px;
+  }
+
+  .manager-list-page [class*='-mobile-card__rating'],
+  .manager-list-page [class*='-mobile-card__duration'],
+  .manager-list-page [class*='-mobile-card__capacity'] {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #334155;
+  }
+
+  .manager-list-page [class*='-mobile-card__edit'] {
+    width: 40px;
+    height: 40px;
+    border: 0;
+    border-radius: 12px;
+    background: #f1f5f9;
+    color: #475569;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    text-decoration: none;
+  }
+
+  .manager-list-page [class*='-mobile-card__edit'] .material-symbols-outlined {
+    font-size: 20px;
+  }
+
+  .manager-list-page .table-footer {
+    position: sticky;
+    bottom: 0;
+    z-index: 15;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px));
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(8px);
+    border-top: 1px solid #e5e7eb;
+  }
+
+  .manager-list-page .table-footer p {
+    font-size: 12px;
+    text-align: center;
+    margin: 0;
+  }
+
+  .manager-list-page .pager,
+  .manager-list-page .pagination-buttons {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .manager-list-page .page-size-control {
+    grid-column: 1 / -1;
+    width: 100%;
+    justify-content: space-between;
+    border-radius: 12px;
+  }
+
+  .manager-list-page .pager .ghost-btn,
+  .manager-list-page .pagination-buttons .ghost-btn {
+    min-height: 42px;
+    justify-content: center;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: inherit;
+  }
+
+  .manager-list-page .detail-column {
+    margin: 0 0 12px;
+    padding: 0;
+    border: 0;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  .manager-list-page .detail-hero {
+    padding: 14px 16px 0;
+  }
+
+  .manager-list-page .detail-hero h2 {
+    font-size: 20px;
+    margin-top: 4px;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+
+  .manager-list-page .detail-sheet-label {
+    display: block;
+    margin: 0;
+    padding: 12px 16px 0;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #64748b;
+  }
+
+  .manager-list-page .activity-hero,
+  .manager-list-page .event-hero {
+    gap: 0;
+  }
+
+  .manager-list-page .hero-media {
+    min-height: 200px;
+    border-radius: 0;
+  }
+
+  .manager-list-page .hero-copy {
+    padding: 14px 16px 12px;
+  }
+
+  .manager-list-page .hero-copy .eyebrow {
+    display: none;
+  }
+
+  .manager-list-page .hero-copy h2 {
+    font-size: 20px;
+    margin-bottom: 6px;
+  }
+
+  .manager-list-page .hero-meta {
+    margin-bottom: 10px;
+    font-size: 13px;
+  }
+
+  .manager-list-page .detail-metrics {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    padding: 0 16px 12px;
+  }
+
+  .manager-list-page .metric-card {
+    border: 0;
+    background: #f8fafc;
+    border-radius: 14px;
+    padding: 10px 12px;
+  }
+
+  .manager-list-page .detail-section {
+    padding: 0 16px 14px;
+  }
+
+  .manager-list-page .schedule-item {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    border: 0;
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 10px 12px;
+  }
+
+  .manager-list-page .map-card {
+    min-height: 160px;
+    border-radius: 14px;
+  }
+}
+
+@media (max-width: 920px) {
+  .manager-dashboard {
+    padding: 18px;
+  }
+
+  .manager-dashboard .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .manager-reviews-page,
+  .manager-reports-page {
+    padding: 18px 18px 12px;
+    gap: 12px;
+  }
+
+  .manager-reviews-page .moderation-grid,
+  .manager-reports-page .reports-content-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .manager-reviews-page .queue-panel {
+    max-height: min(42vh, 420px);
+  }
+
+  .manager-reviews-page .page-head,
+  .manager-reports-page .page-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .manager-reviews-page .page-head-actions {
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .manager-reviews-page .page-head-actions .ghost-btn,
+  .manager-reports-page .page-head .primary-btn {
+    flex: 1 1 auto;
+    justify-content: center;
+    font-size: inherit;
+  }
+
+  .manager-reports-page .page-head .primary-btn .btn-label {
+    display: inline;
+  }
+
+  .event-form-page,
+  .locality-create-page,
+  .profile-page {
+    padding: 18px;
+  }
+
+  .manager-layout--map .page-outlet .map-page {
+    padding: 0;
+  }
+
+  .manager-reviews-page .page-head .ghost-btn {
+    font-size: inherit;
+    gap: 8px;
+  }
+}
