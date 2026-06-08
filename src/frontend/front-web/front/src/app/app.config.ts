@@ -1,5 +1,5 @@
 import { APP_INITIALIZER, ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
-import { provideRouter, withRouterConfig } from '@angular/router';
+import { provideRouter, withRouterConfig, withInMemoryScrolling } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 
 import { routes } from './app.routes';
@@ -14,7 +14,8 @@ export const appConfig: ApplicationConfig = {
       withRouterConfig({
         // Clicking the same sidebar link (e.g. Users twice) runs navigation again so the view refreshes.
         onSameUrlNavigation: 'reload'
-      })
+      }),
+      withInMemoryScrolling({ scrollPositionRestoration: 'top' })
     ),
     provideHttpClient(withInterceptors([authInterceptor])),
     {

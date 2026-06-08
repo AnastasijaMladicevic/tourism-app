@@ -221,6 +221,7 @@
   }
 
   .media-strip {
+    min-height: 0;
     max-height: none;
     overflow: visible;
   }
