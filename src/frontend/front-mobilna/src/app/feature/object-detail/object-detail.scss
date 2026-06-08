@@ -1339,7 +1339,7 @@ button:hover {
   align-items: center;
   gap: 7px;
   background: rgba(255, 255, 255, 0.92);
-  color: var(--emperor);
+  color: #1a2b34;
   border: none;
   padding: 8px 14px;
   border-radius: 999px;
@@ -1355,6 +1355,12 @@ button:hover {
     width: 17px;
     height: 17px;
   }
+}
+
+[data-theme='dark'] .gallery-show-all {
+  background: rgba(0, 0, 0, 0.62);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
 /* ====================== AMENITIES CIRCLES ====================== */
@@ -1396,6 +1402,15 @@ button:hover {
   font-weight: 600;
   color: var(--emperor);
   line-height: 1.3;
+}
+
+/* ====================== PRICE CARD ====================== */
+.price-card {
+  padding-top: 10px;
+
+  > h2 {
+    margin-top: 0;
+  }
 }
 
 /* ====================== COMPACT PRICE ====================== */

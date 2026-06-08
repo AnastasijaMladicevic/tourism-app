@@ -785,7 +785,7 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
 
   formatReviewDate(dateStr: string): string {
     const date = new Date(dateStr);
-    return date.toLocaleDateString('sr-RS', { day: 'numeric', month: 'short', year: 'numeric' });
+    return date.toLocaleDateString('sr-Latn', { day: 'numeric', month: 'short', year: 'numeric' });
   }
 
   getRatingPercentage(rating: number): number {

@@ -380,6 +380,25 @@ export class EventDetailComponent implements OnInit, OnDestroy {
   onImageError(event: Event): void {
     (event.target as HTMLImageElement).style.display = 'none';
   }
+
+  getEventTypeIcon(typeName: string): string {
+    const t = (typeName || '').toLowerCase()
+      .normalize('NFD').replace(/[̀-ͯ]/g, '');
+    if (t.includes('fudbal') || t.includes('football') || t.includes('soccer')) return 'sports_soccer';
+    if (t.includes('kosarka') || t.includes('basket')) return 'sports_basketball';
+    if (t.includes('tenis') || t.includes('tennis')) return 'sports_tennis';
+    if (t.includes('muzik') || t.includes('music') || t.includes('koncert') || t.includes('concert')) return 'music_note';
+    if (t.includes('pozoriste') || t.includes('teatar') || t.includes('theatre') || t.includes('theater')) return 'theater_comedy';
+    if (t.includes('izlozb') || t.includes('exhibit') || t.includes('galerrij')) return 'palette';
+    if (t.includes('festival') || t.includes('karneval') || t.includes('carnival')) return 'celebration';
+    if (t.includes('film') || t.includes('kino') || t.includes('bioskop') || t.includes('cinema')) return 'movie';
+    if (t.includes('kultura') || t.includes('culture') || t.includes('heritage')) return 'museum';
+    if (t.includes('sport')) return 'sports';
+    if (t.includes('hrana') || t.includes('food') || t.includes('gastro')) return 'restaurant';
+    if (t.includes('trka') || t.includes('marathon') || t.includes('trcanje')) return 'directions_run';
+    if (t.includes('plivanje') || t.includes('swim') || t.includes('voda')) return 'pool';
+    return 'event';
+  }
   formatTime(startDateStr: string, endDateStr?: string): string {
     if (!startDateStr) return '';
 

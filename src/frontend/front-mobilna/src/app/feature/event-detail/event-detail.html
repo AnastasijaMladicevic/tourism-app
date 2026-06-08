@@ -44,7 +44,7 @@
 
     <div class="content">
       <div class="left">
-        <div class="card">
+        <div class="card event-header-card">
           <div class="title-row">
             <h1 class="title">{{ event.name }}</h1>
             <button
@@ -56,17 +56,41 @@
               <mat-icon>{{ isInPlanner ? 'event_available' : 'event' }}</mat-icon>
             </button>
           </div>
-          @if (event.localityName && event.destinationName) {
-            <p class="location-bold">{{ event.localityName }}, {{ event.destinationName }}</p>
-          } @else if (event.localityName) {
-            <p class="location-bold">{{ event.localityName }}</p>
-          } @else if (event.destinationName) {
-            <p class="location-bold">{{ event.destinationName }}</p>
-          }
-          <p class="venue"><mat-icon>location_on</mat-icon>{{ event.objectName || 'N/A' }}</p>
 
-          <p class="date">{{ formatDate(event.startDate, event.endDate) }}</p>
-          <p class="date">{{ formatTime(event.startDate, event.endDate) }}</p>
+          @if (event.eventTypeName) {
+            <div class="event-chips">
+              <span class="event-type-chip">
+                <mat-icon>{{ getEventTypeIcon(event.eventTypeName) }}</mat-icon>
+                {{ event.eventTypeName }}
+              </span>
+            </div>
+          }
+
+          @if (event.localityName || event.destinationName) {
+            <p class="event-location-line">
+              <mat-icon>location_on</mat-icon>
+              {{ event.localityName || event.destinationName }}
+            </p>
+          }
+
+          <div class="event-info-row">
+            <span class="event-info-item">
+              <mat-icon>calendar_today</mat-icon>
+              {{ formatDate(event.startDate, event.endDate) }}
+            </span>
+            <span class="event-info-sep">·</span>
+            <span class="event-info-item">
+              <mat-icon>schedule</mat-icon>
+              {{ formatTime(event.startDate, event.endDate) }}
+            </span>
+            @if (event.objectName && event.objectName !== 'N/A') {
+              <span class="event-info-sep">·</span>
+              <span class="event-info-item">
+                <mat-icon>place</mat-icon>
+                {{ event.objectName }}
+              </span>
+            }
+          </div>
         </div>
 
         <div class="card">
