@@ -24,6 +24,15 @@
   }
 
   @if (object) {
+    <div class="hero">
+      @if (mainImage) {
+        <img [src]="mainImage" [alt]="object.name" />
+      } @else {
+        <div class="hero-placeholder">
+          <mat-icon>place</mat-icon>
+        </div>
+      }
+    </div>
     <div class="content">
       <!-- LEVA STRANA -->
       <div class="left">
@@ -70,6 +79,13 @@
         <!-- Gallery grid -->
         @if (images.length > 0 || mainImage) {
           <div class="gallery-block">
+            <div class="gallery-header">
+              <div class="gallery-header-left">
+                <mat-icon class="gallery-header-icon">photo_camera</mat-icon>
+                <h2>{{ 'common.gallery' | translate }}</h2>
+              </div>
+              <button class="see-all-btn" (click)="openGallery(0)">{{ 'common.seeAll' | translate }}</button>
+            </div>
             <div class="gallery-grid">
               <div class="gallery-grid__main" (click)="openGallery(0)">
                 @if (images[0]) {

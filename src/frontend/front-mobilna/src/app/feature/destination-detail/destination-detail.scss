@@ -993,10 +993,17 @@ button:hover {
 }
 
 .gallery-header-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--primary) 12%, white);
   color: var(--primary);
   font-size: 20px;
-  width: 20px;
-  height: 20px;
+  flex-shrink: 0;
 }
 
 .explore-card {
@@ -1159,5 +1166,10 @@ button:hover {
 
   .explore-subtitle {
     color: var(--text-gray);
+  }
+
+  .gallery-header-icon {
+    background: rgba(77, 194, 255, 0.1);
+    color: #4dc2ff;
   }
 }

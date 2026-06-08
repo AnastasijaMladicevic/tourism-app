@@ -465,6 +465,28 @@ button:hover {
   margin-bottom: 10px;
 }
 
+.gallery-header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  h2 { margin: 0; }
+}
+
+.gallery-header-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  border-radius: 10px;
+  background: color-mix(in srgb, var(--primary) 12%, white);
+  color: var(--primary);
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
 .see-all-btn {
   background: none;
   border: none;
@@ -1355,6 +1377,11 @@ button:hover {
     width: 17px;
     height: 17px;
   }
+}
+
+[data-theme='dark'] .gallery-header-icon {
+  background: rgba(77, 194, 255, 0.1);
+  color: #4dc2ff;
 }
 
 [data-theme='dark'] .gallery-show-all {
