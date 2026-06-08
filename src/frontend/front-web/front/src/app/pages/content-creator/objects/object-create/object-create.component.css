@@ -1446,18 +1446,28 @@ textarea:focus {
     grid-template-columns: 1fr;
   }
 
+  .page-header {
+    flex-direction: column;
+  }
+
   .hour-row {
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 36px minmax(0, 1fr) auto minmax(0, 1fr) auto;
   }
 
   .hour-row > span:first-child {
-    grid-column: 1 / -1;
+    grid-column: auto;
+  }
+
+  .hour-row input {
+    font-size: 11px;
+    padding: 5px 4px;
+    min-height: 30px;
   }
 
   .copy-hours-btn {
-    grid-column: 2;
-    grid-row: 2;
-    justify-self: end;
+    grid-column: auto;
+    grid-row: auto;
+    justify-self: auto;
   }
 
   .form-actions {

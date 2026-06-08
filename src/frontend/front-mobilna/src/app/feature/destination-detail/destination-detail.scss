@@ -924,6 +924,7 @@ button:hover {
     font-size: 16px;
     width: 16px;
     height: 16px;
+    color: #e74c3c;
   }
 }
 
@@ -986,10 +987,30 @@ button:hover {
   }
 }
 
+.gallery-card {
+  padding: 18px 16px 10px 16px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.gallery-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
 .gallery-header-left {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  height: 36px;
+
+  h2 {
+    margin: 0;
+    line-height: 36px;
+    display: block;
+  }
 }
 
 .gallery-header-icon {
@@ -1162,6 +1183,10 @@ button:hover {
 
   .dest-region {
     color: var(--text-gray);
+
+    mat-icon {
+      color: #e74c3c;
+    }
   }
 
   .explore-subtitle {

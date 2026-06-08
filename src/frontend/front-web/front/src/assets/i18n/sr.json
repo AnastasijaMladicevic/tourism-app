@@ -2103,7 +2103,13 @@
         "sessionExpired": "Verifikaciona sesija je istekla. Pošalji kod ponovo da nastaviš.",
         "invalidCode": "Neispravan verifikacioni kod.",
         "changeFailed": "Promena lozinke nije uspela.",
-        "codeExpired": "Verifikacioni kod je istekao. Pošalji ga ponovo da nastaviš."
+        "codeExpired": "Verifikacioni kod je istekao. Pošalji ga ponovo da nastaviš.",
+        "userIdUnavailable": "ID korisnika nije dostupan.",
+        "emailUnavailable": "Email adresa nije dostupna za ovaj nalog.",
+        "requestTimeout": "Zahtev je istekao. Proverite konekciju i pokušajte ponovo.",
+        "sendCodeFailed": "Trenutno nije moguće poslati verifikacioni kod.",
+        "verificationFailed": "Provera nije uspela. Zatražite novi kod.",
+        "changeFailedCheckCurrent": "Promena lozinke nije uspela. Proverite trenutnu lozinku."
       }
     },
     "passwordModalDescription": "Unesi trenutnu lozinku i izaberi novu.",

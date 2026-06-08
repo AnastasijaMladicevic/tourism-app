@@ -2103,7 +2103,13 @@
         "sessionExpired": "La sesión de verificación ha expirado. Reenvía el código para continuar.",
         "invalidCode": "Código de verificación inválido.",
         "changeFailed": "No se pudo cambiar la contraseña.",
-        "codeExpired": "El código de verificación ha expirado. Reenvíalo para continuar."
+        "codeExpired": "El código de verificación ha expirado. Reenvíalo para continuar.",
+        "userIdUnavailable": "El ID del usuario no está disponible.",
+        "emailUnavailable": "La dirección de correo no está disponible para esta cuenta.",
+        "requestTimeout": "La solicitud expiró. Revisa tu conexión e inténtalo de nuevo.",
+        "sendCodeFailed": "No se puede enviar un código de verificación en este momento.",
+        "verificationFailed": "La verificación falló. Solicita un código nuevo.",
+        "changeFailedCheckCurrent": "No se pudo cambiar la contraseña. Revisa tu contraseña actual."
       }
     },
     "passwordModalDescription": "Introduce tu contraseña actual y elige una nueva.",

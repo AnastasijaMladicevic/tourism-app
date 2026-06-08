@@ -207,8 +207,13 @@ button:hover {
   display: flex;
   align-items: center;
   gap: 10px;
+  height: 36px;
 
-  h2 { margin: 0; }
+  h2 {
+    margin: 0 !important;
+    line-height: 36px;
+    display: block;
+  }
 }
 
 .gallery-header-icon {
@@ -642,7 +647,9 @@ button:hover {
 
 /* ====================== GALERIJA ====================== */
 .gallery-card {
-  padding: 0px 16px 10px 16px;
+  padding: 18px 16px 10px 16px;
+  min-width: 0;
+  overflow: hidden;
 }
 
 .gallery-header {

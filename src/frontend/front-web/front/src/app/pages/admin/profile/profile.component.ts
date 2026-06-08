@@ -425,7 +425,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   }
 
   get selectedCountryLabel(): string {
-    return this.user.country?.trim() || '';
+    return this.countryLabel(this.user.country?.trim() || '');
   }
 
   toggleCountryMenu(event: Event): void {
@@ -437,6 +437,20 @@ export class ProfileComponent implements OnInit, OnDestroy {
     event.stopPropagation();
     this.user.country = country;
     this.countryMenuOpen = false;
+  }
+
+  countryLabel(country: string): string {
+    if (!country?.trim()) {
+      return '';
+    }
+
+    const key = country
+      .replace(/[()]/g, '')
+      .replace(/\s+/g, '')
+      .replace(/[^A-Za-z]/g, '');
+    const translationKey = `adminTeamMemberCreate.countries.${key}`;
+    const translated = this.t(translationKey);
+    return translated === translationKey ? country : translated;
   }
 
   @HostListener('document:click', ['$event'])
@@ -477,7 +491,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.passwordError = '';
 
     if (!this.currentPassword.trim()) {
-      this.passwordError = 'Enter your current password.';
+      this.passwordError = this.t('adminProfile.password.errors.currentRequired');
       return;
     }
 
@@ -497,7 +511,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     }
 
     if (!this.user.id) {
-      this.passwordError = 'User ID is not available.';
+      this.passwordError = this.t('adminProfile.password.errors.userIdUnavailable');
       return;
     }
 
@@ -518,7 +532,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         this.passwordLoading = false;
-        this.passwordError = err?.error?.message ?? 'Password change failed. Check your current password.';
+        this.passwordError = this.translateApiMessage(err?.error?.message, 'adminProfile.password.errors.changeFailedCheckCurrent');
         this.cdr.detectChanges();
       },
     });
@@ -528,7 +542,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     if (this.passwordLoading) return;
 
     if (!this.user.email) {
-      this.passwordError = 'Email address is not available for this account.';
+      this.passwordError = this.t('adminProfile.password.errors.emailUnavailable');
       return;
     }
 
@@ -547,8 +561,8 @@ export class ProfileComponent implements OnInit, OnDestroy {
       error: (err) => {
         this.passwordLoading = false;
         this.passwordError = err?.name === 'TimeoutError'
-          ? 'Request timed out. Check your connection and try again.'
-          : (err?.error?.message ?? 'Unable to send a verification code right now.');
+          ? this.t('adminProfile.password.errors.requestTimeout')
+          : this.translateApiMessage(err?.error?.message, 'adminProfile.password.errors.sendCodeFailed');
         this.cdr.detectChanges();
       },
     });
@@ -572,7 +586,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
         if (!this.forgotResetSessionToken) {
           this.passwordLoading = false;
-          this.passwordError = 'Verification failed. Please request a new code.';
+          this.passwordError = this.t('adminProfile.password.errors.verificationFailed');
           this.cdr.detectChanges();
           return;
         }
@@ -586,7 +600,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         this.passwordLoading = false;
-        this.passwordError = err?.error?.message ?? 'Invalid or expired verification code.';
+        this.passwordError = this.translateApiMessage(err?.error?.message, 'adminProfile.password.errors.invalidCode');
         this.cdr.detectChanges();
       },
     });
@@ -598,17 +612,17 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.passwordError = '';
 
     if (this.newPassword.length < 8) {
-      this.passwordError = 'New password must be at least 8 characters long.';
+      this.passwordError = this.t('adminProfile.password.errors.minLength');
       return;
     }
 
     if (!/[A-Z]/.test(this.newPassword) || !/[\d\W]/.test(this.newPassword)) {
-      this.passwordError = 'New password must include one uppercase letter and one number or symbol.';
+      this.passwordError = this.t('adminProfile.password.errors.complexity');
       return;
     }
 
     if (this.newPassword !== this.confirmNewPassword) {
-      this.passwordError = 'Passwords do not match.';
+      this.passwordError = this.t('adminProfile.password.errors.mismatch');
       return;
     }
 
@@ -629,7 +643,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
       },
       error: (err) => {
         this.passwordLoading = false;
-        this.passwordError = err?.error?.message ?? 'Password change failed.';
+        this.passwordError = this.translateApiMessage(err?.error?.message, 'adminProfile.password.errors.changeFailed');
         this.cdr.detectChanges();
       },
     });
@@ -751,7 +765,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
     this.otpExpiryTimerId = window.setInterval(() => {
       this.otpSecondsRemaining = Math.max(0, this.otpSecondsRemaining - 1);
       if (this.otpSecondsRemaining === 0) {
-        this.passwordError = 'The verification code has expired. Resend it to continue.';
+        this.passwordError = this.t('adminProfile.password.errors.codeExpired');
         if (this.otpExpiryTimerId !== null) {
           window.clearInterval(this.otpExpiryTimerId);
           this.otpExpiryTimerId = null;
@@ -821,5 +835,13 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   private t(key: string, params?: Record<string, string | number>): string {
     return this.translationService.translate(key, params);
+  }
+
+  private translateApiMessage(message: unknown, fallbackKey: string): string {
+    if (typeof message === 'string' && message.trim()) {
+      return this.translationService.translateLiteral(message.trim());
+    }
+
+    return this.t(fallbackKey);
   }
 }

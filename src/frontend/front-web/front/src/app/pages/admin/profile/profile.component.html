@@ -41,7 +41,7 @@
             <div class="profile-header-info">
               <div class="profile-title-row">
                 <h2 class="profile-name">{{ displayName }}</h2>
-                <span class="badge badge-blue badge-role">{{ role | titlecase }}</span>
+                <span class="badge badge-blue badge-role">{{ roleLabelKey | translate }}</span>
               </div>
 
               <div class="profile-org">
@@ -145,7 +145,7 @@
                               [attr.aria-selected]="user.country === country"
                               (click)="selectCountry(country, $event)"
                             >
-                              <span>{{ country }}</span>
+                              <span>{{ countryLabel(country) }}</span>
                               @if (user.country === country) {
                                 <mat-icon fontSet="material-icons-outlined">check</mat-icon>
                               }
@@ -372,7 +372,7 @@
           <h3>
             @if (passwordChangeMode === 'forgot-otp') { {{ 'adminProfile.forgotPasswordHeading' | translate }} }
             @else if (passwordChangeMode === 'forgot-password') { {{ 'adminProfile.setPasswordHeading' | translate }} }
-            @else { Change Password }
+            @else { {{ 'adminProfile.changePassword' | translate }} }
           </h3>
           <p>
             @if (passwordChangeMode === 'forgot-otp') {
@@ -418,7 +418,7 @@
             </div>
 
             <div class="modal-field modal-field--full">
-              <label class="modal-label" for="new-password">New Password</label>
+              <label class="modal-label" for="new-password">{{ 'adminProfile.password.newPassword' | translate }}</label>
               <div class="modal-input-wrap">
                 <input
                   id="new-password"
@@ -482,7 +482,7 @@
           </div>
 
           <div class="modal-field modal-field--full">
-            <label class="modal-label" for="otp-code">Verification Code</label>
+            <label class="modal-label" for="otp-code">{{ 'adminProfile.password.verificationCode' | translate }}</label>
             <input
               id="otp-code"
               name="otpCode"
@@ -495,9 +495,9 @@
               autocomplete="one-time-code"
             />
             <div class="otp-meta">
-              <span>Resend available in {{ otpResendSecondsRemaining }}s</span>
+              <span>{{ 'adminProfile.password.resendAvailableIn' | translate : { seconds: otpResendSecondsRemaining } }}</span>
               <button class="otp-resend" type="button" [disabled]="otpResendSecondsRemaining > 0 || passwordLoading" (click)="resendForgotCode()">
-                Resend code
+                {{ 'adminProfile.password.resendCode' | translate }}
               </button>
             </div>
           </div>
@@ -506,7 +506,7 @@
         @if (passwordChangeMode === 'forgot-password') {
           <div class="password-modal__grid">
             <div class="modal-field modal-field--full">
-              <label class="modal-label" for="forgot-new-password">New Password</label>
+              <label class="modal-label" for="forgot-new-password">{{ 'adminProfile.password.newPassword' | translate }}</label>
               <div class="modal-input-wrap">
                 <input
                   id="forgot-new-password"
@@ -519,7 +519,7 @@
                   class="modal-toggle"
                   type="button"
                   (click)="hideNewPassword = !hideNewPassword"
-                  [attr.aria-label]="hideNewPassword ? 'Show new password' : 'Hide new password'"
+                  [attr.aria-label]="hideNewPassword ? ('adminProfile.password.showNewPassword' | translate) : ('adminProfile.password.hideNewPassword' | translate)"
                 >
                   <mat-icon fontSet="material-icons-outlined">
                     {{ hideNewPassword ? 'visibility' : 'visibility_off' }}
@@ -529,7 +529,7 @@
             </div>
 
             <div class="modal-field modal-field--full">
-              <label class="modal-label" for="forgot-confirm-password">Confirm New Password</label>
+              <label class="modal-label" for="forgot-confirm-password">{{ 'adminProfile.password.confirmNewPassword' | translate }}</label>
               <div class="modal-input-wrap">
                 <input
                   id="forgot-confirm-password"
@@ -542,7 +542,7 @@
                   class="modal-toggle"
                   type="button"
                   (click)="hideConfirmNewPassword = !hideConfirmNewPassword"
-                  [attr.aria-label]="hideConfirmNewPassword ? 'Show confirm password' : 'Hide confirm password'"
+                  [attr.aria-label]="hideConfirmNewPassword ? ('adminProfile.password.showConfirmPassword' | translate) : ('adminProfile.password.hideConfirmPassword' | translate)"
                 >
                   <mat-icon fontSet="material-icons-outlined">
                     {{ hideConfirmNewPassword ? 'visibility' : 'visibility_off' }}
@@ -553,9 +553,9 @@
           </div>
 
           <div class="password-rules">
-            <div class="password-rule">At least 8 characters</div>
-            <div class="password-rule">Include one uppercase letter</div>
-            <div class="password-rule">Include one number or symbol</div>
+            <div class="password-rule">{{ 'adminProfile.password.rules.minLength' | translate }}</div>
+            <div class="password-rule">{{ 'adminProfile.password.rules.uppercase' | translate }}</div>
+            <div class="password-rule">{{ 'adminProfile.password.rules.numberOrSymbol' | translate }}</div>
           </div>
         }
 
@@ -571,7 +571,7 @@
       <div class="password-modal__footer">
         @if (passwordChangeMode === 'direct') {
           <button class="modal-secondary-btn" type="button" (click)="closePasswordModal()" [disabled]="passwordLoading || passwordSuccess">
-            Cancel
+            {{ 'common.cancel' | translate }}
           </button>
 
           <div class="modal-footer-start">
@@ -581,7 +581,7 @@
           </div>
 
           <button
-            class="modal-primary-btn"
+            class="modal-primary-btn modal-primary-btn--centered-label"
             type="button"
             [disabled]="passwordLoading || passwordSuccess"
             (click)="submitPasswordStep()"
@@ -595,11 +595,11 @@
 
         @if (passwordChangeMode === 'forgot-otp') {
           <button class="modal-secondary-btn" type="button" (click)="backToDirectMode()" [disabled]="passwordLoading">
-            Back
+            {{ 'common.back' | translate }}
           </button>
 
           <button
-            class="modal-primary-btn"
+            class="modal-primary-btn modal-primary-btn--centered-label"
             type="button"
             [disabled]="passwordLoading || otpSecondsRemaining === 0"
             (click)="submitForgotOtp()"
@@ -613,7 +613,7 @@
 
         @if (passwordChangeMode === 'forgot-password') {
           <button class="modal-secondary-btn" type="button" (click)="closePasswordModal()" [disabled]="passwordLoading || passwordSuccess">
-            Cancel
+            {{ 'common.cancel' | translate }}
           </button>
 
           <button

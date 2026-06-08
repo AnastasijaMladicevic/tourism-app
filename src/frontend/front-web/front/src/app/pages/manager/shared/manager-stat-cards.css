@@ -121,3 +121,19 @@
 .manager-reports-page .stat-card[data-tone='green'] strong {
   color: #047857;
 }
+
+@media (max-width: 640px) {
+  .manager-list-page:not(.manager-reviews-page) .stats-row,
+  .manager-list-page:not(.manager-reviews-page) .insights-grid,
+  .manager-reports-page .stats-row {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    overflow-x: visible !important;
+  }
+
+  .manager-list-page:not(.manager-reviews-page) .stat-card,
+  .manager-list-page:not(.manager-reviews-page) .insight-card,
+  .manager-reports-page .stat-card {
+    flex: unset !important;
+  }
+}

@@ -344,7 +344,10 @@
 
 .event-image {
   position: relative;
-  height: 170px;
+  height: 162px;
+  min-height: 162px;
+  max-height: 162px;
+  flex-shrink: 0;
   background-size: cover;
   background-position: center;
   display: flex;
@@ -521,10 +524,17 @@
     display: grid;
     gap: 16px;
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+  }
+
+  .event-card {
+    height: 100%;
   }
 
   .event-image {
-    height: 180px;
+    height: 162px;
+    min-height: 162px;
+    max-height: 162px;
   }
 }
 
@@ -537,7 +547,7 @@
 @media (min-width: 1280px) {
   .events-list {
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    grid-auto-rows: calc((100vh - 290px) / 2);
+    grid-auto-rows: auto;
   }
 }
 

@@ -22,13 +22,9 @@
 }
 
 .manager-list-page .detail-column {
-  position: sticky;
-  top: 80px;
   padding: 18px;
   display: flex;
   flex-direction: column;
   gap: 18px;
   min-width: 0;
-  max-height: none;
-  overflow: visible;
 }

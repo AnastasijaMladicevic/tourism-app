@@ -12,10 +12,10 @@
 }
 
 @container manager-stats-host (max-width: 699px) {
-  .manager-objects-page .insights-grid,
-  .manager-events-page .insights-grid,
+  .manager-list-page.manager-objects-page .insights-grid,
+  .manager-list-page.manager-events-page .insights-grid,
   .activities-page.manager-list-page .insights-grid,
-  .manager-localities-page .insights-grid,
+  .manager-list-page.manager-localities-page .insights-grid,
   .manager-reports-page .stats-row {
     display: flex;
     flex-wrap: nowrap;
@@ -33,35 +33,35 @@
     grid-template-columns: none;
   }
 
-  .manager-objects-page .insights-grid::after,
-  .manager-events-page .insights-grid::after,
+  .manager-list-page.manager-objects-page .insights-grid::after,
+  .manager-list-page.manager-events-page .insights-grid::after,
   .activities-page.manager-list-page .insights-grid::after,
-  .manager-localities-page .insights-grid::after,
+  .manager-list-page.manager-localities-page .insights-grid::after,
   .manager-reports-page .stats-row::after {
     content: '';
     flex: 0 0 4px;
   }
 
-  .manager-objects-page .insights-grid::-webkit-scrollbar,
-  .manager-events-page .insights-grid::-webkit-scrollbar,
+  .manager-list-page.manager-objects-page .insights-grid::-webkit-scrollbar,
+  .manager-list-page.manager-events-page .insights-grid::-webkit-scrollbar,
   .activities-page.manager-list-page .insights-grid::-webkit-scrollbar,
-  .manager-localities-page .insights-grid::-webkit-scrollbar,
+  .manager-list-page.manager-localities-page .insights-grid::-webkit-scrollbar,
   .manager-reports-page .stats-row::-webkit-scrollbar {
     display: none;
   }
 
-  .manager-objects-page .insights-grid .insight-card:last-child,
-  .manager-events-page .insights-grid .insight-card:last-child,
+  .manager-list-page.manager-objects-page .insights-grid .insight-card:last-child,
+  .manager-list-page.manager-events-page .insights-grid .insight-card:last-child,
   .activities-page.manager-list-page .insights-grid .insight-card:last-child,
-  .manager-localities-page .insights-grid .insight-card:last-child,
+  .manager-list-page.manager-localities-page .insights-grid .insight-card:last-child,
   .manager-reports-page .stats-row .stat-card:last-child {
     grid-column: auto;
   }
 
-  .manager-objects-page .insight-card,
-  .manager-events-page .insight-card,
+  .manager-list-page.manager-objects-page .insight-card,
+  .manager-list-page.manager-events-page .insight-card,
   .activities-page.manager-list-page .insight-card,
-  .manager-localities-page .insight-card,
+  .manager-list-page.manager-localities-page .insight-card,
   .manager-reports-page .stat-card {
     flex: 0 0 min(260px, 78%);
     scroll-snap-align: start;
@@ -109,10 +109,10 @@
 }
 
 @container manager-stats-host (min-width: 700px) {
-  .manager-objects-page .insights-grid,
-  .manager-events-page .insights-grid,
+  .manager-list-page.manager-objects-page .insights-grid,
+  .manager-list-page.manager-events-page .insights-grid,
   .activities-page.manager-list-page .insights-grid,
-  .manager-localities-page .insights-grid,
+  .manager-list-page.manager-localities-page .insights-grid,
   .manager-reports-page .stats-row {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -121,10 +121,10 @@
     scroll-snap-type: none;
   }
 
-  .manager-objects-page .insight-card,
-  .manager-events-page .insight-card,
+  .manager-list-page.manager-objects-page .insight-card,
+  .manager-list-page.manager-events-page .insight-card,
   .activities-page.manager-list-page .insight-card,
-  .manager-localities-page .insight-card,
+  .manager-list-page.manager-localities-page .insight-card,
   .manager-reports-page .stat-card {
     flex: unset;
     min-width: 0;
@@ -175,36 +175,36 @@
   }
 
   @container manager-stats-host (max-width: 699px) {
-    .manager-objects-page .insight-card,
-    .manager-events-page .insight-card,
+    .manager-list-page.manager-objects-page .insight-card,
+    .manager-list-page.manager-events-page .insight-card,
     .activities-page.manager-list-page .insight-card,
-    .manager-localities-page .insight-card,
+    .manager-list-page.manager-localities-page .insight-card,
     .manager-reports-page .stat-card {
       padding: 12px;
       border-radius: 16px;
     }
 
-    .manager-objects-page .insight-card strong,
-    .manager-events-page .insight-card strong,
+    .manager-list-page.manager-objects-page .insight-card strong,
+    .manager-list-page.manager-events-page .insight-card strong,
     .activities-page.manager-list-page .insight-card strong,
-    .manager-localities-page .insight-card strong,
+    .manager-list-page.manager-localities-page .insight-card strong,
     .manager-reports-page .stat-card strong {
       font-size: 22px;
       margin: 6px 0 2px;
     }
 
-    .manager-objects-page .insight-card p,
-    .manager-events-page .insight-card p,
+    .manager-list-page.manager-objects-page .insight-card p,
+    .manager-list-page.manager-events-page .insight-card p,
     .activities-page.manager-list-page .insight-card p,
-    .manager-localities-page .insight-card p,
+    .manager-list-page.manager-localities-page .insight-card p,
     .manager-reports-page .stat-card p {
       font-size: 10px;
     }
 
-    .manager-objects-page .insight-card span,
-    .manager-events-page .insight-card span,
+    .manager-list-page.manager-objects-page .insight-card span,
+    .manager-list-page.manager-events-page .insight-card span,
     .activities-page.manager-list-page .insight-card span,
-    .manager-localities-page .insight-card span,
+    .manager-list-page.manager-localities-page .insight-card span,
     .manager-reports-page .stat-card span {
       font-size: 11px;
     }

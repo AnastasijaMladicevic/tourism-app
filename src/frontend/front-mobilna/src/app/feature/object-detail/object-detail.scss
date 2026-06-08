@@ -378,6 +378,7 @@ button:hover {
 
   mat-icon {
     font-size: 20px;
+    color: #e74c3c;
   }
 }
 
@@ -2133,6 +2134,12 @@ textarea {
   .nearby-empty,
   .review-modal-counter {
     color: var(--text-gray);
+  }
+
+  .venue{
+    mat-icon {
+      color: #e74c3c;
+    }
   }
 
   .fav-btn,

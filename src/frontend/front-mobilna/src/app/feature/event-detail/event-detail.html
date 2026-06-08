@@ -93,8 +93,14 @@
           </div>
         </div>
 
-        <div class="card">
-          <h2>{{ 'common.aboutEvent' | translate }}</h2>
+        <div class="card about-card">
+          <div class="about-header">
+            <div class="about-icon">
+              <mat-icon>{{ getEventTypeIcon(event.eventTypeName || '') }}</mat-icon>
+            </div>
+            <h2>{{ 'common.aboutEvent' | translate }}</h2>
+          </div>
+        
           <p class="description">
             {{ event.description || ('event.descriptionFallback' | translate) }}
           </p>
@@ -103,7 +109,11 @@
         <div class="section">
           <div class="card gallery-card">
             <div class="gallery-header">
-              <h2>{{ 'common.gallery' | translate }}</h2>
+              <div class="gallery-header-left">
+                <mat-icon class="gallery-header-icon">photo_camera</mat-icon>
+                <h2>{{ 'common.gallery' | translate }}</h2>
+              </div>
+            
               <button class="see-all-btn" (click)="openGallery(0)">
                 {{ 'common.seeAll' | translate }}
               </button>

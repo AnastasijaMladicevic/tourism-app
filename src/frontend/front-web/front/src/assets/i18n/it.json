@@ -2103,7 +2103,13 @@
         "sessionExpired": "La sessione di verifica è scaduta. Reinvia il codice per continuare.",
         "invalidCode": "Codice di verifica non valido.",
         "changeFailed": "Cambio password non riuscito.",
-        "codeExpired": "Il codice di verifica è scaduto. Reinviarlo per continuare."
+        "codeExpired": "Il codice di verifica è scaduto. Reinviarlo per continuare.",
+        "userIdUnavailable": "L'ID utente non è disponibile.",
+        "emailUnavailable": "L'indirizzo email non è disponibile per questo account.",
+        "requestTimeout": "La richiesta è scaduta. Controlla la connessione e riprova.",
+        "sendCodeFailed": "Al momento non è possibile inviare un codice di verifica.",
+        "verificationFailed": "Verifica non riuscita. Richiedi un nuovo codice.",
+        "changeFailedCheckCurrent": "Cambio password non riuscito. Controlla la password attuale."
       }
     },
     "passwordModalDescription": "Inserisci la password attuale e scegline una nuova.",

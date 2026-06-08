@@ -112,3 +112,19 @@
 .objects-page .insight-card[data-tone='green'] strong {
   color: #047857;
 }
+
+@media (max-width: 640px) {
+  .events-page .insights-grid,
+  .activities-page .insights-grid,
+  .objects-page .insights-grid {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    overflow-x: visible !important;
+  }
+
+  .events-page .insight-card,
+  .activities-page .insight-card,
+  .objects-page .insight-card {
+    flex: unset !important;
+  }
+}

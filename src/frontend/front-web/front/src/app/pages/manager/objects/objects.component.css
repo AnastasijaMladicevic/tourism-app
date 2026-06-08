@@ -675,8 +675,6 @@ tbody tr:hover,
 	display: flex;
 	flex-direction: column;
 	gap: 10px;
-	max-height: 320px;
-	overflow-y: auto;
 }
 
 .review-preview-card {

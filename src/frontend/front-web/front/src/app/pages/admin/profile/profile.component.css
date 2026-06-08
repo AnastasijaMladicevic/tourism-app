@@ -1506,6 +1506,11 @@
   gap: 10px;
 }
 
+.modal-primary-btn--centered-label {
+  justify-content: center;
+  text-align: center;
+}
+
 .modal-primary-btn:disabled,
 .modal-secondary-btn:disabled {
   opacity: 0.72;

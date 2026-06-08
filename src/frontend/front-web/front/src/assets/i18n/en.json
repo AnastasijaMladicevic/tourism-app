@@ -2138,7 +2138,13 @@
         "sessionExpired": "The verification session expired. Resend the code to continue.",
         "invalidCode": "Invalid verification code.",
         "changeFailed": "Password change failed.",
-        "codeExpired": "The verification code has expired. Resend it to continue."
+        "codeExpired": "The verification code has expired. Resend it to continue.",
+        "userIdUnavailable": "User ID is not available.",
+        "emailUnavailable": "Email address is not available for this account.",
+        "requestTimeout": "Request timed out. Check your connection and try again.",
+        "sendCodeFailed": "Unable to send a verification code right now.",
+        "verificationFailed": "Verification failed. Please request a new code.",
+        "changeFailedCheckCurrent": "Password change failed. Check your current password."
       }
     },
     "passwordModalDescription": "Enter your current password and choose a new one.",
