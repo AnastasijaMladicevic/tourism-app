@@ -117,6 +117,9 @@ button:hover {
   gap: 20px;
   padding: 16px 12px 50px;
   background: var(--bg);
+  border-radius: 25px;
+  position: relative;
+  z-index: 1;
 }
 
 /* ====================== ACTIVITY HEADER CARD ====================== */

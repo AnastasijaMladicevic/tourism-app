@@ -806,20 +806,21 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
   }
 
   getAmenityIcon(amenity: string): string {
-    const a = amenity.toLowerCase();
-    if (a.includes('edukac') || a.includes('educ') || a.includes('škol')) return 'school';
-    if (a.includes('mor') || a.includes('ribar') || a.includes('aqua') || a.includes('voda')) return 'waves';
-    if (a.includes('turisti') || a.includes('atrakcij') || a.includes('tourist')) return 'photo_camera';
-    if (a.includes('deij') || a.includes('dečij') || a.includes('decu') || a.includes('children') || a.includes('porodic') || a.includes('family')) return 'family_restroom';
-    if (a.includes('restoran') || a.includes('hrana') || a.includes('food') || a.includes('kafic') || a.includes('bar')) return 'restaurant';
-    if (a.includes('parking')) return 'local_parking';
+    const a = (amenity || '').toLowerCase()
+      .normalize('NFD').replace(/[̀-ͯ]/g, '');
+    if (a.includes('edukac') || a.includes('educ') || a.includes('istruz') || a.includes('skol') || a.includes('obraz')) return 'school';
+    if (a.includes('mor') || a.includes('marine') || a.includes('marino') || a.includes('specie') || a.includes('ribar') || a.includes('aqua') || a.includes('voda')) return 'waves';
+    if (a.includes('turisti') || a.includes('atrakcij') || a.includes('tourist') || a.includes('attrazi') || a.includes('atract')) return 'photo_camera';
+    if (a.includes('decij') || a.includes('decu') || a.includes('bambini') || a.includes('children') || a.includes('porodic') || a.includes('family') || a.includes('infant') || a.includes('nino')) return 'family_restroom';
+    if (a.includes('restoran') || a.includes('hrana') || a.includes('food') || a.includes('kafic') || a.includes('bar') || a.includes('ristoran') || a.includes('comida')) return 'restaurant';
+    if (a.includes('parking') || a.includes('parcheggio')) return 'local_parking';
     if (a.includes('wifi') || a.includes('internet')) return 'wifi';
-    if (a.includes('bazen') || a.includes('pool')) return 'pool';
-    if (a.includes('spa') || a.includes('wellness') || a.includes('masaž')) return 'spa';
-    if (a.includes('sport') || a.includes('fitnes') || a.includes('gym')) return 'fitness_center';
-    if (a.includes('muzej') || a.includes('museum') || a.includes('izložb')) return 'museum';
-    if (a.includes('prodavnic') || a.includes('shop') || a.includes('suvenir')) return 'shopping_bag';
-    if (a.includes('konferencij') || a.includes('sala') || a.includes('event')) return 'event';
+    if (a.includes('bazen') || a.includes('pool') || a.includes('piscina')) return 'pool';
+    if (a.includes('spa') || a.includes('wellness') || a.includes('masaz')) return 'spa';
+    if (a.includes('sport') || a.includes('fitnes') || a.includes('gym') || a.includes('palestra')) return 'fitness_center';
+    if (a.includes('muzej') || a.includes('museum') || a.includes('museo') || a.includes('izlozb')) return 'museum';
+    if (a.includes('prodavnic') || a.includes('shop') || a.includes('suvenir') || a.includes('negozio') || a.includes('tienda')) return 'shopping_bag';
+    if (a.includes('konferencij') || a.includes('sala') || a.includes('event') || a.includes('conferenz')) return 'event';
     return 'local_activity';
   }
 

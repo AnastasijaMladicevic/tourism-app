@@ -76,44 +76,23 @@
           </div>
         </div>
 
-        <!-- Gallery grid -->
-        @if (images.length > 0 || mainImage) {
-          <div class="gallery-block">
+        <!-- Gallery -->
+        @if (images.length > 0) {
+          <div class="card gallery-card">
             <div class="gallery-header">
               <div class="gallery-header-left">
                 <mat-icon class="gallery-header-icon">photo_camera</mat-icon>
                 <h2>{{ 'common.gallery' | translate }}</h2>
               </div>
-              <button class="see-all-btn" (click)="openGallery(0)">{{ 'common.seeAll' | translate }}</button>
+              <button class="see-all-btn" (click)="openGallery(0)">{{ 'common.seeAll' | translate }} ></button>
             </div>
-            <div class="gallery-grid">
-              <div class="gallery-grid__main" (click)="openGallery(0)">
-                @if (images[0]) {
-                  <img [src]="images[0].url" [alt]="images[0].altText || object.name" (error)="onImageError($event)" />
-                } @else {
-                  <img [src]="mainImage" [alt]="object.name" (error)="onImageError($event)" />
-                }
-              </div>
-              @if (images.length > 1) {
-                <div class="gallery-grid__side">
-                  <div class="gallery-grid__thumb" (click)="openGallery(1)">
-                    <img [src]="images[1].url" [alt]="images[1].altText || ''" (error)="onImageError($event)" />
-                  </div>
-                  @if (images[2]) {
-                    <div class="gallery-grid__thumb gallery-grid__thumb--last" (click)="openGallery(2)">
-                      <img [src]="images[2].url" [alt]="images[2].altText || ''" (error)="onImageError($event)" />
-                      @if (images.length > 3) {
-                        <div class="gallery-grid__more">+{{ images.length - 3 }}</div>
-                      }
-                    </div>
-                  }
+            <div class="gallery-scroll">
+              @for (img of images; track img.id; let i = $index) {
+                <div class="gallery-item" (click)="openGallery(i)">
+                  <img [src]="img.url" [alt]="img.altText || ''" (error)="onImageError($event)" />
                 </div>
               }
             </div>
-            <button class="gallery-show-all" (click)="openGallery(0)">
-              <mat-icon>photo_library</mat-icon>
-              {{ 'object.showAllPhotos' | translate }}
-            </button>
           </div>
         }
 
