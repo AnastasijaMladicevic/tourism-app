@@ -372,6 +372,122 @@ button:hover {
 }
 
 
+/* ====================== EVENT TICKET CARDS ====================== */
+.ticket-card {
+  display: flex;
+  align-items: stretch;
+  background: var(--surface);
+  border: 1.5px solid rgba(59, 130, 246, 0.3);
+  border-radius: 14px;
+  padding: 0;
+  margin-top: 12px;
+  overflow: visible;
+  position: relative;
+  transition: transform 0.2s, box-shadow 0.2s;
+
+  &::before {
+    content: '';
+    width: 5px;
+    flex-shrink: 0;
+    background: #3b82f6;
+    border-radius: 14px 0 0 14px;
+    align-self: stretch;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    right: -13px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 26px;
+    height: 26px;
+    background: var(--surface-strong);
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    z-index: 1;
+  }
+}
+
+.ticket-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+.ticket-card[data-idx="1"] {
+  border-color: rgba(59, 130, 246, 0.3);
+  &::before { background: #3b82f6; }
+  .ticket-card__icon { background: rgba(59, 130, 246, 0.1); mat-icon { color: #3b82f6; } }
+  .ticket-price { color: #3b82f6; }
+}
+
+.ticket-card[data-idx="2"] {
+  border-color: rgba(34, 197, 94, 0.35);
+  &::before { background: #22c55e; }
+  .ticket-card__icon { background: rgba(34, 197, 94, 0.1); mat-icon { color: #22c55e; } }
+  .ticket-price { color: #22c55e; }
+}
+
+.ticket-card__left {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 16px;
+  min-width: 0;
+}
+
+.ticket-card__icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+
+  svg {
+    width: 32px;
+    height: 22px;
+  }
+}
+
+.ticket-card__right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 30px 16px 20px;
+  border-left: 2px dashed var(--border);
+  width: 130px;
+  flex-shrink: 0;
+  text-align: center;
+}
+
+.ticket-type {
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--emperor);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.ticket-price {
+  font-size: 26px;
+  font-weight: 800;
+  color: #3b82f6;
+  white-space: nowrap;
+  line-height: 1.1;
+}
+
+.ticket-per {
+  font-size: 12px;
+  color: var(--text-gray);
+  margin-top: 3px;
+}
+
 .nearby-card {
   padding: 20px 16px;
 }
@@ -913,9 +1029,14 @@ button:hover {
     color: var(--text-gray);
   }
 
-  .info-card {
+  .info-card,
+  .ticket-card {
     background: var(--surface);
-    border-color: var(--border);
+
+    &::after {
+      background: var(--surface-strong);
+      border-color: var(--border);
+    }
   }
 
   .planner-btn,

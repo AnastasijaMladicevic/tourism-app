@@ -1095,7 +1095,10 @@
     "deleteReview": "Eliminar",
     "deleteReviewConfirm": "¿Estás seguro de que deseas eliminar esta reseña?",
     "deleteReviewSuccess": "La reseña se eliminó correctamente.",
-    "deleteReviewError": "No se pudo eliminar la reseña."
+    "deleteReviewError": "No se pudo eliminar la reseña.",
+    "showAllPhotos": "Ver todas las fotos",
+    "openToday": "Abierto hoy",
+    "viewAllNearby": "Ver cercanos"
   },
   "restaurant": {
     "title": "Restaurante",

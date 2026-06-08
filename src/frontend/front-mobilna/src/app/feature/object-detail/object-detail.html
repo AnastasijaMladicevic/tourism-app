@@ -24,79 +24,113 @@
   }
 
   @if (object) {
-    <div class="hero">
-      @if (mainImage) {
-        <img [src]="mainImage" [alt]="object.name" (error)="onImageError($event)" />
-      } @else {
-        <div class="hero-placeholder">
-          <mat-icon>restaurant</mat-icon>
-        </div>
-      }
-    </div>
-
     <div class="content">
       <!-- LEVA STRANA -->
       <div class="left">
+        <!-- Title card -->
         <div class="card">
           <div class="title-row">
             <h1 class="title">{{ object.name }}</h1>
-              <button
-                class="fav-btn"
-                type="button"
-                (click)="toggleFavorite(object, $event)"
-                [class.fav-btn--active]="isFavorite"
-                [disabled]="isFavoritePending(object.id)"
-              >
-                <mat-icon>{{ isFavorite ? 'favorite' : 'favorite_border' }}</mat-icon>
+            <button
+              class="fav-btn fav-btn--desktop"
+              type="button"
+              (click)="toggleFavorite(object, $event)"
+              [class.fav-btn--active]="isFavorite"
+              [disabled]="isFavoritePending(object.id)"
+            >
+              <mat-icon>{{ isFavorite ? 'favorite' : 'favorite_border' }}</mat-icon>
             </button>
           </div>
-
           <p class="location-bold">{{ object.localityName }}, {{ object.destinationName }}</p>
-          <p class="venue"><mat-icon>location_on</mat-icon> {{ object.address || ('common.notAvailable' | translate) }}</p>
-          <!--@if (object.cuisineType) {
-            <p class="cuisine"><mat-icon>restaurant</mat-icon>{{object.cuisineType}}</p>
-        }-->
-        </div>
-        <div class="card">
-          <h2>{{ 'object.amenities' | translate }}</h2>
-          <div class="amenities-grid">
-            @if (object.amenities && object.amenities.length > 0) {
-              @for (amenity of object.amenities; track amenity) {
-                <div class="amenity-item">
-                  <mat-icon>check_circle</mat-icon>
-                  <span>{{ amenity }}</span>
-                </div>
-              }
-            } @else {
-              <p>{{ 'object.amenitiesSoon' | translate }}</p>
+          @if (object.address) {
+            <p class="venue"><mat-icon>location_on</mat-icon> {{ object.address }}</p>
+          }
+          <div class="meta-chips">
+            @if (object.objectTypeName) {
+              <span class="meta-chip meta-chip--type">
+                <mat-icon>category</mat-icon>{{ object.objectTypeName }}
+              </span>
+            }
+            @for (amenity of (object.amenities || []).slice(0, 2); track amenity) {
+              <span class="meta-chip">{{ amenity }}</span>
+            }
+            @if (object.averageRating) {
+              <span class="meta-chip meta-chip--rating">
+                <mat-icon>star</mat-icon>{{ object.averageRating | number:'1.1-1' }}<span class="meta-chip__sub">&nbsp;({{ object.reviewCount || 0 }})</span>
+              </span>
+            }
+            @if (object.workingHours) {
+              <span class="meta-chip meta-chip--open">
+                <span class="open-dot"></span>{{ 'object.openToday' | translate }}
+              </span>
             }
           </div>
         </div>
+
+        <!-- Gallery grid -->
+        @if (images.length > 0 || mainImage) {
+          <div class="gallery-block">
+            <div class="gallery-grid">
+              <div class="gallery-grid__main" (click)="openGallery(0)">
+                @if (images[0]) {
+                  <img [src]="images[0].url" [alt]="images[0].altText || object.name" (error)="onImageError($event)" />
+                } @else {
+                  <img [src]="mainImage" [alt]="object.name" (error)="onImageError($event)" />
+                }
+              </div>
+              @if (images.length > 1) {
+                <div class="gallery-grid__side">
+                  <div class="gallery-grid__thumb" (click)="openGallery(1)">
+                    <img [src]="images[1].url" [alt]="images[1].altText || ''" (error)="onImageError($event)" />
+                  </div>
+                  @if (images[2]) {
+                    <div class="gallery-grid__thumb gallery-grid__thumb--last" (click)="openGallery(2)">
+                      <img [src]="images[2].url" [alt]="images[2].altText || ''" (error)="onImageError($event)" />
+                      @if (images.length > 3) {
+                        <div class="gallery-grid__more">+{{ images.length - 3 }}</div>
+                      }
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+            <button class="gallery-show-all" (click)="openGallery(0)">
+              <mat-icon>photo_library</mat-icon>
+              {{ 'object.showAllPhotos' | translate }}
+            </button>
+          </div>
+        }
+
         <!-- O objektu -->
         <div class="card">
           <h2>{{ 'common.aboutObject' | translate:{ name: object.objectTypeName || ('object.titleFallback' | translate) } }}</h2>
           <p class="description">{{ object.description || ('object.descriptionFallback' | translate) }}</p>
         </div>
 
-        <!-- Galerija -->
-        <div class="section">
-          <div class="card gallery-card">
-            <div class="gallery-header">
-              <h2>{{ 'common.gallery' | translate }}</h2>
-              <button class="see-all-btn" (click)="openGallery(0)">{{ 'common.seeAll' | translate }}</button>
-            </div>
-            <div class="gallery-scroll">
-              @for (img of images; track img.id; let i = $index) {
-                <div class="gallery-item" (click)="openGallery(i)">
-                  <img [src]="img.url" [alt]="img.altText || ''" (error)="onImageError($event)" />
+        <!-- Sadržaji -->
+        @if (object.amenities && object.amenities.length > 0) {
+          <div class="card">
+            <h2>{{ 'object.amenities' | translate }}</h2>
+            <div class="amenities-circles">
+              @for (amenity of object.amenities; track amenity) {
+                <div class="amenity-circle-item">
+                  <div class="amenity-circle">
+                    <mat-icon>{{ getAmenityIcon(amenity) }}</mat-icon>
+                  </div>
+                  <span class="amenity-circle-name">{{ amenity }}</span>
                 </div>
               }
             </div>
           </div>
-        </div>
+        }
+
+        <!-- Obližnji -->
         <div class="card nearby-card">
           <div class="nearby-header">
             <h2>{{ 'object.nearbyTitle' | translate:{ name: object.objectTypeName || ('object.titleFallback' | translate) } }}</h2>
+            @if (nearbyObjects.length > 0) {
+              <button class="see-all-btn" (click)="viewOnMap()">{{ 'object.viewAllNearby' | translate }} →</button>
+            }
           </div>
 
           @if (nearbyObjects.length > 0) {
@@ -105,40 +139,25 @@
                 <article class="nearby-item" (click)="openNearbyObjects(nearbyObject.id)">
                   <div class="nearby-item__image">
                     @if (getNearbyObjectImage(nearbyObject); as nearbyImage) {
-                      <img
-                        [src]="nearbyImage"
-                        [alt]="nearbyObject.name"
-                        (error)="onImageError($event)"
-                      />
+                      <img [src]="nearbyImage" [alt]="nearbyObject.name" (error)="onImageError($event)" />
                     } @else {
                       <div class="nearby-item__placeholder">
-                        <mat-icon>objects</mat-icon>
+                        <mat-icon>place</mat-icon>
                       </div>
                     }
                   </div>
-
                   <div class="nearby-item__body">
                     <h3>{{ nearbyObject.name }}</h3>
                     <p class="nearby-item__location">
                       <mat-icon>location_on</mat-icon>
-                      <span>{{
-                        nearbyObject.address ||
-                          nearbyObject.localityName ||
-                          nearbyObject.destinationName ||
-                          ('common.notAvailable' | translate)
-                      }}</span>
+                      <span>{{ nearbyObject.address || nearbyObject.localityName || nearbyObject.destinationName || ('common.notAvailable' | translate) }}</span>
                     </p>
-                    <p class="nearby-item__rating">
-                      <mat-icon>star</mat-icon>
-                      <span>
-                        {{
-                          nearbyObject.averageRating
-                            ? (nearbyObject.averageRating | number: '1.1-1')
-                            : ('common.new' | translate)
-                        }}
-                        ({{ nearbyObject.reviewCount || 0 }} {{ 'common.reviews' | translate }})
-                      </span>
-                    </p>
+                    @if (nearbyObject.averageRating) {
+                      <p class="nearby-item__rating">
+                        <mat-icon>star</mat-icon>
+                        <span>{{ nearbyObject.averageRating | number:'1.1-1' }} ({{ nearbyObject.reviewCount || 0 }} {{ 'common.reviews' | translate }})</span>
+                      </p>
+                    }
                   </div>
                 </article>
               }
@@ -153,6 +172,7 @@
 
       <!-- DESNA STRANA -->
       <div class="right">
+        <!-- Lokacija -->
         <div class="card">
           <h2>{{ 'common.location' | translate }}</h2>
           <div class="location-image" [attr.data-name]="object.address || object.name || ('common.notAvailable' | translate)">
@@ -161,12 +181,12 @@
               [lng]="object.longitude || 18.771"
               [popupText]="object.name"
               [interactive]="false"
-            >
-            </app-map>
+            ></app-map>
             <button class="map-btn-overlay" (click)="viewOnMap()">{{ 'common.viewOnMap' | translate }}</button>
           </div>
         </div>
 
+        <!-- Kontakt -->
         <div class="section">
           <div class="card contact-card">
             <div class="contact-header">
@@ -193,9 +213,10 @@
                   </p>
                 }
                 @if (object.workingHours) {
-                  <p class="date">
+                  <p class="contact-hours">
                     <mat-icon>access_time</mat-icon>
                     {{ getWorkingHours() }}
+                    <span class="open-tag">{{ 'common.openNow' | translate }}</span>
                   </p>
                   <button class="view-full-hours-btn" (click)="openHoursModal()">
                     {{ 'object.viewFullHours' | translate }}
@@ -209,30 +230,30 @@
                 </a>
               }
             </div>
-            
           </div>
         </div>
+
+        <!-- Cena ulaza -->
         @if (showObjectPriceCard) {
           <div class="section">
             <div class="card">
               <h2>{{ 'common.price' | translate }}</h2>
-              <div class="price-ticket">
-                <div class="price-ticket__icon-wrap">
-                  <mat-icon>local_activity</mat-icon>
+              <div class="price-compact">
+                <div class="price-compact__icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 46 30" fill="none">
+                    <path d="M4 2 H42 Q44 2 44 4 V10 A5 5 0 0 0 44 20 V26 Q44 28 42 28 H4 Q2 28 2 26 V20 A5 5 0 0 0 2 10 V4 Q2 2 4 2 Z" stroke="currentColor" stroke-width="2.2" fill="currentColor" fill-opacity="0.1"/>
+                    <circle cx="14.5" cy="10" r="1.6" fill="currentColor"/>
+                    <circle cx="14.5" cy="15" r="1.6" fill="currentColor"/>
+                    <circle cx="14.5" cy="20" r="1.6" fill="currentColor"/>
+                  </svg>
                 </div>
-                <div class="price-ticket__info">
-                  <span class="price-ticket__label">
-                    @if (usesTicketPricing) {
-                      {{ 'event.standardTicket' | translate }}
-                    } @else {
-                      {{ 'common.admissionFee' | translate }}
-                    }
+                <div class="price-compact__info">
+                  <span class="price-compact__label">
+                    @if (usesTicketPricing) { {{ 'event.standardTicket' | translate }} }
+                    @else { {{ 'common.admissionFee' | translate }} }
                   </span>
-                  <span class="price-ticket__amount">{{ object.price }} €</span>
-                  <span class="price-ticket__per">
-                    <mat-icon>person_outline</mat-icon>
-                    {{ 'common.perPerson' | translate }}
-                  </span>
+                  <span class="price-compact__amount">{{ object.price }} €</span>
+                  <span class="price-compact__per">{{ 'common.perPerson' | translate }}</span>
                 </div>
               </div>
             </div>
@@ -243,61 +264,50 @@
         <div class="card reviews-card">
           <div class="reviews-header">
             <h2>{{ 'common.reviewsTitle' | translate }}</h2>
-            <button class="see-all-btn" (click)="openAllReviews()"> {{ 'common.seeAll' | translate }}</button>
+            <button class="see-all-btn" (click)="openAllReviews()">{{ 'common.seeAll' | translate }}</button>
           </div>
 
           <div class="reviews-list">
-            @for (review of reviews | slice: 0 : 3; track review.id) {
+            @for (review of reviews | slice:0:3; track review.id) {
               <div class="review-item">
                 <div class="review-header">
-                  <span class="review-author">{{ review.userFullName }}</span>
+                  <div class="review-avatar" [style.background]="getAvatarColor(review.userFullName)">
+                    {{ getInitials(review.userFullName) }}
+                  </div>
+                  <div class="review-header-info">
+                    <span class="review-author">{{ review.userFullName }}</span>
+                    <div class="review-rating">
+                      @for (star of [1,2,3,4,5]; track star) {
+                        <mat-icon [class.filled]="star <= (review.rating || 0)">star</mat-icon>
+                      }
+                    </div>
+                  </div>
                   <span class="review-date">{{ formatReviewDate(review.createdAt) }}</span>
                 </div>
-                <div class="review-rating">
-                  @for (star of [1, 2, 3, 4, 5]; track star) {
-                    <mat-icon [class.filled]="star <= (review.rating || 0)">star</mat-icon>
-                  }
-                </div>
                 <p class="review-text">{{ review.text }}</p>
-
                 <div class="review-actions">
                   @if (review.images && review.images.length > 0) {
-                    <button
-                      type="button"
-                      class="review-photos-btn"
-                      (click)="openReviewImages(review)"
-                    >
+                    <button type="button" class="review-photos-btn" (click)="openReviewImages(review)">
                       <mat-icon>photo_library</mat-icon>
                       {{ 'object.viewPhotos' | translate:{ count: review.images.length } }}
                     </button>
                   }
-                
                   @if (userReview?.id === review.id) {
-                    <button
-                      type="button"
-                      class="delete-review-text-btn"
-                      (click)="deleteMyReview()"
-                      [disabled]="isSubmittingReview"
-                    >
-                    {{ 'object.deleteReview' | translate }}
+                    <button type="button" class="delete-review-text-btn" (click)="deleteMyReview()" [disabled]="isSubmittingReview">
+                      {{ 'object.deleteReview' | translate }}
                     </button>
                   }
                 </div>
-
                 @if (review.creatorResponse) {
                   <div class="creator-response">
                     <div class="creator-response-header">
                       <mat-icon>reply</mat-icon>
                       <span>{{ 'object.ownerReply' | translate }}</span>
                       @if (review.creatorResponseAt) {
-                        <span class="response-date">
-                          {{ formatReviewDate(review.creatorResponseAt) }}
-                        </span>
+                        <span class="response-date">{{ formatReviewDate(review.creatorResponseAt) }}</span>
                       }
                     </div>
-                    <p class="creator-response-text">
-                      {{ review.creatorResponse }}
-                    </p>
+                    <p class="creator-response-text">{{ review.creatorResponse }}</p>
                   </div>
                 }
               </div>

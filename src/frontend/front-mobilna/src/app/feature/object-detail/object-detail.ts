@@ -795,6 +795,34 @@ export class ObjectDetailComponent implements OnInit, OnDestroy {
     return Math.round((count / this.reviews.length) * 100);
   }
 
+  getInitials(name: string): string {
+    return (name || '?').split(' ').slice(0, 2).map(n => n[0]?.toUpperCase() || '').join('');
+  }
+
+  getAvatarColor(name: string): string {
+    const colors = ['#168aad', '#22c55e', '#f59e0b', '#8b5cf6', '#ef4444', '#ec4899'];
+    const code = (name || '?').charCodeAt(0) || 0;
+    return colors[code % colors.length];
+  }
+
+  getAmenityIcon(amenity: string): string {
+    const a = amenity.toLowerCase();
+    if (a.includes('edukac') || a.includes('educ') || a.includes('škol')) return 'school';
+    if (a.includes('mor') || a.includes('ribar') || a.includes('aqua') || a.includes('voda')) return 'waves';
+    if (a.includes('turisti') || a.includes('atrakcij') || a.includes('tourist')) return 'photo_camera';
+    if (a.includes('deij') || a.includes('dečij') || a.includes('decu') || a.includes('children') || a.includes('porodic') || a.includes('family')) return 'family_restroom';
+    if (a.includes('restoran') || a.includes('hrana') || a.includes('food') || a.includes('kafic') || a.includes('bar')) return 'restaurant';
+    if (a.includes('parking')) return 'local_parking';
+    if (a.includes('wifi') || a.includes('internet')) return 'wifi';
+    if (a.includes('bazen') || a.includes('pool')) return 'pool';
+    if (a.includes('spa') || a.includes('wellness') || a.includes('masaž')) return 'spa';
+    if (a.includes('sport') || a.includes('fitnes') || a.includes('gym')) return 'fitness_center';
+    if (a.includes('muzej') || a.includes('museum') || a.includes('izložb')) return 'museum';
+    if (a.includes('prodavnic') || a.includes('shop') || a.includes('suvenir')) return 'shopping_bag';
+    if (a.includes('konferencij') || a.includes('sala') || a.includes('event')) return 'event';
+    return 'local_activity';
+  }
+
   openAllReviews(): void {
     this.showAllReviewsModal = true;
     document.body.style.overflow = 'hidden';

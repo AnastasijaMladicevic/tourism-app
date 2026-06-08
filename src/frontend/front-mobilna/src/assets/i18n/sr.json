@@ -1097,12 +1097,15 @@
       "cet": "četvrtak",
       "pet": "petak",
       "sub": "subota",
-      "ned": "nedjelja"
+      "ned": "nedelja"
     },
     "deleteReview": "Obriši",
     "deleteReviewConfirm": "Da li ste sigurni da želite da obrišete recenziju?",
     "deleteReviewSuccess": "Recenzija je uspešno obrisana.",
-    "deleteReviewError": "Recenzija nije obrisana."
+    "deleteReviewError": "Recenzija nije obrisana.",
+    "showAllPhotos": "Prikaži sve fotografije",
+    "openToday": "Otvoreno danas",
+    "viewAllNearby": "Pogledaj obližnje"
   },
   "restaurant": {
     "title": "Restoran",

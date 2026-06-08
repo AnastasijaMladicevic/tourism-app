@@ -126,18 +126,22 @@
         }
         <div class="card">
           <h2>{{ 'event.ticketPrice' | translate }}</h2>
-          @for (ticketType of ticketTypesForDisplay; track ticketType.name + '-' + ticketType.price) {
-            <div class="price-ticket">
-              <div class="price-ticket__icon-wrap">
-                <mat-icon>local_activity</mat-icon>
+          @for (ticketType of ticketTypesForDisplay; track ticketType.name + '-' + ticketType.price; let i = $index) {
+            <div class="ticket-card" [attr.data-idx]="i % 3">
+              <div class="ticket-card__left">
+                <div class="ticket-card__icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 46 30" fill="none">
+                    <path d="M4 2 H42 Q44 2 44 4 V10 A5 5 0 0 0 44 20 V26 Q44 28 42 28 H4 Q2 28 2 26 V20 A5 5 0 0 0 2 10 V4 Q2 2 4 2 Z" stroke="currentColor" stroke-width="2.2" fill="currentColor" fill-opacity="0.1"/>
+                    <circle cx="14.5" cy="10" r="1.6" fill="currentColor"/>
+                    <circle cx="14.5" cy="15" r="1.6" fill="currentColor"/>
+                    <circle cx="14.5" cy="20" r="1.6" fill="currentColor"/>
+                  </svg>
+                </div>
+                <span class="ticket-type">{{ ticketType.name }}</span>
               </div>
-              <div class="price-ticket__info">
-                <span class="price-ticket__label">{{ ticketType.name }}</span>
-                <span class="price-ticket__amount">{{ formatTicketPrice(ticketType.price) }}</span>
-                <span class="price-ticket__per">
-                  <mat-icon>person_outline</mat-icon>
-                  {{ 'event.perTicket' | translate }}
-                </span>
+              <div class="ticket-card__right">
+                <span class="ticket-price">{{ formatTicketPrice(ticketType.price) }}</span>
+                <span class="ticket-per">{{ 'event.perTicket' | translate }}</span>
               </div>
             </div>
           }
