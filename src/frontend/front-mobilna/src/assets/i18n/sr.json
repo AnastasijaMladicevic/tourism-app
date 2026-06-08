@@ -189,8 +189,8 @@
     "noRecommendations": "Nema preporuka za ovu pretragu.",
     "categoriesList": {
       "destination": "Destinacije",
-      "object": "Objekti",
       "locality": "Lokaliteti",
+      "object": "Objekti",
       "activity": "Aktivnosti",
       "event": "Događaji"
     }

@@ -189,8 +189,8 @@
     "noRecommendations": "Nessun consiglio per questa ricerca.",
     "categoriesList": {
       "destination": "Destinazioni",
-      "object": "Oggetti",
       "locality": "Località",
+      "object": "Oggetti",
       "activity": "Attività",
       "event": "Eventi"
     }

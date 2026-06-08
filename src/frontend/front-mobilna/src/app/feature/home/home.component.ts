@@ -128,8 +128,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   searchQuery = '';
   readonly categories: HomeCategory[] = [
     { label: 'Destinations', route: '/destinations', key: 'destination' },
-    { label: 'Objects', route: '/objects', key: 'object' },
     { label: 'Localities', route: '/localities', key: 'locality' },
+    { label: 'Objects', route: '/objects', key: 'object' },
     { label: 'Activities', route: '/activities', key: 'activity' },
     { label: 'Events', route: '/events', key: 'event' },
   ];
