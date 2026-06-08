@@ -331,12 +331,12 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NULL, NOW(), NOW()),
 
 ('Kolašin', 'Kolašin je planinski grad na severu Crne Gore, poznat po svežem vazduhu, prirodi i ski centrima. Okružen je planinama i nacionalnim parkovima, što ga čini odličnim za zimske sportove i letnje avanture. Idealan je za odmor u prirodi tokom cele godine.',
- ST_SetSRID(ST_MakePoint(19.522, 42.822), 4326), 'Approved', true,
+ ST_SetSRID(ST_MakePoint(19.5205, 42.8246), 4326), 'Approved', true,
  (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Grad'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NULL, NOW(), NOW()),
 
 ('Žabljak', 'Žabljak je najviši grad na Balkanu, smešten u srcu Nacionalnog parka Durmitor. Poznat je po Crnom jezeru, planinskim pejzažima i brojnim avanturističkim aktivnostima poput planinarenja i skijanja. Idealan je za ljubitelje prirode i aktivnog odmora tokom cele godine.',
- ST_SetSRID(ST_MakePoint(19.123, 43.155), 4326), 'Approved', true,
+ ST_SetSRID(ST_MakePoint(19.1227, 43.1578), 4326), 'Approved', true,
  (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Grad'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NULL, NOW(), NOW()),
  
@@ -516,7 +516,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
  
 ('Centar Žabljaka', 'Glavna turistička zona Žabljaka',
- ST_SetSRID(ST_MakePoint(19.123, 43.155), 4326), true,
+ ST_SetSRID(ST_MakePoint(19.1202, 43.1559), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Žabljak'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Centar grada'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
@@ -636,7 +636,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
  ('Slovenska plaža', 'Najveća i najpoznatija plaža u Budvi, duga šljunkovito-peščana obala sa bogatim turističkim sadržajem',
- ST_SetSRID(ST_MakePoint(18.840, 42.286), 4326), true,
+ ST_SetSRID(ST_MakePoint(18.8484, 42.2849), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Plaža'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
@@ -708,7 +708,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
  
  ('Centar Andrijevice', 'Centar grada Andrijevice',
- ST_SetSRID(ST_MakePoint(19.787, 42.738), 4326), true,
+ ST_SetSRID(ST_MakePoint(19.7924, 42.7335), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Andrijevica'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Centar grada'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
@@ -798,13 +798,13 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
  
  ('Tvrđava Onogošt', 'Istorijska tvrđava u Nikšiću poznata kao Bedem, mesto održavanja kulturnih i muzičkih događaja.',
- ST_SetSRID(ST_MakePoint(18.9417, 42.7748), 4326), true,
+ ST_SetSRID(ST_MakePoint(18.9415, 42.7751), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Nikšić'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Tvrđava'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
  
  ('Krupačko jezero', 'Poznato izletište i kupalište u blizini Nikšića, omiljeno mesto za festivale, kampovanje i odmor u prirodi.',
- ST_SetSRID(ST_MakePoint(18.892, 42.783), 4326), true,
+ ST_SetSRID(ST_MakePoint(18.9005, 42.8024), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Nikšić'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Prirodni lokalitet'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
@@ -861,7 +861,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
 ('Mogren Beach Bar', 'Bar na plaži', 'Plaža Mogren', '+38233456780', 'https://mogren2.me/en',
- 'https://www.dotyourspot.com/EfQ3u4/', 'Mediteranska i bar food', '{"pon":"08:00-02:00"}', 12.00, ARRAY['Terasa', 'Pogled na more', 'Kokteli', 'Muzika'], ST_SetSRID(ST_MakePoint(18.833, 42.278), 4326), 0, 0, 'Approved', true,
+ 'https://www.dotyourspot.com/EfQ3u4/', 'Mediteranska i bar food', '{"pon":"08:00-02:00"}', 12.00, ARRAY['Terasa', 'Pogled na more', 'Kokteli', 'Muzika'], ST_SetSRID(ST_MakePoint(18.8326, 42.2772), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bar'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Plaža Mogren'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
@@ -917,7 +917,7 @@ VALUES
  ---RESTORANI---
 
  ('Konoba Scala Santa', 'Tradicionalna crnogorska kuhinja u srcu Kotora', 'Trg od Salate, Kotorski zaliv', '+38267393458', NULL,
- NULL, 'Crnogorska kuhinja', '{"pon":"09:00-23:00"}', 25.00, ARRAY['Terasa', 'Tradicionalna kuhinja', 'Rezervacije'], ST_SetSRID(ST_MakePoint(18.772, 42.424), 4326), 0, 0, 'Approved', true,
+ NULL, 'Crnogorska kuhinja', '{"pon":"09:00-23:00"}', 25.00, ARRAY['Terasa', 'Tradicionalna kuhinja', 'Rezervacije'], ST_SetSRID(ST_MakePoint(18.7715, 42.4237), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Restoran'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
@@ -1024,7 +1024,7 @@ VALUES
 
 ('Hotel Palas', 'Porodični hotel na plaži', 'Petrovac na Moru', '+38233421000', 'https://www.hotelpalas.me',
  NULL, NULL, '{"pon":"00:00-24:00"}', 140.00, ARRAY['Plaža', 'Bazen', 'Restoran', 'Parking', 'WiFi'],
- ST_SetSRID(ST_MakePoint(18.942, 42.206), 4326), 0, 0, 'Approved', true,
+ ST_SetSRID(ST_MakePoint(18.9424, 42.2054), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Petrovac'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
@@ -1082,7 +1082,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
 ('Konoba Stari grad', 'Kafana poznata po roštilju i narodnoj muzici', '12 Njegoševa, Budva', '+38233454443', NULL,
- NULL, 'Balkanska kuhinja', '{"pon":"10:00-02:00"}', 17.00, ARRAY['Živa muzika', 'Roštilj', 'Kokteli', 'Bašta'], ST_SetSRID(ST_MakePoint(18.837, 42.278), 4326), 0, 0, 'Approved', true,
+ NULL, 'Balkanska kuhinja', '{"pon":"10:00-02:00"}', 17.00, ARRAY['Živa muzika', 'Roštilj', 'Kokteli', 'Bašta'], ST_SetSRID(ST_MakePoint(18.8373, 42.2781), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Kafana'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Budva'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
@@ -1131,7 +1131,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
  ('Narodna biblioteka Radosav Ljumović', 'Glavna gradska biblioteka u Podgorici sa bogatim fondom knjiga i kulturnim programima', 'Bokeška, Podgorica', '+38220664715', 'http://www.nbpg.me/',
- NULL, NULL, '{"pon":"08:00-20:00"}', NULL, ARRAY['Čitaonica', 'WiFi', 'Događaji', 'Knjige'], ST_SetSRID(ST_MakePoint(19.262, 42.442), 4326), 0, 0, 'Approved', true,
+ NULL, NULL, '{"pon":"08:00-20:00"}', NULL, ARRAY['Čitaonica', 'WiFi', 'Događaji', 'Knjige'], ST_SetSRID(ST_MakePoint(19.2623, 42.4418), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Biblioteka'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Podgorice'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Podgorica'),
@@ -1457,7 +1457,7 @@ VALUES
 
  ('Maximus Club Kotor', 'Najveći noćni klub u Kotoru', 'Stari grad, Kotor', '+38267217101', NULL,
  NULL, NULL, '{"pon":"22:00-04:00"}', NULL, ARRAY['DJ nastupi', 'Koncerti', 'Eventi'],
- ST_SetSRID(ST_MakePoint(18.769, 42.426), 4326), 0, 0, 'Approved', true,
+ ST_SetSRID(ST_MakePoint(18.7690, 42.4257), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Klub'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
@@ -1641,7 +1641,7 @@ VALUES
  
  ('Casper Bar Budva', 'Popularan bar u starom gradu Budve sa opuštenom atmosferom', 'Stari grad bb, Budva', '+38233402290', 'https://www.instagram.com/casper_bar',
  NULL, NULL, '{"pon":"08:00-02:00"}', 8.00, ARRAY['Kafa', 'Kokteli', 'Terasa'],
- ST_SetSRID(ST_MakePoint(18.838, 42.279), 4326), 0, 0, 'Approved', true,
+ ST_SetSRID(ST_MakePoint(18.8385, 42.2782), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Kafić'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Budva'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
@@ -1662,7 +1662,7 @@ VALUES
 ('Kafić Marshall’s Gelato & Coffee', 'Popularan kafić i poslastičarnica poznata po gelatu i kafi', 'Stari grad 359 A, Kotor', '+38267876875', 'http://www.marshallsgelato.com/',
  NULL, 'Kafeterija i slatkiši', '{"pon":"08:00-17:00"}', 8.00,
  ARRAY['WiFi', 'Bašta', 'Deserti', 'Kafa', 'Porodično okruženje'],
- ST_SetSRID(ST_MakePoint(18.771, 42.425), 4326), 0, 0, 'Approved', true,
+ ST_SetSRID(ST_MakePoint(18.7708, 42.4249), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Kafić'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
@@ -1732,7 +1732,7 @@ VALUES
 
  ('Grand Central Cetinje', 'Istorijski kafić u centru Cetinja', '7 Balšića Pazar, Cetinje', '+38267030122', 'https://www.instagram.com/grandcentral__/',
  NULL, NULL, '{"pon":"08:00-23:00"}', 6.00, ARRAY['Kafa', 'Terasa', 'Centar grada'],
- ST_SetSRID(ST_MakePoint(18.924, 42.390), 4326), 0, 0, 'Approved', true,
+ ST_SetSRID(ST_MakePoint(18.9240, 42.3900), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Kafić'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Cetinja'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Cetinje'),
@@ -1779,7 +1779,7 @@ VALUES
  ('Evergreen Jazz Bar', 'Jazz bar sa živom muzikom', 'Kotor Stari grad', NULL, NULL,
  NULL, 'Jazz i kokteli', '{"pon":"18:00-01:00","uto":"18:00-01:00","sre":"18:00-01:00","cet":"18:00-01:00","pet":"18:00-02:00","sub":"18:00-02:00","ned":"00:00-00:00"}', 14.00,
  ARRAY['Živa muzika', 'Kokteli', 'Atmosfera'],
- ST_SetSRID(ST_MakePoint(18.772, 42.425), 4326), 0, 0, 'Approved', true,
+ ST_SetSRID(ST_MakePoint(18.7716, 42.4250), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bar'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
@@ -1790,7 +1790,7 @@ VALUES
  ('Itaka Library Bar', 'Alternativni bar poznat po muzici i atmosferi', 'Bulevar Svetog Petra Cetinjskog, Podgorica', '+38267156650', 'https://instagram.com/itaka_library.bar?utm_medium=copy_link',
  'https://itaka.digitalnimeni.me/', 'Bar i pivo', '{"pon":"10:00-00:00","uto":"10:00-00:00","sre":"10:00-00:00","cet":"10:00-00:00","pet":"10:00-02:00","sub":"10:00-02:00","ned":"00:00-00:00"}', 9.00,
  ARRAY['Pivo', 'Muzika', 'Bašta'],
- ST_SetSRID(ST_MakePoint(19.266, 42.438), 4326), 0, 0, 'Approved', true,
+ ST_SetSRID(ST_MakePoint(19.2664, 42.4376), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bar'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Podgorice'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Podgorica'),
@@ -2029,7 +2029,7 @@ VALUES
 ('Galerija Muzeja savremene umjetnosti Crne Gore', 'Najvažnija institucija savremene umetnosti u Crnoj Gori, sa izložbama domaćih i međunarodnih umetnika', '2 Njegoševa, Podgorica', '+38220665409', 'https://msucg.me/',
  NULL, NULL, '{"pon":"09:00-20:00","uto":"09:00-20:00","sre":"09:00-20:00","cet":"09:00-20:00","pet":"09:00-20:00","sub":"10:00-18:00","ned":"neradno"}', NULL,
  ARRAY['Izložbe', 'Kultura', 'Radionice'],
- ST_SetSRID(ST_MakePoint(19.261, 42.440), 4326), 0, 0, 'Approved', true,
+ ST_SetSRID(ST_MakePoint(19.2611, 42.4396), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Galerija'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Podgorice'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Podgorica'),
@@ -2475,7 +2475,7 @@ VALUES
 
  ('Dvorana Park Herceg Novi', 'Kulturna scena i pozorišne predstave', 'Herceg Novi centar', '+38231322098', 'http://hercegfest.me/',
  NULL, NULL, '{"pon":"10:00-20:00","uto":"10:00-20:00","sre":"10:00-20:00","cet":"10:00-20:00","pet":"10:00-20:00","sub":"19:00-22:00","ned":"neradni dan"}',
- NULL, ARRAY['Drama', 'Film', 'Koncerti'], ST_SetSRID(ST_MakePoint(18.53231, 42.45222), 4326), 0, 0, 'Approved', true,
+ NULL, ARRAY['Drama', 'Film', 'Koncerti'], ST_SetSRID(ST_MakePoint(18.5323, 42.4523), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Pozorište'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Šetalište Pet Danica'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Herceg Novi'),
@@ -2525,7 +2525,7 @@ VALUES
 
 ('Ljetnja Pozornica Tivat', 'Kulturno-pozorišni centar sa savremenim programima', 'Tivat', NULL, 'http://www.czktivat.me/',
  NULL, NULL, '{"pon":"10:00-20:00","uto":"10:00-20:00","sre":"10:00-20:00","cet":"10:00-20:00","pet":"10:00-20:00","sub":"18:00-22:00","ned":"neradni dan"}',
- NULL, ARRAY['Drama', 'Film', 'Festival'], ST_SetSRID(ST_MakePoint(18.69581, 42.43125), 4326), 0, 0, 'Approved', true,
+ NULL, ARRAY['Drama', 'Film', 'Festival'], ST_SetSRID(ST_MakePoint(18.6958, 42.4313), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Pozorište'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Tivta'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Tivat'),
@@ -2825,7 +2825,7 @@ VALUES
  
 ('Promenada Krupac', 'Uređena promenada oko Krupačkog jezera, popularno mesto za šetnju, odmor i organizaciju festivala poput Lake Festa', 'Krupačko jezero, Nikšić', NULL, NULL,
  NULL, NULL, '{"pon":"00:00-23:59","uto":"00:00-23:59","sre":"00:00-23:59","cet":"00:00-23:59","pet":"00:00-23:59","sub":"00:00-23:59","ned":"00:00-23:59"}',
- NULL, ARRAY['Šetnja', 'Priroda', 'Festival', 'Rekreacija'], ST_SetSRID(ST_MakePoint(18.892, 42.783), 4326), 0, 0, 'Approved', true,
+ NULL, ARRAY['Šetnja', 'Priroda', 'Festival', 'Rekreacija'], ST_SetSRID(ST_MakePoint(18.8980, 42.7909), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Sportski centar'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Krupačko jezero'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Nikšić'),
@@ -2960,7 +2960,7 @@ INSERT INTO "Activities"
 ("Name", "Description", "Geolocation", "Price", "DurationMinutes", "IsActive", "ActivityTypeId", "LocalityId", "DestinationId", "ObjectId", "Status", "CreatedByUserId", "CreatedAt", "UpdatedAt")
 VALUES
 ('Degustacija morskih specijaliteta', 'Uživajte u lokalnoj kuhinji Kotora kroz degustaciju svežih ribljih i morskih specijaliteta. Aktivnost je idealna za posetioce koji žele da upoznaju autentične ukuse primorja u prijatnom ambijentu.',
- ST_SetSRID(ST_MakePoint(18.771, 42.424), 4326), 25.00, 90, true,
+ ST_SetSRID(ST_MakePoint(18.7692, 42.4227), 4326), 25.00, 90, true,
  (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Poseta Restoranu'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
@@ -2970,7 +2970,7 @@ VALUES
  NOW(), NOW()),
 
 ('Noćni provod Budva', 'Budva je poznata po živahnom noćnom životu, muzici i provodu do kasnih sati. Ova aktivnost je namenjena svima koji žele opušteno veče uz dobru atmosferu, piće i zabavu pored mora.',
- ST_SetSRID(ST_MakePoint(18.833, 42.278), 4326), 10.00, 240, true,
+ ST_SetSRID(ST_MakePoint(18.8335, 42.2784), 4326), 10.00, 240, true,
  (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Noćni provod'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Plaža Mogren'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
@@ -2980,7 +2980,7 @@ VALUES
  NOW(), NOW()),
 
 ('Planinarenje na Durmitoru', 'Planinarenje na Durmitoru pruža priliku za istraživanje netaknute prirode, planinskih staza i prelepih pejzaža. Aktivnost je idealna za ljubitelje avanture, svežeg vazduha i aktivnog odmora.',
- ST_SetSRID(ST_MakePoint(19.123, 43.149), 4326), 0.00, 300, true,
+ ST_SetSRID(ST_MakePoint(19.1088, 43.2072), 4326), 0.00, 300, true,
  (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Planinarenje'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Crno jezero'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Durmitor'),
@@ -2990,7 +2990,7 @@ VALUES
  NOW(), NOW()),
 
 ('Šetnja starim gradom Kotora', 'Šetnja starim gradom Kotora vodi kroz uske kamene ulice, trgove i istorijske znamenitosti ovog primorskog grada. Savršena je za posetioce koji žele da upoznaju kulturu, arhitekturu i duh Kotora.',
- ST_SetSRID(ST_MakePoint(18.771, 42.424), 4326), 0.00, 120, true,
+ ST_SetSRID(ST_MakePoint(18.7700, 42.4254), 4326), 0.00, 120, true,
  (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Razgledanje'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
@@ -3000,7 +3000,7 @@ VALUES
  NOW(), NOW()),
  
  ('Vožnja čamcem Skadarsko jezero', 'Vožnja čamcem po Skadarskom jezeru omogućava uživanje u mirnoj vodi, prirodi i bogatom biljnom i životinjskom svetu. Aktivnost je odlična za opuštanje, fotografisanje i doživljaj jezera iz drugačije perspektive.',
- ST_SetSRID(ST_MakePoint(19.091, 42.246), 4326), 15.00, 120, true,
+ ST_SetSRID(ST_MakePoint(19.0958, 42.2461), 4326), 15.00, 120, true,
  (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Vožnja čamcem'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Virpazar'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Skadarsko jezero'),
@@ -3045,7 +3045,7 @@ INSERT INTO "Events"
 ("Name", "Description", "Geolocation", "StartDate", "EndDate", "Price", "MaxVisitors", "IsActive", "Status", "EventTypeId", "LocalityId", "DestinationId", "ObjectId", "CreatedByUserId", "CreatedAt", "UpdatedAt")
 VALUES
 ('KotorArt festival', 'KotorArt festival predstavlja jedinstven spoj muzike, umetnosti i kulturnog nasleđa u prelepom ambijentu Kotora. Tokom trajanja festivala, posetioci mogu uživati u raznovrsnom programu koji obuhvata koncerte, umetničke performanse i sadržaje inspirisane bogatom tradicijom ovog primorskog grada. Događaj okuplja ljubitelje kulture, domaće i strane goste, stvarajući živu i inspirativnu atmosferu. Poseban doživljaj pruža spoj savremene umetnosti i istorijskog okruženja, gde svaka večer donosi novo iskustvo i priliku za uživanje u kreativnom izrazu. Festival je idealan za sve koji žele da leto provedu u znaku kulture, dobrog raspoloženja i nezaboravnih trenutaka u jednom od najlepših gradova na Jadranu.',
- ST_SetSRID(ST_MakePoint(18.771, 42.424), 4326), '2026-07-15 20:00', '2026-07-30 23:00', 20.00, 1000, true, 'Approved',
+ ST_SetSRID(ST_MakePoint(18.7703, 42.4248), 4326), '2026-07-15 20:00', '2026-07-30 23:00', 20.00, 1000, true, 'Approved',
  (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Festival'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
@@ -3054,7 +3054,7 @@ VALUES
  NOW(), NOW()),
 
 ('Veče klasične muzike', 'U čarobnoj atmosferi starog grada Kotora, ovo veče klasične muzike nudi jedinstven spoj umetnosti i istorije. Program obuhvata pažljivo odabrane kompozicije koje izvode talentovani muzičari, stvarajući intimnu i sofisticiranu atmosferu. Idealno za sve ljubitelje kulture, muzike i romantičnih večeri pod otvorenim nebom. Autentični ambijent kamenih trgova i osvetljenih uličica dodatno pojačava doživljaj, pretvarajući svaki ton u posebno emotivno iskustvo. Posetioci će imati priliku da se prepuste zvucima klasične muzike dok uživaju u jedinstvenom spoju tradicije i umetnosti. Ovaj događaj pruža savršenu priliku za opuštanje, inspiraciju i stvaranje nezaboravnih uspomena u jednom od najlepših primorskih gradova.',
- ST_SetSRID(ST_MakePoint(18.771, 42.424), 4326), '2026-08-05 21:00', '2026-08-05 23:00', 15.00, 200, true, 'Approved',
+ ST_SetSRID(ST_MakePoint(18.7708, 42.4247), 4326), '2026-08-05 21:00', '2026-08-05 23:00', 15.00, 200, true, 'Approved',
  (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Koncert'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
@@ -3063,16 +3063,16 @@ VALUES
  NOW(), NOW()),
 
 ('Budva Summer Festival', 'Budva Summer Festival donosi energičan i raznovrstan letnji program namenjen svima koji žele da uživaju u muzici, zabavi i prijatnoj atmosferi na otvorenom. Festival okuplja veliki broj posetilaca i nudi sadržaje koji spajaju savremenu zabavu sa prepoznatljivim mediteranskim duhom Budve. Tokom više festivalskih dana, grad postaje mesto susreta dobre muzike, opuštanja i letnjih uspomena. Uz atraktivan ambijent i bogat program, posetioci imaju priliku da provedu nezaboravne večeri u društvu prijatelja i porodice. Ovaj događaj je savršen izbor za sve koji žele da iskuse letnju energiju Budve, uživaju u kvalitetnom programu i provedu vreme u jednoj od najpoznatijih turističkih destinacija na crnogorskom primorju.',
- ST_SetSRID(ST_MakePoint(18.837, 42.279), 4326), '2026-07-01 19:00', '2026-07-10 23:00', 10.00, 1500, true, 'Approved',
+ ST_SetSRID(ST_MakePoint(18.8366, 42.2785), 4326), '2026-07-01 19:00', '2026-07-10 23:00', 10.00, 1500, true, 'Approved',
  (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Festival'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Budva'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Budva'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Avala'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  NOW(), NOW()),
 
 ('DJ Night Mogren', 'DJ Night Mogren je večernji događaj namenjen ljubiteljima elektronske muzike, plesa i letnje atmosfere pored mora. Smešten u atraktivnom ambijentu plaže Mogren, ovaj događaj okuplja posetioce koji žele da uživaju u modernim ritmovima, dobroj energiji i nezaboravnom noćnom provodu. Spoj muzike, mora i letnje večeri stvara poseban ambijent koji privlači kako turiste tako i lokalne posetioce. Uz dinamičan program i opuštenu atmosferu, događaj pruža savršenu priliku za druženje, zabavu i uživanje u jedinstvenom noćnom iskustvu na obali. DJ Night Mogren je idealan za sve koji žele da dožive živopisnu letnju scenu Budve i provedu noć ispunjenu muzikom, plesom i odličnim raspoloženjem.',
- ST_SetSRID(ST_MakePoint(18.833, 42.278), 4326), '2026-08-10 22:00', '2026-08-11 03:00', 8.00, 500, true, 'Approved',
+ ST_SetSRID(ST_MakePoint(18.8316, 42.2770), 4326), '2026-08-10 22:00', '2026-08-11 03:00', 8.00, 500, true, 'Approved',
  (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Nastup'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Plaža Mogren'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
@@ -3081,7 +3081,7 @@ VALUES
  NOW(), NOW()),
 
 ('Planinarski susret', 'Planinarski susret na Durmitoru predstavlja idealnu priliku za sve ljubitelje prirode, pešačenja i boravka na svežem planinskom vazduhu. Događaj okuplja planinare, rekreativce i avanturiste koji žele da provedu dan u druženju, istraživanju prirodnih lepota i uživanju u spektakularnim pejzažima jednog od najlepših planinskih predela. Program je osmišljen tako da spoji aktivan odmor, rekreaciju i zajedničko uživanje u prirodi. Pored same šetnje i okupljanja, učesnici imaju priliku da upoznaju druge zaljubljenike u planinu i provedu vreme u prijatnoj i opuštenoj atmosferi. Ovaj događaj pruža savršen beg od svakodnevice i mogućnost da se doživi mir, lepota i autentičan duh Durmitora kroz aktivan i ispunjen dan u prirodi.',
- ST_SetSRID(ST_MakePoint(19.123, 43.149), 4326), '2026-09-01 08:00', '2026-09-01 18:00', 5.00, 100, true, 'Approved',
+ ST_SetSRID(ST_MakePoint(19.1110, 43.1563), 4326), '2026-09-01 08:00', '2026-09-01 18:00', 5.00, 100, true, 'Approved',
  (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Okupljanje'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Žabljak'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Durmitor'),
@@ -3099,7 +3099,7 @@ VALUES
  NOW(), NOW()),
  
 ('Herceg Novi Film Festival', 'Herceg Novi Film Festival okuplja ljubitelje filmske umetnosti iz zemlje i inostranstva. Program obuhvata projekcije igranih, dokumentarnih i autorskih filmova. Poseban doživljaj pružaju projekcije na otvorenom uz more.',
- ST_SetSRID(ST_MakePoint(18.53231, 42.45222), 4326), '2026-08-22 20:00', '2026-08-28 23:30', 8.00, 500, true, 'Approved',
+ ST_SetSRID(ST_MakePoint(18.5325, 42.4524), 4326), '2026-08-22 20:00', '2026-08-28 23:30', 8.00, 500, true, 'Approved',
  (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Festival'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Šetalište Pet Danica'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Herceg Novi'),
@@ -3108,7 +3108,7 @@ VALUES
  NOW(), NOW()),
 
 ('Durmitor Trail Run', 'Durmitor Trail Run je planinska trka koja vodi kroz najlepše predele Nacionalnog parka Durmitor. Učesnici prolaze kroz šume, planinske staze i oko jezera. Događaj privlači sportiste i avanturiste iz celog sveta.',
- ST_SetSRID(ST_MakePoint(19.091, 43.146), 4326), '2026-07-10 08:00', '2026-07-12 18:00', 25.00, 600, true, 'Approved',
+ ST_SetSRID(ST_MakePoint(19.0963, 43.1432), 4326), '2026-07-10 08:00', '2026-07-12 18:00', 25.00, 600, true, 'Approved',
  (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Takmičenje'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Crno jezero'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Durmitor'),
@@ -3117,7 +3117,7 @@ VALUES
  NOW(), NOW()),
 
 ('Wild Beauty Art Festival', 'Wild Beauty Art Festival spaja umetnost, prirodu i muziku u jedinstvenom ambijentu Durmitora. Tokom festivala organizuju se koncerti, performansi i umetničke instalacije. Poseban akcenat stavlja se na očuvanje prirode i ekološku svest.',
- ST_SetSRID(ST_MakePoint(19.091, 43.146), 4326), '2026-07-05 20:00', '2026-08-11 23:00', 10.00, 300, true, 'Approved',
+ ST_SetSRID(ST_MakePoint(19.0908, 43.1492), 4326), '2026-07-05 20:00', '2026-08-11 23:00', 10.00, 300, true, 'Approved',
  (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Festival'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Crno jezero'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Durmitor'),
@@ -3162,7 +3162,7 @@ VALUES
  NOW(), NOW()),
  
 ('Lake Fest 2026', 'Lake Fest je jedan od najvećih crnogorskih muzičkih festivala, poznat po rok i alternativnoj muzici, kampovanju i atmosferi pored Krupačkog jezera kod Nikšića. Festival okuplja ljubitelje muzike iz regiona i pruža višednevni program koncerata na otvorenom.',
- ST_SetSRID(ST_MakePoint(18.892, 42.783), 4326),  '2026-08-07 20:00',  '2026-08-09 23:30',  20.00,  2000,  true,  'Approved',
+ ST_SetSRID(ST_MakePoint(18.8998, 42.7914), 4326),  '2026-08-07 20:00',  '2026-08-09 23:30',  20.00,  2000,  true,  'Approved',
  (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Festival'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Krupačko jezero'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Nikšić'),
@@ -12647,7 +12647,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'lorenzo.creator@spirego.com'),
  NOW(), NOW()),
 ('Belgrade Coffee and Jazz Night', 'Manji večernji program sa jazz nastupom i toplijom lounge atmosferom, namenjen gostima koji vole centar grada i laganiji izlazak. Uslovljen je sedećim formatom i nije preglasan, pa dobro odgovara i turistima koji sutradan nastavljaju obilazak.',
- ST_SetSRID(ST_MakePoint(20.4612, 44.8134), 4326), '2026-11-05 18:00', '2026-11-05 23:00', 9.00, 220, true, 'Approved',
+ ST_SetSRID(ST_MakePoint(20.4605, 44.8130), 4326), '2026-11-05 18:00', '2026-11-05 23:00', 9.00, 220, true, 'Approved',
  (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Nastup'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Terazije Beograd'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Beograd'),
@@ -15233,7 +15233,7 @@ NULL,
 '{"pon":"zatvoreno","uto":"09:00-20:00","sre":"09:00-20:00","cet":"09:00-20:00","pet":"09:00-20:00","sub":"09:00-20:00","ned":"09:00-20:00"}',
 500,
 ARRAY['Književne večeri', 'Izložbe', 'Kulturni program'],
-ST_SetSRID(ST_MakePoint(20.4643, 44.8176), 4326),
+ST_SetSRID(ST_MakePoint(20.46431, 44.81759), 4326),
 0, 0,
 'Approved', true,
 (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Muzej'),
@@ -19653,7 +19653,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
 ('Restoran Salaš Kopaonik', 'Planinski restoran poznat po domaćoj kuhinji, toploj atmosferi i lokalnim specijalitetima.', 'Nikole Tesle 8', '+38164222333', 'https://salaskopaonik.rs/',
- 'https://salaskopaonik.rs/meni', 'Tradicionalna srpska kuhinja', '{"pon":"09:00-23:00","uto":"09:00-23:00","sre":"09:00-23:00","cet":"09:00-23:00","pet":"09:00-00:00","sub":"09:00-00:00","ned":"09:00-22:00"}', 22.00, ARRAY['Terasa', 'Parking', 'Domaća kuhinja'], ST_SetSRID(ST_MakePoint(20.8114, 43.2844), 4326), 0, 0, 'Approved', true,
+ 'https://salaskopaonik.rs/meni', 'Tradicionalna srpska kuhinja', '{"pon":"09:00-23:00","uto":"09:00-23:00","sre":"09:00-23:00","cet":"09:00-23:00","pet":"09:00-00:00","sub":"09:00-00:00","ned":"09:00-22:00"}', 22.00, ARRAY['Terasa', 'Parking', 'Domaća kuhinja'], ST_SetSRID(ST_MakePoint(20.81141, 43.28442), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Restoran'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Konaci'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kopaonik'),
