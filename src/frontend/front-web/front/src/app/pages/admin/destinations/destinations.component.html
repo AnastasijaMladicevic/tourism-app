@@ -83,7 +83,6 @@
         <article *ngFor="let insight of insightCards" class="kpi-card" [ngClass]="insight.cardClass">
           <div class="kpi-top">
             <span class="kpi-icon material-symbols-outlined">{{ insight.icon }}</span>
-            <span class="kpi-pill">{{ insight.pill }}</span>
           </div>
           <p class="kpi-label">{{ insight.label }}</p>
           <p class="kpi-value">{{ insight.value }}</p>

@@ -313,7 +313,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
         window.dispatchEvent(new Event('storage'));
       },
       error: (err) => {
-        this.saveError = err?.error?.message?.trim() || this.t('adminProfile.saveError');
+        this.saveError = this.translateApiMessage(err?.error?.message, 'adminProfile.saveError');
       },
     }).add(() => {
       this.isSaving = false;

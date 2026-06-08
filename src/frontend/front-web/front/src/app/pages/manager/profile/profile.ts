@@ -419,7 +419,7 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
   }
 
   get selectedCountryLabel(): string {
-    return this.user.country?.trim() || '';
+    return this.countryLabel(this.user.country?.trim() || '');
   }
 
   toggleCountryMenu(event: Event): void {
@@ -431,6 +431,20 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
     event.stopPropagation();
     this.user.country = country;
     this.countryMenuOpen = false;
+  }
+
+  countryLabel(country: string): string {
+    if (!country?.trim()) {
+      return '';
+    }
+
+    const key = country
+      .replace(/[()]/g, '')
+      .replace(/\s+/g, '')
+      .replace(/[^A-Za-z]/g, '');
+    const translationKey = `adminTeamMemberCreate.countries.${key}`;
+    const translated = this.translationService.translate(translationKey);
+    return translated === translationKey ? country : translated;
   }
 
   @HostListener('document:click', ['$event'])
