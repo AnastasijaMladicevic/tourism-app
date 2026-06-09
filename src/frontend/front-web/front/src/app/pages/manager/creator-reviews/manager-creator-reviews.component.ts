@@ -581,6 +581,7 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
             seen.add(review.id);
             merged.push({
               ...review,
+              objectId: review.objectId && review.objectId > 0 ? review.objectId : detail.id,
               objectName: review.objectName?.trim() || detail.name?.trim() || '',
             });
           }

@@ -1,7 +1,7 @@
 import { ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { PaginatorComponent } from '../../../shared/components/paginator/paginator';
 import { Subject, of } from 'rxjs';
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
@@ -55,6 +55,8 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
   readonly translationService = inject(TranslationService);
+  private readonly route = inject(ActivatedRoute);
+  private targetObjectIdFromRoute: number | null = null;
 
   private static readonly DEFAULT_BANNER_URL = '/assets/pozadina.png';
 
@@ -116,6 +118,12 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
   typeOptions: FilterOption[] = [];
 
   ngOnInit(): void {
+    const objectIdParam = this.route.snapshot.queryParamMap.get('objectId');
+    const parsedObjectId = Number(objectIdParam);
+  
+    this.targetObjectIdFromRoute =
+      Number.isFinite(parsedObjectId) && parsedObjectId > 0 ? parsedObjectId : null;
+
     this.loadManagedCityLabel();
     this.loadFilterOptions();
     this.loadObjects();
@@ -154,6 +162,10 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
       });
   }
 
+  private idsMatch(left: number | string | null | undefined, right: number | string | null | undefined): boolean {
+    return Number(left) === Number(right);
+  }
+
   loadObjects(): void {
     this.isLoading = true;
     this.errorMessage = '';
@@ -180,12 +192,48 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
           this.pageSize = response?.pageSize ?? this.pageSize;
           this.totalPages = response?.totalPages ?? Math.max(1, Math.ceil(this.totalCount / this.pageSize));
 
+          const objectFromRoute =
+            this.targetObjectIdFromRoute != null
+              ? sorted.find((item) => this.idsMatch(item.id, this.targetObjectIdFromRoute)) ?? null
+              : null;
+
+          if (objectFromRoute) {
+            this.setSelectedObject(objectFromRoute);
+            this.loadSelectedObjectReviews();
+            this.isLoading = false;
+            this.cdr.detectChanges();
+            return;
+          }
+
+          if (this.targetObjectIdFromRoute != null) {
+            this.objectService
+              .getById(this.targetObjectIdFromRoute)
+              .pipe(
+                takeUntil(this.destroy$),
+                catchError(() => of(null))
+              )
+              .subscribe((objectFromApi) => {
+                const nextSelected =
+                  objectFromApi ??
+                  (!this.selectedObject || !sorted.some((item) => this.idsMatch(item.id, this.selectedObject?.id))
+                    ? sorted[0] ?? null
+                    : this.selectedObject);
+
+                this.setSelectedObject(nextSelected);
+                this.loadSelectedObjectReviews();
+                this.isLoading = false;
+                this.cdr.detectChanges();
+              });
+
+            return;
+          }
+
           const nextSelected =
-            !this.selectedObject || !sorted.some((item) => item.id === this.selectedObject?.id)
+            !this.selectedObject || !sorted.some((item) => this.idsMatch(item.id, this.selectedObject?.id))
               ? sorted[0] ?? null
               : this.selectedObject;
-          this.setSelectedObject(nextSelected);
 
+          this.setSelectedObject(nextSelected);
           this.loadSelectedObjectReviews();
           this.isLoading = false;
           this.cdr.detectChanges();
