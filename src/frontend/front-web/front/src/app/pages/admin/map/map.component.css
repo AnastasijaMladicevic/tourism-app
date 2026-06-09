@@ -480,19 +480,21 @@ app-admin-platform-map.admin-platform-map--full :is(.leaflet-container, .leaflet
   }
 
   .map-controls {
-    top: auto;
-    bottom: 24px;
+    top: 40%;
+    bottom: auto;
     right: 12px;
-    transform: none;
+    transform: translateY(-50%);
   }
 
   .bottom-card.bottom-card--anchored {
-    left: 12px !important;
-    right: 12px !important;
+    left: 50% !important;
+    right: auto !important;
     top: auto !important;
     bottom: 72px !important;
-    width: auto !important;
-    max-width: none;
+    width: 280px !important;
+    max-width: calc(100% - 24px);
+    transform: translateX(-50%);
+    border-radius: 20px;
   }
 
   .bottom-card__image-wrap {
