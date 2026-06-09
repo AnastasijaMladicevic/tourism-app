@@ -75,22 +75,9 @@ export class MapComponent implements OnInit, OnDestroy {
   readonly mapFocusRegion = !history.state?.lat || !history.state?.lng;
 
   private readonly navState = history.state;
-  private markerJustClicked = false;
-  private readonly mapClickHandler = () => {
-    if (this.markerJustClicked) {
-      return;
-    }
-    this.closeCard();
-  };
-  private readonly mapMoveHandler = () => {
-    if (window.innerWidth > 900) {
-      this.updateCardPosition();
-    }
-  };
+  private readonly mapClickHandler = () => this.closeCard();
+  private readonly mapMoveHandler = () => this.updateCardPosition();
   private readonly markerClickHandler = (event: Event) => {
-    this.markerJustClicked = true;
-    setTimeout(() => { this.markerJustClicked = false; }, 350);
-
     const customEvent = event as CustomEvent<{ data: AdminMapDestination }>;
 
     this.ngZone.run(() => {
@@ -152,9 +139,7 @@ export class MapComponent implements OnInit, OnDestroy {
 
   @HostListener('window:resize')
   onWindowResize(): void {
-    if (window.innerWidth > 900) {
-      this.scheduleCardPresentation();
-    }
+    this.scheduleCardPresentation();
   }
 
   onSearchInput(): void {
@@ -374,19 +359,7 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   private presentCardForSelection(): void {
-    if (!this.selectedItem) {
-      return;
-    }
-
-    if (window.innerWidth <= 900) {
-      this.ngZone.run(() => {
-        this.isCardVisible = true;
-        this.cdr.detectChanges();
-      });
-      return;
-    }
-
-    if (!this.mapPageRef) {
+    if (!this.selectedItem || !this.mapPageRef) {
       return;
     }
 

@@ -1982,3 +1982,68 @@ th {
     margin: 0 1px;
   }
 }
+
+
+@media (max-width: 640px) {
+  #users-panel-tourists .table-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  #users-panel-tourists .table-search {
+    flex: 1 1 100%;
+    width: 100%;
+    min-width: 0;
+  }
+
+  #users-panel-tourists .table-filter-select {
+    min-width: 0;
+  }
+
+  #users-panel-tourists .table-filter-select:nth-of-type(1),
+  #users-panel-tourists .table-filter-select:nth-of-type(2) {
+    flex: 1 1 calc(50% - 5px);
+  }
+
+  #users-panel-tourists .table-date-range {
+    flex: 1 1 100%;
+    min-width: 0;
+    height: 34px;
+    padding: 0 8px;
+    gap: 4px;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+
+  #users-panel-tourists .table-date-input {
+    flex: 1 1 0;
+    width: 0;
+    min-width: 0;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #111827;
+    font-size: 10px;
+    letter-spacing: -0.5px;
+    cursor: pointer;
+    appearance: auto;
+    -webkit-appearance: auto;
+  }
+
+  #users-panel-tourists .table-date-input::-webkit-calendar-picker-indicator {
+    width: 12px;
+    height: 12px;
+    padding: 0;
+    margin-left: -2px;
+    cursor: pointer;
+  }
+
+  #users-panel-tourists .table-date-sep {
+    flex: 0 0 auto;
+    font-size: 10px;
+    color: #9ca3af;
+    margin: 0 1px;
+  }
+}

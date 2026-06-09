@@ -837,7 +837,7 @@ tbody tr:hover,
     display: flex;
     flex-direction: column;
     gap: 10px;
-    padding: 5px 5px 0;
+    padding: 12px 12px;
     box-sizing: border-box;
   }
 
@@ -1194,7 +1194,7 @@ tbody tr:hover,
       display: flex !important;
       flex-direction: column !important;
       gap: 10px !important;
-      padding: 5px 5px 0 !important;
+      padding: 12px 12px !important;
       box-sizing: border-box !important;
     }
   
@@ -1241,7 +1241,7 @@ tbody tr:hover,
     }
   
     .manager-list-page .activities-mobile-list {
-      padding: 10px 10px 0 !important;
+      padding: 12px 12px !important;
       box-sizing: border-box !important;
     }
   }

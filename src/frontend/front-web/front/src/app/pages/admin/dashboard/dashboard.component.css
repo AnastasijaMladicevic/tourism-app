@@ -95,7 +95,7 @@
 
 .kpi-row {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 12px;
 }
 
@@ -793,6 +793,10 @@
 }
 
 @media (max-width: 1240px) {
+  .kpi-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .top-grid,
   .middle-grid,
   .bottom-grid {
@@ -828,6 +832,7 @@
     padding: 16px;
   }
 
+  .kpi-row,
   .visit-summary,
   .geo-summary {
     grid-template-columns: 1fr;
@@ -850,5 +855,44 @@
     padding-left: 24px;
     gap: 8px;
     font-size: 10px;
+  }
+}
+
+@media (max-width: 920px) {
+  .admin-dashboard .kpi-row {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    gap: 12px !important;
+  }
+
+  .admin-dashboard .kpi-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    flex: 0 0 auto !important;
+    box-sizing: border-box !important;
+  }
+
+  .admin-dashboard .section-head {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 6px !important;
+  }
+
+  .admin-dashboard .section-head > div {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .admin-dashboard .section-head p {
+    width: 100% !important;
+    max-width: 100% !important;
+    white-space: normal !important;
+  }
+
+  .admin-dashboard .section-link {
+    align-self: flex-start !important;
   }
 }
