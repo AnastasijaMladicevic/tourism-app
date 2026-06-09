@@ -430,7 +430,10 @@
             </div>
 
             <div class="modal-forgot-row">
-              <button class="modal-forgot-link" type="button" (click)="startForgotFlow()" [disabled]="passwordLoading">
+              <button class="modal-forgot-link" type="button" (click)="startForgotFlow()" [disabled]="forgotFlowLoading || passwordLoading">
+                @if (forgotFlowLoading) {
+                  <span class="spinner spinner--blue" aria-hidden="true"></span>
+                }
                 {{ 'adminProfile.forgotPasswordLink' | translate }}
               </button>
             </div>

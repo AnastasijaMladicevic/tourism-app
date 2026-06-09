@@ -101,6 +101,7 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
   get otpCode(): string { return this.otpDigits.join(''); }
   otpSecondsRemaining = 0;
   otpResendSecondsRemaining = 0;
+  forgotFlowLoading = false;
   languageMenuOpen = false;
   countryMenuOpen = false;
 
@@ -336,6 +337,7 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
     this.passwordError = '';
     this.passwordSuccess = false;
     this.passwordLoading = false;
+    this.forgotFlowLoading = false;
     this.currentPassword = '';
     this.newPassword = '';
     this.confirmNewPassword = '';
@@ -409,6 +411,7 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
       this.otpResendSecondsRemaining = 0;
       this.forgotResetSessionToken = '';
       this.passwordSuccess = false;
+      this.forgotFlowLoading = false;
       this.releaseBodyScrollIfNoModal();
       this.passwordModalCloseTimerId = null;
     }, 220);
@@ -530,27 +533,27 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
   }
 
   startForgotFlow(): void {
-    if (this.passwordLoading) return;
+    if (this.forgotFlowLoading || this.passwordLoading) return;
 
     if (!this.user.email) {
       this.passwordError = 'Email address is not available for this account.';
       return;
     }
 
-    this.passwordLoading = true;
     this.passwordError = '';
+    this.passwordChangeMode = 'forgot-otp';
+    this.otpDigits = Array(6).fill('');
+    this.forgotFlowLoading = true;
+    this.startOtpCountdown();
     this.cdr.detectChanges();
 
-    this.authService.forgotPassword(this.user.email).pipe(timeout(15000)).subscribe({
+    this.authService.forgotPassword(this.user.email).pipe(timeout(10000)).subscribe({
       next: () => {
-        this.passwordLoading = false;
-        this.passwordChangeMode = 'forgot-otp';
-        this.otpDigits = Array(6).fill('');
-        this.startOtpCountdown();
+        this.forgotFlowLoading = false;
         this.cdr.detectChanges();
       },
       error: (err) => {
-        this.passwordLoading = false;
+        this.forgotFlowLoading = false;
         this.passwordError = err?.name === 'TimeoutError'
           ? 'Request timed out. Check your connection and try again.'
           : (err?.error?.message ?? 'Unable to send a verification code right now.');
@@ -641,13 +644,13 @@ export class ProfileComponentManager implements OnInit, OnDestroy {
   }
 
   resendForgotCode(): void {
-    if (this.passwordLoading || this.otpResendSecondsRemaining > 0) return;
+    if (this.forgotFlowLoading || this.passwordLoading || this.otpResendSecondsRemaining > 0) return;
     this.startForgotFlow();
   }
 
   backToDirectMode(): void {
-    if (this.passwordLoading) return;
-
+    if (this.passwordLoading || this.forgotFlowLoading) return;
+    this.forgotFlowLoading = false;
     this.passwordChangeMode = 'direct';
     this.passwordError = '';
     this.otpDigits = Array(6).fill('');

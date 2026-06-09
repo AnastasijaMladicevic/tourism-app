@@ -1574,7 +1574,15 @@
   padding: 0 24px 24px;
 }
 
+.spinner--blue {
+  border-color: rgba(37, 99, 235, 0.25);
+  border-top-color: #2563eb;
+}
+
 .modal-forgot-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   background: none;
   border: none;
   padding: 0;
