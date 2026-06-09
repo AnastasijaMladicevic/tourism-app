@@ -4358,12 +4358,17 @@
     },
     "code": {
       "title": "Proverite email",
-      "subtitle": "Unesite 6-cifreni kod poslan na",
+      "codeSentTo": "Verifikacioni kod je poslat na",
+      "enterSixDigit": "Unesite šestocifreni kod.",
+      "codeSentNotice": "Kod je poslat na vaš email.",
+      "codeExpires": "Kod ističe za",
       "codeLabel": "Verifikacioni kod",
       "codeError": "Unesite važeći 6-cifreni kod.",
       "verifying": "Verifikacija...",
       "verifyCode": "Verifikuj kod",
-      "changeEmail": "Promeni email"
+      "changeEmail": "Promeni email",
+      "resendIn": "Pošalji ponovo za",
+      "resendCode": "Pošalji ponovo"
     },
     "password": {
       "title": "Postavite novu lozinku",

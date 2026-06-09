@@ -4572,12 +4572,17 @@
     },
     "code": {
       "title": "Check your email",
-      "subtitle": "Enter the 6-digit code sent to",
+      "codeSentTo": "Verification code has been sent to",
+      "enterSixDigit": "Enter the six-digit code.",
+      "codeSentNotice": "Code has been sent to your email.",
+      "codeExpires": "Code expires in",
       "codeLabel": "Verification code",
       "codeError": "Enter a valid 6-digit code.",
       "verifying": "Verifying...",
       "verifyCode": "Verify code",
-      "changeEmail": "Change email"
+      "changeEmail": "Change email",
+      "resendIn": "Resend in",
+      "resendCode": "Resend"
     },
     "password": {
       "title": "Set new password",

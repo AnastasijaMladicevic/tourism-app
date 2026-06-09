@@ -4545,12 +4545,17 @@
     },
     "code": {
       "title": "Revisa tu correo",
-      "subtitle": "Introduce el código de 6 dígitos enviado a",
+      "codeSentTo": "El código de verificación fue enviado a",
+      "enterSixDigit": "Introduce el código de seis dígitos.",
+      "codeSentNotice": "Se envió el código a tu correo.",
+      "codeExpires": "El código expira en",
       "codeLabel": "Código de verificación",
       "codeError": "Introduce un código de 6 dígitos válido.",
       "verifying": "Verificando...",
       "verifyCode": "Verificar código",
-      "changeEmail": "Cambiar correo"
+      "changeEmail": "Cambiar correo",
+      "resendIn": "Reenviar en",
+      "resendCode": "Reenviar"
     },
     "password": {
       "title": "Establecer nueva contraseña",

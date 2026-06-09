@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectorRef, Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnDestroy, QueryList, ViewChildren, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { finalize } from 'rxjs';
@@ -16,7 +16,9 @@ type ForgotPasswordStep = 'email' | 'code' | 'password' | 'success';
   templateUrl: './forgot-password.html',
   styleUrl: './forgot-password.css',
 })
-export class ForgotPasswordComponent {
+export class ForgotPasswordComponent implements OnDestroy {
+  @ViewChildren('digitInput') digitInputs!: QueryList<ElementRef<HTMLInputElement>>;
+
   private readonly fb = inject(FormBuilder);
   private readonly authService = inject(AuthService);
   private readonly router = inject(Router);
@@ -47,6 +49,12 @@ export class ForgotPasswordComponent {
   private resetCode = '';
   private resetSessionToken = '';
 
+  readonly digitIndexes = [0, 1, 2, 3, 4, 5];
+  codeDigits: string[] = ['', '', '', '', '', ''];
+  resendCountdown = 30;
+  canResend = false;
+  private countdownInterval: ReturnType<typeof setInterval> | undefined;
+
   get email() {
     return this.emailForm.get('email');
   }
@@ -61,6 +69,102 @@ export class ForgotPasswordComponent {
 
   get confirmPassword() {
     return this.passwordForm.get('confirmPassword');
+  }
+
+  get resendCountdownFormatted(): string {
+    const m = Math.floor(this.resendCountdown / 60).toString().padStart(2, '0');
+    const s = (this.resendCountdown % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  }
+
+  onDigitInput(index: number, event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const digit = input.value.replace(/\D/g, '').slice(-1);
+    this.codeDigits[index] = digit;
+    input.value = digit;
+
+    this.codeForm.get('code')?.setValue(this.codeDigits.join(''));
+
+    if (digit && index < 5) {
+      const inputs = this.digitInputs.toArray();
+      inputs[index + 1]?.nativeElement.focus();
+    }
+  }
+
+  onDigitKeydown(index: number, event: KeyboardEvent): void {
+    if (event.key === 'Backspace') {
+      if (!this.codeDigits[index] && index > 0) {
+        this.codeDigits[index - 1] = '';
+        this.codeForm.get('code')?.setValue(this.codeDigits.join(''));
+        const inputs = this.digitInputs.toArray();
+        inputs[index - 1]?.nativeElement.focus();
+      } else {
+        this.codeDigits[index] = '';
+        this.codeForm.get('code')?.setValue(this.codeDigits.join(''));
+      }
+    } else if (event.key === 'ArrowLeft' && index > 0) {
+      const inputs = this.digitInputs.toArray();
+      inputs[index - 1]?.nativeElement.focus();
+    } else if (event.key === 'ArrowRight' && index < 5) {
+      const inputs = this.digitInputs.toArray();
+      inputs[index + 1]?.nativeElement.focus();
+    }
+  }
+
+  onDigitPaste(event: ClipboardEvent): void {
+    event.preventDefault();
+    const pasted = (event.clipboardData?.getData('text') ?? '').replace(/\D/g, '').slice(0, 6);
+    for (let i = 0; i < 6; i++) {
+      this.codeDigits[i] = pasted[i] ?? '';
+    }
+    this.codeForm.get('code')?.setValue(this.codeDigits.join(''));
+    const focusIndex = Math.min(pasted.length, 5);
+    setTimeout(() => {
+      const inputs = this.digitInputs.toArray();
+      inputs[focusIndex]?.nativeElement.focus();
+    });
+  }
+
+  private startCountdown(): void {
+    this.resendCountdown = 30;
+    this.canResend = false;
+    clearInterval(this.countdownInterval);
+    this.countdownInterval = setInterval(() => {
+      this.resendCountdown--;
+      if (this.resendCountdown <= 0) {
+        clearInterval(this.countdownInterval);
+        this.canResend = true;
+      }
+      this.cdr.detectChanges();
+    }, 1000);
+  }
+
+  resendCode(): void {
+    if (!this.canResend || this.isLoading) return;
+
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    this.authService
+      .forgotPassword(this.resetEmail)
+      .pipe(finalize(() => {
+        this.isLoading = false;
+        this.cdr.detectChanges();
+      }))
+      .subscribe({
+        next: () => {
+          this.codeDigits = ['', '', '', '', '', ''];
+          this.codeForm.reset();
+          this.startCountdown();
+        },
+        error: (error: any) => {
+          this.errorMessage = error?.error?.message ?? this.translationService.translate('forgotPassword.errors.unableToSend');
+        },
+      });
+  }
+
+  ngOnDestroy(): void {
+    clearInterval(this.countdownInterval);
   }
 
   submitEmailStep(): void {
@@ -84,9 +188,11 @@ export class ForgotPasswordComponent {
       }))
       .subscribe({
         next: () => {
+          this.codeDigits = ['', '', '', '', '', ''];
+          this.codeForm.reset();
           this.step = 'code';
           this.message = this.translationService.translate('forgotPassword.email.codeSentMessage');
-          this.codeForm.reset();
+          this.startCountdown();
         },
         error: (error: any) => {
           this.errorMessage = error?.error?.message ?? this.translationService.translate('forgotPassword.errors.unableToSend');
@@ -125,6 +231,7 @@ export class ForgotPasswordComponent {
 
           this.resetCode = code;
           this.resetSessionToken = resetSessionToken;
+          clearInterval(this.countdownInterval);
           this.step = 'password';
           this.passwordForm.reset();
         },
@@ -189,21 +296,19 @@ export class ForgotPasswordComponent {
   }
 
   backToEmail(): void {
-    if (this.isLoading) {
-      return;
-    }
+    if (this.isLoading) return;
 
+    clearInterval(this.countdownInterval);
     this.step = 'email';
     this.errorMessage = '';
     this.message = '';
+    this.codeDigits = ['', '', '', '', '', ''];
     this.codeForm.reset();
     this.passwordForm.reset();
   }
 
   backToCode(): void {
-    if (this.isLoading) {
-      return;
-    }
+    if (this.isLoading) return;
 
     this.step = 'code';
     this.errorMessage = '';
@@ -217,14 +322,8 @@ export class ForgotPasswordComponent {
   private extractResetSessionToken(
     response: { resetSessionToken?: string; ResetSessionToken?: string; token?: string } | string | null | undefined,
   ): string {
-    if (!response) {
-      return '';
-    }
-
-    if (typeof response === 'string') {
-      return response;
-    }
-
+    if (!response) return '';
+    if (typeof response === 'string') return response;
     return response.resetSessionToken ?? response.ResetSessionToken ?? response.token ?? '';
   }
 }
