@@ -1344,3 +1344,22 @@ tbody tr:hover,
   }
 }
 
+@media (max-width: 920px) {
+  .events-page .insights-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    gap: 12px !important;
+    overflow: visible !important;
+    padding-bottom: 0 !important;
+  }
+
+  .events-page .insight-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    flex: 0 0 auto !important;
+    box-sizing: border-box !important;
+  }
+}
