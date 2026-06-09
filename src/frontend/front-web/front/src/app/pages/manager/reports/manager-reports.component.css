@@ -838,3 +838,30 @@
     justify-self: start;
   }
 }
+
+@media (max-width: 640px) {
+  .manager-reports-page .page-head-actions {
+    width: 100%;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+
+  .manager-reports-page .page-head-actions .ghost-btn,
+  .manager-reports-page .page-head-actions .primary-btn {
+    width: 100% !important;
+    min-height: 44px !important;
+    flex: none !important;
+    justify-content: center !important;
+    text-align: center !important;
+    white-space: normal !important;
+    line-height: 1.25 !important;
+    padding: 11px 14px !important;
+    box-sizing: border-box !important;
+  }
+
+  .manager-reports-page .page-head-actions .material-symbols-outlined {
+    flex-shrink: 0;
+    font-size: 20px;
+  }
+}

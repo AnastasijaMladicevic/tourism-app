@@ -884,3 +884,30 @@
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 920px) {
+  .manager-reviews-page {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    box-sizing: border-box;
+  }
+
+  .manager-reviews-page .stats-row {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    gap: 12px !important;
+    overflow: visible !important;
+    padding: 0 5px !important;
+    box-sizing: border-box !important;
+  }
+
+  .manager-reviews-page .stat-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+}
