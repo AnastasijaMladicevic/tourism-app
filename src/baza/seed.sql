@@ -11643,7 +11643,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'lucia.admin@spirego.com'), NOW()),
 
 ('Barceloneta Beach', 'Živopisna barselonska plaža poznata po šetalištu, sportovima i zalascima sunca',
- ST_SetSRID(ST_MakePoint(2.1966, 41.3780), 4326), true,
+ ST_SetSRID(ST_MakePoint(2.1927, 41.3793), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Barcelona'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Plaža'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'lucia.admin@spirego.com'), NOW()),
@@ -34694,7 +34694,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'), NOW()),
 
 ('Marina Grande Sorrento', 'Manja marina Sorenta sa čamcima, restoranima i blagim prelazom iz centra grada prema vodi.',
- ST_SetSRID(ST_MakePoint(14.3657, 40.6288), 4326), true,
+ ST_SetSRID(ST_MakePoint(14.3725, 40.6279), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Sorrento'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Marina'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'), NOW()),
@@ -34752,7 +34752,7 @@ VALUES
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Marina'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'), NOW()),
 ('Golfo Orosei Sardinija', 'Prirodni lokalitet sa uvalama, stenama i morskim bojama koje najviše dolaze do izražaja tokom dana na vodi.',
- ST_SetSRID(ST_MakePoint(9.6902, 40.2716), 4326), true,
+ ST_SetSRID(ST_MakePoint(9.6729, 40.3297), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Sardinija'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Prirodni lokalitet'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'), NOW());
