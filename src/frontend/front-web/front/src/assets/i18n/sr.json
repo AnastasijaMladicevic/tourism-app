@@ -2091,8 +2091,8 @@
       "verifyChange": "Verifikuj i promeni",
       "rules": {
         "minLength": "Najmanje 8 karaktera",
-        "uppercase": "Uključi jedno veliko slovo",
-        "numberOrSymbol": "Uključi jedan broj ili simbol"
+        "uppercase": "Veliko slovo",
+        "numberOrSymbol": "Broj i simbol"
       },
       "errors": {
         "currentRequired": "Trenutna lozinka je obavezna.",
@@ -2106,7 +2106,9 @@
         "codeExpired": "Verifikacioni kod je istekao. Pošalji ga ponovo da nastaviš."
       }
     },
-    "passwordModalDescription": "Unesi trenutnu lozinku i izaberi novu.",
+    "changePasswordTitle": "Promena lozinke",
+    "passwordModalDescription": "Ažurirajte lozinku kako biste zaštitili nalog.",
+    "passwordInfoBox": "Za sigurnost naloga unesite trenutnu lozinku i izaberite novu.",
     "currentPasswordLabel": "Trenutna lozinka",
     "showCurrentPassword": "Prikaži trenutnu lozinku",
     "hideCurrentPassword": "Sakrij trenutnu lozinku",

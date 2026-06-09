@@ -2091,8 +2091,8 @@
       "verifyChange": "Verificar y cambiar",
       "rules": {
         "minLength": "Al menos 8 caracteres",
-        "uppercase": "Incluye una letra mayúscula",
-        "numberOrSymbol": "Incluye un número o símbolo"
+        "uppercase": "Mayúscula",
+        "numberOrSymbol": "Número o símbolo"
       },
       "errors": {
         "currentRequired": "La contraseña actual es obligatoria.",
@@ -2106,7 +2106,9 @@
         "codeExpired": "El código de verificación ha expirado. Reenvíalo para continuar."
       }
     },
-    "passwordModalDescription": "Introduce tu contraseña actual y elige una nueva.",
+    "changePasswordTitle": "Cambiar contraseña",
+    "passwordModalDescription": "Actualiza tu contraseña para proteger tu cuenta.",
+    "passwordInfoBox": "Por seguridad, introduce tu contraseña actual y elige una nueva.",
     "currentPasswordLabel": "Contraseña actual",
     "showCurrentPassword": "Mostrar contraseña actual",
     "hideCurrentPassword": "Ocultar contraseña actual",

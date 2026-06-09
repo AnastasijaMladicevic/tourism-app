@@ -2126,8 +2126,8 @@
       "verifyChange": "Verify & Change",
       "rules": {
         "minLength": "At least 8 characters",
-        "uppercase": "Include one uppercase letter",
-        "numberOrSymbol": "Include one number or symbol"
+        "uppercase": "Uppercase letter",
+        "numberOrSymbol": "Number or symbol"
       },
       "errors": {
         "currentRequired": "Current password is required.",
@@ -2141,7 +2141,9 @@
         "codeExpired": "The verification code has expired. Resend it to continue."
       }
     },
-    "passwordModalDescription": "Enter your current password and choose a new one.",
+    "changePasswordTitle": "Change Password",
+    "passwordModalDescription": "Update your password to protect your account.",
+    "passwordInfoBox": "For account security, enter your current password and choose a new one.",
     "currentPasswordLabel": "Current Password",
     "showCurrentPassword": "Show current password",
     "hideCurrentPassword": "Hide current password",

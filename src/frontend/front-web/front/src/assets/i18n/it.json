@@ -2091,8 +2091,8 @@
       "verifyChange": "Verifica e cambia",
       "rules": {
         "minLength": "Almeno 8 caratteri",
-        "uppercase": "Includi una lettera maiuscola",
-        "numberOrSymbol": "Includi un numero o simbolo"
+        "uppercase": "Maiuscola",
+        "numberOrSymbol": "Numero o simbolo"
       },
       "errors": {
         "currentRequired": "La password attuale è obbligatoria.",
@@ -2106,7 +2106,9 @@
         "codeExpired": "Il codice di verifica è scaduto. Reinviarlo per continuare."
       }
     },
-    "passwordModalDescription": "Inserisci la password attuale e scegline una nuova.",
+    "changePasswordTitle": "Cambio password",
+    "passwordModalDescription": "Aggiorna la password per proteggere il tuo account.",
+    "passwordInfoBox": "Per sicurezza, inserisci la password attuale e scegline una nuova.",
     "currentPasswordLabel": "Password attuale",
     "showCurrentPassword": "Mostra password attuale",
     "hideCurrentPassword": "Nascondi password attuale",

@@ -1196,8 +1196,9 @@
 .password-modal__eyebrow {
   display: inline-flex;
   align-items: center;
+  gap: 5px;
   margin-bottom: 8px;
-  padding: 4px 10px;
+  padding: 4px 10px 4px 7px;
   border-radius: 999px;
   background: #e8f1ff;
   color: #2563eb;
@@ -1205,6 +1206,12 @@
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+.password-modal__eyebrow mat-icon {
+  width: 14px;
+  height: 14px;
+  font-size: 14px;
 }
 
 .password-modal__header h3 {
@@ -1250,6 +1257,72 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
+}
+
+.modal-info-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  margin-bottom: 20px;
+}
+
+.modal-info-box__icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #2563eb;
+  color: #ffffff;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+
+.modal-info-box__icon mat-icon {
+  width: 18px;
+  height: 18px;
+  font-size: 18px;
+}
+
+.modal-info-box p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #1e40af;
+  padding-top: 6px;
+}
+
+.modal-direct-fields {
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-direct-fields .modal-field + .modal-field {
+  margin-top: 16px;
+}
+
+.modal-direct-fields .modal-field + .modal-forgot-row {
+  margin-top: 6px;
+}
+
+.modal-forgot-row {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.modal-direct-fields .modal-forgot-row + .modal-field {
+  margin-top: 16px;
+}
+
+.modal-direct-fields .modal-field + .password-rules {
+  margin-top: 12px;
+}
+
+.modal-direct-fields .password-rules + .modal-field {
+  margin-top: 16px;
 }
 
 .modal-field {
@@ -1319,19 +1392,41 @@
 }
 
 .password-rules {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
   margin-top: 16px;
 }
 
 .password-rule {
-  padding: 10px 12px;
-  border-radius: 12px;
-  background: #f8fbff;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px 5px 6px;
+  border-radius: 999px;
+  background: #f1f5f9;
   border: 1px solid #e2e8f0;
   font-size: 12px;
-  color: #475569;
+  color: #64748b;
+  transition: background 0.18s, border-color 0.18s, color 0.18s;
+}
+
+.password-rule mat-icon {
+  width: 14px;
+  height: 14px;
+  font-size: 14px;
+  color: #94a3b8;
+  transition: color 0.18s;
+}
+
+.password-rule--valid {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+  color: #166534;
+}
+
+.password-rule--valid mat-icon {
+  color: #22c55e;
 }
 
 .otp-panel {
@@ -1459,10 +1554,6 @@
   justify-content: flex-end;
   gap: 12px;
   padding: 0 24px 24px;
-}
-
-.modal-footer-start {
-  flex: 1;
 }
 
 .modal-forgot-link {
