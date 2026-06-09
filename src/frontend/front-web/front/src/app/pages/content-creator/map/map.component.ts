@@ -368,7 +368,7 @@ export class ContentCreatorMapComponent implements OnInit, AfterViewInit, OnDest
         item,
         score: this.scoreItem(item, terms),
       }))
-      .filter((x) => this.matchesAllTerms(x.item, terms))
+      .filter((x) => this.matchesAllTerms(x.item, terms) && this.matchesActiveFilters(x.item.markerType))
       .sort((a, b) => b.score - a.score)
       .slice(0, 8);
 

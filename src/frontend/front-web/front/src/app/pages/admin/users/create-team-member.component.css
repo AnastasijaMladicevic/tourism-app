@@ -698,3 +698,20 @@
   line-height: 1.45;
   color: #6b7280;
 }
+
+@media (max-width: 480px) {
+  .form-actions {
+    flex-wrap: nowrap;
+  }
+
+  .form-actions .btn-cancel,
+  .form-actions .btn-primary {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .ban-duration-option {
+    font-size: 12px;
+    padding: 10px 6px;
+  }
+}

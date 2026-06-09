@@ -1780,7 +1780,7 @@
     "primaryRole": "Primarna uloga",
     "adminRoleNote": "Admin nalozi imaju širi sistemski pristup od menadžera. Koristi ovu ulogu samo za pouzdano osoblje.",
     "regionLocalization": "Region i lokalizacija",
-    "regionLocalizationDesc": "Gde ovaj clan radi i koji jezik interfejsa koristi.",
+    "regionLocalizationDesc": "Gde ovaj član radi i koji jezik interfejsa koristi.",
     "country": "Država",
     "preferredLanguage": "Željeni jezik",
     "regionAssignment": "Dodela regiona",
