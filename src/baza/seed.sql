@@ -276,7 +276,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NULL, NOW(), NOW()),
 
 ('Sveti Stefan', 'Sveti Stefan je jedno od najprepoznatljivijih mesta na crnogorskom primorju, poznato po jedinstvenom ostrvu povezanom uskim peščanim sprudom sa kopnom. Nekada ribarsko naselje, danas je luksuzna destinacija sa prelepim pogledom na more. Idealno je za miran odmor i uživanje u ekskluzivnoj atmosferi.',
- ST_SetSRID(ST_MakePoint(18.890, 42.255), 4326), 'Approved', true,
+ ST_SetSRID(ST_MakePoint(18.8948, 42.2557), 4326), 'Approved', true,
  (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Obala'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NULL, NOW(), NOW()),
 
@@ -331,12 +331,12 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NULL, NOW(), NOW()),
 
 ('Kolašin', 'Kolašin je planinski grad na severu Crne Gore, poznat po svežem vazduhu, prirodi i ski centrima. Okružen je planinama i nacionalnim parkovima, što ga čini odličnim za zimske sportove i letnje avanture. Idealan je za odmor u prirodi tokom cele godine.',
- ST_SetSRID(ST_MakePoint(19.522, 42.822), 4326), 'Approved', true,
+ ST_SetSRID(ST_MakePoint(19.5205, 42.8246), 4326), 'Approved', true,
  (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Grad'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NULL, NOW(), NOW()),
 
 ('Žabljak', 'Žabljak je najviši grad na Balkanu, smešten u srcu Nacionalnog parka Durmitor. Poznat je po Crnom jezeru, planinskim pejzažima i brojnim avanturističkim aktivnostima poput planinarenja i skijanja. Idealan je za ljubitelje prirode i aktivnog odmora tokom cele godine.',
- ST_SetSRID(ST_MakePoint(19.123, 43.155), 4326), 'Approved', true,
+ ST_SetSRID(ST_MakePoint(19.1227, 43.1578), 4326), 'Approved', true,
  (SELECT "Id" FROM "DestinationTypes" WHERE "Name" = 'Grad'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NULL, NOW(), NOW()),
  
@@ -462,7 +462,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
 ('Velika plaža', 'Poznata peščana plaža i obalna zona u Ulcinju',
- ST_SetSRID(ST_MakePoint(19.238, 41.906), 4326), true,
+ ST_SetSRID(ST_MakePoint(19.2902, 41.8943), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Ulcinj'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Plaža'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
@@ -516,7 +516,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
  
 ('Centar Žabljaka', 'Glavna turistička zona Žabljaka',
- ST_SetSRID(ST_MakePoint(19.123, 43.155), 4326), true,
+ ST_SetSRID(ST_MakePoint(19.1202, 43.1559), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Žabljak'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Centar grada'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
@@ -528,7 +528,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
  ('Muo', 'Primorsko naselje u Bokokotorskom zalivu, nasuprot starom gradu Kotora, poznato po mirnoj obali i pogledu na zaliv',
- ST_SetSRID(ST_MakePoint(18.762, 42.445), 4326), true,
+ ST_SetSRID(ST_MakePoint(18.7574, 42.4303), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Izletište'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
@@ -612,7 +612,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
  ('Čanj', 'Malo turističko primorsko naselje poznato po dugoj peščanoj plaži između Bara i Budve',
- ST_SetSRID(ST_MakePoint(19.033, 42.124), 4326), true,
+ ST_SetSRID(ST_MakePoint(19.0000, 42.1617), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Bar'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Turistička zona'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
@@ -636,7 +636,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
  ('Slovenska plaža', 'Najveća i najpoznatija plaža u Budvi, duga šljunkovito-peščana obala sa bogatim turističkim sadržajem',
- ST_SetSRID(ST_MakePoint(18.840, 42.286), 4326), true,
+ ST_SetSRID(ST_MakePoint(18.8484, 42.2849), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Plaža'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
@@ -654,7 +654,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
 
  ('Perast', 'Malo barokno primorsko mesto u Bokokotorskom zalivu, poznato po istorijskoj arhitekturi i ostrvima Gospa od Škrpjela i Sveti Đorđe',
- ST_SetSRID(ST_MakePoint(18.689, 42.486), 4326), true,
+ ST_SetSRID(ST_MakePoint(18.6974, 42.4877), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Istorijska lokacija'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
@@ -708,7 +708,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
  
  ('Centar Andrijevice', 'Centar grada Andrijevice',
- ST_SetSRID(ST_MakePoint(19.787, 42.738), 4326), true,
+ ST_SetSRID(ST_MakePoint(19.7924, 42.7335), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Andrijevica'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Centar grada'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
@@ -798,13 +798,13 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
  
  ('Tvrđava Onogošt', 'Istorijska tvrđava u Nikšiću poznata kao Bedem, mesto održavanja kulturnih i muzičkih događaja.',
- ST_SetSRID(ST_MakePoint(18.9417, 42.7748), 4326), true,
+ ST_SetSRID(ST_MakePoint(18.9415, 42.7751), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Nikšić'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Tvrđava'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
  
  ('Krupačko jezero', 'Poznato izletište i kupalište u blizini Nikšića, omiljeno mesto za festivale, kampovanje i odmor u prirodi.',
- ST_SetSRID(ST_MakePoint(18.892, 42.783), 4326), true,
+ ST_SetSRID(ST_MakePoint(18.9005, 42.8024), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Nikšić'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Prirodni lokalitet'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'admin@spirego.com'), NOW()),
@@ -861,7 +861,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
 ('Mogren Beach Bar', 'Bar na plaži', 'Plaža Mogren', '+38233456780', 'https://mogren2.me/en',
- 'https://www.dotyourspot.com/EfQ3u4/', 'Mediteranska i bar food', '{"pon":"08:00-02:00"}', 12.00, ARRAY['Terasa', 'Pogled na more', 'Kokteli', 'Muzika'], ST_SetSRID(ST_MakePoint(18.833, 42.278), 4326), 0, 0, 'Approved', true,
+ 'https://www.dotyourspot.com/EfQ3u4/', 'Mediteranska i bar food', '{"pon":"08:00-02:00"}', 12.00, ARRAY['Terasa', 'Pogled na more', 'Kokteli', 'Muzika'], ST_SetSRID(ST_MakePoint(18.8326, 42.2772), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bar'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Plaža Mogren'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
@@ -917,7 +917,7 @@ VALUES
  ---RESTORANI---
 
  ('Konoba Scala Santa', 'Tradicionalna crnogorska kuhinja u srcu Kotora', 'Trg od Salate, Kotorski zaliv', '+38267393458', NULL,
- NULL, 'Crnogorska kuhinja', '{"pon":"09:00-23:00"}', 25.00, ARRAY['Terasa', 'Tradicionalna kuhinja', 'Rezervacije'], ST_SetSRID(ST_MakePoint(18.772, 42.424), 4326), 0, 0, 'Approved', true,
+ NULL, 'Crnogorska kuhinja', '{"pon":"09:00-23:00"}', 25.00, ARRAY['Terasa', 'Tradicionalna kuhinja', 'Rezervacije'], ST_SetSRID(ST_MakePoint(18.7715, 42.4237), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Restoran'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
@@ -1024,7 +1024,7 @@ VALUES
 
 ('Hotel Palas', 'Porodični hotel na plaži', 'Petrovac na Moru', '+38233421000', 'https://www.hotelpalas.me',
  NULL, NULL, '{"pon":"00:00-24:00"}', 140.00, ARRAY['Plaža', 'Bazen', 'Restoran', 'Parking', 'WiFi'],
- ST_SetSRID(ST_MakePoint(18.942, 42.206), 4326), 0, 0, 'Approved', true,
+ ST_SetSRID(ST_MakePoint(18.9424, 42.2054), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Hotel'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Petrovac'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
@@ -1082,7 +1082,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
 ('Konoba Stari grad', 'Kafana poznata po roštilju i narodnoj muzici', '12 Njegoševa, Budva', '+38233454443', NULL,
- NULL, 'Balkanska kuhinja', '{"pon":"10:00-02:00"}', 17.00, ARRAY['Živa muzika', 'Roštilj', 'Kokteli', 'Bašta'], ST_SetSRID(ST_MakePoint(18.837, 42.278), 4326), 0, 0, 'Approved', true,
+ NULL, 'Balkanska kuhinja', '{"pon":"10:00-02:00"}', 17.00, ARRAY['Živa muzika', 'Roštilj', 'Kokteli', 'Bašta'], ST_SetSRID(ST_MakePoint(18.8373, 42.2781), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Kafana'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Budva'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
@@ -1131,7 +1131,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
  ('Narodna biblioteka Radosav Ljumović', 'Glavna gradska biblioteka u Podgorici sa bogatim fondom knjiga i kulturnim programima', 'Bokeška, Podgorica', '+38220664715', 'http://www.nbpg.me/',
- NULL, NULL, '{"pon":"08:00-20:00"}', NULL, ARRAY['Čitaonica', 'WiFi', 'Događaji', 'Knjige'], ST_SetSRID(ST_MakePoint(19.262, 42.442), 4326), 0, 0, 'Approved', true,
+ NULL, NULL, '{"pon":"08:00-20:00"}', NULL, ARRAY['Čitaonica', 'WiFi', 'Događaji', 'Knjige'], ST_SetSRID(ST_MakePoint(19.2623, 42.4418), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Biblioteka'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Podgorice'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Podgorica'),
@@ -1198,7 +1198,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
  ('Apartments Vuković', 'Komforni apartmani sa pogledom na Boku Kotorsku', 'Jadranska magistrala, Muo', '+38269687310', NULL,
- NULL, NULL, '{"pon":"00:00-24:00"}', 85.00, ARRAY['WiFi', 'Parking', 'Terasa', 'Pogled na more'], ST_SetSRID(ST_MakePoint(18.756, 42.437), 4326), 0, 0, 'Approved', true,
+ NULL, NULL, '{"pon":"00:00-24:00"}', 85.00, ARRAY['WiFi', 'Parking', 'Terasa', 'Pogled na more'], ST_SetSRID(ST_MakePoint(18.7555, 42.4370), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Apartman'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Muo'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
@@ -1457,7 +1457,7 @@ VALUES
 
  ('Maximus Club Kotor', 'Najveći noćni klub u Kotoru', 'Stari grad, Kotor', '+38267217101', NULL,
  NULL, NULL, '{"pon":"22:00-04:00"}', NULL, ARRAY['DJ nastupi', 'Koncerti', 'Eventi'],
- ST_SetSRID(ST_MakePoint(18.769, 42.426), 4326), 0, 0, 'Approved', true,
+ ST_SetSRID(ST_MakePoint(18.7690, 42.4257), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Klub'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
@@ -1641,7 +1641,7 @@ VALUES
  
  ('Casper Bar Budva', 'Popularan bar u starom gradu Budve sa opuštenom atmosferom', 'Stari grad bb, Budva', '+38233402290', 'https://www.instagram.com/casper_bar',
  NULL, NULL, '{"pon":"08:00-02:00"}', 8.00, ARRAY['Kafa', 'Kokteli', 'Terasa'],
- ST_SetSRID(ST_MakePoint(18.838, 42.279), 4326), 0, 0, 'Approved', true,
+ ST_SetSRID(ST_MakePoint(18.8385, 42.2782), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Kafić'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Budva'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
@@ -1662,7 +1662,7 @@ VALUES
 ('Kafić Marshall’s Gelato & Coffee', 'Popularan kafić i poslastičarnica poznata po gelatu i kafi', 'Stari grad 359 A, Kotor', '+38267876875', 'http://www.marshallsgelato.com/',
  NULL, 'Kafeterija i slatkiši', '{"pon":"08:00-17:00"}', 8.00,
  ARRAY['WiFi', 'Bašta', 'Deserti', 'Kafa', 'Porodično okruženje'],
- ST_SetSRID(ST_MakePoint(18.771, 42.425), 4326), 0, 0, 'Approved', true,
+ ST_SetSRID(ST_MakePoint(18.7708, 42.4249), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Kafić'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
@@ -1702,7 +1702,7 @@ VALUES
 
  ('Al Posto Giusto Tivat', 'Moderan kafić u Porto Montenegru', 'Porto Montenegro, Tivat', '+38269146046', NULL,
  NULL, NULL, '{"pon":"08:00-00:00"}', 10.00, ARRAY['Kafa', 'Lounge', 'Marina pogled'],
- ST_SetSRID(ST_MakePoint(18.694, 42.433), 4326), 0, 0, 'Approved', true,
+ ST_SetSRID(ST_MakePoint(18.6936, 42.4327), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Kafić'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Porto Montenegro'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Tivat'),
@@ -1732,7 +1732,7 @@ VALUES
 
  ('Grand Central Cetinje', 'Istorijski kafić u centru Cetinja', '7 Balšića Pazar, Cetinje', '+38267030122', 'https://www.instagram.com/grandcentral__/',
  NULL, NULL, '{"pon":"08:00-23:00"}', 6.00, ARRAY['Kafa', 'Terasa', 'Centar grada'],
- ST_SetSRID(ST_MakePoint(18.924, 42.390), 4326), 0, 0, 'Approved', true,
+ ST_SetSRID(ST_MakePoint(18.9240, 42.3900), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Kafić'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Cetinja'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Cetinje'),
@@ -1779,7 +1779,7 @@ VALUES
  ('Evergreen Jazz Bar', 'Jazz bar sa živom muzikom', 'Kotor Stari grad', NULL, NULL,
  NULL, 'Jazz i kokteli', '{"pon":"18:00-01:00","uto":"18:00-01:00","sre":"18:00-01:00","cet":"18:00-01:00","pet":"18:00-02:00","sub":"18:00-02:00","ned":"00:00-00:00"}', 14.00,
  ARRAY['Živa muzika', 'Kokteli', 'Atmosfera'],
- ST_SetSRID(ST_MakePoint(18.772, 42.425), 4326), 0, 0, 'Approved', true,
+ ST_SetSRID(ST_MakePoint(18.7716, 42.4250), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bar'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
@@ -1790,7 +1790,7 @@ VALUES
  ('Itaka Library Bar', 'Alternativni bar poznat po muzici i atmosferi', 'Bulevar Svetog Petra Cetinjskog, Podgorica', '+38267156650', 'https://instagram.com/itaka_library.bar?utm_medium=copy_link',
  'https://itaka.digitalnimeni.me/', 'Bar i pivo', '{"pon":"10:00-00:00","uto":"10:00-00:00","sre":"10:00-00:00","cet":"10:00-00:00","pet":"10:00-02:00","sub":"10:00-02:00","ned":"00:00-00:00"}', 9.00,
  ARRAY['Pivo', 'Muzika', 'Bašta'],
- ST_SetSRID(ST_MakePoint(19.266, 42.438), 4326), 0, 0, 'Approved', true,
+ ST_SetSRID(ST_MakePoint(19.2664, 42.4376), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bar'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Podgorice'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Podgorica'),
@@ -1823,7 +1823,7 @@ VALUES
  ('Medusa', 'Bar na obali mora u Petrovcu', '16 Nika Anđusa, Petrovac', NULL, NULL,
  NULL, 'Bar i kokteli', '{"pon":"08:00-00:00","uto":"08:00-00:00","sre":"08:00-00:00","cet":"08:00-00:00","pet":"08:00-02:00","sub":"08:00-02:00","ned":"00:00-00:00"}', 10.00,
  ARRAY['Plaža', 'Kokteli', 'Pogled na more'],
- ST_SetSRID(ST_MakePoint(18.942, 42.205), 4326), 0, 0, 'Approved', true,
+ ST_SetSRID(ST_MakePoint(18.9423, 42.2051), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bar'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Petrovac'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
@@ -1902,7 +1902,7 @@ VALUES
  ('Muzej grada Perasta', 'Mali muzej posvećen istoriji Perasta i Boke Kotorske', 'Perast', '+38232373519', 'https://muzejikotor.me/',
  NULL, 'Lokalna istorija', '{"pon":"09:00-17:00","uto":"09:00-17:00","sre":"09:00-17:00","cet":"09:00-17:00","pet":"09:00-17:00","sub":"10:00-14:00","ned":"00:00-00:00"}', 3.00,
  ARRAY['Istorija grada', 'Eksponati', 'Vodič'],
- ST_SetSRID(ST_MakePoint(18.696, 42.487), 4326), 0, 0, 'Approved', true,
+ ST_SetSRID(ST_MakePoint(18.6957, 42.4879), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Muzej'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Perast'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
@@ -2029,7 +2029,7 @@ VALUES
 ('Galerija Muzeja savremene umjetnosti Crne Gore', 'Najvažnija institucija savremene umetnosti u Crnoj Gori, sa izložbama domaćih i međunarodnih umetnika', '2 Njegoševa, Podgorica', '+38220665409', 'https://msucg.me/',
  NULL, NULL, '{"pon":"09:00-20:00","uto":"09:00-20:00","sre":"09:00-20:00","cet":"09:00-20:00","pet":"09:00-20:00","sub":"10:00-18:00","ned":"neradno"}', NULL,
  ARRAY['Izložbe', 'Kultura', 'Radionice'],
- ST_SetSRID(ST_MakePoint(19.261, 42.440), 4326), 0, 0, 'Approved', true,
+ ST_SetSRID(ST_MakePoint(19.2611, 42.4396), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Galerija'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Podgorice'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Podgorica'),
@@ -2475,7 +2475,7 @@ VALUES
 
  ('Dvorana Park Herceg Novi', 'Kulturna scena i pozorišne predstave', 'Herceg Novi centar', '+38231322098', 'http://hercegfest.me/',
  NULL, NULL, '{"pon":"10:00-20:00","uto":"10:00-20:00","sre":"10:00-20:00","cet":"10:00-20:00","pet":"10:00-20:00","sub":"19:00-22:00","ned":"neradni dan"}',
- NULL, ARRAY['Drama', 'Film', 'Koncerti'], ST_SetSRID(ST_MakePoint(18.53231, 42.45222), 4326), 0, 0, 'Approved', true,
+ NULL, ARRAY['Drama', 'Film', 'Koncerti'], ST_SetSRID(ST_MakePoint(18.5323, 42.4523), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Pozorište'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Šetalište Pet Danica'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Herceg Novi'),
@@ -2525,7 +2525,7 @@ VALUES
 
 ('Ljetnja Pozornica Tivat', 'Kulturno-pozorišni centar sa savremenim programima', 'Tivat', NULL, 'http://www.czktivat.me/',
  NULL, NULL, '{"pon":"10:00-20:00","uto":"10:00-20:00","sre":"10:00-20:00","cet":"10:00-20:00","pet":"10:00-20:00","sub":"18:00-22:00","ned":"neradni dan"}',
- NULL, ARRAY['Drama', 'Film', 'Festival'], ST_SetSRID(ST_MakePoint(18.69581, 42.43125), 4326), 0, 0, 'Approved', true,
+ NULL, ARRAY['Drama', 'Film', 'Festival'], ST_SetSRID(ST_MakePoint(18.6958, 42.4313), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Pozorište'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Centar Tivta'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Tivat'),
@@ -2825,7 +2825,7 @@ VALUES
  
 ('Promenada Krupac', 'Uređena promenada oko Krupačkog jezera, popularno mesto za šetnju, odmor i organizaciju festivala poput Lake Festa', 'Krupačko jezero, Nikšić', NULL, NULL,
  NULL, NULL, '{"pon":"00:00-23:59","uto":"00:00-23:59","sre":"00:00-23:59","cet":"00:00-23:59","pet":"00:00-23:59","sub":"00:00-23:59","ned":"00:00-23:59"}',
- NULL, ARRAY['Šetnja', 'Priroda', 'Festival', 'Rekreacija'], ST_SetSRID(ST_MakePoint(18.892, 42.783), 4326), 0, 0, 'Approved', true,
+ NULL, ARRAY['Šetnja', 'Priroda', 'Festival', 'Rekreacija'], ST_SetSRID(ST_MakePoint(18.8980, 42.7909), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Sportski centar'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Krupačko jezero'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Nikšić'),
@@ -2960,7 +2960,7 @@ INSERT INTO "Activities"
 ("Name", "Description", "Geolocation", "Price", "DurationMinutes", "IsActive", "ActivityTypeId", "LocalityId", "DestinationId", "ObjectId", "Status", "CreatedByUserId", "CreatedAt", "UpdatedAt")
 VALUES
 ('Degustacija morskih specijaliteta', 'Uživajte u lokalnoj kuhinji Kotora kroz degustaciju svežih ribljih i morskih specijaliteta. Aktivnost je idealna za posetioce koji žele da upoznaju autentične ukuse primorja u prijatnom ambijentu.',
- ST_SetSRID(ST_MakePoint(18.771, 42.424), 4326), 25.00, 90, true,
+ ST_SetSRID(ST_MakePoint(18.7692, 42.4227), 4326), 25.00, 90, true,
  (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Poseta Restoranu'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
@@ -2970,7 +2970,7 @@ VALUES
  NOW(), NOW()),
 
 ('Noćni provod Budva', 'Budva je poznata po živahnom noćnom životu, muzici i provodu do kasnih sati. Ova aktivnost je namenjena svima koji žele opušteno veče uz dobru atmosferu, piće i zabavu pored mora.',
- ST_SetSRID(ST_MakePoint(18.833, 42.278), 4326), 10.00, 240, true,
+ ST_SetSRID(ST_MakePoint(18.8335, 42.2784), 4326), 10.00, 240, true,
  (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Noćni provod'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Plaža Mogren'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
@@ -2980,7 +2980,7 @@ VALUES
  NOW(), NOW()),
 
 ('Planinarenje na Durmitoru', 'Planinarenje na Durmitoru pruža priliku za istraživanje netaknute prirode, planinskih staza i prelepih pejzaža. Aktivnost je idealna za ljubitelje avanture, svežeg vazduha i aktivnog odmora.',
- ST_SetSRID(ST_MakePoint(19.123, 43.149), 4326), 0.00, 300, true,
+ ST_SetSRID(ST_MakePoint(19.1088, 43.2072), 4326), 0.00, 300, true,
  (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Planinarenje'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Crno jezero'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Durmitor'),
@@ -2990,7 +2990,7 @@ VALUES
  NOW(), NOW()),
 
 ('Šetnja starim gradom Kotora', 'Šetnja starim gradom Kotora vodi kroz uske kamene ulice, trgove i istorijske znamenitosti ovog primorskog grada. Savršena je za posetioce koji žele da upoznaju kulturu, arhitekturu i duh Kotora.',
- ST_SetSRID(ST_MakePoint(18.771, 42.424), 4326), 0.00, 120, true,
+ ST_SetSRID(ST_MakePoint(18.7700, 42.4254), 4326), 0.00, 120, true,
  (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Razgledanje'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
@@ -3000,7 +3000,7 @@ VALUES
  NOW(), NOW()),
  
  ('Vožnja čamcem Skadarsko jezero', 'Vožnja čamcem po Skadarskom jezeru omogućava uživanje u mirnoj vodi, prirodi i bogatom biljnom i životinjskom svetu. Aktivnost je odlična za opuštanje, fotografisanje i doživljaj jezera iz drugačije perspektive.',
- ST_SetSRID(ST_MakePoint(19.091, 42.246), 4326), 15.00, 120, true,
+ ST_SetSRID(ST_MakePoint(19.0958, 42.2461), 4326), 15.00, 120, true,
  (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Vožnja čamcem'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Virpazar'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Skadarsko jezero'),
@@ -3045,7 +3045,7 @@ INSERT INTO "Events"
 ("Name", "Description", "Geolocation", "StartDate", "EndDate", "Price", "MaxVisitors", "IsActive", "Status", "EventTypeId", "LocalityId", "DestinationId", "ObjectId", "CreatedByUserId", "CreatedAt", "UpdatedAt")
 VALUES
 ('KotorArt festival', 'KotorArt festival predstavlja jedinstven spoj muzike, umetnosti i kulturnog nasleđa u prelepom ambijentu Kotora. Tokom trajanja festivala, posetioci mogu uživati u raznovrsnom programu koji obuhvata koncerte, umetničke performanse i sadržaje inspirisane bogatom tradicijom ovog primorskog grada. Događaj okuplja ljubitelje kulture, domaće i strane goste, stvarajući živu i inspirativnu atmosferu. Poseban doživljaj pruža spoj savremene umetnosti i istorijskog okruženja, gde svaka večer donosi novo iskustvo i priliku za uživanje u kreativnom izrazu. Festival je idealan za sve koji žele da leto provedu u znaku kulture, dobrog raspoloženja i nezaboravnih trenutaka u jednom od najlepših gradova na Jadranu.',
- ST_SetSRID(ST_MakePoint(18.771, 42.424), 4326), '2026-07-15 20:00', '2026-07-30 23:00', 20.00, 1000, true, 'Approved',
+ ST_SetSRID(ST_MakePoint(18.7703, 42.4248), 4326), '2026-07-15 20:00', '2026-07-30 23:00', 20.00, 1000, true, 'Approved',
  (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Festival'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
@@ -3054,7 +3054,7 @@ VALUES
  NOW(), NOW()),
 
 ('Veče klasične muzike', 'U čarobnoj atmosferi starog grada Kotora, ovo veče klasične muzike nudi jedinstven spoj umetnosti i istorije. Program obuhvata pažljivo odabrane kompozicije koje izvode talentovani muzičari, stvarajući intimnu i sofisticiranu atmosferu. Idealno za sve ljubitelje kulture, muzike i romantičnih večeri pod otvorenim nebom. Autentični ambijent kamenih trgova i osvetljenih uličica dodatno pojačava doživljaj, pretvarajući svaki ton u posebno emotivno iskustvo. Posetioci će imati priliku da se prepuste zvucima klasične muzike dok uživaju u jedinstvenom spoju tradicije i umetnosti. Ovaj događaj pruža savršenu priliku za opuštanje, inspiraciju i stvaranje nezaboravnih uspomena u jednom od najlepših primorskih gradova.',
- ST_SetSRID(ST_MakePoint(18.771, 42.424), 4326), '2026-08-05 21:00', '2026-08-05 23:00', 15.00, 200, true, 'Approved',
+ ST_SetSRID(ST_MakePoint(18.7708, 42.4247), 4326), '2026-08-05 21:00', '2026-08-05 23:00', 15.00, 200, true, 'Approved',
  (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Koncert'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Kotor'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kotor'),
@@ -3063,16 +3063,16 @@ VALUES
  NOW(), NOW()),
 
 ('Budva Summer Festival', 'Budva Summer Festival donosi energičan i raznovrstan letnji program namenjen svima koji žele da uživaju u muzici, zabavi i prijatnoj atmosferi na otvorenom. Festival okuplja veliki broj posetilaca i nudi sadržaje koji spajaju savremenu zabavu sa prepoznatljivim mediteranskim duhom Budve. Tokom više festivalskih dana, grad postaje mesto susreta dobre muzike, opuštanja i letnjih uspomena. Uz atraktivan ambijent i bogat program, posetioci imaju priliku da provedu nezaboravne večeri u društvu prijatelja i porodice. Ovaj događaj je savršen izbor za sve koji žele da iskuse letnju energiju Budve, uživaju u kvalitetnom programu i provedu vreme u jednoj od najpoznatijih turističkih destinacija na crnogorskom primorju.',
- ST_SetSRID(ST_MakePoint(18.837, 42.279), 4326), '2026-07-01 19:00', '2026-07-10 23:00', 10.00, 1500, true, 'Approved',
+ ST_SetSRID(ST_MakePoint(18.8366, 42.2785), 4326), '2026-07-01 19:00', '2026-07-10 23:00', 10.00, 1500, true, 'Approved',
  (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Festival'),
- (SELECT "Id" FROM "Localities" WHERE "Name" = 'Budva'),
+ (SELECT "Id" FROM "Localities" WHERE "Name" = 'Stari grad Budva'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
  (SELECT "Id" FROM "Objects" WHERE "Name" = 'Hotel Avala'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'ana@spirego.com'),
  NOW(), NOW()),
 
 ('DJ Night Mogren', 'DJ Night Mogren je večernji događaj namenjen ljubiteljima elektronske muzike, plesa i letnje atmosfere pored mora. Smešten u atraktivnom ambijentu plaže Mogren, ovaj događaj okuplja posetioce koji žele da uživaju u modernim ritmovima, dobroj energiji i nezaboravnom noćnom provodu. Spoj muzike, mora i letnje večeri stvara poseban ambijent koji privlači kako turiste tako i lokalne posetioce. Uz dinamičan program i opuštenu atmosferu, događaj pruža savršenu priliku za druženje, zabavu i uživanje u jedinstvenom noćnom iskustvu na obali. DJ Night Mogren je idealan za sve koji žele da dožive živopisnu letnju scenu Budve i provedu noć ispunjenu muzikom, plesom i odličnim raspoloženjem.',
- ST_SetSRID(ST_MakePoint(18.833, 42.278), 4326), '2026-08-10 22:00', '2026-08-11 03:00', 8.00, 500, true, 'Approved',
+ ST_SetSRID(ST_MakePoint(18.8316, 42.2770), 4326), '2026-08-10 22:00', '2026-08-11 03:00', 8.00, 500, true, 'Approved',
  (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Nastup'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Plaža Mogren'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Budva'),
@@ -3081,7 +3081,7 @@ VALUES
  NOW(), NOW()),
 
 ('Planinarski susret', 'Planinarski susret na Durmitoru predstavlja idealnu priliku za sve ljubitelje prirode, pešačenja i boravka na svežem planinskom vazduhu. Događaj okuplja planinare, rekreativce i avanturiste koji žele da provedu dan u druženju, istraživanju prirodnih lepota i uživanju u spektakularnim pejzažima jednog od najlepših planinskih predela. Program je osmišljen tako da spoji aktivan odmor, rekreaciju i zajedničko uživanje u prirodi. Pored same šetnje i okupljanja, učesnici imaju priliku da upoznaju druge zaljubljenike u planinu i provedu vreme u prijatnoj i opuštenoj atmosferi. Ovaj događaj pruža savršen beg od svakodnevice i mogućnost da se doživi mir, lepota i autentičan duh Durmitora kroz aktivan i ispunjen dan u prirodi.',
- ST_SetSRID(ST_MakePoint(19.123, 43.149), 4326), '2026-09-01 08:00', '2026-09-01 18:00', 5.00, 100, true, 'Approved',
+ ST_SetSRID(ST_MakePoint(19.1110, 43.1563), 4326), '2026-09-01 08:00', '2026-09-01 18:00', 5.00, 100, true, 'Approved',
  (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Okupljanje'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Žabljak'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Durmitor'),
@@ -3099,7 +3099,7 @@ VALUES
  NOW(), NOW()),
  
 ('Herceg Novi Film Festival', 'Herceg Novi Film Festival okuplja ljubitelje filmske umetnosti iz zemlje i inostranstva. Program obuhvata projekcije igranih, dokumentarnih i autorskih filmova. Poseban doživljaj pružaju projekcije na otvorenom uz more.',
- ST_SetSRID(ST_MakePoint(18.53231, 42.45222), 4326), '2026-08-22 20:00', '2026-08-28 23:30', 8.00, 500, true, 'Approved',
+ ST_SetSRID(ST_MakePoint(18.5325, 42.4524), 4326), '2026-08-22 20:00', '2026-08-28 23:30', 8.00, 500, true, 'Approved',
  (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Festival'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Šetalište Pet Danica'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Herceg Novi'),
@@ -3108,7 +3108,7 @@ VALUES
  NOW(), NOW()),
 
 ('Durmitor Trail Run', 'Durmitor Trail Run je planinska trka koja vodi kroz najlepše predele Nacionalnog parka Durmitor. Učesnici prolaze kroz šume, planinske staze i oko jezera. Događaj privlači sportiste i avanturiste iz celog sveta.',
- ST_SetSRID(ST_MakePoint(19.091, 43.146), 4326), '2026-07-10 08:00', '2026-07-12 18:00', 25.00, 600, true, 'Approved',
+ ST_SetSRID(ST_MakePoint(19.0963, 43.1432), 4326), '2026-07-10 08:00', '2026-07-12 18:00', 25.00, 600, true, 'Approved',
  (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Takmičenje'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Crno jezero'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Durmitor'),
@@ -3117,7 +3117,7 @@ VALUES
  NOW(), NOW()),
 
 ('Wild Beauty Art Festival', 'Wild Beauty Art Festival spaja umetnost, prirodu i muziku u jedinstvenom ambijentu Durmitora. Tokom festivala organizuju se koncerti, performansi i umetničke instalacije. Poseban akcenat stavlja se na očuvanje prirode i ekološku svest.',
- ST_SetSRID(ST_MakePoint(19.091, 43.146), 4326), '2026-07-05 20:00', '2026-08-11 23:00', 10.00, 300, true, 'Approved',
+ ST_SetSRID(ST_MakePoint(19.0908, 43.1492), 4326), '2026-07-05 20:00', '2026-08-11 23:00', 10.00, 300, true, 'Approved',
  (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Festival'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Crno jezero'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Durmitor'),
@@ -3162,7 +3162,7 @@ VALUES
  NOW(), NOW()),
  
 ('Lake Fest 2026', 'Lake Fest je jedan od najvećih crnogorskih muzičkih festivala, poznat po rok i alternativnoj muzici, kampovanju i atmosferi pored Krupačkog jezera kod Nikšića. Festival okuplja ljubitelje muzike iz regiona i pruža višednevni program koncerata na otvorenom.',
- ST_SetSRID(ST_MakePoint(18.892, 42.783), 4326),  '2026-08-07 20:00',  '2026-08-09 23:30',  20.00,  2000,  true,  'Approved',
+ ST_SetSRID(ST_MakePoint(18.8998, 42.7914), 4326),  '2026-08-07 20:00',  '2026-08-09 23:30',  20.00,  2000,  true,  'Approved',
  (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Festival'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Krupačko jezero'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Nikšić'),
@@ -11643,7 +11643,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'lucia.admin@spirego.com'), NOW()),
 
 ('Barceloneta Beach', 'Živopisna barselonska plaža poznata po šetalištu, sportovima i zalascima sunca',
- ST_SetSRID(ST_MakePoint(2.1966, 41.3780), 4326), true,
+ ST_SetSRID(ST_MakePoint(2.1927, 41.3793), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Barcelona'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Plaža'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'lucia.admin@spirego.com'), NOW()),
@@ -11691,7 +11691,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
 ('Barceloneta Sunset Bar', 'Bar uz plažu sa koktelima, muzikom i otvorenom terasom prema moru', 'Passeig Maritim, Barcelona', '+34930000003', 'https://www.barcelonaturisme.com',
- NULL, 'Kokteli i bar food', '{"pon":"10:00-02:00"}', 18.00, ARRAY['Kokteli', 'Muzika', 'Pogled na more', 'Terasa'], ST_SetSRID(ST_MakePoint(2.1955, 41.3783), 4326), 0, 0, 'Approved', true,
+ NULL, 'Kokteli i bar food', '{"pon":"10:00-02:00"}', 18.00, ARRAY['Kokteli', 'Muzika', 'Pogled na more', 'Terasa'], ST_SetSRID(ST_MakePoint(2.1911, 41.3770), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Bar'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Barceloneta Beach'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Barcelona'),
@@ -11733,7 +11733,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
 ('Barceloneta Sunset Ride', 'Lagani biciklistički obilazak obale uz završetak na plaži tokom zalaska sunca',
- ST_SetSRID(ST_MakePoint(2.1959, 41.3781), 4326), 18.00, 90, true,
+ ST_SetSRID(ST_MakePoint(2.1949, 41.3832), 4326), 18.00, 90, true,
  (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Biciklizam'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Barceloneta Beach'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Barcelona'),
@@ -11780,7 +11780,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
 ('Barceloneta Sunset Session', 'Večernji nastup na otvorenom sa DJ setovima i plažnim ambijentom',
- ST_SetSRID(ST_MakePoint(2.1961, 41.3782), 4326), '2026-08-09 20:00', '2026-08-10 00:30', 12.00, 500, true, 'Approved',
+ ST_SetSRID(ST_MakePoint(2.1903, 41.3781), 4326), '2026-08-09 20:00', '2026-08-10 00:30', 12.00, 500, true, 'Approved',
  (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Nastup'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Barceloneta Beach'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Barcelona'),
@@ -12647,7 +12647,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'lorenzo.creator@spirego.com'),
  NOW(), NOW()),
 ('Belgrade Coffee and Jazz Night', 'Manji večernji program sa jazz nastupom i toplijom lounge atmosferom, namenjen gostima koji vole centar grada i laganiji izlazak. Uslovljen je sedećim formatom i nije preglasan, pa dobro odgovara i turistima koji sutradan nastavljaju obilazak.',
- ST_SetSRID(ST_MakePoint(20.4612, 44.8134), 4326), '2026-11-05 18:00', '2026-11-05 23:00', 9.00, 220, true, 'Approved',
+ ST_SetSRID(ST_MakePoint(20.4605, 44.8130), 4326), '2026-11-05 18:00', '2026-11-05 23:00', 9.00, 220, true, 'Approved',
  (SELECT "Id" FROM "EventTypes" WHERE "Name" = 'Nastup'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Terazije Beograd'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Beograd'),
@@ -15233,7 +15233,7 @@ NULL,
 '{"pon":"zatvoreno","uto":"09:00-20:00","sre":"09:00-20:00","cet":"09:00-20:00","pet":"09:00-20:00","sub":"09:00-20:00","ned":"09:00-20:00"}',
 500,
 ARRAY['Književne večeri', 'Izložbe', 'Kulturni program'],
-ST_SetSRID(ST_MakePoint(20.4643, 44.8176), 4326),
+ST_SetSRID(ST_MakePoint(20.46431, 44.81759), 4326),
 0, 0,
 'Approved', true,
 (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Muzej'),
@@ -16773,7 +16773,7 @@ true, 'Approved',
 NOW(), NOW()),
 
 ('Tornik Summer Adventure Day', 'Outdoor događaj sa sportskim i adrenalinskim aktivnostima za posetioce Zlatibora i Tornika.',
-ST_SetSRID(ST_MakePoint(19.4647, 43.6693), 4326),
+ST_SetSRID(ST_MakePoint(19.6316, 43.6550), 4326),
 '2026-08-22 11:00',
 '2026-08-22 19:00',
 0.00, 
@@ -19428,7 +19428,7 @@ VALUES
  NOW(), NOW()),
 
 ('Foto safari Divlji Đerdap', 'Organizovana tura za fotografisanje prirode, pejzaža i životinjskog sveta Đerdapa.',
- ST_SetSRID(ST_MakePoint(22.2735, 44.7026), 4326), 18.00, 150, true,
+ ST_SetSRID(ST_MakePoint(22.0660, 44.5235), 4326), 18.00, 150, true,
  (SELECT "Id" FROM "ActivityTypes" WHERE "Name" = 'Fotografisanje'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Đerdapska klisura'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Đerdap'),
@@ -19653,7 +19653,7 @@ VALUES
  NOW(), NOW(), NOW()),
 
 ('Restoran Salaš Kopaonik', 'Planinski restoran poznat po domaćoj kuhinji, toploj atmosferi i lokalnim specijalitetima.', 'Nikole Tesle 8', '+38164222333', 'https://salaskopaonik.rs/',
- 'https://salaskopaonik.rs/meni', 'Tradicionalna srpska kuhinja', '{"pon":"09:00-23:00","uto":"09:00-23:00","sre":"09:00-23:00","cet":"09:00-23:00","pet":"09:00-00:00","sub":"09:00-00:00","ned":"09:00-22:00"}', 22.00, ARRAY['Terasa', 'Parking', 'Domaća kuhinja'], ST_SetSRID(ST_MakePoint(20.8114, 43.2844), 4326), 0, 0, 'Approved', true,
+ 'https://salaskopaonik.rs/meni', 'Tradicionalna srpska kuhinja', '{"pon":"09:00-23:00","uto":"09:00-23:00","sre":"09:00-23:00","cet":"09:00-23:00","pet":"09:00-00:00","sub":"09:00-00:00","ned":"09:00-22:00"}', 22.00, ARRAY['Terasa', 'Parking', 'Domaća kuhinja'], ST_SetSRID(ST_MakePoint(20.81141, 43.28442), 4326), 0, 0, 'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Restoran'),
  (SELECT "Id" FROM "Localities" WHERE "Name" = 'Konaci'),
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Kopaonik'),
@@ -21925,7 +21925,7 @@ VALUES
  '{"pon":"10:00-22:00","uto":"10:00-22:00","sre":"10:00-22:00","cet":"10:00-22:00","pet":"10:00-23:00","sub":"10:00-23:00","ned":"10:00-22:00"}',
  12.00,
  ARRAY['Interaktivne postavke', 'Suvenirnica', 'Porodični sadržaj'],
- ST_SetSRID(ST_MakePoint(20.1622, 44.8142), 4326),
+ ST_SetSRID(ST_MakePoint(20.4622, 44.8142), 4326),
  0, 0,
  'Approved',
  true,
@@ -28329,7 +28329,7 @@ VALUES
  '{"pon":"10:00-18:00","uto":"10:00-18:00","sre":"10:00-18:00","cet":"10:00-18:00","pet":"10:00-18:00","sub":"10:00-16:00","ned":"10:00-16:00"}',
  3.00,
  ARRAY['Secesijska arhitektura', 'Kultura', 'Fotografisanje'],
- ST_SetSRID(ST_MakePoint(19.6687, 46.4016), 4326),
+ ST_SetSRID(ST_MakePoint(19.6687, 46.1016), 4326),
  0, 0,
  'Approved', true,
  (SELECT "Id" FROM "ObjectTypes" WHERE "Name" = 'Turistička atrakcija'),
@@ -33160,7 +33160,7 @@ WITH source("Name", "Description", "Lng", "Lat", "StartDate", "EndDate", "Price"
     ('Turnir u malom fudbalu Podgorica', 'Turnir rekreativnih ekipa u malom fudbalu sa grupnom fazom, finalom i nagradama za najbolje igrače.', 19.2517, 42.4430, '2026-09-18 17:00'::timestamp, '2026-09-20 22:00'::timestamp, 3.00, 1000, 'Turnir', 'Podgorica', 'ana@spirego.com'),
     ('Beogradski večiti susret', 'Utakmica u Beogradu sa velikom sportskom atmosferom, fan zonom i pratećim programom za posetioce pre početka meča.', 20.4633, 44.7831, '2026-06-13 20:00'::timestamp, '2026-06-13 22:00'::timestamp, 9.00, 18000, 'Utakmica', 'Beograd', 'jelena.creator@spirego.com'),
     ('Predstava na Dorćolu', 'Pozorišna predstava u intimnom prostoru Dorćola, sa savremenim tekstom, jakim glumačkim ansamblom i razgovorom posle izvedbe.', 20.4609, 44.8217, '2026-06-19 20:30'::timestamp, '2026-06-19 22:30'::timestamp, 8.00, 300, 'Predstava', 'Beograd', 'jelena.creator@spirego.com'),
-    ('Sava Street Festival', 'Urbani festival pored Save sa muzikom, hranom, dizajn marketom i programom za mlade kreativce.', 20.4489, 44.8125, '2026-06-27 17:00'::timestamp, '2026-06-29 23:30'::timestamp, 14.00, 4000, 'Festival', 'Beograd', 'jelena.creator@spirego.com'),
+    ('Sava Street Festival', 'Urbani festival pored Save sa muzikom, hranom, dizajn marketom i programom za mlade kreativce.', 20.4349, 44.7976, '2026-06-27 17:00'::timestamp, '2026-06-29 23:30'::timestamp, 14.00, 4000, 'Festival', 'Beograd', 'jelena.creator@spirego.com'),
     ('Izložba Novi pogledi Beograda', 'Izložba fotografija, grafika i video radova posvećenih savremenom Beogradu, rečnim obalama i svakodnevnom životu grada.', 20.4522, 44.8176, '2026-07-03 10:00'::timestamp, '2026-07-18 20:00'::timestamp, 4.00, 500, 'Izložba', 'Beograd', 'jelena.creator@spirego.com'),
     ('Nastup jazz kvarteta', 'Nastup jazz kvarteta u centru Beograda sa autorskim kompozicijama, standardima i gostujućim vokalom.', 20.4592, 44.8150, '2026-07-09 21:00'::timestamp, '2026-07-09 23:00'::timestamp, 9.00, 260, 'Nastup', 'Beograd', 'jelena.creator@spirego.com'),
     ('Okupljanje ljubitelja Dunava', 'Okupljanje lokalaca, turista i vodiča uz kratke priče o Dunavu, rečnim turama i skrivenim mestima za šetnju.', 20.4507, 44.8278, '2026-07-15 18:00'::timestamp, '2026-07-15 21:00'::timestamp, 0.00, 220, 'Okupljanje', 'Beograd', 'jelena.creator@spirego.com'),
@@ -33168,9 +33168,9 @@ WITH source("Name", "Description", "Lng", "Lat", "StartDate", "EndDate", "Price"
     ('Ada sportski dan', 'Sportski događaj na Adi sa trčanjem, odbojkom na pesku, biciklističkim izazovom i rekreativnim zonama.', 20.4164, 44.7872, '2026-07-27 09:00'::timestamp, '2026-07-27 18:00'::timestamp, 2.00, 1800, 'Sportski događaj', 'Beograd', 'jelena.creator@spirego.com'),
     ('Konferencija pametni gradovi Beograd', 'Konferencija o pametnim gradovima, mobilnosti, zelenim rešenjima i digitalnim servisima za turiste i stanovnike.', 20.4386, 44.8092, '2026-08-04 09:00'::timestamp, '2026-08-04 17:30'::timestamp, 35.00, 600, 'Konferencija', 'Beograd', 'jelena.creator@spirego.com'),
     ('Radionica street art Beograd', 'Radionica ulične umetnosti sa uvodom u mural, rad sa sprejevima i zajedničkim oslikavanjem legalnog zida.', 20.4657, 44.8129, '2026-08-10 11:00'::timestamp, '2026-08-10 15:00'::timestamp, 16.00, 35, 'Radionica', 'Beograd', 'jelena.creator@spirego.com'),
-    ('Seminar hotelskog marketinga', 'Seminar za hotele i apartmane o digitalnom marketingu, recenzijama gostiju, sezonskim kampanjama i lokalnim partnerstvima.', 20.4480, 44.8106, '2026-08-17 10:00'::timestamp, '2026-08-17 15:30'::timestamp, 22.00, 160, 'Seminar', 'Beograd', 'jelena.creator@spirego.com'),
+    ('Seminar hotelskog marketinga', 'Seminar za hotele i apartmane o digitalnom marketingu, recenzijama gostiju, sezonskim kampanjama i lokalnim partnerstvima.', 20.3819, 44.8001, '2026-08-17 10:00'::timestamp, '2026-08-17 15:30'::timestamp, 22.00, 160, 'Seminar', 'Beograd', 'jelena.creator@spirego.com'),
     ('Takmičenje barista Beograd', 'Takmičenje barista sa degustacijama, latte art rundom i predstavljanjem lokalnih pržionica kafe.', 20.4611, 44.8159, '2026-08-23 12:00'::timestamp, '2026-08-23 19:00'::timestamp, 5.00, 600, 'Takmičenje', 'Beograd', 'jelena.creator@spirego.com'),
-    ('Proslava beogradskog leta', 'Velika proslava leta sa koncertima, hranom, svetlosnim instalacijama i programom za porodice na otvorenom.', 20.4479, 44.8131, '2026-08-29 18:00'::timestamp, '2026-08-29 23:30'::timestamp, 0.00, 7000, 'Proslava', 'Beograd', 'jelena.creator@spirego.com'),
+    ('Proslava beogradskog leta', 'Velika proslava leta sa koncertima, hranom, svetlosnim instalacijama i programom za porodice na otvorenom.', 20.4498, 44.8196, '2026-08-29 18:00'::timestamp, '2026-08-29 23:30'::timestamp, 0.00, 7000, 'Proslava', 'Beograd', 'jelena.creator@spirego.com'),
     ('Stand-up noć na Vračaru', 'Stand-up veče sa domaćim komičarima, novim materijalom i kratkim open mic segmentom za goste.', 20.4714, 44.7980, '2026-09-05 21:00'::timestamp, '2026-09-05 22:45'::timestamp, 9.00, 240, 'Stand-up', 'Beograd', 'jelena.creator@spirego.com'),
     ('DJ veče Beton hala', 'DJ veče u zoni Beton hale sa house i disco setovima, gostujućim producentima i noćnom atmosferom pored reke.', 20.4481, 44.8180, '2026-09-12 22:30'::timestamp, '2026-09-13 04:00'::timestamp, 12.00, 900, 'DJ veče', 'Beograd', 'jelena.creator@spirego.com'),
     ('Turnir u basketu Beograd', 'Turnir 3x3 basket ekipa sa kvalifikacijama, finalnom utakmicom, muzikom i nagradama za publiku.', 20.4562, 44.8119, '2026-09-19 16:00'::timestamp, '2026-09-20 21:00'::timestamp, 4.00, 1300, 'Turnir', 'Beograd', 'jelena.creator@spirego.com')
@@ -33376,7 +33376,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'lucia.admin@spirego.com'), NOW()),
 
 ('La Concha San Sebastian', 'Najpoznatija plaža grada, uređena za plivanje, šetnje i lagane sportske aktivnosti uz obalu.',
- ST_SetSRID(ST_MakePoint(-1.9891, 43.3213), 4326), true,
+ ST_SetSRID(ST_MakePoint(-1.9881, 43.3164), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'San Sebastian'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Plaža'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'lucia.admin@spirego.com'), NOW()),
@@ -33418,7 +33418,7 @@ VALUES
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Stari grad'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'lucia.admin@spirego.com'), NOW()),
 ('Paseo Campo del Sur', 'Dugo obalsko šetalište sa pogledom na more, tvrđave i gradske zidine Kadiza.',
- ST_SetSRID(ST_MakePoint(-6.2972, 36.5278), 4326), true,
+ ST_SetSRID(ST_MakePoint(-6.2990, 36.5289), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Cadiz'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Šetaliste'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'lucia.admin@spirego.com'), NOW()),
@@ -33440,7 +33440,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'lucia.admin@spirego.com'), NOW()),
 
 ('El Sardinero Santander', 'Duga plaža i obalni deo Santandera pogodan za plivanje, vožnju bicikla i opuštene šetnje.',
- ST_SetSRID(ST_MakePoint(-3.7839, 43.4767), 4326), true,
+ ST_SetSRID(ST_MakePoint(-3.7850, 43.4756), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Santander'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Plaža'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'lucia.admin@spirego.com'), NOW()),
@@ -33450,7 +33450,7 @@ VALUES
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Kulturna četvrt'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'lucia.admin@spirego.com'), NOW()),
 ('Peninsula Magdalena', 'Zeleni poluostrvski prostor sa vidikovcima, stazama i panoramama severne obale.',
- ST_SetSRID(ST_MakePoint(-3.7568, 43.4694), 4326), true,
+ ST_SetSRID(ST_MakePoint(-3.7685, 43.4694), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Santander'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Park'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'lucia.admin@spirego.com'), NOW()),
@@ -33557,14 +33557,14 @@ WITH source("Name", "Description", "Address", "PhoneNumber", "Price", "ObjectTyp
     ('Klinika Vista Med Alicante', 'Privatna klinika sa pregledima, dijagnostikom i brzim prijemom za lakše zdravstvene potrebe.', 'Explanada Alicante, Alicante', '+34965000008', 0.00, 'Klinika', 'Explanada Alicante', 'Alicante', 'carmen.creator@spirego.com', 'manager.alicante@spirego.com', 'health', -0.4827, 38.3457),
     ('Cepsa Castillo Alicante', 'Pumpa na prilazu tvrđavi korisna za vozila koja obilaze širi gradski pojas.', 'Castillo Santa Barbara Alicante, Alicante', '+34965000009', 0.00, 'Benzinska pumpa', 'Castillo Santa Barbara Alicante', 'Alicante', 'carmen.creator@spirego.com', 'manager.alicante@spirego.com', 'fuel', -0.4792, 38.3486),
 
-    ('Pansion La Concha Residence', 'Mirniji smeštaj nekoliko minuta od obale, praktičan za goste koji žele pešački obilazak grada.', 'La Concha San Sebastian, San Sebastian', '+34943000001', 148.00, 'Pansion', 'La Concha San Sebastian', 'San Sebastian', 'carmen.creator@spirego.com', 'manager.sansebastian@spirego.com', 'lodging', -1.9885, 43.3208),
+    ('Pansion La Concha Residence', 'Mirniji smeštaj nekoliko minuta od obale, praktičan za goste koji žele pešački obilazak grada.', 'La Concha San Sebastian, San Sebastian', '+34943000001', 148.00, 'Pansion', 'La Concha San Sebastian', 'San Sebastian', 'carmen.creator@spirego.com', 'manager.sansebastian@spirego.com', 'lodging', -1.9868, 43.3163),
     ('Pintxos Parte Vieja', 'Živ restoran sa baskijskim zalogajima i večernjom atmosferom u starom delu grada.', 'Parte Vieja San Sebastian, San Sebastian', '+34943000002', 31.00, 'Restoran', 'Parte Vieja San Sebastian', 'San Sebastian', 'carmen.creator@spirego.com', 'manager.sansebastian@spirego.com', 'food', -1.9844, 43.3227),
     ('Galerija Atlantik Donostia', 'Savremena galerija sa manjim izložbama i fokusom na lokalnu kreativnu scenu.', 'Parte Vieja San Sebastian, San Sebastian', '+34943000003', 7.00, 'Galerija', 'Parte Vieja San Sebastian', 'San Sebastian', 'carmen.creator@spirego.com', 'manager.sansebastian@spirego.com', 'culture', -1.9841, 43.3229),
     ('Mercado Kursaal San Sebastian', 'Gradska tržnica sa hranom, delikatesima i dosta lokalnih proizvoda za kraću kupovinu.', 'Parte Vieja San Sebastian, San Sebastian', '+34943000004', 0.00, 'Tržnica', 'Parte Vieja San Sebastian', 'San Sebastian', 'carmen.creator@spirego.com', 'manager.sansebastian@spirego.com', 'shopping', -1.9838, 43.3224),
-    ('Hospital Donostia Center', 'Bolnički objekat sa hitnim prijemom i osnovnim specijalističkim uslugama za gradski i turistički deo.', 'La Concha San Sebastian, San Sebastian', '+34943000005', 0.00, 'Bolnica', 'La Concha San Sebastian', 'San Sebastian', 'carmen.creator@spirego.com', 'manager.sansebastian@spirego.com', 'health', -1.9878, 43.3210),
-    ('Repsol La Concha', 'Pumpa uz glavne gradske prilaze sa brzom uslugom i manjom prodavnicom za putnike.', 'La Concha San Sebastian, San Sebastian', '+34943000006', 0.00, 'Benzinska pumpa', 'La Concha San Sebastian', 'San Sebastian', 'carmen.creator@spirego.com', 'manager.sansebastian@spirego.com', 'fuel', -1.9894, 43.3205),
+    ('Hospital Donostia Center', 'Bolnički objekat sa hitnim prijemom i osnovnim specijalističkim uslugama za gradski i turistički deo.', 'La Concha San Sebastian, San Sebastian', '+34943000005', 0.00, 'Bolnica', 'La Concha San Sebastian', 'San Sebastian', 'carmen.creator@spirego.com', 'manager.sansebastian@spirego.com', 'health', -1.9687, 43.2923),
+    ('Repsol La Concha', 'Pumpa uz glavne gradske prilaze sa brzom uslugom i manjom prodavnicom za putnike.', 'La Concha San Sebastian, San Sebastian', '+34943000006', 0.00, 'Benzinska pumpa', 'La Concha San Sebastian', 'San Sebastian', 'carmen.creator@spirego.com', 'manager.sansebastian@spirego.com', 'fuel', -1.9832, 43.3246),
     ('Suveniri Parte Vieja', 'Mala prodavnica sa poklonima, gastronomskim sitnicama i stvarima vezanim za baskijsku kulturu.', 'Parte Vieja San Sebastian, San Sebastian', '+34943000007', 0.00, 'Suvenirnica', 'Parte Vieja San Sebastian', 'San Sebastian', 'carmen.creator@spirego.com', 'manager.sansebastian@spirego.com', 'shopping', -1.9848, 43.3221),
-    ('Poliklinika Zurriola San Sebastian', 'Poliklinika sa pregledima i analizama, pogodna za brže zdravstvene potrebe tokom boravka u gradu.', 'La Concha San Sebastian, San Sebastian', '+34943000008', 0.00, 'Poliklinika', 'La Concha San Sebastian', 'San Sebastian', 'carmen.creator@spirego.com', 'manager.sansebastian@spirego.com', 'health', -1.9869, 43.3216),
+    ('Poliklinika Zurriola San Sebastian', 'Poliklinika sa pregledima i analizama, pogodna za brže zdravstvene potrebe tokom boravka u gradu.', 'La Concha San Sebastian, San Sebastian', '+34943000008', 0.00, 'Poliklinika', 'La Concha San Sebastian', 'San Sebastian', 'carmen.creator@spirego.com', 'manager.sansebastian@spirego.com', 'health', -1.9749, 43.3240),
     ('Cepsa Igueldo Drive', 'Benzinska pumpa na prilazu višim tačkama grada i obalnim rutama prema vidikovcu.', 'Monte Igueldo, San Sebastian', '+34943000009', 0.00, 'Benzinska pumpa', 'Monte Igueldo', 'San Sebastian', 'carmen.creator@spirego.com', 'manager.sansebastian@spirego.com', 'fuel', -2.0319, 43.3185),
 
     ('Apartmani Onyar Rooms', 'Apartmanski smeštaj uz reku, pogodan za duži boravak i mirnije večeri u Đironi.', 'Onyar Riverside Girona, Girona', '+34972000001', 122.00, 'Apartman', 'Onyar Riverside Girona', 'Girona', 'carmen.creator@spirego.com', 'manager.girona@spirego.com', 'lodging', 2.8247, 41.9846),
@@ -33576,7 +33576,7 @@ WITH source("Name", "Description", "Address", "PhoneNumber", "Price", "ObjectTyp
     ('Suvenirnica Katedrala Girona', 'Prodavnica sa poklonima, ilustracijama grada i manjim ručno rađenim predmetima.', 'Girona Cathedral Quarter, Girona', '+34972000007', 0.00, 'Suvenirnica', 'Girona Cathedral Quarter', 'Girona', 'carmen.creator@spirego.com', 'manager.girona@spirego.com', 'shopping', 2.8258, 41.9868),
 
     ('Hotel La Caleta Cadiz', 'Hotel blizu obale i šetališta, praktičan za goste koji žele atlantsku atmosferu i pešački obilazak.', 'La Caleta Cadiz, Cadiz', '+34956000001', 138.00, 'Hotel', 'La Caleta Cadiz', 'Cadiz', 'carmen.creator@spirego.com', 'manager.cadiz@spirego.com', 'lodging', -6.2992, 36.5312),
-    ('Taverna Campo del Sur', 'Restoran sa morskim jelima i kasnijim večerama uz obalni deo starog Kadiza.', 'Paseo Campo del Sur, Cadiz', '+34956000002', 33.00, 'Restoran', 'Paseo Campo del Sur', 'Cadiz', 'carmen.creator@spirego.com', 'manager.cadiz@spirego.com', 'food', -6.2968, 36.5276),
+    ('Taverna Campo del Sur', 'Restoran sa morskim jelima i kasnijim večerama uz obalni deo starog Kadiza.', 'Paseo Campo del Sur, Cadiz', '+34956000002', 33.00, 'Restoran', 'Paseo Campo del Sur', 'Cadiz', 'carmen.creator@spirego.com', 'manager.cadiz@spirego.com', 'food', -6.3041, 36.5298),
     ('Muzej Atlantika Cadiz', 'Kulturni prostor sa fokusom na obalu, luku i istorijski značaj grada kroz vekove.', 'Old Town Cadiz, Cadiz', '+34956000003', 7.00, 'Muzej', 'Old Town Cadiz', 'Cadiz', 'carmen.creator@spirego.com', 'manager.cadiz@spirego.com', 'culture', -6.2944, 36.5290),
     ('Mercado del Puerto Cadiz', 'Tržnica sa ribom, svežim namirnicama i lokalnim proizvodima tipičnim za andaluzijsku obalu.', 'Old Town Cadiz, Cadiz', '+34956000004', 0.00, 'Tržnica', 'Old Town Cadiz', 'Cadiz', 'carmen.creator@spirego.com', 'manager.cadiz@spirego.com', 'shopping', -6.2940, 36.5295),
     ('Hospital Bahia Cadiz', 'Bolnica za hitne i redovne preglede, korisna i lokalnim stanovnicima i sezonskim posetiocima.', 'Old Town Cadiz, Cadiz', '+34956000005', 0.00, 'Bolnica', 'Old Town Cadiz', 'Cadiz', 'carmen.creator@spirego.com', 'manager.cadiz@spirego.com', 'health', -6.2935, 36.5288),
@@ -33591,13 +33591,13 @@ WITH source("Name", "Description", "Address", "PhoneNumber", "Price", "ObjectTyp
     ('Repsol Murcia Centro', 'Pumpa u centralnoj zoni grada, praktična za kraća zaustavljanja i svakodnevne gradske vožnje.', 'Rio Segura Murcia, Murcia', '+34968000006', 0.00, 'Benzinska pumpa', 'Rio Segura Murcia', 'Murcia', 'carmen.creator@spirego.com', 'manager.murcia@spirego.com', 'fuel', -1.1289, 37.9848),
     ('Suvenirnica Plaza Belluga', 'Suvenirnica sa manjim poklonima, slatkišima i predmetima inspirisanim Mursijom.', 'Plaza Belluga Murcia, Murcia', '+34968000007', 0.00, 'Suvenirnica', 'Plaza Belluga Murcia', 'Murcia', 'carmen.creator@spirego.com', 'manager.murcia@spirego.com', 'shopping', -1.1284, 37.9836),
 
-    ('Pansion Sardinero Plaza', 'Pansion uz obalu za goste koji žele jednostavan smeštaj i lagan pristup plaži i centru.', 'El Sardinero Santander, Santander', '+34942000001', 119.00, 'Pansion', 'El Sardinero Santander', 'Santander', 'carmen.creator@spirego.com', 'manager.santander@spirego.com', 'lodging', -3.7842, 43.4762),
+    ('Pansion Sardinero Plaza', 'Pansion uz obalu za goste koji žele jednostavan smeštaj i lagan pristup plaži i centru.', 'El Sardinero Santander, Santander', '+34942000001', 119.00, 'Pansion', 'El Sardinero Santander', 'Santander', 'carmen.creator@spirego.com', 'manager.santander@spirego.com', 'lodging', -3.7820, 43.4713),
     ('Restaurante Botin Norte', 'Restoran severnjačke kuhinje sa ribom, predjelima i pogledom ka obalnom delu Santandera.', 'Centro Botin Santander, Santander', '+34942000002', 35.00, 'Restoran', 'Centro Botin Santander', 'Santander', 'carmen.creator@spirego.com', 'manager.santander@spirego.com', 'food', -3.7977, 43.4635),
     ('Galerija Costa Cantabrica', 'Galerijski prostor sa povremenim postavkama i manjim kulturnim programom uz vodeni deo grada.', 'Centro Botin Santander, Santander', '+34942000003', 6.00, 'Galerija', 'Centro Botin Santander', 'Santander', 'carmen.creator@spirego.com', 'manager.santander@spirego.com', 'culture', -3.7981, 43.4641),
-    ('Mercado Sardinero Santander', 'Tržnica sa lokalnim namirnicama, sirevima i svakodnevnim shopping sadržajem za gradski deo.', 'El Sardinero Santander, Santander', '+34942000004', 0.00, 'Tržnica', 'El Sardinero Santander', 'Santander', 'carmen.creator@spirego.com', 'manager.santander@spirego.com', 'shopping', -3.7837, 43.4769),
+    ('Mercado Sardinero Santander', 'Tržnica sa lokalnim namirnicama, sirevima i svakodnevnim shopping sadržajem za gradski deo.', 'El Sardinero Santander, Santander', '+34942000004', 0.00, 'Tržnica', 'El Sardinero Santander', 'Santander', 'carmen.creator@spirego.com', 'manager.santander@spirego.com', 'shopping', -3.7824, 43.4724),
     ('Hospital Cantabrico Santander', 'Bolnica sa hitnim i redovnim prijemom, lako dostupna iz obalnog i centralnog dela grada.', 'Centro Botin Santander, Santander', '+34942000005', 0.00, 'Bolnica', 'Centro Botin Santander', 'Santander', 'carmen.creator@spirego.com', 'manager.santander@spirego.com', 'health', -3.7974, 43.4638),
-    ('Repsol Sardinero Santander', 'Benzinska pumpa uz glavne saobraćajnice prema plažama i gradskom jezgru.', 'El Sardinero Santander, Santander', '+34942000006', 0.00, 'Benzinska pumpa', 'El Sardinero Santander', 'Santander', 'carmen.creator@spirego.com', 'manager.santander@spirego.com', 'fuel', -3.7848, 43.4758),
-    ('Suveniri Magdalena', 'Prodavnica sa sitnim poklonima i turističkim detaljima inspirisanim severnom obalom.', 'Peninsula Magdalena, Santander', '+34942000007', 0.00, 'Suvenirnica', 'Peninsula Magdalena', 'Santander', 'carmen.creator@spirego.com', 'manager.santander@spirego.com', 'shopping', -3.7564, 43.4691),
+    ('Repsol Sardinero Santander', 'Benzinska pumpa uz glavne saobraćajnice prema plažama i gradskom jezgru.', 'El Sardinero Santander, Santander', '+34942000006', 0.00, 'Benzinska pumpa', 'El Sardinero Santander', 'Santander', 'carmen.creator@spirego.com', 'manager.santander@spirego.com', 'fuel', -3.8716, 43.4715),
+    ('Suveniri Magdalena', 'Prodavnica sa sitnim poklonima i turističkim detaljima inspirisanim severnom obalom.', 'Peninsula Magdalena, Santander', '+34942000007', 0.00, 'Suvenirnica', 'Peninsula Magdalena', 'Santander', 'carmen.creator@spirego.com', 'manager.santander@spirego.com', 'shopping', -3.7723, 43.4697),
 
     ('Resort Costa Adeje Blue', 'Veći hotel na jugu ostrva sa bazenima, dobrim pristupom plažama i sadržajima za odmor.', 'Costa Adeje Tenerife, Tenerife', '+34922000001', 189.00, 'Hotel', 'Costa Adeje Tenerife', 'Tenerife', 'carmen.creator@spirego.com', 'manager.tenerife@spirego.com', 'lodging', -16.7322, 28.0913),
     ('Restaurante Volcán y Mar', 'Restoran koji kombinuje ribu, lokalne sastojke i opušteniju večernju atmosferu uz more.', 'Costa Adeje Tenerife, Tenerife', '+34922000002', 37.00, 'Restoran', 'Costa Adeje Tenerife', 'Tenerife', 'carmen.creator@spirego.com', 'manager.tenerife@spirego.com', 'food', -16.7328, 28.0907),
@@ -34672,7 +34672,7 @@ VALUES
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Šetaliste'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'), NOW()),
 ('Miramare Trieste', 'Dvorac i obala severno od centra sa lepim pogledima, parkom i osećajem izdvojene morske tačke.',
- ST_SetSRID(ST_MakePoint(13.7113, 45.7025), 4326), true,
+ ST_SetSRID(ST_MakePoint(13.7125, 45.7025), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Trieste'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Istorijska lokacija'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'), NOW()),
@@ -34694,7 +34694,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'), NOW()),
 
 ('Marina Grande Sorrento', 'Manja marina Sorenta sa čamcima, restoranima i blagim prelazom iz centra grada prema vodi.',
- ST_SetSRID(ST_MakePoint(14.3657, 40.6288), 4326), true,
+ ST_SetSRID(ST_MakePoint(14.3725, 40.6279), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Sorrento'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Marina'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'), NOW()),
@@ -34742,7 +34742,7 @@ VALUES
  (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'), NOW()),
 
 ('Costa Smeralda Sardinija', 'Poznata obalska zona sa svetlim uvalama, tirkiznom vodom i ritmom koji se menja između mirnih jutara i življih večeri.',
- ST_SetSRID(ST_MakePoint(9.5330, 41.1364), 4326), true,
+ ST_SetSRID(ST_MakePoint(9.5286, 41.1363), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Sardinija'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Turistička zona'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'), NOW()),
@@ -34752,7 +34752,7 @@ VALUES
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Marina'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'), NOW()),
 ('Golfo Orosei Sardinija', 'Prirodni lokalitet sa uvalama, stenama i morskim bojama koje najviše dolaze do izražaja tokom dana na vodi.',
- ST_SetSRID(ST_MakePoint(9.6902, 40.2716), 4326), true,
+ ST_SetSRID(ST_MakePoint(9.6729, 40.3297), 4326), true,
  (SELECT "Id" FROM "Destinations" WHERE "Name" = 'Sardinija'),
  (SELECT "Id" FROM "LocalityTypes" WHERE "Name" = 'Prirodni lokalitet'),
  (SELECT "Id" FROM "Users" WHERE "Email" = 'giulia.admin@spirego.com'), NOW());
@@ -34939,10 +34939,10 @@ WITH source("Name", "Description", "Lng", "Lat", "Price", "DurationMinutes", "Ac
     ('Degustacija pirinčanih ukusa Alicantea', 'Kulinarsko iskustvo uz lokalne specijalitete i sporiji ručak na obali.', -0.4821, 38.3447, 34.00, 100, 'Degustacija hrane', 'Explanada Alicante', 'Alicante', 'Arrocería Costa Blanca', 'carmen.creator@spirego.com', 'food'),
     ('Kupovina na Explanadi Alicante', 'Lagani shopping obilazak uz fokus na lokalne poklone i gradske prodavnice.', -0.4817, 38.3445, 0.00, 80, 'Kupovina', 'Explanada Alicante', 'Alicante', 'Plaza Mar Alicante', 'carmen.creator@spirego.com', 'shopping'),
 
-    ('Kupanje u zalivu La Concha', 'Plivanje i boravak na najpoznatijoj gradskoj plaži uz lep pogled na zaliv.', -1.9889, 43.3211, 0.00, 90, 'Plivanje', 'La Concha San Sebastian', 'San Sebastian', NULL, 'carmen.creator@spirego.com', 'water'),
+    ('Kupanje u zalivu La Concha', 'Plivanje i boravak na najpoznatijoj gradskoj plaži uz lep pogled na zaliv.', -1.9879, 43.3165, 0.00, 90, 'Plivanje', 'La Concha San Sebastian', 'San Sebastian', NULL, 'carmen.creator@spirego.com', 'water'),
     ('Pintxos veče u Parte Vieji', 'Večernji gastronomski obilazak uz baskijske zalogaje i kraća zadržavanja u starom gradu.', -1.9845, 43.3225, 29.00, 110, 'Degustacija hrane', 'Parte Vieja San Sebastian', 'San Sebastian', 'Pintxos Parte Vieja', 'carmen.creator@spirego.com', 'food'),
     ('Fotografisanje Monte Iguelda', 'Kraći obilazak vidikovca sa dovoljno vremena za panoramske fotografije i pogled na zaliv.', -2.0326, 43.3186, 0.00, 75, 'Fotografisanje', 'Monte Igueldo', 'San Sebastian', NULL, 'carmen.creator@spirego.com', 'view'),
-    ('Biciklistički krug uz obalu Donostije', 'Vožnja bicikla kroz obalni deo grada sa laganim tempom i kratkim foto pauzama.', -1.9877, 43.3209, 18.00, 95, 'Biciklizam', 'La Concha San Sebastian', 'San Sebastian', NULL, 'carmen.creator@spirego.com', 'bike'),
+    ('Biciklistički krug uz obalu Donostije', 'Vožnja bicikla kroz obalni deo grada sa laganim tempom i kratkim foto pauzama.', -1.9723, 43.3263, 18.00, 95, 'Biciklizam', 'La Concha San Sebastian', 'San Sebastian', NULL, 'carmen.creator@spirego.com', 'bike'),
 
     ('Foto tura kroz Barri Vell', 'Fotografska šetnja kroz srednjovekovne ulice i stepenice istorijskog jezgra Đirone.', 2.8260, 41.9860, 0.00, 90, 'Fotografisanje', 'Barri Vell Girona', 'Girona', NULL, 'carmen.creator@spirego.com', 'view'),
     ('Razgledanje katedrale i starih ulica', 'Lagani obilazak ključnih tačaka starog grada sa fokusom na detalje i istoriju.', 2.8258, 41.9868, 0.00, 100, 'Razgledanje', 'Girona Cathedral Quarter', 'Girona', NULL, 'carmen.creator@spirego.com', 'walk'),
@@ -34951,8 +34951,8 @@ WITH source("Name", "Description", "Lng", "Lat", "Price", "DurationMinutes", "Ac
 
     ('Plivanje na La Caleti', 'Opusteno plivanje i boravak na gradskoj plaži uz atlantski vetar i otvoren horizont.', -6.2991, 36.5315, 0.00, 95, 'Plivanje', 'La Caleta Cadiz', 'Cadiz', NULL, 'carmen.creator@spirego.com', 'water'),
     ('Vožnja čamcem uz zidine Kadiza', 'Kratka vožnja čamcem sa pogledom na obalu, tvrđave i gradske zidine.', -6.2971, 36.5282, 24.00, 70, 'Vožnja čamcem', 'Paseo Campo del Sur', 'Cadiz', NULL, 'carmen.creator@spirego.com', 'boat'),
-    ('Degustacija morskih zalogaja Kadiza', 'Degustacioni obrok sa morskim plodovima i lokalnim ukusima atlantske obale.', -6.2965, 36.5278, 31.00, 100, 'Degustacija hrane', 'Paseo Campo del Sur', 'Cadiz', 'Taverna Campo del Sur', 'carmen.creator@spirego.com', 'food'),
-    ('Noćni provod uz obalu Kadiza', 'Večernji izlazak u življem delu obale uz muziku i duže zadržavanje na otvorenom.', -6.2963, 36.5275, 12.00, 140, 'Noćni provod', 'Paseo Campo del Sur', 'Cadiz', 'Taverna Campo del Sur', 'carmen.creator@spirego.com', 'night'),
+    ('Degustacija morskih zalogaja Kadiza', 'Degustacioni obrok sa morskim plodovima i lokalnim ukusima atlantske obale.', -6.2811, 36.5170, 31.00, 100, 'Degustacija hrane', 'Paseo Campo del Sur', 'Cadiz', 'Taverna Campo del Sur', 'carmen.creator@spirego.com', 'food'),
+    ('Noćni provod uz obalu Kadiza', 'Večernji izlazak u življem delu obale uz muziku i duže zadržavanje na otvorenom.', -6.3046, 36.5287, 12.00, 140, 'Noćni provod', 'Paseo Campo del Sur', 'Cadiz', 'Taverna Campo del Sur', 'carmen.creator@spirego.com', 'night'),
 
     ('Joga uz Seguru', 'Mirnija jutarnja joga sesija u šetačkoj zoni uz reku i gradsko zelenilo.', -1.1291, 37.9850, 12.00, 60, 'Joga', 'Rio Segura Murcia', 'Murcia', NULL, 'carmen.creator@spirego.com', 'wellness'),
     ('Kupovina u centru Mursije', 'Shopping ruta kroz centralni trg i zatvoreniji trgovački prostor sa više kategorija radnji.', -1.1284, 37.9841, 0.00, 80, 'Kupovina', 'Plaza Belluga Murcia', 'Murcia', 'Centro Comercial Murcia Luz', 'carmen.creator@spirego.com', 'shopping'),
@@ -34961,7 +34961,7 @@ WITH source("Name", "Description", "Lng", "Lat", "Price", "DurationMinutes", "Ac
 
     ('Plivanje na El Sardineru', 'Kupanje i opuštanje na široj plaži uz dovoljno prostora i duže šetnje po obali.', -3.7838, 43.4766, 0.00, 100, 'Plivanje', 'El Sardinero Santander', 'Santander', NULL, 'carmen.creator@spirego.com', 'water'),
     ('Kajak uz obalu Santandera', 'Vožnja kajakom uz obalu sa pogledom na plaže i gradski vodeni front.', -3.7845, 43.4759, 21.00, 80, 'Kajak', 'El Sardinero Santander', 'Santander', NULL, 'carmen.creator@spirego.com', 'boat'),
-    ('Fotografisanje ostrva Magdalena', 'Lagani obilazak poluostrva sa fokusom na panorame i prirodne kadrove.', -3.7566, 43.4692, 0.00, 70, 'Fotografisanje', 'Peninsula Magdalena', 'Santander', NULL, 'carmen.creator@spirego.com', 'view'),
+    ('Fotografisanje ostrva Magdalena', 'Lagani obilazak poluostrva sa fokusom na panorame i prirodne kadrove.', -3.7652, 43.4675, 0.00, 70, 'Fotografisanje', 'Peninsula Magdalena', 'Santander', NULL, 'carmen.creator@spirego.com', 'view'),
     ('Degustacija severnjačke kuhinje Santandera', 'Ručak sa morskim ukusima i lokalnim stilom serviranja u obalnom delu grada.', -3.7975, 43.4637, 35.00, 100, 'Poseta Restoranu', 'Centro Botin Santander', 'Santander', 'Restaurante Botin Norte', 'carmen.creator@spirego.com', 'food'),
 
     ('Ronjenje u Costa Adeji', 'Ronjenje u toplijem priobalju sa fokusom na lakše podvodne tačke za rekreativce.', -16.7329, 28.0908, 42.00, 90, 'Ronjenje', 'Costa Adeje Tenerife', 'Tenerife', NULL, 'carmen.creator@spirego.com', 'water'),
@@ -35131,7 +35131,7 @@ WITH source("Name", "Description", "Address", "PhoneNumber", "Price", "ObjectTyp
     ('Repsol Lungomare Bari', 'Pumpa uz obalski prilaz sa manjom prodavnicom i brzim stajanjem za kraće gradske vožnje.', 'Lungomare Bari, Bari', '+390800000006', 0.00, 'Benzinska pumpa', 'Lungomare Bari', 'Bari', 'lorenzo.creator@spirego.com', 'manager.bari@spirego.com', 'fuel', 16.8821, 41.1208),
     ('Suvenirnica Bari Vecchia', 'Prodavnica sa keramikom, manjim poklonima i detaljima inspirisanim starim jezgrom i obalom.', 'Bari Vecchia, Bari', '+390800000007', 0.00, 'Suvenirnica', 'Bari Vecchia', 'Bari', 'lorenzo.creator@spirego.com', 'manager.bari@spirego.com', 'shopping', 16.8736, 41.1281),
     ('Klinika San Nicola Bari', 'Privatna klinika sa pregledima i dijagnostikom, pogodna za brže zdravstvene potrebe tokom boravka u gradu.', 'Basilica San Nicola Bari, Bari', '+390800000008', 0.00, 'Klinika', 'Basilica San Nicola Bari', 'Bari', 'lorenzo.creator@spirego.com', 'manager.bari@spirego.com', 'health', 16.8716, 41.1297),
-    ('Q8 Porto Bari', 'Benzinska pumpa na prilazu lučkom delu grada, praktična za vozila koja izlaze iz centralne zone.', 'Bari Vecchia, Bari', '+390800000009', 0.00, 'Benzinska pumpa', 'Bari Vecchia', 'Bari', 'lorenzo.creator@spirego.com', 'manager.bari@spirego.com', 'fuel', 16.8768, 41.1248),
+    ('Q8 Porto Bari', 'Benzinska pumpa na prilazu lučkom delu grada, praktična za vozila koja izlaze iz centralne zone.', 'Bari Vecchia, Bari', '+390800000009', 0.00, 'Benzinska pumpa', 'Bari Vecchia', 'Bari', 'lorenzo.creator@spirego.com', 'manager.bari@spirego.com', 'fuel', 16.8337, 41.1234),
 
     ('Hotel Quattro Canti Palermo', 'Centralni hotel za goste koji žele da najvažnije gradske tačke, pijace i večernje ulice obiđu peške.', 'Quattro Canti Palermo, Palermo', '+390910000001', 158.00, 'Hotel', 'Quattro Canti Palermo', 'Palermo', 'lorenzo.creator@spirego.com', 'manager.palermo@spirego.com', 'lodging', 13.3617, 38.1152),
     ('Osteria Ballaro Palermo', 'Restoran sa sicilijanskim jelima, uličnim uticajima i energijom koja traje i posle večere.', 'Mercato Ballaro Palermo, Palermo', '+390910000002', 31.00, 'Restoran', 'Mercato Ballaro Palermo', 'Palermo', 'lorenzo.creator@spirego.com', 'manager.palermo@spirego.com', 'food', 13.3688, 38.1130),
@@ -35148,7 +35148,7 @@ WITH source("Name", "Description", "Address", "PhoneNumber", "Price", "ObjectTyp
     ('Muzej Morskog Trsta', 'Muzejski prostor koji povezuje luku, more i istoriju grada kroz preglednu i nenametljivu postavku.', 'Piazza Unita Trieste, Trieste', '+390400000003', 8.00, 'Muzej', 'Piazza Unita Trieste', 'Trieste', 'lorenzo.creator@spirego.com', 'manager.trieste@spirego.com', 'culture', 13.7698, 45.6492),
     ('Mercato Canal Grande Trieste', 'Gradska tržnica sa lokalnom hranom, kafom i manjim delikatesima za usputnu kupovinu.', 'Canal Grande Trieste, Trieste', '+390400000004', 0.00, 'Tržnica', 'Canal Grande Trieste', 'Trieste', 'lorenzo.creator@spirego.com', 'manager.trieste@spirego.com', 'shopping', 13.7732, 45.6536),
     ('Hospital Porto Trieste', 'Bolnica dostupna iz centralne i obalske zone grada, sa hitnim prijemom i osnovnom dijagnostikom.', 'Piazza Unita Trieste, Trieste', '+390400000005', 0.00, 'Bolnica', 'Piazza Unita Trieste', 'Trieste', 'lorenzo.creator@spirego.com', 'manager.trieste@spirego.com', 'health', 13.7692, 45.6506),
-    ('Eni Miramare Trieste', 'Benzinska pumpa na pravcu ka severnoj obali i dvorcu Miramare, praktična za duže dnevne rute.', 'Miramare Trieste, Trieste', '+390400000006', 0.00, 'Benzinska pumpa', 'Miramare Trieste', 'Trieste', 'lorenzo.creator@spirego.com', 'manager.trieste@spirego.com', 'fuel', 13.7127, 45.7018),
+    ('Eni Miramare Trieste', 'Benzinska pumpa na pravcu ka severnoj obali i dvorcu Miramare, praktična za duže dnevne rute.', 'Miramare Trieste, Trieste', '+390400000006', 0.00, 'Benzinska pumpa', 'Miramare Trieste', 'Trieste', 'lorenzo.creator@spirego.com', 'manager.trieste@spirego.com', 'fuel', 13.7674, 45.6647),
     ('Suvenirnica Piazza Unita', 'Mala prodavnica sa knjigama, ilustracijama i sitnim poklonima vezanim za Trst i njegovu obalu.', 'Piazza Unita Trieste, Trieste', '+390400000007', 0.00, 'Suvenirnica', 'Piazza Unita Trieste', 'Trieste', 'lorenzo.creator@spirego.com', 'manager.trieste@spirego.com', 'shopping', 13.7678, 45.6497),
 
     ('Apartmani Sassi Matera', 'Apartmanski smeštaj u kamenoj zoni Matere, dobar za sporiji boravak i jutra bez žurbe.', 'Sassi di Matera, Matera', '+390835000001', 136.00, 'Apartman', 'Sassi di Matera', 'Matera', 'lorenzo.creator@spirego.com', 'manager.matera@spirego.com', 'lodging', 16.6077, 40.6675),
@@ -35159,12 +35159,12 @@ WITH source("Name", "Description", "Address", "PhoneNumber", "Price", "ObjectTyp
     ('Q8 Murgia Matera', 'Pumpa na putu ka vidikovcu i širim prilazima Materi, pogodna za vozila van centralne pešačke zone.', 'Belvedere Murgia Matera, Matera', '+390835000006', 0.00, 'Benzinska pumpa', 'Belvedere Murgia Matera', 'Matera', 'lorenzo.creator@spirego.com', 'manager.matera@spirego.com', 'fuel', 16.6211, 40.6649),
     ('Tržnica Piazza Matera', 'Manja gradska tržnica sa lokalnim sirevima, hlebom i proizvodima za usputnu kupovinu.', 'Piazza Duomo Matera, Matera', '+390835000007', 0.00, 'Tržnica', 'Piazza Duomo Matera', 'Matera', 'lorenzo.creator@spirego.com', 'manager.matera@spirego.com', 'shopping', 16.6090, 40.6676),
 
-    ('Pansion Marina Grande Sorrento', 'Pansion u zoni marine, dobar za putnike kojima znače pogled na vodu i lak pristup čamcima.', 'Marina Grande Sorrento, Sorrento', '+390810000001', 141.00, 'Pansion', 'Marina Grande Sorrento', 'Sorrento', 'lorenzo.creator@spirego.com', 'manager.sorrento@spirego.com', 'lodging', 14.3661, 40.6284),
+    ('Pansion Marina Grande Sorrento', 'Pansion u zoni marine, dobar za putnike kojima znače pogled na vodu i lak pristup čamcima.', 'Marina Grande Sorrento, Sorrento', '+390810000001', 141.00, 'Pansion', 'Marina Grande Sorrento', 'Sorrento', 'lorenzo.creator@spirego.com', 'manager.sorrento@spirego.com', 'lodging', 14.3665, 40.6275),
     ('Limone Bistro Sorrento', 'Bistro sa limunskim desertima, laganijim obrocima i prijatnim ritmom za duži predah u centru.', 'Corso Italia Sorrento, Sorrento', '+390810000002', 29.00, 'Restoran', 'Corso Italia Sorrento', 'Sorrento', 'lorenzo.creator@spirego.com', 'manager.sorrento@spirego.com', 'food', 14.3752, 40.6268),
     ('Muzej Obale Sorrenta', 'Kulturni prostor sa fokusom na lokalnu obalu, pomorsku prošlost i razvoj grada kao turističke tačke.', 'Villa Comunale Sorrento, Sorrento', '+390810000003', 6.00, 'Muzej', 'Villa Comunale Sorrento', 'Sorrento', 'lorenzo.creator@spirego.com', 'manager.sorrento@spirego.com', 'culture', 14.3715, 40.6274),
     ('Galleria Corso Sorrento', 'Tržni centar sa modom, kozmetikom i manjim radnjama u najfrekventnijem delu Sorenta.', 'Corso Italia Sorrento, Sorrento', '+390810000004', 0.00, 'Tržni centar', 'Corso Italia Sorrento', 'Sorrento', 'lorenzo.creator@spirego.com', 'manager.sorrento@spirego.com', 'shopping', 14.3760, 40.6262),
     ('Hospital Costiera Sorrento', 'Bolnički objekat za obalu i okolna mesta, sa prijemom i pregledima koji su korisni tokom sezone.', 'Corso Italia Sorrento, Sorrento', '+390810000005', 0.00, 'Bolnica', 'Corso Italia Sorrento', 'Sorrento', 'lorenzo.creator@spirego.com', 'manager.sorrento@spirego.com', 'health', 14.3743, 40.6271),
-    ('Eni Marina Grande Sorrento', 'Benzinska pumpa na pristupu ka marini i obalskim rutama, pogodna za kraće gradske odlaske.', 'Marina Grande Sorrento, Sorrento', '+390810000006', 0.00, 'Benzinska pumpa', 'Marina Grande Sorrento', 'Sorrento', 'lorenzo.creator@spirego.com', 'manager.sorrento@spirego.com', 'fuel', 14.3670, 40.6282),
+    ('Eni Marina Grande Sorrento', 'Benzinska pumpa na pristupu ka marini i obalskim rutama, pogodna za kraće gradske odlaske.', 'Marina Grande Sorrento, Sorrento', '+390810000006', 0.00, 'Benzinska pumpa', 'Marina Grande Sorrento', 'Sorrento', 'lorenzo.creator@spirego.com', 'manager.sorrento@spirego.com', 'fuel', 14.3821, 40.6266),
     ('Suvenirnica Villa Sorrento', 'Prodavnica sa limunskim proizvodima, keramikom i sitnijim poklonima vezanim za obalu.', 'Villa Comunale Sorrento, Sorrento', '+390810000007', 0.00, 'Suvenirnica', 'Villa Comunale Sorrento', 'Sorrento', 'lorenzo.creator@spirego.com', 'manager.sorrento@spirego.com', 'shopping', 14.3718, 40.6276),
 
     ('Hotel Barocco Lecce', 'Uređen hotel u centru Lečea, praktičan za boravak bez auta i duže pešačke obilaske starog jezgra.', 'Piazza Sant''Oronzo Lecce, Lecce', '+390832000001', 145.00, 'Hotel', 'Piazza Sant''Oronzo Lecce', 'Lecce', 'lorenzo.creator@spirego.com', 'manager.lecce@spirego.com', 'lodging', 18.1717, 40.3528),
@@ -35183,12 +35183,12 @@ WITH source("Name", "Description", "Address", "PhoneNumber", "Price", "ObjectTyp
     ('Eni Oltretorrente Parma', 'Pumpa u delu grada sa lokalnim radnjama i lakim izlazom ka širim gradskim pravcima.', 'Oltretorrente Parma, Parma', '+390521000006', 0.00, 'Benzinska pumpa', 'Oltretorrente Parma', 'Parma', 'lorenzo.creator@spirego.com', 'manager.parma@spirego.com', 'fuel', 10.3227, 44.8021),
     ('Mercato Parma Gourmet', 'Gradska tržnica sa gurmanskim proizvodima, sirevima i delikatesima za namirnice i poklone.', 'Piazza Duomo Parma, Parma', '+390521000007', 0.00, 'Tržnica', 'Piazza Duomo Parma', 'Parma', 'lorenzo.creator@spirego.com', 'manager.parma@spirego.com', 'shopping', 10.3282, 44.8009),
 
-    ('Hotel Costa Smeralda', 'Hotel uz obalu sa lakim pristupom plažama, uvalama i dnevnim izletima na severu Sardinije.', 'Costa Smeralda Sardinija, Sardinija', '+390790000001', 187.00, 'Hotel', 'Costa Smeralda Sardinija', 'Sardinija', 'lorenzo.creator@spirego.com', 'manager.sardinia@spirego.com', 'lodging', 9.5326, 41.1362),
-    ('Trattoria Golfo Orosei', 'Restoran sa ribom, pastom i sporijim ritmom ručka posle dana na vodi ili izleta uz obalu.', 'Golfo Orosei Sardinija, Sardinija', '+390790000002', 36.00, 'Restoran', 'Golfo Orosei Sardinija', 'Sardinija', 'lorenzo.creator@spirego.com', 'manager.sardinia@spirego.com', 'food', 9.6898, 40.2712),
+    ('Hotel Costa Smeralda', 'Hotel uz obalu sa lakim pristupom plažama, uvalama i dnevnim izletima na severu Sardinije.', 'Costa Smeralda Sardinija, Sardinija', '+390790000001', 187.00, 'Hotel', 'Costa Smeralda Sardinija', 'Sardinija', 'lorenzo.creator@spirego.com', 'manager.sardinia@spirego.com', 'lodging', 9.5297, 41.1364),
+    ('Trattoria Golfo Orosei', 'Restoran sa ribom, pastom i sporijim ritmom ručka posle dana na vodi ili izleta uz obalu.', 'Golfo Orosei Sardinija, Sardinija', '+390790000002', 36.00, 'Restoran', 'Golfo Orosei Sardinija', 'Sardinija', 'lorenzo.creator@spirego.com', 'manager.sardinia@spirego.com', 'food', 9.6967, 40.3790),
     ('Muzej Nuraga Sardinija', 'Muzejski prostor sa fokusom na ostrvsku istoriju i starije civilizacijske slojeve Sardinije.', 'Cagliari Marina Sardinija, Sardinija', '+390790000003', 8.00, 'Muzej', 'Cagliari Marina Sardinija', 'Sardinija', 'lorenzo.creator@spirego.com', 'manager.sardinia@spirego.com', 'culture', 9.1161, 39.2140),
-    ('Surf Shop Sardinija', 'Prodavnica sa opremom, suvenirima i sitnicama korisnim za aktivniji boravak na obali.', 'Costa Smeralda Sardinija, Sardinija', '+390790000004', 0.00, 'Suvenirnica', 'Costa Smeralda Sardinija', 'Sardinija', 'lorenzo.creator@spirego.com', 'manager.sardinia@spirego.com', 'shopping', 9.5334, 41.1367),
+    ('Surf Shop Sardinija', 'Prodavnica sa opremom, suvenirima i sitnicama korisnim za aktivniji boravak na obali.', 'Costa Smeralda Sardinija, Sardinija', '+390790000004', 0.00, 'Suvenirnica', 'Costa Smeralda Sardinija', 'Sardinija', 'lorenzo.creator@spirego.com', 'manager.sardinia@spirego.com', 'shopping', 9.5102, 40.9302),
     ('Poliklinika Cagliari Marina', 'Poliklinika u urbanijem delu ostrva sa pregledima i analizama za svakodnevne zdravstvene potrebe.', 'Cagliari Marina Sardinija, Sardinija', '+390790000005', 0.00, 'Poliklinika', 'Cagliari Marina Sardinija', 'Sardinija', 'lorenzo.creator@spirego.com', 'manager.sardinia@spirego.com', 'health', 9.1158, 39.2136),
-    ('Repsol Costa Smeralda', 'Pumpa uz glavne obalske pravce, korisna za duže vožnje između uvala i gradskih tačaka na ostrvu.', 'Costa Smeralda Sardinija, Sardinija', '+390790000006', 0.00, 'Benzinska pumpa', 'Costa Smeralda Sardinija', 'Sardinija', 'lorenzo.creator@spirego.com', 'manager.sardinia@spirego.com', 'fuel', 9.5341, 41.1360),
+    ('Repsol Costa Smeralda', 'Pumpa uz glavne obalske pravce, korisna za duže vožnje između uvala i gradskih tačaka na ostrvu.', 'Costa Smeralda Sardinija, Sardinija', '+390790000006', 0.00, 'Benzinska pumpa', 'Costa Smeralda Sardinija', 'Sardinija', 'lorenzo.creator@spirego.com', 'manager.sardinia@spirego.com', 'fuel', 9.5327, 41.1396),
     ('Sardinia Sea Spa', 'Spa centar sa tretmanima i mirnijim ritmom za goste koji žele lakši predah između obilazaka i odlazaka na plažu.', 'Cagliari Marina Sardinija, Sardinija', '+390790000007', 34.00, 'Spa centar', 'Cagliari Marina Sardinija', 'Sardinija', 'lorenzo.creator@spirego.com', 'manager.sardinia@spirego.com', 'wellness', 9.1170, 39.2130)
 ),
 ranked_source AS (
