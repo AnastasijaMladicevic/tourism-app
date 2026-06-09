@@ -369,6 +369,12 @@ export class UsersComponent implements OnInit {
     document.removeEventListener('visibilitychange', this.onTouristsTabDocumentVisibility);
   }
 
+  openDatePicker(input: HTMLInputElement): void {
+    if (typeof input.showPicker === 'function') {
+      input.showPicker();
+    }
+  }
+
   private loadDashboardData(options?: { silent?: boolean }): void {
     const silent = options?.silent === true;
 

@@ -387,9 +387,29 @@
           <option *ngFor="let c of adminCountryOptions" [value]="c">{{ c }}</option>
         </select>
         <div class="table-date-range">
-          <input type="date" class="table-date-input" [(ngModel)]="adminDateFrom" [max]="adminDateTo || null" (ngModelChange)="adminCurrentPage = 1" />
-          <span class="table-date-sep">–</span>
-          <input type="date" class="table-date-input" [(ngModel)]="adminDateTo" [min]="adminDateFrom || null" (ngModelChange)="adminCurrentPage = 1" />
+          <input
+              #adminDateFromInput
+              type="date"
+              class="table-date-input"
+              [(ngModel)]="adminDateFrom"
+              [max]="adminDateTo || null"
+              (click)="openDatePicker(adminDateFromInput)"
+              (focus)="openDatePicker(adminDateFromInput)"
+              (ngModelChange)="adminCurrentPage = 1"
+            />
+
+            <span class="table-date-sep">–</span>
+
+            <input
+              #adminDateToInput
+              type="date"
+              class="table-date-input"
+              [(ngModel)]="adminDateTo"
+              [min]="adminDateFrom || null"
+              (click)="openDatePicker(adminDateToInput)"
+              (focus)="openDatePicker(adminDateToInput)"
+              (ngModelChange)="adminCurrentPage = 1"
+            />
         </div>
         <span class="table-filter-meta" *ngIf="adminMembers.length && (adminDirectorySearch.trim() || adminRoleFilter !== 'all' || adminStatusFilter !== 'all' || adminCountryFilter !== 'all' || adminDateFrom || adminDateTo)">
           {{ t('adminUsers.matchesOf', { matches: filteredAdminDirectory.length, total: adminMembers.length }) }}

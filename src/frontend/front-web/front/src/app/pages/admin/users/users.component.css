@@ -1837,3 +1837,148 @@ th {
     box-sizing: border-box;
   }
 }
+
+@media (max-width: 640px) {
+  #users-panel-internal .table-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  #users-panel-internal .table-search {
+    flex: 1 1 100%;
+    width: 100%;
+    min-width: 0;
+  }
+
+  #users-panel-internal .table-filter-select {
+    min-width: 0;
+  }
+
+  #users-panel-internal .table-filter-select:nth-of-type(1),
+  #users-panel-internal .table-filter-select:nth-of-type(2) {
+    flex: 1 1 calc(50% - 5px);
+  }
+
+  #users-panel-internal .table-filter-select:nth-of-type(3) {
+    flex: 0 0 118px;
+  }
+
+  #users-panel-internal .table-date-range {
+    flex: 1 1 calc(100% - 128px);
+    min-width: 0;
+    gap: 4px;
+    padding: 0px 0px;
+    box-sizing: border-box;
+  }
+
+  #users-panel-internal .table-date-input {
+    width: 76px;
+    min-width: 0;
+    font-size: 12px;
+    padding: 0;
+  }
+
+  #users-panel-internal .table-date-sep {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 640px) {
+  #users-panel-internal .table-date-range {
+    flex: 1 1 calc(100% - 136px);
+    height: 34px;
+    padding: 0px 0px;
+    gap: 0px;
+  }
+
+  #users-panel-internal .table-date-input {
+    width: 82px;
+    min-width: 0;
+    font-size: 0;
+    color: transparent;
+  }
+
+  #users-panel-internal .table-date-input:valid {
+    font-size: 11px;
+    color: #111827;
+  }
+
+  #users-panel-internal .table-date-input::-webkit-calendar-picker-indicator {
+    margin: 0;
+    cursor: pointer;
+  }
+
+  #users-panel-internal .table-date-sep {
+    font-size: 12px;
+    color: #9ca3af;
+  }
+}
+
+@media (max-width: 640px) {
+  #users-panel-internal .table-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  #users-panel-internal .table-search {
+    flex: 1 1 100%;
+    width: 100%;
+    min-width: 0;
+  }
+
+  #users-panel-internal .table-filter-select {
+    min-width: 0;
+  }
+
+  #users-panel-internal .table-filter-select:nth-of-type(1),
+  #users-panel-internal .table-filter-select:nth-of-type(2) {
+    flex: 1 1 calc(50% - 5px);
+  }
+
+  #users-panel-internal .table-filter-select:nth-of-type(3) {
+    flex: 0 0 116px;
+  }
+
+  #users-panel-internal .table-date-range {
+    flex: 1 1 calc(100% - 126px);
+    min-width: 0;
+    height: 34px;
+    padding: 0 6px;
+    gap: 2px;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+
+  #users-panel-internal .table-date-input {
+    flex: 1 1 0;
+    width: 0;
+    min-width: 0;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #111827;
+    font-size: 8.5px;
+    letter-spacing: -0.7px;
+    cursor: pointer;
+    appearance: auto;
+    -webkit-appearance: auto;
+  }
+
+  #users-panel-internal .table-date-input::-webkit-calendar-picker-indicator {
+    width: 11px;
+    height: 11px;
+    padding: 0;
+    margin-left: -3px;
+    cursor: pointer;
+  }
+
+  #users-panel-internal .table-date-sep {
+    flex: 0 0 auto;
+    font-size: 10px;
+    color: #9ca3af;
+    margin: 0 1px;
+  }
+}

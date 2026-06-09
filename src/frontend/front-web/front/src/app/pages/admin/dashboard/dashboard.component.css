@@ -95,7 +95,7 @@
 
 .kpi-row {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
   gap: 12px;
 }
 
@@ -793,10 +793,6 @@
 }
 
 @media (max-width: 1240px) {
-  .kpi-row {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   .top-grid,
   .middle-grid,
   .bottom-grid {
@@ -832,7 +828,6 @@
     padding: 16px;
   }
 
-  .kpi-row,
   .visit-summary,
   .geo-summary {
     grid-template-columns: 1fr;

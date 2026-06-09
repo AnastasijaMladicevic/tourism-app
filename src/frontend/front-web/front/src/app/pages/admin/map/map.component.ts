@@ -75,13 +75,22 @@ export class MapComponent implements OnInit, OnDestroy {
   readonly mapFocusRegion = !history.state?.lat || !history.state?.lng;
 
   private readonly navState = history.state;
-  private readonly mapClickHandler = () => this.closeCard();
+  private markerJustClicked = false;
+  private readonly mapClickHandler = () => {
+    if (this.markerJustClicked) {
+      return;
+    }
+    this.closeCard();
+  };
   private readonly mapMoveHandler = () => {
     if (window.innerWidth > 900) {
       this.updateCardPosition();
     }
   };
   private readonly markerClickHandler = (event: Event) => {
+    this.markerJustClicked = true;
+    setTimeout(() => { this.markerJustClicked = false; }, 350);
+
     const customEvent = event as CustomEvent<{ data: AdminMapDestination }>;
 
     this.ngZone.run(() => {
