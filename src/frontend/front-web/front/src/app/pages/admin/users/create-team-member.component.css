@@ -110,6 +110,11 @@
 .field-grid {
   display: grid;
   gap: 16px;
+  margin-bottom: 16px;
+}
+
+.field-grid:last-child {
+  margin-bottom: 0;
 }
 
 .field-grid--2 {
