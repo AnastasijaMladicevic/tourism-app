@@ -1505,3 +1505,47 @@ textarea:focus {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+@media (max-width: 860px) {
+  .object-create-page .page-header {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 12px !important;
+  }
+
+  .object-create-page .top-actions {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 8px !important;
+  }
+
+  .object-create-page .top-actions .danger-btn,
+  .object-create-page .top-actions .primary-btn,
+  .object-create-page .top-actions .ghost-btn {
+    min-width: 0 !important;
+    height: 42px !important;
+    padding: 0 9px !important;
+    font-size: 12px !important;
+    white-space: nowrap !important;
+    justify-content: center !important;
+  }
+
+  .object-create-page .top-actions .danger-btn,
+  .object-create-page .top-actions .primary-btn {
+    flex: 1 1 0 !important;
+  }
+
+  .object-create-page .top-actions .ghost-btn {
+    flex: 0 0 72px !important;
+    width: 72px !important;
+    padding: 0 8px !important;
+  }
+
+  .object-create-page .top-actions .material-symbols-outlined {
+    font-size: 17px !important;
+  }
+}

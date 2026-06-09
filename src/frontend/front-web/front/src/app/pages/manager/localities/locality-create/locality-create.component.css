@@ -753,3 +753,39 @@ select {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+@media (max-width: 720px) {
+  .locality-create-page .top-actions {
+    width: 100%;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 8px !important;
+    align-items: center !important;
+  }
+
+  .locality-create-page .top-actions .danger-btn,
+  .locality-create-page .top-actions .primary-btn,
+  .locality-create-page .top-actions .ghost-btn {
+    min-width: 0 !important;
+    height: 42px !important;
+    padding: 0 9px !important;
+    font-size: 12px !important;
+    white-space: nowrap !important;
+    justify-content: center !important;
+  }
+
+  .locality-create-page .top-actions .danger-btn,
+  .locality-create-page .top-actions .primary-btn {
+    flex: 1 1 0 !important;
+  }
+
+  .locality-create-page .top-actions .ghost-btn {
+    flex: 0 0 68px !important;
+    width: 68px !important;
+    padding: 0 8px !important;
+  }
+
+  .locality-create-page .top-actions .danger-btn .material-symbols-outlined {
+    font-size: 17px !important;
+  }
+}

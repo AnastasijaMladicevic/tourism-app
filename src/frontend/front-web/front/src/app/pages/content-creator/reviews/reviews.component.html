@@ -7,15 +7,18 @@
 
   <div class="filters-row">
     <div class="chip-group">
+      <div class="rating-scroll-row">
         <button class="chip" type="button" [class.active]="isAllRatingsSelected" (click)="selectAllRatings()">
           <span class="material-symbols-outlined" aria-hidden="true">language</span>
           {{ 'contentCreator.reviews.filters.allRatings' | translate }}
         </button>
+      
         <button class="chip chip-rating" type="button" [class.active]="isRatingSelected(5)" (click)="toggleRating(5)">5★</button>
         <button class="chip chip-rating" type="button" [class.active]="isRatingSelected(4)" (click)="toggleRating(4)">4★</button>
         <button class="chip chip-rating" type="button" [class.active]="isRatingSelected(3)" (click)="toggleRating(3)">3★</button>
         <button class="chip chip-rating" type="button" [class.active]="isRatingSelected(2)" (click)="toggleRating(2)">2★</button>
         <button class="chip chip-rating" type="button" [class.active]="isRatingSelected(1)" (click)="toggleRating(1)">1★</button>
+      </div>
         <span class="chip-divider" aria-hidden="true"></span>
         <label class="object-filter-inline" [class.is-active]="objectFilterId != null">
           <span class="material-symbols-outlined object-filter-icon" aria-hidden="true">location_on</span>
@@ -34,21 +37,29 @@
           <span class="material-symbols-outlined object-filter-chevron" aria-hidden="true">expand_more</span>
         </label>
         <span class="chip-divider" aria-hidden="true"></span>
-        <button class="chip" type="button" [class.active]="responseFilter === 'all'" (click)="responseFilter = 'all'; onFilterChange()">
-          {{ 'contentCreator.reviews.filters.all' | translate }}
-        </button>
-        <button class="chip" type="button" [class.active]="responseFilter === 'pending'" (click)="responseFilter = 'pending'; onFilterChange()">
-          <span class="material-symbols-outlined" aria-hidden="true">mark_chat_unread</span>
-          {{ 'contentCreator.reviews.filters.pendingReply' | translate }}
-        </button>
-        <button class="chip" type="button" [class.active]="responseFilter === 'responded'" (click)="responseFilter = 'responded'; onFilterChange()">
-          <span class="material-symbols-outlined" aria-hidden="true">mark_chat_read</span>
-          {{ 'contentCreator.reviews.filters.responded' | translate }}
-        </button>
-        <span class="chip-divider" aria-hidden="true"></span>
-        <button class="chip reset" type="button" (click)="resetFilters()">
-          {{ 'contentCreator.reviews.filters.reset' | translate }}
-        </button>
+
+        <div class="response-filter-row">
+          <label class="response-filter-inline" [class.is-active]="responseFilter !== 'all'">
+            <span class="material-symbols-outlined response-filter-icon" aria-hidden="true">forum</span>
+        
+            <select
+              class="response-filter-select"
+              [(ngModel)]="responseFilter"
+              (ngModelChange)="onFilterChange()"
+              [attr.aria-label]="'contentCreator.reviews.filters.all' | translate"
+            >
+              <option value="all">{{ 'contentCreator.reviews.filters.all' | translate }}</option>
+              <option value="pending">{{ 'contentCreator.reviews.filters.pendingReply' | translate }}</option>
+              <option value="responded">{{ 'contentCreator.reviews.filters.responded' | translate }}</option>
+            </select>
+        
+            <span class="material-symbols-outlined response-filter-chevron" aria-hidden="true">expand_more</span>
+          </label>
+        
+          <button class="chip reset" type="button" (click)="resetFilters()">
+            {{ 'contentCreator.reviews.filters.reset' | translate }}
+          </button>
+        </div>
     </div>
 
     <div class="search-wrap">

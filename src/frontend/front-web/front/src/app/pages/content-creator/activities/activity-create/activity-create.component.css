@@ -723,3 +723,38 @@ select:focus {
     justify-content: center;
   }
 }
+
+@media (max-width: 640px) {
+  .create-activity-page .top-actions {
+    width: 100% !important;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+  }
+
+  .create-activity-page .top-actions .danger-btn,
+  .create-activity-page .top-actions .primary-btn,
+  .create-activity-page .top-actions .ghost-btn {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    height: 64px !important;
+    min-height: 64px !important;
+    padding: 0 8px !important;
+    font-size: 13px !important;
+    line-height: 1.2 !important;
+    white-space: normal !important;
+    text-align: center !important;
+    justify-content: center !important;
+    align-items: center !important;
+  }
+
+  .create-activity-page .top-actions .material-symbols-outlined {
+    font-size: 17px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .create-activity-page .top-actions .ghost-btn {
+    flex: 0 0 96px !important;
+  }
+}

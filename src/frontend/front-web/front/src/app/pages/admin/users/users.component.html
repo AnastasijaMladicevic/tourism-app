@@ -863,9 +863,29 @@
         <option value="banned">{{ t('adminUsers.filters.banned') }}</option>
       </select>
       <div class="table-date-range">
-        <input type="date" class="table-date-input" [(ngModel)]="touristDateFrom" [max]="touristDateTo || null" (ngModelChange)="touristCurrentPage = 1" />
+        <input
+          #touristDateFromInput
+          type="date"
+          class="table-date-input"
+          [(ngModel)]="touristDateFrom"
+          [max]="touristDateTo || null"
+          (click)="openDatePicker(touristDateFromInput)"
+          (focus)="openDatePicker(touristDateFromInput)"
+          (ngModelChange)="touristCurrentPage = 1"
+        />
+      
         <span class="table-date-sep">–</span>
-        <input type="date" class="table-date-input" [(ngModel)]="touristDateTo" [min]="touristDateFrom || null" (ngModelChange)="touristCurrentPage = 1" />
+      
+        <input
+          #touristDateToInput
+          type="date"
+          class="table-date-input"
+          [(ngModel)]="touristDateTo"
+          [min]="touristDateFrom || null"
+          (click)="openDatePicker(touristDateToInput)"
+          (focus)="openDatePicker(touristDateToInput)"
+          (ngModelChange)="touristCurrentPage = 1"
+        />
       </div>
       <span class="table-filter-meta" *ngIf="tourists.length && (touristSearch.trim() || touristOriginFilter !== 'all' || touristStatusFilter !== 'all' || touristDateFrom || touristDateTo)">
         {{ t('adminUsers.matchesOf', { matches: filteredTourists.length, total: tourists.length }) }}

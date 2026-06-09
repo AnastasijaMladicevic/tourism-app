@@ -896,3 +896,27 @@
     align-self: flex-start;
   }
 }
+
+
+@media (max-width: 920px) {
+  .manager-dashboard .report-chip,
+  .manager-dashboard .review-health-card,
+  .manager-dashboard .trend-summary-card {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    min-height: 84px !important;
+  }
+
+  .manager-dashboard .report-chip-label,
+  .manager-dashboard .review-health-label,
+  .manager-dashboard .trend-summary-label,
+  .manager-dashboard .report-chip-value,
+  .manager-dashboard .review-health-value,
+  .manager-dashboard .trend-summary-value {
+    text-align: center !important;
+    width: 100% !important;
+  }
+}
