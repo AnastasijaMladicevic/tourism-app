@@ -1488,13 +1488,31 @@
   margin-top: 16px;
 }
 
-.otp-input {
-  max-width: 240px;
-  padding-right: 14px;
-  letter-spacing: 0.35em;
-  font-size: 18px;
-  font-weight: 700;
+.otp-boxes {
+  display: flex;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.otp-box {
+  width: 48px;
+  height: 54px;
+  border: 1.5px solid #dbe3ee;
+  border-radius: 12px;
+  background: #ffffff;
   text-align: center;
+  font-size: 22px;
+  font-weight: 700;
+  color: #0f172a;
+  caret-color: #2563eb;
+  box-sizing: border-box;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.otp-box:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
 }
 
 .otp-meta {
@@ -1586,6 +1604,9 @@
   border: 1px solid #d8e0ed;
   background: #ffffff;
   color: #334155;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .modal-primary-btn {
@@ -1594,6 +1615,7 @@
   color: #ffffff;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 10px;
 }
 
@@ -1806,8 +1828,7 @@
     padding-right: 16px;
   }
 
-  .password-modal__grid,
-  .password-rules {
+  .password-modal__grid {
     grid-template-columns: 1fr;
   }
 
@@ -1818,10 +1839,24 @@
   }
 
   .modal-secondary-btn,
-  .modal-primary-btn,
-  .otp-resend,
-  .otp-input {
+  .modal-primary-btn {
     width: 100%;
     max-width: none;
+  }
+
+  .otp-resend {
+    width: 100%;
+    max-width: none;
+    text-align: center;
+  }
+
+  .otp-boxes {
+    justify-content: center;
+  }
+
+  .otp-box {
+    flex: 1;
+    min-width: 0;
+    max-width: 52px;
   }
 }

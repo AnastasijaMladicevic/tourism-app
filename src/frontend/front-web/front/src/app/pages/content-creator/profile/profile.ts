@@ -97,7 +97,8 @@ export class ProfileComponentContentCreator implements OnInit, OnDestroy {
   hideCurrentPassword = true;
   hideNewPassword = true;
   hideConfirmNewPassword = true;
-  otpCode = '';
+  otpDigits: string[] = Array(6).fill('');
+  get otpCode(): string { return this.otpDigits.join(''); }
   otpSecondsRemaining = 0;
   otpResendSecondsRemaining = 0;
   languageMenuOpen = false;
@@ -346,7 +347,7 @@ export class ProfileComponentContentCreator implements OnInit, OnDestroy {
     this.hideCurrentPassword = true;
     this.hideNewPassword = true;
     this.hideConfirmNewPassword = true;
-    this.otpCode = '';
+    this.otpDigits = Array(6).fill('');
     this.otpSecondsRemaining = 0;
     this.otpResendSecondsRemaining = 0;
     this.forgotResetSessionToken = '';
@@ -408,7 +409,7 @@ export class ProfileComponentContentCreator implements OnInit, OnDestroy {
       this.currentPassword = '';
       this.newPassword = '';
       this.confirmNewPassword = '';
-      this.otpCode = '';
+      this.otpDigits = Array(6).fill('');
       this.otpSecondsRemaining = 0;
       this.otpResendSecondsRemaining = 0;
       this.forgotResetSessionToken = '';
@@ -549,7 +550,7 @@ export class ProfileComponentContentCreator implements OnInit, OnDestroy {
       next: () => {
         this.passwordLoading = false;
         this.passwordChangeMode = 'forgot-otp';
-        this.otpCode = '';
+        this.otpDigits = Array(6).fill('');
         this.startOtpCountdown();
         this.cdr.detectChanges();
       },
@@ -654,11 +655,40 @@ export class ProfileComponentContentCreator implements OnInit, OnDestroy {
 
     this.passwordChangeMode = 'direct';
     this.passwordError = '';
-    this.otpCode = '';
+    this.otpDigits = Array(6).fill('');
     this.newPassword = '';
     this.confirmNewPassword = '';
     this.forgotResetSessionToken = '';
     this.clearOtpTimers();
+  }
+
+  onOtpInput(index: number, event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const val = input.value.replace(/\D/g, '').slice(-1);
+    input.value = val;
+    this.otpDigits[index] = val;
+    if (val && index < 5) {
+      (document.getElementById('otp-digit-' + (index + 1)) as HTMLInputElement | null)?.focus();
+    }
+  }
+
+  onOtpKeydown(index: number, event: KeyboardEvent): void {
+    if (event.key === 'Backspace' && !this.otpDigits[index] && index > 0) {
+      const prev = document.getElementById('otp-digit-' + (index - 1)) as HTMLInputElement | null;
+      if (prev) { prev.focus(); prev.select(); }
+    }
+  }
+
+  onOtpPaste(event: ClipboardEvent): void {
+    event.preventDefault();
+    const digits = (event.clipboardData?.getData('text') ?? '').replace(/\D/g, '').slice(0, 6).split('');
+    this.otpDigits = Array(6).fill('').map((_, i) => digits[i] ?? '');
+    for (let i = 0; i < 6; i++) {
+      const el = document.getElementById('otp-digit-' + i) as HTMLInputElement | null;
+      if (el) el.value = this.otpDigits[i];
+    }
+    const nextIdx = Math.min(digits.length, 5);
+    (document.getElementById('otp-digit-' + nextIdx) as HTMLInputElement | null)?.focus();
   }
 
   cancel(): void {

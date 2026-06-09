@@ -2151,7 +2151,7 @@
     "savingBtn": "Saving...",
     "passwordChangedSuccess": "Password changed successfully.",
     "forgotPasswordLink": "Forgot password?",
-    "forgotOtpDescription": "A verification code was sent to your email. Enter it below.",
+    "forgotOtpDescription": "A verification code was sent to your email. Enter the six-digit code.",
     "forgotPasswordDescription": "Code verified. Choose a new password for your account.",
     "codeExpiresIn": "Code expires in",
     "verifyCodeBtn": "Verify Code",

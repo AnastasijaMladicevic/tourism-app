@@ -2116,7 +2116,7 @@
     "savingBtn": "Čuvanje...",
     "passwordChangedSuccess": "Lozinka je uspešno promenjena.",
     "forgotPasswordLink": "Zaboravili ste lozinku?",
-    "forgotOtpDescription": "Verifikacioni kod je poslat na vaš mejl. Unesite ga ispod.",
+    "forgotOtpDescription": "Verifikacioni kod je poslat na vaš mejl. Unesite šestocifreni kod.",
     "forgotPasswordDescription": "Kod je potvrđen. Izaberite novu lozinku za nalog.",
     "codeExpiresIn": "Kod ističe za",
     "verifyCodeBtn": "Potvrdi kod",

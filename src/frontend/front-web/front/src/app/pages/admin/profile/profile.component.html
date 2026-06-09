@@ -509,18 +509,21 @@
           </div>
 
           <div class="modal-field modal-field--full">
-            <label class="modal-label" for="otp-code">{{ 'adminProfile.password.verificationCode' | translate }}</label>
-            <input
-              id="otp-code"
-              name="otpCode"
-              [(ngModel)]="otpCode"
-              class="otp-input"
-              type="text"
-              inputmode="numeric"
-              maxlength="6"
-              [placeholder]="'adminProfile.password.codePlaceholder' | translate"
-              autocomplete="one-time-code"
-            />
+            <label class="modal-label">{{ 'adminProfile.password.verificationCode' | translate }}</label>
+            <div class="otp-boxes" (paste)="onOtpPaste($event)">
+              @for (digit of otpDigits; track $index) {
+                <input
+                  class="otp-box"
+                  [id]="'otp-digit-' + $index"
+                  type="text"
+                  inputmode="numeric"
+                  maxlength="1"
+                  autocomplete="off"
+                  (input)="onOtpInput($index, $event)"
+                  (keydown)="onOtpKeydown($index, $event)"
+                />
+              }
+            </div>
             <div class="otp-meta">
               <span>{{ 'adminProfile.password.resendAvailableIn' | translate: { seconds: otpResendSecondsRemaining } }}</span>
               <button class="otp-resend" type="button" [disabled]="otpResendSecondsRemaining > 0 || passwordLoading" (click)="resendForgotCode()">
