@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { CreateUserDto, LoginDto, AuthResponseDto, UserDto } from '../models/user.model';
 import { environment } from '../../environment/environment';
+import { TranslationService } from './translation.service';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private apiUrl = `${environment.apiUrl}/users`;
@@ -10,7 +11,7 @@ export class AuthService {
   private refreshTokenKey = 'refreshToken';
   private userKey = 'user';
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private translationService: TranslationService) {
     this.syncStoredUserWithAuthenticatedRole();
   }
 
@@ -376,6 +377,11 @@ export class AuthService {
     localStorage.setItem(this.tokenKey, response.token);
     localStorage.setItem(this.refreshTokenKey, response.refreshToken);
     localStorage.setItem(this.userKey, JSON.stringify(user));
+
+    if (user.language) {
+      this.translationService.setLanguage(user.language);
+    }
+
     if (response.isBanned && response.banMessage?.trim()) {
       sessionStorage.setItem('spirego-admin-ban-message', response.banMessage.trim());
     } else {
