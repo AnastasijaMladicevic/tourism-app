@@ -76,7 +76,11 @@ export class MapComponent implements OnInit, OnDestroy {
 
   private readonly navState = history.state;
   private readonly mapClickHandler = () => this.closeCard();
-  private readonly mapMoveHandler = () => this.updateCardPosition();
+  private readonly mapMoveHandler = () => {
+    if (window.innerWidth > 900) {
+      this.updateCardPosition();
+    }
+  };
   private readonly markerClickHandler = (event: Event) => {
     const customEvent = event as CustomEvent<{ data: AdminMapDestination }>;
 
@@ -139,7 +143,9 @@ export class MapComponent implements OnInit, OnDestroy {
 
   @HostListener('window:resize')
   onWindowResize(): void {
-    this.scheduleCardPresentation();
+    if (window.innerWidth > 900) {
+      this.scheduleCardPresentation();
+    }
   }
 
   onSearchInput(): void {
@@ -359,7 +365,19 @@ export class MapComponent implements OnInit, OnDestroy {
   }
 
   private presentCardForSelection(): void {
-    if (!this.selectedItem || !this.mapPageRef) {
+    if (!this.selectedItem) {
+      return;
+    }
+
+    if (window.innerWidth <= 900) {
+      this.ngZone.run(() => {
+        this.isCardVisible = true;
+        this.cdr.detectChanges();
+      });
+      return;
+    }
+
+    if (!this.mapPageRef) {
       return;
     }
 

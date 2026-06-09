@@ -181,9 +181,16 @@ app-admin-platform-map.admin-platform-map--full :is(.leaflet-container, .leaflet
 
 .region-filters {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 8px;
   margin-top: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.region-filters::-webkit-scrollbar {
+  display: none;
 }
 
 .region-chip {
