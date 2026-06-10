@@ -34,6 +34,7 @@ interface ObjectOption {
   name: string;
   destinationId?: number;
   destinationName?: string;
+  localityId?: number;
   latitude?: number;
   longitude?: number;
 }
@@ -186,15 +187,18 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
     }
 
     this.form.controls.destinationId.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+      this.syncRegionFromDestination();
       this.syncDependentSelections();
       this.applyLocationFromSelection();
     });
 
     this.form.controls.localityId.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+      this.syncDestinationFromLocality();
       this.applyLocationFromSelection();
     });
 
     this.form.controls.objectId.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+      this.syncDestinationAndLocalityFromObject();
       this.applyLocationFromSelection();
     });
   }
@@ -634,6 +638,7 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
           name: item.name,
           destinationId: item.destinationId,
           destinationName: item.destinationName,
+          localityId: (item as unknown as { localityId?: number }).localityId,
           latitude: (item as unknown as { latitude?: number }).latitude,
           longitude: (item as unknown as { longitude?: number }).longitude
         }))),
@@ -801,6 +806,69 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
           this.errorMessage = this.extractErrorMessage(error) ?? this.translationService.translate('contentCreator.activityForm.errors.loadEditFailed');
         }
       });
+  }
+
+  /** When the destination changes, auto-fill the region from that destination's region. */
+  private syncRegionFromDestination(): void {
+    const destinationId = this.form.controls.destinationId.value;
+    if (destinationId == null) {
+      return;
+    }
+
+    const destination = this.destinations.find((d) => d.id === destinationId);
+    if (destination?.regionId != null) {
+      this.selectedRegionId = destination.regionId;
+    }
+  }
+
+  /** When the locality changes, auto-fill the destination (and through it, the region). */
+  private syncDestinationFromLocality(): void {
+    const localityId = this.form.controls.localityId.value;
+    if (localityId == null) {
+      return;
+    }
+
+    const locality = this.localities.find((l) => l.id === localityId);
+    if (!locality) {
+      return;
+    }
+
+    if (this.form.controls.destinationId.value !== locality.destinationId) {
+      this.form.patchValue({ destinationId: locality.destinationId }, { emitEvent: false });
+      this.syncDependentSelections();
+    }
+
+    this.syncRegionFromDestination();
+  }
+
+  /** When the object changes, auto-fill the locality and destination (and through it, the region). */
+  private syncDestinationAndLocalityFromObject(): void {
+    const objectId = this.form.controls.objectId.value;
+    if (objectId == null) {
+      return;
+    }
+
+    const objectItem = this.objects.find((o) => o.id === objectId);
+    if (!objectItem) {
+      return;
+    }
+
+    const patch: Record<string, number> = {};
+
+    if (objectItem.destinationId != null && this.form.controls.destinationId.value !== objectItem.destinationId) {
+      patch['destinationId'] = objectItem.destinationId;
+    }
+
+    if (objectItem.localityId != null && this.form.controls.localityId.value !== objectItem.localityId) {
+      patch['localityId'] = objectItem.localityId;
+    }
+
+    if (Object.keys(patch).length > 0) {
+      this.form.patchValue(patch, { emitEvent: false });
+      this.syncDependentSelections();
+    }
+
+    this.syncRegionFromDestination();
   }
 
   private syncDependentSelections(): void {

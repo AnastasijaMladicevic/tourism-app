@@ -28,6 +28,7 @@ interface VenueOption {
   name: string;
   address: string;
   destinationId: number;
+  localityId?: number;
   latitude?: number;
   longitude?: number;
 }
@@ -227,7 +228,7 @@ export class EventFormComponent implements OnInit, OnDestroy {
 
   onRegionChange(regionId: number | null): void {
     this.selectedRegionId = regionId;
-    this.form.patchValue({ destinationId: '', objectId: '' }, { emitEvent: false });
+    this.form.patchValue({ destinationId: '', localityId: '', objectId: '' }, { emitEvent: false });
     this.applyLocationFromSelection();
     this.loadDestinationsForRegion(regionId);
   }
@@ -446,6 +447,7 @@ export class EventFormComponent implements OnInit, OnDestroy {
           name: item.name,
           address: item.address ?? this.translationService.translate('contentCreator.eventForm.noAddressAvailable'),
           destinationId: item.destinationId,
+          localityId: (item as unknown as { localityId?: number }).localityId,
           latitude: (item as unknown as { latitude?: number }).latitude,
           longitude: (item as unknown as { longitude?: number }).longitude
         }))),
@@ -510,7 +512,16 @@ export class EventFormComponent implements OnInit, OnDestroy {
     this.form.controls.destinationId.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
+        this.syncRegionFromDestination();
         this.syncObjectSelectionWithDestination();
+        this.applyLocationFromSelection();
+        this.cdr.detectChanges();
+      });
+
+    this.form.controls.localityId.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.syncDestinationFromLocality();
         this.applyLocationFromSelection();
         this.cdr.detectChanges();
       });
@@ -518,9 +529,74 @@ export class EventFormComponent implements OnInit, OnDestroy {
     this.form.controls.objectId.valueChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
+        this.syncDestinationAndLocalityFromObject();
         this.applyLocationFromSelection();
         this.cdr.detectChanges();
       });
+  }
+
+  /** When the destination changes, auto-fill the region from that destination's region. */
+  private syncRegionFromDestination(): void {
+    const destinationId = this.toNumber(this.form.controls.destinationId.value);
+    if (destinationId == null) {
+      return;
+    }
+
+    const destination = this.destinations.find((d) => d.id === destinationId);
+    if (destination?.regionId != null) {
+      this.selectedRegionId = destination.regionId;
+    }
+  }
+
+  /** When the locality changes, auto-fill the destination (and through it, the region). */
+  private syncDestinationFromLocality(): void {
+    const localityId = this.toNumber(this.form.controls.localityId.value);
+    if (localityId == null) {
+      return;
+    }
+
+    const locality = this.localities.find((l) => l.id === localityId);
+    if (!locality) {
+      return;
+    }
+
+    if (this.selectedDestinationId !== locality.destinationId) {
+      this.form.patchValue({ destinationId: String(locality.destinationId) }, { emitEvent: false });
+      this.syncObjectSelectionWithDestination();
+    }
+
+    this.syncRegionFromDestination();
+  }
+
+  /** When the object changes, auto-fill the locality and destination (and through it, the region). */
+  private syncDestinationAndLocalityFromObject(): void {
+    const objectId = this.toNumber(this.form.controls.objectId.value);
+    if (objectId == null) {
+      return;
+    }
+
+    const venue = this.venueOptions.find((v) => v.id === objectId);
+    if (!venue) {
+      return;
+    }
+
+    const patch: Record<string, string> = {};
+
+    if (venue.destinationId != null && this.selectedDestinationId !== venue.destinationId) {
+      patch['destinationId'] = String(venue.destinationId);
+    }
+
+    if (venue.localityId != null && this.toNumber(this.form.controls.localityId.value) !== venue.localityId) {
+      patch['localityId'] = String(venue.localityId);
+    }
+
+    if (Object.keys(patch).length > 0) {
+      this.form.patchValue(patch, { emitEvent: false });
+      this.updateObjectControlState();
+      this.cdr.detectChanges();
+    }
+
+    this.syncRegionFromDestination();
   }
 
   private syncObjectSelectionWithDestination(): void {

@@ -232,10 +232,13 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
     }
 
     this.form.controls.destinationId.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
+      this.syncRegionFromDestination();
+      this.syncLocalitySelectionWithDestination();
       this.applyLocationFromSelection();
     });
 
     this.form.controls.localityId.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
+      this.syncDestinationFromLocality();
       this.applyLocationFromSelection();
     });
 
@@ -598,6 +601,50 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
       return this.localities.filter((l) => regionDestIds.has(l.destinationId));
     }
     return this.localities;
+  }
+
+  /** When the destination changes, auto-fill the region from that destination's region. */
+  private syncRegionFromDestination(): void {
+    const destinationId = this.form.controls.destinationId.value;
+    if (destinationId == null) {
+      return;
+    }
+
+    const destination = this.destinations.find((d) => d.id === destinationId);
+    if (destination?.regionId != null) {
+      this.selectedRegionId = destination.regionId;
+    }
+  }
+
+  /** Reset the locality if it no longer belongs to the selected destination. */
+  private syncLocalitySelectionWithDestination(): void {
+    const localityId = this.form.controls.localityId.value;
+    if (localityId == null) {
+      return;
+    }
+
+    if (!this.filteredLocalities.some((locality) => locality.id === localityId)) {
+      this.form.patchValue({ localityId: null }, { emitEvent: false });
+    }
+  }
+
+  /** When the locality changes, auto-fill the destination (and through it, the region). */
+  private syncDestinationFromLocality(): void {
+    const localityId = this.form.controls.localityId.value;
+    if (localityId == null) {
+      return;
+    }
+
+    const locality = this.localities.find((l) => l.id === localityId);
+    if (!locality) {
+      return;
+    }
+
+    if (this.form.controls.destinationId.value !== locality.destinationId) {
+      this.form.patchValue({ destinationId: locality.destinationId }, { emitEvent: false });
+    }
+
+    this.syncRegionFromDestination();
   }
 
   onRegionChange(regionId: number | null): void {
