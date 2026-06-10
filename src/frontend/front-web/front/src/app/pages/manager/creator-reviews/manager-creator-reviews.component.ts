@@ -45,6 +45,7 @@ import { TranslationService } from '../../../services/translation.service';
 
 export interface ManagerReviewThread {
   id: number;
+  touristId: number;
   touristName: string;
   touristInitials: string;
   objectId: number;
@@ -126,6 +127,11 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
   reportModalCreatorId: number | null = null;
   reportModalCategory = 'unprofessional_conduct';
   reportModalReason = '';
+
+  reportTouristModalOpen = false;
+  reportModalTouristId: number | null = null;
+  reportModalTouristCategory = 'other';
+  reportModalTouristReason = '';
 
   ngOnInit(): void {
     const creatorIdParam = this.route.snapshot.queryParamMap.get('creatorId');
@@ -359,6 +365,54 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
 
   hasPendingReportForCreator(creatorId: number): boolean {
     return this.pendingReportCreatorIds.has(creatorId);
+  }
+
+  get reportableTourists(): ReportableCreatorOption[] {
+    const map = new Map<number, ReportableCreatorOption>();
+    for (const thread of this.allThreads) {
+      if (!thread.touristId) {
+        continue;
+      }
+      map.set(thread.touristId, {
+        id: thread.touristId,
+        name: thread.touristName,
+        contentSummary: this.translationService.translate('manager.creatorReviews.touristSummary', {
+          rating: thread.rating,
+          objectName: thread.objectName,
+        }),
+        hasPendingReport: this.pendingReportCreatorIds.has(thread.touristId),
+      });
+    }
+    return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  openTouristReportModal(thread?: ManagerReviewThread | null): void {
+    const target = thread ?? this.selectedThread;
+    if (!target?.touristId) {
+      return;
+    }
+
+    this.reportModalTouristId = target.touristId;
+    this.reportModalTouristCategory = 'other';
+    this.reportModalTouristReason = '';
+    this.reportTouristModalOpen = true;
+  }
+
+  closeTouristReportModal(): void {
+    this.reportTouristModalOpen = false;
+  }
+
+  onTouristReportSubmitted(): void {
+    if (this.reportModalTouristId) {
+      this.pendingReportCreatorIds.add(this.reportModalTouristId);
+    }
+    this.successMessage = this.translationService.translate('manager.reportModal.successSubmitted');
+    this.reportTouristModalOpen = false;
+    this.triggerViewUpdate();
+  }
+
+  hasPendingReportForTourist(touristId: number): boolean {
+    return this.pendingReportCreatorIds.has(touristId);
   }
 
   isRatingSelected(rating: number): boolean {
@@ -657,6 +711,7 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
 
       return {
         id: review.id,
+        touristId: review.userId,
         touristName:
           review.userFullName?.trim() ||
           this.translationService.translate('manager.creatorReviews.fallback.tourist'),

@@ -719,6 +719,15 @@
   line-height: 1.35;
 }
 
+.tourist-report-action {
+  margin-top: 10px;
+}
+
+.tourist-report-action .ghost-btn.compact {
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
 .inline-alert > .primary-btn.compact {
   white-space: normal;
   text-align: center;

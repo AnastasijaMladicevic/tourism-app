@@ -30,6 +30,7 @@ export class ManagerReportModalComponent implements OnChanges {
   @Input() initialCreatorId: number | null = null;
   @Input() initialCategory = 'unprofessional_conduct';
   @Input() initialReason = '';
+  @Input() subjectType: 'creator' | 'tourist' = 'creator';
 
   @Output() closed = new EventEmitter<void>();
   @Output() submitted = new EventEmitter<void>();
@@ -46,6 +47,30 @@ export class ManagerReportModalComponent implements OnChanges {
 
   get availableCreators(): ReportableCreatorOption[] {
     return this.creators.filter((creator) => !creator.hasPendingReport);
+  }
+
+  get titleKey(): string {
+    return this.subjectType === 'tourist' ? 'manager.reportModal.titleTourist' : 'manager.reportModal.title';
+  }
+
+  get subtitleKey(): string {
+    return this.subjectType === 'tourist' ? 'manager.reportModal.subtitleTourist' : 'manager.reportModal.subtitle';
+  }
+
+  get fieldLabelKey(): string {
+    return this.subjectType === 'tourist' ? 'manager.reportModal.tourist' : 'manager.reportModal.creator';
+  }
+
+  get selectPlaceholderKey(): string {
+    return this.subjectType === 'tourist' ? 'manager.reportModal.selectTourist' : 'manager.reportModal.selectCreator';
+  }
+
+  get noOptionsKey(): string {
+    return this.subjectType === 'tourist' ? 'manager.reportModal.noTourists' : 'manager.reportModal.noCreators';
+  }
+
+  get warningKey(): string {
+    return this.subjectType === 'tourist' ? 'manager.reportModal.warningTourist' : 'manager.reportModal.warning';
   }
 
   get reportCategoryOptions(): Array<{ value: string; label: string }> {
