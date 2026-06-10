@@ -50,6 +50,16 @@ namespace TuristickiVodic.Services.Services
             ["Lake Como"] = "Como, Italy",
         };
 
+        // Lokaliteti ciji naziv treba pretraziti drugacije da bi Nominatim vratio poligon (ne samo tacku).
+        private static readonly Dictionary<string, string> LocalityQueries = new()
+        {
+            ["Donji Milanovac"] = "Donji Milanovac, Serbia",
+            ["Tekija"] = "Tekija, Serbia",
+            ["Kelebija"] = "Kelebija, Serbia",
+            ["Tuzi"] = "Tuzi, Montenegro",
+            ["Perućac"] = "Perućac, Serbia",
+        };
+
         public GeoBoundaryService(AppDbContext context, IHttpClientFactory httpClientFactory)
         {
             _context = context;
@@ -100,6 +110,30 @@ namespace TuristickiVodic.Services.Services
                     destination.Boundary = geometry;
                 else
                     failures.Add($"Destination: {destination.Name} ({query})");
+
+                await Task.Delay(1100, cancellationToken);
+            }
+
+            var localitiesQuery = _context.Localities.Include(l => l.Destination).ThenInclude(d => d.Region).AsQueryable();
+            if (destinationNames != null)
+                localitiesQuery = localitiesQuery.Where(l => destinationNames.Contains(l.Destination.Name) || destinationNames.Contains(l.Name));
+
+            var localities = await localitiesQuery.ToListAsync(cancellationToken);
+
+            foreach (var locality in localities)
+            {
+                var query = LocalityQueries.TryGetValue(locality.Name, out var overrideQuery)
+                    ? overrideQuery
+                    : $"{locality.Name}, {locality.Destination.Name}, {CountryName(locality.Destination.Region.Code)}";
+
+                var geometry = await FetchBoundaryAsync(query, cancellationToken);
+
+                // Prihvatamo samo poligone koji sadrze postojecu geolokaciju lokaliteta - u suprotnom je
+                // Nominatim vratio nepovezano mesto (npr. zgradu sa istim imenom), pa ostaje fallback na granicu destinacije.
+                if (geometry is Polygon or MultiPolygon && (locality.Geolocation == null || geometry.Contains(locality.Geolocation)))
+                    locality.Boundary = geometry;
+                else
+                    failures.Add($"Locality: {locality.Name} ({query})");
 
                 await Task.Delay(1100, cancellationToken);
             }

@@ -184,6 +184,10 @@ public class AppDbContext : DbContext
             .HasMethod("GIST");
 
         mb.Entity<Locality>()
+            .HasIndex(l => l.Boundary)
+            .HasMethod("GIST");
+
+        mb.Entity<Locality>()
             .HasOne(l => l.Destination)
             .WithMany(d => d.Localities)
             .HasForeignKey(l => l.DestinationId)
