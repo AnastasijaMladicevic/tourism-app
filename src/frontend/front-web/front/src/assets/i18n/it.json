@@ -2534,7 +2534,8 @@
         "saveFailed": "Salvataggio evento non riuscito",
         "imageUploadAfterCreate": "Evento creato, ma il caricamento delle immagini non è riuscito. Aggiungile da Modifica.",
         "deletionRequestFailed": "Invio della richiesta di eliminazione non riuscito",
-        "deleteFailed": "Eliminazione evento non riuscita"
+        "deleteFailed": "Eliminazione evento non riuscita",
+        "outsideDestination": "La posizione selezionata è fuori dal confine di \"{{destination}}\"."
       }
     },
     "activityForm": {

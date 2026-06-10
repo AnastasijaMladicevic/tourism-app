@@ -2534,7 +2534,8 @@
         "saveFailed": "No se pudo guardar el evento",
         "imageUploadAfterCreate": "El evento se creó, pero falló la subida de imágenes. Añádelas desde Editar.",
         "deletionRequestFailed": "No se pudo enviar la solicitud de eliminación",
-        "deleteFailed": "No se pudo eliminar el evento"
+        "deleteFailed": "No se pudo eliminar el evento",
+        "outsideDestination": "La ubicación seleccionada está fuera del límite de \"{{destination}}\"."
       }
     },
     "activityForm": {

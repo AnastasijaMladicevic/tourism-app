@@ -2561,7 +2561,8 @@
         "saveFailed": "Failed to save event",
         "imageUploadAfterCreate": "Event created but image upload failed. Please add images via Edit.",
         "deletionRequestFailed": "Failed to submit deletion request",
-        "deleteFailed": "Failed to delete event"
+        "deleteFailed": "Failed to delete event",
+        "outsideDestination": "The selected location is outside the boundary of \"{{destination}}\"."
       }
     },
     "activityForm": {

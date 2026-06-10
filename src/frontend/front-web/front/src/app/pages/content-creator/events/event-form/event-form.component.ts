@@ -4,6 +4,7 @@ import {
   DestroyRef,
   OnDestroy,
   OnInit,
+  ViewChild,
   inject
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -22,6 +23,7 @@ import { MapComponent } from '../../../../shared/components/map/map';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../../../services/translation.service';
 import { formatDurationCompact } from '../../../../utils/duration';
+import { isPointInGeoJson } from '../../../../shared/utils/geo-utils';
 
 interface VenueOption {
   id: number;
@@ -58,6 +60,8 @@ export class EventFormComponent implements OnInit, OnDestroy {
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly destroyRef = inject(DestroyRef);
   private readonly translationService = inject(TranslationService);
+
+  @ViewChild(MapComponent) mapComponent?: MapComponent;
 
   form = this.fb.group({
     name: ['', [Validators.required, Validators.maxLength(200)]],
@@ -324,6 +328,24 @@ export class EventFormComponent implements OnInit, OnDestroy {
     return this.destinations.find((destination) => destination.id === destinationId) ?? null;
   }
 
+  get selectedDestinationBoundary(): string | undefined {
+    return this.selectedDestination?.boundaryGeoJson;
+  }
+
+  // Vraca true ako je tacka unutar granice izabrane destinacije, ili ako granica nije definisana (preskace proveru).
+  private isWithinSelectedDestination(lat: number, lng: number): boolean {
+    const boundary = this.selectedDestinationBoundary;
+    if (!boundary) {
+      return true;
+    }
+    return isPointInGeoJson(lng, lat, boundary);
+  }
+
+  // Pronalazi prvu destinaciju iz ucitane liste cija granica sadrzi datu tacku.
+  private findDestinationContainingPoint(lat: number, lng: number): DestinationDto | null {
+    return this.destinations.find((d) => d.boundaryGeoJson && isPointInGeoJson(lng, lat, d.boundaryGeoJson)) ?? null;
+  }
+
   get linkedLocationTitle(): string {
     return this.selectedVenue?.name || this.translationService.translate('contentCreator.eventForm.noLinkedObjectSelected');
   }
@@ -436,7 +458,8 @@ export class EventFormComponent implements OnInit, OnDestroy {
               longitude: d.longitude,
               regionId: d.regionId,
               regionName: d.regionName,
-              regionCode: d.regionCode
+              regionCode: d.regionCode,
+              boundaryGeoJson: d.boundaryGeoJson
             } as DestinationDto));
           }),
           catchError(() => of(this.fallbackDestinations))
@@ -723,7 +746,77 @@ export class EventFormComponent implements OnInit, OnDestroy {
   }
 
   onMapLocationSelected(event: { lat: number; lng: number }): void {
+    const destinationId = this.selectedDestinationId;
+
+    if (destinationId) {
+      if (!this.isWithinSelectedDestination(event.lat, event.lng)) {
+        this.errorMessage = this.translationService.translate('contentCreator.eventForm.errors.outsideDestination', {
+          destination: this.selectedDestination?.name ?? ''
+        });
+        const lat = this.toNumber(this.form.controls.latitude.value) ?? 42.424;
+        const lng = this.toNumber(this.form.controls.longitude.value) ?? 18.771;
+        this.mapComponent?.resetMarker(lat, lng);
+        this.cdr.detectChanges();
+        return;
+      }
+
+      this.errorMessage = '';
+      this.setLocationFromSelection(event.lat, event.lng);
+      return;
+    }
+
+    // Nijedna destinacija jos nije izabrana - pokusaj automatsko prepoznavanje po klikom izabranoj tacki.
+    const matched = this.findDestinationContainingPoint(event.lat, event.lng);
+    if (matched) {
+      this.errorMessage = '';
+      if (matched.regionId != null && this.selectedRegionId !== matched.regionId) {
+        this.selectedRegionId = matched.regionId;
+        this.loadDestinationsForRegion(matched.regionId);
+      }
+      this.form.patchValue({ destinationId: String(matched.id) }, { emitEvent: false });
+      this.syncObjectSelectionWithDestination();
+    }
+
     this.setLocationFromSelection(event.lat, event.lng);
+  }
+
+  onCoordinateInputChanged(): void {
+    const lat = this.toNumber(this.form.controls.latitude.value);
+    const lng = this.toNumber(this.form.controls.longitude.value);
+
+    if (lat == null || lng == null) {
+      return;
+    }
+
+    const destinationId = this.selectedDestinationId;
+    const outsideMessage = this.translationService.translate('contentCreator.eventForm.errors.outsideDestination', {
+      destination: this.selectedDestination?.name ?? ''
+    });
+
+    if (destinationId) {
+      if (!this.isWithinSelectedDestination(lat, lng)) {
+        this.errorMessage = outsideMessage;
+        return;
+      }
+
+      if (this.errorMessage === outsideMessage) {
+        this.errorMessage = '';
+      }
+      return;
+    }
+
+    // Nijedna destinacija jos nije izabrana - pokusaj automatsko prepoznavanje po unetim koordinatama.
+    const matched = this.findDestinationContainingPoint(lat, lng);
+    if (matched) {
+      this.errorMessage = '';
+      if (matched.regionId != null && this.selectedRegionId !== matched.regionId) {
+        this.selectedRegionId = matched.regionId;
+        this.loadDestinationsForRegion(matched.regionId);
+      }
+      this.form.patchValue({ destinationId: String(matched.id) }, { emitEvent: false });
+      this.syncObjectSelectionWithDestination();
+      this.cdr.detectChanges();
+    }
   }
 
   private setLocationFromSelection(latitude: number, longitude: number): void {
@@ -930,6 +1023,15 @@ export class EventFormComponent implements OnInit, OnDestroy {
 
     if (this.endDateBeforeStart) {
       this.errorMessage = this.translationService.translate('contentCreator.eventForm.errors.endAfterStart');
+      return;
+    }
+
+    const lat = this.toNumber(this.form.controls.latitude.value);
+    const lng = this.toNumber(this.form.controls.longitude.value);
+    if (lat != null && lng != null && !this.isWithinSelectedDestination(lat, lng)) {
+      this.errorMessage = this.translationService.translate('contentCreator.eventForm.errors.outsideDestination', {
+        destination: this.selectedDestination?.name ?? ''
+      });
       return;
     }
 
