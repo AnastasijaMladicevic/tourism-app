@@ -348,7 +348,33 @@ export class EventFormComponent implements OnInit, OnDestroy {
     return Math.max(0, this.relatedActivities.length - 4);
   }
 
+  private scrollPageToTop(): void {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+
+    const scrollableContainers = Array.from(
+      document.querySelectorAll<HTMLElement>(
+        '.page-outlet, .main-content, .content, .page-content, .workspace'
+      )
+    );
+    for (const container of scrollableContainers) {
+      container.scrollTop = 0;
+    }
+
+    setTimeout(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      for (const container of scrollableContainers) {
+        container.scrollTop = 0;
+      }
+    }, 0);
+  }
+
   ngOnInit(): void {
+    this.scrollPageToTop();
+
     const user = this.authService.getUser();
     if (user) {
       this.organizerName = `${user.firstName} ${user.lastName}`.trim();

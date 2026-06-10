@@ -183,7 +183,33 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
     this.releasePendingImagePreviews();
   }
 
+  private scrollPageToTop(): void {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+
+    const scrollableContainers = Array.from(
+      document.querySelectorAll<HTMLElement>(
+        '.page-outlet, .main-content, .content, .page-content, .workspace'
+      )
+    );
+    for (const container of scrollableContainers) {
+      container.scrollTop = 0;
+    }
+
+    setTimeout(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      for (const container of scrollableContainers) {
+        container.scrollTop = 0;
+      }
+    }, 0);
+  }
+
   ngOnInit(): void {
+    this.scrollPageToTop();
+
     this.isManagerReview = this.route.snapshot.data['managerReview'] === true;
 
     const idFromRoute = Number(this.route.snapshot.paramMap.get('id'));

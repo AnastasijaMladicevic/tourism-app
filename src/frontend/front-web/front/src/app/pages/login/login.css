@@ -318,19 +318,34 @@ label {
   }
 
   .content {
-    padding-top: 40px;
+    padding-top: 24px;
+    gap: 6px;
   }
 
   .left {
-    min-height: 230px;
+    min-height: 130px;
   }
 
+  .circle,
   .illustration-wrap {
-    width: min(100%, 280px);
+    width: min(100%, 170px);
   }
 
   .right h2 {
-    font-size: 28px;
+    font-size: 26px;
+    margin-bottom: 4px;
+  }
+
+  .subtitle {
+    margin-bottom: 16px;
+  }
+
+  .input {
+    margin-bottom: 12px;
+  }
+
+  .options {
+    margin: 2px 0 18px;
   }
 
   .btn {

@@ -146,7 +146,33 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
   /** True if GET /activities/:id/images returned at least one row — activity already has a main image in DB. */
   private readonly pendingImageFiles = new Map<string, File>();
 
+  private scrollPageToTop(): void {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+
+    const scrollableContainers = Array.from(
+      document.querySelectorAll<HTMLElement>(
+        '.page-outlet, .main-content, .content, .page-content, .workspace'
+      )
+    );
+    for (const container of scrollableContainers) {
+      container.scrollTop = 0;
+    }
+
+    setTimeout(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      for (const container of scrollableContainers) {
+        container.scrollTop = 0;
+      }
+    }, 0);
+  }
+
   ngOnInit(): void {
+    this.scrollPageToTop();
+
     const idFromRoute = Number(this.route.snapshot.paramMap.get('id'));
     if (Number.isFinite(idFromRoute) && idFromRoute > 0) {
       this.isEditMode = true;
