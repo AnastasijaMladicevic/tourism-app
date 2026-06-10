@@ -485,7 +485,7 @@ export class ManagerReportsComponent implements OnInit, OnDestroy {
       pending.map((creatorId) =>
         this.http
           .get<{ firstName?: string; lastName?: string; email?: string }>(
-            `${environment.apiUrl}/users/${creatorId}`,
+            `${environment.apiUrl}/users/${creatorId}/display-name`,
           )
           .pipe(
             map((user) => {

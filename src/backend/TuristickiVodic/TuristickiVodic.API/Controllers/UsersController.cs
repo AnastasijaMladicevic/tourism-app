@@ -51,6 +51,18 @@ namespace TuristickiVodic.API.Controllers
             return Ok(NormalizeUser(user));
         }
 
+        // Manager može da vidi osnovno ime/prezime kreatora sadržaja (npr. za prijavu kreatora)
+        [HttpGet("{id}/display-name")]
+        [Authorize(Roles = "Manager,Admin")]
+        public async Task<IActionResult> GetDisplayName(int id)
+        {
+            var user = await _userService.GetByIdAsync(id);
+            if (user == null)
+                return NotFound();
+
+            return Ok(new { firstName = user.FirstName, lastName = user.LastName, email = user.Email });
+        }
+
         [HttpGet("me/location")]
         public async Task<IActionResult> GetMyLocation()
         {

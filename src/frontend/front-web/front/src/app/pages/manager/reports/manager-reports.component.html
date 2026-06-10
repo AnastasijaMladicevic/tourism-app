@@ -247,23 +247,27 @@
           <ul class="creator-list">
             @for (creator of reportableCreators; track creator.id) {
               <li class="creator-row" [class.is-blocked]="creator.hasPendingReport">
-                <div class="creator-avatar">{{ creator.name.charAt(0) }}</div>
-                <div class="creator-info">
-                  <strong>{{ creator.name }}</strong>
-                  <span class="content-pill">{{ creator.contentSummary }}</span>
+                <div class="creator-row-main">
+                  <div class="creator-avatar">{{ creator.name.charAt(0) }}</div>
+                  <div class="creator-info">
+                    <strong [title]="creator.name">{{ creator.name }}</strong>
+                    <span class="content-pill">{{ creator.contentSummary }}</span>
+                  </div>
                 </div>
-                @if (creator.hasPendingReport) {
-                  <span class="pending-tag">{{ 'manager.reports.pendingTag' | translate }}</span>
-                } @else {
-                  <button
-                    type="button"
-                    class="creator-report-btn"
-                    (click)="openReportModal(creator)"
-                  >
-                    <span class="material-symbols-outlined">flag</span>
-                    {{ 'manager.reports.report' | translate }}
-                  </button>
-                }
+                <div class="creator-row-actions">
+                  @if (creator.hasPendingReport) {
+                    <span class="pending-tag">{{ 'manager.reports.pendingTag' | translate }}</span>
+                  } @else {
+                    <button
+                      type="button"
+                      class="creator-report-btn"
+                      (click)="openReportModal(creator)"
+                    >
+                      <span class="material-symbols-outlined">flag</span>
+                      {{ 'manager.reports.report' | translate }}
+                    </button>
+                  }
+                </div>
               </li>
             }
           </ul>
