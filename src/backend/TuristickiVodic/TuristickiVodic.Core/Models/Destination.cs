@@ -16,6 +16,7 @@ namespace TuristickiVodic.Core.Models
 
         public string? Description { get; set; }
         public Point? Geolocation { get; set; }
+        public Geometry? Boundary { get; set; }
 
         public ContentStatus Status { get; set; } = ContentStatus.Pending;
 
