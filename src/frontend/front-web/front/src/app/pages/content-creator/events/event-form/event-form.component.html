@@ -97,6 +97,14 @@
                 <small class="form-field-note">{{ 'contentCreator.eventForm.noObjectsForDestination' | translate }}</small>
               }
             </label>
+
+            <label class="form-field">
+              <span>{{ 'contentCreator.eventForm.locality' | translate }}</span>
+              <select class="form-control" formControlName="localityId">
+                <option value="">{{ selectedDestinationId ? ('contentCreator.eventForm.selectLocality' | translate) : ('contentCreator.eventForm.selectDestinationFirst' | translate) }}</option>
+                <option *ngFor="let locality of filteredLocalities" [value]="locality.id">{{ locality.name }}</option>
+              </select>
+            </label>
           </div>
 
           <label class="form-field full-width description-field">

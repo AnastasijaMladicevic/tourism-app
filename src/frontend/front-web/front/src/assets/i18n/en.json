@@ -2475,6 +2475,8 @@
       "selectObject": "Select object",
       "selectDestinationFirst": "Select destination first",
       "noObjectsForDestination": "No objects found for selected destination.",
+      "locality": "Locality",
+      "selectLocality": "Select locality",
       "fullDescription": "Full description",
       "descriptionPlaceholder": "Write a detailed description including what guests can expect...",
       "schedule": "Schedule",

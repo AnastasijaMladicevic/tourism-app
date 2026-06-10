@@ -16,7 +16,7 @@ import { AuthService } from '../../../../services/auth.service';
 import { DestinationDto, DestinationService } from '../../../../services/destination.service';
 import { RegionDto, RegionService } from '../../../../services/region';
 import { EventImageDto, EventService } from '../../../../services/event.service';
-import { ActivitiesService } from '../../../../services/activities';
+import { ActivitiesService, LocalityOption } from '../../../../services/activities';
 import { CreateEventDto, EventDto, EventTicketTypeInputDto, UpdateEventDto } from '../../../../models/event.model';
 import { MapComponent } from '../../../../shared/components/map/map';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
@@ -137,6 +137,7 @@ export class EventFormComponent implements OnInit, OnDestroy {
   regions: RegionDto[] = [];
   destinations: DestinationDto[] = [...this.fallbackDestinations];
   venueOptions: VenueOption[] = [...this.fallbackVenueOptions];
+  localities: LocalityOption[] = [];
   selectedRegionId: number | null = null;
 
   relatedActivities: RelatedActivity[] = [];
@@ -276,6 +277,15 @@ export class EventFormComponent implements OnInit, OnDestroy {
     return this.venueOptions.filter((venue) => venue.destinationId === destinationId);
   }
 
+  get filteredLocalities(): LocalityOption[] {
+    const destinationId = this.selectedDestinationId;
+    if (!destinationId) {
+      return this.localities;
+    }
+
+    return this.localities.filter((locality) => locality.destinationId === destinationId);
+  }
+
   get selectedVenue(): VenueOption | null {
     const selectedObjectId = this.parseOptionalNumber(this.form.get('objectId')?.value);
     if (!selectedObjectId) {
@@ -409,7 +419,7 @@ export class EventFormComponent implements OnInit, OnDestroy {
       ),
       regions: this.regionService.getAll().pipe(catchError(() => of([]))),
       destinations: this.destinationService
-        .getAll({ page: 1, pageSize: 200, sortBy: 'name', sortOrder: 'asc' })
+        .getAll({ page: 1, pageSize: 200, sortBy: 'name', sortOrder: 'asc' }, { bypassRegion: true })
         .pipe(
           map((response: any) => {
             const list = Array.isArray(response)
@@ -422,7 +432,10 @@ export class EventFormComponent implements OnInit, OnDestroy {
               destinationTypeId: d.destinationTypeId ?? 0,
               destinationTypeName: d.destinationTypeName ?? '',
               latitude: d.latitude,
-              longitude: d.longitude
+              longitude: d.longitude,
+              regionId: d.regionId,
+              regionName: d.regionName,
+              regionCode: d.regionCode
             } as DestinationDto));
           }),
           catchError(() => of(this.fallbackDestinations))
@@ -437,12 +450,19 @@ export class EventFormComponent implements OnInit, OnDestroy {
           longitude: (item as unknown as { longitude?: number }).longitude
         }))),
         catchError(() => of(this.fallbackVenueOptions))
+      ),
+      localities: this.activitiesService.getLocalityOptions().pipe(
+        catchError(() => of([] as LocalityOption[]))
       )
-    }).subscribe(({ eventTypes, regions, destinations, venues }) => {
+    }).subscribe(({ eventTypes, regions, destinations, venues, localities }) => {
       this.eventTypes = eventTypes.length > 0 ? eventTypes : [...this.fallbackEventTypes];
       this.regions = regions;
       this.destinations = destinations.length > 0 ? destinations : [...this.fallbackDestinations];
       this.venueOptions = venues.length > 0 ? venues : [...this.fallbackVenueOptions];
+      this.localities = localities;
+
+      // If the event was already loaded, re-apply its region/object/locality selections now that fresh data is in
+      this.applyEditModeSelections();
 
       // Sync any existing selection with new data
       this.syncObjectSelectionWithDestination();
@@ -511,9 +531,82 @@ export class EventFormComponent implements OnInit, OnDestroy {
     if (selectedObjectId && !this.filteredVenueOptions.some((venue) => venue.id === selectedObjectId)) {
       this.form.patchValue({ objectId: '' }, { emitEvent: false });
     }
+
+    const selectedLocalityId = this.toNumber(this.form.controls.localityId.value);
+
+    if (selectedLocalityId && !this.filteredLocalities.some((locality) => locality.id === selectedLocalityId)) {
+      this.form.patchValue({ localityId: '' }, { emitEvent: false });
+    }
+  }
+
+  /**
+   * Pre-populates the region/object/locality dropdowns for an event being edited,
+   * even if those entities would otherwise be filtered out of the loaded option lists.
+   */
+  private applyEditModeSelections(): void {
+    const event = this.loadedEvent;
+    if (!event) {
+      return;
+    }
+
+    const destinationId = this.toNumber(event.destinationId);
+    if (destinationId != null) {
+      let destination = this.destinations.find((d) => d.id === destinationId);
+      if (!destination && event.destinationName) {
+        destination = {
+          id: destinationId,
+          name: event.destinationName,
+          isActive: true,
+          destinationTypeId: 0,
+          destinationTypeName: ''
+        } as DestinationDto;
+        this.destinations = [destination, ...this.destinations];
+      }
+
+      if (destination?.regionId != null) {
+        this.selectedRegionId = destination.regionId;
+        this.destinations = this.destinations.filter(
+          (d) => d.regionId === this.selectedRegionId || d.id === destinationId
+        );
+      }
+    }
+
+    const objectId = this.toNumber(event.objectId);
+    if (objectId != null && !this.venueOptions.some((venue) => venue.id === objectId)) {
+      this.venueOptions = [
+        {
+          id: objectId,
+          name: event.objectName?.trim() || this.translationService.translate('contentCreator.eventForm.linkedObject'),
+          address: this.translationService.translate('contentCreator.eventForm.noAddressAvailable'),
+          destinationId: destinationId ?? 0,
+          latitude: undefined,
+          longitude: undefined
+        },
+        ...this.venueOptions
+      ];
+    }
+
+    const localityId = this.toNumber(event.localityId);
+    if (localityId != null && !this.localities.some((locality) => locality.id === localityId)) {
+      this.localities = [
+        {
+          id: localityId,
+          name: event.localityName?.trim() || '',
+          destinationId: destinationId ?? 0,
+          destinationName: event.destinationName ?? ''
+        },
+        ...this.localities
+      ];
+    }
   }
 
   private applyLocationFromSelection(): void {
+    if (this.isEditMode) {
+      // An event's coordinates are independent of its destination/object/locality;
+      // never overwrite them with the linked entity's coordinates.
+      return;
+    }
+
     const selectedObjectId = this.toNumber(this.form.controls.objectId.value);
     const selectedDestinationId = this.toNumber(this.form.controls.destinationId.value);
 
@@ -642,15 +735,8 @@ export class EventFormComponent implements OnInit, OnDestroy {
 
     this.setTicketTypes(this.getEditableTicketTypes(event));
 
-    // Pre-select region from the event's destination
-    const destId = this.toNumber(event.destinationId);
-    if (destId) {
-      const dest = this.destinations.find((d) => d.id === destId);
-      if (dest?.regionId != null) {
-        this.selectedRegionId = dest.regionId;
-        this.destinations = this.destinations.filter((d) => d.regionId === this.selectedRegionId);
-      }
-    }
+    // Pre-select region/object/locality dropdowns from the loaded event
+    this.applyEditModeSelections();
 
     // Sync the selection and map display
     this.syncObjectSelectionWithDestination();

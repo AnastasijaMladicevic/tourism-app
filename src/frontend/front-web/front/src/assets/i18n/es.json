@@ -2440,6 +2440,8 @@
       "selectObject": "Selecciona objeto",
       "selectDestinationFirst": "Primero selecciona un destino",
       "noObjectsForDestination": "No se encontraron objetos para el destino seleccionado.",
+      "locality": "Localidad",
+      "selectLocality": "Selecciona localidad",
       "fullDescription": "Descripción completa",
       "descriptionPlaceholder": "Escribe una descripción detallada e incluye qué pueden esperar los invitados...",
       "schedule": "Horario",
