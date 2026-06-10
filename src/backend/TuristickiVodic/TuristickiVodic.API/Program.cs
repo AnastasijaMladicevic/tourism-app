@@ -100,6 +100,7 @@ builder.Services.AddScoped<IAiSemanticSearchService, AiSemanticSearchService>();
 builder.Services.AddScoped<IAiChatService, AiChatService>();
 builder.Services.AddScoped<ITranslationService, TranslationService>();
 builder.Services.AddScoped<IExternalTranslationProvider, ArgosTranslateProvider>();
+builder.Services.AddScoped<IGeoBoundaryService, GeoBoundaryService>();
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
