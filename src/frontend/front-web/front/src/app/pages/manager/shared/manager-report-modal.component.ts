@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, Output, inject } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { finalize } from 'rxjs';
@@ -82,8 +82,8 @@ export class ManagerReportModalComponent implements OnChanges {
     }));
   }
 
-  ngOnChanges(): void {
-    if (this.open) {
+  ngOnChanges(changes: SimpleChanges): void {
+    if (this.open && changes['open']) {
       this.resetForm();
     }
   }
