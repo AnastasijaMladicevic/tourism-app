@@ -244,21 +244,23 @@
         <div class="alert alert-error inline-field-error">{{ galleryErrorMessage }}</div>
       }
 
-      <article class="panel panel--muted">
-        <span class="step-tag">{{ t('adminDestinationForm.step3') }}</span>
-        <div class="panel-head">
-          <span class="panel-icon material-symbols-outlined">history</span>
-          <div>
-            <h2 class="panel-title">{{ t('adminDestinationForm.changeHistory') }}</h2>
-            <p class="panel-sub">{{ t('adminDestinationForm.changeHistoryDesc') }}</p>
+      @if (isEditMode) {
+        <article class="panel panel--muted">
+          <span class="step-tag">{{ t('adminDestinationForm.step3') }}</span>
+          <div class="panel-head">
+            <span class="panel-icon material-symbols-outlined">history</span>
+            <div>
+              <h2 class="panel-title">{{ t('adminDestinationForm.changeHistory') }}</h2>
+              <p class="panel-sub">{{ t('adminDestinationForm.changeHistoryDesc') }}</p>
+            </div>
           </div>
-        </div>
-      </article>
+        </article>
+      }
     </div>
 
     <aside class="workspace-side">
       <article class="panel">
-        <span class="step-tag">{{ t('adminDestinationForm.step4') }}</span>
+        <span class="step-tag">{{ isEditMode ? t('adminDestinationForm.step4') : t('adminDestinationForm.step3') }}</span>
         <div class="panel-head">
           <span class="panel-icon material-symbols-outlined">location_on</span>
           <div>
@@ -304,7 +306,7 @@
       </article>
 
       <article class="panel">
-        <span class="step-tag">{{ t('adminDestinationForm.step5') }}</span>
+        <span class="step-tag">{{ isEditMode ? t('adminDestinationForm.step5') : t('adminDestinationForm.step4') }}</span>
         <div class="panel-head panel-head--split">
           <div class="panel-head-left">
             <span class="panel-icon material-symbols-outlined">hub</span>

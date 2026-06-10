@@ -426,17 +426,20 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
     this.isUpdatingImages = true;
     this.destinationService
       .setMainImage(image.id)
-      .pipe(finalize(() => (this.isUpdatingImages = false)))
+      .pipe(
+        finalize(() => {
+          this.isUpdatingImages = false;
+          this.cdr.detectChanges();
+        })
+      )
       .subscribe({
         next: () => {
           this.destinationImages = this.destinationImages
             .map((img) => ({ ...img, isMain: img.id === image.id }))
             .sort((a, b) => (a.isMain === b.isMain ? 0 : a.isMain ? -1 : 1));
-          this.cdr.detectChanges();
         },
         error: (err) => {
           this.errorMessage = this.extractApiErrorMessage(err);
-          this.cdr.detectChanges();
         }
       });
   }
@@ -449,18 +452,21 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
     this.isUpdatingImages = true;
     this.destinationService
       .deleteImageById(image.id)
-      .pipe(finalize(() => (this.isUpdatingImages = false)))
+      .pipe(
+        finalize(() => {
+          this.isUpdatingImages = false;
+          this.cdr.detectChanges();
+        })
+      )
       .subscribe({
         next: () => {
           this.destinationImages = this.destinationImages.filter((img) => img.id !== image.id);
           if (!this.destinationImages.length && this.imagePreviews.length > 0 && this.primaryPreviewImageIndex == null) {
             this.primaryPreviewImageIndex = 0;
           }
-          this.cdr.detectChanges();
         },
         error: (err) => {
           this.errorMessage = this.extractApiErrorMessage(err);
-          this.cdr.detectChanges();
         }
       });
   }

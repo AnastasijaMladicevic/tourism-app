@@ -180,14 +180,24 @@ app-admin-platform-map.admin-platform-map--full :is(.leaflet-container, .leaflet
 }
 
 .region-filters {
+  position: relative;
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 8px;
   margin-top: 8px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.region-filters::-webkit-scrollbar {
+  display: none;
 }
 
 .region-chip {
   display: inline-flex;
+  flex-shrink: 0;
   align-items: center;
   height: 34px;
   padding: 0 16px;
@@ -235,13 +245,19 @@ app-admin-platform-map.admin-platform-map--full :is(.leaflet-container, .leaflet
 
 .map-controls {
   position: absolute;
-  top: 50%;
+  top: 40%;
   right: 16px;
   z-index: 10;
   display: flex;
   flex-direction: column;
   gap: 8px;
   transform: translateY(-50%);
+}
+
+@media (min-width: 768px) {
+  .map-controls {
+    top: 50%;
+  }
 }
 
 .control-btn {
@@ -470,13 +486,6 @@ app-admin-platform-map.admin-platform-map--full :is(.leaflet-container, .leaflet
     height: 30px;
     padding: 0 12px;
     font-size: 12px;
-  }
-
-  .map-controls {
-    top: auto;
-    bottom: 24px;
-    right: 12px;
-    transform: none;
   }
 
   .bottom-card.bottom-card--anchored {

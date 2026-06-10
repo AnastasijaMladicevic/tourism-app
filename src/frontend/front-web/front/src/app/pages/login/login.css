@@ -289,17 +289,19 @@ label {
   }
 
   .content {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 10px;
     padding-top: 54px;
   }
 
   .left {
     min-height: 300px;
+    min-width: 0;
   }
 
   .right {
     justify-self: center;
+    min-width: 0;
   }
 }
 
