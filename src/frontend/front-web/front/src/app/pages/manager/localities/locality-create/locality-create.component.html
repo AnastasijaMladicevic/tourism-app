@@ -165,6 +165,7 @@
             [popupText]="mapPopupText"
             [interactive]="true"
             [showMarker]="hasMapCoordinates"
+            [boundaryGeoJson]="selectedDestinationBoundary"
             mapId="manager-create-locality-map"
             (locationSelected)="onMapLocationSelected($event)"
           ></app-map>
@@ -179,14 +180,14 @@
           <div>
             <span class="coord-label">{{ 'common.latitude' | translate }}</span>
             <div class="coord-input-wrap">
-              <input type="number" min="-90" max="90" step="0.000001" [(ngModel)]="form.latitude" name="latitude" placeholder="42.4240" />
+              <input type="number" min="-90" max="90" step="0.000001" [(ngModel)]="form.latitude" (ngModelChange)="onCoordinateInputChanged()" name="latitude" placeholder="42.4240" />
               <span class="coord-input-suffix">{{ latitudeDirection }}</span>
             </div>
           </div>
           <div>
             <span class="coord-label">{{ 'common.longitude' | translate }}</span>
             <div class="coord-input-wrap">
-              <input type="number" min="-180" max="180" step="0.000001" [(ngModel)]="form.longitude" name="longitude" placeholder="18.7710" />
+              <input type="number" min="-180" max="180" step="0.000001" [(ngModel)]="form.longitude" (ngModelChange)="onCoordinateInputChanged()" name="longitude" placeholder="18.7710" />
               <span class="coord-input-suffix">{{ longitudeDirection }}</span>
             </div>
           </div>

@@ -1052,7 +1052,8 @@
           "deleteFailed": "Brisanje lokaliteta nije uspelo.",
           "uploadLimit": "Možeš da otpremiš najviše {{count}} slika po lokalitetu.",
           "partialUpload": "Dodato je samo prvih {{accepted}} slika. Svaki lokalitet može imati najviše {{count}} slika.",
-          "loadEditFailed": "Učitavanje lokaliteta za izmenu nije uspelo."
+          "loadEditFailed": "Učitavanje lokaliteta za izmenu nije uspelo.",
+          "outsideDestination": "Izabrana lokacija je van granica destinacije \"{{destination}}\"."
         }
       },
       "eventReview": {

@@ -1052,7 +1052,8 @@
           "deleteFailed": "No se pudo eliminar la localidad.",
           "uploadLimit": "Puedes subir hasta {{count}} imágenes por localidad.",
           "partialUpload": "Solo se agregaron las primeras {{accepted}} imagen(es). Cada localidad puede tener hasta {{count}} imágenes.",
-          "loadEditFailed": "No se pudo cargar la localidad para editar."
+          "loadEditFailed": "No se pudo cargar la localidad para editar.",
+          "outsideDestination": "La ubicación seleccionada está fuera del límite de \"{{destination}}\"."
         }
       },
       "eventReview": {

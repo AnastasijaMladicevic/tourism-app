@@ -30,6 +30,7 @@ export interface DestinationDto {
   isFavorite?: boolean;
   favoriteId?: number;
   editLock?: DestinationEditLockDto;
+  boundaryGeoJson?: string;
 }
 
 export interface DestinationImageDto {

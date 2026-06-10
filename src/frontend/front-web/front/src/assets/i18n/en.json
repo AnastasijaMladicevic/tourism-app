@@ -1052,7 +1052,8 @@
           "deleteFailed": "Failed to delete locality.",
           "uploadLimit": "You can upload up to {{count}} images per locality.",
           "partialUpload": "Only the first {{accepted}} image(s) were added. Each locality can have up to {{count}} images.",
-          "loadEditFailed": "Failed to load locality for editing."
+          "loadEditFailed": "Failed to load locality for editing.",
+          "outsideDestination": "The selected location is outside the boundary of \"{{destination}}\"."
         }
       },
       "eventReview": {

@@ -24,6 +24,7 @@ export interface LocalityDto {
   localityTypeName: string;
   createdByUserId?: number;
   createdAt: string;
+  boundaryGeoJson?: string;
 }
 
 export interface LocalityQueryParams {

@@ -32,6 +32,7 @@ export class MapService {
   private markerMap = new Map<string, MarkerEntry>();
   private activeMarkerKey: string | null = null;
   private map: L.Map | null = null;
+  private boundaryLayer: L.GeoJSON | null = null;
   private clusterGroups = new Map<string, MarkerClusterGroup>();
   private clusteringEnabled = false;
   private activeFilters: string[] = [];
@@ -176,11 +177,43 @@ export class MapService {
       this.map = null;
     }
 
+    this.boundaryLayer = null;
     this.clusterGroups.clear();
     this.clusteringEnabled = false;
     this.markers = [];
     this.markerMap.clear();
     this.activeMarkerKey = null;
+  }
+
+  // Iscrtava granicu (Polygon/MultiPolygon) destinacije/regiona/lokaliteta na mapi.
+  setBoundary(geoJson?: string | null): void {
+    this.clearBoundary();
+
+    if (!this.map || !geoJson) {
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(geoJson);
+      this.boundaryLayer = L.geoJSON(parsed, {
+        style: {
+          color: '#2563eb',
+          weight: 2,
+          fillColor: '#2563eb',
+          fillOpacity: 0.06,
+          dashArray: '6 4',
+        },
+      }).addTo(this.map);
+    } catch {
+      this.boundaryLayer = null;
+    }
+  }
+
+  clearBoundary(): void {
+    if (this.boundaryLayer) {
+      this.boundaryLayer.remove();
+      this.boundaryLayer = null;
+    }
   }
 
   flyTo(lat: number, lng: number, zoom = 16): void {

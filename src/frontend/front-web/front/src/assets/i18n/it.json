@@ -1052,7 +1052,8 @@
           "deleteFailed": "Impossibile eliminare la località.",
           "uploadLimit": "Puoi caricare fino a {{count}} immagini per località.",
           "partialUpload": "Sono state aggiunte solo le prime {{accepted}} immagini. Ogni località può avere fino a {{count}} immagini.",
-          "loadEditFailed": "Impossibile caricare la località per la modifica."
+          "loadEditFailed": "Impossibile caricare la località per la modifica.",
+          "outsideDestination": "La posizione selezionata è fuori dal confine di \"{{destination}}\"."
         }
       },
       "eventReview": {
