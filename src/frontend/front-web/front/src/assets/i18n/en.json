@@ -2010,6 +2010,7 @@
     "managerSuggestions": "Manager suggestions",
     "searching": "Searching…",
     "noManagersMatch": "No managers match your search.",
+    "selectRegionFirst": "Select a region first to see available managers.",
     "removeManager": "Remove manager",
     "selectManagerBeforeSave": "Select a manager before you can save this destination.",
     "deleteDestinationTitle": "Delete destination?",
@@ -2038,6 +2039,7 @@
       "maxImagesDestination": "A destination can have at most {{count}} images.",
       "selectManager": "Please select a manager.",
       "managerAlreadyAssigned": "This manager already manages \"{{destination}}\". Each manager can manage only one destination.",
+      "managerOutsideRegion": "This manager does not belong to the selected destination's region.",
       "assignManagerFailed": "Destination was saved, but assigning the manager failed.",
       "anotherAdminEditing": "Another admin is currently editing this destination.",
       "saveFailed": "Save failed. Please check fields and try again."

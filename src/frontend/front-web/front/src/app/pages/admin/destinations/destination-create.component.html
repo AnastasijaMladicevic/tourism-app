@@ -293,53 +293,55 @@
 
       </article>
 
-      <article class="panel">
-        <span class="step-tag">{{ isEditMode ? t('adminDestinationForm.step5') : t('adminDestinationForm.step4') }}</span>
-        <div class="panel-head panel-head--split">
-          <div class="panel-head-left">
-            <span class="panel-icon material-symbols-outlined">hub</span>
-            <h2 class="panel-title">{{ t('adminDestinationForm.linkedEntities') }}</h2>
+      @if (isEditMode) {
+        <article class="panel">
+          <span class="step-tag">{{ t('adminDestinationForm.step5') }}</span>
+          <div class="panel-head panel-head--split">
+            <div class="panel-head-left">
+              <span class="panel-icon material-symbols-outlined">hub</span>
+              <h2 class="panel-title">{{ t('adminDestinationForm.linkedEntities') }}</h2>
+            </div>
+            <button type="button" class="link-quiet" disabled>{{ t('adminDestinationForm.linkMore') }}</button>
           </div>
-          <button type="button" class="link-quiet" disabled>{{ t('adminDestinationForm.linkMore') }}</button>
-        </div>
-        <ul class="entity-list">
-          <li>
-            <span class="material-symbols-outlined entity-ico">apartment</span>
-            <div>
-              <span class="entity-name">{{ t('common.objects') }}</span>
-              <span class="entity-meta">{{ t('adminDestinationForm.hotelsShops') }}</span>
-            </div>
-            <span class="entity-count">{{ linkedEntityCounts.objects }}</span>
-          </li>
-          <li>
-            <span class="material-symbols-outlined entity-ico">event</span>
-            <div>
-              <span class="entity-name">{{ t('adminDestinationForm.relatedEvents') }}</span>
-            </div>
-            <span class="entity-count">{{ linkedEntityCounts.events }}</span>
-          </li>
-          <li>
-            <span class="material-symbols-outlined entity-ico">hiking</span>
-            <div>
-              <span class="entity-name">{{ t('adminDestinationForm.featuredActivities') }}</span>
-            </div>
-            <span class="entity-count">{{ linkedEntityCounts.activities }}</span>
-          </li>
-          <li>
-            <span class="material-symbols-outlined entity-ico">map</span>
-            <div>
-              <span class="entity-name">{{ t('adminDestinationForm.localities') }}</span>
-            </div>
-            <span class="entity-count">{{ linkedEntityCounts.localities }}</span>
-          </li>
-        </ul>
-        <p class="fine-print">
-          {{ isLoadingLinkedEntities ? t('adminDestinationForm.loadingLinkedEntityCounts') : t('adminDestinationForm.linkedEntityCountsLoaded') }}
-        </p>
-      </article>
+          <ul class="entity-list">
+            <li>
+              <span class="material-symbols-outlined entity-ico">apartment</span>
+              <div>
+                <span class="entity-name">{{ t('common.objects') }}</span>
+                <span class="entity-meta">{{ t('adminDestinationForm.hotelsShops') }}</span>
+              </div>
+              <span class="entity-count">{{ linkedEntityCounts.objects }}</span>
+            </li>
+            <li>
+              <span class="material-symbols-outlined entity-ico">event</span>
+              <div>
+                <span class="entity-name">{{ t('adminDestinationForm.relatedEvents') }}</span>
+              </div>
+              <span class="entity-count">{{ linkedEntityCounts.events }}</span>
+            </li>
+            <li>
+              <span class="material-symbols-outlined entity-ico">hiking</span>
+              <div>
+                <span class="entity-name">{{ t('adminDestinationForm.featuredActivities') }}</span>
+              </div>
+              <span class="entity-count">{{ linkedEntityCounts.activities }}</span>
+            </li>
+            <li>
+              <span class="material-symbols-outlined entity-ico">map</span>
+              <div>
+                <span class="entity-name">{{ t('adminDestinationForm.localities') }}</span>
+              </div>
+              <span class="entity-count">{{ linkedEntityCounts.localities }}</span>
+            </li>
+          </ul>
+          <p class="fine-print">
+            {{ isLoadingLinkedEntities ? t('adminDestinationForm.loadingLinkedEntityCounts') : t('adminDestinationForm.linkedEntityCountsLoaded') }}
+          </p>
+        </article>
+      }
 
       <article class="panel">
-        <span class="step-tag">{{ t('adminDestinationForm.step6') }}</span>
+        <span class="step-tag">{{ isEditMode ? t('adminDestinationForm.step6') : t('adminDestinationForm.step4') }}</span>
         <div class="panel-head">
           <span class="panel-icon material-symbols-outlined">group</span>
           <div>
@@ -371,6 +373,10 @@
             >
               @if (managerSuggestionsLoading) {
                 <li class="manager-suggestion manager-suggestion--muted" role="presentation">{{ t('adminDestinationForm.searching') }}</li>
+              } @else if (!form.regionId) {
+                <li class="manager-suggestion manager-suggestion--muted" role="presentation">
+                  {{ t('adminDestinationForm.selectRegionFirst') }}
+                </li>
               } @else if (!managerSuggestions.length) {
                 <li class="manager-suggestion manager-suggestion--muted" role="presentation">
                   {{ t('adminDestinationForm.noManagersMatch') }}

@@ -515,18 +515,35 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
   }
 
   private validateManagerAssignment(user: AdminUserListItemDto): string | null {
+    if (this.isManagerAssignedElsewhere(user)) {
+      const assignment = this.managerAssignments.get(user.id)!;
+      return this.t('adminDestinationForm.errors.managerAlreadyAssigned', {
+        destination: assignment.destinationName
+      });
+    }
+
+    if (!this.isManagerInDestinationRegion(user)) {
+      return this.t('adminDestinationForm.errors.managerOutsideRegion');
+    }
+
+    return null;
+  }
+
+  private isManagerAssignedElsewhere(user: AdminUserListItemDto): boolean {
     const assignment = this.managerAssignments.get(user.id);
     if (!assignment) {
-      return null;
+      return false;
     }
 
-    if (this.isEditMode && assignment.destinationId === this.editDestinationId) {
-      return null;
+    return !(this.isEditMode && assignment.destinationId === this.editDestinationId);
+  }
+
+  private isManagerInDestinationRegion(user: AdminUserListItemDto): boolean {
+    if (!this.form.regionId) {
+      return false;
     }
 
-    return this.t('adminDestinationForm.errors.managerAlreadyAssigned', {
-      destination: assignment.destinationName
-    });
+    return user.preferredRegionId === this.form.regionId;
   }
 
   private setManagerError(message: string): void {
@@ -562,6 +579,14 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
     const skipId = this.selectedManager?.id;
     return users.filter((user) => {
       if (user.id === skipId) {
+        return false;
+      }
+
+      if (this.isManagerAssignedElsewhere(user)) {
+        return false;
+      }
+
+      if (!this.isManagerInDestinationRegion(user)) {
         return false;
       }
 
@@ -683,6 +708,13 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
       this.form.longitude = Number(r.centerLongitude);
     }
     this.onDestinationNameInput(this.form.name?.trim() ?? '');
+
+    if (this.selectedManager && !this.isManagerInDestinationRegion(this.selectedManager)) {
+      this.clearSelectedManager();
+    }
+    if (this.managerSuggestionsOpen) {
+      this.managerSearchInput$.next(this.managerSearch);
+    }
   }
 
   onMapLocationSelected(position: { lat: number; lng: number }): void {

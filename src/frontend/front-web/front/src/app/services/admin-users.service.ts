@@ -18,6 +18,9 @@ export interface AdminUserListItemDto {
   roleName: string;
   profileImageUrl?: string | null;
   country?: string | null;
+  preferredRegionId?: number | null;
+  preferredRegionName?: string | null;
+  preferredRegionCode?: string | null;
   isActive?: boolean;
   createdAt?: string;
   isBanned?: boolean;

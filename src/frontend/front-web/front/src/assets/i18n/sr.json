@@ -1975,6 +1975,7 @@
     "managerSuggestions": "Predlozi menadžera",
     "searching": "Pretraga…",
     "noManagersMatch": "Nijedan menadžer ne odgovara pretrazi.",
+    "selectRegionFirst": "Prvo izaberi region da bi videla dostupne menadžere.",
     "removeManager": "Ukloni menadžera",
     "selectManagerBeforeSave": "Izaberi menadžera pre nego što sačuvaš ovu destinaciju.",
     "deleteDestinationTitle": "Obriši destinaciju?",
@@ -2003,6 +2004,7 @@
       "maxImagesDestination": "Destinacija može imati najviše {{count}} slika.",
       "selectManager": "Izaberite menadžera.",
       "managerAlreadyAssigned": "Ovaj menadžer već upravlja destinacijom \"{{destination}}\". Svaki menadžer može da upravlja samo jednom destinacijom.",
+      "managerOutsideRegion": "Ovaj menadžer ne pripada regionu izabrane destinacije.",
       "assignManagerFailed": "Destinacija je sačuvana, ali dodela menadžera nije uspela.",
       "anotherAdminEditing": "Drugi admin trenutno menja ovu destinaciju.",
       "saveFailed": "Čuvanje nije uspelo. Proverite polja i pokušajte ponovo."

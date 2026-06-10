@@ -1975,6 +1975,7 @@
     "managerSuggestions": "Suggerimenti manager",
     "searching": "Ricerca…",
     "noManagersMatch": "Nessun manager corrisponde alla ricerca.",
+    "selectRegionFirst": "Seleziona prima una regione per vedere i manager disponibili.",
     "removeManager": "Rimuovi manager",
     "selectManagerBeforeSave": "Seleziona un manager prima di salvare questa destinazione.",
     "deleteDestinationTitle": "Eliminare la destinazione?",
@@ -2003,6 +2004,7 @@
       "maxImagesDestination": "Una destinazione può avere al massimo {{count}} immagini.",
       "selectManager": "Seleziona un manager.",
       "managerAlreadyAssigned": "Questo manager gestisce già \"{{destination}}\". Ogni manager può gestire una sola destinazione.",
+      "managerOutsideRegion": "Questo manager non appartiene alla regione della destinazione selezionata.",
       "assignManagerFailed": "La destinazione è stata salvata, ma l'assegnazione del manager non è riuscita.",
       "anotherAdminEditing": "Un altro admin sta modificando questa destinazione.",
       "saveFailed": "Salvataggio non riuscito. Controlla i campi e riprova."
