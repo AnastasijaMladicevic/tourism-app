@@ -6,7 +6,7 @@ namespace TuristickiVodic.API.Controllers
 {
     [ApiController]
     [Route("api/admin/geo")]
-    [AllowAnonymous] // TEMP for one-time boundary import - restore [Authorize(Roles = "Admin")] before commit
+    [Authorize(Roles = "Admin")]
     public class GeoAdminController : ControllerBase
     {
         private readonly IGeoBoundaryService _geoBoundaryService;
@@ -17,9 +17,13 @@ namespace TuristickiVodic.API.Controllers
         }
 
         [HttpPost("fetch-boundaries")]
-        public async Task<IActionResult> FetchBoundaries(CancellationToken cancellationToken)
+        public async Task<IActionResult> FetchBoundaries([FromQuery] string? names, CancellationToken cancellationToken)
         {
-            var failures = await _geoBoundaryService.FetchAndStoreBoundariesAsync(cancellationToken);
+            ISet<string>? nameFilter = string.IsNullOrWhiteSpace(names)
+                ? null
+                : names.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).ToHashSet();
+
+            var failures = await _geoBoundaryService.FetchAndStoreBoundariesAsync(nameFilter, cancellationToken);
             return Ok(new { failures });
         }
     }

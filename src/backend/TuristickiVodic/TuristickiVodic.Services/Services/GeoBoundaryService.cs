@@ -25,12 +25,15 @@ namespace TuristickiVodic.Services.Services
         private static readonly Dictionary<string, string> DestinationQueries = new()
         {
             ["Kotorski zaliv"] = "Boka Kotorska, Montenegro",
+            ["Durmitor"] = "Durmitor National Park, Montenegro",
+            ["Cetinje"] = "Old Royal Capital Cetinje, Montenegro",
             ["Nikšić"] = "Niksic, Montenegro",
             ["Lovćen"] = "Lovcen National Park, Montenegro",
             ["Skadarsko jezero"] = "Lake Skadar, Montenegro",
             ["Kolašin"] = "Kolasin, Montenegro",
             ["Žabljak"] = "Zabljak, Montenegro",
-            ["Plužine"] = "Pluzine, Montenegro",
+            ["Plužine"] = "Plužine Municipality, Montenegro",
+            ["Andrijevica"] = "Andrijevica Municipality, Montenegro",
 
             ["Beograd"] = "Belgrade, Serbia",
             ["Niš"] = "Nis, Serbia",
@@ -39,6 +42,8 @@ namespace TuristickiVodic.Services.Services
             ["Vrnjačka Banja"] = "Vrnjacka Banja, Serbia",
             ["Palić"] = "Palic, Subotica, Serbia",
             ["Uvac"] = "Uvac Special Nature Reserve, Serbia",
+            ["Subotica"] = "City of Subotica, Serbia",
+            ["Kopaonik"] = "Kopaonik National Park, Serbia",
 
             ["Sicily"] = "Sicily, Italy",
             ["Sardinija"] = "Sardinia, Italy",
@@ -54,9 +59,18 @@ namespace TuristickiVodic.Services.Services
 
         public async Task<List<string>> FetchAndStoreBoundariesAsync(CancellationToken cancellationToken = default)
         {
+            return await FetchAndStoreBoundariesAsync(null, cancellationToken);
+        }
+
+        public async Task<List<string>> FetchAndStoreBoundariesAsync(ISet<string>? destinationNames, CancellationToken cancellationToken = default)
+        {
             var failures = new List<string>();
 
-            var regions = await _context.Regions.ToListAsync(cancellationToken);
+            var regionsQuery = _context.Regions.AsQueryable();
+            if (destinationNames != null)
+                regionsQuery = regionsQuery.Where(r => destinationNames.Contains(r.Name));
+
+            var regions = await regionsQuery.ToListAsync(cancellationToken);
             foreach (var region in regions)
             {
                 var query = RegionQueries.GetValueOrDefault(region.Name, region.Name);
@@ -69,9 +83,11 @@ namespace TuristickiVodic.Services.Services
                 await Task.Delay(1100, cancellationToken);
             }
 
-            var destinations = await _context.Destinations
-                .Include(d => d.Region)
-                .ToListAsync(cancellationToken);
+            var destinationsQuery = _context.Destinations.Include(d => d.Region).AsQueryable();
+            if (destinationNames != null)
+                destinationsQuery = destinationsQuery.Where(d => destinationNames.Contains(d.Name));
+
+            var destinations = await destinationsQuery.ToListAsync(cancellationToken);
 
             foreach (var destination in destinations)
             {
