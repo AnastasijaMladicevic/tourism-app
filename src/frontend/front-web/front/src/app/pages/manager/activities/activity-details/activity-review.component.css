@@ -927,3 +927,39 @@
     padding: 14px;
   }
 }
+
+@media (max-width: 640px) {
+  .event-form-page .header-actions {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    gap: 8px !important;
+    align-items: stretch !important;
+  }
+
+  .event-form-page .header-actions .danger-btn,
+  .event-form-page .header-actions .primary-btn {
+    flex: 1 1 0 !important;
+    height: 46px !important;
+    min-height: 46px !important;
+    padding: 0 10px !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    text-align: center !important;
+    line-height: 1 !important;
+    gap: 8px !important;
+  }
+
+  .event-form-page .header-actions .danger-btn .material-symbols-outlined,
+  .event-form-page .header-actions .primary-btn .material-symbols-outlined {
+    font-size: 20px !important;
+    line-height: 1 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+}

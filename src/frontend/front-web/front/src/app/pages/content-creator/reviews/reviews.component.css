@@ -983,3 +983,95 @@ textarea {
     white-space: nowrap !important;
   }
 }
+
+.reviews-page .response-filter-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+.reviews-page .response-filter-inline {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  width: 210px;
+  min-height: 36px;
+  padding: 0 34px 0 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 999px;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.reviews-page .response-filter-inline.is-active,
+.reviews-page .response-filter-inline:has(.response-filter-select:focus) {
+  border-color: #2563eb;
+  background: #eff6ff;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+.reviews-page .response-filter-icon {
+  font-size: 17px;
+  color: #2563eb;
+  flex-shrink: 0;
+}
+
+.reviews-page .response-filter-select {
+  flex: 1;
+  min-width: 0;
+  min-height: 34px;
+  padding: 6px 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1f2937;
+  cursor: pointer;
+  appearance: none;
+}
+
+.reviews-page .response-filter-select:focus {
+  outline: none;
+}
+
+.reviews-page .response-filter-chevron {
+  position: absolute;
+  right: 10px;
+  pointer-events: none;
+  font-size: 20px;
+  color: #64748b;
+}
+
+.reviews-page .response-filter-row .reset {
+  height: 36px;
+  padding: 0 14px;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.reviews-page .rating-scroll-row {
+  align-items: center !important;
+}
+
+.reviews-page .rating-scroll-row .chip,
+.reviews-page .chip {
+  height: 36px !important;
+  min-height: 36px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.reviews-page .rating-scroll-row .chip .material-symbols-outlined {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  line-height: 1 !important;
+  font-size: 17px !important;
+}

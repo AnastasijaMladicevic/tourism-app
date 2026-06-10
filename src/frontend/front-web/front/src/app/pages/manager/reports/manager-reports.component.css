@@ -873,3 +873,24 @@
     font-size: 20px;
   }
 }
+
+@media (max-width: 640px) {
+  .manager-reports-page .filter-chips {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    gap: 8px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    padding-bottom: 4px !important;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+
+  .manager-reports-page .filter-chips .chip {
+    flex: 0 0 auto !important;
+    white-space: nowrap !important;
+  }
+}

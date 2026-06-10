@@ -51,14 +51,17 @@
 
   <div class="filters-bar card">
     <div class="filter-chips">
-      <button type="button" class="chip" [class.active]="isAllRatingsSelected" (click)="selectAllRatings(); onFilterChange()">
-        {{ 'manager.creatorReviews.filters.allRatings' | translate }}
-      </button>
-      @for (r of [5, 4, 3, 2, 1]; track r) {
-        <button type="button" class="chip" [class.active]="isRatingSelected(r)" (click)="toggleRating(r); onFilterChange()">
-          {{ r }}★
+      <div class="rating-scroll-row">
+        <button type="button" class="chip" [class.active]="isAllRatingsSelected" (click)="selectAllRatings(); onFilterChange()">
+          {{ 'manager.creatorReviews.filters.allRatings' | translate }}
         </button>
-      }
+      
+        @for (r of [5, 4, 3, 2, 1]; track r) {
+          <button type="button" class="chip chip-rating" [class.active]="isRatingSelected(r)" (click)="toggleRating(r); onFilterChange()">
+            {{ r }}★
+          </button>
+        }
+      </div>
       <span class="chip-divider" aria-hidden="true"></span>
       <button type="button" class="chip" [class.active]="responseFilter === 'all'" (click)="responseFilter = 'all'; onFilterChange()">
         {{ 'manager.creatorReviews.filters.allResponses' | translate }}
