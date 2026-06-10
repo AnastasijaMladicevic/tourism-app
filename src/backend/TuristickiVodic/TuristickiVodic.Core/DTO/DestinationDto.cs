@@ -23,5 +23,6 @@ namespace TuristickiVodic.Core.DTO
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public DestinationEditLockDto? EditLock { get; set; }
+        public string? BoundaryGeoJson { get; set; }
     }
 }

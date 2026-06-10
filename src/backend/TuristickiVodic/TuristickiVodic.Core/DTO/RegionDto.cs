@@ -11,5 +11,6 @@ namespace TuristickiVodic.Core.DTO
         public double? DefaultMapZoom { get; set; }
         public bool IsDefault { get; set; }
         public bool IsActive { get; set; }
+        public string? BoundaryGeoJson { get; set; }
     }
 }
