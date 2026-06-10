@@ -35,6 +35,7 @@ import {
   DestinationDto,
   DestinationImageDto,
   DestinationService,
+  DestinationTypeDto,
   UpdateDestinationDto
 } from '../../../services/destination.service';
 import { RegionDto, RegionService } from '../../../services/region';
@@ -71,6 +72,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
   isDeleting = false;
   showDeleteConfirmModal = false;
   isLoadingRegions = true;
+  isLoadingDestinationTypes = true;
   errorMessage = '';
   galleryErrorMessage = '';
   editLockState: DestinationEditLockDto | null = null;
@@ -86,8 +88,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
   regions: RegionDto[] = [];
 
   fullDescription = '';
-  categoryInput = '';
-  categories: string[] = [];
+  destinationTypes: DestinationTypeDto[] = [];
   managerSearch = '';
   managerSuggestions: AdminUserListItemDto[] = [];
   managerSuggestionsOpen = false;
@@ -184,6 +185,10 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
       })
     );
 
+    const destinationTypeRequest$ = this.destinationService.getDestinationTypes().pipe(
+      catchError(() => of([] as DestinationTypeDto[]))
+    );
+
     const destinationRequest$ =
       this.editDestinationId != null
         ? forkJoin({
@@ -209,16 +214,18 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
           )
         : of(null);
 
-    forkJoin({ regions: regionRequest$, destination: destinationRequest$ })
+    forkJoin({ regions: regionRequest$, destinationTypes: destinationTypeRequest$, destination: destinationRequest$ })
       .pipe(
         finalize(() => {
           this.isLoadingRegions = false;
+          this.isLoadingDestinationTypes = false;
           this.isLoadingDestination = false;
           this.cdr.detectChanges();
         })
       )
-      .subscribe(({ regions, destination }) => {
+      .subscribe(({ regions, destinationTypes, destination }) => {
         this.regions = [...regions].sort((a, b) => a.name.localeCompare(b.name));
+        this.destinationTypes = [...destinationTypes].sort((a, b) => a.name.localeCompare(b.name));
         if (destination) {
           this.applyLoadedDestination(destination.destination, destination.images);
           this.applyEditLockState(destination.editLock);
@@ -837,18 +844,6 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
     return normalizedQueries.some((q) => candidateNames.includes(q));
   }
 
-  addCategory(): void {
-    const next = this.categoryInput.trim();
-    if (!next) {
-      return;
-    }
-    this.categories = [...this.categories, next];
-    this.categoryInput = '';
-  }
-
-  removeCategory(index: number): void {
-    this.categories = this.categories.filter((_, i) => i !== index);
-  }
 
   onGalleryFilesSelected(event: Event): void {
     const input = event.target as HTMLInputElement;

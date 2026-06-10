@@ -74,6 +74,11 @@ export interface AssignManagerDto {
   managerUserId: number;
 }
 
+export interface DestinationTypeDto {
+  id: number;
+  name: string;
+}
+
 export interface DestinationEditLockDto {
   destinationId: number;
   isLocked: boolean;
@@ -101,6 +106,10 @@ export class DestinationService {
     }
 
     return params.set('Lang', this.translationService.language());
+  }
+
+  getDestinationTypes(): Observable<DestinationTypeDto[]> {
+    return this.http.get<DestinationTypeDto[]>(`${this.apiUrl}/types`);
   }
 
   getAll(
