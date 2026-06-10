@@ -491,11 +491,14 @@ namespace TuristickiVodic.Services.Services
                     throw new InvalidOperationException("Object not found.");
             }
 
+            var geolocation = CreatePoint(dto.Longitude, dto.Latitude);
+            await GeoBoundaryHelper.EnsurePointWithinBoundsAsync(_context, geolocation, dto.LocalityId, dto.DestinationId);
+
             var activity = new Activity
             {
                 Name = dto.Name,
                 Description = dto.Description,
-                Geolocation = CreatePoint(dto.Longitude, dto.Latitude),
+                Geolocation = geolocation,
                 Price = dto.Price,
                 DurationMinutes = dto.DurationMinutes,
                 ActivityTypeId = dto.ActivityTypeId,
@@ -668,6 +671,9 @@ namespace TuristickiVodic.Services.Services
             if (dto.Description != null) activity.Description = dto.Description;
             if (dto.Longitude.HasValue && dto.Latitude.HasValue)
                 activity.Geolocation = CreatePoint(dto.Longitude, dto.Latitude);
+
+            await GeoBoundaryHelper.EnsurePointWithinBoundsAsync(_context, activity.Geolocation, activity.LocalityId, activity.DestinationId);
+
             if (dto.Price.HasValue) activity.Price = dto.Price.Value;
             if (dto.DurationMinutes.HasValue) activity.DurationMinutes = dto.DurationMinutes.Value;
 

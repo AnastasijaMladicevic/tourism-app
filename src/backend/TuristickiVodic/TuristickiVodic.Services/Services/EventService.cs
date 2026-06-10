@@ -523,11 +523,14 @@ namespace TuristickiVodic.Services.Services
                     dto.DestinationId = locality.DestinationId;
             }
 
+            var geolocation = CreatePoint(dto.Longitude, dto.Latitude);
+            await GeoBoundaryHelper.EnsurePointWithinBoundsAsync(_context, geolocation, dto.LocalityId, dto.DestinationId);
+
             var ev = new Event
             {
                 Name = dto.Name,
                 Description = dto.Description,
-                Geolocation = CreatePoint(dto.Longitude, dto.Latitude),
+                Geolocation = geolocation,
                 StartDate = dto.StartDate,
                 EndDate = dto.EndDate,
                 Price = ResolveEventPrice(dto.Price, dto.TicketTypes),
@@ -675,6 +678,9 @@ namespace TuristickiVodic.Services.Services
             if (dto.Description != null) ev.Description = dto.Description;
             if (dto.Longitude.HasValue && dto.Latitude.HasValue)
                 ev.Geolocation = CreatePoint(dto.Longitude, dto.Latitude);
+
+            await GeoBoundaryHelper.EnsurePointWithinBoundsAsync(_context, ev.Geolocation, ev.LocalityId, ev.DestinationId);
+
             if (dto.StartDate.HasValue) ev.StartDate = dto.StartDate.Value;
             if (dto.EndDate.HasValue) ev.EndDate = dto.EndDate.Value;
 

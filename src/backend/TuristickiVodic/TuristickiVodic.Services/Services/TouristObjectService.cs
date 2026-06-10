@@ -702,6 +702,9 @@ namespace TuristickiVodic.Services.Services
             if (dto.Price.HasValue && dto.Price.Value < 0)
                 throw new InvalidOperationException("Price cannot be negative.");
 
+            var geolocation = CreatePoint(dto.Longitude, dto.Latitude);
+            await GeoBoundaryHelper.EnsurePointWithinBoundsAsync(_context, geolocation, dto.LocalityId, dto.DestinationId);
+
             var obj = new TouristObject
             {
                 Name = dto.Name,
@@ -714,7 +717,7 @@ namespace TuristickiVodic.Services.Services
                 WorkingHours = dto.WorkingHours,
                 Price = NormalizeObjectPrice(objectType.Name, dto.Price),
                 Amenities = NormalizeAmenities(dto.Amenities),
-                Geolocation = CreatePoint(dto.Longitude, dto.Latitude),
+                Geolocation = geolocation,
                 ObjectTypeId = dto.ObjectTypeId,
                 DestinationId = dto.DestinationId.Value,
                 LocalityId = dto.LocalityId,
@@ -876,6 +879,8 @@ namespace TuristickiVodic.Services.Services
 
             if (dto.Longitude.HasValue && dto.Latitude.HasValue)
                 obj.Geolocation = CreatePoint(dto.Longitude, dto.Latitude);
+
+            await GeoBoundaryHelper.EnsurePointWithinBoundsAsync(_context, obj.Geolocation, obj.LocalityId, obj.DestinationId);
 
             obj.UpdatedAt = DateTime.UtcNow;
 
