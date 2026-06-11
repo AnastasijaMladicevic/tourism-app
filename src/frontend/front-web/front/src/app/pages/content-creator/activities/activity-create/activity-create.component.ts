@@ -350,6 +350,29 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
     return this.destinations.find((d) => d.boundaryGeoJson && isPointInGeoJson(lng, lat, d.boundaryGeoJson)) ?? null;
   }
 
+  get selectedRegion(): RegionDto | undefined {
+    if (this.selectedRegionId == null) {
+      return undefined;
+    }
+    return this.regions.find((r) => r.id === this.selectedRegionId);
+  }
+
+  get selectedRegionBoundary(): string | undefined {
+    return this.selectedRegion?.boundaryGeoJson;
+  }
+
+  private isWithinSelectedRegion(lat: number, lng: number): boolean {
+    const boundary = this.selectedRegionBoundary;
+    if (!boundary) {
+      return true;
+    }
+    return isPointInGeoJson(lng, lat, boundary);
+  }
+
+  get activeBoundaryGeoJson(): string | undefined {
+    return this.selectedDestinationBoundary ?? this.selectedRegionBoundary;
+  }
+
   get filteredObjects(): ObjectOption[] {
     const destinationId = this.form.controls.destinationId.value;
     if (!destinationId) {
@@ -1161,6 +1184,14 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
         }
         this.form.patchValue({ destinationId: matched.id }, { emitEvent: false });
         this.syncDependentSelections();
+      } else if (this.selectedRegionId != null && !this.isWithinSelectedRegion(latitude, longitude)) {
+        this.errorMessage = this.translationService.translate('contentCreator.activityForm.errors.outsideRegion', {
+          region: this.selectedRegion?.name ?? ''
+        });
+        this.cdr.detectChanges();
+        return;
+      } else {
+        this.errorMessage = '';
       }
     }
 
@@ -1218,6 +1249,20 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
       }
       this.form.patchValue({ destinationId: matched.id }, { emitEvent: false });
       this.syncDependentSelections();
+    } else if (this.selectedRegionId != null) {
+      const outsideRegionMessage = this.translationService.translate('contentCreator.activityForm.errors.outsideRegion', {
+        region: this.selectedRegion?.name ?? ''
+      });
+
+      if (!this.isWithinSelectedRegion(lat, lng)) {
+        this.errorMessage = outsideRegionMessage;
+        this.cdr.detectChanges();
+        return;
+      }
+
+      if (this.errorMessage === outsideRegionMessage) {
+        this.errorMessage = '';
+      }
     }
 
     this.reverseGeocode(lat, lng);

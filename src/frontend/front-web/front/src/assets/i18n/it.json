@@ -2537,7 +2537,8 @@
         "imageUploadAfterCreate": "Evento creato, ma il caricamento delle immagini non è riuscito. Aggiungile da Modifica.",
         "deletionRequestFailed": "Invio della richiesta di eliminazione non riuscito",
         "deleteFailed": "Eliminazione evento non riuscita",
-        "outsideDestination": "La posizione selezionata è fuori dal confine di \"{{destination}}\"."
+        "outsideDestination": "La posizione selezionata è fuori dal confine di \"{{destination}}\".",
+        "outsideRegion": "La posizione selezionata è fuori dal confine di \"{{region}}\"."
       }
     },
     "activityForm": {
@@ -2618,7 +2619,8 @@
         "deletionRequestFailed": "Invio della richiesta di eliminazione non riuscito",
         "deleteFailed": "Eliminazione attività non riuscita.",
         "loadEditFailed": "Caricamento dell'attività per la modifica non riuscito.",
-        "outsideDestination": "La posizione selezionata è fuori dal confine di \"{{destination}}\"."
+        "outsideDestination": "La posizione selezionata è fuori dal confine di \"{{destination}}\".",
+        "outsideRegion": "La posizione selezionata è fuori dal confine di \"{{region}}\"."
       }
     },
     "map": {
@@ -2805,6 +2807,7 @@
       "imageRequired": "Aggiungi almeno un'immagine prima di inviare l'oggetto.",
       "destinationRequired": "Seleziona una destinazione prima di inviare l'oggetto.",
       "outsideDestination": "La posizione selezionata è fuori dal confine di \"{{destination}}\".",
+      "outsideRegion": "La posizione selezionata è fuori dal confine di \"{{region}}\".",
       "saveFailed": "Non è stato possibile salvare l'oggetto.",
       "loadFailed": "Non è stato possibile caricare l'oggetto.",
       "imageUploadAfterCreate": "L'oggetto è stato creato, ma il caricamento delle immagini non è riuscito. Aggiungile qui sotto."

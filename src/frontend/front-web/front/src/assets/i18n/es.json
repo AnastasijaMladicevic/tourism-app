@@ -2537,7 +2537,8 @@
         "imageUploadAfterCreate": "El evento se creó, pero falló la subida de imágenes. Añádelas desde Editar.",
         "deletionRequestFailed": "No se pudo enviar la solicitud de eliminación",
         "deleteFailed": "No se pudo eliminar el evento",
-        "outsideDestination": "La ubicación seleccionada está fuera del límite de \"{{destination}}\"."
+        "outsideDestination": "La ubicación seleccionada está fuera del límite de \"{{destination}}\".",
+        "outsideRegion": "La ubicación seleccionada está fuera del límite de \"{{region}}\"."
       }
     },
     "activityForm": {
@@ -2618,7 +2619,8 @@
         "deletionRequestFailed": "No se pudo enviar la solicitud de eliminación",
         "deleteFailed": "No se pudo eliminar la actividad.",
         "loadEditFailed": "No se pudo cargar la actividad para editarla.",
-        "outsideDestination": "La ubicación seleccionada está fuera del límite de \"{{destination}}\"."
+        "outsideDestination": "La ubicación seleccionada está fuera del límite de \"{{destination}}\".",
+        "outsideRegion": "La ubicación seleccionada está fuera del límite de \"{{region}}\"."
       }
     },
     "map": {
@@ -2805,6 +2807,7 @@
       "imageRequired": "Añade al menos una imagen antes de enviar el objeto.",
       "destinationRequired": "Selecciona un destino antes de enviar el objeto.",
       "outsideDestination": "La ubicación seleccionada está fuera del límite de \"{{destination}}\".",
+      "outsideRegion": "La ubicación seleccionada está fuera del límite de \"{{region}}\".",
       "saveFailed": "No se pudo guardar el objeto.",
       "loadFailed": "No se pudo cargar el objeto.",
       "imageUploadAfterCreate": "El objeto se creó, pero falló la subida de imágenes. Añádelas abajo."

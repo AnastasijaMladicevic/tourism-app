@@ -717,6 +717,29 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
     return this.destinations.find((d) => d.boundaryGeoJson && isPointInGeoJson(lng, lat, d.boundaryGeoJson)) ?? null;
   }
 
+  get selectedRegion(): RegionDto | undefined {
+    if (this.selectedRegionId == null) {
+      return undefined;
+    }
+    return this.regions.find((r) => r.id === this.selectedRegionId);
+  }
+
+  get selectedRegionBoundary(): string | undefined {
+    return this.selectedRegion?.boundaryGeoJson;
+  }
+
+  private isWithinSelectedRegion(lat: number, lng: number): boolean {
+    const boundary = this.selectedRegionBoundary;
+    if (!boundary) {
+      return true;
+    }
+    return isPointInGeoJson(lng, lat, boundary);
+  }
+
+  get activeBoundaryGeoJson(): string | undefined {
+    return this.selectedDestinationBoundary ?? this.selectedRegionBoundary;
+  }
+
   get latitudeDirection(): 'N' | 'S' {
     const lat = Number(this.form.controls.latitude.value);
     return Number.isFinite(lat) && lat < 0 ? 'S' : 'N';
@@ -752,6 +775,17 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
         this.loadDestinationsForRegion(this.selectedRegionId);
         this.form.patchValue({ destinationId: matched.id }, { emitEvent: false });
         this.syncLocalitySelectionWithDestination();
+      } else if (this.selectedRegionId != null && !this.isWithinSelectedRegion(lat, lng)) {
+        this.locationErrorMessage = this.translationService.translate('contentCreatorObjectForm.errors.outsideRegion', {
+          region: this.selectedRegion?.name ?? ''
+        });
+        const fallbackLat = this.toNumber(this.form.controls.latitude.value) ?? 42.424;
+        const fallbackLng = this.toNumber(this.form.controls.longitude.value) ?? 18.771;
+        this.mapComponent?.resetMarker(fallbackLat, fallbackLng);
+        this.cdr.detectChanges();
+        return;
+      } else {
+        this.locationErrorMessage = '';
       }
     }
 
@@ -791,6 +825,24 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
       this.form.patchValue({ destinationId: matched.id }, { emitEvent: false });
       this.syncLocalitySelectionWithDestination();
       this.cdr.detectChanges();
+      return;
+    }
+
+    if (this.selectedRegionId != null) {
+      const outsideRegionMessage = this.translationService.translate('contentCreatorObjectForm.errors.outsideRegion', {
+        region: this.selectedRegion?.name ?? ''
+      });
+
+      if (!this.isWithinSelectedRegion(lat, lng)) {
+        this.locationErrorMessage = outsideRegionMessage;
+        this.cdr.detectChanges();
+        return;
+      }
+
+      if (this.locationErrorMessage === outsideRegionMessage) {
+        this.locationErrorMessage = '';
+        this.cdr.detectChanges();
+      }
     }
   }
 

@@ -278,7 +278,7 @@
             [interactive]="!isManagerReview"
             [zoomable]="isManagerReview"
             [showMarker]="hasMapCoordinates"
-            [boundaryGeoJson]="selectedDestinationBoundary"
+            [boundaryGeoJson]="activeBoundaryGeoJson"
             mapId="create-object-map"
             (locationSelected)="onMapLocationSelected($event)"
           ></app-map>

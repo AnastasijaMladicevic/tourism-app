@@ -346,6 +346,29 @@ export class EventFormComponent implements OnInit, OnDestroy {
     return this.destinations.find((d) => d.boundaryGeoJson && isPointInGeoJson(lng, lat, d.boundaryGeoJson)) ?? null;
   }
 
+  get selectedRegion(): RegionDto | undefined {
+    if (this.selectedRegionId == null) {
+      return undefined;
+    }
+    return this.regions.find((r) => r.id === this.selectedRegionId);
+  }
+
+  get selectedRegionBoundary(): string | undefined {
+    return this.selectedRegion?.boundaryGeoJson;
+  }
+
+  private isWithinSelectedRegion(lat: number, lng: number): boolean {
+    const boundary = this.selectedRegionBoundary;
+    if (!boundary) {
+      return true;
+    }
+    return isPointInGeoJson(lng, lat, boundary);
+  }
+
+  get activeBoundaryGeoJson(): string | undefined {
+    return this.selectedDestinationBoundary ?? this.selectedRegionBoundary;
+  }
+
   get linkedLocationTitle(): string {
     return this.selectedVenue?.name || this.translationService.translate('contentCreator.eventForm.noLinkedObjectSelected');
   }
@@ -775,6 +798,17 @@ export class EventFormComponent implements OnInit, OnDestroy {
       }
       this.form.patchValue({ destinationId: String(matched.id) }, { emitEvent: false });
       this.syncObjectSelectionWithDestination();
+    } else if (this.selectedRegionId != null && !this.isWithinSelectedRegion(event.lat, event.lng)) {
+      this.errorMessage = this.translationService.translate('contentCreator.eventForm.errors.outsideRegion', {
+        region: this.selectedRegion?.name ?? ''
+      });
+      const lat = this.toNumber(this.form.controls.latitude.value) ?? 42.424;
+      const lng = this.toNumber(this.form.controls.longitude.value) ?? 18.771;
+      this.mapComponent?.resetMarker(lat, lng);
+      this.cdr.detectChanges();
+      return;
+    } else {
+      this.errorMessage = '';
     }
 
     this.setLocationFromSelection(event.lat, event.lng);
@@ -816,6 +850,22 @@ export class EventFormComponent implements OnInit, OnDestroy {
       this.form.patchValue({ destinationId: String(matched.id) }, { emitEvent: false });
       this.syncObjectSelectionWithDestination();
       this.cdr.detectChanges();
+      return;
+    }
+
+    if (this.selectedRegionId != null) {
+      const outsideRegionMessage = this.translationService.translate('contentCreator.eventForm.errors.outsideRegion', {
+        region: this.selectedRegion?.name ?? ''
+      });
+
+      if (!this.isWithinSelectedRegion(lat, lng)) {
+        this.errorMessage = outsideRegionMessage;
+        return;
+      }
+
+      if (this.errorMessage === outsideRegionMessage) {
+        this.errorMessage = '';
+      }
     }
   }
 

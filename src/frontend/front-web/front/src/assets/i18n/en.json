@@ -2564,7 +2564,8 @@
         "imageUploadAfterCreate": "Event created but image upload failed. Please add images via Edit.",
         "deletionRequestFailed": "Failed to submit deletion request",
         "deleteFailed": "Failed to delete event",
-        "outsideDestination": "The selected location is outside the boundary of \"{{destination}}\"."
+        "outsideDestination": "The selected location is outside the boundary of \"{{destination}}\".",
+        "outsideRegion": "The selected location is outside the boundary of \"{{region}}\"."
       }
     },
     "activityForm": {
@@ -2645,7 +2646,8 @@
         "deletionRequestFailed": "Failed to submit deletion request",
         "deleteFailed": "Failed to delete activity.",
         "loadEditFailed": "Failed to load activity for editing.",
-        "outsideDestination": "The selected location is outside the boundary of \"{{destination}}\"."
+        "outsideDestination": "The selected location is outside the boundary of \"{{destination}}\".",
+        "outsideRegion": "The selected location is outside the boundary of \"{{region}}\"."
       }
     },
     "map": {
@@ -2832,6 +2834,7 @@
       "imageRequired": "Add at least one image before submitting the object.",
       "destinationRequired": "Select a destination before submitting the object.",
       "outsideDestination": "The selected location is outside the boundary of \"{{destination}}\".",
+      "outsideRegion": "The selected location is outside the boundary of \"{{region}}\".",
       "saveFailed": "The object could not be saved.",
       "loadFailed": "The object could not be loaded.",
       "imageUploadAfterCreate": "Object was created but image upload failed. Please add images below."
