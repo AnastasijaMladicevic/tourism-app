@@ -2802,6 +2802,7 @@
       "partialImages": "Algunas imágenes no pudieron procesarse. Inténtalo de nuevo.",
       "imageRequired": "Añade al menos una imagen antes de enviar el objeto.",
       "destinationRequired": "Selecciona un destino antes de enviar el objeto.",
+      "outsideDestination": "La ubicación seleccionada está fuera del límite de \"{{destination}}\".",
       "saveFailed": "No se pudo guardar el objeto.",
       "loadFailed": "No se pudo cargar el objeto.",
       "imageUploadAfterCreate": "El objeto se creó, pero falló la subida de imágenes. Añádelas abajo."

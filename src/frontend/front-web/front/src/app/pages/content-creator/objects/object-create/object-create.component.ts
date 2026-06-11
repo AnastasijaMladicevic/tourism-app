@@ -1,5 +1,5 @@
 import { CommonModule, Location } from '@angular/common';
-import { ChangeDetectorRef, Component, NgZone, OnDestroy, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, NgZone, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -33,6 +33,7 @@ import {
   isConcerningCreatorReply,
   ManagerObjectReviewThread,
 } from '../../../manager/shared/manager-object-review.mock';
+import { isPointInGeoJson } from '../../../../shared/utils/geo-utils';
 
 type WorkingDayKey = 'pon' | 'uto' | 'sre' | 'cet' | 'pet' | 'sub' | 'ned';
 
@@ -71,6 +72,8 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly translationService = inject(TranslationService);
   private readonly ngZone = inject(NgZone);
+
+  @ViewChild(SharedMapComponent) mapComponent?: SharedMapComponent;
 
   /** Manager opens this page read-only via `/manager/objects/review/:id` (route data). */
   isManagerReview = false;
@@ -687,6 +690,30 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
     return this.form.controls.latitude.value != null && this.form.controls.longitude.value != null;
   }
 
+  get selectedDestination(): DestinationDto | null {
+    const destinationId = this.form.controls.destinationId.value;
+    if (!destinationId) {
+      return null;
+    }
+    return this.destinations.find((destination) => destination.id === destinationId) ?? null;
+  }
+
+  get selectedDestinationBoundary(): string | undefined {
+    return this.selectedDestination?.boundaryGeoJson;
+  }
+
+  private isWithinSelectedDestination(lat: number, lng: number): boolean {
+    const boundary = this.selectedDestinationBoundary;
+    if (!boundary) {
+      return true;
+    }
+    return isPointInGeoJson(lng, lat, boundary);
+  }
+
+  private findDestinationContainingPoint(lat: number, lng: number): DestinationDto | null {
+    return this.destinations.find((d) => d.boundaryGeoJson && isPointInGeoJson(lng, lat, d.boundaryGeoJson)) ?? null;
+  }
+
   get latitudeDirection(): 'N' | 'S' {
     const lat = Number(this.form.controls.latitude.value);
     return Number.isFinite(lat) && lat < 0 ? 'S' : 'N';
@@ -699,9 +726,69 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
 
   onMapLocationSelected(event: { lat: number; lng: number }): void {
     if (this.isManagerReview) return;
-    this.form.patchValue({ latitude: event.lat, longitude: event.lng }, { emitEvent: false });
+
+    const { lat, lng } = event;
+
+    if (this.selectedDestination) {
+      if (!this.isWithinSelectedDestination(lat, lng)) {
+        this.locationErrorMessage = this.translationService.translate('contentCreatorObjectForm.errors.outsideDestination', {
+          destination: this.selectedDestination?.name ?? ''
+        });
+        const fallbackLat = this.toNumber(this.form.controls.latitude.value) ?? 42.424;
+        const fallbackLng = this.toNumber(this.form.controls.longitude.value) ?? 18.771;
+        this.mapComponent?.resetMarker(fallbackLat, fallbackLng);
+        this.cdr.detectChanges();
+        return;
+      }
+      this.locationErrorMessage = '';
+    } else {
+      const matched = this.findDestinationContainingPoint(lat, lng);
+      if (matched) {
+        this.locationErrorMessage = '';
+        this.selectedRegionId = matched.regionId ?? null;
+        this.loadDestinationsForRegion(this.selectedRegionId);
+        this.form.patchValue({ destinationId: matched.id }, { emitEvent: false });
+        this.syncLocalitySelectionWithDestination();
+      }
+    }
+
+    this.form.patchValue({ latitude: lat, longitude: lng }, { emitEvent: false });
     this.form.controls.latitude.markAsDirty();
     this.form.controls.longitude.markAsDirty();
+    this.cdr.detectChanges();
+  }
+
+  onCoordinateInputChanged(): void {
+    if (this.isManagerReview) return;
+
+    const lat = this.toNumber(this.form.controls.latitude.value);
+    const lng = this.toNumber(this.form.controls.longitude.value);
+    if (lat == null || lng == null) {
+      return;
+    }
+
+    if (this.selectedDestination) {
+      if (!this.isWithinSelectedDestination(lat, lng)) {
+        this.locationErrorMessage = this.translationService.translate('contentCreatorObjectForm.errors.outsideDestination', {
+          destination: this.selectedDestination?.name ?? ''
+        });
+        this.cdr.detectChanges();
+        return;
+      }
+      this.locationErrorMessage = '';
+      this.cdr.detectChanges();
+      return;
+    }
+
+    const matched = this.findDestinationContainingPoint(lat, lng);
+    if (matched) {
+      this.locationErrorMessage = '';
+      this.selectedRegionId = matched.regionId ?? null;
+      this.loadDestinationsForRegion(this.selectedRegionId);
+      this.form.patchValue({ destinationId: matched.id }, { emitEvent: false });
+      this.syncLocalitySelectionWithDestination();
+      this.cdr.detectChanges();
+    }
   }
 
   onAddressSearch(): void {
@@ -1008,6 +1095,15 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
       this.locationErrorMessage = this.translationService.translate(
         'contentCreatorObjectForm.errors.destinationRequired',
       );
+      return;
+    }
+
+    const lat = this.toNumber(this.form.controls.latitude.value);
+    const lng = this.toNumber(this.form.controls.longitude.value);
+    if (lat != null && lng != null && !this.isWithinSelectedDestination(lat, lng)) {
+      this.locationErrorMessage = this.translationService.translate('contentCreatorObjectForm.errors.outsideDestination', {
+        destination: this.selectedDestination?.name ?? ''
+      });
       return;
     }
 

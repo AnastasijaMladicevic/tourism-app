@@ -2829,6 +2829,7 @@
       "partialImages": "Some images could not be processed. Please try again.",
       "imageRequired": "Add at least one image before submitting the object.",
       "destinationRequired": "Select a destination before submitting the object.",
+      "outsideDestination": "The selected location is outside the boundary of \"{{destination}}\".",
       "saveFailed": "The object could not be saved.",
       "loadFailed": "The object could not be loaded.",
       "imageUploadAfterCreate": "Object was created but image upload failed. Please add images below."

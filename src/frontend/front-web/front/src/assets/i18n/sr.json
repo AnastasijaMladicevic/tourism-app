@@ -2612,6 +2612,7 @@
       "partialImages": "Neke slike nisu mogle da budu obrađene. Pokušaj ponovo.",
       "imageRequired": "Dodaj bar jednu sliku pre slanja objekta.",
       "destinationRequired": "Izaberi destinaciju pre slanja objekta.",
+      "outsideDestination": "Izabrana lokacija je van granica destinacije \"{{destination}}\".",
       "saveFailed": "Objekat nije mogao da bude sačuvan.",
       "loadFailed": "Objekat nije mogao da bude učitan.",
       "imageUploadAfterCreate": "Objekat je kreiran, ali otpremanje slika nije uspelo. Dodaj slike ispod."
