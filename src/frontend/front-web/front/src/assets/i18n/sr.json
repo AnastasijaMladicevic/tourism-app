@@ -93,7 +93,7 @@
     "events": "Događaji",
     "reviews": "Recenzije",
     "reviewsReplies": "Recenzije i odgovori",
-    "creatorReports": "Izveštaji kreatora",
+    "creatorReports": "Izveštaji prijava",
     "localities": "Lokaliteti",
     "signOut": "Odjavi se",
     "profile": "Profil",
@@ -1204,7 +1204,7 @@
       "creatorReviews": {
         "title": "Aktivnost recenzija",
         "subtitle": "Prikaz samo za čitanje turističkih recenzija i odgovora kreatora sadržaja na objavljenim objektima. Iskoristi ovaj kontekst pre nego što eskaliraš prijavu.",
-        "creatorReports": "Prijave korisnika",
+        "creatorReports": "Izveštaji prijava",
         "managedDestinationFallback": "tvoje destinacije",
         "creatorSummary": "{{count}} objekat(a) u tvojim destinacijama",
         "creatorSummaryFallback": "Sadržaj u tvojim destinacijama",

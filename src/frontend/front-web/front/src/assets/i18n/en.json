@@ -93,7 +93,7 @@
     "events": "Events",
     "reviews": "Reviews",
     "reviewsReplies": "Reviews & Replies",
-    "creatorReports": "Creator Reports",
+    "creatorReports": "Report log",
     "localities": "Localities",
     "signOut": "Sign Out",
     "profile": "Profile",
@@ -1204,7 +1204,7 @@
       "creatorReviews": {
         "title": "Review activity",
         "subtitle": "Read-only view of tourist reviews and Content Creator replies on published objects. Use this context before escalating a report.",
-        "creatorReports": "User reports",
+        "creatorReports": "Report log",
         "managedDestinationFallback": "your destinations",
         "creatorSummary": "{{count}} object(s) in your destinations",
         "creatorSummaryFallback": "Content in your destinations",

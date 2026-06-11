@@ -736,6 +736,9 @@
 .tourist-report-action .ghost-btn.compact {
   padding: 4px 10px;
   font-size: 12px;
+  border-color: #bfdbfe;
+  background: #eff6ff;
+  color: #1d4ed8;
 }
 
 .inline-alert-actions .primary-btn.compact {

@@ -93,7 +93,7 @@
     "events": "Eventos",
     "reviews": "Reseñas",
     "reviewsReplies": "Reseñas y respuestas",
-    "creatorReports": "Informes del creador",
+    "creatorReports": "Registro de reportes",
     "localities": "Localidades",
     "signOut": "Cerrar sesión",
     "profile": "Perfil",
@@ -1204,7 +1204,7 @@
       "creatorReviews": {
         "title": "Actividad de reseñas",
         "subtitle": "Vista de solo lectura de reseñas de turistas y respuestas del creador de contenido en objetos publicados. Usa este contexto antes de escalar un reporte.",
-        "creatorReports": "Reportes de usuarios",
+        "creatorReports": "Registro de reportes",
         "managedDestinationFallback": "tus destinos",
         "creatorSummary": "{{count}} objeto(s) en tus destinos",
         "creatorSummaryFallback": "Contenido en tus destinos",

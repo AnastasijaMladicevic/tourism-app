@@ -93,7 +93,7 @@
     "events": "Eventi",
     "reviews": "Recensioni",
     "reviewsReplies": "Recensioni e risposte",
-    "creatorReports": "Segnalazioni creator",
+    "creatorReports": "Registro segnalazioni",
     "localities": "Località",
     "signOut": "Esci",
     "profile": "Profilo",
@@ -1204,7 +1204,7 @@
       "creatorReviews": {
         "title": "Attività delle recensioni",
         "subtitle": "Vista di sola lettura delle recensioni dei turisti e delle risposte del creatore di contenuti sugli oggetti pubblicati. Usa questo contesto prima di inoltrare una segnalazione.",
-        "creatorReports": "Segnalazioni utenti",
+        "creatorReports": "Registro segnalazioni",
         "managedDestinationFallback": "le tue destinazioni",
         "creatorSummary": "{{count}} oggetto/i nelle tue destinazioni",
         "creatorSummaryFallback": "Contenuti nelle tue destinazioni",
