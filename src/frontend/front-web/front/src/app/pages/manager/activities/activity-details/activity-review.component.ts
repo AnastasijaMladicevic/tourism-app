@@ -310,7 +310,7 @@ export class ManagerActivityReviewComponent implements OnInit, OnDestroy {
   }
 
   openDeclineModal(): void {
-    if (!this.activityId || this.isSubmitting) {
+    if (!this.activityId || this.isSubmitting || this.reviewStatusKey === 'approved') {
       return;
     }
 

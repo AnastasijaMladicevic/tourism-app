@@ -10,7 +10,13 @@
         <span class="material-symbols-outlined">close</span>
         {{ 'common.back' | translate }}
       </button>-->
-      <button type="button" class="danger-btn" (click)="openDeclineModal()" [disabled]="isSubmitting">
+      <button
+        type="button"
+        class="danger-btn"
+        [attr.title]="reviewStatus === 'Approved' ? translationService.translate('manager.eventReview.alreadyApproved') : null"
+        (click)="openDeclineModal()"
+        [disabled]="isSubmitting || reviewStatus === 'Approved'"
+      >
         <span class="material-symbols-outlined">thumb_down</span>
         {{ 'manager.eventReview.decline' | translate }}
       </button>

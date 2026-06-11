@@ -53,7 +53,7 @@
 }
 
 .media-strip {
-  min-height: 300px;
+  align-self: start;
   display: flex;
   flex-direction: column;
   max-height: 420px;
@@ -97,7 +97,7 @@
 }
 
 .media-empty {
-  min-height: 300px;
+  min-height: 80px;
   display: flex;
   align-items: center;
   justify-content: center;
