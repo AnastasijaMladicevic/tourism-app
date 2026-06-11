@@ -2000,9 +2000,11 @@
       "searching": "Pretraga lokacije na mapi...",
       "matched": "Lokacija je pronađena: {{label}}",
       "notFound": "Lokacija nije automatski pronađena — postavi koordinate na mapi ispod.",
-      "unavailable": "Pretraga lokacije je privremeno nedostupna. I dalje možeš ručno postaviti koordinate."
+      "unavailable": "Pretraga lokacije je privremeno nedostupna. I dalje možeš ručno postaviti koordinate.",
+      "outsideRegion": "Pronađena lokacija je van granica regiona \"{{region}}\". Postavi koordinate ručno na mapi."
     },
     "errors": {
+      "outsideRegion": "Izabrana lokacija je van granica regiona \"{{region}}\".",
       "loadRegions": "Nije moguće učitati regione. I dalje možeš kreirati destinaciju bez regiona.",
       "startEditSession": "Nije moguće započeti sesiju izmene za ovu destinaciju.",
       "loadDestination": "Nije moguće učitati destinaciju za izmenu.",

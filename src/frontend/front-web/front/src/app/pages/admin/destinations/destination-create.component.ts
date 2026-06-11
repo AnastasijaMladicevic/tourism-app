@@ -42,6 +42,7 @@ import { RegionDto, RegionService } from '../../../services/region';
 import { TranslationService } from '../../../services/translation.service';
 import { MapComponent as SharedMapComponent } from '../../../shared/components/map/map';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
+import { isPointInGeoJson } from '../../../shared/utils/geo-utils';
 
 @Component({
   selector: 'app-admin-create-destination',
@@ -61,6 +62,7 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
   private readonly translationService = inject(TranslationService);
 
   @ViewChild('managerCombo') managerComboRef?: ElementRef<HTMLElement>;
+  @ViewChild(SharedMapComponent) mapComponent?: SharedMapComponent;
 
   private readonly destroy$ = new Subject<void>();
   private readonly managerSearchInput$ = new Subject<string>();
@@ -290,6 +292,12 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
           return;
         }
         if (result.kind === 'resolved') {
+          if (!this.isWithinSelectedRegion(result.lat, result.lng)) {
+            this.locationLookupState = 'error';
+            this.locationLookupMessage = this.t('adminDestinationForm.locationLookup.outsideRegion', { region: this.selectedRegion?.name ?? '' });
+            this.cdr.detectChanges();
+            return;
+          }
           this.form.latitude = Number(result.lat.toFixed(6));
           this.form.longitude = Number(result.lng.toFixed(6));
           this.locationLookupState = 'resolved';
@@ -658,6 +666,18 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
     return this.selectedRegion?.name ?? this.t('adminDestinationForm.notSet');
   }
 
+  get selectedRegionBoundary(): string | undefined {
+    return this.selectedRegion?.boundaryGeoJson;
+  }
+
+  private isWithinSelectedRegion(lat: number, lng: number): boolean {
+    const boundary = this.selectedRegionBoundary;
+    if (!boundary) {
+      return true;
+    }
+    return isPointInGeoJson(lng, lat, boundary);
+  }
+
   get latitudeDirection(): 'N' | 'S' {
     const lat = Number(this.form.latitude);
     if (!Number.isFinite(lat)) {
@@ -736,8 +756,30 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
   }
 
   onMapLocationSelected(position: { lat: number; lng: number }): void {
-    this.form.latitude = Number(position.lat.toFixed(6));
-    this.form.longitude = Number(position.lng.toFixed(6));
+    const lat = Number(position.lat.toFixed(6));
+    const lng = Number(position.lng.toFixed(6));
+    if (!this.isWithinSelectedRegion(lat, lng)) {
+      this.errorMessage = this.t('adminDestinationForm.errors.outsideRegion', { region: this.selectedRegion?.name ?? '' });
+      this.mapComponent?.resetMarker(this.mapLat, this.mapLng);
+      this.cdr.detectChanges();
+      return;
+    }
+    this.errorMessage = '';
+    this.form.latitude = lat;
+    this.form.longitude = lng;
+  }
+
+  onCoordinateInputChanged(): void {
+    const lat = Number(this.form.latitude);
+    const lng = Number(this.form.longitude);
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+      return;
+    }
+    if (!this.isWithinSelectedRegion(lat, lng)) {
+      this.errorMessage = this.t('adminDestinationForm.errors.outsideRegion', { region: this.selectedRegion?.name ?? '' });
+      return;
+    }
+    this.errorMessage = '';
   }
 
   private lookupCoordinatesByName(name: string) {
@@ -973,6 +1015,12 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
     }
     if (this.destinationImages.length + this.imageFiles.length > this.maxImageCount) {
       this.errorMessage = this.t('adminDestinationForm.errors.maxImagesDestination', { count: this.maxImageCount });
+      return false;
+    }
+    const lat = Number(this.form.latitude);
+    const lng = Number(this.form.longitude);
+    if (Number.isFinite(lat) && Number.isFinite(lng) && !this.isWithinSelectedRegion(lat, lng)) {
+      this.errorMessage = this.t('adminDestinationForm.errors.outsideRegion', { region: this.selectedRegion?.name ?? '' });
       return false;
     }
     if (!this.selectedManager) {

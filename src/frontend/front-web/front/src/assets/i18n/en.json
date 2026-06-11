@@ -2035,9 +2035,11 @@
       "searching": "Searching map location...",
       "matched": "Location matched: {{label}}",
       "notFound": "Location not found automatically — set coordinates on the map below.",
-      "unavailable": "Location lookup is temporarily unavailable. You can still set coordinates manually."
+      "unavailable": "Location lookup is temporarily unavailable. You can still set coordinates manually.",
+      "outsideRegion": "The matched location is outside the boundary of \"{{region}}\". Set the coordinates manually on the map."
     },
     "errors": {
+      "outsideRegion": "The selected location is outside the boundary of \"{{region}}\".",
       "loadRegions": "Could not load regions. You can still create a destination without a region.",
       "startEditSession": "Could not start an edit session for this destination.",
       "loadDestination": "Could not load destination for editing.",

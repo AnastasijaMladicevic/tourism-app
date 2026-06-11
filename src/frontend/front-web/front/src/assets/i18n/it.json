@@ -2000,9 +2000,11 @@
       "searching": "Ricerca posizione sulla mappa...",
       "matched": "Posizione trovata: {{label}}",
       "notFound": "Posizione non trovata automaticamente: imposta le coordinate sulla mappa qui sotto.",
-      "unavailable": "La ricerca posizione è temporaneamente non disponibile. Puoi comunque impostare manualmente le coordinate."
+      "unavailable": "La ricerca posizione è temporaneamente non disponibile. Puoi comunque impostare manualmente le coordinate.",
+      "outsideRegion": "La posizione trovata è fuori dal confine di \"{{region}}\". Imposta manualmente le coordinate sulla mappa."
     },
     "errors": {
+      "outsideRegion": "La posizione selezionata è fuori dal confine di \"{{region}}\".",
       "loadRegions": "Impossibile caricare le regioni. Puoi comunque creare una destinazione senza regione.",
       "startEditSession": "Impossibile avviare una sessione di modifica per questa destinazione.",
       "loadDestination": "Impossibile caricare la destinazione per la modifica.",
