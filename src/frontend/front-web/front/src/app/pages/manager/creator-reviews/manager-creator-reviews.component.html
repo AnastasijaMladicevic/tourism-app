@@ -62,20 +62,6 @@
           </button>
         }
       </div>
-      <span class="chip-divider" aria-hidden="true"></span>
-      <button type="button" class="chip" [class.active]="responseFilter === 'all'" (click)="responseFilter = 'all'; onFilterChange()">
-        {{ 'manager.creatorReviews.filters.allResponses' | translate }}
-      </button>
-      <button type="button" class="chip" [class.active]="responseFilter === 'responded'" (click)="responseFilter = 'responded'; onFilterChange()">
-        {{ 'manager.creatorReviews.filters.withReply' | translate }}
-      </button>
-      <button type="button" class="chip" [class.active]="responseFilter === 'pending'" (click)="responseFilter = 'pending'; onFilterChange()">
-        {{ 'manager.creatorReviews.filters.pendingReply' | translate }}
-      </button>
-      <button type="button" class="chip warn" [class.active]="responseFilter === 'concerning'" (click)="responseFilter = 'concerning'; onFilterChange()">
-        <span class="material-symbols-outlined">warning</span>
-        {{ 'manager.creatorReviews.filters.concerningReplies' | translate }}
-      </button>
     </div>
 
     <div class="filter-row-secondary">
@@ -86,6 +72,24 @@
           @for (c of creatorOptions; track c.id) {
             <option [ngValue]="c.id">{{ c.name }}</option>
           }
+        </select>
+      </label>
+      <label class="creator-select">
+        <span>{{ 'manager.creatorReviews.filters.tourist' | translate }}</span>
+        <select [(ngModel)]="touristFilter" (ngModelChange)="onFilterChange()">
+          <option [ngValue]="'all'">{{ 'manager.creatorReviews.filters.allTourists' | translate }}</option>
+          @for (t of touristOptions; track t.id) {
+            <option [ngValue]="t.id">{{ t.name }}</option>
+          }
+        </select>
+      </label>
+      <label class="creator-select">
+        <span>{{ 'manager.creatorReviews.context.replyStatus' | translate }}</span>
+        <select [(ngModel)]="responseFilter" (ngModelChange)="onFilterChange()">
+          <option [ngValue]="'all'">{{ 'manager.creatorReviews.filters.allResponses' | translate }}</option>
+          <option [ngValue]="'responded'">{{ 'manager.creatorReviews.filters.withReply' | translate }}</option>
+          <option [ngValue]="'pending'">{{ 'manager.creatorReviews.filters.pendingReply' | translate }}</option>
+          <option [ngValue]="'concerning'">{{ 'manager.creatorReviews.filters.concerningReplies' | translate }}</option>
         </select>
       </label>
       <label class="search-field">
@@ -190,13 +194,19 @@
 
         <div class="thread-panel-scroll">
         <div class="conversation">
-          <article class="message message-tourist">
+          <article class="message message-tourist" [class.concerning]="isTouristReviewConcerning(selectedThread)">
             <div class="message-avatar tourist">{{ selectedThread.touristInitials }}</div>
             <div class="message-body">
               <div class="message-meta">
                 <strong>{{ selectedThread.touristName }}</strong>
                 <span>{{ 'manager.creatorReviews.touristMeta' | translate:{ date: formatDate(selectedThread.createdAt) } }}</span>
                 <span class="stars-filled">{{ filledStars(selectedThread.rating) }}</span><span class="stars-empty">{{ emptyStars(selectedThread.rating) }}</span>
+                @if (isTouristReviewConcerning(selectedThread)) {
+                  <span class="concerning-label">
+                    <span class="material-symbols-outlined">warning</span>
+                    {{ 'manager.creatorReviews.concerningTone' | translate }}
+                  </span>
+                }
               </div>
               <p class="message-text">{{ selectedThread.touristReview }}</p>
               <div class="tourist-report-action">
@@ -213,13 +223,13 @@
           </article>
 
           @if (selectedThread.creatorResponse?.trim()) {
-            <article class="message message-creator" [class.concerning]="isConcerning(selectedThread)">
+            <article class="message message-creator" [class.concerning]="isCreatorResponseConcerning(selectedThread)">
               <div class="message-avatar creator">{{ creatorInitials(selectedThread.creatorName) }}</div>
               <div class="message-body">
                 <div class="message-meta">
                   <strong>{{ selectedThread.creatorName }}</strong>
                   <span>{{ 'manager.creatorReviews.creatorMeta' | translate:{ date: formatDate(selectedThread.creatorResponseAt!) } }}</span>
-                  @if (isConcerning(selectedThread)) {
+                  @if (isCreatorResponseConcerning(selectedThread)) {
                     <span class="concerning-label">
                       <span class="material-symbols-outlined">warning</span>
                       {{ 'manager.creatorReviews.concerningTone' | translate }}
@@ -240,13 +250,26 @@
             <div class="inline-alert" role="status">
               <span class="material-symbols-outlined" aria-hidden="true">info</span>
               <p>{{ 'manager.creatorReviews.flaggedBody' | translate }}</p>
-              @if (hasPendingReportForCreator(selectedThread.creatorId)) {
-                <span class="pending-report-note">{{ 'manager.creatorReviews.pendingReportOnFile' | translate }}</span>
-              } @else {
-                <button type="button" class="primary-btn compact" (click)="openReportModal(selectedThread)">
-                  {{ 'manager.creatorReviews.reportCreator' | translate }}
-                </button>
-              }
+              <div class="inline-alert-actions">
+                @if (isTouristReviewConcerning(selectedThread)) {
+                  @if (hasPendingReportForTourist(selectedThread.touristId)) {
+                    <span class="pending-report-note">{{ 'manager.creatorReviews.pendingTouristReportOnFile' | translate }}</span>
+                  } @else {
+                    <button type="button" class="primary-btn compact" (click)="openTouristReportModal(selectedThread)">
+                      {{ 'manager.creatorReviews.reportTourist' | translate }}
+                    </button>
+                  }
+                }
+                @if (isCreatorResponseConcerning(selectedThread)) {
+                  @if (hasPendingReportForCreator(selectedThread.creatorId)) {
+                    <span class="pending-report-note">{{ 'manager.creatorReviews.pendingReportOnFile' | translate }}</span>
+                  } @else {
+                    <button type="button" class="primary-btn compact" (click)="openReportModal(selectedThread)">
+                      {{ 'manager.creatorReviews.reportCreator' | translate }}
+                    </button>
+                  }
+                }
+              </div>
             </div>
           }
         </div>

@@ -14,8 +14,10 @@ import { ManagerReportsService } from '../../../services/manager-reports.service
 import {
   buildReviewReportReason,
   detectConcerningReplyKind,
+  detectConcerningTextKind,
   getConcerningReportCategory,
   isConcerningCreatorReply,
+  isConcerningText,
 } from '../shared/concerning-reply.util';
 import {
   ManagerReportModalComponent,
@@ -111,6 +113,7 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
   searchTerm = '';
   responseFilter: 'all' | 'responded' | 'pending' | 'concerning' = 'all';
   creatorFilter: 'all' | number = 'all';
+  touristFilter: 'all' | number = 'all';
   selectedRatings: number[] = [];
 
   selectedThread: ManagerReviewThread | null = null;
@@ -203,6 +206,18 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
       .sort((a, b) => a.name.localeCompare(b.name));
   }
 
+  get touristOptions(): { id: number; name: string }[] {
+    const map = new Map<number, string>();
+    for (const thread of this.allThreads) {
+      if (thread.touristId) {
+        map.set(thread.touristId, thread.touristName);
+      }
+    }
+    return Array.from(map.entries())
+      .map(([id, name]) => ({ id, name }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }
+
   get pagedThreads(): ManagerReviewThread[] {
     const start = (this.queuePage - 1) * this.queuePageSize;
     return this.filteredThreads.slice(start, start + this.queuePageSize);
@@ -242,6 +257,9 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
       if (this.creatorFilter !== 'all' && thread.creatorId !== this.creatorFilter) {
         return false;
       }
+      if (this.touristFilter !== 'all' && thread.touristId !== this.touristFilter) {
+        return false;
+      }
       if (this.selectedRatings.length && !this.selectedRatings.includes(thread.rating)) {
         return false;
       }
@@ -276,10 +294,18 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
   }
 
   isConcerning(thread: ManagerReviewThread): boolean {
+    return this.isCreatorResponseConcerning(thread) || this.isTouristReviewConcerning(thread);
+  }
+
+  isCreatorResponseConcerning(thread: ManagerReviewThread): boolean {
     return isConcerningCreatorReply({
       creatorResponse: thread.creatorResponse,
       touristRating: thread.rating,
     });
+  }
+
+  isTouristReviewConcerning(thread: ManagerReviewThread): boolean {
+    return isConcerningText(thread.touristReview);
   }
 
   hasCreatorReply(thread: ManagerReviewThread): boolean {
@@ -392,9 +418,29 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
       return;
     }
 
+    const concerningKind = detectConcerningTextKind(target.touristReview);
     this.reportModalTouristId = target.touristId;
-    this.reportModalTouristCategory = 'other';
-    this.reportModalTouristReason = '';
+    this.reportModalTouristCategory = getConcerningReportCategory(concerningKind);
+    this.reportModalTouristReason = target.touristReview?.trim()
+      ? buildReviewReportReason({
+          reviewId: target.id,
+          objectName: target.objectName,
+          touristName: target.touristName,
+          touristRating: target.rating,
+          creatorName: target.creatorName,
+          creatorResponse: target.touristReview,
+          category: this.reportModalTouristCategory,
+          autoDetected: concerningKind != null,
+        }, {
+          categoryPrefix: this.translationService.translate('manager.reportModal.reason.category'),
+          autoDetected: this.translationService.translate('manager.reportModal.reason.autoDetectedReview'),
+          managerModeration: this.translationService.translate('manager.reportModal.reason.managerModeration'),
+          reviewLabel: this.translationService.translate('manager.reportModal.reason.review'),
+          touristLabel: this.translationService.translate('manager.reportModal.reason.tourist'),
+          creatorLabel: this.translationService.translate('manager.reportModal.reason.creator'),
+          replyLabel: this.translationService.translate('manager.reportModal.reason.reviewText'),
+        })
+      : '';
     this.reportTouristModalOpen = true;
   }
 
@@ -462,6 +508,7 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
     this.searchTerm = '';
     this.responseFilter = 'all';
     this.creatorFilter = 'all';
+    this.touristFilter = 'all';
     this.selectedRatings = [];
     this.onFilterChange();
   }

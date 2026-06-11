@@ -1202,9 +1202,9 @@
         }
       },
       "creatorReviews": {
-        "title": "Creator review activity",
-        "subtitle": "Read-only view of tourist reviews and Content Creator replies on published objects. Use this context before escalating a creator report.",
-        "creatorReports": "Creator reports",
+        "title": "Review activity",
+        "subtitle": "Read-only view of tourist reviews and Content Creator replies on published objects. Use this context before escalating a report.",
+        "creatorReports": "User reports",
         "managedDestinationFallback": "your destinations",
         "creatorSummary": "{{count}} object(s) in your destinations",
         "creatorSummaryFallback": "Content in your destinations",
@@ -1222,7 +1222,7 @@
         "creatorMeta": "Content Creator · {{date}}",
         "concerningTone": "Concerning tone",
         "noReply": "This creator has not replied to the tourist yet.",
-        "flaggedBody": "This reply was flagged as potentially inappropriate. Submit a creator report for Admin review.",
+        "flaggedBody": "This content was flagged as potentially inappropriate. Submit a report for Admin review.",
         "pendingReportOnFile": "Pending report on file",
         "reportCreator": "Report creator",
         "loading": "Loading reviews...",
@@ -1238,6 +1238,8 @@
           "concerningReplies": "Concerning replies",
           "creator": "Content Creator",
           "allCreators": "All creators",
+          "tourist": "Tourist",
+          "allTourists": "All tourists",
           "searchPlaceholder": "Search tourist, object, review text, reply...",
           "reset": "Reset"
         },
@@ -1248,7 +1250,7 @@
           "needsResponseHint": "No reply from creator yet",
           "replied": "CC replied",
           "repliedHint": "Reviews with a creator reply",
-          "flagged": "Flagged replies",
+          "flagged": "Flagged content",
           "flaggedHint": "May warrant a report"
         },
         "context": {
@@ -1303,11 +1305,13 @@
         "reason": {
           "category": "Category",
           "autoDetected": "Flagged automatically as a concerning reply (language / conduct rules).",
+          "autoDetectedReview": "Flagged automatically as a concerning review (language / conduct rules).",
           "managerModeration": "Reported from manager review moderation.",
           "review": "Review",
           "tourist": "Tourist",
           "creator": "Content creator",
-          "reply": "Reply"
+          "reply": "Reply",
+          "reviewText": "Review text"
         },
         "categories": {
           "placeholder": "Select a category (optional)",

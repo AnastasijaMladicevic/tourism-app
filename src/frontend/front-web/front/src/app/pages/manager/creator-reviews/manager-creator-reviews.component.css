@@ -263,7 +263,7 @@
 
 .filter-row-secondary {
   display: grid;
-  grid-template-columns: minmax(160px, 220px) minmax(0, 1fr) auto;
+  grid-template-columns: minmax(160px, 220px) minmax(160px, 220px) minmax(160px, 220px) minmax(0, 1fr) auto;
   gap: 10px;
   align-items: end;
 }
@@ -561,7 +561,8 @@
   flex-direction: row-reverse;
 }
 
-.message-creator.concerning .message-body {
+.message-creator.concerning .message-body,
+.message-tourist.concerning .message-body {
   border-color: #fca5a5;
   background: #fff5f5;
 }
@@ -704,11 +705,18 @@
   margin-top: 1px;
 }
 
-.inline-alert > .pending-report-note,
-.inline-alert > .primary-btn.compact {
+.inline-alert-actions {
   grid-column: 2;
   grid-row: 2;
-  justify-self: start;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+}
+
+.inline-alert-actions .pending-report-note,
+.inline-alert-actions .primary-btn.compact {
   max-width: 100%;
 }
 
@@ -730,7 +738,7 @@
   font-size: 12px;
 }
 
-.inline-alert > .primary-btn.compact {
+.inline-alert-actions .primary-btn.compact {
   white-space: normal;
   text-align: center;
 }

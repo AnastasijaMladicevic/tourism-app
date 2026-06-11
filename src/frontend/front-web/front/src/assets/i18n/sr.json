@@ -1202,9 +1202,9 @@
         }
       },
       "creatorReviews": {
-        "title": "Aktivnost recenzija kreatora",
-        "subtitle": "Prikaz samo za čitanje turističkih recenzija i odgovora kreatora sadržaja na objavljenim objektima. Iskoristi ovaj kontekst pre nego što eskaliraš prijavu kreatora.",
-        "creatorReports": "Prijave kreatora",
+        "title": "Aktivnost recenzija",
+        "subtitle": "Prikaz samo za čitanje turističkih recenzija i odgovora kreatora sadržaja na objavljenim objektima. Iskoristi ovaj kontekst pre nego što eskaliraš prijavu.",
+        "creatorReports": "Prijave korisnika",
         "managedDestinationFallback": "tvoje destinacije",
         "creatorSummary": "{{count}} objekat(a) u tvojim destinacijama",
         "creatorSummaryFallback": "Sadržaj u tvojim destinacijama",
@@ -1222,7 +1222,7 @@
         "creatorMeta": "Kreator sadržaja · {{date}}",
         "concerningTone": "Zabrinjavajući ton",
         "noReply": "Ovaj kreator još nije odgovorio turisti.",
-        "flaggedBody": "Ovaj odgovor je označen kao potencijalno neprimeren. Pošalji prijavu kreatora za admin pregled.",
+        "flaggedBody": "Ovaj sadržaj je označen kao potencijalno neprimeren. Pošalji prijavu za admin pregled.",
         "pendingReportOnFile": "Prijava je već na čekanju",
         "reportCreator": "Prijavi kreatora",
         "loading": "Učitavanje recenzija...",
@@ -1238,6 +1238,8 @@
           "concerningReplies": "Zabrinjavajući odgovori",
           "creator": "Kreator sadržaja",
           "allCreators": "Svi kreatori",
+          "tourist": "Turista",
+          "allTourists": "Svi turisti",
           "searchPlaceholder": "Pretraži turistu, objekat, tekst recenzije, odgovor...",
           "reset": "Resetuj"
         },
@@ -1248,8 +1250,8 @@
           "needsResponseHint": "Kreator još nije odgovorio",
           "replied": "KK odgovorio",
           "repliedHint": "Recenzije sa odgovorom kreatora",
-          "flagged": "Označeni odgovori",
-          "flaggedHint": "Možda zahtevaju prijavu"
+          "flagged": "Označen sadržaj",
+          "flaggedHint": "Možda zahteva prijavu"
         },
         "context": {
           "object": "Objekat",
@@ -1303,11 +1305,13 @@
         "reason": {
           "category": "Kategorija",
           "autoDetected": "Odgovor je automatski označen kao zabrinjavajući (pravila jezika i ponašanja).",
+          "autoDetectedReview": "Recenzija je automatski označena kao zabrinjavajuća (pravila jezika i ponašanja).",
           "managerModeration": "Prijavljeno iz menadžerske moderacije recenzija.",
           "review": "Recenzija",
           "tourist": "Turista",
           "creator": "Kreator sadržaja",
-          "reply": "Odgovor"
+          "reply": "Odgovor",
+          "reviewText": "Tekst recenzije"
         },
         "categories": {
           "placeholder": "Izaberi kategoriju (opciono)",

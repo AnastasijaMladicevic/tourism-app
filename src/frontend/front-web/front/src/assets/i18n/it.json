@@ -1202,9 +1202,9 @@
         }
       },
       "creatorReviews": {
-        "title": "Attività delle recensioni del creatore",
-        "subtitle": "Vista di sola lettura delle recensioni dei turisti e delle risposte del creatore di contenuti sugli oggetti pubblicati. Usa questo contesto prima di inoltrare una segnalazione sul creatore.",
-        "creatorReports": "Segnalazioni creatori",
+        "title": "Attività delle recensioni",
+        "subtitle": "Vista di sola lettura delle recensioni dei turisti e delle risposte del creatore di contenuti sugli oggetti pubblicati. Usa questo contesto prima di inoltrare una segnalazione.",
+        "creatorReports": "Segnalazioni utenti",
         "managedDestinationFallback": "le tue destinazioni",
         "creatorSummary": "{{count}} oggetto/i nelle tue destinazioni",
         "creatorSummaryFallback": "Contenuti nelle tue destinazioni",
@@ -1222,7 +1222,7 @@
         "creatorMeta": "Creatore di contenuti · {{date}}",
         "concerningTone": "Tono preoccupante",
         "noReply": "Questo creatore non ha ancora risposto al turista.",
-        "flaggedBody": "Questa risposta è stata contrassegnata come potenzialmente inappropriata. Invia una segnalazione del creatore per la revisione Admin.",
+        "flaggedBody": "Questo contenuto è stato contrassegnato come potenzialmente inappropriato. Invia una segnalazione per la revisione Admin.",
         "pendingReportOnFile": "Segnalazione già in sospeso",
         "reportCreator": "Segnala creatore",
         "loading": "Caricamento recensioni...",
@@ -1238,6 +1238,8 @@
           "concerningReplies": "Risposte preoccupanti",
           "creator": "Creatore di contenuti",
           "allCreators": "Tutti i creatori",
+          "tourist": "Turista",
+          "allTourists": "Tutti i turisti",
           "searchPlaceholder": "Cerca turista, oggetto, testo recensione, risposta...",
           "reset": "Reimposta"
         },
@@ -1248,7 +1250,7 @@
           "needsResponseHint": "Il creatore non ha ancora risposto",
           "replied": "CC ha risposto",
           "repliedHint": "Recensioni con risposta del creatore",
-          "flagged": "Risposte segnalate",
+          "flagged": "Contenuti segnalati",
           "flaggedHint": "Potrebbero richiedere una segnalazione"
         },
         "context": {
@@ -1303,11 +1305,13 @@
         "reason": {
           "category": "Categoria",
           "autoDetected": "Contrassegnata automaticamente come risposta preoccupante (regole su lingua e comportamento).",
+          "autoDetectedReview": "Contrassegnata automaticamente come recensione preoccupante (regole su lingua e comportamento).",
           "managerModeration": "Segnalata dalla moderazione recensioni del manager.",
           "review": "Recensione",
           "tourist": "Turista",
           "creator": "Creatore di contenuti",
-          "reply": "Risposta"
+          "reply": "Risposta",
+          "reviewText": "Testo della recensione"
         },
         "categories": {
           "placeholder": "Seleziona una categoria (opzionale)",

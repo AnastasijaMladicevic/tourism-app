@@ -339,8 +339,8 @@ function pickHighestPriorityKind(matches: Set<ConcerningReplyKind>): ConcerningR
   return null;
 }
 
-export function detectConcerningReplyKind(context: ConcerningReplyContext): ConcerningReplyKind | null {
-  const raw = context.creatorResponse?.trim();
+export function detectConcerningTextKind(text?: string | null): ConcerningReplyKind | null {
+  const raw = text?.trim();
   if (!raw) {
     return null;
   }
@@ -355,8 +355,16 @@ export function detectConcerningReplyKind(context: ConcerningReplyContext): Conc
   return pickHighestPriorityKind(matches);
 }
 
+export function detectConcerningReplyKind(context: ConcerningReplyContext): ConcerningReplyKind | null {
+  return detectConcerningTextKind(context.creatorResponse);
+}
+
 export function isConcerningCreatorReply(context: ConcerningReplyContext): boolean {
   return detectConcerningReplyKind(context) != null;
+}
+
+export function isConcerningText(text?: string | null): boolean {
+  return detectConcerningTextKind(text) != null;
 }
 
 export function getConcerningReportCategory(kind: ConcerningReplyKind | null): string {
