@@ -788,7 +788,7 @@ export class ContentCreatorMapComponent implements OnInit, AfterViewInit, OnDest
 
     switch (this.selectedType) {
       case 'event':
-        this.router.navigate(['/content-creator/events/view', this.selectedItem.id]);
+        this.router.navigate(['/content-creator/events/edit', this.selectedItem.id]);
         break;
       case 'activity':
         this.router.navigate(['/content-creator/activities/edit', this.selectedItem.id]);
