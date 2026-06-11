@@ -6,6 +6,10 @@
     </div>
 
     <div class="top-actions">
+      <button type="button" class="ghost-btn" (click)="cancel()">
+        <span class="material-symbols-outlined" aria-hidden="true">close</span>
+        {{ cancelLabel }}
+      </button>
       @if (isEditMode) {
         <button
           type="button"
@@ -21,10 +25,6 @@
       <button type="button" class="primary-btn" (click)="submit()" [disabled]="isSubmitDisabled">
         <span class="material-symbols-outlined" aria-hidden="true">check_circle</span>
         {{ submitLabel }}
-      </button>
-      <button type="button" class="ghost-btn" (click)="cancel()">
-        <span class="material-symbols-outlined" aria-hidden="true">close</span>
-        {{ cancelLabel }}
       </button>
     </div>
   </div>

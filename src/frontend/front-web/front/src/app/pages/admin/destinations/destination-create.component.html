@@ -11,10 +11,7 @@
         <h1 class="page-title">{{ form.name.trim() || t('adminDestinationForm.newDestination') }}</h1>
       </div>
       <div class="title-actions">
-        <button type="button" class="btn btn-primary btn-with-icon" (click)="onSubmit()" [disabled]="isSubmitDisabled">
-          <span class="material-symbols-outlined">check_circle</span>
-          {{ isSubmitting ? t('common.saving') : isEditMode ? t('common.saveChanges') : t('adminDestinationForm.createDestination') }}
-        </button>
+        <button type="button" class="btn btn-ghost" (click)="onCancel()">{{ t('common.cancel') }}</button>
         @if (isEditMode) {
           <button
             type="button"
@@ -26,7 +23,10 @@
             {{ isDeleting ? t('adminDestinationForm.deleting') : t('adminDestinationForm.deleteDestination') }}
           </button>
         }
-        <button type="button" class="btn btn-ghost" (click)="onCancel()">{{ t('common.cancel') }}</button>
+        <button type="button" class="btn btn-primary btn-with-icon" (click)="onSubmit()" [disabled]="isSubmitDisabled">
+          <span class="material-symbols-outlined">check_circle</span>
+          {{ isSubmitting ? t('common.saving') : isEditMode ? t('common.saveChanges') : t('adminDestinationForm.createDestination') }}
+        </button>
       </div>
     </div>
   </header>

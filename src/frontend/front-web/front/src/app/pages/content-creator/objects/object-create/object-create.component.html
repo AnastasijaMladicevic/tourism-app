@@ -7,6 +7,10 @@
     </div>
     <div class="top-actions">
       @if (!isManagerReview) {
+        <button type="button" class="ghost-btn" [routerLink]="objectsListPath">
+          <span class="material-symbols-outlined" aria-hidden="true">close</span>
+          {{ 'common.cancel' | translate }}
+        </button>
         @if (isEditMode) {
           <button
             type="button"
@@ -57,11 +61,6 @@
         >
           <span class="material-symbols-outlined" aria-hidden="true">thumb_up</span>
           {{ 'contentCreatorObjectForm.review.approve' | translate }}
-        </button>
-      } @else {
-        <button type="button" class="ghost-btn" [routerLink]="objectsListPath">
-          <span class="material-symbols-outlined" aria-hidden="true">close</span>
-          {{ 'common.cancel' | translate }}
         </button>
       }
     </div>

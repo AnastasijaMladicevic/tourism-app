@@ -6,6 +6,10 @@
     </div>
 
     <div class="top-actions">
+      <button type="button" class="ghost-btn" (click)="cancel()">
+        <span class="material-symbols-outlined" aria-hidden="true">close</span>
+        {{ 'common.cancel' | translate }}
+      </button>
       @if (isEditMode) {
         <button type="button" class="danger-btn" (click)="openDeleteModal()" [disabled]="isSubmitting || isDeleting || hasPendingDeletionRequest">
           <span class="material-symbols-outlined" aria-hidden="true">delete</span>
@@ -16,10 +20,6 @@
       <button type="button" class="primary-btn" [disabled]="isSubmitDisabled" (click)="submit()">
         <span class="material-symbols-outlined" aria-hidden="true">check_circle</span>
         {{ isSubmitting ? (isEditMode ? ('contentCreator.activityForm.updating' | translate) : ('contentCreator.activityForm.creating' | translate)) : (isEditMode ? ('contentCreator.activityForm.updateAction' | translate) : ('contentCreator.activityForm.createAction' | translate)) }}
-      </button>
-      <button type="button" class="ghost-btn" (click)="cancel()">
-        <span class="material-symbols-outlined" aria-hidden="true">close</span>
-        {{ 'common.cancel' | translate }}
       </button>
     </div>
   </header>

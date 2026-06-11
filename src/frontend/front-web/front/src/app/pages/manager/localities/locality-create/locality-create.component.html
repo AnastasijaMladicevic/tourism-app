@@ -7,6 +7,7 @@
       </p>
     </div>
     <div class="top-actions">
+      <button type="button" class="ghost-btn" (click)="onCancel()">{{ 'common.cancel' | translate }}</button>
       @if (isEditMode) {
         <button
           type="button"
@@ -18,7 +19,6 @@
           {{ isDeleting ? ('manager.localityForm.deleting' | translate) : ('manager.localityForm.deleteLocality' | translate) }}
         </button>
       }
-      <button type="button" class="ghost-btn" (click)="onCancel()">{{ 'common.cancel' | translate }}</button>
       <button type="submit" class="primary-btn" form="create-locality-form" [disabled]="isSubmitDisabled">
         {{
           isSubmitting
