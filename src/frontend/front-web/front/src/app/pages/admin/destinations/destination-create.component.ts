@@ -689,6 +689,24 @@ export class AdminCreateDestinationComponent implements OnInit, OnDestroy {
     return this.form.name?.trim() || this.t('adminDestinationForm.newDestination');
   }
 
+  get hasRequiredCreateFields(): boolean {
+    return Boolean(
+      this.form.name.trim() &&
+      (this.destinationImages.length > 0 || this.imageFiles.length > 0) &&
+      this.selectedManager
+    );
+  }
+
+  get isSubmitDisabled(): boolean {
+    return (
+      this.isSubmitting ||
+      this.isDeleting ||
+      this.isLoadingDestination ||
+      this.isEditBlocked ||
+      !this.hasRequiredCreateFields
+    );
+  }
+
   onDestinationNameInput(value: string): void {
     if (this.isHydratingForm) {
       return;

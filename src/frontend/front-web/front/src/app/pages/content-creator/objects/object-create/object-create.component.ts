@@ -333,17 +333,20 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
       return true;
     }
 
-    return this.isSubmitting || this.isLoadingOptions || !this.hasRequiredCreateFields;
+    return this.isSubmitting || this.isLoadingOptions || this.form.invalid || !this.hasRequiredCreateFields;
   }
 
   get hasRequiredCreateFields(): boolean {
     const name = this.form.controls.name.value?.trim();
     const objectTypeId = this.form.controls.objectTypeId.value;
+    const destinationId = this.form.controls.destinationId.value;
+    const localityId = this.form.controls.localityId.value;
 
     return Boolean(
       name &&
       objectTypeId != null &&
       objectTypeId >= 1 &&
+      (destinationId != null || localityId != null) &&
       this.editableImageUrls.length > 0
     );
   }

@@ -224,6 +224,19 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
     return this.existingImages.length > 0 || this.imagePreviews.length > 0;
   }
 
+  get hasRequiredCreateFields(): boolean {
+    return Boolean(
+      this.form.name.trim() &&
+      this.form.destinationId &&
+      this.form.localityTypeId &&
+      this.hasAnyGalleryImages
+    );
+  }
+
+  get isSubmitDisabled(): boolean {
+    return this.isSubmitting || this.isLoadingOptions || !this.hasRequiredCreateFields;
+  }
+
   onSubmit(): void {
     if (this.isSubmitting || this.isLoadingOptions) {
       return;

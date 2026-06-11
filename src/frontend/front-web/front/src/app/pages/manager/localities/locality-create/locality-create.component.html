@@ -19,7 +19,7 @@
         </button>
       }
       <button type="button" class="ghost-btn" (click)="onCancel()">{{ 'common.cancel' | translate }}</button>
-      <button type="submit" class="primary-btn" form="create-locality-form" [disabled]="isSubmitting || isLoadingOptions">
+      <button type="submit" class="primary-btn" form="create-locality-form" [disabled]="isSubmitDisabled">
         {{
           isSubmitting
             ? (isEditMode ? ('common.saving' | translate) : ('manager.localityForm.creating' | translate))

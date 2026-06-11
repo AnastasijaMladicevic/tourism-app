@@ -215,7 +215,7 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
   }
 
   get isSubmitDisabled(): boolean {
-    return this.isSubmitting || this.isLoadingOptions || !this.hasRequiredCreateFields;
+    return this.isSubmitting || this.isLoadingOptions || this.form.invalid || !this.hasRequiredCreateFields;
   }
 
   get hasRequiredCreateFields(): boolean {
