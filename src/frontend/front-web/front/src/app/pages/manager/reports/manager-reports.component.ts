@@ -32,6 +32,7 @@ export interface ManagerReportRow {
   resolvedAt?: string;
   rejectionReason?: string;
   reportedUserId: number;
+  reportedUserType: 'creator' | 'tourist';
 }
 
 interface DeletionRequestNameHint {
@@ -170,7 +171,13 @@ export class ManagerReportsComponent implements OnInit, OnDestroy {
             }
           }
 
-          this.allReports = reports.map((report) => this.mapReportRow(report));
+          const creatorOwnerIds = new Set(
+            objects
+              .map((object) => object.createdByUserId)
+              .filter((id): id is number => !!id),
+          );
+
+          this.allReports = reports.map((report) => this.mapReportRow(report, creatorOwnerIds));
           this.reportableCreators = this.buildReportableCreators(objects, pendingIds);
 
           const creatorIds = [
@@ -259,6 +266,10 @@ export class ManagerReportsComponent implements OnInit, OnDestroy {
     });
   }
 
+  getUserTypeLabel(type: 'creator' | 'tourist'): string {
+    return this.translationService.translate(`manager.reports.userType.${type}`);
+  }
+
   formatStatus(status: ReportStatus): string {
     return this.translationService.translate(`manager.reports.status.${status.toLowerCase()}`);
   }
@@ -317,7 +328,7 @@ export class ManagerReportsComponent implements OnInit, OnDestroy {
     });
   }
 
-  private mapReportRow(report: ManagerReportDto): ManagerReportRow {
+  private mapReportRow(report: ManagerReportDto, creatorOwnerIds: Set<number>): ManagerReportRow {
     const status = this.normalizeStatus(report.status);
     return {
       id: report.id,
@@ -333,6 +344,7 @@ export class ManagerReportsComponent implements OnInit, OnDestroy {
       createdAt: report.createdAt,
       resolvedAt: report.resolvedAt ?? undefined,
       rejectionReason: report.rejectionReason ?? undefined,
+      reportedUserType: creatorOwnerIds.has(report.reportedUserId) ? 'creator' : 'tourist',
     };
   }
 

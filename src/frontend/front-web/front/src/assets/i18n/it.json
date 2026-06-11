@@ -1128,12 +1128,12 @@
       "reports": {
         "title": "Segnalazioni utenti",
         "subtitle": "Escala le violazioni gravi o ripetute di creatori di contenuti o turisti alla revisione Admin. Per i singoli problemi di contenuto usa prima la revisione di oggetti, eventi e attività.",
-        "reportCreator": "Segnala creatore di contenuti",
+        "reportCreator": "Segnala un utente",
         "infoTitle": "Quando usare una segnalazione",
-        "infoBody": "Le segnalazioni servono per problemi a livello di account come violazioni ripetute, abusi o comportamento non professionale. Quando possibile, rifiuta o disattiva prima il contenuto specifico da Oggetti, Eventi o Attività.",
+        "infoBody": "Le segnalazioni servono per problemi a livello di account come violazioni ripetute, abusi o comportamento non professionale, sia da parte di un creatore di contenuti che di un turista. Quando possibile, rifiuta o disattiva prima il contenuto specifico da Oggetti, Eventi o Attività, oppure agisci direttamente dalle recensioni.",
         "infoLink": "Vedi recensioni dei turisti e risposte del creatore →",
         "searchAria": "Cerca segnalazioni",
-        "searchPlaceholder": "Cerca per nome del creatore, motivo o ID della segnalazione...",
+        "searchPlaceholder": "Cerca per nome dell'utente, motivo o ID della segnalazione...",
         "managedDestinationFallback": "le tue destinazioni",
         "creatorSummary": "{{count}} oggetto/i nelle tue destinazioni",
         "withdraw": "Ritira",
@@ -1144,6 +1144,10 @@
         "creatorPanelHint": "Creatori di contenuti attualmente disponibili per la segnalazione",
         "pendingTag": "Segnalazione in sospeso",
         "loading": "Caricamento segnalazioni...",
+        "userType": {
+          "creator": "Creatore di contenuti",
+          "tourist": "Turista"
+        },
         "filters": {
           "status": "Stato",
           "allStatuses": "Tutti gli stati",
@@ -1177,7 +1181,7 @@
         },
         "empty": {
           "filtered": "Nessuna segnalazione corrisponde ai filtri.",
-          "nonePrefix": "Non hai ancora inviato segnalazioni sui creatori. Usa Segnala su un creatore qui sotto oppure segnala da ",
+          "nonePrefix": "Non hai ancora inviato segnalazioni. Usa Segnala qui sotto oppure segnala da ",
           "linkLabel": "recensioni dei turisti e risposte del creatore"
         },
         "status": {

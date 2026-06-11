@@ -1128,12 +1128,12 @@
       "reports": {
         "title": "Prijave korisnika",
         "subtitle": "Prosledi ozbiljna ili ponovljena kršenja kreatora sadržaja ili turista admin pregledu. Za pojedinačne probleme sa sadržajem prvo koristi pregled objekata, događaja i aktivnosti.",
-        "reportCreator": "Prijavi kreatora sadržaja",
+        "reportCreator": "Prijavi korisnika",
         "infoTitle": "Kada koristiti prijavu",
-        "infoBody": "Prijave su namenjene problemima na nivou naloga kao što su ponovljena kršenja, zloupotreba ili neprofesionalno ponašanje. Kada je moguće, prvo odbij ili deaktiviraj konkretan sadržaj iz Objekata, Događaja ili Aktivnosti.",
+        "infoBody": "Prijave su namenjene problemima na nivou naloga kao što su ponovljena kršenja, zloupotreba ili neprofesionalno ponašanje, bilo da je u pitanju kreator sadržaja ili turista. Kada je moguće, prvo odbij ili deaktiviraj konkretan sadržaj iz Objekata, Događaja ili Aktivnosti, ili reaguj direktno iz recenzija.",
         "infoLink": "Pogledaj turističke recenzije i odgovore kreatora →",
         "searchAria": "Pretraži prijave",
-        "searchPlaceholder": "Pretraži po imenu kreatora, razlogu ili ID-u prijave...",
+        "searchPlaceholder": "Pretraži po imenu korisnika, razlogu ili ID-u prijave...",
         "managedDestinationFallback": "tvoje destinacije",
         "creatorSummary": "{{count}} objekat(a) u tvojim destinacijama",
         "withdraw": "Povuci",
@@ -1144,6 +1144,10 @@
         "creatorPanelHint": "Kreatori sadržaja koji su trenutno dostupni za prijavu",
         "pendingTag": "Prijava na čekanju",
         "loading": "Učitavanje prijava...",
+        "userType": {
+          "creator": "Kreator sadržaja",
+          "tourist": "Turista"
+        },
         "filters": {
           "status": "Status",
           "allStatuses": "Svi statusi",
@@ -1177,7 +1181,7 @@
         },
         "empty": {
           "filtered": "Nijedna prijava se ne poklapa sa filterima.",
-          "nonePrefix": "Još nisi poslao nijednu prijavu kreatora. Koristi prijavu ispod ili prijavi iz ",
+          "nonePrefix": "Još nisi poslao nijednu prijavu. Koristi prijavu ispod ili prijavi iz ",
           "linkLabel": "turističkih recenzija i odgovora kreatora"
         },
         "status": {

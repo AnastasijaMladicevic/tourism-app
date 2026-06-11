@@ -1128,12 +1128,12 @@
       "reports": {
         "title": "Reportes de usuarios",
         "subtitle": "Escala las infracciones graves o repetidas de creadores de contenido o turistas a revisión de Admin. Para problemas individuales de contenido, usa primero la revisión de objetos, eventos y actividades.",
-        "reportCreator": "Reportar creador de contenido",
+        "reportCreator": "Reportar usuario",
         "infoTitle": "Cuándo usar un reporte",
-        "infoBody": "Los reportes son para problemas a nivel de cuenta como infracciones repetidas, abuso o conducta no profesional. Cuando sea posible, primero rechaza o desactiva contenido específico desde Objetos, Eventos o Actividades.",
+        "infoBody": "Los reportes son para problemas a nivel de cuenta como infracciones repetidas, abuso o conducta no profesional, ya sea de un creador de contenido o de un turista. Cuando sea posible, primero rechaza o desactiva contenido específico desde Objetos, Eventos o Actividades, o actúa directamente desde las reseñas.",
         "infoLink": "Ver reseñas de turistas y respuestas del creador →",
         "searchAria": "Buscar reportes",
-        "searchPlaceholder": "Buscar por nombre del creador, motivo o ID del reporte...",
+        "searchPlaceholder": "Buscar por nombre del usuario, motivo o ID del reporte...",
         "managedDestinationFallback": "tus destinos",
         "creatorSummary": "{{count}} objeto(s) en tus destinos",
         "withdraw": "Retirar",
@@ -1144,6 +1144,10 @@
         "creatorPanelHint": "Creadores de contenido disponibles actualmente para reportar",
         "pendingTag": "Reporte pendiente",
         "loading": "Cargando reportes...",
+        "userType": {
+          "creator": "Creador de contenido",
+          "tourist": "Turista"
+        },
         "filters": {
           "status": "Estado",
           "allStatuses": "Todos los estados",
@@ -1177,7 +1181,7 @@
         },
         "empty": {
           "filtered": "Ningún reporte coincide con tus filtros.",
-          "nonePrefix": "Todavía no has enviado reportes de creadores. Usa Reportar en un creador abajo o reporta desde ",
+          "nonePrefix": "Todavía no has enviado ningún reporte. Usa Reportar abajo o reporta desde ",
           "linkLabel": "reseñas de turistas y respuestas del creador"
         },
         "status": {

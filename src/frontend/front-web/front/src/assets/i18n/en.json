@@ -1128,12 +1128,12 @@
       "reports": {
         "title": "User Reports",
         "subtitle": "Escalate serious or repeated violations by content creators or tourists to Admin review. Use object, event, and activity review for individual content issues first.",
-        "reportCreator": "Report Content Creator",
+        "reportCreator": "Report a User",
         "infoTitle": "When to use a report",
-        "infoBody": "Reports are for account-level concerns such as repeated violations, abuse, or unprofessional conduct. Reject or deactivate specific content from Objects, Events, or Activities first when possible.",
+        "infoBody": "Reports are for account-level concerns such as repeated violations, abuse, or unprofessional conduct, whether by a content creator or a tourist. Reject or deactivate specific content from Objects, Events, or Activities first when possible, or act directly from reviews.",
         "infoLink": "View tourist reviews & creator replies →",
         "searchAria": "Search reports",
-        "searchPlaceholder": "Search by creator name, reason, or report ID...",
+        "searchPlaceholder": "Search by user name, reason, or report ID...",
         "managedDestinationFallback": "your destinations",
         "creatorSummary": "{{count}} object(s) in your destinations",
         "withdraw": "Withdraw",
@@ -1144,6 +1144,10 @@
         "creatorPanelHint": "Content creators currently available for reporting",
         "pendingTag": "Pending report",
         "loading": "Loading reports...",
+        "userType": {
+          "creator": "Content creator",
+          "tourist": "Tourist"
+        },
         "filters": {
           "status": "Status",
           "allStatuses": "All statuses",
@@ -1177,7 +1181,7 @@
         },
         "empty": {
           "filtered": "No reports match your filters.",
-          "nonePrefix": "You have not submitted any creator reports yet. Use Report on a creator below, or report from ",
+          "nonePrefix": "You have not submitted any reports yet. Use Report below, or report from ",
           "linkLabel": "tourist reviews & creator replies"
         },
         "status": {

@@ -134,6 +134,7 @@
               </div>
               <p class="queue-snippet">{{ report.reason }}</p>
               <div class="queue-meta">
+                <span class="user-type-chip" [ngClass]="report.reportedUserType">{{ getUserTypeLabel(report.reportedUserType) }}</span>
                 <span>#{{ report.id }}</span>
                 <span>{{ formatDate(report.createdAt) }}</span>
                 @if (report.destinationName && report.destinationName !== ('manager.reports.fallback.notAvailable' | translate)) {
@@ -160,7 +161,10 @@
         <header class="detail-header">
           <div>
             <p class="eyebrow">{{ 'manager.reports.reportNumber' | translate:{ id: selectedReport.id } }}</p>
-            <h2>{{ selectedReport.reportedUserName }}</h2>
+            <h2>
+              {{ selectedReport.reportedUserName }}
+              <span class="user-type-chip" [ngClass]="selectedReport.reportedUserType">{{ getUserTypeLabel(selectedReport.reportedUserType) }}</span>
+            </h2>
           </div>
           <span class="status-chip" [ngClass]="getStatusClass(selectedReport.status)">
             {{ formatStatus(selectedReport.status) }}

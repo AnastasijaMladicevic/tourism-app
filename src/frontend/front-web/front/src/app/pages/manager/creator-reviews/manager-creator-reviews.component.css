@@ -721,10 +721,12 @@
 
 .tourist-report-action {
   margin-top: 10px;
+  display: flex;
+  justify-content: flex-end;
 }
 
 .tourist-report-action .ghost-btn.compact {
-  padding: 6px 10px;
+  padding: 4px 10px;
   font-size: 12px;
 }
 
