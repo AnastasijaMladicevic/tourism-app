@@ -2615,7 +2615,8 @@
         "saveFailed": "No se pudo guardar la actividad.",
         "deletionRequestFailed": "No se pudo enviar la solicitud de eliminación",
         "deleteFailed": "No se pudo eliminar la actividad.",
-        "loadEditFailed": "No se pudo cargar la actividad para editarla."
+        "loadEditFailed": "No se pudo cargar la actividad para editarla.",
+        "outsideDestination": "La ubicación seleccionada está fuera del límite de \"{{destination}}\"."
       }
     },
     "map": {

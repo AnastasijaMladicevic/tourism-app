@@ -28,6 +28,7 @@ import { DestinationService, DestinationDto } from '../../../../services/destina
 import { RegionDto, RegionService } from '../../../../services/region';
 import { EventService } from '../../../../services/event.service';
 import { TranslationService } from '../../../../services/translation.service';
+import { isPointInGeoJson } from '../../../../shared/utils/geo-utils';
 
 interface ObjectOption {
   id: number;
@@ -322,6 +323,33 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
     });
   }
 
+  get selectedDestination(): DestinationDto | null {
+    const destinationId = this.form.controls.destinationId.value;
+    if (!destinationId) {
+      return null;
+    }
+
+    return this.destinations.find((destination) => destination.id === destinationId) ?? null;
+  }
+
+  get selectedDestinationBoundary(): string | undefined {
+    return this.selectedDestination?.boundaryGeoJson;
+  }
+
+  // Vraca true ako je tacka unutar granice izabrane destinacije, ili ako granica nije definisana (preskace proveru).
+  private isWithinSelectedDestination(lat: number, lng: number): boolean {
+    const boundary = this.selectedDestinationBoundary;
+    if (!boundary) {
+      return true;
+    }
+    return isPointInGeoJson(lng, lat, boundary);
+  }
+
+  // Pronalazi prvu destinaciju iz ucitane liste cija granica sadrzi datu tacku.
+  private findDestinationContainingPoint(lat: number, lng: number): DestinationDto | null {
+    return this.destinations.find((d) => d.boundaryGeoJson && isPointInGeoJson(lng, lat, d.boundaryGeoJson)) ?? null;
+  }
+
   get filteredObjects(): ObjectOption[] {
     const destinationId = this.form.controls.destinationId.value;
     if (!destinationId) {
@@ -457,6 +485,15 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
 
     if (this.imageUrls.length === 0) {
       this.galleryErrorMessage = this.translationService.translate('contentCreator.activityForm.errors.imageRequired');
+      return;
+    }
+
+    const lat = this.form.controls.latitude.value;
+    const lng = this.form.controls.longitude.value;
+    if (lat != null && lng != null && !this.isWithinSelectedDestination(lat, lng)) {
+      this.errorMessage = this.translationService.translate('contentCreator.activityForm.errors.outsideDestination', {
+        destination: this.selectedDestination?.name ?? ''
+      });
       return;
     }
 
@@ -1101,6 +1138,32 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
   }
 
   selectLocation(latitude: number, longitude: number): void {
+    const destinationId = this.form.controls.destinationId.value;
+
+    if (destinationId) {
+      if (!this.isWithinSelectedDestination(latitude, longitude)) {
+        this.errorMessage = this.translationService.translate('contentCreator.activityForm.errors.outsideDestination', {
+          destination: this.selectedDestination?.name ?? ''
+        });
+        this.cdr.detectChanges();
+        return;
+      }
+
+      this.errorMessage = '';
+    } else {
+      // Nijedna destinacija jos nije izabrana - pokusaj automatsko prepoznavanje po klikom izabranoj tacki.
+      const matched = this.findDestinationContainingPoint(latitude, longitude);
+      if (matched) {
+        this.errorMessage = '';
+        if (matched.regionId != null && this.selectedRegionId !== matched.regionId) {
+          this.selectedRegionId = matched.regionId;
+          this.loadDestinationsForRegion(matched.regionId);
+        }
+        this.form.patchValue({ destinationId: matched.id }, { emitEvent: false });
+        this.syncDependentSelections();
+      }
+    }
+
     this.form.patchValue(
       {
         latitude,
@@ -1115,6 +1178,50 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
     this.form.controls.longitude.markAsTouched();
 
     this.reverseGeocode(latitude, longitude);
+    this.cdr.detectChanges();
+  }
+
+  onCoordinateInputChanged(): void {
+    const lat = this.toNumber(this.form.controls.latitude.value);
+    const lng = this.toNumber(this.form.controls.longitude.value);
+
+    if (lat == null || lng == null) {
+      return;
+    }
+
+    const destinationId = this.form.controls.destinationId.value;
+    const outsideMessage = this.translationService.translate('contentCreator.activityForm.errors.outsideDestination', {
+      destination: this.selectedDestination?.name ?? ''
+    });
+
+    if (destinationId) {
+      if (!this.isWithinSelectedDestination(lat, lng)) {
+        this.errorMessage = outsideMessage;
+        return;
+      }
+
+      if (this.errorMessage === outsideMessage) {
+        this.errorMessage = '';
+      }
+
+      this.reverseGeocode(lat, lng);
+      return;
+    }
+
+    // Nijedna destinacija jos nije izabrana - pokusaj automatsko prepoznavanje po unetim koordinatama.
+    const matched = this.findDestinationContainingPoint(lat, lng);
+    if (matched) {
+      this.errorMessage = '';
+      if (matched.regionId != null && this.selectedRegionId !== matched.regionId) {
+        this.selectedRegionId = matched.regionId;
+        this.loadDestinationsForRegion(matched.regionId);
+      }
+      this.form.patchValue({ destinationId: matched.id }, { emitEvent: false });
+      this.syncDependentSelections();
+    }
+
+    this.reverseGeocode(lat, lng);
+    this.cdr.detectChanges();
   }
 
   private reverseGeocode(latitude: number, longitude: number): void {

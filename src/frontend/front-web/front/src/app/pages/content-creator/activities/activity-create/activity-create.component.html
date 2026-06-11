@@ -218,6 +218,7 @@
           [zoom]="form.controls.latitude.value && form.controls.longitude.value ? 15 : 13"
           [popupText]="form.controls.name.value || ('common.activity' | translate)"
           [zoomable]="true"
+          [boundaryGeoJson]="selectedDestinationBoundary"
           (mapClick)="selectLocation($event.lat, $event.lng)">
         </app-map>
 
@@ -239,14 +240,14 @@
           <div>
             <span class="coord-label">{{ 'common.latitude' | translate }}</span>
             <div class="coord-input-wrap">
-              <input id="latitude-input" type="number" formControlName="latitude" min="-90" max="90" step="0.000001" placeholder="42.4240" />
+              <input id="latitude-input" type="number" formControlName="latitude" min="-90" max="90" step="0.000001" placeholder="42.4240" (change)="onCoordinateInputChanged()" />
               <span class="coord-input-suffix">{{ latitudeDirection }}</span>
             </div>
           </div>
           <div>
             <span class="coord-label">{{ 'common.longitude' | translate }}</span>
             <div class="coord-input-wrap">
-              <input id="longitude-input" type="number" formControlName="longitude" min="-180" max="180" step="0.000001" placeholder="18.7710" />
+              <input id="longitude-input" type="number" formControlName="longitude" min="-180" max="180" step="0.000001" placeholder="18.7710" (change)="onCoordinateInputChanged()" />
               <span class="coord-input-suffix">{{ longitudeDirection }}</span>
             </div>
           </div>

@@ -2642,7 +2642,8 @@
         "saveFailed": "Failed to save activity.",
         "deletionRequestFailed": "Failed to submit deletion request",
         "deleteFailed": "Failed to delete activity.",
-        "loadEditFailed": "Failed to load activity for editing."
+        "loadEditFailed": "Failed to load activity for editing.",
+        "outsideDestination": "The selected location is outside the boundary of \"{{destination}}\"."
       }
     },
     "map": {
