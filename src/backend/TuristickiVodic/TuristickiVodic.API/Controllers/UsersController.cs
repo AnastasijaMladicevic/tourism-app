@@ -51,6 +51,15 @@ namespace TuristickiVodic.API.Controllers
             return Ok(NormalizeUser(user));
         }
 
+        // Manager/Admin može da vidi osnovna imena/prezimena vise korisnika odjednom (npr. za prijavu kreatora)
+        [HttpGet("display-names")]
+        [Authorize(Roles = "Manager,Admin")]
+        public async Task<IActionResult> GetDisplayNames([FromQuery] int[] ids)
+        {
+            var users = await _userService.GetDisplayNamesAsync(ids);
+            return Ok(users);
+        }
+
         // Manager može da vidi osnovno ime/prezime kreatora sadržaja (npr. za prijavu kreatora)
         [HttpGet("{id}/display-name")]
         [Authorize(Roles = "Manager,Admin")]

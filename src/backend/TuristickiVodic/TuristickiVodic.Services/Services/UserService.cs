@@ -150,6 +150,24 @@ namespace TuristickiVodic.Services
             return await MapUserDtoWithMetricsAsync(user, requestingUserId);
         }
 
+        public async Task<List<UserDisplayNameDto>> GetDisplayNamesAsync(int[] ids)
+        {
+            if (ids == null || ids.Length == 0)
+                return new List<UserDisplayNameDto>();
+
+            return await _context.Users
+                .AsNoTracking()
+                .Where(u => ids.Contains(u.Id))
+                .Select(u => new UserDisplayNameDto
+                {
+                    Id = u.Id,
+                    FirstName = u.FirstName,
+                    LastName = u.LastName,
+                    Email = u.Email
+                })
+                .ToListAsync();
+        }
+
         public async Task<UserDto?> GetByEmailAsync(string email)
         {
             await ReleaseExpiredBansAsync();

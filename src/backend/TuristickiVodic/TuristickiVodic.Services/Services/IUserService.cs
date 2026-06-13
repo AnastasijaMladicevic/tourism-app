@@ -7,6 +7,7 @@ namespace TuristickiVodic.Services
     {
         Task<PagedResultDto<UserDto>> GetAllAsync(UserQueryDto query, int? requestingUserId = null);
         Task<UserDto?> GetByIdAsync(int id, int? requestingUserId = null);
+        Task<List<UserDisplayNameDto>> GetDisplayNamesAsync(int[] ids);
         Task<UserDto?> GetByEmailAsync(string email);
         Task<UserDto> CreateAsync(CreateUserDto createUserDto);
         Task<UserDto> CreateManagerAsync(CreateUserDto createUserDto);

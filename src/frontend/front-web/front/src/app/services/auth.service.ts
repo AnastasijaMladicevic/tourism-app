@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { CreateUserDto, LoginDto, AuthResponseDto, UserDto } from '../models/user.model';
 import { environment } from '../../environment/environment';
@@ -40,6 +40,18 @@ export class AuthService {
     return this.http
       .delete<UserDto>(`${this.apiUrl}/${userId}/profile-image`)
       .pipe(tap((user) => this.setCurrentUser(user)));
+  }
+
+  getDisplayNames(ids: number[]): Observable<UserDisplayNameDto[]> {
+    if (!ids.length) {
+      return new Observable<UserDisplayNameDto[]>((subscriber) => {
+        subscriber.next([]);
+        subscriber.complete();
+      });
+    }
+
+    const params = new HttpParams().set('ids', ids.join(','));
+    return this.http.get<UserDisplayNameDto[]>(`${this.apiUrl}/display-names`, { params });
   }
 
   changePassword(userId: number, dto: ChangePasswordDto): Observable<{ message: string }> {
@@ -435,6 +447,13 @@ export class AuthService {
   }
 }
 
+
+export interface UserDisplayNameDto {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+}
 
 export interface ChangePasswordDto {
   currentPassword: string;

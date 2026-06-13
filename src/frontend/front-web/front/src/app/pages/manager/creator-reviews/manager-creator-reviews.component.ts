@@ -45,6 +45,7 @@ import { DestinationService } from '../../../services/destination.service';
 import { ManagerDashboardService } from '../../../services/manager-dashboard.service';
 import { ObjectService } from '../../../services/object';
 import { ReviewDto, ReviewService } from '../../../services/review';
+import { AuthService } from '../../../services/auth.service';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../../services/translation.service';
 
@@ -99,6 +100,7 @@ interface ManagerReportNameHint {
 export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
   private readonly objectService = inject(ObjectService);
   private readonly reviewService = inject(ReviewService);
+  private readonly authService = inject(AuthService);
   private readonly destinationService = inject(DestinationService);
   private readonly http = inject(HttpClient);
   private readonly managerReportsService = inject(ManagerReportsService);
@@ -917,25 +919,21 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    forkJoin(
-      pending.map((creatorId) =>
-        this.http
-          .get<{ firstName?: string; lastName?: string; email?: string }>(
-            `${environment.apiUrl}/users/${creatorId}`,
-          )
-          .pipe(
-            map((user) => {
-              const fullName = `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim();
-              return {
-                creatorId,
-                fullName: fullName || user.email?.trim() || '',
-              };
-            }),
-            catchError(() => of({ creatorId, fullName: '' })),
-          ),
-      ),
-    )
-      .pipe(takeUntil(this.destroy$))
+    this.authService
+      .getDisplayNames(pending)
+      .pipe(
+        map((users) =>
+          users.map((user) => {
+            const fullName = `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim();
+            return {
+              creatorId: user.id,
+              fullName: fullName || user.email?.trim() || '',
+            };
+          }),
+        ),
+        catchError(() => of([] as { creatorId: number; fullName: string }[])),
+        takeUntil(this.destroy$),
+      )
       .subscribe((results) => {
         let changed = false;
 

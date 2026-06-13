@@ -6,6 +6,8 @@ import { Subject, catchError, finalize, forkJoin, map, of, switchMap, type Obser
 import { takeUntil } from 'rxjs/operators';
 import { DestinationService } from '../../../services/destination.service';
 import { ObjectDto, ObjectService } from '../../../services/object';
+import { ReviewService } from '../../../services/review';
+import { AuthService } from '../../../services/auth.service';
 import {
   ManagerReportDto,
   ManagerReportsService,
@@ -61,6 +63,8 @@ interface ManagerReportNameHint {
 export class ManagerReportsComponent implements OnInit, OnDestroy {
   private readonly managerReportsService = inject(ManagerReportsService);
   private readonly objectService = inject(ObjectService);
+  private readonly reviewService = inject(ReviewService);
+  private readonly authService = inject(AuthService);
   private readonly destinationService = inject(DestinationService);
   private readonly http = inject(HttpClient);
   private readonly route = inject(ActivatedRoute);
@@ -374,29 +378,23 @@ export class ManagerReportsComponent implements OnInit, OnDestroy {
       return of([]);
     }
 
-    return forkJoin(
-      objectIds.map((id) => this.objectService.getById(id).pipe(catchError(() => of(null)))),
-    ).pipe(
-      map((details) => {
+    return this.reviewService.getForManagerObjects(objectIds).pipe(
+      catchError(() => of([])),
+      map((reviews) => {
         const tourists = new Map<number, ReportableCreatorOption>();
 
-        for (const detail of details) {
-          if (!detail) {
+        for (const review of reviews) {
+          if (!review.userId || tourists.has(review.userId)) {
             continue;
           }
-          for (const review of detail.reviews ?? []) {
-            if (!review.userId || tourists.has(review.userId)) {
-              continue;
-            }
-            tourists.set(review.userId, {
-              id: review.userId,
-              name:
-                review.userFullName?.trim() ||
-                this.translationService.translate('manager.reports.fallback.tourist'),
-              contentSummary: '',
-              hasPendingReport: pendingIds.has(review.userId),
-            });
-          }
+          tourists.set(review.userId, {
+            id: review.userId,
+            name:
+              review.userFullName?.trim() ||
+              this.translationService.translate('manager.reports.fallback.tourist'),
+            contentSummary: '',
+            hasPendingReport: pendingIds.has(review.userId),
+          });
         }
 
         return Array.from(tourists.values()).sort((a, b) => a.name.localeCompare(b.name));
@@ -541,24 +539,21 @@ export class ManagerReportsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    forkJoin(
-      pending.map((creatorId) =>
-        this.http
-          .get<{ firstName?: string; lastName?: string; email?: string }>(
-            `${environment.apiUrl}/users/${creatorId}/display-name`,
-          )
-          .pipe(
-            map((user) => {
-              const fullName = `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim();
-              return {
-                creatorId,
-                fullName: fullName || user.email?.trim() || '',
-              };
-            }),
-            catchError(() => of({ creatorId, fullName: '' })),
-          ),
-      ),
-    ).subscribe((results) => {
+    this.authService
+      .getDisplayNames(pending)
+      .pipe(
+        map((users) =>
+          users.map((user) => {
+            const fullName = `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim();
+            return {
+              creatorId: user.id,
+              fullName: fullName || user.email?.trim() || '',
+            };
+          }),
+        ),
+        catchError(() => of([] as { creatorId: number; fullName: string }[])),
+      )
+      .subscribe((results) => {
       let changed = false;
       for (const result of results) {
         if (!result.fullName) {
