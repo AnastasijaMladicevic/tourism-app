@@ -148,7 +148,21 @@ export class NotificationsComponent implements OnInit, OnDestroy {
     return this.notifications.some((notification) => notification.isRead);
   }
 
+  /** CC role granted/revoked/rejected notices are informational only — tapping just marks them as read. */
+  private isInformationalCreatorRoleNotification(notification: NotificationDto): boolean {
+    const type = (notification.type ?? '').toLowerCase();
+    return (
+      type === 'creatorrolerequestapproved'
+      || type === 'creatorroleaccessrevoked'
+      || type === 'creatorrolerequestrejected'
+    );
+  }
+
   private handleNotificationAction(notification: NotificationDto): void {
+    if (this.isInformationalCreatorRoleNotification(notification)) {
+      return;
+    }
+
     const actionUrl = notification.actionUrl?.trim();
     if (!actionUrl) {
       return;

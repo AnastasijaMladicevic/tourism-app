@@ -1158,14 +1158,14 @@ namespace TuristickiVodic.Services
 
         private async Task CreateAdminNewCreatorRoleRequestNotificationsAsync(User requester)
         {
-            var admins = await _context.Users
+            var adminIds = await _context.Users
                 .AsNoTracking()
                 .Include(u => u.Role)
                 .Where(u => u.Role.Name == RoleType.Admin && u.IsActive && !u.IsBlacklisted)
-                .Select(u => new { u.Id, u.Language })
+                .Select(u => u.Id)
                 .ToListAsync();
 
-            if (admins.Count == 0)
+            if (adminIds.Count == 0)
                 return;
 
             var requesterName = $"{requester.FirstName} {requester.LastName}".Trim();
@@ -1174,21 +1174,17 @@ namespace TuristickiVodic.Services
 
             var title = "Novi zahtev za ContentCreator ulogu";
             var message = $"Korisnik {requesterName} je poslao zahtev za ContentCreator ulogu.";
+            var createdAt = DateTime.UtcNow;
 
-            var notifications = new List<Notification>();
-            foreach (var admin in admins)
+            var notifications = adminIds.Select(adminId => new Notification
             {
-                var (translatedTitle, translatedMessage) = await _translationService.TranslateNotificationAsync(title, message, admin.Language);
-                notifications.Add(new Notification
-                {
-                    UserId = admin.Id,
-                    Type = NotificationType.AdminNewCreatorRoleRequest,
-                    Title = translatedTitle,
-                    Message = translatedMessage,
-                    ActionUrl = "/users/creator-requests",
-                    CreatedAt = DateTime.UtcNow
-                });
-            }
+                UserId = adminId,
+                Type = NotificationType.AdminNewCreatorRoleRequest,
+                Title = title,
+                Message = message,
+                ActionUrl = "/users/creator-requests",
+                CreatedAt = createdAt
+            });
 
             _context.Notifications.AddRange(notifications);
             await _context.SaveChangesAsync();

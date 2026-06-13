@@ -83,6 +83,17 @@ export class NotificationBellComponent implements OnInit {
 
   protected openNotification(notification: NotificationDto): void {
     if (this.isInformationalCreatorRoleNotification(notification)) {
+      if (!notification.isRead) {
+        this.notificationsService.markAsRead(notification.id)
+          .pipe(takeUntilDestroyed(this.destroyRef))
+          .subscribe({
+            next: () => {
+              this.notifications.update((items) =>
+                items.map((item) => (item.id === notification.id ? { ...item, isRead: true } : item)),
+              );
+            },
+          });
+      }
       return;
     }
 
