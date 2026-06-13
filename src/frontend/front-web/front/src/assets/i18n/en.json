@@ -1142,7 +1142,6 @@
         "searchPlaceholder": "Search by user name, reason, or report ID...",
         "managedDestinationFallback": "your destinations",
         "creatorSummary": "{{count}} object(s) in your destinations",
-        "touristSummary": "Rating {{rating}}/5 · {{objectName}}",
         "withdraw": "Withdraw",
         "report": "Report",
         "reportNumber": "Report #{{id}}",
@@ -1962,7 +1961,14 @@
       "anotherAdminEditing": "Another admin is currently editing this user.",
       "network": "Network error. Check that the API is running.",
       "server": "Server error. Try again later.",
-      "saveFailed": "Could not save changes. Please try again."
+      "saveFailed": "Could not save changes. Please try again.",
+      "notTourist": "Only tourist accounts can be promoted to content creator.",
+      "noCreatorRequest": "This user has not requested the content creator role.",
+      "roleNotFound": "The selected role could not be found.",
+      "notContentCreator": "Only content creator accounts can be moved back to tourist.",
+      "currentPasswordIncorrect": "The current password is incorrect.",
+      "userLoggedIn": "This user is currently logged in. Ask them to log out before changing the password.",
+      "banEndDateInFuture": "The ban end date must be in the future."
     }
   },
   "adminMap": {

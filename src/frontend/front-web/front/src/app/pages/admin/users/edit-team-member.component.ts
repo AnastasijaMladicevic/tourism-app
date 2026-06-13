@@ -24,6 +24,22 @@ export type DisplayRole = 'manager' | 'content-creator' | 'tourist' | 'admin';
 
 type BanDurationOption = '30-days' | 'permanent' | 'custom';
 
+/** Maps known raw backend error messages to translation keys so they are shown in the admin's language. */
+const API_ERROR_MESSAGE_KEYS: Record<string, string> = {
+  'Only tourists can be approved for content creator role.': 'adminTeamMemberEdit.errors.notTourist',
+  'User has not requested creator role.': 'adminTeamMemberEdit.errors.noCreatorRequest',
+  'Content creator role not found.': 'adminTeamMemberEdit.errors.roleNotFound',
+  'Tourist role not found.': 'adminTeamMemberEdit.errors.roleNotFound',
+  'Only content creators can be moved back to tourist role.': 'adminTeamMemberEdit.errors.notContentCreator',
+  'Current password is incorrect': 'adminTeamMemberEdit.errors.currentPasswordIncorrect',
+  'This user is currently logged in. Ask them to log out before changing the password.':
+    'adminTeamMemberEdit.errors.userLoggedIn',
+  'User not found.': 'adminTeamMemberEdit.errors.notFound',
+  'Only tourist and content creator accounts can be banned.': 'adminTeamMemberEdit.errors.banNotAllowed',
+  'Ban reason is required.': 'adminTeamMemberEdit.errors.banReasonRequired',
+  'Ban end date must be in the future.': 'adminTeamMemberEdit.errors.banEndDateInFuture'
+};
+
 @Component({
   selector: 'app-edit-team-member',
   standalone: true,
@@ -759,15 +775,15 @@ export class EditTeamMemberComponent {
     if (err instanceof HttpErrorResponse) {
       const body = err.error as { message?: string; errors?: Record<string, string[] | string> } | null;
       if (body && typeof body.message === 'string' && body.message.trim()) {
-        return body.message;
+        return this.translateApiMessage(body.message.trim());
       }
       if (body?.errors && typeof body.errors === 'object') {
         for (const val of Object.values(body.errors)) {
           if (Array.isArray(val) && val[0]) {
-            return String(val[0]);
+            return this.translateApiMessage(String(val[0]));
           }
           if (typeof val === 'string') {
-            return val;
+            return this.translateApiMessage(val);
           }
         }
       }
@@ -779,6 +795,12 @@ export class EditTeamMemberComponent {
       }
     }
     return this.t('adminTeamMemberEdit.errors.saveFailed');
+  }
+
+  /** Translates a known raw backend error message; falls back to a generic translated message otherwise. */
+  private translateApiMessage(message: string): string {
+    const key = API_ERROR_MESSAGE_KEYS[message];
+    return key ? this.t(key) : this.t('adminTeamMemberEdit.errors.saveFailed');
   }
 
   t(key: string, params?: Record<string, string | number>): string {

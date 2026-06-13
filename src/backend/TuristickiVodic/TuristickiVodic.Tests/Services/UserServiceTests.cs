@@ -77,13 +77,19 @@ namespace TuristickiVodic.Tests.Services
             string? adminAppBaseUrl = null)
         {
             emailSvc ??= new Mock<IEmailService>();
+            var translationSvc = new Mock<ITranslationService>();
+            translationSvc
+                .Setup(t => t.TranslateExternalAsync(It.IsAny<string>(), It.IsAny<string>()))
+                .ReturnsAsync((string text, string _) => text);
+
             return new UserService(
                 ctx,
                 CreateMapper(),
                 tokenSvc.Object,
                 emailSvc.Object,
                 CreateEnvironmentMock().Object,
-                CreateConfiguration(publicAppBaseUrl, adminAppBaseUrl));
+                CreateConfiguration(publicAppBaseUrl, adminAppBaseUrl),
+                translationSvc.Object);
         }
 
         private static (Role tourist, Role cc, Role manager, Role admin) SeedRoles(AppDbContext ctx)

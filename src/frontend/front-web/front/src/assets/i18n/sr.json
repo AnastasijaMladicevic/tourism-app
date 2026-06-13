@@ -1142,7 +1142,6 @@
         "searchPlaceholder": "Pretraži po imenu korisnika, razlogu ili ID-u prijave...",
         "managedDestinationFallback": "tvoje destinacije",
         "creatorSummary": "{{count}} objekat(a) u tvojim destinacijama",
-        "touristSummary": "Ocena {{rating}}/5 · {{objectName}}",
         "withdraw": "Povuci",
         "report": "Prijavi",
         "reportNumber": "Prijava #{{id}}",
@@ -1927,7 +1926,14 @@
       "anotherAdminEditing": "Drugi admin trenutno menja ovog korisnika.",
       "network": "Greška na mreži. Proverite da li API radi.",
       "server": "Greška servera. Pokušajte ponovo kasnije.",
-      "saveFailed": "Nije moguće sačuvati izmene. Pokušajte ponovo."
+      "saveFailed": "Nije moguće sačuvati izmene. Pokušajte ponovo.",
+      "notTourist": "Samo turistički nalozi mogu biti promovisani u kreatora sadržaja.",
+      "noCreatorRequest": "Ovaj korisnik nije poslao zahtev za ContentCreator ulogu.",
+      "roleNotFound": "Izabrana uloga nije pronađena.",
+      "notContentCreator": "Samo kreatori sadržaja mogu biti vraćeni u turistu.",
+      "currentPasswordIncorrect": "Trenutna lozinka nije ispravna.",
+      "userLoggedIn": "Ovaj korisnik je trenutno prijavljen. Zamolite ga da se odjavi pre izmene lozinke.",
+      "banEndDateInFuture": "Datum završetka bana mora biti u budućnosti."
     }
   },
   "adminMap": {

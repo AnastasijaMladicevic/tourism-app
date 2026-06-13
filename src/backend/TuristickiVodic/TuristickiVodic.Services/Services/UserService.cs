@@ -43,6 +43,7 @@ namespace TuristickiVodic.Services
         private readonly IEmailService _emailService;
         private readonly IWebHostEnvironment _environment;
         private readonly IConfiguration _configuration;
+        private readonly ITranslationService _translationService;
 
         public UserService(
             AppDbContext context,
@@ -50,7 +51,8 @@ namespace TuristickiVodic.Services
             ITokenService tokenService,
             IEmailService emailService,
             IWebHostEnvironment environment,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            ITranslationService translationService)
         {
             _context = context;
             _mapper = mapper;
@@ -58,6 +60,7 @@ namespace TuristickiVodic.Services
             _emailService = emailService;
             _environment = environment;
             _configuration = configuration;
+            _translationService = translationService;
         }
 
         public async Task<PagedResultDto<UserDto>> GetAllAsync(UserQueryDto query, int? requestingUserId = null)
@@ -1155,29 +1158,37 @@ namespace TuristickiVodic.Services
 
         private async Task CreateAdminNewCreatorRoleRequestNotificationsAsync(User requester)
         {
-            var adminIds = await _context.Users
+            var admins = await _context.Users
                 .AsNoTracking()
                 .Include(u => u.Role)
                 .Where(u => u.Role.Name == RoleType.Admin && u.IsActive && !u.IsBlacklisted)
-                .Select(u => u.Id)
+                .Select(u => new { u.Id, u.Language })
                 .ToListAsync();
 
-            if (adminIds.Count == 0)
+            if (admins.Count == 0)
                 return;
 
             var requesterName = $"{requester.FirstName} {requester.LastName}".Trim();
             if (string.IsNullOrWhiteSpace(requesterName))
                 requesterName = requester.Email;
 
-            var notifications = adminIds.Select(adminId => new Notification
+            var title = "Novi zahtev za ContentCreator ulogu";
+            var message = $"Korisnik {requesterName} je poslao zahtev za ContentCreator ulogu.";
+
+            var notifications = new List<Notification>();
+            foreach (var admin in admins)
             {
-                UserId = adminId,
-                Type = NotificationType.AdminNewCreatorRoleRequest,
-                Title = "Novi zahtev za ContentCreator ulogu",
-                Message = $"Korisnik {requesterName} je poslao zahtev za ContentCreator ulogu.",
-                ActionUrl = "/users/creator-requests",
-                CreatedAt = DateTime.UtcNow
-            });
+                var (translatedTitle, translatedMessage) = await TranslateNotificationAsync(title, message, admin.Language);
+                notifications.Add(new Notification
+                {
+                    UserId = admin.Id,
+                    Type = NotificationType.AdminNewCreatorRoleRequest,
+                    Title = translatedTitle,
+                    Message = translatedMessage,
+                    ActionUrl = "/users/creator-requests",
+                    CreatedAt = DateTime.UtcNow
+                });
+            }
 
             _context.Notifications.AddRange(notifications);
             await _context.SaveChangesAsync();
@@ -1199,8 +1210,7 @@ namespace TuristickiVodic.Services
             if (user.Role.Name != RoleType.Tourist)
                 throw new InvalidOperationException("Only tourists can be approved for content creator role.");
 
-            if (!HasPendingCreatorRoleRequest(user))
-                throw new InvalidOperationException("User has not requested creator role.");
+            var hadPendingRequest = HasPendingCreatorRoleRequest(user);
 
             var contentCreatorRole = await _context.Roles
                 .FirstOrDefaultAsync(r => r.Name == RoleType.ContentCreator);
@@ -1213,7 +1223,9 @@ namespace TuristickiVodic.Services
             user.HasRequestedCreatorRole = false;
             user.CreatorRoleRequestStatus = CreatorRoleRequestStatus.Approved;
             user.UpdatedAt = DateTime.UtcNow;
-            _context.Notifications.Add(CreateCreatorRoleDecisionNotification(user, approved: true));
+            _context.Notifications.Add(hadPendingRequest
+                ? await CreateCreatorRoleDecisionNotificationAsync(user, approved: true)
+                : await CreateCreatorRolePromotedByAdminNotificationAsync(user));
 
             await _context.SaveChangesAsync();
             return true;
@@ -1239,7 +1251,7 @@ namespace TuristickiVodic.Services
             user.HasRequestedCreatorRole = false;
             user.CreatorRoleRequestStatus = CreatorRoleRequestStatus.Rejected;
             user.UpdatedAt = DateTime.UtcNow;
-            _context.Notifications.Add(CreateCreatorRoleDecisionNotification(user, approved: false));
+            _context.Notifications.Add(await CreateCreatorRoleDecisionNotificationAsync(user, approved: false));
 
             await _context.SaveChangesAsync();
             return true;
@@ -1270,7 +1282,7 @@ namespace TuristickiVodic.Services
             user.HasRequestedCreatorRole = false;
             user.CreatorRoleRequestStatus = CreatorRoleRequestStatus.None;
             user.UpdatedAt = DateTime.UtcNow;
-            _context.Notifications.Add(CreateCreatorRoleRevokedNotification(user));
+            _context.Notifications.Add(await CreateCreatorRoleRevokedNotificationAsync(user));
 
             await _context.SaveChangesAsync();
             return true;
@@ -1873,7 +1885,14 @@ namespace TuristickiVodic.Services
             return CreatorRoleRequestStatus.None;
         }
 
-        private Notification CreateCreatorRoleDecisionNotification(User user, bool approved)
+        private async Task<(string Title, string Message)> TranslateNotificationAsync(string title, string message, string languageCode)
+        {
+            var translatedTitle = await _translationService.TranslateExternalAsync(title, languageCode);
+            var translatedMessage = await _translationService.TranslateExternalAsync(message, languageCode);
+            return (translatedTitle, translatedMessage);
+        }
+
+        private async Task<Notification> CreateCreatorRoleDecisionNotificationAsync(User user, bool approved)
         {
             var targetLoginUrl = ResolveAdminAppLoginUrl();
             var title = approved
@@ -1883,27 +1902,53 @@ namespace TuristickiVodic.Services
                 ? "Tvoj zahtev za ContentCreator ulogu je odobren. Prijavi se u admin aplikaciju da nastavis."
                 : "Tvoj zahtev za ContentCreator ulogu je odbijen. Mozes poslati novi zahtev kasnije.";
 
+            var (translatedTitle, translatedMessage) = await TranslateNotificationAsync(title, message, user.Language);
+
             return new Notification
             {
                 UserId = user.Id,
                 Type = approved
                     ? NotificationType.CreatorRoleRequestApproved
                     : NotificationType.CreatorRoleRequestRejected,
-                Title = title,
-                Message = message,
+                Title = translatedTitle,
+                Message = translatedMessage,
                 ActionUrl = approved ? targetLoginUrl : null,
                 CreatedAt = DateTime.UtcNow
             };
         }
 
-        private Notification CreateCreatorRoleRevokedNotification(User user)
+        private async Task<Notification> CreateCreatorRolePromotedByAdminNotificationAsync(User user)
         {
+            var targetLoginUrl = ResolveAdminAppLoginUrl();
+            var title = "Dodeljena je ContentCreator uloga";
+            var message = "Administrator ti je dodelio ContentCreator ulogu. Prijavi se u admin aplikaciju da nastavis.";
+
+            var (translatedTitle, translatedMessage) = await TranslateNotificationAsync(title, message, user.Language);
+
+            return new Notification
+            {
+                UserId = user.Id,
+                Type = NotificationType.CreatorRoleRequestApproved,
+                Title = translatedTitle,
+                Message = translatedMessage,
+                ActionUrl = targetLoginUrl,
+                CreatedAt = DateTime.UtcNow
+            };
+        }
+
+        private async Task<Notification> CreateCreatorRoleRevokedNotificationAsync(User user)
+        {
+            var title = "ContentCreator uloga je uklonjena";
+            var message = "Tvoja ContentCreator uloga je uklonjena. Vraćamo te na turisticku aplikaciju.";
+
+            var (translatedTitle, translatedMessage) = await TranslateNotificationAsync(title, message, user.Language);
+
             return new Notification
             {
                 UserId = user.Id,
                 Type = NotificationType.CreatorRoleAccessRevoked,
-                Title = "ContentCreator uloga je uklonjena",
-                Message = "Tvoja ContentCreator uloga je uklonjena. Vracamo te na turisticku aplikaciju.",
+                Title = translatedTitle,
+                Message = translatedMessage,
                 ActionUrl = ResolvePublicAppHomeUrl(),
                 CreatedAt = DateTime.UtcNow
             };

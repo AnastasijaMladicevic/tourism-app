@@ -1142,7 +1142,6 @@
         "searchPlaceholder": "Buscar por nombre del usuario, motivo o ID del reporte...",
         "managedDestinationFallback": "tus destinos",
         "creatorSummary": "{{count}} objeto(s) en tus destinos",
-        "touristSummary": "Calificación {{rating}}/5 · {{objectName}}",
         "withdraw": "Retirar",
         "report": "Reportar",
         "reportNumber": "Reporte #{{id}}",
@@ -1927,7 +1926,14 @@
       "anotherAdminEditing": "Otro admin está editando actualmente este usuario.",
       "network": "Error de red. Verifica que la API esté ejecutándose.",
       "server": "Error del servidor. Inténtalo más tarde.",
-      "saveFailed": "No se pudieron guardar los cambios. Inténtalo de nuevo."
+      "saveFailed": "No se pudieron guardar los cambios. Inténtalo de nuevo.",
+      "notTourist": "Solo las cuentas de turista pueden ser promovidas a creador de contenido.",
+      "noCreatorRequest": "Este usuario no ha solicitado el rol de creador de contenido.",
+      "roleNotFound": "No se encontró el rol seleccionado.",
+      "notContentCreator": "Solo las cuentas de creador de contenido pueden volver a turista.",
+      "currentPasswordIncorrect": "La contraseña actual no es correcta.",
+      "userLoggedIn": "Este usuario está actualmente conectado. Pídele que cierre sesión antes de cambiar la contraseña.",
+      "banEndDateInFuture": "La fecha de finalización del bloqueo debe ser futura."
     }
   },
   "adminMap": {
