@@ -1084,10 +1084,43 @@ namespace TuristickiVodic.Services.Services
                 return;
 
             var activitiesById = activities.ToDictionary(a => a.Id);
+
+            var batchItems = new List<TranslationBatchItem>();
+            var fieldSlots = new List<(ActivityDto Item, string Field)>();
+
             foreach (var dto in dtos)
             {
-                if (activitiesById.TryGetValue(dto.Id, out var activity))
-                    await ApplyTranslationsAsync(dto, activity, normalizedLang, true);
+                if (!activitiesById.TryGetValue(dto.Id, out var activity))
+                    continue;
+
+                dto.Description ??= string.Empty;
+                if (!string.IsNullOrWhiteSpace(dto.Description))
+                {
+                    batchItems.Add(new TranslationBatchItem("Activity", activity.Id, "Description", dto.Description));
+                    fieldSlots.Add((dto, "Description"));
+                }
+
+                if (activity.ActivityType != null && !string.IsNullOrWhiteSpace(activity.ActivityType.Name))
+                {
+                    batchItems.Add(new TranslationBatchItem("ActivityType", activity.ActivityType.Id, "Name", activity.ActivityType.Name));
+                    fieldSlots.Add((dto, "ActivityTypeName"));
+                }
+            }
+
+            var results = await _translationService.TranslateBatchAsync(batchItems, normalizedLang);
+
+            for (var i = 0; i < fieldSlots.Count; i++)
+            {
+                var (dto, field) = fieldSlots[i];
+                switch (field)
+                {
+                    case "Description":
+                        dto.Description = results[i];
+                        break;
+                    case "ActivityTypeName":
+                        dto.ActivityTypeName = results[i];
+                        break;
+                }
             }
         }
 

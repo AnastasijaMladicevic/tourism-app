@@ -1374,10 +1374,43 @@ namespace TuristickiVodic.Services.Services
                 return;
 
             var eventsById = events.ToDictionary(e => e.Id);
+
+            var batchItems = new List<TranslationBatchItem>();
+            var fieldSlots = new List<(EventDto Item, string Field)>();
+
             foreach (var dto in dtos)
             {
-                if (eventsById.TryGetValue(dto.Id, out var ev))
-                    await ApplyTranslationsAsync(dto, ev, normalizedLang, true);
+                if (!eventsById.TryGetValue(dto.Id, out var ev))
+                    continue;
+
+                dto.Description ??= string.Empty;
+                if (!string.IsNullOrWhiteSpace(dto.Description))
+                {
+                    batchItems.Add(new TranslationBatchItem("Event", ev.Id, "Description", dto.Description));
+                    fieldSlots.Add((dto, "Description"));
+                }
+
+                if (ev.EventType != null && !string.IsNullOrWhiteSpace(ev.EventType.Name))
+                {
+                    batchItems.Add(new TranslationBatchItem("EventType", ev.EventType.Id, "Name", ev.EventType.Name));
+                    fieldSlots.Add((dto, "EventTypeName"));
+                }
+            }
+
+            var results = await _translationService.TranslateBatchAsync(batchItems, normalizedLang);
+
+            for (var i = 0; i < fieldSlots.Count; i++)
+            {
+                var (dto, field) = fieldSlots[i];
+                switch (field)
+                {
+                    case "Description":
+                        dto.Description = results[i];
+                        break;
+                    case "EventTypeName":
+                        dto.EventTypeName = results[i];
+                        break;
+                }
             }
         }
 
