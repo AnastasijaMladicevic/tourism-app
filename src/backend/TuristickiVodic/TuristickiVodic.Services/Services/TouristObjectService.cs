@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
 using System;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using TuristickiVodic.Core.DTO;
 using TuristickiVodic.Core.Models;
@@ -1503,57 +1504,86 @@ namespace TuristickiVodic.Services.Services
             if (normalizedLang == "sr")
                 return;
 
-            dto.Description = createMissing
-                ? await _translationService.GetOrCreateTextAsync(
-                "Object",
-                obj.Id,
-                "Description",
-                obj.Description ?? string.Empty,
-                normalizedLang)
-                : await _translationService.GetTextAsync(
-                "Object",
-                obj.Id,
-                "Description",
-                obj.Description ?? string.Empty,
-                normalizedLang);
+            if (!createMissing)
+            {
+                dto.Description = await _translationService.GetTextAsync(
+                    "Object", obj.Id, "Description", obj.Description ?? string.Empty, normalizedLang);
 
+                if (!string.IsNullOrWhiteSpace(obj.CuisineType))
+                {
+                    dto.CuisineType = await _translationService.GetTextAsync(
+                        "Object", obj.Id, "CuisineType", obj.CuisineType, normalizedLang);
+                }
+
+                if (obj.ObjectType != null && !string.IsNullOrWhiteSpace(obj.ObjectType.Name))
+                {
+                    dto.ObjectTypeName = await _translationService.GetTextAsync(
+                        "ObjectType", obj.ObjectType.Id, "Name", obj.ObjectType.Name, normalizedLang);
+                }
+
+                if (obj.Amenities != null && obj.Amenities.Length > 0)
+                {
+                    var translatedAmenities = new string[obj.Amenities.Length];
+                    for (var index = 0; index < obj.Amenities.Length; index++)
+                    {
+                        var value = obj.Amenities[index];
+                        translatedAmenities[index] = string.IsNullOrWhiteSpace(value)
+                            ? value
+                            : await _translationService.GetTextAsync("Object", obj.Id, $"Amenity:{index}", value, normalizedLang);
+                    }
+                    dto.Amenities = translatedAmenities;
+                }
+
+                return;
+            }
+
+            var items = new List<TranslationBatchItem>
+            {
+                new("Object", obj.Id, "Description", obj.Description ?? string.Empty)
+            };
+
+            var cuisineTypeIndex = -1;
             if (!string.IsNullOrWhiteSpace(obj.CuisineType))
             {
-                dto.CuisineType = createMissing
-                    ? await _translationService.GetOrCreateTextAsync(
-                    "Object",
-                    obj.Id,
-                    "CuisineType",
-                    obj.CuisineType,
-                    normalizedLang)
-                    : await _translationService.GetTextAsync(
-                    "Object",
-                    obj.Id,
-                    "CuisineType",
-                    obj.CuisineType,
-                    normalizedLang);
+                cuisineTypeIndex = items.Count;
+                items.Add(new TranslationBatchItem("Object", obj.Id, "CuisineType", obj.CuisineType));
             }
 
+            var objectTypeNameIndex = -1;
             if (obj.ObjectType != null && !string.IsNullOrWhiteSpace(obj.ObjectType.Name))
             {
-                dto.ObjectTypeName = createMissing
-                    ? await _translationService.GetOrCreateTextAsync(
-                    "ObjectType",
-                    obj.ObjectType.Id,
-                    "Name",
-                    obj.ObjectType.Name,
-                    normalizedLang)
-                    : await _translationService.GetTextAsync(
-                    "ObjectType",
-                    obj.ObjectType.Id,
-                    "Name",
-                    obj.ObjectType.Name,
-                    normalizedLang);
+                objectTypeNameIndex = items.Count;
+                items.Add(new TranslationBatchItem("ObjectType", obj.ObjectType.Id, "Name", obj.ObjectType.Name));
             }
 
+            var amenitiesStartIndex = -1;
             if (obj.Amenities != null && obj.Amenities.Length > 0)
             {
-                dto.Amenities = await TranslateAmenityValuesAsync(obj.Id, obj.Amenities, normalizedLang, createMissing);
+                amenitiesStartIndex = items.Count;
+                for (var index = 0; index < obj.Amenities.Length; index++)
+                {
+                    items.Add(new TranslationBatchItem("Object", obj.Id, $"Amenity:{index}", obj.Amenities[index]));
+                }
+            }
+
+            var results = await _translationService.TranslateBatchAsync(items, normalizedLang);
+
+            dto.Description = results[0];
+
+            if (cuisineTypeIndex >= 0)
+                dto.CuisineType = results[cuisineTypeIndex];
+
+            if (objectTypeNameIndex >= 0)
+                dto.ObjectTypeName = results[objectTypeNameIndex];
+
+            if (amenitiesStartIndex >= 0)
+            {
+                var translatedAmenities = new string[obj.Amenities!.Length];
+                for (var index = 0; index < obj.Amenities.Length; index++)
+                {
+                    translatedAmenities[index] = results[amenitiesStartIndex + index];
+                }
+                dto.Amenities = translatedAmenities;
             }
 
             // Nazive realnih objekata najčešće ne prevodimo.
@@ -1568,33 +1598,6 @@ namespace TuristickiVodic.Services.Services
             */
         }
 
-        private async Task<string[]> TranslateAmenityValuesAsync(int objectId, string[] amenities, string lang, bool createMissing)
-        {
-            var translated = new List<string>(amenities.Length);
-
-            for (var index = 0; index < amenities.Length; index++)
-            {
-                var value = amenities[index];
-                if (string.IsNullOrWhiteSpace(value))
-                    continue;
-
-                translated.Add(createMissing
-                    ? await _translationService.GetOrCreateTextAsync(
-                        "Object",
-                        objectId,
-                        $"Amenity:{index}",
-                        value,
-                        lang)
-                    : await _translationService.GetTextAsync(
-                        "Object",
-                        objectId,
-                        $"Amenity:{index}",
-                        value,
-                        lang));
-            }
-
-            return translated.ToArray();
-        }
 
         private async Task ApplyReviewTranslationsAsync(List<TouristObjectReviewDto> reviews, string? lang, bool createMissing)
         {
@@ -1602,17 +1605,51 @@ namespace TuristickiVodic.Services.Services
             if (normalizedLang == "sr" || reviews.Count == 0)
                 return;
 
-            foreach (var review in reviews)
+            if (!createMissing)
             {
-                review.Text = createMissing
-                    ? await _translationService.GetOrCreateTextAsync("Review", review.Id, "Text", review.Text, normalizedLang)
-                    : await _translationService.GetTextAsync("Review", review.Id, "Text", review.Text, normalizedLang);
+                foreach (var review in reviews)
+                {
+                    review.Text = await _translationService.GetTextAsync("Review", review.Id, "Text", review.Text, normalizedLang);
+
+                    if (!string.IsNullOrWhiteSpace(review.CreatorResponse))
+                    {
+                        review.CreatorResponse = await _translationService.GetTextAsync("Review", review.Id, "CreatorResponse", review.CreatorResponse, normalizedLang);
+                    }
+                }
+                return;
+            }
+
+            var items = new List<TranslationBatchItem>();
+            var creatorResponseIndexes = new int[reviews.Count];
+
+            for (var i = 0; i < reviews.Count; i++)
+            {
+                var review = reviews[i];
+                items.Add(new TranslationBatchItem("Review", review.Id, "Text", review.Text));
 
                 if (!string.IsNullOrWhiteSpace(review.CreatorResponse))
                 {
-                    review.CreatorResponse = createMissing
-                        ? await _translationService.GetOrCreateTextAsync("Review", review.Id, "CreatorResponse", review.CreatorResponse, normalizedLang)
-                        : await _translationService.GetTextAsync("Review", review.Id, "CreatorResponse", review.CreatorResponse, normalizedLang);
+                    creatorResponseIndexes[i] = items.Count;
+                    items.Add(new TranslationBatchItem("Review", review.Id, "CreatorResponse", review.CreatorResponse));
+                }
+                else
+                {
+                    creatorResponseIndexes[i] = -1;
+                }
+            }
+
+            var results = await _translationService.TranslateBatchAsync(items, normalizedLang);
+
+            var textIndex = 0;
+            for (var i = 0; i < reviews.Count; i++)
+            {
+                reviews[i].Text = results[textIndex];
+                textIndex++;
+
+                if (creatorResponseIndexes[i] >= 0)
+                {
+                    reviews[i].CreatorResponse = results[textIndex];
+                    textIndex++;
                 }
             }
         }

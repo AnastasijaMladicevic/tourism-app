@@ -114,7 +114,7 @@ namespace TuristickiVodic.Services.Services
                 .ToListAsync();
 
             var items = _mapper.Map<List<ReviewDto>>(reviews);
-            await ApplyTranslationsAsync(items, reviews, query.LanguageCode, createMissing: false);
+            await ApplyTranslationsAsync(items, reviews, query.LanguageCode, createMissing: true);
 
             return new PagedResultDto<ReviewDto>
             {
@@ -571,57 +571,148 @@ namespace TuristickiVodic.Services.Services
 
             var reviewsById = reviews.ToDictionary(review => review.Id);
 
+            if (!createMissing)
+            {
+                foreach (var item in items)
+                {
+                    if (!reviewsById.TryGetValue(item.Id, out var review))
+                        continue;
+
+                    await ApplyReviewItemTranslationsAsync(item, review, normalizedLanguage, createMissing: false);
+                }
+                return;
+            }
+
+            // Build a flat list of translatable fields so the slow external-translation calls
+            // (cache misses) can run in parallel instead of one-by-one for every review on the page.
+            var batchItems = new List<TranslationBatchItem>();
+            var fieldSlots = new List<(ReviewDto Item, string Field)>();
+
             foreach (var item in items)
             {
                 if (!reviewsById.TryGetValue(item.Id, out var review))
                     continue;
 
-                item.Text = await TranslateOptionalFieldAsync("Review", review.Id, "Text", item.Text, normalizedLanguage, createMissing);
+                batchItems.Add(new TranslationBatchItem("Review", review.Id, "Text", item.Text));
+                fieldSlots.Add((item, "Text"));
 
-                item.CreatorResponse = await TranslateOptionalFieldAsync(
-                    "Review",
-                    review.Id,
-                    "CreatorResponse",
-                    item.CreatorResponse,
-                    normalizedLanguage,
-                    createMissing);
+                // Normalize null -> "" up front (matches previous TranslateOptionalFieldAsync behavior),
+                // so nullable DTO fields never flip from "" to null for clients that expect a non-null string.
+                item.CreatorResponse ??= string.Empty;
+                if (!string.IsNullOrWhiteSpace(item.CreatorResponse))
+                {
+                    batchItems.Add(new TranslationBatchItem("Review", review.Id, "CreatorResponse", item.CreatorResponse));
+                    fieldSlots.Add((item, "CreatorResponse"));
+                }
 
                 if (review.Object == null)
                     continue;
 
                 if (review.Object.ObjectType != null)
                 {
-                    item.ObjectTypeName = await TranslateOptionalFieldAsync(
-                        "ObjectType",
-                        review.Object.ObjectType.Id,
-                        "Name",
-                        item.ObjectTypeName,
-                        normalizedLanguage,
-                        createMissing);
+                    item.ObjectTypeName ??= string.Empty;
+                    if (!string.IsNullOrWhiteSpace(item.ObjectTypeName))
+                    {
+                        batchItems.Add(new TranslationBatchItem("ObjectType", review.Object.ObjectType.Id, "Name", item.ObjectTypeName));
+                        fieldSlots.Add((item, "ObjectTypeName"));
+                    }
                 }
 
                 if (review.Object.Locality != null)
                 {
-                    item.LocalityName = await TranslateOptionalFieldAsync(
-                        "Locality",
-                        review.Object.Locality.Id,
-                        "Name",
-                        item.LocalityName,
-                        normalizedLanguage,
-                        createMissing);
+                    item.LocalityName ??= string.Empty;
+                    if (!string.IsNullOrWhiteSpace(item.LocalityName))
+                    {
+                        batchItems.Add(new TranslationBatchItem("Locality", review.Object.Locality.Id, "Name", item.LocalityName));
+                        fieldSlots.Add((item, "LocalityName"));
+                    }
                 }
 
                 var destination = review.Object.Destination ?? review.Object.Locality?.Destination;
                 if (destination != null)
                 {
-                    item.DestinationName = await TranslateOptionalFieldAsync(
-                        "Destination",
-                        destination.Id,
-                        "Name",
-                        item.DestinationName,
-                        normalizedLanguage,
-                        createMissing);
+                    item.DestinationName ??= string.Empty;
+                    if (!string.IsNullOrWhiteSpace(item.DestinationName))
+                    {
+                        batchItems.Add(new TranslationBatchItem("Destination", destination.Id, "Name", item.DestinationName));
+                        fieldSlots.Add((item, "DestinationName"));
+                    }
                 }
+            }
+
+            var results = await _translationService.TranslateBatchAsync(batchItems, normalizedLanguage);
+
+            for (var i = 0; i < fieldSlots.Count; i++)
+            {
+                var (item, field) = fieldSlots[i];
+                switch (field)
+                {
+                    case "Text":
+                        item.Text = results[i];
+                        break;
+                    case "CreatorResponse":
+                        item.CreatorResponse = results[i];
+                        break;
+                    case "ObjectTypeName":
+                        item.ObjectTypeName = results[i];
+                        break;
+                    case "LocalityName":
+                        item.LocalityName = results[i];
+                        break;
+                    case "DestinationName":
+                        item.DestinationName = results[i];
+                        break;
+                }
+            }
+        }
+
+        private async Task ApplyReviewItemTranslationsAsync(ReviewDto item, Review review, string normalizedLanguage, bool createMissing)
+        {
+            item.Text = await TranslateOptionalFieldAsync("Review", review.Id, "Text", item.Text, normalizedLanguage, createMissing);
+
+            item.CreatorResponse = await TranslateOptionalFieldAsync(
+                "Review",
+                review.Id,
+                "CreatorResponse",
+                item.CreatorResponse,
+                normalizedLanguage,
+                createMissing);
+
+            if (review.Object == null)
+                return;
+
+            if (review.Object.ObjectType != null)
+            {
+                item.ObjectTypeName = await TranslateOptionalFieldAsync(
+                    "ObjectType",
+                    review.Object.ObjectType.Id,
+                    "Name",
+                    item.ObjectTypeName,
+                    normalizedLanguage,
+                    createMissing);
+            }
+
+            if (review.Object.Locality != null)
+            {
+                item.LocalityName = await TranslateOptionalFieldAsync(
+                    "Locality",
+                    review.Object.Locality.Id,
+                    "Name",
+                    item.LocalityName,
+                    normalizedLanguage,
+                    createMissing);
+            }
+
+            var destination = review.Object.Destination ?? review.Object.Locality?.Destination;
+            if (destination != null)
+            {
+                item.DestinationName = await TranslateOptionalFieldAsync(
+                    "Destination",
+                    destination.Id,
+                    "Name",
+                    item.DestinationName,
+                    normalizedLanguage,
+                    createMissing);
             }
         }
 

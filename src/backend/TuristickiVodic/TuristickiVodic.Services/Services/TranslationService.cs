@@ -105,6 +105,75 @@ namespace TuristickiVodic.Services.Services
             }
         }
 
+        public async Task<string?> TryGetCachedTextAsync(
+            string entityType,
+            int entityId,
+            string fieldName,
+            string languageCode)
+        {
+            var normalizedLanguage = LanguageHelper.Normalize(languageCode);
+            if (normalizedLanguage == "sr")
+                return null;
+
+            var translation = await _context.Translations
+                .AsNoTracking()
+                .FirstOrDefaultAsync(t =>
+                    t.EntityType == entityType &&
+                    t.EntityId == entityId &&
+                    t.FieldName == fieldName &&
+                    t.LanguageCode == normalizedLanguage);
+
+            return translation?.TranslatedText;
+        }
+
+        public async Task<string> TranslateExternalAsync(string originalText, string languageCode)
+        {
+            if (string.IsNullOrWhiteSpace(originalText))
+                return originalText;
+
+            var normalizedLanguage = LanguageHelper.Normalize(languageCode);
+            if (normalizedLanguage == "sr")
+                return originalText;
+
+            try
+            {
+                var translated = await _translationProvider.TranslateAsync(originalText, normalizedLanguage, "sr");
+                return string.IsNullOrWhiteSpace(translated) ? originalText : translated;
+            }
+            catch
+            {
+                return originalText;
+            }
+        }
+
+        public async Task PersistTranslationAsync(
+            string entityType,
+            int entityId,
+            string fieldName,
+            string originalText,
+            string languageCode,
+            string translatedText)
+        {
+            var normalizedLanguage = LanguageHelper.Normalize(languageCode);
+            if (normalizedLanguage == "sr")
+                return;
+
+            var newTranslation = new Translation
+            {
+                EntityType = entityType,
+                EntityId = entityId,
+                FieldName = fieldName,
+                LanguageCode = normalizedLanguage,
+                OriginalTextHash = HashText(originalText),
+                TranslatedText = translatedText,
+                IsAutoTranslated = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            await InsertIfMissingAsync(newTranslation);
+        }
+
         public async Task GenerateIfMissingAsync(
             string entityType,
             int entityId,
