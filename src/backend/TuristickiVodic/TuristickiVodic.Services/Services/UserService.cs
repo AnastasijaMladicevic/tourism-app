@@ -1178,7 +1178,7 @@ namespace TuristickiVodic.Services
             var notifications = new List<Notification>();
             foreach (var admin in admins)
             {
-                var (translatedTitle, translatedMessage) = await TranslateNotificationAsync(title, message, admin.Language);
+                var (translatedTitle, translatedMessage) = await _translationService.TranslateNotificationAsync(title, message, admin.Language);
                 notifications.Add(new Notification
                 {
                     UserId = admin.Id,
@@ -1885,13 +1885,6 @@ namespace TuristickiVodic.Services
             return CreatorRoleRequestStatus.None;
         }
 
-        private async Task<(string Title, string Message)> TranslateNotificationAsync(string title, string message, string languageCode)
-        {
-            var translatedTitle = await _translationService.TranslateExternalAsync(title, languageCode);
-            var translatedMessage = await _translationService.TranslateExternalAsync(message, languageCode);
-            return (translatedTitle, translatedMessage);
-        }
-
         private async Task<Notification> CreateCreatorRoleDecisionNotificationAsync(User user, bool approved)
         {
             var targetLoginUrl = ResolveAdminAppLoginUrl();
@@ -1899,10 +1892,10 @@ namespace TuristickiVodic.Services
                 ? "Zahtev za ContentCreator ulogu je odobren"
                 : "Zahtev za ContentCreator ulogu je odbijen";
             var message = approved
-                ? "Tvoj zahtev za ContentCreator ulogu je odobren. Prijavi se u admin aplikaciju da nastavis."
-                : "Tvoj zahtev za ContentCreator ulogu je odbijen. Mozes poslati novi zahtev kasnije.";
+                ? "Tvoj zahtev za ContentCreator ulogu je odobren. Prijavi se u admin aplikaciju da nastaviš."
+                : "Tvoj zahtev za ContentCreator ulogu je odbijen. Možeš poslati novi zahtev kasnije.";
 
-            var (translatedTitle, translatedMessage) = await TranslateNotificationAsync(title, message, user.Language);
+            var (translatedTitle, translatedMessage) = await _translationService.TranslateNotificationAsync(title, message, user.Language);
 
             return new Notification
             {
@@ -1921,9 +1914,9 @@ namespace TuristickiVodic.Services
         {
             var targetLoginUrl = ResolveAdminAppLoginUrl();
             var title = "Dodeljena je ContentCreator uloga";
-            var message = "Administrator ti je dodelio ContentCreator ulogu. Prijavi se u admin aplikaciju da nastavis.";
+            var message = "Administrator ti je dodelio ContentCreator ulogu. Prijavi se u admin aplikaciju da nastaviš.";
 
-            var (translatedTitle, translatedMessage) = await TranslateNotificationAsync(title, message, user.Language);
+            var (translatedTitle, translatedMessage) = await _translationService.TranslateNotificationAsync(title, message, user.Language);
 
             return new Notification
             {
@@ -1939,9 +1932,9 @@ namespace TuristickiVodic.Services
         private async Task<Notification> CreateCreatorRoleRevokedNotificationAsync(User user)
         {
             var title = "ContentCreator uloga je uklonjena";
-            var message = "Tvoja ContentCreator uloga je uklonjena. Vraćamo te na turisticku aplikaciju.";
+            var message = "Tvoja ContentCreator uloga je uklonjena. Vraćamo te na turističku aplikaciju.";
 
-            var (translatedTitle, translatedMessage) = await TranslateNotificationAsync(title, message, user.Language);
+            var (translatedTitle, translatedMessage) = await _translationService.TranslateNotificationAsync(title, message, user.Language);
 
             return new Notification
             {

@@ -8,10 +8,12 @@ namespace TuristickiVodic.Services.Services
     public class ManagerReportService : IManagerReportService
     {
         private readonly AppDbContext _context;
+        private readonly ITranslationService _translationService;
 
-        public ManagerReportService(AppDbContext context)
+        public ManagerReportService(AppDbContext context, ITranslationService? translationService = null)
         {
             _context = context;
+            _translationService = translationService ?? NullTranslationService.Instance;
         }
 
         public async Task<ManagerReportDto> CreateAsync(CreateManagerReportDto dto, int managerUserId)
@@ -121,14 +123,14 @@ namespace TuristickiVodic.Services.Services
             User manager,
             User reportedUser)
         {
-            var adminIds = await _context.Users
+            var admins = await _context.Users
                 .AsNoTracking()
                 .Include(u => u.Role)
                 .Where(u => u.Role.Name == RoleType.Admin && u.IsActive && !u.IsBlacklisted)
-                .Select(u => u.Id)
+                .Select(u => new { u.Id, u.Language })
                 .ToListAsync();
 
-            if (adminIds.Count == 0)
+            if (admins.Count == 0)
                 return;
 
             var managerName = $"{manager.FirstName} {manager.LastName}".Trim();
@@ -141,15 +143,25 @@ namespace TuristickiVodic.Services.Services
 
             var reportedRoleLabel = reportedUser.Role.Name == RoleType.ContentCreator ? "ContentCreator-a" : "turistu";
 
-            var notifications = adminIds.Select(adminId => new Notification
+            var newReportTitle = "Nova prijava menadžera";
+            var newReportMessage = $"Menadžer {managerName} je prijavio {reportedRoleLabel} {reportedUserName}.";
+            var createdAt = DateTime.UtcNow;
+            var notifications = new List<Notification>();
+
+            foreach (var admin in admins)
             {
-                UserId = adminId,
-                Type = NotificationType.AdminNewManagerReport,
-                Title = "Nova prijava managera",
-                Message = $"Manager {managerName} je prijavio {reportedRoleLabel} {reportedUserName}.",
-                ActionUrl = $"/manager-reports/{report.Id}",
-                CreatedAt = DateTime.UtcNow
-            }).ToList();
+                var (translatedTitle, translatedMessage) = await _translationService.TranslateNotificationAsync(newReportTitle, newReportMessage, admin.Language);
+
+                notifications.Add(new Notification
+                {
+                    UserId = admin.Id,
+                    Type = NotificationType.AdminNewManagerReport,
+                    Title = translatedTitle,
+                    Message = translatedMessage,
+                    ActionUrl = $"/manager-reports/{report.Id}",
+                    CreatedAt = createdAt
+                });
+            }
 
             var reportCountForCreator = await _context.ManagerReports
                 .AsNoTracking()
@@ -157,15 +169,23 @@ namespace TuristickiVodic.Services.Services
 
             if (reportCountForCreator > 1)
             {
-                notifications.AddRange(adminIds.Select(adminId => new Notification
+                var repeatedTitle = "Korisnik ima više prijava";
+                var repeatedMessage = $"Korisnik {reportedUserName} sada ima {reportCountForCreator} prijava u sistemu.";
+
+                foreach (var admin in admins)
                 {
-                    UserId = adminId,
-                    Type = NotificationType.AdminRepeatedManagerReports,
-                    Title = "Korisnik ima vise prijava",
-                    Message = $"Korisnik {reportedUserName} sada ima {reportCountForCreator} prijava u sistemu.",
-                    ActionUrl = $"/manager-reports/{report.Id}",
-                    CreatedAt = DateTime.UtcNow
-                }));
+                    var (translatedTitle, translatedMessage) = await _translationService.TranslateNotificationAsync(repeatedTitle, repeatedMessage, admin.Language);
+
+                    notifications.Add(new Notification
+                    {
+                        UserId = admin.Id,
+                        Type = NotificationType.AdminRepeatedManagerReports,
+                        Title = translatedTitle,
+                        Message = translatedMessage,
+                        ActionUrl = $"/manager-reports/{report.Id}",
+                        CreatedAt = createdAt
+                    });
+                }
             }
 
             _context.Notifications.AddRange(notifications);
@@ -302,11 +322,11 @@ namespace TuristickiVodic.Services.Services
 
         private async Task CreateManagerReportReviewedNotificationAsync(ManagerReport report, bool approved)
         {
-            var managerCanReceive = await _context.Users
+            var manager = await _context.Users
                 .AsNoTracking()
-                .AnyAsync(u => u.Id == report.ManagerId && u.IsActive && !u.IsBlacklisted);
+                .FirstOrDefaultAsync(u => u.Id == report.ManagerId && u.IsActive && !u.IsBlacklisted);
 
-            if (!managerCanReceive)
+            if (manager == null)
                 return;
 
             var statusText = approved ? "odobrena" : "odbijena";
@@ -314,12 +334,16 @@ namespace TuristickiVodic.Services.Services
             if (string.IsNullOrWhiteSpace(reportedUserName))
                 reportedUserName = report.ReportedUser.Email;
 
+            var title = $"Tvoja prijava je {statusText}";
+            var message = $"Prijava za korisnika {reportedUserName} je {statusText}.";
+            var (translatedTitle, translatedMessage) = await _translationService.TranslateNotificationAsync(title, message, manager.Language);
+
             _context.Notifications.Add(new Notification
             {
                 UserId = report.ManagerId,
                 Type = NotificationType.ManagerReportReviewed,
-                Title = $"Tvoja prijava je {statusText}",
-                Message = $"Prijava za korisnika {reportedUserName} je {statusText}.",
+                Title = translatedTitle,
+                Message = translatedMessage,
                 ActionUrl = $"/manager-reports/{report.Id}",
                 CreatedAt = DateTime.UtcNow
             });

@@ -10,11 +10,13 @@ namespace TuristickiVodic.Services.Services
     {
         private readonly AppDbContext _context;
         private readonly IConfiguration _configuration;
+        private readonly ITranslationService _translationService;
 
-        public NotificationService(AppDbContext context, IConfiguration configuration)
+        public NotificationService(AppDbContext context, IConfiguration configuration, ITranslationService? translationService = null)
         {
             _context = context;
             _configuration = configuration;
+            _translationService = translationService ?? NullTranslationService.Instance;
         }
 
         public async Task<PagedResultDto<NotificationDto>> GetMyAsync(int userId, NotificationQueryDto query)
@@ -283,24 +285,40 @@ namespace TuristickiVodic.Services.Services
                 .Select(x => $"{x.EventPlannerItemId!.Value}:{x.TriggerAtUtc!.Value.Ticks}")
                 .ToHashSet();
 
-            var newNotifications = duePlannerItems
+            var itemsToNotify = duePlannerItems
                 .Where(item => !existingKeySet.Contains($"{item.PlannerItemId}:{item.StartDate.AddHours(-2).Ticks}"))
-                .Select(item => new Notification
+                .ToList();
+
+            if (itemsToNotify.Count == 0)
+                return;
+
+            var language = await _context.Users
+                .AsNoTracking()
+                .Where(u => u.Id == userId)
+                .Select(u => u.Language)
+                .FirstOrDefaultAsync() ?? "sr";
+
+            var newNotifications = new List<Notification>();
+
+            foreach (var item in itemsToNotify)
+            {
+                var title = "Događaj počinje uskoro";
+                var message = $"Događaj \"{item.EventName}\" počinje za manje od 2 sata.";
+                var (translatedTitle, translatedMessage) = await _translationService.TranslateNotificationAsync(title, message, language);
+
+                newNotifications.Add(new Notification
                 {
                     UserId = userId,
                     Type = NotificationType.PlannerEventReminder2Hours,
-                    Title = "Dogadjaj pocinje uskoro",
-                    Message = $"Dogadjaj \"{item.EventName}\" pocinje za manje od 2 sata.",
+                    Title = translatedTitle,
+                    Message = translatedMessage,
                     ActionUrl = $"/event/{item.EventId}",
                     EventId = item.EventId,
                     EventPlannerItemId = item.PlannerItemId,
                     TriggerAtUtc = item.StartDate.AddHours(-2),
                     CreatedAt = now
-                })
-                .ToList();
-
-            if (newNotifications.Count == 0)
-                return;
+                });
+            }
 
             _context.Notifications.AddRange(newNotifications);
             try
