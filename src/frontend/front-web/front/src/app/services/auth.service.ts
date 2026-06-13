@@ -188,11 +188,19 @@ export class AuthService {
   }
 
   logout(): void {
+    const token = this.getToken();
+
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.refreshTokenKey);
     localStorage.removeItem(this.userKey);
     sessionStorage.removeItem('spirego-admin-ban-message');
     window.dispatchEvent(new CustomEvent('auth-user-changed'));
+
+    if (token) {
+      this.http
+        .post(`${this.apiUrl}/logout`, {}, { headers: { Authorization: `Bearer ${token}` } })
+        .subscribe({ error: () => {} });
+    }
   }
 
   isLoggedIn(): boolean {

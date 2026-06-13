@@ -181,12 +181,13 @@ export class NotificationBellComponent implements OnInit {
     return type === 'adminnewcreatorrolerequest';
   }
 
-  /** CC role granted/revoked notices are informational only — no redirect on click. */
+  /** CC role granted/revoked/rejected notices are informational only — no redirect on click. */
   private isInformationalCreatorRoleNotification(notification: NotificationDto): boolean {
     const type = (notification.type ?? '').toLowerCase();
     return (
       type === 'creatorrolerequestapproved'
       || type === 'creatorroleaccessrevoked'
+      || type === 'creatorrolerequestrejected'
     );
   }
 
