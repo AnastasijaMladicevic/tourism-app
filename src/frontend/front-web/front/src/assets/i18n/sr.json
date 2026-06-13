@@ -1142,6 +1142,7 @@
         "searchPlaceholder": "Pretraži po imenu korisnika, razlogu ili ID-u prijave...",
         "managedDestinationFallback": "tvoje destinacije",
         "creatorSummary": "{{count}} objekat(a) u tvojim destinacijama",
+        "touristSummary": "Ocena {{rating}}/5 · {{objectName}}",
         "withdraw": "Povuci",
         "report": "Prijavi",
         "reportNumber": "Prijava #{{id}}",
@@ -1204,7 +1205,8 @@
         },
         "fallback": {
           "notAvailable": "—",
-          "contentCreator": "Kreator sadržaja"
+          "contentCreator": "Kreator sadržaja",
+          "tourist": "Turista"
         }
       },
       "creatorReviews": {

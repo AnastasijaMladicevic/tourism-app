@@ -27,6 +27,7 @@ export class ManagerReportModalComponent implements OnChanges {
 
   @Input() open = false;
   @Input() creators: ReportableCreatorOption[] = [];
+  @Input() tourists: ReportableCreatorOption[] = [];
   @Input() initialCreatorId: number | null = null;
   @Input() initialCategory = 'unprofessional_conduct';
   @Input() initialReason = '';
@@ -41,36 +42,50 @@ export class ManagerReportModalComponent implements OnChanges {
     reason: '',
   };
 
+  activeType: 'creator' | 'tourist' = 'creator';
   isSubmitting = false;
   errorMessage = '';
   successMessage = '';
 
+  get canSwitchType(): boolean {
+    return this.creators.length > 0 && this.tourists.length > 0;
+  }
+
   get availableCreators(): ReportableCreatorOption[] {
-    return this.creators.filter((creator) => !creator.hasPendingReport);
+    const list = this.activeType === 'tourist' ? this.tourists : this.creators;
+    return list.filter((option) => !option.hasPendingReport);
+  }
+
+  setActiveType(type: 'creator' | 'tourist'): void {
+    if (this.isSubmitting || this.activeType === type) {
+      return;
+    }
+    this.activeType = type;
+    this.reportForm.creatorId = null;
   }
 
   get titleKey(): string {
-    return this.subjectType === 'tourist' ? 'manager.reportModal.titleTourist' : 'manager.reportModal.title';
+    return this.activeType === 'tourist' ? 'manager.reportModal.titleTourist' : 'manager.reportModal.title';
   }
 
   get subtitleKey(): string {
-    return this.subjectType === 'tourist' ? 'manager.reportModal.subtitleTourist' : 'manager.reportModal.subtitle';
+    return this.activeType === 'tourist' ? 'manager.reportModal.subtitleTourist' : 'manager.reportModal.subtitle';
   }
 
   get fieldLabelKey(): string {
-    return this.subjectType === 'tourist' ? 'manager.reportModal.tourist' : 'manager.reportModal.creator';
+    return this.activeType === 'tourist' ? 'manager.reportModal.tourist' : 'manager.reportModal.creator';
   }
 
   get selectPlaceholderKey(): string {
-    return this.subjectType === 'tourist' ? 'manager.reportModal.selectTourist' : 'manager.reportModal.selectCreator';
+    return this.activeType === 'tourist' ? 'manager.reportModal.selectTourist' : 'manager.reportModal.selectCreator';
   }
 
   get noOptionsKey(): string {
-    return this.subjectType === 'tourist' ? 'manager.reportModal.noTourists' : 'manager.reportModal.noCreators';
+    return this.activeType === 'tourist' ? 'manager.reportModal.noTourists' : 'manager.reportModal.noCreators';
   }
 
   get warningKey(): string {
-    return this.subjectType === 'tourist' ? 'manager.reportModal.warningTourist' : 'manager.reportModal.warning';
+    return this.activeType === 'tourist' ? 'manager.reportModal.warningTourist' : 'manager.reportModal.warning';
   }
 
   get reportCategoryOptions(): Array<{ value: string; label: string }> {
@@ -130,6 +145,7 @@ export class ManagerReportModalComponent implements OnChanges {
   }
 
   private resetForm(): void {
+    this.activeType = this.subjectType;
     this.reportForm = {
       creatorId: this.initialCreatorId,
       category: this.initialCategory || 'unprofessional_conduct',

@@ -19,12 +19,35 @@
     }
 
     <form class="modal-body" (ngSubmit)="submit()">
+      @if (canSwitchType) {
+        <div class="subject-type-toggle" role="group">
+          <button
+            type="button"
+            [class.active]="activeType === 'creator'"
+            (click)="setActiveType('creator')"
+            [disabled]="isSubmitting"
+          >
+            {{ 'manager.reportModal.creator' | translate }}
+          </button>
+          <button
+            type="button"
+            [class.active]="activeType === 'tourist'"
+            (click)="setActiveType('tourist')"
+            [disabled]="isSubmitting"
+          >
+            {{ 'manager.reportModal.tourist' | translate }}
+          </button>
+        </div>
+      }
+
       <label>
         <span>{{ fieldLabelKey | translate }}</span>
         <select [(ngModel)]="reportForm.creatorId" name="creatorId" required [disabled]="isSubmitting">
           <option [ngValue]="null" disabled>{{ selectPlaceholderKey | translate }}</option>
           @for (creator of availableCreators; track creator.id) {
-            <option [ngValue]="creator.id">{{ creator.name }} — {{ creator.contentSummary }}</option>
+            <option [ngValue]="creator.id">
+              {{ creator.contentSummary ? (creator.name + ' — ' + creator.contentSummary) : creator.name }}
+            </option>
           }
         </select>
         @if (!availableCreators.length) {

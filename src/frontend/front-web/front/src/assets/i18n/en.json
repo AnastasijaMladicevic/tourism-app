@@ -1142,6 +1142,7 @@
         "searchPlaceholder": "Search by user name, reason, or report ID...",
         "managedDestinationFallback": "your destinations",
         "creatorSummary": "{{count}} object(s) in your destinations",
+        "touristSummary": "Rating {{rating}}/5 · {{objectName}}",
         "withdraw": "Withdraw",
         "report": "Report",
         "reportNumber": "Report #{{id}}",
@@ -1204,7 +1205,8 @@
         },
         "fallback": {
           "notAvailable": "—",
-          "contentCreator": "Content creator"
+          "contentCreator": "Content creator",
+          "tourist": "Tourist"
         }
       },
       "creatorReviews": {
