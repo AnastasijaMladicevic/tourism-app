@@ -1,0 +1,78 @@
+<div
+  #root
+  class="date-picker-root"
+  [class.date-picker-root--open]="isOpen"
+  [class.date-picker-root--align-end]="alignPanelEnd"
+  [class.date-picker-root--mobile]="useMobilePanel"
+>
+  <button
+    type="button"
+    class="date-picker-trigger"
+    [attr.aria-label]="ariaLabel"
+    [attr.aria-expanded]="isOpen"
+    (click)="toggle($event)"
+  >
+    <span class="date-picker-value" [class.date-picker-value--placeholder]="!displayValue">
+      {{ displayValue || placeholder }}
+    </span>
+  </button>
+
+  @if (isOpen) {
+    @if (useMobilePanel) {
+      <button
+        type="button"
+        class="date-picker-backdrop"
+        [attr.aria-label]="'common.close' | translate"
+        (click)="onBackdropClick()"
+      ></button>
+    }
+
+    <div class="date-picker-panel" role="dialog" [attr.aria-label]="ariaLabel" (click)="$event.stopPropagation()">
+      <div class="date-picker-header">
+        <strong>{{ monthLabel }}</strong>
+        <div class="date-picker-nav">
+          <button type="button" class="date-picker-nav-btn" (click)="prevMonth()">
+            <span class="material-symbols-outlined" aria-hidden="true">chevron_left</span>
+          </button>
+          <button type="button" class="date-picker-nav-btn" (click)="nextMonth()">
+            <span class="material-symbols-outlined" aria-hidden="true">chevron_right</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="date-picker-weekdays">
+        @for (label of weekdayLabels; track label) {
+          <span>{{ label }}</span>
+        }
+      </div>
+
+      <div class="date-picker-grid">
+        @for (week of weeks; track $index) {
+          @for (cell of week; track cell.key) {
+            <button
+              type="button"
+              class="date-picker-day"
+              [class.date-picker-day--outside]="!cell.isCurrentMonth"
+              [class.date-picker-day--selected]="cell.isSelected"
+              [class.date-picker-day--today]="cell.isToday"
+              [class.date-picker-day--disabled]="cell.isDisabled"
+              [disabled]="cell.isDisabled"
+              (click)="selectDay(cell)"
+            >
+              {{ cell.label }}
+            </button>
+          }
+        }
+      </div>
+
+      <div class="date-picker-footer">
+        <button type="button" class="date-picker-footer-btn date-picker-footer-btn--secondary" (click)="clear()">
+          {{ 'common.clear' | translate }}
+        </button>
+        <button type="button" class="date-picker-footer-btn date-picker-footer-btn--primary" (click)="selectToday()">
+          {{ 'common.today' | translate }}
+        </button>
+      </div>
+    </div>
+  }
+</div>

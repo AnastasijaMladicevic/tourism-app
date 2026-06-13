@@ -1,0 +1,161 @@
+/* Custom filter dropdowns — matches CC reviews / manager creator reviews */
+
+.manager-list-page .filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.manager-list-page .filter-field-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.manager-list-page .filter-menu {
+  position: relative;
+  width: 100%;
+  min-width: 0;
+}
+
+.manager-list-page .filter-menu.is-disabled .filter-menu-trigger {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.manager-list-page .filter-menu-trigger {
+  width: 100%;
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 12px;
+  border: 1px solid #dbe1ea;
+  border-radius: 12px;
+  background: #fff;
+  color: #1f2937;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.manager-list-page .filter-menu-trigger:disabled {
+  cursor: not-allowed;
+}
+
+.manager-list-page .filter-menu.is-active .filter-menu-trigger,
+.manager-list-page .filter-menu.is-open .filter-menu-trigger,
+.manager-list-page .filter-menu-trigger:focus-visible {
+  border-color: #93c5fd;
+  background: #eff6ff;
+  box-shadow: 0 0 0 3px rgba(147, 197, 253, 0.28);
+  outline: none;
+}
+
+.manager-list-page .filter-menu.is-active .filter-menu-label,
+.manager-list-page .filter-menu.is-open .filter-menu-label {
+  color: #1d4ed8;
+}
+
+.manager-list-page .filter-menu-icon {
+  font-size: 18px;
+  color: #2563eb;
+  flex-shrink: 0;
+}
+
+.manager-list-page .filter-menu-label {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.manager-list-page .filter-menu-chevron {
+  font-size: 20px;
+  color: #64748b;
+  flex-shrink: 0;
+  transition: transform 0.15s ease;
+}
+
+.manager-list-page .filter-menu.is-open .filter-menu-chevron {
+  transform: rotate(180deg);
+  color: #2563eb;
+}
+
+.manager-list-page .filter-menu-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow:
+    0 12px 28px rgba(15, 23, 42, 0.12),
+    0 2px 8px rgba(15, 23, 42, 0.06);
+  box-sizing: border-box;
+}
+
+.manager-list-page .filter-menu-panel--scroll {
+  max-height: min(320px, 50vh);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+.manager-list-page .filter-menu-panel--scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.manager-list-page .filter-menu-panel--scroll::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: #cbd5e1;
+}
+
+.manager-list-page .filter-menu-option {
+  width: 100%;
+  min-height: 38px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: #1f2937;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.12s ease, color 0.12s ease;
+}
+
+.manager-list-page .filter-menu-option:hover {
+  background: #f8fafc;
+}
+
+.manager-list-page .filter-menu-option--selected {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.manager-list-page .filter-menu-option--selected:hover {
+  background: #dbeafe;
+}
+
+.manager-list-page .filters-panel {
+  overflow: visible;
+}

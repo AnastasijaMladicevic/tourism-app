@@ -7,6 +7,7 @@
     "saveChanges": "Salva modifiche",
     "cancel": "Annulla",
     "clear": "Cancella",
+    "today": "Oggi",
     "remove": "Rimuovi",
     "close": "Chiudi",
     "optional": "Opzionale",
@@ -124,6 +125,8 @@
     "reportsCreatedInPeriod": "{{count}} segnalazioni create in {{period}}",
     "geocodedDestinations": "Destinazioni geocodificate",
     "regionsRepresentedCount": "{{count}} regioni rappresentate",
+    "totalEmployees": "Dipendenti della piattaforma",
+    "totalEmployeesMeta": "{{creators}} creatori · {{managers}} manager · {{admins}} admin",
     "userGrowth": "Crescita utenti",
     "groupedByWeek": "Raggruppato per settimana",
     "groupedByMonth": "Raggruppato per mese",
@@ -784,6 +787,9 @@
         "searchAria": "Cerca eventi",
         "searchPlaceholder": "Cerca eventi, oggetti o organizzatori...",
         "dateRangeFilter": "Filtro intervallo date",
+        "fromDate": "Dalla data",
+        "toDate": "Alla data",
+        "datePlaceholder": "gg/mm/aaaa",
         "filtersReady": "Filtri pronti",
         "managedDestinationFallback": "Eventi del manager",
         "loading": "Caricamento eventi...",
@@ -2219,6 +2225,7 @@
       "dateRangeFilter": "Filtro intervallo date",
       "fromDate": "Dalla data",
       "toDate": "Alla data",
+      "datePlaceholder": "gg/mm/aaaa",
       "loading": "Caricamento eventi...",
       "selectedEvent": "Evento selezionato",
       "featuredEvent": "Evento in evidenza",
@@ -4544,7 +4551,7 @@
     "hidePassword": "Nascondi password",
     "showPassword": "Mostra password",
     "invalidCredentials": "Email o password non validi.",
-    "portalComingSoon": "portal in arrivo. Riprova più tardi."
+    "accessDenied": "Accesso negato. Il tuo account non ha il permesso di accedere a questa applicazione."
   },
   "signup": {
     "welcome": "Benvenuto",

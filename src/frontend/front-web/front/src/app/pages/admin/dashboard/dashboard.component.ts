@@ -104,7 +104,6 @@ const ADMIN_DASHBOARD_PERIOD_STORAGE_KEY = 'admin-dashboard-selected-period';
   styleUrls: [
     './dashboard.component.css',
     '../shared/admin-page-title.css',
-    '../shared/admin-page-stats-scroll.css'
   ],
 })
 export class DashboardComponent implements OnInit, OnDestroy {
@@ -134,6 +133,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   roleDonutSlices: RoleDonutSlice[] = [];
   roleDonutTotal = 0;
+  contentCreatorsCount = 0;
+  managersCount = 0;
+  adminsCount = 0;
+  totalEmployeesCount = 0;
 
   regionRows: RegionCoverageRow[] = [];
   banRegionRows: BanRegionRow[] = [];
@@ -289,6 +292,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.userGrowthHoverZones = [];
     this.roleDonutSlices = [];
     this.roleDonutTotal = 0;
+    this.contentCreatorsCount = 0;
+    this.managersCount = 0;
+    this.adminsCount = 0;
+    this.totalEmployeesCount = 0;
     this.regionRows = [];
     this.banRegionRows = [];
     this.creatorSlices = [];
@@ -362,6 +369,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   private bindRoleDistribution(roleDistribution: AdminDashboardRoleDistributionItemDto[]): void {
+    this.contentCreatorsCount = roleDistribution.find((role) => role.role === 'ContentCreator')?.count ?? 0;
+    this.managersCount = roleDistribution.find((role) => role.role === 'Manager')?.count ?? 0;
+    this.adminsCount = roleDistribution.find((role) => role.role === 'Admin')?.count ?? 0;
+    this.totalEmployeesCount = this.contentCreatorsCount + this.managersCount + this.adminsCount;
     this.roleDonutTotal = roleDistribution.reduce((sum, role) => sum + role.count, 0);
     this.roleDonutSlices = this.buildDonutSlices(
       roleDistribution.map((role) => ({

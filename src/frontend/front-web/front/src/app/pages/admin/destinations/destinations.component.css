@@ -116,8 +116,7 @@
   pointer-events: none;
 }
 
-.toolbar-input,
-.filters-panel select {
+.toolbar-input {
   width: 100%;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
@@ -125,33 +124,17 @@
   color: #111827;
   font: inherit;
   outline: none;
-}
-
-.toolbar-input {
   padding: 11px 14px 11px 38px;
   min-width: 0;
 }
 
 .filters-panel {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr)) auto auto;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) auto;
   gap: 12px;
   padding: 14px;
   align-items: end;
-}
-
-.filters-panel label {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  color: #6b7280;
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.filters-panel select {
-  min-height: 42px;
-  padding: 10px 12px;
+  overflow: visible;
 }
 
 .filter-actions {

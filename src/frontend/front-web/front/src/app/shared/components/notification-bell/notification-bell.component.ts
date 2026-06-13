@@ -82,43 +82,24 @@ export class NotificationBellComponent implements OnInit {
   }
 
   protected openNotification(notification: NotificationDto): void {
-    const performNavigation = () => {
-      const actionUrl = notification.actionUrl?.trim();
-      if (!actionUrl) {
-        if (this.isCreatorRoleRequestNotification(notification)) {
-          this.router.navigateByUrl('/admin/users?tab=tourists');
-        }
-        this.isOpen.set(false);
-        return;
-      }
-
-      if (/^https?:\/\//i.test(actionUrl)) {
-        window.location.href = actionUrl;
-        return;
-      }
-
-      this.router.navigateByUrl(this.resolveInternalActionUrl(actionUrl, notification));
-      this.isOpen.set(false);
-    };
-
-    if (notification.isRead) {
-      performNavigation();
+    if (this.isInformationalCreatorRoleNotification(notification)) {
       return;
     }
 
-    this.notificationsService.markAsRead(notification.id)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: () => {
-          this.notifications.update((items) =>
-            items.map((item) => (item.id === notification.id ? { ...item, isRead: true } : item)),
-          );
-          performNavigation();
-        },
-        error: () => {
-          performNavigation();
-        },
-      });
+    const actionUrl = notification.actionUrl?.trim();
+    if (!actionUrl) {
+      if (this.isCreatorRoleRequestNotification(notification)) {
+        this.router.navigateByUrl('/admin/users?tab=tourists');
+      }
+      return;
+    }
+
+    if (/^https?:\/\//i.test(actionUrl)) {
+      window.location.href = actionUrl;
+      return;
+    }
+
+    this.router.navigateByUrl(this.resolveInternalActionUrl(actionUrl, notification));
   }
 
   protected notificationKind(notification: NotificationDto): string {
@@ -187,6 +168,15 @@ export class NotificationBellComponent implements OnInit {
   private isCreatorRoleRequestNotification(notification: NotificationDto): boolean {
     const type = (notification.type ?? '').toLowerCase();
     return type === 'adminnewcreatorrolerequest';
+  }
+
+  /** CC role granted/revoked notices are informational only — no redirect on click. */
+  private isInformationalCreatorRoleNotification(notification: NotificationDto): boolean {
+    const type = (notification.type ?? '').toLowerCase();
+    return (
+      type === 'creatorrolerequestapproved'
+      || type === 'creatorroleaccessrevoked'
+    );
   }
 
   private isManagerReportNotification(notification?: NotificationDto): boolean {

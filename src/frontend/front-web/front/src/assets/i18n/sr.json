@@ -7,6 +7,7 @@
     "saveChanges": "Sačuvaj izmene",
     "cancel": "Otkaži",
     "clear": "Očisti",
+    "today": "Danas",
     "remove": "Ukloni",
     "close": "Zatvori",
     "optional": "Opcionalno",
@@ -124,6 +125,8 @@
     "reportsCreatedInPeriod": "{{count}} izveštaja kreirano u {{period}}",
     "geocodedDestinations": "Geokodirane destinacije",
     "regionsRepresentedCount": "{{count}} zastupljenih regiona",
+    "totalEmployees": "Zaposleni na platformi",
+    "totalEmployeesMeta": "{{creators}} kreatora · {{managers}} menadžera · {{admins}} admina",
     "userGrowth": "Rast korisnika",
     "groupedByWeek": "Grupisano po nedelji",
     "groupedByMonth": "Grupisano po mesecu",
@@ -784,6 +787,9 @@
         "searchAria": "Pretraži događaje",
         "searchPlaceholder": "Pretraži događaje, objekte ili organizatore...",
         "dateRangeFilter": "Filter opsega datuma",
+        "fromDate": "Od datuma",
+        "toDate": "Do datuma",
+        "datePlaceholder": "dd.mm.gggg",
         "filtersReady": "Filteri spremni",
         "managedDestinationFallback": "Menadžerski događaji",
         "loading": "Učitavanje događaja...",
@@ -2219,6 +2225,7 @@
       "dateRangeFilter": "Filter opsega datuma",
       "fromDate": "Od datuma",
       "toDate": "Do datuma",
+      "datePlaceholder": "dd.mm.gggg",
       "loading": "Učitavanje događaja...",
       "selectedEvent": "Izabrani događaj",
       "featuredEvent": "Izdvojeni događaj",
@@ -4351,7 +4358,7 @@
     "hidePassword": "Sakrij lozinku",
     "showPassword": "Prikaži lozinku",
     "invalidCredentials": "Neispravni email ili lozinka.",
-    "portalComingSoon": "portal uskoro dolazi. Proverite ponovo."
+    "accessDenied": "Pristup odbijen. Vaš nalog nema dozvolu za pristup ovoj aplikaciji."
   },
   "signup": {
     "welcome": "Dobrodošli",

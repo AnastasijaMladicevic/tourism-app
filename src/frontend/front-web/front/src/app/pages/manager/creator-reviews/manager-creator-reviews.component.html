@@ -65,33 +65,140 @@
     </div>
 
     <div class="filter-row-secondary">
-      <label class="creator-select">
-        <span>{{ 'manager.creatorReviews.filters.creator' | translate }}</span>
-        <select [(ngModel)]="creatorFilter" (ngModelChange)="onFilterChange()">
-          <option [ngValue]="'all'">{{ 'manager.creatorReviews.filters.allCreators' | translate }}</option>
-          @for (c of creatorOptions; track c.id) {
-            <option [ngValue]="c.id">{{ c.name }}</option>
+      <div class="filter-field">
+        <span class="filter-field-label">{{ 'manager.creatorReviews.filters.creator' | translate }}</span>
+        <div
+          #creatorFilterRoot
+          class="filter-menu"
+          [class.is-open]="creatorFilterMenuOpen"
+          [class.is-active]="creatorFilter !== 'all'"
+        >
+          <button
+            type="button"
+            class="filter-menu-trigger"
+            [attr.aria-expanded]="creatorFilterMenuOpen"
+            [attr.aria-haspopup]="'listbox'"
+            [attr.aria-label]="'manager.creatorReviews.filters.creator' | translate"
+            (click)="toggleCreatorFilterMenu($event)"
+          >
+            <span class="material-symbols-outlined filter-menu-icon" aria-hidden="true">badge</span>
+            <span class="filter-menu-label">{{ creatorFilterLabel }}</span>
+            <span class="material-symbols-outlined filter-menu-chevron" aria-hidden="true">expand_more</span>
+          </button>
+          @if (creatorFilterMenuOpen) {
+            <div class="filter-menu-panel filter-menu-panel--scroll" role="listbox">
+              <button
+                type="button"
+                class="filter-menu-option"
+                role="option"
+                [class.filter-menu-option--selected]="creatorFilter === 'all'"
+                [attr.aria-selected]="creatorFilter === 'all'"
+                (click)="selectCreatorFilter('all', $event)"
+              >
+                {{ 'manager.creatorReviews.filters.allCreators' | translate }}
+              </button>
+              @for (c of creatorOptions; track c.id) {
+                <button
+                  type="button"
+                  class="filter-menu-option"
+                  role="option"
+                  [class.filter-menu-option--selected]="creatorFilter === c.id"
+                  [attr.aria-selected]="creatorFilter === c.id"
+                  (click)="selectCreatorFilter(c.id, $event)"
+                >
+                  {{ c.name }}
+                </button>
+              }
+            </div>
           }
-        </select>
-      </label>
-      <label class="creator-select">
-        <span>{{ 'manager.creatorReviews.filters.tourist' | translate }}</span>
-        <select [(ngModel)]="touristFilter" (ngModelChange)="onFilterChange()">
-          <option [ngValue]="'all'">{{ 'manager.creatorReviews.filters.allTourists' | translate }}</option>
-          @for (t of touristOptions; track t.id) {
-            <option [ngValue]="t.id">{{ t.name }}</option>
+        </div>
+      </div>
+      <div class="filter-field">
+        <span class="filter-field-label">{{ 'manager.creatorReviews.filters.tourist' | translate }}</span>
+        <div
+          #touristFilterRoot
+          class="filter-menu"
+          [class.is-open]="touristFilterMenuOpen"
+          [class.is-active]="touristFilter !== 'all'"
+        >
+          <button
+            type="button"
+            class="filter-menu-trigger"
+            [attr.aria-expanded]="touristFilterMenuOpen"
+            [attr.aria-haspopup]="'listbox'"
+            [attr.aria-label]="'manager.creatorReviews.filters.tourist' | translate"
+            (click)="toggleTouristFilterMenu($event)"
+          >
+            <span class="material-symbols-outlined filter-menu-icon" aria-hidden="true">person</span>
+            <span class="filter-menu-label">{{ touristFilterLabel }}</span>
+            <span class="material-symbols-outlined filter-menu-chevron" aria-hidden="true">expand_more</span>
+          </button>
+          @if (touristFilterMenuOpen) {
+            <div class="filter-menu-panel filter-menu-panel--scroll" role="listbox">
+              <button
+                type="button"
+                class="filter-menu-option"
+                role="option"
+                [class.filter-menu-option--selected]="touristFilter === 'all'"
+                [attr.aria-selected]="touristFilter === 'all'"
+                (click)="selectTouristFilter('all', $event)"
+              >
+                {{ 'manager.creatorReviews.filters.allTourists' | translate }}
+              </button>
+              @for (t of touristOptions; track t.id) {
+                <button
+                  type="button"
+                  class="filter-menu-option"
+                  role="option"
+                  [class.filter-menu-option--selected]="touristFilter === t.id"
+                  [attr.aria-selected]="touristFilter === t.id"
+                  (click)="selectTouristFilter(t.id, $event)"
+                >
+                  {{ t.name }}
+                </button>
+              }
+            </div>
           }
-        </select>
-      </label>
-      <label class="creator-select">
-        <span>{{ 'manager.creatorReviews.context.replyStatus' | translate }}</span>
-        <select [(ngModel)]="responseFilter" (ngModelChange)="onFilterChange()">
-          <option [ngValue]="'all'">{{ 'manager.creatorReviews.filters.allResponses' | translate }}</option>
-          <option [ngValue]="'responded'">{{ 'manager.creatorReviews.filters.withReply' | translate }}</option>
-          <option [ngValue]="'pending'">{{ 'manager.creatorReviews.filters.pendingReply' | translate }}</option>
-          <option [ngValue]="'concerning'">{{ 'manager.creatorReviews.filters.concerningReplies' | translate }}</option>
-        </select>
-      </label>
+        </div>
+      </div>
+      <div class="filter-field">
+        <span class="filter-field-label">{{ 'manager.creatorReviews.context.replyStatus' | translate }}</span>
+        <div
+          #responseFilterRoot
+          class="filter-menu"
+          [class.is-open]="responseFilterMenuOpen"
+          [class.is-active]="responseFilter !== 'all'"
+        >
+          <button
+            type="button"
+            class="filter-menu-trigger"
+            [attr.aria-expanded]="responseFilterMenuOpen"
+            [attr.aria-haspopup]="'listbox'"
+            [attr.aria-label]="'manager.creatorReviews.context.replyStatus' | translate"
+            (click)="toggleResponseFilterMenu($event)"
+          >
+            <span class="material-symbols-outlined filter-menu-icon" aria-hidden="true">forum</span>
+            <span class="filter-menu-label">{{ responseFilterLabelKey | translate }}</span>
+            <span class="material-symbols-outlined filter-menu-chevron" aria-hidden="true">expand_more</span>
+          </button>
+          @if (responseFilterMenuOpen) {
+            <div class="filter-menu-panel" role="listbox">
+              @for (option of responseFilterOptions; track option.value) {
+                <button
+                  type="button"
+                  class="filter-menu-option"
+                  role="option"
+                  [class.filter-menu-option--selected]="responseFilter === option.value"
+                  [attr.aria-selected]="responseFilter === option.value"
+                  (click)="selectResponseFilter(option.value, $event)"
+                >
+                  {{ option.labelKey | translate }}
+                </button>
+              }
+            </div>
+          }
+        </div>
+      </div>
       <label class="search-field">
         <span class="material-symbols-outlined">search</span>
         <input

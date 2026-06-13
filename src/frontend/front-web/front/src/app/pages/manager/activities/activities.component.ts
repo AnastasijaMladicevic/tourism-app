@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, ChangeDetectorRef, DestroyRef } from '@angular/core';
+import { Component, OnInit, ElementRef, HostListener, ViewChild, inject, ChangeDetectorRef, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
@@ -32,7 +32,8 @@ import { formatDurationCompact } from '../../../utils/duration';
     '../shared/manager-list-detail-layout.css',
     '../shared/manager-page-stats-scroll.css',
     '../shared/manager-stat-cards.css',
-    '../shared/manager-hero-slides.css'
+    '../shared/manager-hero-slides.css',
+    '../shared/manager-filter-menu.css'
   ]
 })
 export class ManagerActivitiesComponent implements OnInit {
@@ -92,6 +93,21 @@ export class ManagerActivitiesComponent implements OnInit {
     { value: 'status', label: 'manager.activities.filters.status' },
     { value: 'createdAt', label: 'manager.activities.filters.createdDate' }
   ];
+
+  readonly sortOrderOptions: Array<{ value: 'asc' | 'desc'; label: string }> = [
+    { value: 'asc', label: 'manager.activities.filters.ascending' },
+    { value: 'desc', label: 'manager.activities.filters.descending' }
+  ];
+
+  statusFilterMenuOpen = false;
+  typeFilterMenuOpen = false;
+  sortByFilterMenuOpen = false;
+  sortOrderFilterMenuOpen = false;
+
+  @ViewChild('statusFilterRoot') private statusFilterRoot?: ElementRef<HTMLElement>;
+  @ViewChild('typeFilterRoot') private typeFilterRoot?: ElementRef<HTMLElement>;
+  @ViewChild('sortByFilterRoot') private sortByFilterRoot?: ElementRef<HTMLElement>;
+  @ViewChild('sortOrderFilterRoot') private sortOrderFilterRoot?: ElementRef<HTMLElement>;
 
   ngOnInit(): void {
     this.destroyRef.onDestroy(() => this.stopHeroImageRotation());
@@ -302,6 +318,7 @@ export class ManagerActivitiesComponent implements OnInit {
   }
 
   onResetFilters(): void {
+    this.closeAllFilterMenus();
     this.searchQuery = '';
     this.draftSearchQuery = '';
     this.statusFilter = 'all';
@@ -310,6 +327,156 @@ export class ManagerActivitiesComponent implements OnInit {
     this.sortOrder = 'desc';
     this.currentPage = 1;
     this.loadActivities();
+  }
+
+  get statusFilterLabel(): string {
+    const option = this.statusOptions.find((item) => item.value === this.statusFilter);
+    return this.translationService.translate(option?.label ?? 'manager.activities.filters.allStatuses');
+  }
+
+  get typeFilterLabel(): string {
+    if (this.typeFilter === 'all') {
+      return this.translationService.translate('manager.activities.filters.allTypes');
+    }
+
+    const typeId = Number(this.typeFilter);
+    return (
+      this.activityTypeOptions.find((type) => type.id === typeId)?.name
+      ?? this.translationService.translate('manager.activities.filters.allTypes')
+    );
+  }
+
+  get sortByFilterLabel(): string {
+    const option = this.sortByOptions.find((item) => item.value === this.sortBy);
+    return this.translationService.translate(option?.label ?? 'manager.activities.filters.status');
+  }
+
+  get sortOrderFilterLabel(): string {
+    const option = this.sortOrderOptions.find((item) => item.value === this.sortOrder);
+    return this.translationService.translate(option?.label ?? 'manager.activities.filters.descending');
+  }
+
+  toggleStatusFilterMenu(event: Event): void {
+    if (this.isLoading) {
+      return;
+    }
+
+    event.stopPropagation();
+    this.statusFilterMenuOpen = !this.statusFilterMenuOpen;
+    if (this.statusFilterMenuOpen) {
+      this.closeOtherFilterMenus('status');
+    }
+  }
+
+  selectStatusFilter(value: string, event: Event): void {
+    event.stopPropagation();
+    this.statusFilter = value;
+    this.statusFilterMenuOpen = false;
+    this.onApplyFilters();
+  }
+
+  toggleTypeFilterMenu(event: Event): void {
+    if (this.isLoadingTypes || this.isLoading) {
+      return;
+    }
+
+    event.stopPropagation();
+    this.typeFilterMenuOpen = !this.typeFilterMenuOpen;
+    if (this.typeFilterMenuOpen) {
+      this.closeOtherFilterMenus('type');
+    }
+  }
+
+  selectTypeFilter(value: string, event: Event): void {
+    event.stopPropagation();
+    this.typeFilter = value;
+    this.typeFilterMenuOpen = false;
+    this.onApplyFilters();
+  }
+
+  toggleSortByFilterMenu(event: Event): void {
+    event.stopPropagation();
+    this.sortByFilterMenuOpen = !this.sortByFilterMenuOpen;
+    if (this.sortByFilterMenuOpen) {
+      this.closeOtherFilterMenus('sortBy');
+    }
+  }
+
+  selectSortByFilter(value: string, event: Event): void {
+    event.stopPropagation();
+    this.sortBy = value;
+    this.sortByFilterMenuOpen = false;
+    this.onApplyFilters();
+  }
+
+  toggleSortOrderFilterMenu(event: Event): void {
+    event.stopPropagation();
+    this.sortOrderFilterMenuOpen = !this.sortOrderFilterMenuOpen;
+    if (this.sortOrderFilterMenuOpen) {
+      this.closeOtherFilterMenus('sortOrder');
+    }
+  }
+
+  selectSortOrderFilter(value: 'asc' | 'desc', event: Event): void {
+    event.stopPropagation();
+    this.sortOrder = value;
+    this.sortOrderFilterMenuOpen = false;
+    this.onApplyFilters();
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as Node;
+
+    if (
+      this.statusFilterMenuOpen
+      && !this.statusFilterRoot?.nativeElement.contains(target)
+    ) {
+      this.statusFilterMenuOpen = false;
+    }
+
+    if (
+      this.typeFilterMenuOpen
+      && !this.typeFilterRoot?.nativeElement.contains(target)
+    ) {
+      this.typeFilterMenuOpen = false;
+    }
+
+    if (
+      this.sortByFilterMenuOpen
+      && !this.sortByFilterRoot?.nativeElement.contains(target)
+    ) {
+      this.sortByFilterMenuOpen = false;
+    }
+
+    if (
+      this.sortOrderFilterMenuOpen
+      && !this.sortOrderFilterRoot?.nativeElement.contains(target)
+    ) {
+      this.sortOrderFilterMenuOpen = false;
+    }
+  }
+
+  private closeAllFilterMenus(): void {
+    this.statusFilterMenuOpen = false;
+    this.typeFilterMenuOpen = false;
+    this.sortByFilterMenuOpen = false;
+    this.sortOrderFilterMenuOpen = false;
+  }
+
+  private closeOtherFilterMenus(except: 'status' | 'type' | 'sortBy' | 'sortOrder'): void {
+    if (except !== 'status') {
+      this.statusFilterMenuOpen = false;
+    }
+    if (except !== 'type') {
+      this.typeFilterMenuOpen = false;
+    }
+    if (except !== 'sortBy') {
+      this.sortByFilterMenuOpen = false;
+    }
+    if (except !== 'sortOrder') {
+      this.sortOrderFilterMenuOpen = false;
+    }
   }
 
   onGoToPage(page: number): void {
