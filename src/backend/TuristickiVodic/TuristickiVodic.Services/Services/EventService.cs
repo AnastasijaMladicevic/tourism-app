@@ -455,6 +455,22 @@ namespace TuristickiVodic.Services.Services
             return dto;
         }
 
+        public async Task<List<EventDto>> GetByIdsAsync(int[] ids, string lang = "sr")
+        {
+            if (ids == null || ids.Length == 0)
+                return new List<EventDto>();
+
+            var events = await IncludeEventDetailRelations(_context.Events)
+                .AsNoTracking()
+                .Where(e => ids.Contains(e.Id))
+                .ToListAsync();
+
+            var items = _mapper.Map<List<EventDto>>(events);
+            await ApplyTranslationsAsync(items, events, lang);
+            await ApplyPendingDeletionRequestFlagsAsync(items);
+            return items;
+        }
+
         public async Task<EventDto?> GetMineByIdAsync(int id, int userId, string lang = "sr")
         {
             var ev = await IncludeEventDetailRelations(_context.Events)

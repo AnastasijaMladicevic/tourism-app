@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
-import { catchError, finalize, forkJoin, map, of, switchMap } from 'rxjs';
+import { catchError, finalize, map, of, switchMap } from 'rxjs';
 import { environment } from '../../../environment/environment';
 import { EventDto, EventService } from '../../services/event';
 import { EventPlannerDto, EventPlannerService } from '../../services/event-planner';
@@ -227,7 +227,19 @@ export class PlannerComponent implements OnInit {
             return of([] as PlannerStop[]);
           }
 
-          return forkJoin(result.items.map((item) => this.enrichPlannerItem(item)));
+          const eventIds = Array.from(new Set(result.items.map((item) => item.eventId)));
+
+          return this.eventService.getByIds(eventIds).pipe(
+            map((events) => {
+              const eventsById = new Map(events.map((event) => [event.id, event]));
+              return result.items.flatMap((item) =>
+                this.mapPlannerItems(item, eventsById.get(item.eventId)),
+              );
+            }),
+            catchError(() =>
+              of(result.items.flatMap((item) => this.mapPlannerItems(item))),
+            ),
+          );
         }),
         catchError(() => {
           this.errorMessage.set(this.translate('planner.loadError'));
@@ -236,18 +248,10 @@ export class PlannerComponent implements OnInit {
         finalize(() => this.isLoading.set(false)),
       )
       .subscribe((items) => {
-        const flattenedItems = items.flat();
-        this.plannerItems.set(flattenedItems);
-        this.profileStatsCache.write({ plans: flattenedItems.length });
+        this.plannerItems.set(items);
+        this.profileStatsCache.write({ plans: items.length });
         this.ensureSelectedDay();
       });
-  }
-
-  private enrichPlannerItem(item: EventPlannerDto) {
-    return this.eventService.getById(item.eventId).pipe(
-      map((eventDetails) => this.mapPlannerItems(item, eventDetails)),
-      catchError(() => of(this.mapPlannerItems(item))),
-    );
   }
 
   private mapPlannerItems(item: EventPlannerDto, eventDetails?: EventDto): PlannerStop[] {
