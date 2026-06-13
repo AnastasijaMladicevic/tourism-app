@@ -5,6 +5,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PaginatorComponent } from '../../../shared/components/paginator/paginator';
+import { DatePickerInputComponent } from '../../../shared/components/date-picker-input/date-picker-input.component';
 import { EMPTY, Observable, TimeoutError, forkJoin, of } from 'rxjs';
 import { catchError, finalize, map, switchMap, tap, timeout } from 'rxjs/operators';
 import {
@@ -82,7 +83,7 @@ interface BannedUserRow {
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, PaginatorComponent],
+  imports: [CommonModule, FormsModule, RouterLink, PaginatorComponent, DatePickerInputComponent],
   templateUrl: './users.component.html',
   styleUrls: [
     './users.component.css',
@@ -367,12 +368,6 @@ export class UsersComponent implements OnInit {
       this.touristsTabPollTimer = undefined;
     }
     document.removeEventListener('visibilitychange', this.onTouristsTabDocumentVisibility);
-  }
-
-  openDatePicker(input: HTMLInputElement): void {
-    if (typeof input.showPicker === 'function') {
-      input.showPicker();
-    }
   }
 
   private loadDashboardData(options?: { silent?: boolean }): void {

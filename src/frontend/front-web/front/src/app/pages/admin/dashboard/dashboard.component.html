@@ -74,6 +74,15 @@
         <span class="kpi-value">{{ overview.geospatialOverview.totalActiveDestinationsWithCoordinates | number }}</span>
         <span class="kpi-meta muted">{{ t('adminDashboard.regionsRepresentedCount', { count: overview.geospatialOverview.regionsRepresented }) }}</span>
       </article>
+
+      <article class="kpi-card card kpi-card--green">
+        <div class="kpi-icon">
+          <span class="material-symbols-outlined">groups_3</span>
+        </div>
+        <span class="kpi-label">{{ t('adminDashboard.totalEmployees') }}</span>
+        <span class="kpi-value">{{ totalEmployeesCount | number }}</span>
+        <span class="kpi-meta muted">{{ t('adminDashboard.totalEmployeesMeta', { creators: contentCreatorsCount, managers: managersCount, admins: adminsCount }) }}</span>
+      </article>
     </div>
 
     <div class="top-grid">

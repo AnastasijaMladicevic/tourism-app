@@ -25,47 +25,226 @@
 
   @if (filterPanelOpen) {
     <div class="filters-panel card">
-      <label>
-        <span>{{ 'contentCreator.objects.filters.status' | translate }}</span>
-        <select [(ngModel)]="statusFilter" (ngModelChange)="onApplyFilters()">
-          <option value="all">{{ 'contentCreator.objects.filters.allStatuses' | translate }}</option>
-          <option *ngFor="let option of statusOptions" [value]="option.value">
-            {{ translateOptionLabel(option) }}
-          </option>
-        </select>
-      </label>
+      <div class="filter-field">
+        <span class="filter-field-label">{{ 'contentCreator.objects.filters.status' | translate }}</span>
+        <div
+          #statusFilterRoot
+          class="filter-menu"
+          [class.is-open]="statusFilterMenuOpen"
+          [class.is-active]="statusFilter !== 'all'"
+          [class.is-disabled]="isLoading"
+        >
+          <button
+            type="button"
+            class="filter-menu-trigger"
+            [disabled]="isLoading"
+            [attr.aria-expanded]="statusFilterMenuOpen"
+            [attr.aria-haspopup]="'listbox'"
+            [attr.aria-label]="'contentCreator.objects.filters.status' | translate"
+            (click)="toggleStatusFilterMenu($event)"
+          >
+            <span class="material-symbols-outlined filter-menu-icon" aria-hidden="true">flag</span>
+            <span class="filter-menu-label">{{ statusFilterLabel }}</span>
+            <span class="material-symbols-outlined filter-menu-chevron" aria-hidden="true">expand_more</span>
+          </button>
+          @if (statusFilterMenuOpen) {
+            <div class="filter-menu-panel" role="listbox">
+              <button
+                type="button"
+                class="filter-menu-option"
+                role="option"
+                [class.filter-menu-option--selected]="statusFilter === 'all'"
+                [attr.aria-selected]="statusFilter === 'all'"
+                (click)="selectStatusFilter('all', $event)"
+              >
+                {{ 'contentCreator.objects.filters.allStatuses' | translate }}
+              </button>
+              @for (option of statusOptions; track option.value) {
+                <button
+                  type="button"
+                  class="filter-menu-option"
+                  role="option"
+                  [class.filter-menu-option--selected]="statusFilter === option.value"
+                  [attr.aria-selected]="statusFilter === option.value"
+                  (click)="selectStatusFilter(option.value, $event)"
+                >
+                  {{ translateOptionLabel(option) }}
+                </button>
+              }
+            </div>
+          }
+        </div>
+      </div>
 
-      <label>
-        <span>{{ 'contentCreator.objects.filters.type' | translate }}</span>
-        <select [(ngModel)]="typeFilter" (ngModelChange)="onApplyFilters()">
-          <option value="all">{{ 'contentCreator.objects.filters.allTypes' | translate }}</option>
-          <option *ngFor="let option of typeOptions" [value]="option.value">{{ option.label }}</option>
-        </select>
-      </label>
+      <div class="filter-field">
+        <span class="filter-field-label">{{ 'contentCreator.objects.filters.type' | translate }}</span>
+        <div
+          #typeFilterRoot
+          class="filter-menu"
+          [class.is-open]="typeFilterMenuOpen"
+          [class.is-active]="typeFilter !== 'all'"
+          [class.is-disabled]="isLoading"
+        >
+          <button
+            type="button"
+            class="filter-menu-trigger"
+            [disabled]="isLoading"
+            [attr.aria-expanded]="typeFilterMenuOpen"
+            [attr.aria-haspopup]="'listbox'"
+            [attr.aria-label]="'contentCreator.objects.filters.type' | translate"
+            (click)="toggleTypeFilterMenu($event)"
+          >
+            <span class="material-symbols-outlined filter-menu-icon" aria-hidden="true">category</span>
+            <span class="filter-menu-label">{{ typeFilterLabel }}</span>
+            <span class="material-symbols-outlined filter-menu-chevron" aria-hidden="true">expand_more</span>
+          </button>
+          @if (typeFilterMenuOpen) {
+            <div class="filter-menu-panel filter-menu-panel--scroll" role="listbox">
+              <button
+                type="button"
+                class="filter-menu-option"
+                role="option"
+                [class.filter-menu-option--selected]="typeFilter === 'all'"
+                [attr.aria-selected]="typeFilter === 'all'"
+                (click)="selectTypeFilter('all', $event)"
+              >
+                {{ 'contentCreator.objects.filters.allTypes' | translate }}
+              </button>
+              @for (option of typeOptions; track option.value) {
+                <button
+                  type="button"
+                  class="filter-menu-option"
+                  role="option"
+                  [class.filter-menu-option--selected]="typeFilter === option.value"
+                  [attr.aria-selected]="typeFilter === option.value"
+                  (click)="selectTypeFilter(option.value, $event)"
+                >
+                  {{ option.label }}
+                </button>
+              }
+            </div>
+          }
+        </div>
+      </div>
 
-      <label>
-        <span>{{ 'contentCreator.objects.filters.rating' | translate }}</span>
-        <select [(ngModel)]="ratingFilter" (ngModelChange)="onApplyFilters()">
-          <option *ngFor="let option of ratingOptions" [value]="option.value">{{ translateOptionLabel(option) }}</option>
-        </select>
-      </label>
+      <div class="filter-field">
+        <span class="filter-field-label">{{ 'contentCreator.objects.filters.rating' | translate }}</span>
+        <div
+          #ratingFilterRoot
+          class="filter-menu"
+          [class.is-open]="ratingFilterMenuOpen"
+          [class.is-active]="ratingFilter !== 'all'"
+          [class.is-disabled]="isLoading"
+        >
+          <button
+            type="button"
+            class="filter-menu-trigger"
+            [disabled]="isLoading"
+            [attr.aria-expanded]="ratingFilterMenuOpen"
+            [attr.aria-haspopup]="'listbox'"
+            [attr.aria-label]="'contentCreator.objects.filters.rating' | translate"
+            (click)="toggleRatingFilterMenu($event)"
+          >
+            <span class="material-symbols-outlined filter-menu-icon" aria-hidden="true">star</span>
+            <span class="filter-menu-label">{{ ratingFilterLabel }}</span>
+            <span class="material-symbols-outlined filter-menu-chevron" aria-hidden="true">expand_more</span>
+          </button>
+          @if (ratingFilterMenuOpen) {
+            <div class="filter-menu-panel" role="listbox">
+              @for (option of ratingOptions; track option.value) {
+                <button
+                  type="button"
+                  class="filter-menu-option"
+                  role="option"
+                  [class.filter-menu-option--selected]="ratingFilter === option.value"
+                  [attr.aria-selected]="ratingFilter === option.value"
+                  (click)="selectRatingFilter(option.value, $event)"
+                >
+                  {{ translateOptionLabel(option) }}
+                </button>
+              }
+            </div>
+          }
+        </div>
+      </div>
 
-      <label>
-        <span>{{ 'contentCreator.objects.filters.sortBy' | translate }}</span>
-        <select [(ngModel)]="sortBy" (ngModelChange)="onApplyFilters()">
-          <option *ngFor="let option of sortByOptions" [value]="option.value">
-            {{ translateOptionLabel(option) }}
-          </option>
-        </select>
-      </label>
+      <div class="filter-field">
+        <span class="filter-field-label">{{ 'contentCreator.objects.filters.sortBy' | translate }}</span>
+        <div
+          #sortByFilterRoot
+          class="filter-menu"
+          [class.is-open]="sortByFilterMenuOpen"
+          [class.is-active]="sortBy !== 'status'"
+        >
+          <button
+            type="button"
+            class="filter-menu-trigger"
+            [attr.aria-expanded]="sortByFilterMenuOpen"
+            [attr.aria-haspopup]="'listbox'"
+            [attr.aria-label]="'contentCreator.objects.filters.sortBy' | translate"
+            (click)="toggleSortByFilterMenu($event)"
+          >
+            <span class="material-symbols-outlined filter-menu-icon" aria-hidden="true">sort</span>
+            <span class="filter-menu-label">{{ sortByFilterLabel }}</span>
+            <span class="material-symbols-outlined filter-menu-chevron" aria-hidden="true">expand_more</span>
+          </button>
+          @if (sortByFilterMenuOpen) {
+            <div class="filter-menu-panel" role="listbox">
+              @for (option of sortByOptions; track option.value) {
+                <button
+                  type="button"
+                  class="filter-menu-option"
+                  role="option"
+                  [class.filter-menu-option--selected]="sortBy === option.value"
+                  [attr.aria-selected]="sortBy === option.value"
+                  (click)="selectSortByFilter(option.value, $event)"
+                >
+                  {{ translateOptionLabel(option) }}
+                </button>
+              }
+            </div>
+          }
+        </div>
+      </div>
 
-      <label>
-        <span>{{ 'contentCreator.objects.filters.order' | translate }}</span>
-        <select [(ngModel)]="sortOrder" (ngModelChange)="onApplyFilters()">
-          <option value="asc">{{ 'contentCreator.objects.filters.ascending' | translate }}</option>
-          <option value="desc">{{ 'contentCreator.objects.filters.descending' | translate }}</option>
-        </select>
-      </label>
+      <div class="filter-field">
+        <span class="filter-field-label">{{ 'contentCreator.objects.filters.order' | translate }}</span>
+        <div
+          #sortOrderFilterRoot
+          class="filter-menu"
+          [class.is-open]="sortOrderFilterMenuOpen"
+          [class.is-active]="sortOrder !== 'desc'"
+        >
+          <button
+            type="button"
+            class="filter-menu-trigger"
+            [attr.aria-expanded]="sortOrderFilterMenuOpen"
+            [attr.aria-haspopup]="'listbox'"
+            [attr.aria-label]="'contentCreator.objects.filters.order' | translate"
+            (click)="toggleSortOrderFilterMenu($event)"
+          >
+            <span class="material-symbols-outlined filter-menu-icon" aria-hidden="true">swap_vert</span>
+            <span class="filter-menu-label">{{ sortOrderFilterLabel }}</span>
+            <span class="material-symbols-outlined filter-menu-chevron" aria-hidden="true">expand_more</span>
+          </button>
+          @if (sortOrderFilterMenuOpen) {
+            <div class="filter-menu-panel" role="listbox">
+              @for (option of sortOrderOptions; track option.value) {
+                <button
+                  type="button"
+                  class="filter-menu-option"
+                  role="option"
+                  [class.filter-menu-option--selected]="sortOrder === option.value"
+                  [attr.aria-selected]="sortOrder === option.value"
+                  (click)="selectSortOrderFilter(option.value, $event)"
+                >
+                  {{ translateOptionLabel(option) }}
+                </button>
+              }
+            </div>
+          }
+        </div>
+      </div>
 
       <div class="filter-actions">
         <button type="button" class="ghost-btn filter-btn secondary" (click)="onResetFilters()">

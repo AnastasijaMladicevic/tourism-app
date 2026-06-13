@@ -15,7 +15,7 @@
 .objects-layout .main-column {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 16px;
   min-width: 0;
 }
 

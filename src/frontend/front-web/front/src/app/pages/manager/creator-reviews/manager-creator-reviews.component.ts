@@ -1,8 +1,11 @@
 import {
   ChangeDetectorRef,
   Component,
+  ElementRef,
+  HostListener,
   OnDestroy,
   OnInit,
+  ViewChild,
   inject,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -114,7 +117,23 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
   responseFilter: 'all' | 'responded' | 'pending' | 'concerning' = 'all';
   creatorFilter: 'all' | number = 'all';
   touristFilter: 'all' | number = 'all';
+  creatorFilterMenuOpen = false;
+  touristFilterMenuOpen = false;
+  responseFilterMenuOpen = false;
+  readonly responseFilterOptions: Array<{
+    value: 'all' | 'responded' | 'pending' | 'concerning';
+    labelKey: string;
+  }> = [
+    { value: 'all', labelKey: 'manager.creatorReviews.filters.allResponses' },
+    { value: 'responded', labelKey: 'manager.creatorReviews.filters.withReply' },
+    { value: 'pending', labelKey: 'manager.creatorReviews.filters.pendingReply' },
+    { value: 'concerning', labelKey: 'manager.creatorReviews.filters.concerningReplies' },
+  ];
   selectedRatings: number[] = [];
+
+  @ViewChild('creatorFilterRoot') private creatorFilterRoot?: ElementRef<HTMLElement>;
+  @ViewChild('touristFilterRoot') private touristFilterRoot?: ElementRef<HTMLElement>;
+  @ViewChild('responseFilterRoot') private responseFilterRoot?: ElementRef<HTMLElement>;
 
   selectedThread: ManagerReviewThread | null = null;
 
@@ -481,6 +500,112 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
     return this.selectedRatings.length === 0;
   }
 
+  get creatorFilterLabel(): string {
+    if (this.creatorFilter === 'all') {
+      return this.translationService.translate('manager.creatorReviews.filters.allCreators');
+    }
+
+    return (
+      this.creatorOptions.find((creator) => creator.id === this.creatorFilter)?.name
+      ?? this.translationService.translate('manager.creatorReviews.filters.allCreators')
+    );
+  }
+
+  get touristFilterLabel(): string {
+    if (this.touristFilter === 'all') {
+      return this.translationService.translate('manager.creatorReviews.filters.allTourists');
+    }
+
+    return (
+      this.touristOptions.find((tourist) => tourist.id === this.touristFilter)?.name
+      ?? this.translationService.translate('manager.creatorReviews.filters.allTourists')
+    );
+  }
+
+  get responseFilterLabelKey(): string {
+    return (
+      this.responseFilterOptions.find((option) => option.value === this.responseFilter)?.labelKey
+      ?? 'manager.creatorReviews.filters.allResponses'
+    );
+  }
+
+  toggleCreatorFilterMenu(event: Event): void {
+    event.stopPropagation();
+    this.creatorFilterMenuOpen = !this.creatorFilterMenuOpen;
+    if (this.creatorFilterMenuOpen) {
+      this.touristFilterMenuOpen = false;
+      this.responseFilterMenuOpen = false;
+    }
+  }
+
+  selectCreatorFilter(value: 'all' | number, event: Event): void {
+    event.stopPropagation();
+    this.creatorFilter = value;
+    this.creatorFilterMenuOpen = false;
+    this.onFilterChange();
+  }
+
+  toggleTouristFilterMenu(event: Event): void {
+    event.stopPropagation();
+    this.touristFilterMenuOpen = !this.touristFilterMenuOpen;
+    if (this.touristFilterMenuOpen) {
+      this.creatorFilterMenuOpen = false;
+      this.responseFilterMenuOpen = false;
+    }
+  }
+
+  selectTouristFilter(value: 'all' | number, event: Event): void {
+    event.stopPropagation();
+    this.touristFilter = value;
+    this.touristFilterMenuOpen = false;
+    this.onFilterChange();
+  }
+
+  toggleResponseFilterMenu(event: Event): void {
+    event.stopPropagation();
+    this.responseFilterMenuOpen = !this.responseFilterMenuOpen;
+    if (this.responseFilterMenuOpen) {
+      this.creatorFilterMenuOpen = false;
+      this.touristFilterMenuOpen = false;
+    }
+  }
+
+  selectResponseFilter(
+    value: 'all' | 'responded' | 'pending' | 'concerning',
+    event: Event,
+  ): void {
+    event.stopPropagation();
+    this.responseFilter = value;
+    this.responseFilterMenuOpen = false;
+    this.onFilterChange();
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as Node;
+
+    if (
+      this.creatorFilterMenuOpen
+      && !this.creatorFilterRoot?.nativeElement.contains(target)
+    ) {
+      this.creatorFilterMenuOpen = false;
+    }
+
+    if (
+      this.touristFilterMenuOpen
+      && !this.touristFilterRoot?.nativeElement.contains(target)
+    ) {
+      this.touristFilterMenuOpen = false;
+    }
+
+    if (
+      this.responseFilterMenuOpen
+      && !this.responseFilterRoot?.nativeElement.contains(target)
+    ) {
+      this.responseFilterMenuOpen = false;
+    }
+  }
+
   onFilterChange(): void {
     if (
       this.selectedThread &&
@@ -505,6 +630,9 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
   }
 
   resetFilters(): void {
+    this.creatorFilterMenuOpen = false;
+    this.touristFilterMenuOpen = false;
+    this.responseFilterMenuOpen = false;
     this.searchTerm = '';
     this.responseFilter = 'all';
     this.creatorFilter = 'all';

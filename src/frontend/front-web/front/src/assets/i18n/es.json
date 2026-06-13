@@ -7,6 +7,7 @@
     "saveChanges": "Guardar cambios",
     "cancel": "Cancelar",
     "clear": "Limpiar",
+    "today": "Hoy",
     "remove": "Eliminar",
     "close": "Cerrar",
     "optional": "Opcional",
@@ -124,6 +125,8 @@
     "reportsCreatedInPeriod": "{{count}} informes creados en {{period}}",
     "geocodedDestinations": "Destinos geocodificados",
     "regionsRepresentedCount": "{{count}} regiones representadas",
+    "totalEmployees": "Empleados de la plataforma",
+    "totalEmployeesMeta": "{{creators}} creadores · {{managers}} gestores · {{admins}} administradores",
     "userGrowth": "Crecimiento de usuarios",
     "groupedByWeek": "Agrupado por semana",
     "groupedByMonth": "Agrupado por mes",
@@ -784,6 +787,9 @@
         "searchAria": "Buscar eventos",
         "searchPlaceholder": "Buscar eventos, objetos u organizadores...",
         "dateRangeFilter": "Filtro de rango de fechas",
+        "fromDate": "Desde la fecha",
+        "toDate": "Hasta la fecha",
+        "datePlaceholder": "dd/mm/aaaa",
         "filtersReady": "Filtros listos",
         "managedDestinationFallback": "Eventos del gerente",
         "loading": "Cargando eventos...",
@@ -2219,6 +2225,7 @@
       "dateRangeFilter": "Filtro de rango de fechas",
       "fromDate": "Desde la fecha",
       "toDate": "Hasta la fecha",
+      "datePlaceholder": "dd/mm/aaaa",
       "loading": "Cargando eventos...",
       "selectedEvent": "Evento seleccionado",
       "featuredEvent": "Evento destacado",
@@ -4544,7 +4551,7 @@
     "hidePassword": "Ocultar contraseña",
     "showPassword": "Mostrar contraseña",
     "invalidCredentials": "Correo electrónico o contraseña inválidos.",
-    "portalComingSoon": "portal próximamente. Vuelve a comprobarlo más tarde."
+    "accessDenied": "Acceso denegado. Su cuenta no tiene permiso para acceder a esta aplicación."
   },
   "signup": {
     "welcome": "Bienvenido",

@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnDestroy, OnInit, ElementRef, HostListener, ViewChild, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -37,7 +37,9 @@ interface ActivityFilterOption {
     '../shared/cc-list-detail-layout.css',
     '../shared/cc-page-stats-scroll.css',
     '../shared/cc-stat-cards.css',
-    '../shared/cc-filters-parity.css'
+    '../shared/cc-filters-parity.css',
+    '../shared/cc-filter-menu.css',
+    '../shared/cc-list-page-responsive.css'
   ]
 })
 export class ContentCreatorActivitiesComponent implements OnInit, OnDestroy {
@@ -94,6 +96,23 @@ export class ContentCreatorActivitiesComponent implements OnInit, OnDestroy {
     { value: 'status', labelKey: 'contentCreator.activities.filters.status' },
     { value: 'createdAt', labelKey: 'contentCreator.activities.filters.createdDate' }
   ];
+
+  readonly sortOrderOptions: ActivityFilterOption[] = [
+    { value: 'asc', labelKey: 'contentCreator.activities.filters.ascending' },
+    { value: 'desc', labelKey: 'contentCreator.activities.filters.descending' }
+  ];
+
+  statusFilterMenuOpen = false;
+  typeFilterMenuOpen = false;
+  destinationFilterMenuOpen = false;
+  sortByFilterMenuOpen = false;
+  sortOrderFilterMenuOpen = false;
+
+  @ViewChild('statusFilterRoot') private statusFilterRoot?: ElementRef<HTMLElement>;
+  @ViewChild('typeFilterRoot') private typeFilterRoot?: ElementRef<HTMLElement>;
+  @ViewChild('destinationFilterRoot') private destinationFilterRoot?: ElementRef<HTMLElement>;
+  @ViewChild('sortByFilterRoot') private sortByFilterRoot?: ElementRef<HTMLElement>;
+  @ViewChild('sortOrderFilterRoot') private sortOrderFilterRoot?: ElementRef<HTMLElement>;
 
   typeOptions: ActivityFilterOption[] = [];
   destinationOptions: ActivityFilterOption[] = [];
@@ -292,6 +311,7 @@ export class ContentCreatorActivitiesComponent implements OnInit, OnDestroy {
   }
 
   onResetFilters(): void {
+    this.closeAllFilterMenus();
     this.searchQuery = '';
     this.draftSearchQuery = '';
     this.rangeStartDate = '';
@@ -303,6 +323,194 @@ export class ContentCreatorActivitiesComponent implements OnInit, OnDestroy {
     this.sortOrder = 'desc';
     this.currentPage = 1;
     this.loadActivities();
+  }
+
+  get statusFilterLabel(): string {
+    const option = this.statusOptions.find((item) => item.value === this.statusFilter);
+    return this.translateOptionLabel(option ?? this.fallbackStatusOptions[0]);
+  }
+
+  get typeFilterLabel(): string {
+    if (this.typeFilter === 'all') {
+      return this.translationService.translate('contentCreator.activities.filters.allTypes');
+    }
+
+    const option = this.typeOptions.find((item) => item.value === this.typeFilter);
+    return option ? this.translateOptionLabel(option) : this.translationService.translate('contentCreator.activities.filters.allTypes');
+  }
+
+  get destinationFilterLabel(): string {
+    if (this.destinationFilter === 'all') {
+      return this.translationService.translate('contentCreator.activities.filters.allDestinations');
+    }
+
+    const option = this.destinationOptions.find((item) => item.value === this.destinationFilter);
+    return option ? this.translateOptionLabel(option) : this.translationService.translate('contentCreator.activities.filters.allDestinations');
+  }
+
+  get sortByFilterLabel(): string {
+    const option = this.sortByOptions.find((item) => item.value === this.sortBy);
+    return this.translateOptionLabel(option ?? this.sortByOptions[3]);
+  }
+
+  get sortOrderFilterLabel(): string {
+    const option = this.sortOrderOptions.find((item) => item.value === this.sortOrder);
+    return this.translateOptionLabel(option ?? this.sortOrderOptions[1]);
+  }
+
+  toggleStatusFilterMenu(event: Event): void {
+    if (this.isLoading) {
+      return;
+    }
+
+    event.stopPropagation();
+    this.statusFilterMenuOpen = !this.statusFilterMenuOpen;
+    if (this.statusFilterMenuOpen) {
+      this.closeOtherFilterMenus('status');
+    }
+  }
+
+  selectStatusFilter(value: string, event: Event): void {
+    event.stopPropagation();
+    this.statusFilter = value;
+    this.statusFilterMenuOpen = false;
+    this.onApplyFilters();
+  }
+
+  toggleTypeFilterMenu(event: Event): void {
+    if (this.isLoading) {
+      return;
+    }
+
+    event.stopPropagation();
+    this.typeFilterMenuOpen = !this.typeFilterMenuOpen;
+    if (this.typeFilterMenuOpen) {
+      this.closeOtherFilterMenus('type');
+    }
+  }
+
+  selectTypeFilter(value: string, event: Event): void {
+    event.stopPropagation();
+    this.typeFilter = value;
+    this.typeFilterMenuOpen = false;
+    this.onApplyFilters();
+  }
+
+  toggleDestinationFilterMenu(event: Event): void {
+    if (this.isLoading) {
+      return;
+    }
+
+    event.stopPropagation();
+    this.destinationFilterMenuOpen = !this.destinationFilterMenuOpen;
+    if (this.destinationFilterMenuOpen) {
+      this.closeOtherFilterMenus('destination');
+    }
+  }
+
+  selectDestinationFilter(value: string, event: Event): void {
+    event.stopPropagation();
+    this.destinationFilter = value;
+    this.destinationFilterMenuOpen = false;
+    this.onApplyFilters();
+  }
+
+  toggleSortByFilterMenu(event: Event): void {
+    event.stopPropagation();
+    this.sortByFilterMenuOpen = !this.sortByFilterMenuOpen;
+    if (this.sortByFilterMenuOpen) {
+      this.closeOtherFilterMenus('sortBy');
+    }
+  }
+
+  selectSortByFilter(value: string, event: Event): void {
+    event.stopPropagation();
+    this.sortBy = value;
+    this.sortByFilterMenuOpen = false;
+    this.onApplyFilters();
+  }
+
+  toggleSortOrderFilterMenu(event: Event): void {
+    event.stopPropagation();
+    this.sortOrderFilterMenuOpen = !this.sortOrderFilterMenuOpen;
+    if (this.sortOrderFilterMenuOpen) {
+      this.closeOtherFilterMenus('sortOrder');
+    }
+  }
+
+  selectSortOrderFilter(value: string, event: Event): void {
+    event.stopPropagation();
+    this.sortOrder = value as 'asc' | 'desc';
+    this.sortOrderFilterMenuOpen = false;
+    this.onApplyFilters();
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as Node;
+
+    if (
+      this.statusFilterMenuOpen
+      && !this.statusFilterRoot?.nativeElement.contains(target)
+    ) {
+      this.statusFilterMenuOpen = false;
+    }
+
+    if (
+      this.typeFilterMenuOpen
+      && !this.typeFilterRoot?.nativeElement.contains(target)
+    ) {
+      this.typeFilterMenuOpen = false;
+    }
+
+    if (
+      this.destinationFilterMenuOpen
+      && !this.destinationFilterRoot?.nativeElement.contains(target)
+    ) {
+      this.destinationFilterMenuOpen = false;
+    }
+
+    if (
+      this.sortByFilterMenuOpen
+      && !this.sortByFilterRoot?.nativeElement.contains(target)
+    ) {
+      this.sortByFilterMenuOpen = false;
+    }
+
+    if (
+      this.sortOrderFilterMenuOpen
+      && !this.sortOrderFilterRoot?.nativeElement.contains(target)
+    ) {
+      this.sortOrderFilterMenuOpen = false;
+    }
+  }
+
+  private closeAllFilterMenus(): void {
+    this.statusFilterMenuOpen = false;
+    this.typeFilterMenuOpen = false;
+    this.destinationFilterMenuOpen = false;
+    this.sortByFilterMenuOpen = false;
+    this.sortOrderFilterMenuOpen = false;
+  }
+
+  private closeOtherFilterMenus(
+    except: 'status' | 'type' | 'destination' | 'sortBy' | 'sortOrder',
+  ): void {
+    if (except !== 'status') {
+      this.statusFilterMenuOpen = false;
+    }
+    if (except !== 'type') {
+      this.typeFilterMenuOpen = false;
+    }
+    if (except !== 'destination') {
+      this.destinationFilterMenuOpen = false;
+    }
+    if (except !== 'sortBy') {
+      this.sortByFilterMenuOpen = false;
+    }
+    if (except !== 'sortOrder') {
+      this.sortOrderFilterMenuOpen = false;
+    }
   }
 
   onGoToPage(page: number): void {

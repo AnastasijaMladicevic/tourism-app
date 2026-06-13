@@ -1,23 +1,27 @@
-/* Tinted statistic / insight cards — list & reports pages (not Creator Reviews). */
+/* Tinted statistic / insight cards — list & reports pages (not Creator Reviews grid). */
 
 .manager-list-page:not(.manager-reviews-page) .stats-row,
 .manager-list-page:not(.manager-reviews-page) .insights-grid,
 .manager-reports-page .stats-row {
   display: grid;
-  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(min(168px, 100%), 1fr));
+  gap: 12px;
+  width: 100%;
 }
 
-.manager-list-page:not(.manager-reviews-page) .stats-row,
-.manager-list-page:not(.manager-reviews-page) .insights-grid,
-.manager-reports-page .stats-row {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+.manager-reviews-page .stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(168px, 100%), 1fr));
+  gap: 12px;
+  width: 100%;
 }
 
 .manager-list-page:not(.manager-reviews-page) .stat-card,
 .manager-list-page:not(.manager-reviews-page) .insight-card,
-.manager-reports-page .stat-card {
+.manager-reports-page .stat-card,
+.manager-reviews-page .stat-card {
   border: 1px solid #e5e7eb;
-  border-radius: 12px;
+  border-radius: 14px;
   padding: 14px;
   background: #f8fafc;
   box-shadow: none;
@@ -29,29 +33,31 @@
 
 .manager-list-page:not(.manager-reviews-page) .stat-card p,
 .manager-list-page:not(.manager-reviews-page) .insight-card p,
-.manager-reports-page .stat-card p {
-  margin: 0;
-  font-size: 11px;
+.manager-reports-page .stat-card p,
+.manager-reviews-page .stat-card p {
+  margin: 0 0 8px;
+  font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.04em;
 }
 
 .manager-list-page:not(.manager-reviews-page) .stat-card strong,
 .manager-list-page:not(.manager-reviews-page) .insight-card strong,
-.manager-reports-page .stat-card strong {
+.manager-reports-page .stat-card strong,
+.manager-reviews-page .stat-card strong {
   display: block;
-  margin: 6px 0 0;
-  font-size: 32px;
+  font-size: 34px;
   line-height: 1;
+  margin-bottom: 6px;
   font-weight: 700;
 }
 
 .manager-list-page:not(.manager-reviews-page) .stat-card span,
 .manager-list-page:not(.manager-reviews-page) .insight-card span,
-.manager-reports-page .stat-card span {
+.manager-reports-page .stat-card span,
+.manager-reviews-page .stat-card span {
   display: block;
-  margin: 6px 0 0;
   font-size: 12px;
   color: #64748b;
 }
@@ -59,38 +65,43 @@
 /* Blue */
 .manager-list-page:not(.manager-reviews-page) .stat-card[data-tone='blue'],
 .manager-list-page:not(.manager-reviews-page) .insight-card[data-tone='blue'],
-.manager-reports-page .stat-card[data-tone='blue'] {
+.manager-reports-page .stat-card[data-tone='blue'],
+.manager-reviews-page .stat-card[data-tone='blue'] {
   background: #eff6ff;
-  border-color: #bfdbfe;
+  border-color: #93c5fd;
 }
 
 .manager-list-page:not(.manager-reviews-page) .stat-card[data-tone='blue'] p,
 .manager-list-page:not(.manager-reviews-page) .insight-card[data-tone='blue'] p,
-.manager-reports-page .stat-card[data-tone='blue'] p {
+.manager-reports-page .stat-card[data-tone='blue'] p,
+.manager-reviews-page .stat-card[data-tone='blue'] p {
   color: #3b82f6;
 }
 
 .manager-list-page:not(.manager-reviews-page) .stat-card[data-tone='blue'] strong,
 .manager-list-page:not(.manager-reviews-page) .insight-card[data-tone='blue'] strong,
-.manager-reports-page .stat-card[data-tone='blue'] strong {
+.manager-reports-page .stat-card[data-tone='blue'] strong,
+.manager-reviews-page .stat-card[data-tone='blue'] strong {
   color: #1d4ed8;
 }
 
-/* Amber / neutral (pending, warnings) */
+/* Amber / neutral */
 .manager-list-page:not(.manager-reviews-page) .stat-card[data-tone='amber'],
 .manager-list-page:not(.manager-reviews-page) .insight-card[data-tone='amber'],
 .manager-list-page:not(.manager-reviews-page) .stat-card[data-tone='neutral'],
 .manager-list-page:not(.manager-reviews-page) .insight-card[data-tone='neutral'],
-.manager-reports-page .stat-card[data-tone='amber'] {
+.manager-reports-page .stat-card[data-tone='amber'],
+.manager-reviews-page .stat-card[data-tone='amber'] {
   background: #fffbeb;
-  border-color: #fde68a;
+  border-color: #fcd34d;
 }
 
 .manager-list-page:not(.manager-reviews-page) .stat-card[data-tone='amber'] p,
 .manager-list-page:not(.manager-reviews-page) .insight-card[data-tone='amber'] p,
 .manager-list-page:not(.manager-reviews-page) .stat-card[data-tone='neutral'] p,
 .manager-list-page:not(.manager-reviews-page) .insight-card[data-tone='neutral'] p,
-.manager-reports-page .stat-card[data-tone='amber'] p {
+.manager-reports-page .stat-card[data-tone='amber'] p,
+.manager-reviews-page .stat-card[data-tone='amber'] p {
   color: #d97706;
 }
 
@@ -98,26 +109,75 @@
 .manager-list-page:not(.manager-reviews-page) .insight-card[data-tone='amber'] strong,
 .manager-list-page:not(.manager-reviews-page) .stat-card[data-tone='neutral'] strong,
 .manager-list-page:not(.manager-reviews-page) .insight-card[data-tone='neutral'] strong,
-.manager-reports-page .stat-card[data-tone='amber'] strong {
+.manager-reports-page .stat-card[data-tone='amber'] strong,
+.manager-reviews-page .stat-card[data-tone='amber'] strong {
   color: #b45309;
 }
 
 /* Green */
 .manager-list-page:not(.manager-reviews-page) .stat-card[data-tone='green'],
 .manager-list-page:not(.manager-reviews-page) .insight-card[data-tone='green'],
-.manager-reports-page .stat-card[data-tone='green'] {
+.manager-reports-page .stat-card[data-tone='green'],
+.manager-reviews-page .stat-card[data-tone='green'] {
   background: #ecfdf5;
-  border-color: #a7f3d0;
+  border-color: #6ee7b7;
 }
 
 .manager-list-page:not(.manager-reviews-page) .stat-card[data-tone='green'] p,
 .manager-list-page:not(.manager-reviews-page) .insight-card[data-tone='green'] p,
-.manager-reports-page .stat-card[data-tone='green'] p {
+.manager-reports-page .stat-card[data-tone='green'] p,
+.manager-reviews-page .stat-card[data-tone='green'] p {
   color: #059669;
 }
 
 .manager-list-page:not(.manager-reviews-page) .stat-card[data-tone='green'] strong,
 .manager-list-page:not(.manager-reviews-page) .insight-card[data-tone='green'] strong,
-.manager-reports-page .stat-card[data-tone='green'] strong {
+.manager-reports-page .stat-card[data-tone='green'] strong,
+.manager-reviews-page .stat-card[data-tone='green'] strong {
   color: #047857;
+}
+
+/* Stack when the column cannot fit three cards in one row (avoids a lone 3rd card). */
+@container manager-stats-host (max-width: 527px) {
+  .manager-list-page:not(.manager-reviews-page) .insights-grid,
+  .manager-reports-page .stats-row {
+    grid-template-columns: 1fr !important;
+  }
+
+  .manager-list-page:not(.manager-reviews-page) .insight-card,
+  .manager-reports-page .stat-card {
+    padding: 12px;
+  }
+
+  .manager-list-page:not(.manager-reviews-page) .insight-card strong,
+  .manager-reports-page .stat-card strong {
+    font-size: 28px;
+  }
+}
+
+@container manager-stats-host (max-width: 719px) {
+  .manager-reviews-page .stats-row {
+    grid-template-columns: 1fr !important;
+  }
+
+  .manager-reviews-page .stat-card {
+    padding: 12px;
+  }
+
+  .manager-reviews-page .stat-card strong {
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 530px) {
+  .manager-list-page:not(.manager-reviews-page) .insights-grid,
+  .manager-reports-page .stats-row {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .manager-reviews-page .stats-row {
+    grid-template-columns: 1fr !important;
+  }
 }

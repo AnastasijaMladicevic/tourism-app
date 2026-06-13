@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient, HttpParams } from '@angular/common/http';
@@ -60,7 +60,8 @@ interface DestinationInsightCard {
   styleUrls: [
     './destinations.component.css',
     '../shared/admin-page-title.css',
-    '../shared/admin-page-stats-scroll.css'
+    '../shared/admin-page-stats-scroll.css',
+    '../shared/admin-filter-menu.css'
   ]
 })
 export class DestinationsComponent implements OnInit, OnDestroy {
@@ -107,6 +108,21 @@ export class DestinationsComponent implements OnInit, OnDestroy {
     { value: 'status', labelKey: 'adminDestinations.columns.status' },
     { value: 'updatedAt', labelKey: 'adminDestinations.lastUpdated' }
   ];
+
+  readonly sortOrderOptions = [
+    { value: 'asc', labelKey: 'adminDestinations.filters.ascending' },
+    { value: 'desc', labelKey: 'adminDestinations.filters.descending' }
+  ];
+
+  statusFilterMenuOpen = false;
+  regionFilterMenuOpen = false;
+  sortByFilterMenuOpen = false;
+  sortOrderFilterMenuOpen = false;
+
+  @ViewChild('statusFilterRoot') private statusFilterRoot?: ElementRef<HTMLElement>;
+  @ViewChild('regionFilterRoot') private regionFilterRoot?: ElementRef<HTMLElement>;
+  @ViewChild('sortByFilterRoot') private sortByFilterRoot?: ElementRef<HTMLElement>;
+  @ViewChild('sortOrderFilterRoot') private sortOrderFilterRoot?: ElementRef<HTMLElement>;
 
   ngOnInit(): void {
     const presetRegion = this.route.snapshot.queryParamMap.get('region')?.trim();
@@ -392,6 +408,7 @@ export class DestinationsComponent implements OnInit, OnDestroy {
   }
 
   onResetFilters(): void {
+    this.closeAllFilterMenus();
     this.draftSearchQuery = '';
     this.searchQuery = '';
     this.statusFilter = 'all';
@@ -400,6 +417,153 @@ export class DestinationsComponent implements OnInit, OnDestroy {
     this.sortOrder = 'asc';
     this.currentPage = 1;
     this.syncSelectionAfterFilter();
+  }
+
+  get statusFilterLabel(): string {
+    return (
+      this.statusFilterOptions.find((option) => option.value === this.statusFilter)?.label
+      ?? this.t('adminDestinations.filters.allStatuses')
+    );
+  }
+
+  get regionFilterLabel(): string {
+    return (
+      this.regionFilterOptions.find((option) => option.value === this.regionFilter)?.label
+      ?? this.t('adminDestinations.filters.allRegions')
+    );
+  }
+
+  get sortByFilterLabel(): string {
+    const option = this.sortByOptions.find((item) => item.value === this.sortBy);
+    return this.t(option?.labelKey ?? 'adminDestinations.columns.destination');
+  }
+
+  get sortOrderFilterLabel(): string {
+    const option = this.sortOrderOptions.find((item) => item.value === this.sortOrder);
+    return this.t(option?.labelKey ?? 'adminDestinations.filters.ascending');
+  }
+
+  toggleStatusFilterMenu(event: Event): void {
+    if (this.isLoading) {
+      return;
+    }
+
+    event.stopPropagation();
+    this.statusFilterMenuOpen = !this.statusFilterMenuOpen;
+    if (this.statusFilterMenuOpen) {
+      this.closeOtherFilterMenus('status');
+    }
+  }
+
+  selectStatusFilter(value: string, event: Event): void {
+    event.stopPropagation();
+    this.statusFilter = value;
+    this.statusFilterMenuOpen = false;
+    this.onApplyFilters();
+  }
+
+  toggleRegionFilterMenu(event: Event): void {
+    if (this.isLoading) {
+      return;
+    }
+
+    event.stopPropagation();
+    this.regionFilterMenuOpen = !this.regionFilterMenuOpen;
+    if (this.regionFilterMenuOpen) {
+      this.closeOtherFilterMenus('region');
+    }
+  }
+
+  selectRegionFilter(value: string, event: Event): void {
+    event.stopPropagation();
+    this.regionFilter = value;
+    this.regionFilterMenuOpen = false;
+    this.onApplyFilters();
+  }
+
+  toggleSortByFilterMenu(event: Event): void {
+    event.stopPropagation();
+    this.sortByFilterMenuOpen = !this.sortByFilterMenuOpen;
+    if (this.sortByFilterMenuOpen) {
+      this.closeOtherFilterMenus('sortBy');
+    }
+  }
+
+  selectSortByFilter(value: string, event: Event): void {
+    event.stopPropagation();
+    this.sortBy = value as DestinationsComponent['sortBy'];
+    this.sortByFilterMenuOpen = false;
+    this.onApplyFilters();
+  }
+
+  toggleSortOrderFilterMenu(event: Event): void {
+    event.stopPropagation();
+    this.sortOrderFilterMenuOpen = !this.sortOrderFilterMenuOpen;
+    if (this.sortOrderFilterMenuOpen) {
+      this.closeOtherFilterMenus('sortOrder');
+    }
+  }
+
+  selectSortOrderFilter(value: string, event: Event): void {
+    event.stopPropagation();
+    this.sortOrder = value as 'asc' | 'desc';
+    this.sortOrderFilterMenuOpen = false;
+    this.onApplyFilters();
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as Node;
+
+    if (
+      this.statusFilterMenuOpen
+      && !this.statusFilterRoot?.nativeElement.contains(target)
+    ) {
+      this.statusFilterMenuOpen = false;
+    }
+
+    if (
+      this.regionFilterMenuOpen
+      && !this.regionFilterRoot?.nativeElement.contains(target)
+    ) {
+      this.regionFilterMenuOpen = false;
+    }
+
+    if (
+      this.sortByFilterMenuOpen
+      && !this.sortByFilterRoot?.nativeElement.contains(target)
+    ) {
+      this.sortByFilterMenuOpen = false;
+    }
+
+    if (
+      this.sortOrderFilterMenuOpen
+      && !this.sortOrderFilterRoot?.nativeElement.contains(target)
+    ) {
+      this.sortOrderFilterMenuOpen = false;
+    }
+  }
+
+  private closeAllFilterMenus(): void {
+    this.statusFilterMenuOpen = false;
+    this.regionFilterMenuOpen = false;
+    this.sortByFilterMenuOpen = false;
+    this.sortOrderFilterMenuOpen = false;
+  }
+
+  private closeOtherFilterMenus(except: 'status' | 'region' | 'sortBy' | 'sortOrder'): void {
+    if (except !== 'status') {
+      this.statusFilterMenuOpen = false;
+    }
+    if (except !== 'region') {
+      this.regionFilterMenuOpen = false;
+    }
+    if (except !== 'sortBy') {
+      this.sortByFilterMenuOpen = false;
+    }
+    if (except !== 'sortOrder') {
+      this.sortOrderFilterMenuOpen = false;
+    }
   }
 
   onPageSizeChange(value: number | string): void {

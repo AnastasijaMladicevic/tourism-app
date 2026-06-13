@@ -4,15 +4,16 @@
 .activities-page .insights-grid,
 .objects-page .insights-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(min(168px, 100%), 1fr));
+  gap: 12px;
+  width: 100%;
 }
 
 .events-page .insight-card,
 .activities-page .insight-card,
 .objects-page .insight-card {
   border: 1px solid #e5e7eb;
-  border-radius: 12px;
+  border-radius: 14px;
   padding: 14px;
   background: #f8fafc;
   box-shadow: none;
@@ -27,20 +28,20 @@
 .events-page .insight-card p,
 .activities-page .insight-card p,
 .objects-page .insight-card p {
-  margin: 0;
-  font-size: 11px;
+  margin: 0 0 8px;
+  font-size: 10px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.04em;
 }
 
 .events-page .insight-card strong,
 .activities-page .insight-card strong,
 .objects-page .insight-card strong {
   display: block;
-  margin: 6px 0 0;
-  font-size: 32px;
+  font-size: 34px;
   line-height: 1;
+  margin-bottom: 6px;
   font-weight: 700;
 }
 
@@ -48,7 +49,6 @@
 .activities-page .insight-card span,
 .objects-page .insight-card span {
   display: block;
-  margin: 6px 0 0;
   font-size: 12px;
   color: #64748b;
 }
@@ -58,7 +58,7 @@
 .activities-page .insight-card[data-tone='blue'],
 .objects-page .insight-card[data-tone='blue'] {
   background: #eff6ff;
-  border-color: #bfdbfe;
+  border-color: #93c5fd;
 }
 
 .events-page .insight-card[data-tone='blue'] p,
@@ -78,7 +78,7 @@
 .activities-page .insight-card[data-tone='amber'],
 .objects-page .insight-card[data-tone='amber'] {
   background: #fffbeb;
-  border-color: #fde68a;
+  border-color: #fcd34d;
 }
 
 .events-page .insight-card[data-tone='amber'] p,
@@ -98,7 +98,7 @@
 .activities-page .insight-card[data-tone='green'],
 .objects-page .insight-card[data-tone='green'] {
   background: #ecfdf5;
-  border-color: #a7f3d0;
+  border-color: #6ee7b7;
 }
 
 .events-page .insight-card[data-tone='green'] p,
@@ -111,4 +111,33 @@
 .activities-page .insight-card[data-tone='green'] strong,
 .objects-page .insight-card[data-tone='green'] strong {
   color: #047857;
+}
+
+/* Stack when the column cannot fit three cards in one row (avoids a lone 3rd card). */
+@container cc-stats-host (max-width: 527px) {
+  .events-page .insights-grid,
+  .activities-page .insights-grid,
+  .objects-page .insights-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .events-page .insight-card,
+  .activities-page .insight-card,
+  .objects-page .insight-card {
+    padding: 12px;
+  }
+
+  .events-page .insight-card strong,
+  .activities-page .insight-card strong,
+  .objects-page .insight-card strong {
+    font-size: 28px;
+  }
+}
+
+@media (max-width: 530px) {
+  .events-page .insights-grid,
+  .activities-page .insights-grid,
+  .objects-page .insights-grid {
+    grid-template-columns: 1fr;
+  }
 }

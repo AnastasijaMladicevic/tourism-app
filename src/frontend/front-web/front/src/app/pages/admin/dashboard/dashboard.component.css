@@ -5,6 +5,11 @@
   gap: 16px;
   color: #0f172a;
   min-height: 100%;
+  container-type: inline-size;
+  container-name: admin-dashboard;
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: clip;
 }
 
 .page-head {
@@ -93,10 +98,37 @@
   box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
 }
 
-.kpi-row {
+.kpi-row,
+.top-grid,
+.middle-grid,
+.bottom-grid {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 12px;
+  gap: 14px;
+  align-items: stretch;
+}
+
+.kpi-row {
+  width: 100%;
+  max-width: 100%;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+@container admin-dashboard (max-width: 1120px) {
+  .kpi-row {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@container admin-dashboard (max-width: 860px) {
+  .kpi-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@container admin-dashboard (max-width: 520px) {
+  .kpi-row {
+    grid-template-columns: 1fr;
+  }
 }
 
 .kpi-card {
@@ -107,6 +139,8 @@
   flex-direction: column;
   gap: 5px;
   min-height: 154px;
+  min-width: 0;
+  box-sizing: border-box;
   --kpi-accent: #1976d2;
   --kpi-hover-bg: #eff6ff;
   --kpi-hover-text: #1e3a8a;
@@ -237,12 +271,10 @@
   --kpi-hover-text: #5b21b6;
 }
 
-.top-grid,
-.middle-grid,
-.bottom-grid {
-  display: grid;
-  gap: 14px;
-  align-items: stretch;
+.kpi-card--green {
+  --kpi-accent: #059669;
+  --kpi-hover-bg: #d1fae5;
+  --kpi-hover-text: #064e3b;
 }
 
 .top-grid {
@@ -793,10 +825,6 @@
 }
 
 @media (max-width: 1240px) {
-  .kpi-row {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   .top-grid,
   .middle-grid,
   .bottom-grid {
@@ -812,12 +840,6 @@
 }
 
 @media (max-width: 1080px) {
-  .admin-dashboard {
-    min-width: 0;
-    max-width: 100%;
-    overflow-x: hidden;
-  }
-
   .top-grid,
   .middle-grid,
   .bottom-grid,
@@ -832,7 +854,6 @@
     padding: 16px;
   }
 
-  .kpi-row,
   .visit-summary,
   .geo-summary {
     grid-template-columns: 1fr;
@@ -856,43 +877,25 @@
     gap: 8px;
     font-size: 10px;
   }
-}
-
-@media (max-width: 920px) {
-  .admin-dashboard .kpi-row {
-    display: flex !important;
-    flex-direction: column !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    gap: 12px !important;
-  }
-
-  .admin-dashboard .kpi-card {
-    width: 100% !important;
-    max-width: 100% !important;
-    min-width: 0 !important;
-    flex: 0 0 auto !important;
-    box-sizing: border-box !important;
-  }
 
   .admin-dashboard .section-head {
-    flex-direction: column !important;
-    align-items: stretch !important;
-    gap: 6px !important;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
   }
 
   .admin-dashboard .section-head > div {
-    width: 100% !important;
-    min-width: 0 !important;
+    width: 100%;
+    min-width: 0;
   }
 
   .admin-dashboard .section-head p {
-    width: 100% !important;
-    max-width: 100% !important;
-    white-space: normal !important;
+    max-width: 100%;
+    width: 100%;
+    white-space: normal;
   }
 
   .admin-dashboard .section-link {
-    align-self: flex-start !important;
+    align-self: flex-start;
   }
 }

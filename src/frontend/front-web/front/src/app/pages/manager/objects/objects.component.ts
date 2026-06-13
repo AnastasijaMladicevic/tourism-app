@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -45,7 +45,8 @@ interface WorkingHoursRow {
     '../shared/manager-list-detail-layout.css',
     '../shared/manager-page-stats-scroll.css',
     '../shared/manager-stat-cards.css',
-    '../shared/manager-hero-slides.css'
+    '../shared/manager-hero-slides.css',
+    '../shared/manager-filter-menu.css'
   ]
 })
 export class ManagerObjectsComponent implements OnInit, OnDestroy {
@@ -107,6 +108,23 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
     { value: '4', label: 'manager.objects.rating.4' },
     { value: '4.5', label: 'manager.objects.rating.4_5' }
   ];
+
+  readonly sortOrderOptions: Array<{ value: 'asc' | 'desc'; label: string }> = [
+    { value: 'asc', label: 'manager.objects.filter.ascending' },
+    { value: 'desc', label: 'manager.objects.filter.descending' }
+  ];
+
+  statusFilterMenuOpen = false;
+  typeFilterMenuOpen = false;
+  ratingFilterMenuOpen = false;
+  sortByFilterMenuOpen = false;
+  sortOrderFilterMenuOpen = false;
+
+  @ViewChild('statusFilterRoot') private statusFilterRoot?: ElementRef<HTMLElement>;
+  @ViewChild('typeFilterRoot') private typeFilterRoot?: ElementRef<HTMLElement>;
+  @ViewChild('ratingFilterRoot') private ratingFilterRoot?: ElementRef<HTMLElement>;
+  @ViewChild('sortByFilterRoot') private sortByFilterRoot?: ElementRef<HTMLElement>;
+  @ViewChild('sortOrderFilterRoot') private sortOrderFilterRoot?: ElementRef<HTMLElement>;
 
   private readonly fallbackStatusOptions: FilterOption[] = [
     { value: 'Approved', label: 'manager.objects.status.approved' },
@@ -310,6 +328,7 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
   }
 
   onResetFilters(): void {
+    this.closeAllFilterMenus();
     this.searchQuery = '';
     this.draftSearchQuery = '';
     this.statusFilter = 'all';
@@ -319,6 +338,194 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
     this.sortOrder = 'desc';
     this.currentPage = 1;
     this.loadObjects();
+  }
+
+  get statusFilterLabel(): string {
+    if (this.statusFilter === 'all') {
+      return this.translationService.translate('manager.objects.filter.allStatuses');
+    }
+
+    const option = this.statusOptions.find((item) => item.value === this.statusFilter);
+    return option ? this.statusOptionLabel(option) : this.translationService.translate('manager.objects.filter.allStatuses');
+  }
+
+  get typeFilterLabel(): string {
+    if (this.typeFilter === 'all') {
+      return this.translationService.translate('manager.objects.filter.allTypes');
+    }
+
+    return (
+      this.typeOptions.find((option) => option.value === this.typeFilter)?.label
+      ?? this.translationService.translate('manager.objects.filter.allTypes')
+    );
+  }
+
+  get ratingFilterLabel(): string {
+    const option = this.ratingOptions.find((item) => item.value === this.ratingFilter);
+    return this.translationService.translate(option?.label ?? 'manager.objects.rating.any');
+  }
+
+  get sortByFilterLabel(): string {
+    const option = this.sortByOptions.find((item) => item.value === this.sortBy);
+    return this.translationService.translate(option?.label ?? 'manager.objects.sort.status');
+  }
+
+  get sortOrderFilterLabel(): string {
+    const option = this.sortOrderOptions.find((item) => item.value === this.sortOrder);
+    return this.translationService.translate(option?.label ?? 'manager.objects.filter.descending');
+  }
+
+  toggleStatusFilterMenu(event: Event): void {
+    if (this.isLoading) {
+      return;
+    }
+
+    event.stopPropagation();
+    this.statusFilterMenuOpen = !this.statusFilterMenuOpen;
+    if (this.statusFilterMenuOpen) {
+      this.closeOtherFilterMenus('status');
+    }
+  }
+
+  selectStatusFilter(value: string, event: Event): void {
+    event.stopPropagation();
+    this.statusFilter = value;
+    this.statusFilterMenuOpen = false;
+    this.onApplyFilters();
+  }
+
+  toggleTypeFilterMenu(event: Event): void {
+    if (this.isLoading) {
+      return;
+    }
+
+    event.stopPropagation();
+    this.typeFilterMenuOpen = !this.typeFilterMenuOpen;
+    if (this.typeFilterMenuOpen) {
+      this.closeOtherFilterMenus('type');
+    }
+  }
+
+  selectTypeFilter(value: string, event: Event): void {
+    event.stopPropagation();
+    this.typeFilter = value;
+    this.typeFilterMenuOpen = false;
+    this.onApplyFilters();
+  }
+
+  toggleRatingFilterMenu(event: Event): void {
+    if (this.isLoading) {
+      return;
+    }
+
+    event.stopPropagation();
+    this.ratingFilterMenuOpen = !this.ratingFilterMenuOpen;
+    if (this.ratingFilterMenuOpen) {
+      this.closeOtherFilterMenus('rating');
+    }
+  }
+
+  selectRatingFilter(value: string, event: Event): void {
+    event.stopPropagation();
+    this.ratingFilter = value;
+    this.ratingFilterMenuOpen = false;
+    this.onApplyFilters();
+  }
+
+  toggleSortByFilterMenu(event: Event): void {
+    event.stopPropagation();
+    this.sortByFilterMenuOpen = !this.sortByFilterMenuOpen;
+    if (this.sortByFilterMenuOpen) {
+      this.closeOtherFilterMenus('sortBy');
+    }
+  }
+
+  selectSortByFilter(value: string, event: Event): void {
+    event.stopPropagation();
+    this.sortBy = value;
+    this.sortByFilterMenuOpen = false;
+    this.onApplyFilters();
+  }
+
+  toggleSortOrderFilterMenu(event: Event): void {
+    event.stopPropagation();
+    this.sortOrderFilterMenuOpen = !this.sortOrderFilterMenuOpen;
+    if (this.sortOrderFilterMenuOpen) {
+      this.closeOtherFilterMenus('sortOrder');
+    }
+  }
+
+  selectSortOrderFilter(value: 'asc' | 'desc', event: Event): void {
+    event.stopPropagation();
+    this.sortOrder = value;
+    this.sortOrderFilterMenuOpen = false;
+    this.onApplyFilters();
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as Node;
+
+    if (
+      this.statusFilterMenuOpen
+      && !this.statusFilterRoot?.nativeElement.contains(target)
+    ) {
+      this.statusFilterMenuOpen = false;
+    }
+
+    if (
+      this.typeFilterMenuOpen
+      && !this.typeFilterRoot?.nativeElement.contains(target)
+    ) {
+      this.typeFilterMenuOpen = false;
+    }
+
+    if (
+      this.ratingFilterMenuOpen
+      && !this.ratingFilterRoot?.nativeElement.contains(target)
+    ) {
+      this.ratingFilterMenuOpen = false;
+    }
+
+    if (
+      this.sortByFilterMenuOpen
+      && !this.sortByFilterRoot?.nativeElement.contains(target)
+    ) {
+      this.sortByFilterMenuOpen = false;
+    }
+
+    if (
+      this.sortOrderFilterMenuOpen
+      && !this.sortOrderFilterRoot?.nativeElement.contains(target)
+    ) {
+      this.sortOrderFilterMenuOpen = false;
+    }
+  }
+
+  private closeAllFilterMenus(): void {
+    this.statusFilterMenuOpen = false;
+    this.typeFilterMenuOpen = false;
+    this.ratingFilterMenuOpen = false;
+    this.sortByFilterMenuOpen = false;
+    this.sortOrderFilterMenuOpen = false;
+  }
+
+  private closeOtherFilterMenus(except: 'status' | 'type' | 'rating' | 'sortBy' | 'sortOrder'): void {
+    if (except !== 'status') {
+      this.statusFilterMenuOpen = false;
+    }
+    if (except !== 'type') {
+      this.typeFilterMenuOpen = false;
+    }
+    if (except !== 'rating') {
+      this.ratingFilterMenuOpen = false;
+    }
+    if (except !== 'sortBy') {
+      this.sortByFilterMenuOpen = false;
+    }
+    if (except !== 'sortOrder') {
+      this.sortOrderFilterMenuOpen = false;
+    }
   }
 
   /** Pending first, then approved, then rejected - then user's secondary sort (within each status group). */

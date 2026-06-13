@@ -7,6 +7,7 @@
     "saveChanges": "Save changes",
     "cancel": "Cancel",
     "clear": "Clear",
+    "today": "Today",
     "remove": "Remove",
     "close": "Close",
     "optional": "Optional",
@@ -124,6 +125,8 @@
     "reportsCreatedInPeriod": "{{count}} reports created in {{period}}",
     "geocodedDestinations": "Geocoded Destinations",
     "regionsRepresentedCount": "{{count}} regions represented",
+    "totalEmployees": "Platform Employees",
+    "totalEmployeesMeta": "{{creators}} creators · {{managers}} managers · {{admins}} admins",
     "userGrowth": "User Growth",
     "groupedByWeek": "Grouped by week",
     "groupedByMonth": "Grouped by month",
@@ -784,6 +787,9 @@
         "searchAria": "Search events",
         "searchPlaceholder": "Search events, objects, or organizers...",
         "dateRangeFilter": "Date range filter",
+        "fromDate": "From date",
+        "toDate": "To date",
+        "datePlaceholder": "dd/mm/yyyy",
         "filtersReady": "Filters ready",
         "managedDestinationFallback": "Manager events",
         "loading": "Loading events...",
@@ -2254,6 +2260,7 @@
       "dateRangeFilter": "Date range filter",
       "fromDate": "From date",
       "toDate": "To date",
+      "datePlaceholder": "dd/mm/yyyy",
       "loading": "Loading events...",
       "selectedEvent": "Selected event",
       "featuredEvent": "Featured event",
@@ -4571,7 +4578,7 @@
     "hidePassword": "Hide password",
     "showPassword": "Show password",
     "invalidCredentials": "Invalid email or password.",
-    "portalComingSoon": "portal is coming soon. Please check back later."
+    "accessDenied": "Access denied. Your account does not have permission to access this application."
   },
   "signup": {
     "welcome": "Welcome",
