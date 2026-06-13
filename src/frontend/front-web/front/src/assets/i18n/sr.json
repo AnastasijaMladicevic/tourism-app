@@ -932,6 +932,7 @@
         }
       },
       "localities": {
+        "loading": "Učitavanje lokaliteta...",
         "eyebrow": "Upravljanje lokalitetima",
         "searchAria": "Pretraži lokalitete",
         "searchPlaceholder": "Pretraži po lokalitetu, destinaciji ili regionu...",

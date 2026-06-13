@@ -932,6 +932,7 @@
         }
       },
       "localities": {
+        "loading": "Loading localities...",
         "eyebrow": "Locality management",
         "searchAria": "Search localities",
         "searchPlaceholder": "Search by locality, destination or region...",

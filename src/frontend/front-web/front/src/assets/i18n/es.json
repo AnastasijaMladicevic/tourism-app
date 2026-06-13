@@ -932,6 +932,7 @@
         }
       },
       "localities": {
+        "loading": "Cargando localidades...",
         "eyebrow": "Gestión de localidades",
         "searchAria": "Buscar localidades",
         "searchPlaceholder": "Buscar por localidad, destino o región...",
