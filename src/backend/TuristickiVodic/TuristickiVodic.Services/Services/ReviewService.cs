@@ -126,6 +126,28 @@ namespace TuristickiVodic.Services.Services
             };
         }
 
+        public async Task<List<ReviewDto>> GetForManagerObjectsAsync(int managerUserId, int[] objectIds, string? languageCode = null)
+        {
+            if (objectIds == null || objectIds.Length == 0)
+                return new List<ReviewDto>();
+
+            var destinationIds = await DestinationManagerHelper.GetResponsibleDestinationIdsAsync(_context, managerUserId);
+
+            var reviewsQuery = BuildReviewsQuery()
+                .Where(r => r.Status == ContentStatus.Approved)
+                .Where(r => objectIds.Contains(r.ObjectId))
+                .Where(r => r.Object != null &&
+                    (destinationIds.Contains(r.Object.DestinationId) ||
+                     (r.Object.Locality != null && destinationIds.Contains(r.Object.Locality.DestinationId))));
+
+            var reviews = await reviewsQuery.ToListAsync();
+
+            var items = _mapper.Map<List<ReviewDto>>(reviews);
+            await ApplyTranslationsAsync(items, reviews, languageCode, createMissing: true);
+
+            return items;
+        }
+
         public async Task<ReviewDto?> GetByIdAsync(int id, string? languageCode = null)
         {
             var review = await _context.Reviews

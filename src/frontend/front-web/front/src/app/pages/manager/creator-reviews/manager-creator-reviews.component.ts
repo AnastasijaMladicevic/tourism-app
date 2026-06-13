@@ -43,8 +43,8 @@ import {
 } from 'rxjs';
 import { DestinationService } from '../../../services/destination.service';
 import { ManagerDashboardService } from '../../../services/manager-dashboard.service';
-import { ObjectDto, ObjectService } from '../../../services/object';
-import { ReviewDto } from '../../../services/review';
+import { ObjectService } from '../../../services/object';
+import { ReviewDto, ReviewService } from '../../../services/review';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../../services/translation.service';
 
@@ -98,6 +98,7 @@ interface ManagerReportNameHint {
 })
 export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
   private readonly objectService = inject(ObjectService);
+  private readonly reviewService = inject(ReviewService);
   private readonly destinationService = inject(DestinationService);
   private readonly http = inject(HttpClient);
   private readonly managerReportsService = inject(ManagerReportsService);
@@ -788,36 +789,10 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
     );
   }
 
-  /** Loads reviews only for objects in the manager's scope using translated object endpoint. */
+  /** Loads reviews only for objects in the manager's scope using a single batched endpoint. */
   private fetchReviewsForManagedObjects(objectIds: number[]): Observable<ReviewDto[]> {
-    return forkJoin(
-      objectIds.map((objectId) =>
-        this.objectService.getById(objectId).pipe(catchError(() => of(null)))
-      )
-    ).pipe(
-      map((objectDetails) => {
-        const seen = new Set<number>();
-        const merged: ReviewDto[] = [];
-
-        for (const detail of objectDetails) {
-          if (!detail) {
-            continue;
-          }
-          for (const review of detail.reviews ?? []) {
-            if (seen.has(review.id)) {
-              continue;
-            }
-            seen.add(review.id);
-            merged.push({
-              ...review,
-              objectId: review.objectId && review.objectId > 0 ? review.objectId : detail.id,
-              objectName: review.objectName?.trim() || detail.name?.trim() || '',
-            });
-          }
-        }
-
-        return merged;
-      })
+    return this.reviewService.getForManagerObjects(objectIds).pipe(
+      catchError(() => of([] as ReviewDto[])),
     );
   }
 
@@ -878,7 +853,6 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
     reviews: ReviewDto[],
     objectContext: Map<number, ObjectReviewContext>,
   ): ManagerReviewThread[] {
-    console.log(reviews);
     const threads = reviews.map((review) => {
       const context = objectContext.get(review.objectId);
       const creatorId = context?.creatorId ?? 0;

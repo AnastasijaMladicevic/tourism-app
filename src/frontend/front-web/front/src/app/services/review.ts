@@ -124,6 +124,18 @@ export class ReviewService {
     return this.http.get<PagedResultDto<ReviewDto>>(`${this.baseUrl}/creator`, { params });
   }
 
+  getForManagerObjects(objectIds: number[]): Observable<ReviewDto[]> {
+    if (!objectIds.length) {
+      return new Observable<ReviewDto[]>((subscriber) => {
+        subscriber.next([]);
+        subscriber.complete();
+      });
+    }
+
+    let params = this.addLanguageCode(new HttpParams()).set('objectIds', objectIds.join(','));
+    return this.http.get<ReviewDto[]>(`${this.baseUrl}/for-manager`, { params });
+  }
+
   getById(id: number): Observable<ReviewDto> {
     const params = this.addLanguageCode(new HttpParams());
     return this.http.get<ReviewDto>(`${this.baseUrl}/${id}`, { params });

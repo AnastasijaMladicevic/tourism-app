@@ -43,6 +43,15 @@ namespace TuristickiVodic.API.Controllers
             return Ok(reviews);
         }
 
+        [HttpGet("for-manager")]
+        [Authorize(Roles = "Manager")]
+        public async Task<IActionResult> GetForManager([FromQuery] int[] objectIds, [FromQuery] string? languageCode)
+        {
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+            var reviews = await _reviewService.GetForManagerObjectsAsync(userId, objectIds, languageCode);
+            return Ok(reviews);
+        }
+
         [HttpGet("{id}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetById(int id, [FromQuery] string? languageCode)

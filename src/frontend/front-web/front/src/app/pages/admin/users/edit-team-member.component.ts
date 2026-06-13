@@ -122,6 +122,48 @@ export class EditTeamMemberComponent {
 
 
 
+  /** Maps localized/alternate country names (e.g. stored as "Srbija") to the canonical English names used in `countries` and the i18n country keys. */
+  private readonly countryNameAliases: Record<string, string> = {
+    'srbija': 'Serbia',
+    'crna gora': 'Montenegro',
+    'crnagora': 'Montenegro',
+    'bosna i hercegovina': 'Bosnia and Herzegovina',
+    'hrvatska': 'Croatia',
+    'slovenija': 'Slovenia',
+    'slovačka': 'Slovakia',
+    'češka': 'Czech Republic',
+    'mađarska': 'Hungary',
+    'rumunija': 'Romania',
+    'bugarska': 'Bulgaria',
+    'grčka': 'Greece',
+    'italija': 'Italy',
+    'španija': 'Spain',
+    'francuska': 'France',
+    'nemačka': 'Germany',
+    'austrija': 'Austria',
+    'švajcarska': 'Switzerland',
+    'švedska': 'Sweden',
+    'norveška': 'Norway',
+    'danska': 'Denmark',
+    'finska': 'Finland',
+    'holandija': 'Netherlands',
+    'poljska': 'Poland',
+    'portugalija': 'Portugal',
+    'rusija': 'Russia',
+    'turska': 'Turkey',
+    'ukrajina': 'Ukraine',
+    'ujedinjeno kraljevstvo': 'United Kingdom',
+    'sjedinjene države': 'United States',
+    'albanija': 'Albania',
+    'belgija': 'Belgium',
+    'kanada': 'Canada',
+    'kina': 'China',
+    'indija': 'India',
+    'meksiko': 'Mexico',
+    'severna makedonija': 'North Macedonia',
+    'australija': 'Australia'
+  };
+
   /** Maps UI labels to API `language` codes (max 5 chars per backend). */
   private readonly languageCodes: Record<string, string> = {
     Serbian: 'sr',
@@ -199,7 +241,7 @@ export class EditTeamMemberComponent {
     this.phoneNumber = user.phoneNumber ?? '';
 
     const c = (user.country ?? '').trim();
-    this.country = c || 'United States';
+    this.country = this.normalizeCountryName(c) || 'United States';
 
     const langCode = (user.language ?? 'en').trim();
     this.preferredLanguage = this.languageLabelFromCode(langCode);
@@ -601,6 +643,14 @@ export class EditTeamMemberComponent {
     const m = String(d.getMonth() + 1).padStart(2, '0');
     const day = String(d.getDate()).padStart(2, '0');
     return `${y}-${m}-${day}`;
+  }
+
+  private normalizeCountryName(raw: string): string {
+    if (!raw) {
+      return raw;
+    }
+    const alias = this.countryNameAliases[raw.toLowerCase().trim()];
+    return alias ?? raw;
   }
 
   private languageLabelFromCode(code: string): string {
