@@ -43,7 +43,6 @@ namespace TuristickiVodic.Services
         private readonly IEmailService _emailService;
         private readonly IWebHostEnvironment _environment;
         private readonly IConfiguration _configuration;
-        private readonly ITranslationService _translationService;
 
         public UserService(
             AppDbContext context,
@@ -51,8 +50,7 @@ namespace TuristickiVodic.Services
             ITokenService tokenService,
             IEmailService emailService,
             IWebHostEnvironment environment,
-            IConfiguration configuration,
-            ITranslationService translationService)
+            IConfiguration configuration)
         {
             _context = context;
             _mapper = mapper;
@@ -60,7 +58,6 @@ namespace TuristickiVodic.Services
             _emailService = emailService;
             _environment = environment;
             _configuration = configuration;
-            _translationService = translationService;
         }
 
         public async Task<PagedResultDto<UserDto>> GetAllAsync(UserQueryDto query, int? requestingUserId = null)
@@ -1220,8 +1217,8 @@ namespace TuristickiVodic.Services
             user.CreatorRoleRequestStatus = CreatorRoleRequestStatus.Approved;
             user.UpdatedAt = DateTime.UtcNow;
             _context.Notifications.Add(hadPendingRequest
-                ? await CreateCreatorRoleDecisionNotificationAsync(user, approved: true)
-                : await CreateCreatorRolePromotedByAdminNotificationAsync(user));
+                ? CreateCreatorRoleDecisionNotificationAsync(user, approved: true)
+                : CreateCreatorRolePromotedByAdminNotificationAsync(user));
 
             await _context.SaveChangesAsync();
             return true;
@@ -1247,7 +1244,7 @@ namespace TuristickiVodic.Services
             user.HasRequestedCreatorRole = false;
             user.CreatorRoleRequestStatus = CreatorRoleRequestStatus.Rejected;
             user.UpdatedAt = DateTime.UtcNow;
-            _context.Notifications.Add(await CreateCreatorRoleDecisionNotificationAsync(user, approved: false));
+            _context.Notifications.Add(CreateCreatorRoleDecisionNotificationAsync(user, approved: false));
 
             await _context.SaveChangesAsync();
             return true;
@@ -1278,7 +1275,7 @@ namespace TuristickiVodic.Services
             user.HasRequestedCreatorRole = false;
             user.CreatorRoleRequestStatus = CreatorRoleRequestStatus.None;
             user.UpdatedAt = DateTime.UtcNow;
-            _context.Notifications.Add(await CreateCreatorRoleRevokedNotificationAsync(user));
+            _context.Notifications.Add(CreateCreatorRoleRevokedNotificationAsync(user));
 
             await _context.SaveChangesAsync();
             return true;
@@ -1881,7 +1878,7 @@ namespace TuristickiVodic.Services
             return CreatorRoleRequestStatus.None;
         }
 
-        private async Task<Notification> CreateCreatorRoleDecisionNotificationAsync(User user, bool approved)
+        private Notification CreateCreatorRoleDecisionNotificationAsync(User user, bool approved)
         {
             var targetLoginUrl = ResolveAdminAppLoginUrl();
             var title = approved
@@ -1891,53 +1888,47 @@ namespace TuristickiVodic.Services
                 ? "Tvoj zahtev za ContentCreator ulogu je odobren. Prijavi se u admin aplikaciju da nastaviš."
                 : "Tvoj zahtev za ContentCreator ulogu je odbijen. Možeš poslati novi zahtev kasnije.";
 
-            var (translatedTitle, translatedMessage) = await _translationService.TranslateNotificationAsync(title, message, user.Language);
-
             return new Notification
             {
                 UserId = user.Id,
                 Type = approved
                     ? NotificationType.CreatorRoleRequestApproved
                     : NotificationType.CreatorRoleRequestRejected,
-                Title = translatedTitle,
-                Message = translatedMessage,
+                Title = title,
+                Message = message,
                 ActionUrl = approved ? targetLoginUrl : null,
                 CreatedAt = DateTime.UtcNow
             };
         }
 
-        private async Task<Notification> CreateCreatorRolePromotedByAdminNotificationAsync(User user)
+        private Notification CreateCreatorRolePromotedByAdminNotificationAsync(User user)
         {
             var targetLoginUrl = ResolveAdminAppLoginUrl();
             var title = "Dodeljena je ContentCreator uloga";
             var message = "Administrator ti je dodelio ContentCreator ulogu. Prijavi se u admin aplikaciju da nastaviš.";
 
-            var (translatedTitle, translatedMessage) = await _translationService.TranslateNotificationAsync(title, message, user.Language);
-
             return new Notification
             {
                 UserId = user.Id,
                 Type = NotificationType.CreatorRoleRequestApproved,
-                Title = translatedTitle,
-                Message = translatedMessage,
+                Title = title,
+                Message = message,
                 ActionUrl = targetLoginUrl,
                 CreatedAt = DateTime.UtcNow
             };
         }
 
-        private async Task<Notification> CreateCreatorRoleRevokedNotificationAsync(User user)
+        private Notification CreateCreatorRoleRevokedNotificationAsync(User user)
         {
             var title = "ContentCreator uloga je uklonjena";
             var message = "Tvoja ContentCreator uloga je uklonjena. Vraćamo te na turističku aplikaciju.";
-
-            var (translatedTitle, translatedMessage) = await _translationService.TranslateNotificationAsync(title, message, user.Language);
 
             return new Notification
             {
                 UserId = user.Id,
                 Type = NotificationType.CreatorRoleAccessRevoked,
-                Title = translatedTitle,
-                Message = translatedMessage,
+                Title = title,
+                Message = message,
                 ActionUrl = ResolvePublicAppHomeUrl(),
                 CreatedAt = DateTime.UtcNow
             };

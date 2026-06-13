@@ -8,12 +8,10 @@ namespace TuristickiVodic.Services.Services
     public class DeletionRequestService : IDeletionRequestService
     {
         private readonly AppDbContext _context;
-        private readonly ITranslationService _translationService;
 
-        public DeletionRequestService(AppDbContext context, ITranslationService? translationService = null)
+        public DeletionRequestService(AppDbContext context)
         {
             _context = context;
-            _translationService = translationService ?? NullTranslationService.Instance;
         }
 
         public async Task<DeletionRequestDto> CreateForObjectAsync(int objectId, CreateDeletionRequestDto dto, int requestedByUserId)
@@ -647,38 +645,32 @@ namespace TuristickiVodic.Services.Services
             string message,
             string actionUrl)
         {
-            var plannerUsers = await _context.EventPlannerItems
+            var userIds = await _context.EventPlannerItems
                 .AsNoTracking()
                 .Where(item => item.EventId == eventId)
                 .Join(
                     _context.Users.AsNoTracking().Where(u => u.IsActive && !u.IsBlacklisted),
                     item => item.UserId,
                     user => user.Id,
-                    (item, user) => new { item.UserId, user.Language })
+                    (item, user) => item.UserId)
                 .Distinct()
                 .ToListAsync();
 
-            if (plannerUsers.Count == 0)
+            if (userIds.Count == 0)
                 return;
 
             var createdAt = DateTime.UtcNow;
-            var notifications = new List<Notification>();
 
-            foreach (var plannerUser in plannerUsers)
+            var notifications = userIds.Select(userId => new Notification
             {
-                var (translatedTitle, translatedMessage) = await _translationService.TranslateNotificationAsync(title, message, plannerUser.Language);
-
-                notifications.Add(new Notification
-                {
-                    UserId = plannerUser.UserId,
-                    Type = type,
-                    Title = translatedTitle,
-                    Message = translatedMessage,
-                    ActionUrl = actionUrl,
-                    EventId = eventId,
-                    CreatedAt = createdAt
-                });
-            }
+                UserId = userId,
+                Type = type,
+                Title = title,
+                Message = message,
+                ActionUrl = actionUrl,
+                EventId = eventId,
+                CreatedAt = createdAt
+            });
 
             _context.Notifications.AddRange(notifications);
             await _context.SaveChangesAsync();
@@ -701,14 +693,12 @@ namespace TuristickiVodic.Services.Services
             if (manager == null)
                 return;
 
-            var (translatedTitle, translatedMessage) = await _translationService.TranslateNotificationAsync(title, message, manager.Language);
-
             _context.Notifications.Add(new Notification
             {
                 UserId = managerId,
                 Type = NotificationType.ManagerNewDeletionRequest,
-                Title = translatedTitle,
-                Message = translatedMessage,
+                Title = title,
+                Message = message,
                 ActionUrl = actionUrl,
                 CreatedAt = DateTime.UtcNow
             });
@@ -734,14 +724,13 @@ namespace TuristickiVodic.Services.Services
 
             var title = $"Zahtev za brisanje je {statusText}";
             var message = $"Tvoj zahtev za brisanje sadržaja \"{contentName}\" je {statusText}.";
-            var (translatedTitle, translatedMessage) = await _translationService.TranslateNotificationAsync(title, message, creator.Language);
 
             _context.Notifications.Add(new Notification
             {
                 UserId = request.RequestedByUserId,
                 Type = NotificationType.CreatorDeletionRequestReviewed,
-                Title = translatedTitle,
-                Message = translatedMessage,
+                Title = title,
+                Message = message,
                 ActionUrl = $"/deletion-requests/{request.Id}",
                 CreatedAt = DateTime.UtcNow
             });

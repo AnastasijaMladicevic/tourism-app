@@ -209,14 +209,13 @@ namespace TuristickiVodic.Services.Services
 
             var title = "Nova recenzija na tvom objektu";
             var message = $"Objekat \"{objectName}\" je dobio novu recenziju.";
-            var (translatedTitle, translatedMessage) = await _translationService.TranslateNotificationAsync(title, message, creator.Language);
 
             _context.Notifications.Add(new Notification
             {
                 UserId = creatorId,
                 Type = NotificationType.CreatorNewObjectReview,
-                Title = translatedTitle,
-                Message = translatedMessage,
+                Title = title,
+                Message = message,
                 ActionUrl = actionUrl,
                 ReviewId = reviewId,
                 CreatedAt = DateTime.UtcNow
@@ -280,14 +279,13 @@ namespace TuristickiVodic.Services.Services
             {
                 var title = "Stigao je odgovor na tvoju recenziju";
                 var message = $"Dobio/la si odgovor na recenziju za objekat \"{review.Object.Name}\".";
-                var (translatedTitle, translatedMessage) = await _translationService.TranslateNotificationAsync(title, message, review.User.Language);
 
                 _context.Notifications.Add(new Notification
                 {
                     UserId = review.UserId,
                     Type = NotificationType.ReviewReply,
-                    Title = translatedTitle,
-                    Message = translatedMessage,
+                    Title = title,
+                    Message = message,
                     ActionUrl = $"/object/{review.ObjectId}",
                     ReviewId = review.Id,
                     CreatedAt = DateTime.UtcNow
@@ -324,14 +322,13 @@ namespace TuristickiVodic.Services.Services
 
             var title = "Odgovor na tvoju recenziju je izmenjen";
             var message = $"Odgovor na tvoju recenziju za objekat \"{review.Object.Name}\" je ažuriran.";
-            var (translatedTitle, translatedMessage) = await _translationService.TranslateNotificationAsync(title, message, review.User.Language);
 
             _context.Notifications.Add(new Notification
             {
                 UserId = review.UserId,
                 Type = NotificationType.ReviewReplyUpdated,
-                Title = translatedTitle,
-                Message = translatedMessage,
+                Title = title,
+                Message = message,
                 ActionUrl = $"/object/{review.ObjectId}",
                 ReviewId = review.Id,
                 CreatedAt = DateTime.UtcNow
@@ -412,14 +409,13 @@ namespace TuristickiVodic.Services.Services
 
             var title = "Recenzija na tvom objektu je obrisana";
             var message = $"Turista je obrisao/la recenziju za objekat \"{objectName}\".";
-            var (translatedTitle, translatedMessage) = await _translationService.TranslateNotificationAsync(title, message, creator.Language);
 
             _context.Notifications.Add(new Notification
             {
                 UserId = creatorId,
                 Type = NotificationType.CreatorObjectReviewDeleted,
-                Title = translatedTitle,
-                Message = translatedMessage,
+                Title = title,
+                Message = message,
                 ActionUrl = $"/objects/{objectId}",
                 CreatedAt = DateTime.UtcNow
             });

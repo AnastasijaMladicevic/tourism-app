@@ -577,14 +577,12 @@ namespace TuristickiVodic.Services.Services
             if (manager == null)
                 return;
 
-            var (translatedTitle, translatedMessage) = await _translationService.TranslateNotificationAsync(title, message, manager.Language);
-
             _context.Notifications.Add(new Notification
             {
                 UserId = managerId.Value,
                 Type = NotificationType.ManagerNewPendingContent,
-                Title = translatedTitle,
-                Message = translatedMessage,
+                Title = title,
+                Message = message,
                 ActionUrl = actionUrl,
                 CreatedAt = DateTime.UtcNow
             });
@@ -789,14 +787,13 @@ namespace TuristickiVodic.Services.Services
             var statusText = approved ? "odobrena" : "odbijena";
             var title = $"Tvoja {contentType} je {statusText}";
             var message = $"Sadržaj \"{contentName}\" je {statusText}.";
-            var (translatedTitle, translatedMessage) = await _translationService.TranslateNotificationAsync(title, message, creator.Language);
 
             _context.Notifications.Add(new Notification
             {
                 UserId = creatorId,
                 Type = NotificationType.CreatorContentReviewed,
-                Title = translatedTitle,
-                Message = translatedMessage,
+                Title = title,
+                Message = message,
                 ActionUrl = actionUrl,
                 CreatedAt = DateTime.UtcNow
             });
@@ -824,14 +821,14 @@ namespace TuristickiVodic.Services.Services
             if (creator == null)
                 return;
 
-            var admins = await _context.Users
+            var adminIds = await _context.Users
                 .AsNoTracking()
                 .Include(u => u.Role)
                 .Where(u => u.Role.Name == RoleType.Admin && u.IsActive && !u.IsBlacklisted)
-                .Select(u => new { u.Id, u.Language })
+                .Select(u => u.Id)
                 .ToListAsync();
 
-            if (admins.Count == 0)
+            if (adminIds.Count == 0)
                 return;
 
             var creatorName = $"{creator.FirstName} {creator.LastName}".Trim();
@@ -840,21 +837,17 @@ namespace TuristickiVodic.Services.Services
 
             var title = "ContentCreator ima više odbijenih sadržaja";
             var message = $"ContentCreator {creatorName} ima {rejectedCount} odbijenih sadržaja. Poslednje odbijeno: \"{latestContentName}\".";
+            var createdAt = DateTime.UtcNow;
 
-            var notifications = new List<Notification>();
-            foreach (var admin in admins)
+            var notifications = adminIds.Select(adminId => new Notification
             {
-                var (translatedTitle, translatedMessage) = await _translationService.TranslateNotificationAsync(title, message, admin.Language);
-                notifications.Add(new Notification
-                {
-                    UserId = admin.Id,
-                    Type = NotificationType.AdminCreatorMultipleRejectedContent,
-                    Title = translatedTitle,
-                    Message = translatedMessage,
-                    ActionUrl = actionUrl,
-                    CreatedAt = DateTime.UtcNow
-                });
-            }
+                UserId = adminId,
+                Type = NotificationType.AdminCreatorMultipleRejectedContent,
+                Title = title,
+                Message = message,
+                ActionUrl = actionUrl,
+                CreatedAt = createdAt
+            });
 
             _context.Notifications.AddRange(notifications);
             await _context.SaveChangesAsync();

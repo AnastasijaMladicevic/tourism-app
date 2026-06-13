@@ -37,9 +37,21 @@ namespace TuristickiVodic.Services.Services
                 .Take(query.PageSize)
                 .ToListAsync();
 
+            var language = await _context.Users
+                .AsNoTracking()
+                .Where(u => u.Id == userId)
+                .Select(u => u.Language)
+                .FirstOrDefaultAsync() ?? "sr";
+
+            var dtos = new List<NotificationDto>(items.Count);
+            foreach (var item in items)
+            {
+                dtos.Add(await MapToDtoAsync(item, language));
+            }
+
             return new PagedResultDto<NotificationDto>
             {
-                Items = items.Select(MapToDto).ToList(),
+                Items = dtos,
                 Page = query.Page,
                 PageSize = query.PageSize,
                 TotalCount = totalCount,
@@ -292,26 +304,19 @@ namespace TuristickiVodic.Services.Services
             if (itemsToNotify.Count == 0)
                 return;
 
-            var language = await _context.Users
-                .AsNoTracking()
-                .Where(u => u.Id == userId)
-                .Select(u => u.Language)
-                .FirstOrDefaultAsync() ?? "sr";
-
             var newNotifications = new List<Notification>();
 
             foreach (var item in itemsToNotify)
             {
                 var title = "Događaj počinje uskoro";
                 var message = $"Događaj \"{item.EventName}\" počinje za manje od 2 sata.";
-                var (translatedTitle, translatedMessage) = await _translationService.TranslateNotificationAsync(title, message, language);
 
                 newNotifications.Add(new Notification
                 {
                     UserId = userId,
                     Type = NotificationType.PlannerEventReminder2Hours,
-                    Title = translatedTitle,
-                    Message = translatedMessage,
+                    Title = title,
+                    Message = message,
                     ActionUrl = $"/event/{item.EventId}",
                     EventId = item.EventId,
                     EventPlannerItemId = item.PlannerItemId,
@@ -362,14 +367,19 @@ namespace TuristickiVodic.Services.Services
                 query.PageSize = 100;
         }
 
-        private static NotificationDto MapToDto(Notification notification)
+        private async Task<NotificationDto> MapToDtoAsync(Notification notification, string languageCode)
         {
+            var title = await _translationService.GetOrCreateTextAsync(
+                "Notification", notification.Id, "Title", notification.Title, languageCode);
+            var message = await _translationService.GetOrCreateTextAsync(
+                "Notification", notification.Id, "Message", notification.Message, languageCode);
+
             return new NotificationDto
             {
                 Id = notification.Id,
                 Type = notification.Type.ToString(),
-                Title = notification.Title,
-                Message = notification.Message,
+                Title = title,
+                Message = message,
                 ActionUrl = notification.ActionUrl,
                 IsRead = notification.IsRead,
                 ReadAt = notification.ReadAt,

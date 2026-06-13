@@ -598,14 +598,12 @@ namespace TuristickiVodic.Services.Services
             if (manager == null)
                 return;
 
-            var (translatedTitle, translatedMessage) = await _translationService.TranslateNotificationAsync(title, message, manager.Language);
-
             _context.Notifications.Add(new Notification
             {
                 UserId = managerId.Value,
                 Type = NotificationType.ManagerNewPendingContent,
-                Title = translatedTitle,
-                Message = translatedMessage,
+                Title = title,
+                Message = message,
                 ActionUrl = actionUrl,
                 CreatedAt = DateTime.UtcNow
             });
@@ -812,14 +810,13 @@ namespace TuristickiVodic.Services.Services
             var statusText = approved ? "odobren" : "odbijen";
             var title = $"Tvoj {contentType} je {statusText}";
             var message = $"Sadržaj \"{contentName}\" je {statusText}.";
-            var (translatedTitle, translatedMessage) = await _translationService.TranslateNotificationAsync(title, message, creator.Language);
 
             _context.Notifications.Add(new Notification
             {
                 UserId = creatorId,
                 Type = NotificationType.CreatorContentReviewed,
-                Title = translatedTitle,
-                Message = translatedMessage,
+                Title = title,
+                Message = message,
                 ActionUrl = actionUrl,
                 CreatedAt = DateTime.UtcNow
             });
@@ -847,14 +844,14 @@ namespace TuristickiVodic.Services.Services
             if (creator == null)
                 return;
 
-            var admins = await _context.Users
+            var adminIds = await _context.Users
                 .AsNoTracking()
                 .Include(u => u.Role)
                 .Where(u => u.Role.Name == RoleType.Admin && u.IsActive && !u.IsBlacklisted)
-                .Select(u => new { u.Id, u.Language })
+                .Select(u => u.Id)
                 .ToListAsync();
 
-            if (admins.Count == 0)
+            if (adminIds.Count == 0)
                 return;
 
             var creatorName = $"{creator.FirstName} {creator.LastName}".Trim();
@@ -864,22 +861,16 @@ namespace TuristickiVodic.Services.Services
             var title = "ContentCreator ima više odbijenih sadržaja";
             var message = $"ContentCreator {creatorName} ima {rejectedCount} odbijenih sadržaja. Poslednje odbijeno: \"{latestContentName}\".";
             var createdAt = DateTime.UtcNow;
-            var notifications = new List<Notification>();
 
-            foreach (var admin in admins)
+            var notifications = adminIds.Select(adminId => new Notification
             {
-                var (translatedTitle, translatedMessage) = await _translationService.TranslateNotificationAsync(title, message, admin.Language);
-
-                notifications.Add(new Notification
-                {
-                    UserId = admin.Id,
-                    Type = NotificationType.AdminCreatorMultipleRejectedContent,
-                    Title = translatedTitle,
-                    Message = translatedMessage,
-                    ActionUrl = actionUrl,
-                    CreatedAt = createdAt
-                });
-            }
+                UserId = adminId,
+                Type = NotificationType.AdminCreatorMultipleRejectedContent,
+                Title = title,
+                Message = message,
+                ActionUrl = actionUrl,
+                CreatedAt = createdAt
+            });
 
             _context.Notifications.AddRange(notifications);
             await _context.SaveChangesAsync();
@@ -890,7 +881,7 @@ namespace TuristickiVodic.Services.Services
             if (!ev.DestinationId.HasValue && !ev.LocalityId.HasValue)
                 return;
 
-            var users = await _context.Favorites
+            var userIds = await _context.Favorites
                 .AsNoTracking()
                 .Where(f =>
                     (ev.LocalityId.HasValue && f.LocalityId == ev.LocalityId.Value) ||
@@ -899,11 +890,11 @@ namespace TuristickiVodic.Services.Services
                     _context.Users.AsNoTracking().Where(u => u.IsActive && !u.IsBlacklisted),
                     favorite => favorite.UserId,
                     user => user.Id,
-                    (favorite, user) => new { user.Id, user.Language })
+                    (favorite, user) => user.Id)
                 .Distinct()
                 .ToListAsync();
 
-            if (users.Count == 0)
+            if (userIds.Count == 0)
                 return;
 
             var locationName = !string.IsNullOrWhiteSpace(ev.Locality?.Name)
@@ -915,23 +906,17 @@ namespace TuristickiVodic.Services.Services
             var title = "Novi događaj na sačuvanoj lokaciji";
             var message = $"Dodat je novi događaj \"{ev.Name}\" za lokaciju \"{locationName}\" koja je među tvojim favoritima.";
             var createdAt = DateTime.UtcNow;
-            var notifications = new List<Notification>();
 
-            foreach (var user in users)
+            var notifications = userIds.Select(userId => new Notification
             {
-                var (translatedTitle, translatedMessage) = await _translationService.TranslateNotificationAsync(title, message, user.Language);
-
-                notifications.Add(new Notification
-                {
-                    UserId = user.Id,
-                    Type = NotificationType.FavoritedLocationNewEvent,
-                    Title = translatedTitle,
-                    Message = translatedMessage,
-                    ActionUrl = $"/event/{ev.Id}",
-                    EventId = ev.Id,
-                    CreatedAt = createdAt
-                });
-            }
+                UserId = userId,
+                Type = NotificationType.FavoritedLocationNewEvent,
+                Title = title,
+                Message = message,
+                ActionUrl = $"/event/{ev.Id}",
+                EventId = ev.Id,
+                CreatedAt = createdAt
+            });
 
             _context.Notifications.AddRange(notifications);
             await _context.SaveChangesAsync();
@@ -1184,38 +1169,32 @@ namespace TuristickiVodic.Services.Services
             string message,
             string actionUrl)
         {
-            var plannerItems = await _context.EventPlannerItems
+            var userIds = await _context.EventPlannerItems
                 .AsNoTracking()
                 .Where(item => item.EventId == eventId)
                 .Join(
                     _context.Users.AsNoTracking().Where(u => u.IsActive && !u.IsBlacklisted),
                     item => item.UserId,
                     user => user.Id,
-                    (item, user) => new { item.UserId, user.Language })
+                    (item, user) => item.UserId)
                 .Distinct()
                 .ToListAsync();
 
-            if (plannerItems.Count == 0)
+            if (userIds.Count == 0)
                 return;
 
             var createdAt = DateTime.UtcNow;
-            var notifications = new List<Notification>();
 
-            foreach (var item in plannerItems)
+            var notifications = userIds.Select(userId => new Notification
             {
-                var (translatedTitle, translatedMessage) = await _translationService.TranslateNotificationAsync(title, message, item.Language);
-
-                notifications.Add(new Notification
-                {
-                    UserId = item.UserId,
-                    Type = type,
-                    Title = translatedTitle,
-                    Message = translatedMessage,
-                    ActionUrl = actionUrl,
-                    EventId = eventId,
-                    CreatedAt = createdAt
-                });
-            }
+                UserId = userId,
+                Type = type,
+                Title = title,
+                Message = message,
+                ActionUrl = actionUrl,
+                EventId = eventId,
+                CreatedAt = createdAt
+            });
 
             _context.Notifications.AddRange(notifications);
             await _context.SaveChangesAsync();
