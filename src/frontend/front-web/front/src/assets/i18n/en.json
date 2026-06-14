@@ -808,12 +808,12 @@
         "load": "Failed to load events"
       },
       "stats": {
-        "upcomingThisWeek": "Upcoming this week",
-        "upcomingThisWeekHint": "+2 from last month",
-        "activeStaff": "Active staff",
-        "activeStaffHint": "98% availability",
-        "totalCapacityFilled": "Total capacity filled",
-        "totalCapacityFilledHint": "Across all published events"
+        "totalEvents": "Total events",
+        "totalEventsHint": "Matching the active filters",
+        "onThisPage": "On this page",
+        "onThisPageHint": "Events shown in the current page",
+        "next7Days": "In the next 7 days",
+        "next7DaysHint": "Events starting within 7 days"
       },
       "filters": {
         "status": "Status",

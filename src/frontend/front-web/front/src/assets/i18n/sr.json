@@ -808,12 +808,12 @@
         "load": "Učitavanje događaja nije uspelo"
       },
       "stats": {
-        "upcomingThisWeek": "Predstojeće ove nedelje",
-        "upcomingThisWeekHint": "+2 u odnosu na prošli mesec",
-        "activeStaff": "Aktivno osoblje",
-        "activeStaffHint": "98% dostupnosti",
-        "totalCapacityFilled": "Ukupno popunjeno kapaciteta",
-        "totalCapacityFilledHint": "Za sve objavljene događaje"
+        "totalEvents": "Ukupno događaja",
+        "totalEventsHint": "Odgovara aktivnim filterima",
+        "onThisPage": "Na ovoj stranici",
+        "onThisPageHint": "Događaji prikazani na trenutnoj stranici",
+        "next7Days": "U narednih 7 dana",
+        "next7DaysHint": "Događaji koji počinju u narednih 7 dana"
       },
       "filters": {
         "status": "Status",

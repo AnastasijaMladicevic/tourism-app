@@ -343,6 +343,12 @@ export class UsersComponent implements OnInit {
     } else {
       this.stopTouristsTabLiveRefresh();
     }
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { tab },
+      queryParamsHandling: 'merge',
+      replaceUrl: true
+    });
   }
 
   private startTouristsTabLiveRefresh(): void {

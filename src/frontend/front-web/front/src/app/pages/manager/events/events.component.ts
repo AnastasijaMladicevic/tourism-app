@@ -80,6 +80,7 @@ export class ManagerEventsComponent implements OnInit, OnDestroy {
 
   currentPage = 1;
   totalCount = 0;
+  next7DaysCount = '-';
 
   readonly categoryOptions = [
     { value: 'Festival', label: 'manager.events.categories.festival' },
@@ -121,21 +122,21 @@ export class ManagerEventsComponent implements OnInit, OnDestroy {
   get stats(): EventInsightCard[] {
     return [
       {
-        label: this.translationService.translate('manager.events.stats.upcomingThisWeek'),
-        value: '12',
-        hint: this.translationService.translate('manager.events.stats.upcomingThisWeekHint'),
+        label: this.translationService.translate('manager.events.stats.totalEvents'),
+        value: String(this.totalCount),
+        hint: this.translationService.translate('manager.events.stats.totalEventsHint'),
         tone: 'blue'
       },
       {
-        label: this.translationService.translate('manager.events.stats.activeStaff'),
-        value: '48',
-        hint: this.translationService.translate('manager.events.stats.activeStaffHint'),
+        label: this.translationService.translate('manager.events.stats.onThisPage'),
+        value: String(this.pagedEvents.length),
+        hint: this.translationService.translate('manager.events.stats.onThisPageHint'),
         tone: 'green'
       },
       {
-        label: this.translationService.translate('manager.events.stats.totalCapacityFilled'),
-        value: '64%',
-        hint: this.translationService.translate('manager.events.stats.totalCapacityFilledHint'),
+        label: this.translationService.translate('manager.events.stats.next7Days'),
+        value: this.next7DaysCount,
+        hint: this.translationService.translate('manager.events.stats.next7DaysHint'),
         tone: 'neutral'
       }
     ];
@@ -144,6 +145,25 @@ export class ManagerEventsComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadManagedDestinationLabel();
     this.loadEvents();
+    this.loadNext7DaysStat();
+  }
+
+  private loadNext7DaysStat(): void {
+    this.eventService.getForManager({
+      page: 1,
+      pageSize: 1,
+      nextDays: 7,
+      sortBy: 'startDate',
+      sortOrder: 'asc'
+    }).subscribe({
+      next: (response) => {
+        this.next7DaysCount = String(response.totalCount ?? 0);
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.next7DaysCount = '0';
+      }
+    });
   }
 
   ngOnDestroy(): void {

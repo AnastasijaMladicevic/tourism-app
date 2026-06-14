@@ -808,12 +808,12 @@
         "load": "No se pudieron cargar los eventos"
       },
       "stats": {
-        "upcomingThisWeek": "Próximos esta semana",
-        "upcomingThisWeekHint": "+2 respecto al mes pasado",
-        "activeStaff": "Personal activo",
-        "activeStaffHint": "98% de disponibilidad",
-        "totalCapacityFilled": "Capacidad total ocupada",
-        "totalCapacityFilledHint": "En todos los eventos publicados"
+        "totalEvents": "Total de eventos",
+        "totalEventsHint": "Según los filtros activos",
+        "onThisPage": "En esta página",
+        "onThisPageHint": "Eventos mostrados en la página actual",
+        "next7Days": "En los próximos 7 días",
+        "next7DaysHint": "Eventos que comienzan en los próximos 7 días"
       },
       "filters": {
         "status": "Estado",
