@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, DestroyRef, ElementRef, ViewChild, effect, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { NavigationStart, Router } from '@angular/router';
+import { NavigationEnd, NavigationStart, Router } from '@angular/router';
 import { catchError, filter, of } from 'rxjs';
 import { AiChatResponseDto, AiChatService } from '../../../services/ai-chat';
 import { LocationTrackingService } from '../../../services/location-tracking';
@@ -75,6 +75,15 @@ export class FloatingAiAssistantComponent {
         this.isOpen.set(false);
         this.isLiftedForMoreMenu.set(false);
         this.updateVisibility(nextUrl);
+      });
+
+    this.router.events
+      .pipe(
+        filter((event) => event instanceof NavigationEnd),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((event) => {
+        this.updateVisibility((event as NavigationEnd).urlAfterRedirects);
       });
 
     if (typeof window !== 'undefined') {

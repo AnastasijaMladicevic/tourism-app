@@ -228,7 +228,18 @@ export class LoginComponent implements OnDestroy {
     this.cleanupGooglePopup();
   }
 
-  goBack(): void { this.router.navigateByUrl(this.returnUrl); }
+  goBack(): void {
+    if (!this.authService.isLoggedIn()) {
+      const lastUrl = this.routerHistory.getLastUrl();
+      if (lastUrl && !lastUrl.startsWith('/login')) {
+        this.router.navigateByUrl(lastUrl);
+        return;
+      }
+      this.router.navigateByUrl('/home');
+      return;
+    }
+    this.router.navigateByUrl(this.returnUrl);
+  }
   goRegister(): void { this.router.navigate(['/register']); }
   goForgot(): void { this.router.navigate(['/forgot-password']); }
   goTerms(): void { this.router.navigate(['/terms']); }
