@@ -3296,7 +3296,7 @@
     "Search admin directory": "Cerca nell'elenco amministratori",
     "Buscar en el directorio de administradores": "Cerca nell'elenco amministratori",
     "Pretraži administratorski imenik": "Cerca nell'elenco amministratori",
-    "Search by name, email, role, statusâ€¦": "Search by name, email, role, statusâ€¦",
+    "Search by name, email, role, statusâ€¦": "Cerca per nome, email, ruolo, stato…",
     "Buscar por nombre, correo, rol, estado...": "Cerca per nome, email, ruolo, stato…",
     "Pretraži po imenu, emailu, ulozi, statusu...": "Cerca per nome, email, ruolo, stato…",
     "Search by name, email, role, status…": "Cerca per nome, email, ruolo, stato…",
@@ -4604,7 +4604,8 @@
     "New destination": "Nuova destinazione",
     "Nueva destinación": "Nuova destinazione",
     "Nuova destinazione": "Nuova destinazione",
-    "Nova destinacija": "Nuova destinazione"
+    "Nova destinacija": "Nuova destinazione",
+    "Search by name, email, role, status": "Cerca per nome, email, ruolo, stato..."
   },
   "login": {
     "title": "Accedi",
