@@ -58,7 +58,8 @@
       "weeksAgoShort": "{{count}}w ago",
       "monthsAgoShort": "{{count}}mo ago",
       "yearsAgoShort": "{{count}}y ago"
-    }
+    },
+    "notice": "Notice"
   },
   "paginator": {
     "of": "of",
@@ -4604,7 +4605,33 @@
     "New destination": "New destination",
     "Nueva destinación": "New destination",
     "Nuova destinazione": "New destination",
-    "Nova destinacija": "New destination"
+    "Nova destinacija": "New destination",
+    "Content editing is disabled": "Content editing is disabled",
+    "Access restores automatically when the ban ends": "Access restores automatically when the ban ends",
+    "Suspended account": "Suspended account",
+    "Your access is on hold": "Your access is on hold",
+    "A platform administrator has restricted your Content Creator permissions. Review the details below — your portal access will return when the suspension ends.": "A platform administrator has restricted your Content Creator permissions. Review the details below — your portal access will return when the suspension ends.",
+    "Reason for suspension": "Reason for suspension",
+    "Suspension duration": "Suspension duration",
+    "No automatic end date is set": "No automatic end date is set",
+    "Permanent suspension": "Permanent suspension",
+    "An administrator must manually lift this suspension before you can create or edit content again.": "An administrator must manually lift this suspension before you can create or edit content again.",
+    "Time until access is restored": "Time until access is restored",
+    "Ends": "Ends",
+    "Your suspension has ended. Restoring access…": "Your suspension has ended. Restoring access…",
+    "Month": "Month",
+    "Months": "Months",
+    "Day": "Day",
+    "Days": "Days",
+    "Hour": "Hour",
+    "Hours": "Hours",
+    "Minute": "Minute",
+    "Minutes": "Minutes",
+    "Updates every minute · shown in UTC": "Updates every minute · shown in UTC",
+    "Checking access…": "Checking access…",
+    "Check access again": "Check access again",
+    "Sign out": "Sign out",
+    "Enter your current password and choose a new one.": "Enter your current password and choose a new one."
   },
   "login": {
     "title": "Log in",
