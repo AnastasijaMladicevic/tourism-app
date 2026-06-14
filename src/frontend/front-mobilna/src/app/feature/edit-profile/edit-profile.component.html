@@ -52,8 +52,8 @@
       <div class="crop-modal-backdrop" (click)="cancelCrop()">
         <div class="crop-modal" (click)="$event.stopPropagation()">
           <div class="crop-modal__header">
-            <span>Opseci fotografiju</span>
-            <button class="crop-modal__close" type="button" (click)="cancelCrop()" aria-label="Zatvori">
+            <span>{{ 'editProfile.cropPhoto' | translate }}</span>
+            <button class="crop-modal__close" type="button" (click)="cancelCrop()" [attr.aria-label]="'common.close' | translate">
               <svg
                 viewBox="0 0 24 24"
                 fill="none"

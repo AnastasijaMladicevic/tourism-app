@@ -2,7 +2,7 @@
   <div class="card">
     <div class="auth-topbar">
       <!-- Back button -->
-      <button class="back-btn" (click)="goBack()" aria-label="Go back">
+      <button class="back-btn" (click)="goBack()" [attr.aria-label]="'common.back' | translate">
         <span class="material-icons">arrow_back_ios</span>
       </button>
 
@@ -15,9 +15,9 @@
     </div>
 
     <!-- Heading -->
-    <h1 class="title">Code Verification</h1>
+    <h1 class="title">{{ 'auth.codeVerification.title' | translate }}</h1>
     <p class="subtitle">
-      Enter OTP (One time password) sent to<br />
+      {{ 'auth.codeVerification.subtitle' | translate }}<br />
       <span class="email">{{ email }}</span>
     </p>
 
@@ -60,12 +60,12 @@
       @if (isLoading) {
         <span class="spinner"></span>
       } @else {
-        Verify Code
+        {{ 'auth.codeVerification.verifyButton' | translate }}
       }
     </button>
 
     <button class="btn btn-outline" [disabled]="isLoading" (click)="resendCode()">
-      Resend Code
+      {{ 'auth.codeVerification.resendButton' | translate }}
     </button>
   </div>
 </div>

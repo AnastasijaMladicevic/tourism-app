@@ -125,7 +125,7 @@
       [lazyBackgroundImmediate]="true"
     >
       <!-- LEFT -->
-      <button class="nav left" type="button" aria-label="Previous featured destination" (click)="prevFeatured()">
+      <button class="nav left" type="button" [attr.aria-label]="'home.previousFeatured' | translate" (click)="prevFeatured()">
         <mat-icon>chevron_left</mat-icon>
       </button>
 
@@ -142,7 +142,7 @@
       </div>
 
       <!-- RIGHT -->
-      <button class="nav right" type="button" aria-label="Next featured destination" (click)="nextFeatured()">
+      <button class="nav right" type="button" [attr.aria-label]="'home.nextFeatured' | translate" (click)="nextFeatured()">
         <mat-icon>chevron_right</mat-icon>
       </button>
       <!-- DOTS -->

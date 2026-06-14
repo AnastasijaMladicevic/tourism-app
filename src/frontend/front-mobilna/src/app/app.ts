@@ -9,9 +9,11 @@ import { LocationIntelligenceService } from './services/location-intelligence';
 import { AuthService } from './services/auth';
 import { ThemeService } from './services/theme';
 import { OfflineMapService } from './services/offline-map';
+import { TranslationService } from './services/translation.service';
+import { TranslatePipe } from './shared/pipes/translate.pipe';
 @Component({
   selector: 'app-root',
-  imports: [CommonModule, RouterOutlet, NavbarComponent, FloatingAiAssistantComponent, LiveNotificationBannerComponent],
+  imports: [CommonModule, RouterOutlet, NavbarComponent, FloatingAiAssistantComponent, LiveNotificationBannerComponent, TranslatePipe],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })
@@ -21,6 +23,7 @@ export class App implements OnInit, OnDestroy {
   private readonly authService = inject(AuthService);
   private readonly themeService = inject(ThemeService);
   private readonly offlineMapService = inject(OfflineMapService);
+  private readonly translationService = inject(TranslationService);
   protected readonly title = signal('front-mobilna');
   protected readonly bannedAccountNotice = signal('');
 
@@ -58,12 +61,12 @@ export class App implements OnInit, OnDestroy {
       return;
     }
 
-    const reason = currentUser.banReason?.trim() || 'Krsenje pravila platforme.';
+    const reason = currentUser.banReason?.trim() || this.translationService.translate('common.violationOfRules');
     const expiresAt = currentUser.banExpiresAtUtc?.trim();
     this.bannedAccountNotice.set(
       expiresAt
-        ? `Ovaj nalog je banovan do ${this.formatUtc(expiresAt)}. Razlog: ${reason}`
-        : `Ovaj nalog je trajno banovan. Razlog: ${reason}`,
+        ? this.translationService.translate('common.bannedUntil', { date: this.formatUtc(expiresAt), reason })
+        : this.translationService.translate('common.bannedPermanent', { reason }),
     );
   }
 

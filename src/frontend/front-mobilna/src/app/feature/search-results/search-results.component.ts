@@ -12,6 +12,8 @@ import { ObjectDto, ObjectService } from '../../services/object';
 import { SmartSearchResultDto } from '../../services/smart-search';
 import { environment } from '../../../environment/environment';
 import { DataCacheService } from '../../services/data-cache';
+import { TranslationService } from '../../services/translation.service';
+import { TranslatePipe } from '../../shared/pipes/translate.pipe';
 
 const SEARCH_STOP_WORDS = new Set([
   'gde', 'mogu', 'moze', 'mozete', 'da', 'na', 'sa', 'u', 'uz', 'za', 'od', 'do', 'i', 'ili',
@@ -25,7 +27,7 @@ type SearchSource = 'home' | 'map' | 'default';
 @Component({
   selector: 'app-search-results',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatIconModule],
+  imports: [CommonModule, FormsModule, MatIconModule, TranslatePipe],
   templateUrl: './search-results.component.html',
   styleUrl: './search-results.component.scss',
 })
@@ -75,7 +77,12 @@ export class SearchResultsComponent implements OnInit, OnDestroy {
     private readonly activityService: ActivityService,
     private readonly localityService: LocalityService,
     private readonly dataCache: DataCacheService,
+    private readonly translationService: TranslationService,
   ) {}
+
+  resultsCountLabel(): string {
+    return this.translationService.translate('search.resultsCount', { count: String(this.displayedResults.length) });
+  }
 
   ngOnInit(): void {
     this.subscriptions.add(

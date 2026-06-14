@@ -63,7 +63,19 @@
     "enable": "Uključi",
     "locationModalTitle": "Uključi lokaciju da bi sortiranje radilo",
     "locationModalBody": "Praćenje lokacije trenutno nije uključeno. Klikni ispod i otvori podešavanja da uključiš saglasnost za praćenje lokacije.",
-    "notification": "Obaveštenje"
+    "notification": "Obaveštenje",
+    "weekdayShort": {
+      "sun": "Ne",
+      "mon": "Po",
+      "tue": "Ut",
+      "wed": "Sr",
+      "thu": "Če",
+      "fri": "Pe",
+      "sat": "Su"
+    },
+    "violationOfRules": "Kršenje pravila platforme.",
+    "bannedUntil": "Ovaj nalog je banovan do {{date}}. Razlog: {{reason}}",
+    "bannedPermanent": "Ovaj nalog je trajno banovan. Razlog: {{reason}}"
   },
   "reviewImages": {
     "maxImages": "Možete dodati najviše 5 slika.",
@@ -104,7 +116,8 @@
       "requestSent": "Zahtev je poslat",
       "approved": "Pristup odobren",
       "specialRoleActive": "Posebna uloga aktivna",
-      "notRequested": "Nije zatraženo"
+      "notRequested": "Nije zatraženo",
+      "rejected": "Zahtev odbijen"
     },
     "feedback": {
       "sendFailed": "Zahtev trenutno nije moguće poslati.",
@@ -190,6 +203,8 @@
     "chooseRegion": "Izaberi region",
     "categories": "Kategorije",
     "featuredDestination": "Izdvojena destinacija",
+    "previousFeatured": "Prethodna izdvojena destinacija",
+    "nextFeatured": "Sledeća izdvojena destinacija",
     "explore": "Istraži",
     "recommendedForYou": "Preporučeno za tebe",
     "popularPlaces": "Popularna mesta",
@@ -805,7 +820,8 @@
       "nightlife": "Noćni zivot",
       "culture": "Kultura",
       "parks": "Nacionalni parkovi"
-    }
+    },
+    "cropPhoto": "Opseci fotografiju"
   },
   "appearance": {
     "title": "Izgled",
@@ -985,7 +1001,8 @@
       "notSelected": "Nije izabrano",
       "recenter": "Centriraj ponovo",
       "exit": "Izađi",
-      "reorderStop": "Promeni redosled stanice"
+      "reorderStop": "Promeni redosled stanice",
+      "resizePanel": "Promeni veličinu panela"
     },
     "addStop": {
       "title": "Dodaj stanicu",
@@ -1030,7 +1047,6 @@
     },
     "getDirections": "Prikaži putanju"
   },
-  
   "event": {
     "title": "Događaj",
     "loadingError": "Greška pri učitavanju događaja.",
@@ -1044,14 +1060,14 @@
     "addToPlanner": "Dodaj u planer",
     "about": "O događaju",
     "descriptionFallback": "Opis nije dostupan.",
-      "availableTickets": "Dostupne ulaznice",
-      "ticketTypesHelp": "Dodaj jedan ili vise tipova karata i ukupan kapacitet događaja.",
-      "addTicketType": "Dodaj tip karte",
-      "removeTicketType": "Ukloni",
-      "ticketTypeName": "Naziv karte",
-      "ticketTypeNamePlaceholder": "VIP, Regular, Early bird...",
-      "ticketPricePlaceholder": "45.00",
-      "noTicketTypesHint": "Ostavi prazno ako je događaj besplatan.",
+    "availableTickets": "Dostupne ulaznice",
+    "ticketTypesHelp": "Dodaj jedan ili vise tipova karata i ukupan kapacitet događaja.",
+    "addTicketType": "Dodaj tip karte",
+    "removeTicketType": "Ukloni",
+    "ticketTypeName": "Naziv karte",
+    "ticketTypeNamePlaceholder": "VIP, Regular, Early bird...",
+    "ticketPricePlaceholder": "45.00",
+    "noTicketTypesHint": "Ostavi prazno ako je događaj besplatan.",
     "standardTicket": "Standardna ulaznica",
     "select": "Odaberi",
     "amenities": "Sadržaji",
@@ -1270,7 +1286,11 @@
     "togglePriority": "Promeni prioritet",
     "save": "Sačuvaj u planer",
     "saveChanges": "Sačuvaj izmene",
-    "lockedHint": "Događaj može da se planira samo u okviru svog datuma i originalnog trajanja."
+    "lockedHint": "Događaj može da se planira samo u okviru svog datuma i originalnog trajanja.",
+    "selectedDaysCount": "{{count}} dana izabrano",
+    "selectAtLeastOneDay": "Izaberi bar jedan dan.",
+    "conflictMessageWithDay": "Ovaj termin se preklapa sa \"{{title}}\" dana {{day}} u {{time}}.",
+    "selectDateHint": "Izaberi kada želiš da odeš na događaj"
   },
   "destination": {
     "title": "Destinacija",
@@ -1308,5 +1328,25 @@
     "searchPlaceholder": "Pretraži lokalitete...",
     "foundCount": "{{count}} pronađenih lokaliteta",
     "empty": "Nema pronađenih lokaliteta."
+  },
+  "auth": {
+    "codeVerification": {
+      "title": "Verifikacija koda",
+      "subtitle": "Unesi OTP (jednokratnu lozinku) poslat na",
+      "verifyButton": "Potvrdi kod",
+      "resendButton": "Ponovo pošalji kod"
+    },
+    "passwordUpdated": {
+      "title": "Lozinka je ažurirana",
+      "body": "Vaša lozinka je uspešno ažurirana.",
+      "loginButton": "Prijavi se"
+    }
+  },
+  "search": {
+    "placeholder": "Pretraži rečenicom, tipom ili sadržajem...",
+    "inProgress": "Pretraga u toku...",
+    "typeToSearch": "Ukucaj šta tražiš",
+    "resultsCount": "{{count}} rezultata",
+    "noResultsHint": "Pokušaj drugi upit ili ključne reči kao što su hotel, bazen, restoran, parking ili večera."
   }
 }

@@ -63,7 +63,19 @@
     "enable": "Attiva",
     "locationModalTitle": "Attiva la posizione per usare l'ordinamento",
     "locationModalBody": "Il rilevamento della posizione è disattivato. Tocca qui sotto per aprire le impostazioni e attivare il consenso alla posizione.",
-    "notification": "Notifica"
+    "notification": "Notifica",
+    "weekdayShort": {
+      "sun": "Do",
+      "mon": "Lu",
+      "tue": "Ma",
+      "wed": "Me",
+      "thu": "Gi",
+      "fri": "Ve",
+      "sat": "Sa"
+    },
+    "violationOfRules": "Violazione delle regole della piattaforma.",
+    "bannedUntil": "Questo account è sospeso fino al {{date}}. Motivo: {{reason}}",
+    "bannedPermanent": "Questo account è sospeso permanentemente. Motivo: {{reason}}"
   },
   "reviewImages": {
     "maxImages": "Puoi aggiungere fino a 5 immagini.",
@@ -104,7 +116,8 @@
       "requestSent": "Richiesta inviata",
       "approved": "Accesso approvato",
       "specialRoleActive": "Ruolo speciale attivo",
-      "notRequested": "Non richiesto"
+      "notRequested": "Non richiesto",
+      "rejected": "Richiesta rifiutata"
     },
     "feedback": {
       "sendFailed": "La richiesta non può essere inviata al momento.",
@@ -190,6 +203,8 @@
     "chooseRegion": "Scegli regione",
     "categories": "Categorie",
     "featuredDestination": "Destinazione in evidenza",
+    "previousFeatured": "Destinazione in evidenza precedente",
+    "nextFeatured": "Prossima destinazione in evidenza",
     "explore": "Esplora",
     "recommendedForYou": "Consigliato per te",
     "popularPlaces": "Luoghi popolari",
@@ -803,7 +818,8 @@
       "nightlife": "Vita notturna",
       "culture": "Cultura",
       "parks": "Parchi nazionali"
-    }
+    },
+    "cropPhoto": "Ritaglia foto"
   },
   "appearance": {
     "title": "Aspetto",
@@ -981,7 +997,10 @@
       "notSelected": "Non selezionato",
       "recenter": "Ricentra",
       "exit": "Esci",
-      "reorderStop": "Riordina fermata"
+      "reorderStop": "Riordina fermata",
+      "useMyLocation": "Usa la mia posizione",
+      "locationAlreadyInRoute": "La posizione è già nel percorso",
+      "resizePanel": "Ridimensiona il pannello"
     },
     "addStop": {
       "title": "Aggiungi fermata",
@@ -1039,14 +1058,14 @@
     "addToPlanner": "Aggiungi al Pianificatore",
     "about": "Sull'evento",
     "descriptionFallback": "Descrizione non disponibile.",
-      "availableTickets": "Biglietti disponibili",
-      "ticketTypesHelp": "Aggiungi uno o piu tipi di biglietto e la capienza totale dell'evento.",
-      "addTicketType": "Aggiungi tipo di biglietto",
-      "removeTicketType": "Rimuovi",
-      "ticketTypeName": "Nome del biglietto",
-      "ticketTypeNamePlaceholder": "VIP, Standard, Early bird...",
-      "ticketPricePlaceholder": "45.00",
-      "noTicketTypesHint": "Lascia vuoto se l'evento e gratuito.",
+    "availableTickets": "Biglietti disponibili",
+    "ticketTypesHelp": "Aggiungi uno o piu tipi di biglietto e la capienza totale dell'evento.",
+    "addTicketType": "Aggiungi tipo di biglietto",
+    "removeTicketType": "Rimuovi",
+    "ticketTypeName": "Nome del biglietto",
+    "ticketTypeNamePlaceholder": "VIP, Standard, Early bird...",
+    "ticketPricePlaceholder": "45.00",
+    "noTicketTypesHint": "Lascia vuoto se l'evento e gratuito.",
     "standardTicket": "Biglietto standard",
     "select": "Seleziona",
     "nearbyEmpty": "Non ci sono eventi nelle vicinanze.",
@@ -1263,7 +1282,11 @@
     "togglePriority": "Cambia priorita",
     "save": "Salva nel pianificatore",
     "saveChanges": "Salva modifiche",
-    "lockedHint": "Questo evento puo essere pianificato solo entro la sua data e durata originali."
+    "lockedHint": "Questo evento puo essere pianificato solo entro la sua data e durata originali.",
+    "selectedDaysCount": "{{count}} giorni selezionati",
+    "selectAtLeastOneDay": "Seleziona almeno un giorno.",
+    "conflictMessageWithDay": "Questo orario si sovrappone a \"{{title}}\" il {{day}} alle {{time}}.",
+    "selectDateHint": "Scegli quando vuoi partecipare all'evento"
   },
   "destination": {
     "title": "Destinazione",
@@ -1301,5 +1324,25 @@
     "searchPlaceholder": "Cerca località...",
     "foundCount": "{{count}} località trovate",
     "empty": "Nessuna località trovata."
+  },
+  "auth": {
+    "codeVerification": {
+      "title": "Verifica codice",
+      "subtitle": "Inserisci l'OTP (password temporanea) inviata a",
+      "verifyButton": "Verifica codice",
+      "resendButton": "Invia di nuovo il codice"
+    },
+    "passwordUpdated": {
+      "title": "Password aggiornata",
+      "body": "La tua password è stata aggiornata con successo.",
+      "loginButton": "Accedi"
+    }
+  },
+  "search": {
+    "placeholder": "Cerca per frase, tipo o servizio...",
+    "inProgress": "Ricerca in corso...",
+    "typeToSearch": "Scrivi cosa stai cercando",
+    "resultsCount": "{{count}} risultati",
+    "noResultsHint": "Prova un'altra ricerca o parole chiave come hotel, piscina, ristorante, parcheggio o cena."
   }
 }

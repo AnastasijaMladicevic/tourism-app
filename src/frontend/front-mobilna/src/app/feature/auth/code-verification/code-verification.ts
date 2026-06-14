@@ -13,11 +13,12 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { LogoComponent } from '../../../shared/components/logo/logo';
 import { AuthService } from '../../../services/auth';
+import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 
 @Component({
   selector: 'app-code-verification',
   standalone: true,
-  imports: [CommonModule, LogoComponent],
+  imports: [CommonModule, LogoComponent, TranslatePipe],
   templateUrl: './code-verification.html',
   styleUrls: ['./code-verification.scss'],
   encapsulation: ViewEncapsulation.None, // lets root CSS variables like --primary reach this component

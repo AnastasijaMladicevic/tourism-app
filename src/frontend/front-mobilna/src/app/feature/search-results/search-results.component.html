@@ -1,6 +1,6 @@
 <div class="search-page">
   <div class="search-page__header">
-    <button class="icon-btn" type="button" (click)="goBack()" aria-label="Back">
+    <button class="icon-btn" type="button" (click)="goBack()" [attr.aria-label]="'common.back' | translate">
       <mat-icon>arrow_back</mat-icon>
     </button>
 
@@ -8,7 +8,7 @@
       <mat-icon>search</mat-icon>
       <input
         type="text"
-        placeholder="Pretrazi recenicom, tipom ili amenity-jem..."
+        [placeholder]="'search.placeholder' | translate"
         [(ngModel)]="searchQuery"
         (input)="onSearchInput()"
         (keydown.enter)="submitSearch()"
@@ -37,11 +37,11 @@
 
   <div class="search-page__meta">
     @if (isLoading) {
-      <span>Pretraga u toku...</span>
+      <span>{{ 'search.inProgress' | translate }}</span>
     } @else if (hasSearched) {
-      <span>{{ displayedResults.length }} rezultata</span>
+      <span>{{ resultsCountLabel() }}</span>
     } @else {
-      <span>Ukucaj sta trazis</span>
+      <span>{{ 'search.typeToSearch' | translate }}</span>
     }
   </div>
 
@@ -62,8 +62,8 @@
     @if (!isLoading && hasSearched && !displayedResults.length) {
       <div class="empty-state">
         <mat-icon>travel_explore</mat-icon>
-        <h2>Nema rezultata</h2>
-        <p>Pokusaj drugi upit ili kljucne reci kao sto su hotel, bazen, restoran, parking ili vecera.</p>
+        <h2>{{ 'common.noResults' | translate }}</h2>
+        <p>{{ 'search.noResultsHint' | translate }}</p>
       </div>
     }
 
