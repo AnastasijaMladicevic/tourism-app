@@ -357,12 +357,67 @@ export class EventFormComponent implements OnInit, OnDestroy {
     return this.selectedRegion?.boundaryGeoJson;
   }
 
-  private isWithinSelectedRegion(lat: number, lng: number): boolean {
-    const boundary = this.selectedRegionBoundary;
-    if (!boundary) {
-      return true;
+  // Pronalazi prvi region iz ucitane liste cija granica sadrzi datu tacku.
+  private findRegionContainingPoint(lat: number, lng: number): RegionDto | null {
+    return this.regions.find((r) => r.boundaryGeoJson && isPointInGeoJson(lng, lat, r.boundaryGeoJson)) ?? null;
+  }
+
+  private haversineDistanceKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
+    const toRad = (value: number) => (value * Math.PI) / 180;
+    const earthRadiusKm = 6371;
+    const dLat = toRad(lat2 - lat1);
+    const dLng = toRad(lng2 - lng1);
+    const a =
+      Math.sin(dLat / 2) ** 2 +
+      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+    return earthRadiusKm * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+
+  // Ako nijedna destinacija ne sadrzi tacku po granici, pronadji najblizu destinaciju po centru.
+  private findNearestDestination(lat: number, lng: number, maxDistanceKm = 25): DestinationDto | null {
+    let nearest: DestinationDto | null = null;
+    let nearestDistance = Infinity;
+
+    for (const destination of this.destinations) {
+      if (destination.latitude == null || destination.longitude == null) {
+        continue;
+      }
+      const distance = this.haversineDistanceKm(lat, lng, destination.latitude, destination.longitude);
+      if (distance < nearestDistance) {
+        nearestDistance = distance;
+        nearest = destination;
+      }
     }
-    return isPointInGeoJson(lng, lat, boundary);
+
+    return nearest && nearestDistance <= maxDistanceKm ? nearest : null;
+  }
+
+  // Automatski izabere najblizi lokalitet (unutar 5km) koji pripada izabranoj destinaciji.
+  private tryAutoSelectLocality(lat: number, lng: number): void {
+    const destinationId = this.selectedDestinationId;
+    if (destinationId == null) {
+      return;
+    }
+
+    let nearest: LocalityOption | null = null;
+    let nearestDistance = Infinity;
+
+    for (const locality of this.localities) {
+      if (locality.destinationId !== destinationId || locality.latitude == null || locality.longitude == null) {
+        continue;
+      }
+      const distance = this.haversineDistanceKm(lat, lng, locality.latitude, locality.longitude);
+      if (distance < nearestDistance) {
+        nearestDistance = distance;
+        nearest = locality;
+      }
+    }
+
+    if (nearest && nearestDistance <= 5) {
+      if (this.toNumber(this.form.controls.localityId.value) !== nearest.id) {
+        this.form.patchValue({ localityId: String(nearest.id) }, { emitEvent: false });
+      }
+    }
   }
 
   get activeBoundaryGeoJson(): string | undefined {
@@ -769,49 +824,34 @@ export class EventFormComponent implements OnInit, OnDestroy {
   }
 
   onMapLocationSelected(event: { lat: number; lng: number }): void {
-    const destinationId = this.selectedDestinationId;
+    const { lat, lng } = event;
 
-    if (destinationId) {
-      if (!this.isWithinSelectedDestination(event.lat, event.lng)) {
-        this.errorMessage = this.translationService.translate('contentCreator.eventForm.errors.outsideDestination', {
-          destination: this.selectedDestination?.name ?? ''
-        });
-        const lat = this.toNumber(this.form.controls.latitude.value) ?? 42.424;
-        const lng = this.toNumber(this.form.controls.longitude.value) ?? 18.771;
-        this.mapComponent?.resetMarker(lat, lng);
-        this.cdr.detectChanges();
-        return;
-      }
+    // Uvek odmah odrazi kliknutu tacku na formi, pa zatim ponovo detektuj region/destinaciju/lokalitet.
+    this.setLocationFromSelection(lat, lng);
 
-      this.errorMessage = '';
-      this.setLocationFromSelection(event.lat, event.lng);
-      return;
-    }
-
-    // Nijedna destinacija jos nije izabrana - pokusaj automatsko prepoznavanje po klikom izabranoj tacki.
-    const matched = this.findDestinationContainingPoint(event.lat, event.lng);
+    const matched = this.findDestinationContainingPoint(lat, lng) ?? this.findNearestDestination(lat, lng);
     if (matched) {
       this.errorMessage = '';
       if (matched.regionId != null && this.selectedRegionId !== matched.regionId) {
         this.selectedRegionId = matched.regionId;
         this.loadDestinationsForRegion(matched.regionId);
       }
-      this.form.patchValue({ destinationId: String(matched.id) }, { emitEvent: false });
-      this.syncObjectSelectionWithDestination();
-    } else if (this.selectedRegionId != null && !this.isWithinSelectedRegion(event.lat, event.lng)) {
-      this.errorMessage = this.translationService.translate('contentCreator.eventForm.errors.outsideRegion', {
-        region: this.selectedRegion?.name ?? ''
-      });
-      const lat = this.toNumber(this.form.controls.latitude.value) ?? 42.424;
-      const lng = this.toNumber(this.form.controls.longitude.value) ?? 18.771;
-      this.mapComponent?.resetMarker(lat, lng);
-      this.cdr.detectChanges();
-      return;
+      if (this.selectedDestinationId !== matched.id) {
+        this.form.patchValue({ destinationId: String(matched.id) }, { emitEvent: false });
+        this.syncObjectSelectionWithDestination();
+      }
     } else {
+      const matchedRegion = this.findRegionContainingPoint(lat, lng);
+      if (matchedRegion && this.selectedRegionId !== matchedRegion.id) {
+        this.selectedRegionId = matchedRegion.id;
+        this.loadDestinationsForRegion(matchedRegion.id);
+      }
       this.errorMessage = '';
     }
 
-    this.setLocationFromSelection(event.lat, event.lng);
+    this.tryAutoSelectLocality(lat, lng);
+    this.refreshSubmitDisabled();
+    this.cdr.detectChanges();
   }
 
   onCoordinateInputChanged(): void {
@@ -822,51 +862,29 @@ export class EventFormComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const destinationId = this.selectedDestinationId;
-    const outsideMessage = this.translationService.translate('contentCreator.eventForm.errors.outsideDestination', {
-      destination: this.selectedDestination?.name ?? ''
-    });
-
-    if (destinationId) {
-      if (!this.isWithinSelectedDestination(lat, lng)) {
-        this.errorMessage = outsideMessage;
-        return;
-      }
-
-      if (this.errorMessage === outsideMessage) {
-        this.errorMessage = '';
-      }
-      return;
-    }
-
-    // Nijedna destinacija jos nije izabrana - pokusaj automatsko prepoznavanje po unetim koordinatama.
-    const matched = this.findDestinationContainingPoint(lat, lng);
+    const matched = this.findDestinationContainingPoint(lat, lng) ?? this.findNearestDestination(lat, lng);
     if (matched) {
       this.errorMessage = '';
       if (matched.regionId != null && this.selectedRegionId !== matched.regionId) {
         this.selectedRegionId = matched.regionId;
         this.loadDestinationsForRegion(matched.regionId);
       }
-      this.form.patchValue({ destinationId: String(matched.id) }, { emitEvent: false });
-      this.syncObjectSelectionWithDestination();
-      this.cdr.detectChanges();
-      return;
+      if (this.selectedDestinationId !== matched.id) {
+        this.form.patchValue({ destinationId: String(matched.id) }, { emitEvent: false });
+        this.syncObjectSelectionWithDestination();
+      }
+    } else {
+      const matchedRegion = this.findRegionContainingPoint(lat, lng);
+      if (matchedRegion && this.selectedRegionId !== matchedRegion.id) {
+        this.selectedRegionId = matchedRegion.id;
+        this.loadDestinationsForRegion(matchedRegion.id);
+      }
+      this.errorMessage = '';
     }
 
-    if (this.selectedRegionId != null) {
-      const outsideRegionMessage = this.translationService.translate('contentCreator.eventForm.errors.outsideRegion', {
-        region: this.selectedRegion?.name ?? ''
-      });
-
-      if (!this.isWithinSelectedRegion(lat, lng)) {
-        this.errorMessage = outsideRegionMessage;
-        return;
-      }
-
-      if (this.errorMessage === outsideRegionMessage) {
-        this.errorMessage = '';
-      }
-    }
+    this.tryAutoSelectLocality(lat, lng);
+    this.refreshSubmitDisabled();
+    this.cdr.detectChanges();
   }
 
   private setLocationFromSelection(latitude: number, longitude: number): void {

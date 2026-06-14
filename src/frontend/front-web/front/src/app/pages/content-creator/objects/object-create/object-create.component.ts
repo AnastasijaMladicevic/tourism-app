@@ -80,6 +80,7 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
 
   isAddressSearching = false;
   private forwardGeocodeRequestId = 0;
+  private reverseGeocodeRequestId = 0;
 
   /** Latest content status from API (for approve/decline availability). */
   reviewObjectStatus = '';
@@ -740,6 +741,86 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
     return isPointInGeoJson(lng, lat, boundary);
   }
 
+  private findRegionContainingPoint(lat: number, lng: number): RegionDto | null {
+    return this.regions.find((r) => r.boundaryGeoJson && isPointInGeoJson(lng, lat, r.boundaryGeoJson)) ?? null;
+  }
+
+  /** Fallback for destinations without boundary data: pick the closest one by its center point. */
+  private findNearestDestination(lat: number, lng: number, maxDistanceKm = 25): DestinationDto | null {
+    let nearest: DestinationDto | null = null;
+    let nearestDistanceKm = Infinity;
+
+    for (const destination of this.destinations) {
+      if (destination.latitude == null || destination.longitude == null) {
+        continue;
+      }
+      const distanceKm = this.haversineDistanceKm(lat, lng, destination.latitude, destination.longitude);
+      if (distanceKm < nearestDistanceKm) {
+        nearestDistanceKm = distanceKm;
+        nearest = destination;
+      }
+    }
+
+    return nearest && nearestDistanceKm <= maxDistanceKm ? nearest : null;
+  }
+
+  private haversineDistanceKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
+    const toRad = (value: number) => (value * Math.PI) / 180;
+    const earthRadiusKm = 6371;
+    const dLat = toRad(lat2 - lat1);
+    const dLng = toRad(lng2 - lng1);
+    const a =
+      Math.sin(dLat / 2) ** 2 +
+      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+    return earthRadiusKm * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+
+  /** Auto-selects the closest locality to the clicked point, within the selected destination. */
+  private tryAutoSelectLocality(lat: number, lng: number): void {
+    const destinationId = this.form.controls.destinationId.value;
+    if (destinationId == null) {
+      return;
+    }
+
+    const maxLocalityDistanceKm = 5;
+    let nearest: LocalityOption | null = null;
+    let nearestDistanceKm = Infinity;
+
+    for (const candidate of this.localities) {
+      if (candidate.destinationId !== destinationId || candidate.latitude == null || candidate.longitude == null) {
+        continue;
+      }
+      const distanceKm = this.haversineDistanceKm(lat, lng, candidate.latitude, candidate.longitude);
+      if (distanceKm < nearestDistanceKm) {
+        nearestDistanceKm = distanceKm;
+        nearest = candidate;
+      }
+    }
+
+    if (nearest && nearestDistanceKm <= maxLocalityDistanceKm) {
+      this.form.patchValue({ localityId: nearest.id }, { emitEvent: false });
+    }
+  }
+
+  /** Fills the address field from the clicked map coordinates via reverse geocoding. */
+  private reverseGeocodeAddress(lat: number, lng: number): void {
+    const requestId = ++this.reverseGeocodeRequestId;
+    const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`;
+
+    fetch(url, { headers: { Accept: 'application/json' } })
+      .then(r => r.ok ? r.json() : Promise.reject(new Error('Reverse geocoding failed')))
+      .then((result: { display_name?: string }) => {
+        this.ngZone.run(() => {
+          if (requestId !== this.reverseGeocodeRequestId || !result?.display_name) {
+            return;
+          }
+          this.form.patchValue({ address: result.display_name }, { emitEvent: false });
+          this.cdr.detectChanges();
+        });
+      })
+      .catch(() => undefined);
+  }
+
   get activeBoundaryGeoJson(): string | undefined {
     return this.selectedDestinationBoundary ?? this.selectedRegionBoundary;
   }
@@ -759,43 +840,31 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
 
     const { lat, lng } = event;
 
-    if (this.selectedDestination) {
-      if (!this.isWithinSelectedDestination(lat, lng)) {
-        this.locationErrorMessage = this.translationService.translate('contentCreatorObjectForm.errors.outsideDestination', {
-          destination: this.selectedDestination?.name ?? ''
-        });
-        const fallbackLat = this.toNumber(this.form.controls.latitude.value) ?? 42.424;
-        const fallbackLng = this.toNumber(this.form.controls.longitude.value) ?? 18.771;
-        this.mapComponent?.resetMarker(fallbackLat, fallbackLng);
-        this.cdr.detectChanges();
-        return;
-      }
-      this.locationErrorMessage = '';
-    } else {
-      const matched = this.findDestinationContainingPoint(lat, lng);
-      if (matched) {
-        this.locationErrorMessage = '';
-        this.selectedRegionId = matched.regionId ?? null;
-        this.loadDestinationsForRegion(this.selectedRegionId);
-        this.form.patchValue({ destinationId: matched.id }, { emitEvent: false });
-        this.syncLocalitySelectionWithDestination();
-      } else if (this.selectedRegionId != null && !this.isWithinSelectedRegion(lat, lng)) {
-        this.locationErrorMessage = this.translationService.translate('contentCreatorObjectForm.errors.outsideRegion', {
-          region: this.selectedRegion?.name ?? ''
-        });
-        const fallbackLat = this.toNumber(this.form.controls.latitude.value) ?? 42.424;
-        const fallbackLng = this.toNumber(this.form.controls.longitude.value) ?? 18.771;
-        this.mapComponent?.resetMarker(fallbackLat, fallbackLng);
-        this.cdr.detectChanges();
-        return;
-      } else {
-        this.locationErrorMessage = '';
-      }
-    }
-
+    // Always reflect the clicked point on the form, then re-detect region/destination/locality/address.
     this.form.patchValue({ latitude: lat, longitude: lng }, { emitEvent: false });
     this.form.controls.latitude.markAsDirty();
     this.form.controls.longitude.markAsDirty();
+
+    const matched = this.findDestinationContainingPoint(lat, lng) ?? this.findNearestDestination(lat, lng);
+    if (matched) {
+      this.locationErrorMessage = '';
+      this.selectedRegionId = matched.regionId ?? this.selectedRegionId;
+      if (this.form.controls.destinationId.value !== matched.id) {
+        this.loadDestinationsForRegion(this.selectedRegionId);
+        this.form.patchValue({ destinationId: matched.id }, { emitEvent: false });
+        this.syncLocalitySelectionWithDestination();
+      }
+    } else {
+      const matchedRegion = this.findRegionContainingPoint(lat, lng);
+      if (matchedRegion && this.selectedRegionId !== matchedRegion.id) {
+        this.selectedRegionId = matchedRegion.id;
+        this.loadDestinationsForRegion(this.selectedRegionId);
+      }
+      this.locationErrorMessage = '';
+    }
+
+    this.tryAutoSelectLocality(lat, lng);
+    this.reverseGeocodeAddress(lat, lng);
     this.cdr.detectChanges();
   }
 
@@ -808,29 +877,28 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
       return;
     }
 
-    if (this.selectedDestination) {
-      if (!this.isWithinSelectedDestination(lat, lng)) {
-        this.locationErrorMessage = this.translationService.translate('contentCreatorObjectForm.errors.outsideDestination', {
-          destination: this.selectedDestination?.name ?? ''
-        });
-        this.cdr.detectChanges();
-        return;
-      }
+    const matched = this.findDestinationContainingPoint(lat, lng) ?? this.findNearestDestination(lat, lng);
+    if (matched) {
       this.locationErrorMessage = '';
+      this.selectedRegionId = matched.regionId ?? this.selectedRegionId;
+      if (this.form.controls.destinationId.value !== matched.id) {
+        this.loadDestinationsForRegion(this.selectedRegionId);
+        this.form.patchValue({ destinationId: matched.id }, { emitEvent: false });
+        this.syncLocalitySelectionWithDestination();
+      }
+      this.tryAutoSelectLocality(lat, lng);
+      this.reverseGeocodeAddress(lat, lng);
       this.cdr.detectChanges();
       return;
     }
 
-    const matched = this.findDestinationContainingPoint(lat, lng);
-    if (matched) {
-      this.locationErrorMessage = '';
-      this.selectedRegionId = matched.regionId ?? null;
+    const matchedRegion = this.findRegionContainingPoint(lat, lng);
+    if (matchedRegion && this.selectedRegionId !== matchedRegion.id) {
+      this.selectedRegionId = matchedRegion.id;
       this.loadDestinationsForRegion(this.selectedRegionId);
-      this.form.patchValue({ destinationId: matched.id }, { emitEvent: false });
-      this.syncLocalitySelectionWithDestination();
-      this.cdr.detectChanges();
-      return;
     }
+
+    this.reverseGeocodeAddress(lat, lng);
 
     if (this.selectedRegionId != null) {
       const outsideRegionMessage = this.translationService.translate('contentCreatorObjectForm.errors.outsideRegion', {

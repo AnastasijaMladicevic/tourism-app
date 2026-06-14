@@ -2333,12 +2333,12 @@
         "concert": "Concerto"
       },
       "stats": {
-        "upcomingThisWeek": "In arrivo questa settimana",
-        "next7DaysHint": "Eventi pubblicati nei prossimi 7 giorni",
-        "publishedOnPage": "Pubblicati nella pagina",
-        "pageVisibilityHint": "Eventi pubblicati o approvati nella pagina corrente della tabella",
-        "capacityConfigured": "Capienza configurata",
-        "capacityConfiguredHint": "Quota di eventi visibili con numero massimo di visitatori impostato"
+        "totalEvents": "Totale eventi",
+        "totalEventsHint": "In base ai filtri attivi",
+        "onThisPage": "In questa pagina",
+        "onThisPageHint": "Eventi mostrati nella pagina corrente",
+        "next7Days": "Nei prossimi 7 giorni",
+        "next7DaysHint": "Eventi che iniziano nei prossimi 7 giorni"
       },
       "table": {
         "status": "Stato",
@@ -2775,6 +2775,7 @@
     "locality": "Località",
     "selectLocality": "Seleziona una località",
     "selectDestinationFirst": "Seleziona prima una destinazione",
+    "destinationOrLocalityRequired": "Devi selezionare una destinazione o una località per poter creare l'oggetto.",
     "story": "Storia",
     "fullDescription": "Descrizione completa",
     "descriptionPlaceholder": "Condividi la storia, i dettagli pratici e i punti di forza di questo oggetto.",

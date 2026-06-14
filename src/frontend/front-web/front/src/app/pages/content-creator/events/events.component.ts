@@ -84,9 +84,7 @@ export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
   rangeStartDate = '';
   rangeEndDate = '';
 
-  upcomingThisWeekCount = '-';
-  publishedOnPageCount = '-';
-  capacityConfiguredRate = '-';
+  next7DaysCount = '-';
 
   private readonly fallbackCategoryOptions: EventFilterOption[] = [
     { value: 'all', labelKey: 'contentCreator.events.filters.allCategories' },
@@ -141,14 +139,14 @@ export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
     this.loadCategoryOptions();
     this.loadStatusOptions();
     this.loadEvents();
-    this.loadUpcomingThisWeekStat();
+    this.loadNext7DaysStat();
   }
 
   ngOnDestroy(): void {
     this.stopHeroImageRotation();
   }
 
-  private loadUpcomingThisWeekStat(): void {
+  private loadNext7DaysStat(): void {
     forkJoin({
       approved: this.eventService.getMy({
         page: 1,
@@ -169,11 +167,11 @@ export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
     }).subscribe({
       next: ({ approved, published }) => {
         const upcomingVisibleCount = (approved.totalCount ?? 0) + (published.totalCount ?? 0);
-        this.upcomingThisWeekCount = String(upcomingVisibleCount);
+        this.next7DaysCount = String(upcomingVisibleCount);
         this.cdr.detectChanges();
       },
       error: () => {
-        this.upcomingThisWeekCount = String(this.countUpcomingNonDeclinedInEvents(this.events));
+        this.next7DaysCount = String(this.countUpcomingNonDeclinedInEvents(this.events));
       }
     });
   }
@@ -228,7 +226,6 @@ export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
         this.totalCount = response.totalCount;
         this.currentPage = response.page;
         this.syncStatusOptionsFromEvents();
-        this.refreshPageInsightCards(response.items ?? []);
 
         if (!this.selectedEvent || !this.pagedEvents.some((event) => event.id === this.selectedEvent?.id)) {
           this.setSelectedEvent(this.pagedEvents[0] ?? null);
@@ -685,21 +682,21 @@ export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
   get selectedInsightCards(): EventInsightCard[] {
     return [
       {
-        label: this.translationService.translate('contentCreator.events.stats.upcomingThisWeek'),
-        value: this.upcomingThisWeekCount,
-        hint: this.translationService.translate('contentCreator.events.stats.next7DaysHint'),
+        label: this.translationService.translate('contentCreator.events.stats.totalEvents'),
+        value: String(this.totalCount),
+        hint: this.translationService.translate('contentCreator.events.stats.totalEventsHint'),
         tone: 'blue',
       },
       {
-        label: this.translationService.translate('contentCreator.events.stats.publishedOnPage'),
-        value: this.publishedOnPageCount,
-        hint: this.translationService.translate('contentCreator.events.stats.pageVisibilityHint'),
+        label: this.translationService.translate('contentCreator.events.stats.onThisPage'),
+        value: String(this.pagedEvents.length),
+        hint: this.translationService.translate('contentCreator.events.stats.onThisPageHint'),
         tone: 'green',
       },
       {
-        label: this.translationService.translate('contentCreator.events.stats.capacityConfigured'),
-        value: this.capacityConfiguredRate,
-        hint: this.translationService.translate('contentCreator.events.stats.capacityConfiguredHint'),
+        label: this.translationService.translate('contentCreator.events.stats.next7Days'),
+        value: this.next7DaysCount,
+        hint: this.translationService.translate('contentCreator.events.stats.next7DaysHint'),
         tone: 'amber',
       },
     ];
@@ -925,21 +922,6 @@ export class ContentCreatorEventsComponent implements OnInit, OnDestroy {
     if (!this.statusOptions.some((option) => option.value === this.statusFilter)) {
       this.statusFilter = 'all';
     }
-  }
-
-  private refreshPageInsightCards(items: EventDto[]): void {
-    const publishedCount = items.filter((event) => {
-      const normalized = (event.status ?? '').toLowerCase();
-      return normalized === 'published' || normalized === 'approved';
-    }).length;
-
-    const configuredCapacityCount = items.filter((event) => (event.maxVisitors ?? 0) > 0).length;
-    const capacityConfiguredRate = items.length > 0
-      ? Math.round((configuredCapacityCount / items.length) * 100)
-      : 0;
-
-    this.publishedOnPageCount = String(publishedCount);
-    this.capacityConfiguredRate = `${capacityConfiguredRate}%`;
   }
 
 }

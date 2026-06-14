@@ -139,20 +139,22 @@
             </select>
           </label>
           <label>
-            <span>{{ 'contentCreatorObjectForm.destination' | translate }}</span>
+            <span>{{ 'contentCreatorObjectForm.destination' | translate }} <span class="required-star" aria-hidden="true">*</span></span>
             <select formControlName="destinationId">
               <option [ngValue]="null">{{ selectedRegionId ? ('contentCreatorObjectForm.selectDestination' | translate) : ('contentCreatorObjectForm.selectRegionFirst' | translate) }}</option>
               <option *ngFor="let destination of destinations" [ngValue]="destination.id">{{ destination.name }}</option>
             </select>
           </label>
           <label>
-            <span>{{ 'contentCreatorObjectForm.locality' | translate }}</span>
+            <span>{{ 'contentCreatorObjectForm.locality' | translate }} <span class="required-star" aria-hidden="true">*</span></span>
             <select formControlName="localityId">
               <option [ngValue]="null">{{ form.controls.destinationId.value ? ('contentCreatorObjectForm.selectLocality' | translate) : ('contentCreatorObjectForm.selectDestinationFirst' | translate) }}</option>
               <option *ngFor="let locality of filteredLocalities" [ngValue]="locality.id">{{ locality.name }}</option>
             </select>
           </label>
-          @if (locationErrorMessage) {
+          @if (!form.controls.destinationId.value && !form.controls.localityId.value) {
+            <p class="error-msg inline-field-error" style="grid-column: 1 / -1">{{ 'contentCreatorObjectForm.destinationOrLocalityRequired' | translate }}</p>
+          } @else if (locationErrorMessage) {
             <p class="error-msg inline-field-error" style="grid-column: 1 / -1">{{ locationErrorMessage }}</p>
           }
         </div>

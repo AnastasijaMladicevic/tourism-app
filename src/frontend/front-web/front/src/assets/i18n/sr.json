@@ -2333,12 +2333,12 @@
         "concert": "Koncert"
       },
       "stats": {
-        "upcomingThisWeek": "Predstojeće ove nedelje",
-        "next7DaysHint": "Događaji objavljeni u narednih 7 dana",
-        "publishedOnPage": "Objavljeno na stranici",
-        "pageVisibilityHint": "Objavljeni ili odobreni događaji na trenutnoj stranici tabele",
-        "capacityConfigured": "Podešen kapacitet",
-        "capacityConfiguredHint": "Udeo vidljivih događaja sa podešenim maksimalnim brojem posetilaca"
+        "totalEvents": "Ukupno događaja",
+        "totalEventsHint": "Odgovara aktivnim filterima",
+        "onThisPage": "Na ovoj stranici",
+        "onThisPageHint": "Događaji prikazani na trenutnoj stranici",
+        "next7Days": "U narednih 7 dana",
+        "next7DaysHint": "Događaji koji počinju u narednih 7 dana"
       },
       "table": {
         "status": "Status",
@@ -2775,6 +2775,7 @@
     "locality": "Lokalitet",
     "selectLocality": "Izaberi lokalitet",
     "selectDestinationFirst": "Prvo izaberi destinaciju",
+    "destinationOrLocalityRequired": "Obavezno izaberi destinaciju ili lokalitet da bi mogla/mogao da kreiraš objekat.",
     "story": "Priča",
     "fullDescription": "Pun opis",
     "descriptionPlaceholder": "Podeli priču, praktične informacije i glavne kvalitete ovog objekta.",
