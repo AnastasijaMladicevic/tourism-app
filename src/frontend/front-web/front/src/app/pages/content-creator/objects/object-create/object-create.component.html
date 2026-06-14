@@ -108,7 +108,7 @@
             <span>{{ 'contentCreatorObjectForm.objectType' | translate }} <span class="required-star" aria-hidden="true">*</span></span>
             <select formControlName="objectTypeId">
               <option [ngValue]="null">{{ 'contentCreatorObjectForm.selectType' | translate }}</option>
-              <option *ngFor="let type of objectTypes" [ngValue]="type.id">{{ type.name }}</option>
+              <option *ngFor="let type of objectTypes" [ngValue]="type.id">{{ translateTypeName(type.name) }}</option>
             </select>
           </label>
           @if (showObjectPriceField) {

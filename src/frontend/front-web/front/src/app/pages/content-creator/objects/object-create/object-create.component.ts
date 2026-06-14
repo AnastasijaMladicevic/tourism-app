@@ -267,6 +267,10 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
     return this.isEditMode && this.objectId != null && !this.isManagerReview;
   }
 
+  translateTypeName(name: string): string {
+    return this.translationService.translateLiteral(name);
+  }
+
   get selectedObjectTypeName(): string {
     const typeId = this.form.controls.objectTypeId.value;
     if (typeId == null) {
