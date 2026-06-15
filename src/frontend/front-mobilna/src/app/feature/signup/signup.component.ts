@@ -329,7 +329,9 @@ export class SignupComponent implements OnDestroy {
       .subscribe({
         next: () => {
           this.isLoading = false;
-          this.router.navigate(['/login']);
+          this.router.navigate(['/login'], {
+            state: { registered: true, email: this.form.value.email ?? '' },
+          });
         },
         error: (err) => {
           this.isLoading = false;

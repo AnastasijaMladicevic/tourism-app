@@ -18,6 +18,8 @@ namespace TuristickiVodic.Services
         Task<UserEditLockDto?> AcquireEditLockAsync(int userId, int requestingUserId);
         Task<UserEditLockDto?> RefreshEditLockAsync(int userId, int requestingUserId);
         Task<bool> ReleaseEditLockAsync(int userId, int requestingUserId);
+        Task<UserDto?> VerifyEmailAsync(VerifyEmailDto dto);
+        Task ResendVerificationEmailAsync(ResendVerificationEmailDto dto);
         Task ForgotPasswordAsync(ForgotPasswordDto dto);
         Task<ResetPasswordVerificationDto> VerifyResetCodeAsync(VerifyResetCodeDto dto);
         Task ResetPasswordAsync(ResetPasswordDto dto);

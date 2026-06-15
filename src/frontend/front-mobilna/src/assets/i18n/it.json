@@ -236,7 +236,13 @@
     "onlyTourists": "Solo i turisti possono accedere da qui.",
     "invalidCredentials": "Email o password non validi.",
     "googleFailed": "L'accesso con Google non è disponibile in questo momento.",
-    "loginButton": "Accedi"
+    "loginButton": "Accedi",
+    "registrationSuccess": "Registrazione completata! Controlla la tua email per verificare il tuo account prima di accedere.",
+    "emailNotVerified": "Verifica il tuo indirizzo email prima di accedere.",
+    "resendVerificationEmail": "Invia di nuovo l'email di verifica",
+    "resending": "Invio in corso...",
+    "verificationEmailSent": "Email di verifica inviata. Controlla la tua casella di posta.",
+    "resendFailed": "Impossibile inviare nuovamente l'email di verifica. Riprova più tardi."
   },
   "forgotPassword": {
     "title": "Password dimenticata",
@@ -1336,6 +1342,15 @@
       "title": "Password aggiornata",
       "body": "La tua password è stata aggiornata con successo.",
       "loginButton": "Accedi"
+    },
+    "verifyEmail": {
+      "loadingTitle": "Verifica della tua email...",
+      "loadingBody": "Attendi mentre confermiamo il tuo indirizzo email.",
+      "successTitle": "Email verificata",
+      "successBody": "Il tuo indirizzo email è stato verificato con successo. Ora puoi accedere.",
+      "errorTitle": "Verifica non riuscita",
+      "errorBody": "Questo link di verifica non è valido o è scaduto. Richiedine uno nuovo dalla pagina di accesso.",
+      "loginButton": "Vai al login"
     }
   },
   "search": {

@@ -30,6 +30,10 @@ export class LoginComponent implements OnDestroy {
   hidePassword = true;
   isLoading = false;
   errorMessage = '';
+  infoMessage = '';
+  emailNotVerified = false;
+  isResending = false;
+  resendSuccessMessage = '';
   returnUrl = '/home';
   googleClientId: string | null = null;
   private googlePopupListener: ((e: MessageEvent) => void) | null = null;
@@ -55,6 +59,14 @@ export class LoginComponent implements OnDestroy {
       ],
       rememberMe: [false],
     });
+
+    const state = history.state as { registered?: boolean; email?: string } | undefined;
+    if (state?.registered) {
+      this.infoMessage = this.translationService.translate('login.registrationSuccess');
+      if (state.email) {
+        this.form.patchValue({ email: state.email });
+      }
+    }
 
     this.loadGoogleAuthSettings();
   }
@@ -87,6 +99,9 @@ export class LoginComponent implements OnDestroy {
   login(): void {
     this.isLoading = true;
     this.errorMessage = '';
+    this.infoMessage = '';
+    this.emailNotVerified = false;
+    this.resendSuccessMessage = '';
 
     this.authService.login({
       email: this.form.value.email,
@@ -96,6 +111,13 @@ export class LoginComponent implements OnDestroy {
       next: (response) => {
         this.isLoading = false;
         this.cdr.detectChanges();
+
+        if (response.requiresEmailVerification) {
+          this.emailNotVerified = true;
+          this.errorMessage = this.translationService.translate('login.emailNotVerified');
+          this.cdr.detectChanges();
+          return;
+        }
 
         const role = response.user?.roleName?.toLowerCase();
         if (role && role !== 'tourist') {
@@ -240,6 +262,28 @@ export class LoginComponent implements OnDestroy {
     }
     this.router.navigateByUrl(this.returnUrl);
   }
+  resendVerificationEmail(): void {
+    const email = this.form.value.email;
+    if (!email || this.isResending) return;
+
+    this.isResending = true;
+    this.resendSuccessMessage = '';
+    this.cdr.detectChanges();
+
+    this.authService.resendVerificationEmail(email).subscribe({
+      next: () => {
+        this.isResending = false;
+        this.resendSuccessMessage = this.translationService.translate('login.verificationEmailSent');
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.isResending = false;
+        this.resendSuccessMessage = err?.error?.message ?? this.translationService.translate('login.resendFailed');
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
   goRegister(): void { this.router.navigate(['/register']); }
   goForgot(): void { this.router.navigate(['/forgot-password']); }
   goTerms(): void { this.router.navigate(['/terms']); }

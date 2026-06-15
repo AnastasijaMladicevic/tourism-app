@@ -1,0 +1,32 @@
+<div class="page">
+  <div class="card">
+    <div class="auth-topbar">
+      <div class="logo">
+        <app-logo size="lg"></app-logo>
+      </div>
+    </div>
+
+    <div class="content">
+      @if (status === 'loading') {
+        <h1 class="title">{{ 'auth.verifyEmail.loadingTitle' | translate }}</h1>
+        <p class="subtitle">{{ 'auth.verifyEmail.loadingBody' | translate }}</p>
+      }
+
+      @if (status === 'success') {
+        <h1 class="title">{{ 'auth.verifyEmail.successTitle' | translate }}</h1>
+        <p class="subtitle">{{ 'auth.verifyEmail.successBody' | translate }}</p>
+      }
+
+      @if (status === 'error') {
+        <h1 class="title">{{ 'auth.verifyEmail.errorTitle' | translate }}</h1>
+        <p class="subtitle">{{ 'auth.verifyEmail.errorBody' | translate }}</p>
+      }
+    </div>
+
+    @if (status !== 'loading') {
+      <button class="btn btn-primary" (click)="goToLogin()" (keydown.enter)="goToLogin()">
+        {{ 'auth.verifyEmail.loginButton' | translate }}
+      </button>
+    }
+  </div>
+</div>

@@ -236,7 +236,13 @@
     "onlyTourists": "Only tourists can log in here.",
     "invalidCredentials": "Invalid email or password.",
     "googleFailed": "Google sign-in is currently unavailable.",
-    "loginButton": "Log In"
+    "loginButton": "Log In",
+    "registrationSuccess": "Registration successful! Please check your email to verify your account before logging in.",
+    "emailNotVerified": "Please verify your email address before logging in.",
+    "resendVerificationEmail": "Resend verification email",
+    "resending": "Sending...",
+    "verificationEmailSent": "Verification email sent. Please check your inbox.",
+    "resendFailed": "Could not resend the verification email. Please try again later."
   },
   "forgotPassword": {
     "title": "Forgot Password",
@@ -1340,6 +1346,15 @@
       "title": "Password Updated",
       "body": "Your password has been successfully updated.",
       "loginButton": "Login"
+    },
+    "verifyEmail": {
+      "loadingTitle": "Verifying your email...",
+      "loadingBody": "Please wait while we confirm your email address.",
+      "successTitle": "Email Verified",
+      "successBody": "Your email address has been successfully verified. You can now log in.",
+      "errorTitle": "Verification Failed",
+      "errorBody": "This verification link is invalid or has expired. Please request a new one from the login page.",
+      "loginButton": "Go to Login"
     }
   },
   "search": {

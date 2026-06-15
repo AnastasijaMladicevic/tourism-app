@@ -24,6 +24,7 @@ namespace TuristickiVodic.Services
         private const int ResetCodeLifetimeMinutes = 5;
         private const int ResetSessionLifetimeMinutes = 5;
         private const int TwoFactorCodeLifetimeMinutes = 5;
+        private const int EmailVerificationLifetimeHours = 24;
         private const int ShareLocationStaleMinutes = 30;
         private const int MaxVisitedHistoryPoints = 3000;
         private const double MaxVisitedPointAccuracyMeters = 250d;
@@ -664,15 +665,33 @@ namespace TuristickiVodic.Services
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(createUserDto.Password);
             user.RoleId = role.Id;
             user.Role = role;
-            user.IsVerified = false;
             user.IsActive = true;
             user.IsBlacklisted = false;
             user.ProfileImageUrl = "/images/profiles/default_icon.png";
             user.CreatedAt = DateTime.UtcNow;
             user.UpdatedAt = DateTime.UtcNow;
 
+            string? verificationToken = null;
+
+            if (roleType == RoleType.Tourist)
+            {
+                verificationToken = GenerateOpaqueToken();
+                user.IsVerified = false;
+                user.VerificationToken = HashOpaqueToken(verificationToken);
+                user.VerificationTokenExpiry = DateTime.UtcNow.AddHours(EmailVerificationLifetimeHours);
+            }
+            else
+            {
+                user.IsVerified = true;
+            }
+
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
+
+            if (verificationToken != null)
+            {
+                await SendVerificationEmailAsync(user, verificationToken);
+            }
 
             return await MapExistingUserDtoWithMetricsAsync(user);
         }
@@ -796,6 +815,107 @@ namespace TuristickiVodic.Services
             await _context.SaveChangesAsync();
         }
 
+        public async Task<UserDto?> VerifyEmailAsync(VerifyEmailDto dto)
+        {
+            var tokenHash = HashOpaqueToken(dto.Token.Trim());
+
+            var user = await _context.Users
+                .Include(u => u.Role)
+                .Include(u => u.PreferredRegion)
+                .FirstOrDefaultAsync(u => u.VerificationToken == tokenHash);
+
+            if (user == null ||
+                !user.VerificationTokenExpiry.HasValue ||
+                user.VerificationTokenExpiry.Value <= DateTime.UtcNow)
+            {
+                throw new InvalidOperationException("Invalid or expired verification link.");
+            }
+
+            user.IsVerified = true;
+            user.VerificationToken = null;
+            user.VerificationTokenExpiry = null;
+            user.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            return await MapExistingUserDtoWithMetricsAsync(user);
+        }
+
+        public async Task ResendVerificationEmailAsync(ResendVerificationEmailDto dto)
+        {
+            var normalizedEmail = dto.Email.Trim().ToLowerInvariant();
+
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Email.Trim().ToLower() == normalizedEmail);
+
+            if (user == null || !user.IsActive)
+                throw new InvalidOperationException("Korisnik sa ovom email adresom jos uvek nije registrovan.");
+
+            if (user.IsVerified)
+                throw new InvalidOperationException("Email adresa je vec potvrdjena.");
+
+            await EnsureUserNotBannedAsync(user);
+
+            var verificationToken = GenerateOpaqueToken();
+            user.VerificationToken = HashOpaqueToken(verificationToken);
+            user.VerificationTokenExpiry = DateTime.UtcNow.AddHours(EmailVerificationLifetimeHours);
+            user.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            await SendVerificationEmailAsync(user, verificationToken);
+        }
+
+        private async Task SendVerificationEmailAsync(User user, string verificationToken)
+        {
+            var verifyUrl = $"{ResolvePublicAppBaseUrl()}/verify-email?token={Uri.EscapeDataString(verificationToken)}";
+            var subject = ResolveVerificationEmailSubject(user.Language);
+            var htmlBody = BuildVerificationEmailBody(user.FirstName, verifyUrl, user.Language);
+
+            await _emailService.SendAsync(user.Email, subject, htmlBody);
+        }
+
+        private static string ResolveVerificationEmailSubject(string? language)
+        {
+            return language?.Trim().ToLowerInvariant() switch
+            {
+                "sr" or "me" or "cnr" => "Potvrdi svoju SpireGO email adresu",
+                _ => "Confirm your SpireGO email address"
+            };
+        }
+
+        private static string BuildVerificationEmailBody(string? firstName, string verifyUrl, string? language)
+        {
+            var safeName = string.IsNullOrWhiteSpace(firstName) ? "there" : System.Net.WebUtility.HtmlEncode(firstName);
+            var encodedUrl = System.Net.WebUtility.HtmlEncode(verifyUrl);
+
+            return language?.Trim().ToLowerInvariant() switch
+            {
+                "sr" or "me" or "cnr" => $"""
+                    <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+                        <h2>Potvrda email adrese</h2>
+                        <p>Zdravo {safeName},</p>
+                        <p>Hvala na registraciji na SpireGO. Da bi aktivirao/la svoj nalog, potvrdi email adresu klikom na dugme ispod:</p>
+                        <p><a href="{encodedUrl}" style="display: inline-block; padding: 12px 24px; background-color: #2e7d32; color: #ffffff; text-decoration: none; border-radius: 6px;">Potvrdi email</a></p>
+                        <p>Ako dugme ne radi, otvori ovaj link u pretrazivacu:</p>
+                        <p>{encodedUrl}</p>
+                        <p>Link vazi {EmailVerificationLifetimeHours} sata. Ako nisi ti kreirao/la ovaj nalog, slobodno ignorisi ovu poruku.</p>
+                    </div>
+                    """,
+                _ => $"""
+                    <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+                        <h2>Confirm your email address</h2>
+                        <p>Hello {safeName},</p>
+                        <p>Thanks for signing up for SpireGO. To activate your account, please confirm your email address by clicking the button below:</p>
+                        <p><a href="{encodedUrl}" style="display: inline-block; padding: 12px 24px; background-color: #2e7d32; color: #ffffff; text-decoration: none; border-radius: 6px;">Confirm email</a></p>
+                        <p>If the button doesn't work, open this link in your browser:</p>
+                        <p>{encodedUrl}</p>
+                        <p>This link is valid for {EmailVerificationLifetimeHours} hours. If you did not create this account, you can safely ignore this email.</p>
+                    </div>
+                    """
+            };
+        }
+
         public async Task ForgotPasswordAsync(ForgotPasswordDto dto)
         {
             await ReleaseExpiredBansAsync();
@@ -909,6 +1029,15 @@ namespace TuristickiVodic.Services
 
             if (!user.IsActive)
                 throw new InvalidOperationException("Account is deactivated");
+
+            if (RequiresEmailVerification(user))
+            {
+                return new AuthResponseDto
+                {
+                    RequiresEmailVerification = true,
+                    EmailVerificationDeliveryTarget = MaskEmailAddress(user.Email)
+                };
+            }
 
             if (ShouldRequireTwoFactor(user))
                 return await CreateTwoFactorChallengeAsync(user, loginDto.RememberMe);
@@ -1498,6 +1627,9 @@ namespace TuristickiVodic.Services
 
         private static bool ShouldRequireTwoFactor(User user)
             => user.IsTwoFactorEnabled && user.Role?.Name == RoleType.Tourist;
+
+        private static bool RequiresEmailVerification(User user)
+            => !user.IsVerified && user.Role?.Name == RoleType.Tourist;
 
         private async Task<AuthResponseDto> CreateTwoFactorChallengeAsync(User user, bool rememberMe)
         {

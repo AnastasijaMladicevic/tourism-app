@@ -236,7 +236,13 @@
     "onlyTourists": "Samo turisti mogu da se prijave ovde.",
     "invalidCredentials": "Neispravan email ili lozinka.",
     "googleFailed": "Google prijava trenutno nije uspela.",
-    "loginButton": "Prijavi se"
+    "loginButton": "Prijavi se",
+    "registrationSuccess": "Registracija je uspešna! Provjeri svoj email da bi potvrdio/la nalog pre prijave.",
+    "emailNotVerified": "Potvrdi svoju email adresu pre prijave.",
+    "resendVerificationEmail": "Ponovo pošalji email za potvrdu",
+    "resending": "Slanje...",
+    "verificationEmailSent": "Email za potvrdu je poslat. Provjeri svoje sanduče.",
+    "resendFailed": "Slanje email-a za potvrdu nije uspelo. Pokušaj kasnije."
   },
   "forgotPassword": {
     "title": "Zaboravljena lozinka",
@@ -1340,6 +1346,15 @@
       "title": "Lozinka je ažurirana",
       "body": "Vaša lozinka je uspešno ažurirana.",
       "loginButton": "Prijavi se"
+    },
+    "verifyEmail": {
+      "loadingTitle": "Verifikacija email adrese...",
+      "loadingBody": "Sačekaj dok potvrđujemo tvoju email adresu.",
+      "successTitle": "Email je potvrđen",
+      "successBody": "Tvoja email adresa je uspešno potvrđena. Sada možeš da se prijaviš.",
+      "errorTitle": "Verifikacija nije uspela",
+      "errorBody": "Ovaj link za verifikaciju nije važeći ili je istekao. Zatraži novi sa stranice za prijavu.",
+      "loginButton": "Idi na prijavu"
     }
   },
   "search": {

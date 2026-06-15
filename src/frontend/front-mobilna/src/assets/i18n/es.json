@@ -236,7 +236,13 @@
     "onlyTourists": "Solo los turistas pueden iniciar sesión aquí.",
     "invalidCredentials": "Email o contraseña incorrectos.",
     "googleFailed": "El acceso con Google no está disponible en este momento.",
-    "loginButton": "Iniciar sesión"
+    "loginButton": "Iniciar sesión",
+    "registrationSuccess": "¡Registro exitoso! Revisa tu correo para verificar tu cuenta antes de iniciar sesión.",
+    "emailNotVerified": "Verifica tu dirección de correo electrónico antes de iniciar sesión.",
+    "resendVerificationEmail": "Reenviar correo de verificación",
+    "resending": "Enviando...",
+    "verificationEmailSent": "Correo de verificación enviado. Revisa tu bandeja de entrada.",
+    "resendFailed": "No se pudo reenviar el correo de verificación. Inténtalo de nuevo más tarde."
   },
   "forgotPassword": {
     "title": "Olvidé mi contraseña",
@@ -1336,6 +1342,15 @@
       "title": "Contraseña actualizada",
       "body": "Tu contraseña se ha actualizado correctamente.",
       "loginButton": "Iniciar sesión"
+    },
+    "verifyEmail": {
+      "loadingTitle": "Verificando tu email...",
+      "loadingBody": "Espera mientras confirmamos tu dirección de correo electrónico.",
+      "successTitle": "Email verificado",
+      "successBody": "Tu dirección de correo electrónico ha sido verificada correctamente. Ya puedes iniciar sesión.",
+      "errorTitle": "Verificación fallida",
+      "errorBody": "Este enlace de verificación no es válido o ha expirado. Solicita uno nuevo desde la página de inicio de sesión.",
+      "loginButton": "Ir a iniciar sesión"
     }
   },
   "search": {

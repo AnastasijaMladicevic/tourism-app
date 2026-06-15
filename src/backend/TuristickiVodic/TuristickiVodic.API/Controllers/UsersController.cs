@@ -270,6 +270,42 @@ namespace TuristickiVodic.API.Controllers
             }
         }
 
+        [HttpPost("verify-email")]
+        [AllowAnonymous]
+        public async Task<IActionResult> VerifyEmail([FromBody] VerifyEmailDto verifyEmailDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var user = await _userService.VerifyEmailAsync(verifyEmailDto);
+                return Ok(NormalizeUser(user));
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPost("resend-verification")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ResendVerificationEmail([FromBody] ResendVerificationEmailDto resendVerificationEmailDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                await _userService.ResendVerificationEmailAsync(resendVerificationEmailDto);
+                return Ok(new { message = "Verification email has been sent." });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message + " | " + ex.InnerException?.Message });
+            }
+        }
+
         [HttpGet("auth-settings")]
         [AllowAnonymous]
         public IActionResult GetPublicAuthSettings()
