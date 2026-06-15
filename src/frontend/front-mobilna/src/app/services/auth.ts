@@ -178,8 +178,8 @@ export class AuthService {
     return this.http.post<UserDto>(`${this.url}/register`, dto);
   }
 
-  verifyEmail(token: string): Observable<UserDto> {
-    return this.http.post<UserDto>(`${this.url}/verify-email`, { token });
+  verifyEmail(email: string, code: string): Observable<UserDto> {
+    return this.http.post<UserDto>(`${this.url}/verify-email`, { email, code });
   }
 
   resendVerificationEmail(email: string): Observable<{ message: string }> {

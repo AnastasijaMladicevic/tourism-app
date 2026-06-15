@@ -237,12 +237,7 @@
     "invalidCredentials": "Invalid email or password.",
     "googleFailed": "Google sign-in is currently unavailable.",
     "loginButton": "Log In",
-    "registrationSuccess": "Registration successful! Please check your email to verify your account before logging in.",
-    "emailNotVerified": "Please verify your email address before logging in.",
-    "resendVerificationEmail": "Resend verification email",
-    "resending": "Sending...",
-    "verificationEmailSent": "Verification email sent. Please check your inbox.",
-    "resendFailed": "Could not resend the verification email. Please try again later."
+    "emailVerifiedSuccess": "Email verified successfully! You can now log in."
   },
   "forgotPassword": {
     "title": "Forgot Password",
@@ -1348,13 +1343,15 @@
       "loginButton": "Login"
     },
     "verifyEmail": {
-      "loadingTitle": "Verifying your email...",
-      "loadingBody": "Please wait while we confirm your email address.",
-      "successTitle": "Email Verified",
-      "successBody": "Your email address has been successfully verified. You can now log in.",
-      "errorTitle": "Verification Failed",
-      "errorBody": "This verification link is invalid or has expired. Please request a new one from the login page.",
-      "loginButton": "Go to Login"
+      "title": "Verify Your Email",
+      "subtitle": "Enter the 6-digit code sent to",
+      "verifyButton": "Verify Email",
+      "resendButton": "Resend Code",
+      "codeRequired": "Enter all 6 digits.",
+      "codeExpired": "The code expired. Request a new one.",
+      "invalidCode": "Invalid or expired code.",
+      "resendSuccess": "A new code was sent.",
+      "resendFailed": "The code could not be resent right now."
     }
   },
   "search": {

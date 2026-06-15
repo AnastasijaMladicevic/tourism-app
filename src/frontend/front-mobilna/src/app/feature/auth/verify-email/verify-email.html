@@ -1,32 +1,76 @@
 <div class="page">
   <div class="card">
     <div class="auth-topbar">
+      <!-- Back button -->
+      <button class="back-btn" (click)="goBack()" [attr.aria-label]="'common.back' | translate">
+        <span class="material-icons">arrow_back_ios</span>
+      </button>
+
+      <!-- Logo -->
       <div class="logo">
         <app-logo size="lg"></app-logo>
       </div>
+
+      <span class="auth-topbar__spacer" aria-hidden="true"></span>
     </div>
 
-    <div class="content">
-      @if (status === 'loading') {
-        <h1 class="title">{{ 'auth.verifyEmail.loadingTitle' | translate }}</h1>
-        <p class="subtitle">{{ 'auth.verifyEmail.loadingBody' | translate }}</p>
-      }
+    <!-- Heading -->
+    <h1 class="title">{{ 'auth.verifyEmail.title' | translate }}</h1>
+    <p class="subtitle">
+      {{ 'auth.verifyEmail.subtitle' | translate }}<br />
+      <span class="email">{{ email }}</span>
+    </p>
 
-      @if (status === 'success') {
-        <h1 class="title">{{ 'auth.verifyEmail.successTitle' | translate }}</h1>
-        <p class="subtitle">{{ 'auth.verifyEmail.successBody' | translate }}</p>
-      }
-
-      @if (status === 'error') {
-        <h1 class="title">{{ 'auth.verifyEmail.errorTitle' | translate }}</h1>
-        <p class="subtitle">{{ 'auth.verifyEmail.errorBody' | translate }}</p>
+    <!-- OTP inputs -->
+    <div class="otp-row" (paste)="onPaste($event)">
+      @for (val of otpValues; track $index) {
+        <input
+          #otpInput
+          class="otp-input"
+          [class.otp-input--filled]="otpValues[$index] !== ''"
+          [class.otp-input--error]="errorMessage !== ''"
+          type="text"
+          inputmode="numeric"
+          maxlength="1"
+          autocomplete="one-time-code"
+          [value]="otpValues[$index]"
+          (input)="onInput($event, $index)"
+          (keydown)="onKeyDown($event, $index)"
+          (keydown.enter)="verifyCode()"
+          [attr.aria-label]="'OTP digit ' + ($index + 1)"
+        />
       }
     </div>
 
-    @if (status !== 'loading') {
-      <button class="btn btn-primary" (click)="goToLogin()" (keydown.enter)="goToLogin()">
-        {{ 'auth.verifyEmail.loginButton' | translate }}
-      </button>
+    <!-- Timer -->
+    <p class="timer" [class.timer--expired]="isExpired">{{ timerDisplay }}</p>
+
+    <!-- Error -->
+    @if (errorMessage) {
+      <p class="error" role="alert">{{ errorMessage }}</p>
     }
+
+    <!-- Resend feedback -->
+    @if (resendMessage) {
+      <p class="resend-message">{{ resendMessage }}</p>
+    }
+
+    <!-- Buttons -->
+    <button
+      class="btn btn-primary"
+      [class.btn-loading]="isLoading"
+      [disabled]="isLoading || !isOtpComplete || isExpired"
+      (click)="verifyCode()"
+    >
+      @if (isLoading) {
+        <span class="spinner"></span>
+      } @else {
+        {{ 'auth.verifyEmail.verifyButton' | translate }}
+      }
+    </button>
+
+    <button class="btn btn-outline" [disabled]="isLoading || isResending" (click)="resendCode()">
+      {{ 'auth.verifyEmail.resendButton' | translate }}
+    </button>
   </div>
 </div>

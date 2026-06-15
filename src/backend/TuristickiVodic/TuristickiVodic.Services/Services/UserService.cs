@@ -24,7 +24,7 @@ namespace TuristickiVodic.Services
         private const int ResetCodeLifetimeMinutes = 5;
         private const int ResetSessionLifetimeMinutes = 5;
         private const int TwoFactorCodeLifetimeMinutes = 5;
-        private const int EmailVerificationLifetimeHours = 24;
+        private const int EmailVerificationCodeLifetimeMinutes = 10;
         private const int ShareLocationStaleMinutes = 30;
         private const int MaxVisitedHistoryPoints = 3000;
         private const double MaxVisitedPointAccuracyMeters = 250d;
@@ -675,10 +675,10 @@ namespace TuristickiVodic.Services
 
             if (roleType == RoleType.Tourist)
             {
-                verificationToken = GenerateOpaqueToken();
+                verificationToken = GenerateTwoFactorCode();
                 user.IsVerified = false;
                 user.VerificationToken = HashOpaqueToken(verificationToken);
-                user.VerificationTokenExpiry = DateTime.UtcNow.AddHours(EmailVerificationLifetimeHours);
+                user.VerificationTokenExpiry = DateTime.UtcNow.AddMinutes(EmailVerificationCodeLifetimeMinutes);
             }
             else
             {
@@ -817,18 +817,22 @@ namespace TuristickiVodic.Services
 
         public async Task<UserDto?> VerifyEmailAsync(VerifyEmailDto dto)
         {
-            var tokenHash = HashOpaqueToken(dto.Token.Trim());
+            var normalizedEmail = dto.Email.Trim().ToLowerInvariant();
+            var codeHash = HashOpaqueToken(dto.Code.Trim());
 
             var user = await _context.Users
                 .Include(u => u.Role)
                 .Include(u => u.PreferredRegion)
-                .FirstOrDefaultAsync(u => u.VerificationToken == tokenHash);
+                .FirstOrDefaultAsync(u => u.Email.Trim().ToLower() == normalizedEmail);
 
             if (user == null ||
+                user.IsVerified ||
+                string.IsNullOrEmpty(user.VerificationToken) ||
+                !string.Equals(user.VerificationToken, codeHash, StringComparison.Ordinal) ||
                 !user.VerificationTokenExpiry.HasValue ||
                 user.VerificationTokenExpiry.Value <= DateTime.UtcNow)
             {
-                throw new InvalidOperationException("Invalid or expired verification link.");
+                throw new InvalidOperationException("Kod za potvrdu nije ispravan ili je istekao.");
             }
 
             user.IsVerified = true;
@@ -856,21 +860,20 @@ namespace TuristickiVodic.Services
 
             await EnsureUserNotBannedAsync(user);
 
-            var verificationToken = GenerateOpaqueToken();
-            user.VerificationToken = HashOpaqueToken(verificationToken);
-            user.VerificationTokenExpiry = DateTime.UtcNow.AddHours(EmailVerificationLifetimeHours);
+            var verificationCode = GenerateTwoFactorCode();
+            user.VerificationToken = HashOpaqueToken(verificationCode);
+            user.VerificationTokenExpiry = DateTime.UtcNow.AddMinutes(EmailVerificationCodeLifetimeMinutes);
             user.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
 
-            await SendVerificationEmailAsync(user, verificationToken);
+            await SendVerificationEmailAsync(user, verificationCode);
         }
 
-        private async Task SendVerificationEmailAsync(User user, string verificationToken)
+        private async Task SendVerificationEmailAsync(User user, string verificationCode)
         {
-            var verifyUrl = $"{ResolvePublicAppBaseUrl()}/verify-email?token={Uri.EscapeDataString(verificationToken)}";
             var subject = ResolveVerificationEmailSubject(user.Language);
-            var htmlBody = BuildVerificationEmailBody(user.FirstName, verifyUrl, user.Language);
+            var htmlBody = BuildVerificationEmailBody(user.FirstName, verificationCode, user.Language);
 
             await _emailService.SendAsync(user.Email, subject, htmlBody);
         }
@@ -884,10 +887,9 @@ namespace TuristickiVodic.Services
             };
         }
 
-        private static string BuildVerificationEmailBody(string? firstName, string verifyUrl, string? language)
+        private static string BuildVerificationEmailBody(string? firstName, string verificationCode, string? language)
         {
             var safeName = string.IsNullOrWhiteSpace(firstName) ? "there" : System.Net.WebUtility.HtmlEncode(firstName);
-            var encodedUrl = System.Net.WebUtility.HtmlEncode(verifyUrl);
 
             return language?.Trim().ToLowerInvariant() switch
             {
@@ -895,22 +897,18 @@ namespace TuristickiVodic.Services
                     <div style="font-family: Arial, sans-serif; line-height: 1.6;">
                         <h2>Potvrda email adrese</h2>
                         <p>Zdravo {safeName},</p>
-                        <p>Hvala na registraciji na SpireGO. Da bi aktivirao/la svoj nalog, potvrdi email adresu klikom na dugme ispod:</p>
-                        <p><a href="{encodedUrl}" style="display: inline-block; padding: 12px 24px; background-color: #2e7d32; color: #ffffff; text-decoration: none; border-radius: 6px;">Potvrdi email</a></p>
-                        <p>Ako dugme ne radi, otvori ovaj link u pretrazivacu:</p>
-                        <p>{encodedUrl}</p>
-                        <p>Link vazi {EmailVerificationLifetimeHours} sata. Ako nisi ti kreirao/la ovaj nalog, slobodno ignorisi ovu poruku.</p>
+                        <p>Hvala na registraciji na SpireGO. Tvoj kod za potvrdu email adrese je:</p>
+                        <p style="font-size: 24px; font-weight: 700; letter-spacing: 4px;">{verificationCode}</p>
+                        <p>Kod važi {EmailVerificationCodeLifetimeMinutes} minuta. Ako nisi ti kreirao/la ovaj nalog, slobodno ignorisi ovu poruku.</p>
                     </div>
                     """,
                 _ => $"""
                     <div style="font-family: Arial, sans-serif; line-height: 1.6;">
                         <h2>Confirm your email address</h2>
                         <p>Hello {safeName},</p>
-                        <p>Thanks for signing up for SpireGO. To activate your account, please confirm your email address by clicking the button below:</p>
-                        <p><a href="{encodedUrl}" style="display: inline-block; padding: 12px 24px; background-color: #2e7d32; color: #ffffff; text-decoration: none; border-radius: 6px;">Confirm email</a></p>
-                        <p>If the button doesn't work, open this link in your browser:</p>
-                        <p>{encodedUrl}</p>
-                        <p>This link is valid for {EmailVerificationLifetimeHours} hours. If you did not create this account, you can safely ignore this email.</p>
+                        <p>Thanks for signing up for SpireGO. Your email verification code is:</p>
+                        <p style="font-size: 24px; font-weight: 700; letter-spacing: 4px;">{verificationCode}</p>
+                        <p>This code is valid for {EmailVerificationCodeLifetimeMinutes} minutes. If you did not create this account, you can safely ignore this email.</p>
                     </div>
                     """
             };
@@ -1032,6 +1030,14 @@ namespace TuristickiVodic.Services
 
             if (RequiresEmailVerification(user))
             {
+                var verificationCode = GenerateTwoFactorCode();
+                user.VerificationToken = HashOpaqueToken(verificationCode);
+                user.VerificationTokenExpiry = DateTime.UtcNow.AddMinutes(EmailVerificationCodeLifetimeMinutes);
+                user.UpdatedAt = DateTime.UtcNow;
+                await _context.SaveChangesAsync();
+
+                await SendVerificationEmailAsync(user, verificationCode);
+
                 return new AuthResponseDto
                 {
                     RequiresEmailVerification = true,

@@ -86,17 +86,6 @@
         <div class="error">{{ errorMessage }}</div>
       }
 
-      @if (emailNotVerified) {
-        <div class="info email-verification">
-          <button class="link resend" type="button" (click)="resendVerificationEmail()" [disabled]="isResending">
-            {{ isResending ? ('login.resending' | translate) : ('login.resendVerificationEmail' | translate) }}
-          </button>
-          @if (resendSuccessMessage) {
-            <div class="success">{{ resendSuccessMessage }}</div>
-          }
-        </div>
-      }
-
       <p class="links">
         <span class="row">
           {{ 'login.noAccount' | translate }}

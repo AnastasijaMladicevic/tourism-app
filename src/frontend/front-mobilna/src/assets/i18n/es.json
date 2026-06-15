@@ -237,12 +237,7 @@
     "invalidCredentials": "Email o contraseña incorrectos.",
     "googleFailed": "El acceso con Google no está disponible en este momento.",
     "loginButton": "Iniciar sesión",
-    "registrationSuccess": "¡Registro exitoso! Revisa tu correo para verificar tu cuenta antes de iniciar sesión.",
-    "emailNotVerified": "Verifica tu dirección de correo electrónico antes de iniciar sesión.",
-    "resendVerificationEmail": "Reenviar correo de verificación",
-    "resending": "Enviando...",
-    "verificationEmailSent": "Correo de verificación enviado. Revisa tu bandeja de entrada.",
-    "resendFailed": "No se pudo reenviar el correo de verificación. Inténtalo de nuevo más tarde."
+    "emailVerifiedSuccess": "¡Correo verificado con éxito! Ahora puedes iniciar sesión."
   },
   "forgotPassword": {
     "title": "Olvidé mi contraseña",
@@ -1344,13 +1339,15 @@
       "loginButton": "Iniciar sesión"
     },
     "verifyEmail": {
-      "loadingTitle": "Verificando tu email...",
-      "loadingBody": "Espera mientras confirmamos tu dirección de correo electrónico.",
-      "successTitle": "Email verificado",
-      "successBody": "Tu dirección de correo electrónico ha sido verificada correctamente. Ya puedes iniciar sesión.",
-      "errorTitle": "Verificación fallida",
-      "errorBody": "Este enlace de verificación no es válido o ha expirado. Solicita uno nuevo desde la página de inicio de sesión.",
-      "loginButton": "Ir a iniciar sesión"
+      "title": "Verifica tu email",
+      "subtitle": "Introduce el código de 6 dígitos enviado a",
+      "verifyButton": "Verificar email",
+      "resendButton": "Reenviar código",
+      "codeRequired": "Introduce los 6 dígitos.",
+      "codeExpired": "El código ha expirado. Solicita uno nuevo.",
+      "invalidCode": "Código inválido o expirado.",
+      "resendSuccess": "Se envió un nuevo código.",
+      "resendFailed": "No se pudo reenviar el código en este momento."
     }
   },
   "search": {
