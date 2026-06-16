@@ -29,6 +29,10 @@
     </div>
   </header>
 
+  @if (errorMessage) {
+    <div class="alert alert-error" role="alert">{{ errorMessage }}</div>
+  }
+
   <div class="create-layout">
     <form id="create-locality-form" class="create-form" (ngSubmit)="onSubmit()">
       <section class="section-block step-card">

@@ -761,19 +761,19 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
         this.creatorObjectCounts.clear();
         const objectContext = new Map<number, ObjectReviewContext>();
         for (const object of objects) {
-          if (!object.createdByUserId) {
-            continue;
-          }
+          const creatorId = object.createdByUserId ?? 0;
           const knownName = object.createdByFullName?.trim();
-          if (knownName && !this.creatorNameById.has(object.createdByUserId)) {
-            this.creatorNameById.set(object.createdByUserId, knownName);
+          if (creatorId > 0 && knownName && !this.creatorNameById.has(creatorId)) {
+            this.creatorNameById.set(creatorId, knownName);
           }
-          this.creatorObjectCounts.set(
-            object.createdByUserId,
-            (this.creatorObjectCounts.get(object.createdByUserId) ?? 0) + 1,
-          );
+          if (creatorId > 0) {
+            this.creatorObjectCounts.set(
+              creatorId,
+              (this.creatorObjectCounts.get(creatorId) ?? 0) + 1,
+            );
+          }
           objectContext.set(object.id, {
-            creatorId: object.createdByUserId,
+            creatorId,
             localityName: object.localityName?.trim() ?? '',
             destinationName: object.destinationName?.trim() ?? '',
           });

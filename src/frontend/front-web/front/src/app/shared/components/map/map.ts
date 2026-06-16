@@ -41,6 +41,10 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
     const showMarkerBecomingTrue =
       changes['showMarker']?.previousValue === false && changes['showMarker']?.currentValue === true;
 
+    if (changes['boundaryGeoJson'] && !changes['boundaryGeoJson'].firstChange) {
+      this.mapService.setBoundary(this.boundaryGeoJson);
+    }
+
     if (latOrLngChanged) {
       if (showMarkerBecomingTrue) {
         // Initial data load (marker was hidden, now shows): jump without animation
@@ -57,10 +61,6 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
 
     if (changes['showMarker'] || changes['popupText']) {
       this.renderMarker();
-    }
-
-    if (changes['boundaryGeoJson'] && !changes['boundaryGeoJson'].firstChange) {
-      this.mapService.setBoundary(this.boundaryGeoJson);
     }
   }
 

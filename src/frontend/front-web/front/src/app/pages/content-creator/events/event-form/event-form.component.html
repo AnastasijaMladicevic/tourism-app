@@ -326,7 +326,6 @@
           [popupText]="form.controls.name.value || ('event.title' | translate)"
           [interactive]="true"
           [showMarker]="true"
-          [boundaryGeoJson]="activeBoundaryGeoJson"
           (locationSelected)="onMapLocationSelected($event)">
         </app-map>
         <br>
