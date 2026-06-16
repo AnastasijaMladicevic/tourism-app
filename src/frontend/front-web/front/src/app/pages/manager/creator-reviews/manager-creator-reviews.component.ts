@@ -43,7 +43,6 @@ import {
 } from 'rxjs';
 import { DestinationService } from '../../../services/destination.service';
 import { ManagerDashboardService } from '../../../services/manager-dashboard.service';
-import { ObjectService } from '../../../services/object';
 import { ReviewDto, ReviewService } from '../../../services/review';
 import { AuthService } from '../../../services/auth.service';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
@@ -78,10 +77,6 @@ interface DeletionRequestNameHint {
   requestedByName?: string;
 }
 
-interface ManagerReportNameHint {
-  reportedUserId: number;
-  reportedUserName?: string;
-}
 
 @Component({
   selector: 'app-manager-creator-reviews',
@@ -98,7 +93,6 @@ interface ManagerReportNameHint {
   ],
 })
 export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
-  private readonly objectService = inject(ObjectService);
   private readonly reviewService = inject(ReviewService);
   private readonly authService = inject(AuthService);
   private readonly destinationService = inject(DestinationService);
@@ -183,6 +177,16 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
     this.creatorObjectCounts.clear();
     this.successMessage = '';
 
+    // Background: pending report IDs and name hints — do not block review display
+    this.loadCreatorNameHints()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({ next: () => { this.applyCreatorNamesToThreads(); this.triggerViewUpdate(); } });
+
+    this.loadPendingReportIds()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({ next: () => this.triggerViewUpdate() });
+
+    const previousId = this.selectedThread?.id ?? null;
     this.fetchManagerReviewThreads()
       .pipe(
         timeout(15000),
@@ -200,7 +204,6 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
       )
       .subscribe({
         next: (threads) => {
-          const previousId = this.selectedThread?.id ?? null;
           this.allThreads = threads;
           this.resolveMissingCreatorNames([
             ...new Set(threads.map((thread) => thread.creatorId).filter((id) => id > 0)),
@@ -727,81 +730,59 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
   }
 
   private fetchManagerReviewThreads(): Observable<ManagerReviewThread[]> {
-    const pageSize = 100;
-
-    return this.loadCreatorNameHints().pipe(
-      switchMap(() =>
-        forkJoin({
-          objects: this.getAllPagedItems((page) =>
-            this.objectService.getForManager({
-              page,
-              pageSize,
-              sortBy: 'name',
-              sortOrder: 'asc',
-            }),
-          ),
-          myReports: this.getAllPagedItems((page) =>
-            this.managerReportsService.getMyReports({
-              page,
-              pageSize,
-              sortBy: 'createdAt',
-              sortOrder: 'desc',
-            }),
-          ),
-        }),
-      ),
-      switchMap(({ objects, myReports }) => {
-        this.pendingReportCreatorIds.clear();
-        for (const report of myReports) {
-          if (report.status?.toLowerCase() === 'pending') {
-            this.pendingReportCreatorIds.add(report.reportedUserId);
-          }
-        }
-
+    return this.reviewService.getForManagerObjects().pipe(
+      map((reviews) => {
         this.creatorObjectCounts.clear();
+        const objectsByCreator = new Map<number, Set<number>>();
         const objectContext = new Map<number, ObjectReviewContext>();
-        for (const object of objects) {
-          const creatorId = object.createdByUserId ?? 0;
-          const knownName = object.createdByFullName?.trim();
+
+        for (const review of reviews) {
+          const creatorId = review.createdByUserId ?? 0;
+          const knownName = review.createdByFullName?.trim();
           if (creatorId > 0 && knownName && !this.creatorNameById.has(creatorId)) {
             this.creatorNameById.set(creatorId, knownName);
           }
-          if (creatorId > 0) {
-            this.creatorObjectCounts.set(
+          if (!objectContext.has(review.objectId)) {
+            objectContext.set(review.objectId, {
               creatorId,
-              (this.creatorObjectCounts.get(creatorId) ?? 0) + 1,
-            );
+              localityName: review.localityName?.trim() ?? '',
+              destinationName: review.destinationName?.trim() ?? '',
+            });
           }
-          objectContext.set(object.id, {
-            creatorId,
-            localityName: object.localityName?.trim() ?? '',
-            destinationName: object.destinationName?.trim() ?? '',
-          });
+          if (creatorId > 0) {
+            if (!objectsByCreator.has(creatorId)) objectsByCreator.set(creatorId, new Set<number>());
+            objectsByCreator.get(creatorId)!.add(review.objectId);
+          }
         }
 
-        const managedObjectIds = [...objectContext.keys()];
-        if (!managedObjectIds.length) {
-          return of(this.mapReviewsToThreads([], objectContext));
+        for (const [creatorId, objectIds] of objectsByCreator) {
+          this.creatorObjectCounts.set(creatorId, objectIds.size);
         }
 
-        return this.fetchReviewsForManagedObjects(managedObjectIds).pipe(
-          map((reviews) => this.mapReviewsToThreads(reviews, objectContext)),
-        );
+        return this.mapReviewsToThreads(reviews, objectContext);
       }),
     );
   }
 
-  /** Loads reviews only for objects in the manager's scope using a single batched endpoint. */
-  private fetchReviewsForManagedObjects(objectIds: number[]): Observable<ReviewDto[]> {
-    return this.reviewService.getForManagerObjects(objectIds).pipe(
-      catchError(() => of([] as ReviewDto[])),
+  private loadPendingReportIds(): Observable<void> {
+    const pageSize = 100;
+    return this.getAllPagedItems((page) =>
+      this.managerReportsService.getMyReports({ page, pageSize, sortBy: 'createdAt', sortOrder: 'desc' }),
+    ).pipe(
+      map((reports) => {
+        for (const report of reports) {
+          if (report.status?.toLowerCase() === 'pending') {
+            this.pendingReportCreatorIds.add(report.reportedUserId);
+          }
+        }
+      }),
+      catchError(() => of(undefined as void)),
     );
   }
 
   private loadCreatorNameHints(): Observable<void> {
     const pageSize = 100;
     const deletionUrl = `${environment.apiUrl}/deletion-requests`;
-    const reportsUrl = `${environment.apiUrl}/manager-reports/my`;
 
     return forkJoin({
       deletionRequests: this.getAllPagedItems<DeletionRequestNameHint>((page) =>
@@ -809,27 +790,15 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
           params: { page, pageSize },
         }),
       ).pipe(catchError(() => of([] as DeletionRequestNameHint[]))),
-      managerReports: this.getAllPagedItems<ManagerReportNameHint>((page) =>
-        this.http.get<{ items?: ManagerReportNameHint[]; totalPages?: number }>(reportsUrl, {
-          params: { page, pageSize },
-        }),
-      ).pipe(catchError(() => of([] as ManagerReportNameHint[]))),
       dashboard: this.dashboardService.getOverview('1y').pipe(
         catchError(() => of(null)),
       ),
     }).pipe(
-      map(({ deletionRequests, managerReports, dashboard }) => {
+      map(({ deletionRequests, dashboard }) => {
         for (const request of deletionRequests) {
           const name = request.requestedByName?.trim();
           if (name && request.requestedByUserId > 0) {
             this.creatorNameById.set(request.requestedByUserId, name);
-          }
-        }
-
-        for (const report of managerReports) {
-          const name = report.reportedUserName?.trim();
-          if (name && report.reportedUserId > 0) {
-            this.creatorNameById.set(report.reportedUserId, name);
           }
         }
 

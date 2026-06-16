@@ -128,17 +128,19 @@ namespace TuristickiVodic.Services.Services
 
         public async Task<List<ReviewDto>> GetForManagerObjectsAsync(int managerUserId, int[] objectIds, string? languageCode = null)
         {
-            if (objectIds == null || objectIds.Length == 0)
-                return new List<ReviewDto>();
-
             var destinationIds = await DestinationManagerHelper.GetResponsibleDestinationIdsAsync(_context, managerUserId);
+
+            if (!destinationIds.Any())
+                return new List<ReviewDto>();
 
             var reviewsQuery = BuildReviewsQuery()
                 .Where(r => r.Status == ContentStatus.Approved)
-                .Where(r => objectIds.Contains(r.ObjectId))
                 .Where(r => r.Object != null &&
                     (destinationIds.Contains(r.Object.DestinationId) ||
                      (r.Object.Locality != null && destinationIds.Contains(r.Object.Locality.DestinationId))));
+
+            if (objectIds != null && objectIds.Length > 0)
+                reviewsQuery = reviewsQuery.Where(r => objectIds.Contains(r.ObjectId));
 
             var reviews = await reviewsQuery.ToListAsync();
 
@@ -496,6 +498,8 @@ namespace TuristickiVodic.Services.Services
                     .ThenInclude(o => o.Locality)
                         .ThenInclude(l => l.Destination)
                             .ThenInclude(d => d.Region)
+                .Include(r => r.Object)
+                    .ThenInclude(o => o.CreatedBy)
                 .Include(r => r.Images)
                 .Include(r => r.ReviewedBy)
                 .AsQueryable();

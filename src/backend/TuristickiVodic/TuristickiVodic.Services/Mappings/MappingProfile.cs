@@ -324,6 +324,13 @@ namespace TuristickiVodic.Services.Mappings
                 .ForMember(dest => dest.ReviewedByFullName,
                     opt => opt.MapFrom(src =>
                         src.ReviewedBy != null ? (src.ReviewedBy.FirstName + " " + src.ReviewedBy.LastName) : null))
+                .ForMember(dest => dest.CreatedByUserId,
+                    opt => opt.MapFrom(src => src.Object != null ? (int?)src.Object.CreatedByUserId : null))
+                .ForMember(dest => dest.CreatedByFullName,
+                    opt => opt.MapFrom(src =>
+                        src.Object != null && src.Object.CreatedBy != null
+                            ? (src.Object.CreatedBy.FirstName + " " + src.Object.CreatedBy.LastName).Trim()
+                            : null))
                 .ForMember(dest => dest.Status,
                     opt => opt.MapFrom(src => src.Status.ToString()));
 
