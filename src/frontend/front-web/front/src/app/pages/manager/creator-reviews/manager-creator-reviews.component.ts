@@ -13,7 +13,7 @@ import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { environment } from '../../../../environment/environment';
-import { ManagerReportsService } from '../../../services/manager-reports.service';
+import { ManagerReportDto, ManagerReportsService } from '../../../services/manager-reports.service';
 import {
   buildReviewReportReason,
   detectConcerningReplyKind,
@@ -730,8 +730,21 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
   }
 
   private fetchManagerReviewThreads(): Observable<ManagerReviewThread[]> {
-    return this.reviewService.getForManagerObjects().pipe(
-      map((reviews) => {
+    const pageSize = 100;
+    return forkJoin({
+      reviews: this.reviewService.getForManagerObjects(),
+      reports: this.getAllPagedItems((page) =>
+        this.managerReportsService.getMyReports({ page, pageSize, sortBy: 'createdAt', sortOrder: 'desc' }),
+      ).pipe(catchError(() => of([] as ManagerReportDto[]))),
+    }).pipe(
+      map(({ reviews, reports }) => {
+        this.pendingReportCreatorIds.clear();
+        for (const report of reports) {
+          if (report.status?.toLowerCase() === 'pending') {
+            this.pendingReportCreatorIds.add(report.reportedUserId);
+          }
+        }
+
         this.creatorObjectCounts.clear();
         const objectsByCreator = new Map<number, Set<number>>();
         const objectContext = new Map<number, ObjectReviewContext>();
@@ -765,19 +778,7 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
   }
 
   private loadPendingReportIds(): Observable<void> {
-    const pageSize = 100;
-    return this.getAllPagedItems((page) =>
-      this.managerReportsService.getMyReports({ page, pageSize, sortBy: 'createdAt', sortOrder: 'desc' }),
-    ).pipe(
-      map((reports) => {
-        for (const report of reports) {
-          if (report.status?.toLowerCase() === 'pending') {
-            this.pendingReportCreatorIds.add(report.reportedUserId);
-          }
-        }
-      }),
-      catchError(() => of(undefined as void)),
-    );
+    return of(undefined as void);
   }
 
   private loadCreatorNameHints(): Observable<void> {
@@ -998,7 +999,14 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
     );
   }
 
+  private viewUpdatePending = false;
+
   private triggerViewUpdate(): void {
-    queueMicrotask(() => this.cdr.detectChanges());
+    if (this.viewUpdatePending) return;
+    this.viewUpdatePending = true;
+    queueMicrotask(() => {
+      this.viewUpdatePending = false;
+      this.cdr.detectChanges();
+    });
   }
 }

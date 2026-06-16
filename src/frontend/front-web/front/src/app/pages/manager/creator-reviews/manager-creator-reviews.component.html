@@ -215,10 +215,6 @@
   </div>
 
   <div class="moderation-grid" [class.is-loading]="isLoading">
-    @if (isLoading) {
-      <p class="loading-note card">{{ 'manager.creatorReviews.loading' | translate }}</p>
-    }
-
     <aside class="queue-panel card">
       <div class="queue-panel-head">
         <h2>{{ 'manager.creatorReviews.queueTitle' | translate }}</h2>
@@ -317,13 +313,15 @@
               </div>
               <p class="message-text">{{ selectedThread.touristReview }}</p>
               <div class="tourist-report-action">
-                @if (hasPendingReportForTourist(selectedThread.touristId)) {
-                  <span class="pending-report-note">{{ 'manager.creatorReviews.pendingTouristReportOnFile' | translate }}</span>
-                } @else {
-                  <button type="button" class="ghost-btn compact" (click)="openTouristReportModal(selectedThread)">
-                    <span class="material-symbols-outlined">flag</span>
-                    {{ 'manager.creatorReviews.reportTourist' | translate }}
-                  </button>
+                @if (isTouristReviewConcerning(selectedThread)) {
+                  @if (hasPendingReportForTourist(selectedThread.touristId)) {
+                    <span class="pending-report-note">{{ 'manager.creatorReviews.pendingTouristReportOnFile' | translate }}</span>
+                  } @else {
+                    <button type="button" class="ghost-btn compact" (click)="openTouristReportModal(selectedThread)">
+                      <span class="material-symbols-outlined">flag</span>
+                      {{ 'manager.creatorReviews.reportTourist' | translate }}
+                    </button>
+                  }
                 }
               </div>
             </div>
