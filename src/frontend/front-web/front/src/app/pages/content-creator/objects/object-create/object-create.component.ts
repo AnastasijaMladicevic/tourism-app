@@ -1,5 +1,5 @@
 import { CommonModule, Location } from '@angular/common';
-import { ChangeDetectorRef, Component, NgZone, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, NgZone, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -58,7 +58,7 @@ type WorkingDayKey = 'pon' | 'uto' | 'sre' | 'cet' | 'pet' | 'sub' | 'ned';
     '../../../shared/location-sidebar.css'
   ]
 })
-export class ObjectCreateComponent implements OnInit, OnDestroy {
+export class ObjectCreateComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
@@ -74,6 +74,8 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
   private readonly ngZone = inject(NgZone);
 
   @ViewChild(SharedMapComponent) mapComponent?: SharedMapComponent;
+  @ViewChild('reviewsSectionRef') reviewsSectionRef?: ElementRef<HTMLElement>;
+  private scrollToReviews = false;
 
   /** Manager opens this page read-only via `/manager/objects/review/:id` (route data). */
   isManagerReview = false;
@@ -187,6 +189,14 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
     this.releasePendingImagePreviews();
   }
 
+  ngAfterViewInit(): void {
+    if (this.scrollToReviews && this.reviewsSectionRef?.nativeElement) {
+      setTimeout(() => {
+        this.reviewsSectionRef?.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 0);
+    }
+  }
+
   private scrollPageToTop(): void {
     window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
     document.documentElement.scrollTop = 0;
@@ -212,7 +222,10 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.scrollPageToTop();
+    this.scrollToReviews = this.route.snapshot.queryParamMap.get('scrollTo') === 'reviews';
+    if (!this.scrollToReviews) {
+      this.scrollPageToTop();
+    }
 
     this.isManagerReview = this.route.snapshot.data['managerReview'] === true;
 

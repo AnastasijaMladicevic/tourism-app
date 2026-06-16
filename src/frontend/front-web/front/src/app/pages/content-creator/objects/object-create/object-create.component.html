@@ -392,7 +392,7 @@
   </div>
 
   @if (isManagerReview && objectId) {
-    <section class="manager-guest-reviews card">
+    <section class="manager-guest-reviews card" #reviewsSectionRef>
       <header class="guest-reviews-header">
         <div>
           <p class="guest-reviews-eyebrow">{{ 'contentCreatorObjectForm.review.guestFeedbackEyebrow' | translate }}</p>

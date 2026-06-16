@@ -930,6 +930,7 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
 
   private navigateToObjectReview(obj: ObjectDto): void {
     this.router.navigate(['/manager/objects/review', obj.id], {
+      queryParams: { scrollTo: 'reviews' },
       state: { objectStatus: obj.status ?? '' }
     });
   }
