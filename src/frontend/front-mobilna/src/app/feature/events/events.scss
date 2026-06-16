@@ -1,3 +1,5 @@
+@use '../../../styles/action-buttons' as action-buttons;
+
 .screen {
   display: flex;
   flex-direction: column;
@@ -1064,4 +1066,8 @@
     flex: 0 0 auto;
     align-items: center;
   }
+}
+// ─── Shared hover stanje (kalendar/planer) ────────────────────────────────
+.planner-btn {
+  @include action-buttons.planner-action-hover;
 }

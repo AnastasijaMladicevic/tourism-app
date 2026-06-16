@@ -1,3 +1,5 @@
+@use '../../../styles/action-buttons' as action-buttons;
+
 h1 {
   font-size: 32px;
 }
@@ -2734,4 +2736,8 @@ textarea {
   background: rgba(77, 194, 255, 0.1) !important;
   border-color: rgba(77, 194, 255, 0.18) !important;
   color: #ff6b6b !important;
+}
+// ─── Shared hover stanje (srce/favorit) ───────────────────────────────────
+.title-row .fav-btn {
+  @include action-buttons.heart-action-hover;
 }

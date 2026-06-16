@@ -1,3 +1,5 @@
+@use '../../../styles/action-buttons' as action-buttons;
+
 h1 {
   font-size: 32px;
 }
@@ -126,9 +128,7 @@ button:hover {
   }
 }
 
-.fav-btn:hover {
-  background: #eef3f6;
-}
+
 
 .fav-btn--active {
   color: #e74c3c;
@@ -1122,10 +1122,7 @@ button:hover {
     border: 1px solid rgba(77, 194, 255, 0.18) !important;
     box-shadow: none !important;
   }
-  
-  .fav-btn:hover {
-    background: rgba(77, 194, 255, 0.16) !important;
-  }
+
   
   .fav-btn--active {
     color: #ff6b6b !important;
@@ -1196,5 +1193,47 @@ button:hover {
   .gallery-header-icon {
     background: rgba(77, 194, 255, 0.1);
     color: #4dc2ff;
+  }
+}
+
+// ─── Shared hover stanje (srce/favorit) ───────────────────────────────────
+.fav-btn {
+  @include action-buttons.heart-action-hover;
+}
+
+/* ─── Destination detail explore chips - mobile horizontal scroll ─────────── */
+
+@media (max-width: 768px) {
+  .explore-card {
+    overflow: hidden;
+  }
+
+  .explore-chips {
+    display: flex;
+    flex-wrap: nowrap !important;
+    gap: 8px;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    max-width: 100%;
+    min-width: 0;
+
+    padding-bottom: 2px;
+
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .explore-chips::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+  }
+
+  .explore-chip {
+    flex: 0 0 auto;
+    white-space: nowrap;
   }
 }

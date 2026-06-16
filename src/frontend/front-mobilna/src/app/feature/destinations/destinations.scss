@@ -1,3 +1,5 @@
+@use '../../../styles/action-buttons' as action-buttons;
+
 // ─── Screen ────────────────────────────────────────────────────────────────────
 .screen {
   display: flex;
@@ -479,10 +481,6 @@
     font-size: 18px;
     width: 18px;
     height: 18px;
-  }
-
-  &:hover {
-    transform: scale(1.06);
   }
 
   &:disabled {
@@ -982,4 +980,8 @@
     border-color: var(--primary) !important;
     color: #ffffff !important;
   }
+}
+// ─── Shared hover stanje (srce/favorit) ───────────────────────────────────
+.card__fav {
+  @include action-buttons.heart-action-hover;
 }

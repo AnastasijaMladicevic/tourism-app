@@ -1,3 +1,5 @@
+@use '../../../styles/action-buttons' as action-buttons;
+
 .page {
   height: 100dvh;
   background: var(--bg);
@@ -1195,4 +1197,13 @@
 .suggestion-item:last-child {
   border-bottom-left-radius: 16px;
   border-bottom-right-radius: 16px;
+}
+// ─── Shared hover stanje (srce/favorit) ───────────────────────────────────
+.heart-btn {
+  @include action-buttons.heart-action-hover;
+}
+
+// ─── Shared hover stanje (kalendar/planer) ────────────────────────────────
+.planner-btn {
+  @include action-buttons.planner-action-hover;
 }

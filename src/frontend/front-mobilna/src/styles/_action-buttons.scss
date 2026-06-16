@@ -1,0 +1,55 @@
+@mixin heart-action-hover {
+  &:hover {
+    border: 1px solid #ef4444 !important;
+    //background: #fddcb5 !important;
+    color: #ef4444 !important;
+    //transition: all 200ms ease !important;
+
+    svg {
+      stroke: #ef4444 !important;
+    }
+
+    mat-icon {
+      color: #ef4444 !important;
+    }
+  }
+
+  :host-context(:root[data-theme='dark']) &:hover,
+  :root[data-theme='dark'] &:hover {
+    border-color: #ef4444 !important;
+    background: #2d1515 !important;
+    color: #ef4444 !important;
+
+    svg {
+      stroke: #ef4444 !important;
+    }
+
+    mat-icon {
+      color: #ef4444 !important;
+    }
+  }
+}
+
+@mixin planner-action-hover {
+  &:hover {
+    border: 1px solid var(--primary) !important;
+    background: #e6f7f5 !important;
+    color: var(--primary) !important;
+    //transition: all 200ms ease !important;
+
+    mat-icon {
+      color: var(--primary) !important;
+    }
+  }
+
+  :host-context(:root[data-theme='dark']) &:hover,
+  :root[data-theme='dark'] &:hover {
+    border-color: var(--primary) !important;
+    background: #0d2b28 !important;
+    color: var(--primary) !important;
+
+    mat-icon {
+      color: var(--primary) !important;
+    }
+  }
+}
