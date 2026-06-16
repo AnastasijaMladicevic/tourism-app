@@ -994,3 +994,74 @@
     box-shadow: 0 0 0 1000px var(--surface) inset !important;
   }
 }
+
+/* ─── Events filters row fix - align with search + hide scrollbar ─────────── */
+
+.filters-row {
+  align-items: center !important;
+}
+
+.filters-scroll {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  scrollbar-width: none;      // Firefox
+  -ms-overflow-style: none;   // old Edge/IE
+
+  padding-bottom: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+.filters-scroll::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.filter-btn,
+.search-inline,
+.sort-trigger {
+  height: 34px;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+}
+
+.filter-btn {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.search-inline {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.sort-trigger {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+@media (min-width: 768px) {
+  .filters-row {
+    flex-direction: row-reverse;
+    align-items: center !important;
+    gap: 12px;
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+
+  .filters-scroll {
+    flex: 1 1 auto;
+  }
+
+  .filters-right {
+    flex: 0 0 auto;
+    align-items: center;
+  }
+}

@@ -307,6 +307,27 @@
     padding-left: 10px;
     padding-right: 10px;
   }
+
+  .ai-prompts {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    max-width: 100%;
+    width: 100%;
+    padding: 14px 18px 10px;
+    gap: 10px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .ai-prompts::-webkit-scrollbar {
+    display: none;
+  }
+
+  .ai-prompts button {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
 }
 
 :host-context(:root[data-theme='dark']) {
