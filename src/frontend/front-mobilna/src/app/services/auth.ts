@@ -69,6 +69,8 @@ export interface AuthResponseDto {
   twoFactorChallengeToken?: string | null;
   twoFactorExpiresAt?: string | null;
   twoFactorDeliveryTarget?: string | null;
+  requiresEmailVerification?: boolean;
+  emailVerificationDeliveryTarget?: string | null;
   isBanned?: boolean;
   banMessage?: string | null;
   banReason?: string | null;
@@ -174,6 +176,14 @@ export class AuthService {
 
   register(dto: CreateUserDto): Observable<UserDto> {
     return this.http.post<UserDto>(`${this.url}/register`, dto);
+  }
+
+  verifyEmail(email: string, code: string): Observable<UserDto> {
+    return this.http.post<UserDto>(`${this.url}/verify-email`, { email, code });
+  }
+
+  resendVerificationEmail(email: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.url}/resend-verification`, { email });
   }
 
   login(dto: LoginDto): Observable<AuthResponseDto> {

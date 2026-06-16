@@ -6,6 +6,10 @@
     </div>
 
     <div class="top-actions">
+      <button type="button" class="ghost-btn" (click)="cancel()">
+        <span class="material-symbols-outlined" aria-hidden="true">close</span>
+        {{ cancelLabel }}
+      </button>
       @if (isEditMode) {
         <button
           type="button"
@@ -21,10 +25,6 @@
       <button type="button" class="primary-btn" (click)="submit()" [disabled]="isSubmitDisabled">
         <span class="material-symbols-outlined" aria-hidden="true">check_circle</span>
         {{ submitLabel }}
-      </button>
-      <button type="button" class="ghost-btn" (click)="cancel()">
-        <span class="material-symbols-outlined" aria-hidden="true">close</span>
-        {{ cancelLabel }}
       </button>
     </div>
   </div>
@@ -96,6 +96,14 @@
               @if (selectedDestinationId && filteredVenueOptions.length === 0) {
                 <small class="form-field-note">{{ 'contentCreator.eventForm.noObjectsForDestination' | translate }}</small>
               }
+            </label>
+
+            <label class="form-field">
+              <span>{{ 'contentCreator.eventForm.locality' | translate }}</span>
+              <select class="form-control" formControlName="localityId">
+                <option value="">{{ selectedDestinationId ? ('contentCreator.eventForm.selectLocality' | translate) : ('contentCreator.eventForm.selectDestinationFirst' | translate) }}</option>
+                <option *ngFor="let locality of filteredLocalities" [value]="locality.id">{{ locality.name }}</option>
+              </select>
             </label>
           </div>
 
@@ -325,14 +333,14 @@
           <div>
             <span class="coord-label">{{ 'common.latitude' | translate }}</span>
             <div class="coord-input-wrap">
-              <input class="form-control" type="number" formControlName="latitude" min="-90" max="90" step="0.000001" placeholder="42.4240" />
+              <input class="form-control" type="number" formControlName="latitude" min="-90" max="90" step="0.000001" placeholder="42.4240" (change)="onCoordinateInputChanged()" />
               <span class="coord-input-suffix">{{ latitudeDirection }}</span>
             </div>
           </div>
           <div>
             <span class="coord-label">{{ 'common.longitude' | translate }}</span>
             <div class="coord-input-wrap">
-              <input class="form-control" type="number" formControlName="longitude" min="-180" max="180" step="0.000001" placeholder="18.7710" />
+              <input class="form-control" type="number" formControlName="longitude" min="-180" max="180" step="0.000001" placeholder="18.7710" (change)="onCoordinateInputChanged()" />
               <span class="coord-input-suffix">{{ longitudeDirection }}</span>
             </div>
           </div>

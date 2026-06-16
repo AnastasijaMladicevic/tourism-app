@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnDestroy, OnInit, ElementRef, HostListener, ViewChild, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -11,6 +11,7 @@ import { MapComponent as SharedMapComponent } from '../../../shared/components/m
 import { HERO_IMAGE_ROTATION_INTERVAL_MS } from '../../../shared/constants/hero-image-rotation';
 import { TranslationService } from '../../../services/translation.service';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
+import { DatePickerInputComponent } from '../../../shared/components/date-picker-input/date-picker-input.component';
 
 interface EventInsightCard {
   label: string;
@@ -27,7 +28,7 @@ interface EventScheduleRow {
 @Component({
   selector: 'app-manager-events',
   standalone: true,
-  imports: [CommonModule, FormsModule, SharedMapComponent, PaginatorComponent, TranslatePipe],
+  imports: [CommonModule, FormsModule, SharedMapComponent, PaginatorComponent, TranslatePipe, DatePickerInputComponent],
   templateUrl: './events.component.html',
   styleUrls: [
     './events.component.css',
@@ -38,7 +39,8 @@ interface EventScheduleRow {
     '../shared/manager-list-detail-layout.css',
     '../shared/manager-page-stats-scroll.css',
     '../shared/manager-stat-cards.css',
-    '../shared/manager-hero-slides.css'
+    '../shared/manager-hero-slides.css',
+    '../shared/manager-filter-menu.css'
   ]
 })
 export class ManagerEventsComponent implements OnInit, OnDestroy {
@@ -78,6 +80,7 @@ export class ManagerEventsComponent implements OnInit, OnDestroy {
 
   currentPage = 1;
   totalCount = 0;
+  next7DaysCount = '-';
 
   readonly categoryOptions = [
     { value: 'Festival', label: 'manager.events.categories.festival' },
@@ -88,24 +91,52 @@ export class ManagerEventsComponent implements OnInit, OnDestroy {
     { value: 'Concert', label: 'manager.events.categories.concert' }
   ];
 
+  readonly statusOptions = [
+    { value: 'all', label: 'manager.events.filters.allStatuses' },
+    { value: 'approved', label: 'manager.events.status.approved' },
+    { value: 'pending', label: 'manager.events.status.pending' },
+    { value: 'rejected', label: 'manager.events.status.rejected' }
+  ];
+
+  readonly sortByOptions = [
+    { value: 'startDate', label: 'manager.events.filters.startDate' },
+    { value: 'name', label: 'manager.events.filters.name' },
+    { value: 'status', label: 'manager.events.filters.status' }
+  ];
+
+  readonly sortOrderOptions: Array<{ value: 'asc' | 'desc'; label: string }> = [
+    { value: 'asc', label: 'manager.events.filters.ascending' },
+    { value: 'desc', label: 'manager.events.filters.descending' }
+  ];
+
+  statusFilterMenuOpen = false;
+  categoryFilterMenuOpen = false;
+  sortByFilterMenuOpen = false;
+  sortOrderFilterMenuOpen = false;
+
+  @ViewChild('statusFilterRoot') private statusFilterRoot?: ElementRef<HTMLElement>;
+  @ViewChild('categoryFilterRoot') private categoryFilterRoot?: ElementRef<HTMLElement>;
+  @ViewChild('sortByFilterRoot') private sortByFilterRoot?: ElementRef<HTMLElement>;
+  @ViewChild('sortOrderFilterRoot') private sortOrderFilterRoot?: ElementRef<HTMLElement>;
+
   get stats(): EventInsightCard[] {
     return [
       {
-        label: this.translationService.translate('manager.events.stats.upcomingThisWeek'),
-        value: '12',
-        hint: this.translationService.translate('manager.events.stats.upcomingThisWeekHint'),
+        label: this.translationService.translate('manager.events.stats.totalEvents'),
+        value: String(this.totalCount),
+        hint: this.translationService.translate('manager.events.stats.totalEventsHint'),
         tone: 'blue'
       },
       {
-        label: this.translationService.translate('manager.events.stats.activeStaff'),
-        value: '48',
-        hint: this.translationService.translate('manager.events.stats.activeStaffHint'),
+        label: this.translationService.translate('manager.events.stats.onThisPage'),
+        value: String(this.pagedEvents.length),
+        hint: this.translationService.translate('manager.events.stats.onThisPageHint'),
         tone: 'green'
       },
       {
-        label: this.translationService.translate('manager.events.stats.totalCapacityFilled'),
-        value: '64%',
-        hint: this.translationService.translate('manager.events.stats.totalCapacityFilledHint'),
+        label: this.translationService.translate('manager.events.stats.next7Days'),
+        value: this.next7DaysCount,
+        hint: this.translationService.translate('manager.events.stats.next7DaysHint'),
         tone: 'neutral'
       }
     ];
@@ -114,6 +145,25 @@ export class ManagerEventsComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadManagedDestinationLabel();
     this.loadEvents();
+    this.loadNext7DaysStat();
+  }
+
+  private loadNext7DaysStat(): void {
+    this.eventService.getForManager({
+      page: 1,
+      pageSize: 1,
+      nextDays: 7,
+      sortBy: 'startDate',
+      sortOrder: 'asc'
+    }).subscribe({
+      next: (response) => {
+        this.next7DaysCount = String(response.totalCount ?? 0);
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.next7DaysCount = '0';
+      }
+    });
   }
 
   ngOnDestroy(): void {
@@ -223,6 +273,7 @@ export class ManagerEventsComponent implements OnInit, OnDestroy {
   }
 
   onResetFilters(): void {
+    this.closeAllFilterMenus();
     this.searchQuery = '';
     this.draftSearchQuery = '';
     this.statusFilter = 'all';
@@ -234,6 +285,153 @@ export class ManagerEventsComponent implements OnInit, OnDestroy {
     this.pageSize = 5;
     this.currentPage = 1;
     this.loadEvents();
+  }
+
+  get statusFilterLabel(): string {
+    const option = this.statusOptions.find((item) => item.value === this.statusFilter);
+    return this.translationService.translate(option?.label ?? 'manager.events.filters.allStatuses');
+  }
+
+  get categoryFilterLabel(): string {
+    if (this.categoryFilter === 'all') {
+      return this.translationService.translate('manager.events.filters.allCategories');
+    }
+
+    const option = this.categoryOptions.find((item) => item.value === this.categoryFilter);
+    return this.translationService.translate(option?.label ?? 'manager.events.filters.allCategories');
+  }
+
+  get sortByFilterLabel(): string {
+    const option = this.sortByOptions.find((item) => item.value === this.sortBy);
+    return this.translationService.translate(option?.label ?? 'manager.events.filters.status');
+  }
+
+  get sortOrderFilterLabel(): string {
+    const option = this.sortOrderOptions.find((item) => item.value === this.sortOrder);
+    return this.translationService.translate(option?.label ?? 'manager.events.filters.descending');
+  }
+
+  toggleStatusFilterMenu(event: Event): void {
+    if (this.isLoading) {
+      return;
+    }
+
+    event.stopPropagation();
+    this.statusFilterMenuOpen = !this.statusFilterMenuOpen;
+    if (this.statusFilterMenuOpen) {
+      this.closeOtherFilterMenus('status');
+    }
+  }
+
+  selectStatusFilter(value: string, event: Event): void {
+    event.stopPropagation();
+    this.statusFilter = value;
+    this.statusFilterMenuOpen = false;
+    this.onApplyFilters();
+  }
+
+  toggleCategoryFilterMenu(event: Event): void {
+    if (this.isLoading) {
+      return;
+    }
+
+    event.stopPropagation();
+    this.categoryFilterMenuOpen = !this.categoryFilterMenuOpen;
+    if (this.categoryFilterMenuOpen) {
+      this.closeOtherFilterMenus('category');
+    }
+  }
+
+  selectCategoryFilter(value: string, event: Event): void {
+    event.stopPropagation();
+    this.categoryFilter = value;
+    this.categoryFilterMenuOpen = false;
+    this.onApplyFilters();
+  }
+
+  toggleSortByFilterMenu(event: Event): void {
+    event.stopPropagation();
+    this.sortByFilterMenuOpen = !this.sortByFilterMenuOpen;
+    if (this.sortByFilterMenuOpen) {
+      this.closeOtherFilterMenus('sortBy');
+    }
+  }
+
+  selectSortByFilter(value: string, event: Event): void {
+    event.stopPropagation();
+    this.sortBy = value;
+    this.sortByFilterMenuOpen = false;
+    this.onApplyFilters();
+  }
+
+  toggleSortOrderFilterMenu(event: Event): void {
+    event.stopPropagation();
+    this.sortOrderFilterMenuOpen = !this.sortOrderFilterMenuOpen;
+    if (this.sortOrderFilterMenuOpen) {
+      this.closeOtherFilterMenus('sortOrder');
+    }
+  }
+
+  selectSortOrderFilter(value: string, event: Event): void {
+    event.stopPropagation();
+    this.sortOrder = value as 'asc' | 'desc';
+    this.sortOrderFilterMenuOpen = false;
+    this.onApplyFilters();
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as Node;
+
+    if (
+      this.statusFilterMenuOpen
+      && !this.statusFilterRoot?.nativeElement.contains(target)
+    ) {
+      this.statusFilterMenuOpen = false;
+    }
+
+    if (
+      this.categoryFilterMenuOpen
+      && !this.categoryFilterRoot?.nativeElement.contains(target)
+    ) {
+      this.categoryFilterMenuOpen = false;
+    }
+
+    if (
+      this.sortByFilterMenuOpen
+      && !this.sortByFilterRoot?.nativeElement.contains(target)
+    ) {
+      this.sortByFilterMenuOpen = false;
+    }
+
+    if (
+      this.sortOrderFilterMenuOpen
+      && !this.sortOrderFilterRoot?.nativeElement.contains(target)
+    ) {
+      this.sortOrderFilterMenuOpen = false;
+    }
+  }
+
+  private closeAllFilterMenus(): void {
+    this.statusFilterMenuOpen = false;
+    this.categoryFilterMenuOpen = false;
+    this.sortByFilterMenuOpen = false;
+    this.sortOrderFilterMenuOpen = false;
+  }
+
+  private closeOtherFilterMenus(except: 'status' | 'category' | 'sortBy' | 'sortOrder'): void {
+    if (except !== 'status') {
+      this.statusFilterMenuOpen = false;
+    }
+    if (except !== 'category') {
+      this.categoryFilterMenuOpen = false;
+    }
+    if (except !== 'sortBy') {
+      this.sortByFilterMenuOpen = false;
+    }
+    if (except !== 'sortOrder') {
+      this.sortOrderFilterMenuOpen = false;
+    }
   }
 
   onEditEvent(event: EventDto): void {

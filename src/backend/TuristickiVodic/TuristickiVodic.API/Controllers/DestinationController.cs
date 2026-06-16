@@ -18,6 +18,14 @@ namespace TuristickiVodic.API.Controllers
             _service = service;
         }
 
+        [HttpGet("types")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetDestinationTypes()
+        {
+            var types = await _service.GetDestinationTypesAsync();
+            return Ok(types);
+        }
+
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> GetAll([FromQuery] DestinationQueryDto query)

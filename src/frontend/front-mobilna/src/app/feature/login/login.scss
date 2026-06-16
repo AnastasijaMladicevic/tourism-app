@@ -244,6 +244,37 @@
   font-size: 12px;
 }
 
+.info {
+  color: var(--text-dark);
+  font-size: 12px;
+  text-align: center;
+}
+
+.success {
+  color: var(--primary);
+  font-size: 12px;
+  margin-top: 6px;
+}
+
+.email-verification {
+  margin-top: 4px;
+
+  .resend {
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--primary);
+    font-weight: 800;
+    font-size: 12px;
+    cursor: pointer;
+
+    &:disabled {
+      opacity: 0.6;
+      cursor: default;
+    }
+  }
+}
+
 label {
   display: block;
   text-align: left;

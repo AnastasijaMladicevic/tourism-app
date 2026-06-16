@@ -63,7 +63,19 @@
     "enable": "Enable",
     "locationModalTitle": "Enable location to use sorting",
     "locationModalBody": "Location tracking is currently off. Tap below to open settings and enable location access.",
-    "notification": "Notification"
+    "notification": "Notification",
+    "weekdayShort": {
+      "sun": "Su",
+      "mon": "Mo",
+      "tue": "Tu",
+      "wed": "We",
+      "thu": "Th",
+      "fri": "Fr",
+      "sat": "Sa"
+    },
+    "violationOfRules": "Violation of platform rules.",
+    "bannedUntil": "This account is banned until {{date}}. Reason: {{reason}}",
+    "bannedPermanent": "This account is permanently banned. Reason: {{reason}}"
   },
   "reviewImages": {
     "maxImages": "You can add up to 5 images.",
@@ -104,7 +116,8 @@
       "requestSent": "Request sent",
       "approved": "Access approved",
       "specialRoleActive": "Special role active",
-      "notRequested": "Not requested"
+      "notRequested": "Not requested",
+      "rejected": "Request rejected"
     },
     "feedback": {
       "sendFailed": "The request cannot be sent right now.",
@@ -190,6 +203,8 @@
     "chooseRegion": "Choose Region",
     "categories": "Categories",
     "featuredDestination": "Featured Destination",
+    "previousFeatured": "Previous featured destination",
+    "nextFeatured": "Next featured destination",
     "explore": "Explore",
     "recommendedForYou": "Recommended for you",
     "popularPlaces": "Popular places",
@@ -221,7 +236,8 @@
     "onlyTourists": "Only tourists can log in here.",
     "invalidCredentials": "Invalid email or password.",
     "googleFailed": "Google sign-in is currently unavailable.",
-    "loginButton": "Log In"
+    "loginButton": "Log In",
+    "emailVerifiedSuccess": "Email verified successfully! You can now log in."
   },
   "forgotPassword": {
     "title": "Forgot Password",
@@ -584,22 +600,22 @@
     "apply": "Apply region",
     "confirm": "By tapping the button you confirm switching the app region to {{language}}.",
     "regions": {
-        "montenegro": {
-          "name": "Montenegro",
-          "description": "Default app region."
-        },
-        "italy": {
-          "name": "Italy",
-          "description": "Region for content from Italy."
-        },
-        "serbia": {
-          "name": "Serbia",
-          "description": "Region for content from Serbia."
-        },
-        "spain": {
-          "name": "Spain",
-          "description": "Region for content from Spain."
-        }
+      "montenegro": {
+        "name": "Montenegro",
+        "description": "Default app region."
+      },
+      "italy": {
+        "name": "Italy",
+        "description": "Region for content from Italy."
+      },
+      "serbia": {
+        "name": "Serbia",
+        "description": "Region for content from Serbia."
+      },
+      "spain": {
+        "name": "Spain",
+        "description": "Region for content from Spain."
+      }
     }
   },
   "language": {
@@ -805,7 +821,8 @@
       "nightlife": "Nightlife",
       "culture": "Culture",
       "parks": "National parks"
-    }
+    },
+    "cropPhoto": "Crop photo"
   },
   "appearance": {
     "title": "Appearance",
@@ -985,7 +1002,8 @@
       "notSelected": "Not selected",
       "recenter": "Re-center",
       "exit": "Exit",
-      "reorderStop": "Reorder stop"
+      "reorderStop": "Reorder stop",
+      "resizePanel": "Resize panel"
     },
     "addStop": {
       "title": "Add Stop",
@@ -1043,14 +1061,14 @@
     "addToPlanner": "Add to Planner",
     "about": "About the event",
     "descriptionFallback": "Description is not available.",
-      "availableTickets": "Available tickets",
-      "ticketTypesHelp": "Add one or more ticket types and the total event capacity.",
-      "addTicketType": "Add ticket type",
-      "removeTicketType": "Remove",
-      "ticketTypeName": "Ticket name",
-      "ticketTypeNamePlaceholder": "VIP, Regular, Early bird...",
-      "ticketPricePlaceholder": "45.00",
-      "noTicketTypesHint": "Leave this empty if the event is free.",
+    "availableTickets": "Available tickets",
+    "ticketTypesHelp": "Add one or more ticket types and the total event capacity.",
+    "addTicketType": "Add ticket type",
+    "removeTicketType": "Remove",
+    "ticketTypeName": "Ticket name",
+    "ticketTypeNamePlaceholder": "VIP, Regular, Early bird...",
+    "ticketPricePlaceholder": "45.00",
+    "noTicketTypesHint": "Leave this empty if the event is free.",
     "standardTicket": "Standard ticket",
     "select": "Select",
     "amenities": "Amenities",
@@ -1269,7 +1287,11 @@
     "togglePriority": "Toggle priority",
     "save": "Save to planner",
     "saveChanges": "Save changes",
-    "lockedHint": "This event can only be planned within its original date and duration."
+    "lockedHint": "This event can only be planned within its original date and duration.",
+    "selectedDaysCount": "{{count}} days selected",
+    "selectAtLeastOneDay": "Please select at least one day.",
+    "conflictMessageWithDay": "This time overlaps with \"{{title}}\" on {{day}} at {{time}}.",
+    "selectDateHint": "Choose when you want to attend the event"
   },
   "destination": {
     "title": "Destination",
@@ -1307,5 +1329,36 @@
     "searchPlaceholder": "Search localities...",
     "foundCount": "{{count}} localities found",
     "empty": "No localities found."
+  },
+  "auth": {
+    "codeVerification": {
+      "title": "Code Verification",
+      "subtitle": "Enter OTP (One time password) sent to",
+      "verifyButton": "Verify Code",
+      "resendButton": "Resend Code"
+    },
+    "passwordUpdated": {
+      "title": "Password Updated",
+      "body": "Your password has been successfully updated.",
+      "loginButton": "Login"
+    },
+    "verifyEmail": {
+      "title": "Verify Your Email",
+      "subtitle": "Enter the 6-digit code sent to",
+      "verifyButton": "Verify Email",
+      "resendButton": "Resend Code",
+      "codeRequired": "Enter all 6 digits.",
+      "codeExpired": "The code expired. Request a new one.",
+      "invalidCode": "Invalid or expired code.",
+      "resendSuccess": "A new code was sent.",
+      "resendFailed": "The code could not be resent right now."
+    }
+  },
+  "search": {
+    "placeholder": "Search by sentence, type or amenity...",
+    "inProgress": "Searching...",
+    "typeToSearch": "Type what you're looking for",
+    "resultsCount": "{{count}} results",
+    "noResultsHint": "Try another query or keywords such as hotel, pool, restaurant, parking or dinner."
   }
 }

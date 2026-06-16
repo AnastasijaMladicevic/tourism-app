@@ -79,7 +79,7 @@ export class Login implements OnDestroy {
 
         if (role === 'tourist') {
           this.authService.logout();
-          this.errorMessage = `${role} ${this.translationService.translate('login.portalComingSoon')}`;
+          this.errorMessage = this.translationService.translate('login.accessDenied');
           this.triggerShake();
           return;
         }

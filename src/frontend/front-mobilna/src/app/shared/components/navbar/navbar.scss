@@ -111,6 +111,11 @@
   text-align: center;
 }
 
+:root[data-theme='dark'] .nav-badge {
+  background: var(--primary);
+  border-color: var(--surface-strong);
+}
+
 .bottom-nav {
   position: fixed;
   bottom: 0;

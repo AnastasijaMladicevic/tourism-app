@@ -1,0 +1,220 @@
+:host {
+  display: block;
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.date-picker-root {
+  position: relative;
+  width: 100%;
+}
+
+.date-picker-trigger {
+  width: 100%;
+  min-width: 0;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #ffffff;
+  color: #111827;
+  padding: 6px 8px;
+  font: inherit;
+  font-size: 12px;
+  line-height: 1.2;
+  text-align: left;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.date-picker-trigger:focus {
+  outline: none;
+  border-color: #93c5fd;
+  box-shadow: 0 0 0 3px rgba(147, 197, 253, 0.3);
+}
+
+.date-picker-value {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.date-picker-value--placeholder {
+  color: #9ca3af;
+}
+
+.date-picker-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 2690;
+  border: 0;
+  padding: 0;
+  background: rgba(15, 23, 42, 0.38);
+  cursor: default;
+}
+
+.date-picker-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 2700;
+  width: min(288px, calc(100vw - 32px));
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.16);
+  padding: 12px;
+  box-sizing: border-box;
+}
+
+.date-picker-root--align-end .date-picker-panel {
+  left: auto;
+  right: 0;
+}
+
+.date-picker-root--mobile .date-picker-panel {
+  position: fixed;
+  top: calc(31px + 50dvh + env(safe-area-inset-top, 0px));
+  left: 50%;
+  right: auto;
+  transform: translate(-50%, -50%);
+  width: min(300px, calc(100vw - 32px));
+  max-height: calc(100dvh - 94px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+  overflow-y: auto;
+}
+
+.date-picker-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.date-picker-header strong {
+  color: #0f172a;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.date-picker-nav {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.date-picker-nav-btn {
+  width: 28px;
+  height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #475569;
+  cursor: pointer;
+}
+
+.date-picker-nav-btn:hover {
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.date-picker-nav-btn .material-symbols-outlined {
+  font-size: 20px;
+}
+
+.date-picker-weekdays,
+.date-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 2px;
+}
+
+.date-picker-weekdays {
+  margin-bottom: 4px;
+}
+
+.date-picker-weekdays span {
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.date-picker-day {
+  min-height: 32px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: #0f172a;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.date-picker-day--outside {
+  color: #94a3b8;
+}
+
+.date-picker-day--today:not(.date-picker-day--selected) {
+  box-shadow: inset 0 0 0 1px #93c5fd;
+  color: #1d4ed8;
+}
+
+.date-picker-day--selected {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.28);
+}
+
+.date-picker-day--disabled {
+  color: #cbd5e1;
+  cursor: not-allowed;
+}
+
+.date-picker-day:hover:not(:disabled):not(.date-picker-day--selected) {
+  background: #f1f5f9;
+}
+
+.date-picker-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.date-picker-footer-btn {
+  min-height: 32px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.date-picker-footer-btn--secondary {
+  background: transparent;
+  color: #2563eb;
+}
+
+.date-picker-footer-btn--secondary:hover {
+  background: #eff6ff;
+}
+
+.date-picker-footer-btn--primary {
+  background: transparent;
+  color: #2563eb;
+}
+
+.date-picker-footer-btn--primary:hover {
+  background: #eff6ff;
+}

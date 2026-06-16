@@ -1,3 +1,5 @@
+@use '../../../styles/action-buttons' as action-buttons;
+
 // ─── Screen ────────────────────────────────────────────────────────────────────
 .screen {
   display: flex;
@@ -1146,4 +1148,13 @@
     box-shadow: 0 0 0 1000px var(--surface-strong) inset !important;
     transition: background-color 9999s ease-in-out 0s;
   }
+}
+// ─── Shared hover stanje (srce/favorit) ───────────────────────────────────
+.card__fav {
+  @include action-buttons.heart-action-hover;
+}
+
+// ─── Shared hover stanje (kalendar/planer) ────────────────────────────────
+.planner-btn {
+  @include action-buttons.planner-action-hover;
 }

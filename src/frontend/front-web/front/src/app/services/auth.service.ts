@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { CreateUserDto, LoginDto, AuthResponseDto, UserDto } from '../models/user.model';
 import { environment } from '../../environment/environment';
+import { TranslationService } from './translation.service';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private apiUrl = `${environment.apiUrl}/users`;
@@ -10,7 +11,7 @@ export class AuthService {
   private refreshTokenKey = 'refreshToken';
   private userKey = 'user';
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private translationService: TranslationService) {
     this.syncStoredUserWithAuthenticatedRole();
   }
 
@@ -39,6 +40,18 @@ export class AuthService {
     return this.http
       .delete<UserDto>(`${this.apiUrl}/${userId}/profile-image`)
       .pipe(tap((user) => this.setCurrentUser(user)));
+  }
+
+  getDisplayNames(ids: number[]): Observable<UserDisplayNameDto[]> {
+    if (!ids.length) {
+      return new Observable<UserDisplayNameDto[]>((subscriber) => {
+        subscriber.next([]);
+        subscriber.complete();
+      });
+    }
+
+    const params = new HttpParams().set('ids', ids.join(','));
+    return this.http.get<UserDisplayNameDto[]>(`${this.apiUrl}/display-names`, { params });
   }
 
   changePassword(userId: number, dto: ChangePasswordDto): Observable<{ message: string }> {
@@ -187,11 +200,19 @@ export class AuthService {
   }
 
   logout(): void {
+    const token = this.getToken();
+
     localStorage.removeItem(this.tokenKey);
     localStorage.removeItem(this.refreshTokenKey);
     localStorage.removeItem(this.userKey);
     sessionStorage.removeItem('spirego-admin-ban-message');
     window.dispatchEvent(new CustomEvent('auth-user-changed'));
+
+    if (token) {
+      this.http
+        .post(`${this.apiUrl}/logout`, {}, { headers: { Authorization: `Bearer ${token}` } })
+        .subscribe({ error: () => {} });
+    }
   }
 
   isLoggedIn(): boolean {
@@ -376,6 +397,11 @@ export class AuthService {
     localStorage.setItem(this.tokenKey, response.token);
     localStorage.setItem(this.refreshTokenKey, response.refreshToken);
     localStorage.setItem(this.userKey, JSON.stringify(user));
+
+    if (user.language) {
+      this.translationService.setLanguage(user.language);
+    }
+
     if (response.isBanned && response.banMessage?.trim()) {
       sessionStorage.setItem('spirego-admin-ban-message', response.banMessage.trim());
     } else {
@@ -421,6 +447,13 @@ export class AuthService {
   }
 }
 
+
+export interface UserDisplayNameDto {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+}
 
 export interface ChangePasswordDto {
   currentPassword: string;

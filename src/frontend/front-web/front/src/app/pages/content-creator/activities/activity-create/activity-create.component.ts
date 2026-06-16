@@ -28,12 +28,14 @@ import { DestinationService, DestinationDto } from '../../../../services/destina
 import { RegionDto, RegionService } from '../../../../services/region';
 import { EventService } from '../../../../services/event.service';
 import { TranslationService } from '../../../../services/translation.service';
+import { isPointInGeoJson } from '../../../../shared/utils/geo-utils';
 
 interface ObjectOption {
   id: number;
   name: string;
   destinationId?: number;
   destinationName?: string;
+  localityId?: number;
   latitude?: number;
   longitude?: number;
 }
@@ -146,7 +148,33 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
   /** True if GET /activities/:id/images returned at least one row — activity already has a main image in DB. */
   private readonly pendingImageFiles = new Map<string, File>();
 
+  private scrollPageToTop(): void {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+
+    const scrollableContainers = Array.from(
+      document.querySelectorAll<HTMLElement>(
+        '.page-outlet, .main-content, .content, .page-content, .workspace'
+      )
+    );
+    for (const container of scrollableContainers) {
+      container.scrollTop = 0;
+    }
+
+    setTimeout(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      for (const container of scrollableContainers) {
+        container.scrollTop = 0;
+      }
+    }, 0);
+  }
+
   ngOnInit(): void {
+    this.scrollPageToTop();
+
     const idFromRoute = Number(this.route.snapshot.paramMap.get('id'));
     if (Number.isFinite(idFromRoute) && idFromRoute > 0) {
       this.isEditMode = true;
@@ -160,15 +188,18 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
     }
 
     this.form.controls.destinationId.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+      this.syncRegionFromDestination();
       this.syncDependentSelections();
       this.applyLocationFromSelection();
     });
 
     this.form.controls.localityId.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+      this.syncDestinationFromLocality();
       this.applyLocationFromSelection();
     });
 
     this.form.controls.objectId.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => {
+      this.syncDestinationAndLocalityFromObject();
       this.applyLocationFromSelection();
     });
   }
@@ -184,7 +215,7 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
   }
 
   get isSubmitDisabled(): boolean {
-    return this.isSubmitting || this.isLoadingOptions || !this.hasRequiredCreateFields;
+    return this.isSubmitting || this.isLoadingOptions || this.form.invalid || !this.hasRequiredCreateFields;
   }
 
   get hasRequiredCreateFields(): boolean {
@@ -290,6 +321,117 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
       this.destinations = destinations;
       this.cdr.detectChanges();
     });
+  }
+
+  get selectedDestination(): DestinationDto | null {
+    const destinationId = this.form.controls.destinationId.value;
+    if (!destinationId) {
+      return null;
+    }
+
+    return this.destinations.find((destination) => destination.id === destinationId) ?? null;
+  }
+
+  get selectedDestinationBoundary(): string | undefined {
+    return this.selectedDestination?.boundaryGeoJson;
+  }
+
+  // Vraca true ako je tacka unutar granice izabrane destinacije, ili ako granica nije definisana (preskace proveru).
+  private isWithinSelectedDestination(lat: number, lng: number): boolean {
+    const boundary = this.selectedDestinationBoundary;
+    if (!boundary) {
+      return true;
+    }
+    return isPointInGeoJson(lng, lat, boundary);
+  }
+
+  // Pronalazi prvu destinaciju iz ucitane liste cija granica sadrzi datu tacku.
+  private findDestinationContainingPoint(lat: number, lng: number): DestinationDto | null {
+    return this.destinations.find((d) => d.boundaryGeoJson && isPointInGeoJson(lng, lat, d.boundaryGeoJson)) ?? null;
+  }
+
+  get selectedRegion(): RegionDto | undefined {
+    if (this.selectedRegionId == null) {
+      return undefined;
+    }
+    return this.regions.find((r) => r.id === this.selectedRegionId);
+  }
+
+  get selectedRegionBoundary(): string | undefined {
+    return this.selectedRegion?.boundaryGeoJson;
+  }
+
+  private isWithinSelectedRegion(lat: number, lng: number): boolean {
+    const boundary = this.selectedRegionBoundary;
+    if (!boundary) {
+      return true;
+    }
+    return isPointInGeoJson(lng, lat, boundary);
+  }
+
+  private findRegionContainingPoint(lat: number, lng: number): RegionDto | null {
+    return this.regions.find((r) => r.boundaryGeoJson && isPointInGeoJson(lng, lat, r.boundaryGeoJson)) ?? null;
+  }
+
+  private haversineDistanceKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
+    const toRad = (value: number) => (value * Math.PI) / 180;
+    const earthRadiusKm = 6371;
+    const dLat = toRad(lat2 - lat1);
+    const dLng = toRad(lng2 - lng1);
+    const a =
+      Math.sin(dLat / 2) ** 2 +
+      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+    return earthRadiusKm * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+
+  /** Fallback for destinations without boundary data: pick the closest one by its center point. */
+  private findNearestDestination(lat: number, lng: number, maxDistanceKm = 25): DestinationDto | null {
+    let nearest: DestinationDto | null = null;
+    let nearestDistanceKm = Infinity;
+
+    for (const destination of this.destinations) {
+      if (destination.latitude == null || destination.longitude == null) {
+        continue;
+      }
+      const distanceKm = this.haversineDistanceKm(lat, lng, destination.latitude, destination.longitude);
+      if (distanceKm < nearestDistanceKm) {
+        nearestDistanceKm = distanceKm;
+        nearest = destination;
+      }
+    }
+
+    return nearest && nearestDistanceKm <= maxDistanceKm ? nearest : null;
+  }
+
+  /** Auto-selects the closest locality to the given point, within the selected destination. */
+  private tryAutoSelectLocality(lat: number, lng: number): void {
+    const destinationId = this.form.controls.destinationId.value;
+    if (destinationId == null) {
+      return;
+    }
+
+    const maxLocalityDistanceKm = 5;
+    let nearest: LocalityOption | null = null;
+    let nearestDistanceKm = Infinity;
+
+    for (const candidate of this.localities) {
+      if (candidate.destinationId !== destinationId || candidate.latitude == null || candidate.longitude == null) {
+        continue;
+      }
+      const distanceKm = this.haversineDistanceKm(lat, lng, candidate.latitude, candidate.longitude);
+      if (distanceKm < nearestDistanceKm) {
+        nearestDistanceKm = distanceKm;
+        nearest = candidate;
+      }
+    }
+
+    if (nearest && nearestDistanceKm <= maxLocalityDistanceKm) {
+      this.form.patchValue({ localityId: nearest.id }, { emitEvent: false });
+    }
+  }
+
+  get activeBoundaryGeoJson(): string | undefined {
+    return this.selectedDestinationBoundary ?? this.selectedRegionBoundary;
   }
 
   get filteredObjects(): ObjectOption[] {
@@ -427,6 +569,15 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
 
     if (this.imageUrls.length === 0) {
       this.galleryErrorMessage = this.translationService.translate('contentCreator.activityForm.errors.imageRequired');
+      return;
+    }
+
+    const lat = this.form.controls.latitude.value;
+    const lng = this.form.controls.longitude.value;
+    if (lat != null && lng != null && !this.isWithinSelectedDestination(lat, lng)) {
+      this.errorMessage = this.translationService.translate('contentCreator.activityForm.errors.outsideDestination', {
+        destination: this.selectedDestination?.name ?? ''
+      });
       return;
     }
 
@@ -608,6 +759,7 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
           name: item.name,
           destinationId: item.destinationId,
           destinationName: item.destinationName,
+          localityId: (item as unknown as { localityId?: number }).localityId,
           latitude: (item as unknown as { latitude?: number }).latitude,
           longitude: (item as unknown as { longitude?: number }).longitude
         }))),
@@ -775,6 +927,69 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
           this.errorMessage = this.extractErrorMessage(error) ?? this.translationService.translate('contentCreator.activityForm.errors.loadEditFailed');
         }
       });
+  }
+
+  /** When the destination changes, auto-fill the region from that destination's region. */
+  private syncRegionFromDestination(): void {
+    const destinationId = this.form.controls.destinationId.value;
+    if (destinationId == null) {
+      return;
+    }
+
+    const destination = this.destinations.find((d) => d.id === destinationId);
+    if (destination?.regionId != null) {
+      this.selectedRegionId = destination.regionId;
+    }
+  }
+
+  /** When the locality changes, auto-fill the destination (and through it, the region). */
+  private syncDestinationFromLocality(): void {
+    const localityId = this.form.controls.localityId.value;
+    if (localityId == null) {
+      return;
+    }
+
+    const locality = this.localities.find((l) => l.id === localityId);
+    if (!locality) {
+      return;
+    }
+
+    if (this.form.controls.destinationId.value !== locality.destinationId) {
+      this.form.patchValue({ destinationId: locality.destinationId }, { emitEvent: false });
+      this.syncDependentSelections();
+    }
+
+    this.syncRegionFromDestination();
+  }
+
+  /** When the object changes, auto-fill the locality and destination (and through it, the region). */
+  private syncDestinationAndLocalityFromObject(): void {
+    const objectId = this.form.controls.objectId.value;
+    if (objectId == null) {
+      return;
+    }
+
+    const objectItem = this.objects.find((o) => o.id === objectId);
+    if (!objectItem) {
+      return;
+    }
+
+    const patch: Record<string, number> = {};
+
+    if (objectItem.destinationId != null && this.form.controls.destinationId.value !== objectItem.destinationId) {
+      patch['destinationId'] = objectItem.destinationId;
+    }
+
+    if (objectItem.localityId != null && this.form.controls.localityId.value !== objectItem.localityId) {
+      patch['localityId'] = objectItem.localityId;
+    }
+
+    if (Object.keys(patch).length > 0) {
+      this.form.patchValue(patch, { emitEvent: false });
+      this.syncDependentSelections();
+    }
+
+    this.syncRegionFromDestination();
   }
 
   private syncDependentSelections(): void {
@@ -1007,6 +1222,7 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
   }
 
   selectLocation(latitude: number, longitude: number): void {
+    // Always reflect the clicked point on the form, then re-detect region/destination/locality.
     this.form.patchValue(
       {
         latitude,
@@ -1020,7 +1236,80 @@ export class ActivityCreateComponent implements OnInit, OnDestroy {
     this.form.controls.latitude.markAsTouched();
     this.form.controls.longitude.markAsTouched();
 
+    const matched = this.findDestinationContainingPoint(latitude, longitude) ?? this.findNearestDestination(latitude, longitude);
+    if (matched) {
+      this.errorMessage = '';
+      if (matched.regionId != null && this.selectedRegionId !== matched.regionId) {
+        this.selectedRegionId = matched.regionId;
+        this.loadDestinationsForRegion(matched.regionId);
+      }
+      if (this.form.controls.destinationId.value !== matched.id) {
+        this.form.patchValue({ destinationId: matched.id }, { emitEvent: false });
+        this.syncDependentSelections();
+      }
+    } else {
+      const matchedRegion = this.findRegionContainingPoint(latitude, longitude);
+      if (matchedRegion && this.selectedRegionId !== matchedRegion.id) {
+        this.selectedRegionId = matchedRegion.id;
+        this.loadDestinationsForRegion(matchedRegion.id);
+      }
+      this.errorMessage = '';
+    }
+
+    this.tryAutoSelectLocality(latitude, longitude);
     this.reverseGeocode(latitude, longitude);
+    this.cdr.detectChanges();
+  }
+
+  onCoordinateInputChanged(): void {
+    const lat = this.toNumber(this.form.controls.latitude.value);
+    const lng = this.toNumber(this.form.controls.longitude.value);
+
+    if (lat == null || lng == null) {
+      return;
+    }
+
+    const matched = this.findDestinationContainingPoint(lat, lng) ?? this.findNearestDestination(lat, lng);
+    if (matched) {
+      this.errorMessage = '';
+      if (matched.regionId != null && this.selectedRegionId !== matched.regionId) {
+        this.selectedRegionId = matched.regionId;
+        this.loadDestinationsForRegion(matched.regionId);
+      }
+      if (this.form.controls.destinationId.value !== matched.id) {
+        this.form.patchValue({ destinationId: matched.id }, { emitEvent: false });
+        this.syncDependentSelections();
+      }
+      this.tryAutoSelectLocality(lat, lng);
+      this.reverseGeocode(lat, lng);
+      this.cdr.detectChanges();
+      return;
+    }
+
+    const matchedRegion = this.findRegionContainingPoint(lat, lng);
+    if (matchedRegion && this.selectedRegionId !== matchedRegion.id) {
+      this.selectedRegionId = matchedRegion.id;
+      this.loadDestinationsForRegion(matchedRegion.id);
+    }
+
+    if (this.selectedRegionId != null) {
+      const outsideRegionMessage = this.translationService.translate('contentCreator.activityForm.errors.outsideRegion', {
+        region: this.selectedRegion?.name ?? ''
+      });
+
+      if (!this.isWithinSelectedRegion(lat, lng)) {
+        this.errorMessage = outsideRegionMessage;
+        this.cdr.detectChanges();
+        return;
+      }
+
+      if (this.errorMessage === outsideRegionMessage) {
+        this.errorMessage = '';
+      }
+    }
+
+    this.reverseGeocode(lat, lng);
+    this.cdr.detectChanges();
   }
 
   private reverseGeocode(latitude: number, longitude: number): void {

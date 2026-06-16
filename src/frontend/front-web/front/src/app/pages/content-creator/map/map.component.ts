@@ -368,7 +368,7 @@ export class ContentCreatorMapComponent implements OnInit, AfterViewInit, OnDest
         item,
         score: this.scoreItem(item, terms),
       }))
-      .filter((x) => this.matchesAllTerms(x.item, terms))
+      .filter((x) => this.matchesAllTerms(x.item, terms) && this.matchesActiveFilters(x.item.markerType))
       .sort((a, b) => b.score - a.score)
       .slice(0, 8);
 
@@ -788,7 +788,7 @@ export class ContentCreatorMapComponent implements OnInit, AfterViewInit, OnDest
 
     switch (this.selectedType) {
       case 'event':
-        this.router.navigate(['/content-creator/events/view', this.selectedItem.id]);
+        this.router.navigate(['/content-creator/events/edit', this.selectedItem.id]);
         break;
       case 'activity':
         this.router.navigate(['/content-creator/activities/edit', this.selectedItem.id]);

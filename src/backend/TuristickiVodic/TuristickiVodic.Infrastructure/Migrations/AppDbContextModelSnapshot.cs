@@ -124,6 +124,55 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.ToTable("ActivityTypes");
                 });
 
+            modelBuilder.Entity("TuristickiVodic.Core.Models.BrowserPushSubscription", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Auth")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Endpoint")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
+
+                    b.Property<DateTime?>("ExpirationTimeUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Language")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<string>("P256dh")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("character varying(512)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Endpoint")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("BrowserPushSubscriptions");
+                });
+
             modelBuilder.Entity("TuristickiVodic.Core.Models.DeletionRequest", b =>
                 {
                     b.Property<int>("Id")
@@ -200,6 +249,9 @@ namespace TuristickiVodic.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<Geometry>("Boundary")
+                        .HasColumnType("geometry");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -209,6 +261,13 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("text");
 
+                    b.Property<int>("DestinationTypeId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("DisplayTitle")
+                        .HasMaxLength(250)
+                        .HasColumnType("character varying(250)");
+
                     b.Property<DateTime?>("EditLockAcquiredAtUtc")
                         .HasColumnType("timestamp with time zone");
 
@@ -217,13 +276,6 @@ namespace TuristickiVodic.Infrastructure.Migrations
 
                     b.Property<int?>("EditLockedByUserId")
                         .HasColumnType("integer");
-
-                    b.Property<int>("DestinationTypeId")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("DisplayTitle")
-                        .HasMaxLength(250)
-                        .HasColumnType("character varying(250)");
 
                     b.Property<Point>("Geolocation")
                         .HasColumnType("geometry");
@@ -252,6 +304,10 @@ namespace TuristickiVodic.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Boundary");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Boundary"), "GIST");
 
                     b.HasIndex("CreatedByUserId");
 
@@ -376,6 +432,33 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.ToTable("Events");
                 });
 
+            modelBuilder.Entity("TuristickiVodic.Core.Models.EventPlannerItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("AddedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("EventId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EventId");
+
+                    b.HasIndex("UserId", "EventId")
+                        .IsUnique();
+
+                    b.ToTable("EventPlannerItems");
+                });
+
             modelBuilder.Entity("TuristickiVodic.Core.Models.EventTicketType", b =>
                 {
                     b.Property<int>("Id")
@@ -410,33 +493,6 @@ namespace TuristickiVodic.Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("EventTicketTypes");
-                });
-
-            modelBuilder.Entity("TuristickiVodic.Core.Models.EventPlannerItem", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("AddedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("EventId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EventId");
-
-                    b.HasIndex("UserId", "EventId")
-                        .IsUnique();
-
-                    b.ToTable("EventPlannerItems");
                 });
 
             modelBuilder.Entity("TuristickiVodic.Core.Models.EventType", b =>
@@ -623,6 +679,9 @@ namespace TuristickiVodic.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<Geometry>("Boundary")
+                        .HasColumnType("geometry");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -653,6 +712,10 @@ namespace TuristickiVodic.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Boundary");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Boundary"), "GIST");
 
                     b.HasIndex("CreatedByUserId");
 
@@ -730,55 +793,6 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.HasIndex("ResolvedByUserId");
 
                     b.ToTable("ManagerReports");
-                });
-
-            modelBuilder.Entity("TuristickiVodic.Core.Models.BrowserPushSubscription", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Auth")
-                        .IsRequired()
-                        .HasMaxLength(256)
-                        .HasColumnType("character varying(256)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Endpoint")
-                        .IsRequired()
-                        .HasMaxLength(2000)
-                        .HasColumnType("character varying(2000)");
-
-                    b.Property<DateTime?>("ExpirationTimeUtc")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Language")
-                        .HasMaxLength(20)
-                        .HasColumnType("character varying(20)");
-
-                    b.Property<string>("P256dh")
-                        .IsRequired()
-                        .HasMaxLength(512)
-                        .HasColumnType("character varying(512)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Endpoint")
-                        .IsUnique();
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("BrowserPushSubscriptions");
                 });
 
             modelBuilder.Entity("TuristickiVodic.Core.Models.Notification", b =>
@@ -903,6 +917,9 @@ namespace TuristickiVodic.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<Geometry>("Boundary")
+                        .HasColumnType("geometry");
+
                     b.Property<double?>("CenterLatitude")
                         .HasColumnType("double precision");
 
@@ -939,6 +956,10 @@ namespace TuristickiVodic.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Boundary");
+
+                    NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Boundary"), "GIST");
 
                     b.HasIndex("Code")
                         .IsUnique();
@@ -1319,12 +1340,29 @@ namespace TuristickiVodic.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<bool>("AllowPushNotifications")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTime?>("BanExpiresAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("BanReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTime?>("BannedAtUtc")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("Country")
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("CreatorRoleRequestStatus")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("DateOfBirth")
                         .HasColumnType("timestamp with time zone");
@@ -1348,23 +1386,6 @@ namespace TuristickiVodic.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
-                    b.Property<string>("CreatorRoleRequestStatus")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<bool>("AllowPushNotifications")
-                        .HasColumnType("boolean");
-
-                    b.Property<DateTime?>("BannedAtUtc")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime?>("BanExpiresAtUtc")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("BanReason")
-                        .HasMaxLength(500)
-                        .HasColumnType("character varying(500)");
-
                     b.Property<bool>("HasRequestedCreatorRole")
                         .HasColumnType("boolean");
 
@@ -1374,10 +1395,10 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.Property<bool>("IsBlacklisted")
                         .HasColumnType("boolean");
 
-                    b.Property<bool>("IsVerified")
+                    b.Property<bool>("IsTwoFactorEnabled")
                         .HasColumnType("boolean");
 
-                    b.Property<bool>("IsTwoFactorEnabled")
+                    b.Property<bool>("IsVerified")
                         .HasColumnType("boolean");
 
                     b.Property<string>("Language")
@@ -1423,25 +1444,25 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.Property<DateTime?>("ResetTokenExpiry")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("TwoFactorChallengeTokenHash")
-                        .HasMaxLength(128)
-                        .HasColumnType("character varying(128)");
+                    b.Property<int>("RoleId")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime?>("TwoFactorChallengeExpiryUtc")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("TwoFactorCodeHash")
+                    b.Property<string>("TwoFactorChallengeTokenHash")
                         .HasMaxLength(128)
                         .HasColumnType("character varying(128)");
 
                     b.Property<DateTime?>("TwoFactorCodeExpiryUtc")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<string>("TwoFactorCodeHash")
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
+
                     b.Property<bool?>("TwoFactorRememberMe")
                         .HasColumnType("boolean");
-
-                    b.Property<int>("RoleId")
-                        .HasColumnType("integer");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -1454,12 +1475,12 @@ namespace TuristickiVodic.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Email")
-                        .IsUnique();
-
                     b.HasIndex("EditLockExpiresAtUtc");
 
                     b.HasIndex("EditLockedByUserId");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
 
                     b.HasIndex("LastKnownLocation");
 
@@ -1597,6 +1618,17 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.Navigation("Locality");
 
                     b.Navigation("Object");
+                });
+
+            modelBuilder.Entity("TuristickiVodic.Core.Models.BrowserPushSubscription", b =>
+                {
+                    b.HasOne("TuristickiVodic.Core.Models.User", "User")
+                        .WithMany("BrowserPushSubscriptions")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("TuristickiVodic.Core.Models.DeletionRequest", b =>
@@ -1754,49 +1786,6 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.Navigation("Event");
                 });
 
-            modelBuilder.Entity("TuristickiVodic.Core.Models.BrowserPushSubscription", b =>
-                {
-                    b.HasOne("TuristickiVodic.Core.Models.User", "User")
-                        .WithMany("BrowserPushSubscriptions")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("TuristickiVodic.Core.Models.Notification", b =>
-                {
-                    b.HasOne("TuristickiVodic.Core.Models.Event", "Event")
-                        .WithMany()
-                        .HasForeignKey("EventId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("TuristickiVodic.Core.Models.EventPlannerItem", "EventPlannerItem")
-                        .WithMany()
-                        .HasForeignKey("EventPlannerItemId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("TuristickiVodic.Core.Models.Review", "Review")
-                        .WithMany()
-                        .HasForeignKey("ReviewId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("TuristickiVodic.Core.Models.User", "User")
-                        .WithMany("Notifications")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Event");
-
-                    b.Navigation("EventPlannerItem");
-
-                    b.Navigation("Review");
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("TuristickiVodic.Core.Models.Favorite", b =>
                 {
                     b.HasOne("TuristickiVodic.Core.Models.Activity", "Activity")
@@ -1933,6 +1922,38 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.Navigation("ResolvedBy");
                 });
 
+            modelBuilder.Entity("TuristickiVodic.Core.Models.Notification", b =>
+                {
+                    b.HasOne("TuristickiVodic.Core.Models.Event", "Event")
+                        .WithMany()
+                        .HasForeignKey("EventId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TuristickiVodic.Core.Models.EventPlannerItem", "EventPlannerItem")
+                        .WithMany()
+                        .HasForeignKey("EventPlannerItemId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("TuristickiVodic.Core.Models.Review", "Review")
+                        .WithMany()
+                        .HasForeignKey("ReviewId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.HasOne("TuristickiVodic.Core.Models.User", "User")
+                        .WithMany("Notifications")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Event");
+
+                    b.Navigation("EventPlannerItem");
+
+                    b.Navigation("Review");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("TuristickiVodic.Core.Models.RefreshToken", b =>
                 {
                     b.HasOne("TuristickiVodic.Core.Models.User", "User")
@@ -1942,31 +1963,6 @@ namespace TuristickiVodic.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("TuristickiVodic.Core.Models.User", b =>
-                {
-                    b.HasOne("TuristickiVodic.Core.Models.User", "EditLockedByUser")
-                        .WithMany("LockedUsers")
-                        .HasForeignKey("EditLockedByUserId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("TuristickiVodic.Core.Models.Region", "PreferredRegion")
-                        .WithMany("PreferredByUsers")
-                        .HasForeignKey("PreferredRegionId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("TuristickiVodic.Core.Models.Role", "Role")
-                        .WithMany("Users")
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("EditLockedByUser");
-
-                    b.Navigation("PreferredRegion");
-
-                    b.Navigation("Role");
                 });
 
             modelBuilder.Entity("TuristickiVodic.Core.Models.Review", b =>
@@ -2066,6 +2062,31 @@ namespace TuristickiVodic.Infrastructure.Migrations
                     b.Navigation("Locality");
 
                     b.Navigation("ObjectType");
+                });
+
+            modelBuilder.Entity("TuristickiVodic.Core.Models.User", b =>
+                {
+                    b.HasOne("TuristickiVodic.Core.Models.User", "EditLockedByUser")
+                        .WithMany("LockedUsers")
+                        .HasForeignKey("EditLockedByUserId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TuristickiVodic.Core.Models.Region", "PreferredRegion")
+                        .WithMany("PreferredByUsers")
+                        .HasForeignKey("PreferredRegionId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("TuristickiVodic.Core.Models.Role", "Role")
+                        .WithMany("Users")
+                        .HasForeignKey("RoleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("EditLockedByUser");
+
+                    b.Navigation("PreferredRegion");
+
+                    b.Navigation("Role");
                 });
 
             modelBuilder.Entity("TuristickiVodic.Core.Models.UserLocationHistory", b =>
@@ -2218,13 +2239,13 @@ namespace TuristickiVodic.Infrastructure.Migrations
 
                     b.Navigation("LocationHistory");
 
-                    b.Navigation("LockedUsers");
-
-                    b.Navigation("Notifications");
-
                     b.Navigation("LockedDestinations");
 
+                    b.Navigation("LockedUsers");
+
                     b.Navigation("ManagedDestination");
+
+                    b.Navigation("Notifications");
 
                     b.Navigation("RefreshToken");
 

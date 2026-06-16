@@ -84,7 +84,7 @@ export class EventDetailsComponent implements OnInit {
       return this.translationService.translate('contentCreator.events.status.draft');
     }
 
-    return this.translationService.translate(`contentCreator.events.statuses.${status}`);
+    return this.translationService.translate(`contentCreator.events.status.${status}`);
   }
 
   getStatusBadgeClass(status: string | undefined): string {

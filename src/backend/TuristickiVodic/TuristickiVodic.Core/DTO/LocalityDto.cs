@@ -23,5 +23,6 @@ namespace TuristickiVodic.Core.DTO
         public string LocalityTypeName { get; set; } = string.Empty;
         public int? CreatedByUserId { get; set; }
         public DateTime CreatedAt { get; set; }
+        public string? BoundaryGeoJson { get; set; }
     }
 }

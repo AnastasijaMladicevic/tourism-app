@@ -30,6 +30,7 @@ export class LoginComponent implements OnDestroy {
   hidePassword = true;
   isLoading = false;
   errorMessage = '';
+  infoMessage = '';
   returnUrl = '/home';
   googleClientId: string | null = null;
   private googlePopupListener: ((e: MessageEvent) => void) | null = null;
@@ -55,6 +56,14 @@ export class LoginComponent implements OnDestroy {
       ],
       rememberMe: [false],
     });
+
+    const state = history.state as { verified?: boolean; email?: string } | undefined;
+    if (state?.verified) {
+      this.infoMessage = this.translationService.translate('login.emailVerifiedSuccess');
+      if (state.email) {
+        this.form.patchValue({ email: state.email });
+      }
+    }
 
     this.loadGoogleAuthSettings();
   }
@@ -87,6 +96,7 @@ export class LoginComponent implements OnDestroy {
   login(): void {
     this.isLoading = true;
     this.errorMessage = '';
+    this.infoMessage = '';
 
     this.authService.login({
       email: this.form.value.email,
@@ -96,6 +106,13 @@ export class LoginComponent implements OnDestroy {
       next: (response) => {
         this.isLoading = false;
         this.cdr.detectChanges();
+
+        if (response.requiresEmailVerification) {
+          this.router.navigate(['/verify-email'], {
+            state: { email: this.form.value.email },
+          });
+          return;
+        }
 
         const role = response.user?.roleName?.toLowerCase();
         if (role && role !== 'tourist') {
@@ -228,7 +245,18 @@ export class LoginComponent implements OnDestroy {
     this.cleanupGooglePopup();
   }
 
-  goBack(): void { this.router.navigateByUrl(this.returnUrl); }
+  goBack(): void {
+    if (!this.authService.isLoggedIn()) {
+      const lastUrl = this.routerHistory.getLastUrl();
+      if (lastUrl && !lastUrl.startsWith('/login')) {
+        this.router.navigateByUrl(lastUrl);
+        return;
+      }
+      this.router.navigateByUrl('/home');
+      return;
+    }
+    this.router.navigateByUrl(this.returnUrl);
+  }
   goRegister(): void { this.router.navigate(['/register']); }
   goForgot(): void { this.router.navigate(['/forgot-password']); }
   goTerms(): void { this.router.navigate(['/terms']); }

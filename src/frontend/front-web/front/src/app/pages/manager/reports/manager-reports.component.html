@@ -134,6 +134,7 @@
               </div>
               <p class="queue-snippet">{{ report.reason }}</p>
               <div class="queue-meta">
+                <span class="user-type-chip" [ngClass]="report.reportedUserType">{{ getUserTypeLabel(report.reportedUserType) }}</span>
                 <span>#{{ report.id }}</span>
                 <span>{{ formatDate(report.createdAt) }}</span>
                 @if (report.destinationName && report.destinationName !== ('manager.reports.fallback.notAvailable' | translate)) {
@@ -160,7 +161,10 @@
         <header class="detail-header">
           <div>
             <p class="eyebrow">{{ 'manager.reports.reportNumber' | translate:{ id: selectedReport.id } }}</p>
-            <h2>{{ selectedReport.reportedUserName }}</h2>
+            <h2>
+              {{ selectedReport.reportedUserName }}
+              <span class="user-type-chip" [ngClass]="selectedReport.reportedUserType">{{ getUserTypeLabel(selectedReport.reportedUserType) }}</span>
+            </h2>
           </div>
           <span class="status-chip" [ngClass]="getStatusClass(selectedReport.status)">
             {{ formatStatus(selectedReport.status) }}
@@ -247,23 +251,27 @@
           <ul class="creator-list">
             @for (creator of reportableCreators; track creator.id) {
               <li class="creator-row" [class.is-blocked]="creator.hasPendingReport">
-                <div class="creator-avatar">{{ creator.name.charAt(0) }}</div>
-                <div class="creator-info">
-                  <strong>{{ creator.name }}</strong>
-                  <span class="content-pill">{{ creator.contentSummary }}</span>
+                <div class="creator-row-main">
+                  <div class="creator-avatar">{{ creator.name.charAt(0) }}</div>
+                  <div class="creator-info">
+                    <strong [title]="creator.name">{{ creator.name }}</strong>
+                    <span class="content-pill">{{ creator.contentSummary }}</span>
+                  </div>
                 </div>
-                @if (creator.hasPendingReport) {
-                  <span class="pending-tag">{{ 'manager.reports.pendingTag' | translate }}</span>
-                } @else {
-                  <button
-                    type="button"
-                    class="creator-report-btn"
-                    (click)="openReportModal(creator)"
-                  >
-                    <span class="material-symbols-outlined">flag</span>
-                    {{ 'manager.reports.report' | translate }}
-                  </button>
-                }
+                <div class="creator-row-actions">
+                  @if (creator.hasPendingReport) {
+                    <span class="pending-tag">{{ 'manager.reports.pendingTag' | translate }}</span>
+                  } @else {
+                    <button
+                      type="button"
+                      class="creator-report-btn"
+                      (click)="openReportModal(creator)"
+                    >
+                      <span class="material-symbols-outlined">flag</span>
+                      {{ 'manager.reports.report' | translate }}
+                    </button>
+                  }
+                </div>
               </li>
             }
           </ul>
@@ -276,6 +284,7 @@
 <app-manager-report-modal
   [open]="reportModalOpen"
   [creators]="reportableCreators"
+  [tourists]="reportableTourists"
   [initialCreatorId]="reportModalCreatorId"
   [initialCategory]="reportModalCategory"
   [initialReason]="reportModalReason"

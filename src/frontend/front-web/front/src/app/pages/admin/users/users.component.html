@@ -386,10 +386,25 @@
           <option value="all">{{ t('adminUsers.filters.allOrigins') }}</option>
           <option *ngFor="let c of adminCountryOptions" [value]="c">{{ c }}</option>
         </select>
-        <div class="table-date-range">
-          <input type="date" class="table-date-input" [(ngModel)]="adminDateFrom" [max]="adminDateTo || null" (ngModelChange)="adminCurrentPage = 1" />
-          <span class="table-date-sep">–</span>
-          <input type="date" class="table-date-input" [(ngModel)]="adminDateTo" [min]="adminDateFrom || null" (ngModelChange)="adminCurrentPage = 1" />
+        <div class="date-range-pill" [attr.aria-label]="t('manager.events.dateRangeFilter')">
+          <span class="material-symbols-outlined date-range-icon" aria-hidden="true">calendar_month</span>
+          <div class="date-range-inputs">
+            <app-date-picker-input
+              [(ngModel)]="adminDateFrom"
+              [max]="adminDateTo || null"
+              (ngModelChange)="adminCurrentPage = 1"
+              [ariaLabel]="t('manager.events.fromDate')"
+              [placeholder]="t('manager.events.datePlaceholder')"
+            />
+            <span class="date-range-separator" aria-hidden="true">–</span>
+            <app-date-picker-input
+              [(ngModel)]="adminDateTo"
+              [min]="adminDateFrom || null"
+              (ngModelChange)="adminCurrentPage = 1"
+              [ariaLabel]="t('manager.events.toDate')"
+              [placeholder]="t('manager.events.datePlaceholder')"
+            />
+          </div>
         </div>
         <span class="table-filter-meta" *ngIf="adminMembers.length && (adminDirectorySearch.trim() || adminRoleFilter !== 'all' || adminStatusFilter !== 'all' || adminCountryFilter !== 'all' || adminDateFrom || adminDateTo)">
           {{ t('adminUsers.matchesOf', { matches: filteredAdminDirectory.length, total: adminMembers.length }) }}
@@ -673,7 +688,7 @@
             [attr.aria-label]="t('adminUsers.dismissSuccessMessage')"
             (click)="dismissCreatorApproveSuccess()"
           >
-            Ã—
+            &times;
           </button>
         </div>
 
@@ -842,10 +857,25 @@
         <option value="inactive">{{ t('adminUsers.filters.inactive') }}</option>
         <option value="banned">{{ t('adminUsers.filters.banned') }}</option>
       </select>
-      <div class="table-date-range">
-        <input type="date" class="table-date-input" [(ngModel)]="touristDateFrom" [max]="touristDateTo || null" (ngModelChange)="touristCurrentPage = 1" />
-        <span class="table-date-sep">–</span>
-        <input type="date" class="table-date-input" [(ngModel)]="touristDateTo" [min]="touristDateFrom || null" (ngModelChange)="touristCurrentPage = 1" />
+      <div class="date-range-pill" [attr.aria-label]="t('manager.events.dateRangeFilter')">
+        <span class="material-symbols-outlined date-range-icon" aria-hidden="true">calendar_month</span>
+        <div class="date-range-inputs">
+          <app-date-picker-input
+            [(ngModel)]="touristDateFrom"
+            [max]="touristDateTo || null"
+            (ngModelChange)="touristCurrentPage = 1"
+            [ariaLabel]="t('manager.events.fromDate')"
+            [placeholder]="t('manager.events.datePlaceholder')"
+          />
+          <span class="date-range-separator" aria-hidden="true">–</span>
+          <app-date-picker-input
+            [(ngModel)]="touristDateTo"
+            [min]="touristDateFrom || null"
+            (ngModelChange)="touristCurrentPage = 1"
+            [ariaLabel]="t('manager.events.toDate')"
+            [placeholder]="t('manager.events.datePlaceholder')"
+          />
+        </div>
       </div>
       <span class="table-filter-meta" *ngIf="tourists.length && (touristSearch.trim() || touristOriginFilter !== 'all' || touristStatusFilter !== 'all' || touristDateFrom || touristDateTo)">
         {{ t('adminUsers.matchesOf', { matches: filteredTourists.length, total: tourists.length }) }}

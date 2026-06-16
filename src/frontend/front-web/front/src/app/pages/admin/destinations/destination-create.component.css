@@ -405,47 +405,6 @@ textarea {
   min-height: 200px;
 }
 
-.categories-block .category-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  min-height: 8px;
-}
-
-.chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 10px;
-  background: #f1f5f9;
-  border: 1px solid #e2e8f0;
-  border-radius: 999px;
-  font-size: 13px;
-  font-weight: 600;
-  color: #334155;
-}
-
-.chip-remove {
-  border: 0;
-  background: transparent;
-  cursor: pointer;
-  font-size: 16px;
-  line-height: 1;
-  color: #64748b;
-  padding: 0 0 0 2px;
-}
-
-.category-add-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  align-items: center;
-}
-
-.category-add-row input {
-  flex: 1 1 200px;
-}
-
 .upload-all-label {
   cursor: pointer;
   margin: 0;
@@ -1001,5 +960,36 @@ textarea {
 
   .title-row {
     flex-direction: column;
+  }
+}
+
+@media (max-width: 720px) {
+  .title-actions {
+    width: 100%;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 8px !important;
+  }
+
+  .title-actions .btn {
+    min-width: 0 !important;
+    height: 42px !important;
+    padding: 0 10px !important;
+    font-size: 12px !important;
+    white-space: nowrap !important;
+  }
+
+  .title-actions .btn-with-icon {
+    flex: 1 1 auto !important;
+  }
+
+  .title-actions .btn-with-icon .material-symbols-outlined {
+    font-size: 17px !important;
+  }
+
+  .title-actions .btn:not(.btn-with-icon) {
+    flex: 0 0 78px !important;
+    width: 78px !important;
+    padding: 0 8px !important;
   }
 }

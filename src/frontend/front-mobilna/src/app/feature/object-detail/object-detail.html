@@ -432,7 +432,7 @@
               <div class="creator-response">
                 <div class="creator-response-header">
                   <mat-icon>reply</mat-icon>
-                  <span>Odgovor vlasnika</span>
+                  <span>{{ 'object.ownerReply' | translate }}</span>
                   @if (review.creatorResponseAt) {
                     <span class="response-date">
                       {{ formatReviewDate(review.creatorResponseAt) }}

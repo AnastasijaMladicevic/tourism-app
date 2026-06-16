@@ -128,6 +128,32 @@ export class EventService {
     );
   }
 
+  getByIds(ids: number[]): Observable<EventDto[]> {
+    if (!ids.length) return of([]);
+
+    const lang = this.translationService.language();
+    const cached: EventDto[] = [];
+    const missingIds: number[] = [];
+
+    for (const id of ids) {
+      const cachedItem = this.dataCache.get<EventDto>(`event:${id}:${lang}`);
+      if (cachedItem) {
+        cached.push(cachedItem);
+      } else {
+        missingIds.push(id);
+      }
+    }
+
+    if (!missingIds.length) return of(cached);
+
+    let params = new HttpParams().set('ids', missingIds.join(','));
+    params = this.addLang(params);
+    return this.http.get<EventDto[]>(`${this.url}/by-ids`, { params }).pipe(
+      tap((items) => items.forEach((item) => this.dataCache.set(`event:${item.id}:${lang}`, item))),
+      map((items) => [...cached, ...items]),
+    );
+  }
+
   getTypes(options?: RegionRequestOptions): Observable<EventTypeOptionDto[]> {
     let params = new HttpParams();
     params = this.addLang(params, options);

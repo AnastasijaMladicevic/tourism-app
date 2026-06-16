@@ -23,6 +23,14 @@ namespace TuristickiVodic.Services
             _translationService = translationService ?? NullTranslationService.Instance;
         }
 
+        public async Task<List<DestinationTypeDto>> GetDestinationTypesAsync()
+        {
+            return await _context.DestinationTypes
+                .OrderBy(t => t.Name)
+                .Select(t => new DestinationTypeDto { Id = t.Id, Name = t.Name })
+                .ToListAsync();
+        }
+
         public async Task<PagedResultDto<DestinationDto>> GetAllAsync(int? userId, string? role, DestinationQueryDto query)
         {
             if (query.Page < 1)

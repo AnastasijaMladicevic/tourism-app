@@ -196,7 +196,7 @@
   position: sticky;
   top: 20px;
   align-self: stretch;
-  padding-top: 0;
+  padding-top: 18px;
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -393,6 +393,8 @@
 
 .access-card__copy {
   min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .access-card__title {
@@ -400,6 +402,8 @@
   font-size: 16px;
   font-weight: 700;
   color: #0f172a;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .access-card__sub {
@@ -407,6 +411,8 @@
   font-size: 12px;
   line-height: 1.45;
   color: #667085;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .access-card__badge {
@@ -481,6 +487,8 @@
 
 .security-card__copy {
   min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
 }
 
 .security-card__title {
@@ -488,6 +496,8 @@
   font-size: 16px;
   font-weight: 700;
   color: #0f172a;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .security-card__sub {
@@ -495,6 +505,8 @@
   font-size: 12px;
   line-height: 1.45;
   color: #667085;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .security-card__action {
@@ -547,6 +559,7 @@
   color: #1f2937;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   font-size: 13px;
   font-weight: 600;
@@ -892,11 +905,15 @@
 .permissions-modal-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 1240;
+  z-index: 2700;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px;
+  padding:
+    max(16px, env(safe-area-inset-top))
+    max(16px, env(safe-area-inset-right))
+    max(16px, env(safe-area-inset-bottom))
+    max(16px, env(safe-area-inset-left));
   background: rgba(15, 23, 42, 0.58);
   backdrop-filter: blur(10px);
   animation: passwordBackdropIn 0.22s ease-out both;
@@ -907,9 +924,14 @@
 }
 
 .permissions-modal {
+  display: flex;
+  flex-direction: column;
   width: min(620px, 100%);
-  max-height: min(680px, calc(100vh - 48px));
-  overflow: auto;
+  max-height: min(
+    680px,
+    calc(100dvh - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom))
+  );
+  overflow: hidden;
   border: 1px solid rgba(226, 232, 240, 0.9);
   border-radius: 16px;
   background: #ffffff;
@@ -927,6 +949,11 @@
   justify-content: space-between;
   gap: 18px;
   padding: 24px 24px 18px;
+  flex-shrink: 0;
+}
+
+.permissions-modal__header > div:first-child {
+  min-width: 0;
 }
 
 .permissions-modal__header h3 {
@@ -935,14 +962,17 @@
   line-height: 1.25;
   font-weight: 800;
   color: #0f172a;
+  overflow-wrap: anywhere;
 }
 
 .permissions-modal__header p {
   margin: 10px 0 0;
-  max-width: 46ch;
+  max-width: none;
   font-size: 13px;
   line-height: 1.45;
   color: #64748b;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .permissions-modal__close {
@@ -966,21 +996,32 @@
 
 .permissions-modal__grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+  grid-auto-rows: auto;
+  align-items: start;
+  align-content: start;
   gap: 10px;
   padding: 0 24px 10px;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 .permission-tile {
   display: grid;
-  grid-template-columns: auto auto 1fr;
+  grid-template-columns: auto auto minmax(0, 1fr);
   gap: 12px;
   align-items: start;
-  min-height: 78px;
+  align-self: start;
+  height: auto;
   padding: 14px;
   border: 1px solid #dfe7f3;
   border-radius: 10px;
   background: #ffffff;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .permission-tile__check {
@@ -1018,9 +1059,18 @@
 
 .permission-tile__copy {
   min-width: 0;
+  max-width: 100%;
   display: flex;
   flex-direction: column;
   gap: 4px;
+}
+
+.permission-tile__label,
+.permission-tile__detail {
+  display: block;
+  max-width: 100%;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .permission-tile__label {
@@ -1039,7 +1089,10 @@
 .permissions-modal__footer {
   display: flex;
   justify-content: flex-end;
-  padding: 0 24px 24px;
+  padding: 12px 24px max(24px, env(safe-area-inset-bottom));
+  flex-shrink: 0;
+  border-top: 1px solid #edf1f6;
+  background: #ffffff;
 }
 
 .permissions-modal__button {
@@ -1052,6 +1105,9 @@
   font-size: 13px;
   font-weight: 700;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .crop-modal-backdrop {
@@ -1133,6 +1189,9 @@
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .crop-confirm-button {
@@ -1150,11 +1209,15 @@
 .password-modal-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 1250;
+  z-index: 2700;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px;
+  padding:
+    max(16px, env(safe-area-inset-top))
+    max(16px, env(safe-area-inset-right))
+    max(16px, env(safe-area-inset-bottom))
+    max(16px, env(safe-area-inset-left));
   background: rgba(15, 23, 42, 0.58);
   backdrop-filter: blur(10px);
   animation: passwordBackdropIn 0.22s ease-out both;
@@ -1165,7 +1228,13 @@
 }
 
 .password-modal {
+  display: flex;
+  flex-direction: column;
   width: min(620px, 100%);
+  max-height: min(
+    720px,
+    calc(100dvh - 32px - env(safe-area-inset-top) - env(safe-area-inset-bottom))
+  );
   border-radius: 26px;
   border: 1px solid rgba(226, 232, 240, 0.9);
   background:
@@ -1187,6 +1256,7 @@
   gap: 18px;
   padding: 22px 24px 18px;
   border-bottom: 1px solid #edf1f6;
+  flex-shrink: 0;
 }
 
 .password-modal__heading-copy {
@@ -1220,14 +1290,18 @@
   line-height: 1.15;
   font-weight: 800;
   color: #0f172a;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .password-modal__header p {
   margin: 8px 0 0;
-  max-width: 46ch;
+  max-width: none;
   font-size: 13px;
   line-height: 1.5;
   color: #64748b;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .password-modal__close {
@@ -1251,11 +1325,17 @@
 
 .password-modal__body {
   padding: 22px 24px 18px;
+  flex: 1;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 .password-modal__grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
   gap: 16px;
 }
 
@@ -1263,6 +1343,7 @@
   display: flex;
   align-items: flex-start;
   gap: 12px;
+  min-width: 0;
   padding: 14px 16px;
   border-radius: 14px;
   background: #eff6ff;
@@ -1289,15 +1370,19 @@
 
 .modal-info-box p {
   margin: 0;
+  min-width: 0;
   font-size: 13px;
   line-height: 1.5;
   color: #1e40af;
   padding-top: 6px;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .modal-direct-fields {
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .modal-direct-fields .modal-field + .modal-field {
@@ -1396,6 +1481,7 @@
   flex-wrap: wrap;
   gap: 8px;
   margin-top: 16px;
+  max-width: 100%;
 }
 
 .password-rule {
@@ -1431,13 +1517,14 @@
 
 .otp-panel {
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: auto minmax(0, 1fr);
   gap: 14px;
   align-items: center;
   padding: 16px;
   border: 1px solid #dbe3ee;
   border-radius: 18px;
   background: linear-gradient(135deg, #f7fbff 0%, #eef5ff 100%);
+  min-width: 0;
 }
 
 .otp-panel__icon {
@@ -1464,11 +1551,17 @@
   color: #0f172a;
 }
 
+.otp-panel__copy {
+  min-width: 0;
+}
+
 .otp-panel__copy p {
   margin: 6px 0 0;
   font-size: 13px;
   line-height: 1.45;
   color: #64748b;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .otp-panel__code {
@@ -1490,8 +1583,10 @@
 
 .otp-boxes {
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
   margin-top: 6px;
+  max-width: 100%;
 }
 
 .otp-box {
@@ -1546,6 +1641,8 @@
   border-radius: 14px;
   font-size: 13px;
   line-height: 1.45;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .modal-message--error {
@@ -1571,7 +1668,10 @@
   align-items: center;
   justify-content: flex-end;
   gap: 12px;
-  padding: 0 24px 24px;
+  padding: 12px 24px max(24px, env(safe-area-inset-bottom));
+  flex-shrink: 0;
+  border-top: 1px solid #edf1f6;
+  background: #f8fbff;
 }
 
 .spinner--blue {
@@ -1671,6 +1771,18 @@
   }
 }
 
+@media (max-height: 640px) and (min-width: 761px) {
+  .permissions-modal-backdrop,
+  .password-modal-backdrop {
+    align-items: flex-start;
+  }
+
+  .permissions-modal,
+  .password-modal {
+    max-height: calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  }
+}
+
 @media (max-width: 760px) {
   .profile-page {
     padding: 16px;
@@ -1718,7 +1830,7 @@
 
   .profile-sidebar {
     position: static;
-    padding-top: 0;
+    padding-top: 16px;
   }
 
   .language-options {
@@ -1779,14 +1891,31 @@
   }
 
   .permissions-modal-backdrop {
-    padding: 16px;
+    align-items: flex-start;
+    padding:
+      max(12px, env(safe-area-inset-top))
+      max(12px, env(safe-area-inset-right))
+      max(12px, env(safe-area-inset-bottom))
+      max(12px, env(safe-area-inset-left));
   }
 
   .permissions-modal {
+    width: 100%;
+    max-height: min(
+      92dvh,
+      calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom))
+    );
     border-radius: 14px;
   }
 
-  .permissions-modal__header,
+  .permissions-modal__header {
+    padding: 18px 16px 14px;
+  }
+
+  .permissions-modal__header h3 {
+    font-size: 16px;
+  }
+
   .permissions-modal__grid,
   .permissions-modal__footer {
     padding-left: 16px;
@@ -1795,6 +1924,37 @@
 
   .permissions-modal__grid {
     grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .permission-tile {
+    gap: 10px;
+    padding: 12px;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      'check copy'
+      'icon copy';
+  }
+
+  .permission-tile__check {
+    grid-area: check;
+  }
+
+  .permission-tile__icon {
+    grid-area: icon;
+  }
+
+  .permission-tile__copy {
+    grid-area: copy;
+  }
+
+  .permissions-modal__footer {
+    padding-top: 10px;
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+  }
+
+  .permissions-modal__button {
+    width: 100%;
   }
 
   .crop-modal {
@@ -1822,28 +1982,71 @@
   }
 
   .password-modal-backdrop {
-    padding: 16px;
+    align-items: flex-start;
+    padding:
+      max(12px, env(safe-area-inset-top))
+      max(12px, env(safe-area-inset-right))
+      max(12px, env(safe-area-inset-bottom))
+      max(12px, env(safe-area-inset-left));
   }
 
   .password-modal {
+    width: 100%;
+    max-height: min(
+      92dvh,
+      calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom))
+    );
     border-radius: 20px;
   }
 
-  .password-modal__header,
+  .password-modal__header {
+    padding: 18px 16px 14px;
+  }
+
+  .password-modal__header h3 {
+    font-size: 18px;
+  }
+
   .password-modal__body,
   .password-modal__footer {
     padding-left: 16px;
     padding-right: 16px;
   }
 
+  .password-modal__body {
+    padding-top: 16px;
+    padding-bottom: 14px;
+  }
+
   .password-modal__grid {
     grid-template-columns: 1fr;
+  }
+
+  .otp-panel {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .otp-panel__copy {
+    width: 100%;
+  }
+
+  .otp-panel__code {
+    max-width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
   }
 
   .otp-meta,
   .password-modal__footer {
     flex-direction: column;
     align-items: stretch;
+  }
+
+  .password-modal__footer {
+    padding-top: 10px;
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
   }
 
   .modal-secondary-btn,
@@ -1859,12 +2062,16 @@
   }
 
   .otp-boxes {
-    justify-content: center;
+    justify-content: space-between;
+    gap: 8px;
   }
 
   .otp-box {
-    flex: 1;
+    flex: 1 1 40px;
     min-width: 0;
     max-width: 52px;
+    width: auto;
+    height: 50px;
+    font-size: 20px;
   }
 }

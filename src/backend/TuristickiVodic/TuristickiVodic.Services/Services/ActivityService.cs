@@ -491,11 +491,14 @@ namespace TuristickiVodic.Services.Services
                     throw new InvalidOperationException("Object not found.");
             }
 
+            var geolocation = CreatePoint(dto.Longitude, dto.Latitude);
+            await GeoBoundaryHelper.EnsurePointWithinBoundsAsync(_context, geolocation, dto.LocalityId, dto.DestinationId);
+
             var activity = new Activity
             {
                 Name = dto.Name,
                 Description = dto.Description,
-                Geolocation = CreatePoint(dto.Longitude, dto.Latitude),
+                Geolocation = geolocation,
                 Price = dto.Price,
                 DurationMinutes = dto.DurationMinutes,
                 ActivityTypeId = dto.ActivityTypeId,
@@ -512,7 +515,7 @@ namespace TuristickiVodic.Services.Services
             await _context.SaveChangesAsync();
             await CreateManagerPendingContentNotificationAsync(
                 activity.DestinationId,
-                "Nova aktivnost ceka odobrenje",
+                "Nova aktivnost čeka odobrenje",
                 $"Aktivnost \"{activity.Name}\" je poslata na odobrenje u tvojoj destinaciji.",
                 $"/activities/{activity.Id}");
 
@@ -567,11 +570,11 @@ namespace TuristickiVodic.Services.Services
             if (!managerId.HasValue)
                 return;
 
-            var managerCanReceive = await _context.Users
+            var manager = await _context.Users
                 .AsNoTracking()
-                .AnyAsync(u => u.Id == managerId.Value && u.IsActive && !u.IsBlacklisted);
+                .FirstOrDefaultAsync(u => u.Id == managerId.Value && u.IsActive && !u.IsBlacklisted);
 
-            if (!managerCanReceive)
+            if (manager == null)
                 return;
 
             _context.Notifications.Add(new Notification
@@ -668,6 +671,9 @@ namespace TuristickiVodic.Services.Services
             if (dto.Description != null) activity.Description = dto.Description;
             if (dto.Longitude.HasValue && dto.Latitude.HasValue)
                 activity.Geolocation = CreatePoint(dto.Longitude, dto.Latitude);
+
+            await GeoBoundaryHelper.EnsurePointWithinBoundsAsync(_context, activity.Geolocation, activity.LocalityId, activity.DestinationId);
+
             if (dto.Price.HasValue) activity.Price = dto.Price.Value;
             if (dto.DurationMinutes.HasValue) activity.DurationMinutes = dto.DurationMinutes.Value;
 
@@ -771,21 +777,23 @@ namespace TuristickiVodic.Services.Services
             string contentName,
             string actionUrl)
         {
-            var creatorCanReceive = await _context.Users
+            var creator = await _context.Users
                 .AsNoTracking()
-                .AnyAsync(u => u.Id == creatorId && u.IsActive && !u.IsBlacklisted);
+                .FirstOrDefaultAsync(u => u.Id == creatorId && u.IsActive && !u.IsBlacklisted);
 
-            if (!creatorCanReceive)
+            if (creator == null)
                 return;
 
             var statusText = approved ? "odobrena" : "odbijena";
+            var title = $"Tvoja {contentType} je {statusText}";
+            var message = $"Sadržaj \"{contentName}\" je {statusText}.";
 
             _context.Notifications.Add(new Notification
             {
                 UserId = creatorId,
                 Type = NotificationType.CreatorContentReviewed,
-                Title = $"Tvoja {contentType} je {statusText}",
-                Message = $"Sadrzaj \"{contentName}\" je {statusText}.",
+                Title = title,
+                Message = message,
                 ActionUrl = actionUrl,
                 CreatedAt = DateTime.UtcNow
             });
@@ -827,14 +835,18 @@ namespace TuristickiVodic.Services.Services
             if (string.IsNullOrWhiteSpace(creatorName))
                 creatorName = creator.Email;
 
+            var title = "ContentCreator ima više odbijenih sadržaja";
+            var message = $"ContentCreator {creatorName} ima {rejectedCount} odbijenih sadržaja. Poslednje odbijeno: \"{latestContentName}\".";
+            var createdAt = DateTime.UtcNow;
+
             var notifications = adminIds.Select(adminId => new Notification
             {
                 UserId = adminId,
                 Type = NotificationType.AdminCreatorMultipleRejectedContent,
-                Title = "ContentCreator ima vise odbijenih sadrzaja",
-                Message = $"ContentCreator {creatorName} ima {rejectedCount} odbijenih sadrzaja. Poslednje odbijeno: \"{latestContentName}\".",
+                Title = title,
+                Message = message,
                 ActionUrl = actionUrl,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = createdAt
             });
 
             _context.Notifications.AddRange(notifications);
@@ -1072,10 +1084,43 @@ namespace TuristickiVodic.Services.Services
                 return;
 
             var activitiesById = activities.ToDictionary(a => a.Id);
+
+            var batchItems = new List<TranslationBatchItem>();
+            var fieldSlots = new List<(ActivityDto Item, string Field)>();
+
             foreach (var dto in dtos)
             {
-                if (activitiesById.TryGetValue(dto.Id, out var activity))
-                    await ApplyTranslationsAsync(dto, activity, normalizedLang, true);
+                if (!activitiesById.TryGetValue(dto.Id, out var activity))
+                    continue;
+
+                dto.Description ??= string.Empty;
+                if (!string.IsNullOrWhiteSpace(dto.Description))
+                {
+                    batchItems.Add(new TranslationBatchItem("Activity", activity.Id, "Description", dto.Description));
+                    fieldSlots.Add((dto, "Description"));
+                }
+
+                if (activity.ActivityType != null && !string.IsNullOrWhiteSpace(activity.ActivityType.Name))
+                {
+                    batchItems.Add(new TranslationBatchItem("ActivityType", activity.ActivityType.Id, "Name", activity.ActivityType.Name));
+                    fieldSlots.Add((dto, "ActivityTypeName"));
+                }
+            }
+
+            var results = await _translationService.TranslateBatchAsync(batchItems, normalizedLang);
+
+            for (var i = 0; i < fieldSlots.Count; i++)
+            {
+                var (dto, field) = fieldSlots[i];
+                switch (field)
+                {
+                    case "Description":
+                        dto.Description = results[i];
+                        break;
+                    case "ActivityTypeName":
+                        dto.ActivityTypeName = results[i];
+                        break;
+                }
             }
         }
 

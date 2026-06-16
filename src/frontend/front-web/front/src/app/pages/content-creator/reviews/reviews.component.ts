@@ -1,4 +1,14 @@
-import { ChangeDetectorRef, Component, Injector, OnDestroy, OnInit, inject } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  HostListener,
+  Injector,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+  inject,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PaginatorComponent } from '../../../shared/components/paginator/paginator';
@@ -56,6 +66,7 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
   filteredReviews: ReviewDto[] = [];
   creatorObjects: ObjectDto[] = [];
   objectFilterId: number | null = null;
+  objectFilterMenuOpen = false;
   selectedReview: ReviewDto | null = null;
   selectedObject: ObjectDto | null = null;
   selectedObjectImages: ObjectImageDto[] = [];
@@ -69,8 +80,20 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
 
   searchTerm = '';
   responseFilter: 'all' | 'responded' | 'pending' = 'all';
+  responseFilterMenuOpen = false;
+  readonly responseFilterOptions: Array<{
+    value: 'all' | 'responded' | 'pending';
+    labelKey: string;
+  }> = [
+    { value: 'all', labelKey: 'contentCreator.reviews.filters.all' },
+    { value: 'pending', labelKey: 'contentCreator.reviews.filters.pendingReply' },
+    { value: 'responded', labelKey: 'contentCreator.reviews.filters.responded' },
+  ];
   selectedRatings: number[] = [];
   sortOrder: 'desc' | 'asc' = 'desc';
+
+  @ViewChild('objectFilterRoot') private objectFilterRoot?: ElementRef<HTMLElement>;
+  @ViewChild('responseFilterRoot') private responseFilterRoot?: ElementRef<HTMLElement>;
 
   queuePage = 1;
   queuePageSize = 5;
@@ -202,12 +225,86 @@ export class ContentCreatorReviewsComponent implements OnInit, OnDestroy {
     this.loadReviews();
   }
 
+  get responseFilterLabelKey(): string {
+    return (
+      this.responseFilterOptions.find((option) => option.value === this.responseFilter)?.labelKey
+      ?? 'contentCreator.reviews.filters.all'
+    );
+  }
+
+  get objectFilterLabel(): string {
+    if (this.objectFilterId == null) {
+      return this.translationService.translate('contentCreator.reviews.filters.allObjects');
+    }
+
+    const selectedName = this.creatorObjects
+      .find((object) => object.id === this.objectFilterId)
+      ?.name
+      ?.trim();
+
+    return selectedName || this.translationService.translate('contentCreator.reviews.filters.allObjects');
+  }
+
+  toggleObjectFilterMenu(event: Event): void {
+    if (this.isLoading) {
+      return;
+    }
+
+    event.stopPropagation();
+    this.objectFilterMenuOpen = !this.objectFilterMenuOpen;
+    if (this.objectFilterMenuOpen) {
+      this.responseFilterMenuOpen = false;
+    }
+  }
+
+  selectObjectFilter(value: number | null, event: Event): void {
+    event.stopPropagation();
+    this.objectFilterMenuOpen = false;
+    this.onObjectFilterChange(value);
+  }
+
+  toggleResponseFilterMenu(event: Event): void {
+    event.stopPropagation();
+    this.responseFilterMenuOpen = !this.responseFilterMenuOpen;
+    if (this.responseFilterMenuOpen) {
+      this.objectFilterMenuOpen = false;
+    }
+  }
+
+  selectResponseFilter(value: 'all' | 'responded' | 'pending', event: Event): void {
+    event.stopPropagation();
+    this.responseFilter = value;
+    this.responseFilterMenuOpen = false;
+    this.onFilterChange();
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as Node;
+
+    if (
+      this.objectFilterMenuOpen
+      && !this.objectFilterRoot?.nativeElement.contains(target)
+    ) {
+      this.objectFilterMenuOpen = false;
+    }
+
+    if (
+      this.responseFilterMenuOpen
+      && !this.responseFilterRoot?.nativeElement.contains(target)
+    ) {
+      this.responseFilterMenuOpen = false;
+    }
+  }
+
   onSearchChange(value: string): void {
     this.searchTerm = value;
     this.searchInput$.next(value.trim());
   }
 
   resetFilters(): void {
+    this.objectFilterMenuOpen = false;
+    this.responseFilterMenuOpen = false;
     this.searchTerm = '';
     this.objectFilterId = null;
     this.queuePage = 1;

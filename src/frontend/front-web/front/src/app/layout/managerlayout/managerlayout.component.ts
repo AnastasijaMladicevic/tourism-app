@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
@@ -15,6 +15,7 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
   styleUrls: ['./managerlayout.component.css'],
 })
 export class ManagerLayoutComponent implements OnInit, OnDestroy {
+  @ViewChild('pageOutlet') pageOutlet!: ElementRef<HTMLElement>;
   searchQuery = '';
   sidebarOpen = false;
   isMapRoute = false;
@@ -41,6 +42,7 @@ export class ManagerLayoutComponent implements OnInit, OnDestroy {
       .subscribe(() => {
       //  this.closeSidebar();
         this.syncMapRoute();
+        this.pageOutlet?.nativeElement.scrollTo({ top: 0 });
       });
   }
 

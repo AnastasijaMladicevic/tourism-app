@@ -110,6 +110,11 @@
 .field-grid {
   display: grid;
   gap: 16px;
+  margin-bottom: 16px;
+}
+
+.field-grid:last-child {
+  margin-bottom: 0;
 }
 
 .field-grid--2 {
@@ -255,15 +260,9 @@
 .role-cards {
   margin-top: 14px;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
   gap: 12px;
-}
-
-@media (max-width: 900px) {
-  .role-cards {
-    margin-top: 14px;
-    grid-template-columns: 1fr;
-  }
+  width: 100%;
 }
 
 .role-card {
@@ -276,6 +275,8 @@
   cursor: pointer;
   transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
   font-family: inherit;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .role-card:hover {
@@ -322,6 +323,8 @@
   font-size: 12px;
   line-height: 1.45;
   color: #6b7280;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .form-actions {
@@ -458,17 +461,10 @@
 }
 
 .role-cards--tourist-pair {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
   max-width: 720px;
   margin-left: auto;
   margin-right: auto;
-}
-
-@media (max-width: 900px) {
-  .role-cards--tourist-pair {
-    grid-template-columns: 1fr;
-    max-width: none;
-  }
 }
 
 .role-card--clickable:focus-visible {
@@ -697,4 +693,21 @@
   font-size: 12px;
   line-height: 1.45;
   color: #6b7280;
+}
+
+@media (max-width: 480px) {
+  .form-actions {
+    flex-wrap: nowrap;
+  }
+
+  .form-actions .btn-cancel,
+  .form-actions .btn-primary {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .ban-duration-option {
+    font-size: 12px;
+    padding: 10px 6px;
+  }
 }

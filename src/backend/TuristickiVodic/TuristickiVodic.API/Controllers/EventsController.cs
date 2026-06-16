@@ -84,6 +84,14 @@ namespace TuristickiVodic.API.Controllers
             return Ok(ev);
         }
 
+        [HttpGet("by-ids")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetByIds([FromQuery] int[] ids, [FromQuery] string lang = "sr")
+        {
+            var events = await _eventService.GetByIdsAsync(ids, lang);
+            return Ok(events);
+        }
+
         [HttpGet("my")]
         [Authorize(Roles = "ContentCreator")]
         public async Task<IActionResult> GetMy([FromQuery] EventQueryDto query)

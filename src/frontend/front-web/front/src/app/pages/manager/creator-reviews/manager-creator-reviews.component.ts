@@ -1,8 +1,11 @@
 import {
   ChangeDetectorRef,
   Component,
+  ElementRef,
+  HostListener,
   OnDestroy,
   OnInit,
+  ViewChild,
   inject,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -10,12 +13,14 @@ import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { environment } from '../../../../environment/environment';
-import { ManagerReportsService } from '../../../services/manager-reports.service';
+import { ManagerReportDto, ManagerReportsService } from '../../../services/manager-reports.service';
 import {
   buildReviewReportReason,
   detectConcerningReplyKind,
+  detectConcerningTextKind,
   getConcerningReportCategory,
   isConcerningCreatorReply,
+  isConcerningText,
 } from '../shared/concerning-reply.util';
 import {
   ManagerReportModalComponent,
@@ -38,13 +43,14 @@ import {
 } from 'rxjs';
 import { DestinationService } from '../../../services/destination.service';
 import { ManagerDashboardService } from '../../../services/manager-dashboard.service';
-import { ObjectDto, ObjectService } from '../../../services/object';
-import { ReviewDto } from '../../../services/review';
+import { ReviewDto, ReviewService } from '../../../services/review';
+import { AuthService } from '../../../services/auth.service';
 import { TranslatePipe } from '../../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../../services/translation.service';
 
 export interface ManagerReviewThread {
   id: number;
+  touristId: number;
   touristName: string;
   touristInitials: string;
   objectId: number;
@@ -71,10 +77,6 @@ interface DeletionRequestNameHint {
   requestedByName?: string;
 }
 
-interface ManagerReportNameHint {
-  reportedUserId: number;
-  reportedUserName?: string;
-}
 
 @Component({
   selector: 'app-manager-creator-reviews',
@@ -91,7 +93,8 @@ interface ManagerReportNameHint {
   ],
 })
 export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
-  private readonly objectService = inject(ObjectService);
+  private readonly reviewService = inject(ReviewService);
+  private readonly authService = inject(AuthService);
   private readonly destinationService = inject(DestinationService);
   private readonly http = inject(HttpClient);
   private readonly managerReportsService = inject(ManagerReportsService);
@@ -110,7 +113,24 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
   searchTerm = '';
   responseFilter: 'all' | 'responded' | 'pending' | 'concerning' = 'all';
   creatorFilter: 'all' | number = 'all';
+  touristFilter: 'all' | number = 'all';
+  creatorFilterMenuOpen = false;
+  touristFilterMenuOpen = false;
+  responseFilterMenuOpen = false;
+  readonly responseFilterOptions: Array<{
+    value: 'all' | 'responded' | 'pending' | 'concerning';
+    labelKey: string;
+  }> = [
+    { value: 'all', labelKey: 'manager.creatorReviews.filters.allResponses' },
+    { value: 'responded', labelKey: 'manager.creatorReviews.filters.withReply' },
+    { value: 'pending', labelKey: 'manager.creatorReviews.filters.pendingReply' },
+    { value: 'concerning', labelKey: 'manager.creatorReviews.filters.concerningReplies' },
+  ];
   selectedRatings: number[] = [];
+
+  @ViewChild('creatorFilterRoot') private creatorFilterRoot?: ElementRef<HTMLElement>;
+  @ViewChild('touristFilterRoot') private touristFilterRoot?: ElementRef<HTMLElement>;
+  @ViewChild('responseFilterRoot') private responseFilterRoot?: ElementRef<HTMLElement>;
 
   selectedThread: ManagerReviewThread | null = null;
 
@@ -126,6 +146,11 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
   reportModalCreatorId: number | null = null;
   reportModalCategory = 'unprofessional_conduct';
   reportModalReason = '';
+
+  reportTouristModalOpen = false;
+  reportModalTouristId: number | null = null;
+  reportModalTouristCategory = 'other';
+  reportModalTouristReason = '';
 
   ngOnInit(): void {
     const creatorIdParam = this.route.snapshot.queryParamMap.get('creatorId');
@@ -152,6 +177,16 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
     this.creatorObjectCounts.clear();
     this.successMessage = '';
 
+    // Background: pending report IDs and name hints — do not block review display
+    this.loadCreatorNameHints()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({ next: () => { this.applyCreatorNamesToThreads(); this.triggerViewUpdate(); } });
+
+    this.loadPendingReportIds()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({ next: () => this.triggerViewUpdate() });
+
+    const previousId = this.selectedThread?.id ?? null;
     this.fetchManagerReviewThreads()
       .pipe(
         timeout(15000),
@@ -169,7 +204,6 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
       )
       .subscribe({
         next: (threads) => {
-          const previousId = this.selectedThread?.id ?? null;
           this.allThreads = threads;
           this.resolveMissingCreatorNames([
             ...new Set(threads.map((thread) => thread.creatorId).filter((id) => id > 0)),
@@ -191,6 +225,18 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
     const map = new Map<number, string>();
     for (const thread of this.allThreads) {
       map.set(thread.creatorId, thread.creatorName);
+    }
+    return Array.from(map.entries())
+      .map(([id, name]) => ({ id, name }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  get touristOptions(): { id: number; name: string }[] {
+    const map = new Map<number, string>();
+    for (const thread of this.allThreads) {
+      if (thread.touristId) {
+        map.set(thread.touristId, thread.touristName);
+      }
     }
     return Array.from(map.entries())
       .map(([id, name]) => ({ id, name }))
@@ -236,6 +282,9 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
       if (this.creatorFilter !== 'all' && thread.creatorId !== this.creatorFilter) {
         return false;
       }
+      if (this.touristFilter !== 'all' && thread.touristId !== this.touristFilter) {
+        return false;
+      }
       if (this.selectedRatings.length && !this.selectedRatings.includes(thread.rating)) {
         return false;
       }
@@ -270,10 +319,18 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
   }
 
   isConcerning(thread: ManagerReviewThread): boolean {
+    return this.isCreatorResponseConcerning(thread) || this.isTouristReviewConcerning(thread);
+  }
+
+  isCreatorResponseConcerning(thread: ManagerReviewThread): boolean {
     return isConcerningCreatorReply({
       creatorResponse: thread.creatorResponse,
       touristRating: thread.rating,
     });
+  }
+
+  isTouristReviewConcerning(thread: ManagerReviewThread): boolean {
+    return isConcerningText(thread.touristReview);
   }
 
   hasCreatorReply(thread: ManagerReviewThread): boolean {
@@ -361,6 +418,74 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
     return this.pendingReportCreatorIds.has(creatorId);
   }
 
+  get reportableTourists(): ReportableCreatorOption[] {
+    const map = new Map<number, ReportableCreatorOption>();
+    for (const thread of this.allThreads) {
+      if (!thread.touristId) {
+        continue;
+      }
+      map.set(thread.touristId, {
+        id: thread.touristId,
+        name: thread.touristName,
+        contentSummary: this.translationService.translate('manager.creatorReviews.touristSummary', {
+          rating: thread.rating,
+          objectName: thread.objectName,
+        }),
+        hasPendingReport: this.pendingReportCreatorIds.has(thread.touristId),
+      });
+    }
+    return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
+  }
+
+  openTouristReportModal(thread?: ManagerReviewThread | null): void {
+    const target = thread ?? this.selectedThread;
+    if (!target?.touristId) {
+      return;
+    }
+
+    const concerningKind = detectConcerningTextKind(target.touristReview);
+    this.reportModalTouristId = target.touristId;
+    this.reportModalTouristCategory = getConcerningReportCategory(concerningKind);
+    this.reportModalTouristReason = target.touristReview?.trim()
+      ? buildReviewReportReason({
+          reviewId: target.id,
+          objectName: target.objectName,
+          touristName: target.touristName,
+          touristRating: target.rating,
+          creatorName: target.creatorName,
+          creatorResponse: target.touristReview,
+          category: this.reportModalTouristCategory,
+          autoDetected: concerningKind != null,
+        }, {
+          categoryPrefix: this.translationService.translate('manager.reportModal.reason.category'),
+          autoDetected: this.translationService.translate('manager.reportModal.reason.autoDetectedReview'),
+          managerModeration: this.translationService.translate('manager.reportModal.reason.managerModeration'),
+          reviewLabel: this.translationService.translate('manager.reportModal.reason.review'),
+          touristLabel: this.translationService.translate('manager.reportModal.reason.tourist'),
+          creatorLabel: this.translationService.translate('manager.reportModal.reason.creator'),
+          replyLabel: this.translationService.translate('manager.reportModal.reason.reviewText'),
+        })
+      : '';
+    this.reportTouristModalOpen = true;
+  }
+
+  closeTouristReportModal(): void {
+    this.reportTouristModalOpen = false;
+  }
+
+  onTouristReportSubmitted(): void {
+    if (this.reportModalTouristId) {
+      this.pendingReportCreatorIds.add(this.reportModalTouristId);
+    }
+    this.successMessage = this.translationService.translate('manager.reportModal.successSubmitted');
+    this.reportTouristModalOpen = false;
+    this.triggerViewUpdate();
+  }
+
+  hasPendingReportForTourist(touristId: number): boolean {
+    return this.pendingReportCreatorIds.has(touristId);
+  }
+
   isRatingSelected(rating: number): boolean {
     return this.selectedRatings.includes(rating);
   }
@@ -379,6 +504,112 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
 
   get isAllRatingsSelected(): boolean {
     return this.selectedRatings.length === 0;
+  }
+
+  get creatorFilterLabel(): string {
+    if (this.creatorFilter === 'all') {
+      return this.translationService.translate('manager.creatorReviews.filters.allCreators');
+    }
+
+    return (
+      this.creatorOptions.find((creator) => creator.id === this.creatorFilter)?.name
+      ?? this.translationService.translate('manager.creatorReviews.filters.allCreators')
+    );
+  }
+
+  get touristFilterLabel(): string {
+    if (this.touristFilter === 'all') {
+      return this.translationService.translate('manager.creatorReviews.filters.allTourists');
+    }
+
+    return (
+      this.touristOptions.find((tourist) => tourist.id === this.touristFilter)?.name
+      ?? this.translationService.translate('manager.creatorReviews.filters.allTourists')
+    );
+  }
+
+  get responseFilterLabelKey(): string {
+    return (
+      this.responseFilterOptions.find((option) => option.value === this.responseFilter)?.labelKey
+      ?? 'manager.creatorReviews.filters.allResponses'
+    );
+  }
+
+  toggleCreatorFilterMenu(event: Event): void {
+    event.stopPropagation();
+    this.creatorFilterMenuOpen = !this.creatorFilterMenuOpen;
+    if (this.creatorFilterMenuOpen) {
+      this.touristFilterMenuOpen = false;
+      this.responseFilterMenuOpen = false;
+    }
+  }
+
+  selectCreatorFilter(value: 'all' | number, event: Event): void {
+    event.stopPropagation();
+    this.creatorFilter = value;
+    this.creatorFilterMenuOpen = false;
+    this.onFilterChange();
+  }
+
+  toggleTouristFilterMenu(event: Event): void {
+    event.stopPropagation();
+    this.touristFilterMenuOpen = !this.touristFilterMenuOpen;
+    if (this.touristFilterMenuOpen) {
+      this.creatorFilterMenuOpen = false;
+      this.responseFilterMenuOpen = false;
+    }
+  }
+
+  selectTouristFilter(value: 'all' | number, event: Event): void {
+    event.stopPropagation();
+    this.touristFilter = value;
+    this.touristFilterMenuOpen = false;
+    this.onFilterChange();
+  }
+
+  toggleResponseFilterMenu(event: Event): void {
+    event.stopPropagation();
+    this.responseFilterMenuOpen = !this.responseFilterMenuOpen;
+    if (this.responseFilterMenuOpen) {
+      this.creatorFilterMenuOpen = false;
+      this.touristFilterMenuOpen = false;
+    }
+  }
+
+  selectResponseFilter(
+    value: 'all' | 'responded' | 'pending' | 'concerning',
+    event: Event,
+  ): void {
+    event.stopPropagation();
+    this.responseFilter = value;
+    this.responseFilterMenuOpen = false;
+    this.onFilterChange();
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as Node;
+
+    if (
+      this.creatorFilterMenuOpen
+      && !this.creatorFilterRoot?.nativeElement.contains(target)
+    ) {
+      this.creatorFilterMenuOpen = false;
+    }
+
+    if (
+      this.touristFilterMenuOpen
+      && !this.touristFilterRoot?.nativeElement.contains(target)
+    ) {
+      this.touristFilterMenuOpen = false;
+    }
+
+    if (
+      this.responseFilterMenuOpen
+      && !this.responseFilterRoot?.nativeElement.contains(target)
+    ) {
+      this.responseFilterMenuOpen = false;
+    }
   }
 
   onFilterChange(): void {
@@ -405,9 +636,13 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
   }
 
   resetFilters(): void {
+    this.creatorFilterMenuOpen = false;
+    this.touristFilterMenuOpen = false;
+    this.responseFilterMenuOpen = false;
     this.searchTerm = '';
     this.responseFilter = 'all';
     this.creatorFilter = 'all';
+    this.touristFilter = 'all';
     this.selectedRatings = [];
     this.onFilterChange();
   }
@@ -496,105 +731,59 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
 
   private fetchManagerReviewThreads(): Observable<ManagerReviewThread[]> {
     const pageSize = 100;
-
-    return this.loadCreatorNameHints().pipe(
-      switchMap(() =>
-        forkJoin({
-          objects: this.getAllPagedItems((page) =>
-            this.objectService.getForManager({
-              page,
-              pageSize,
-              sortBy: 'name',
-              sortOrder: 'asc',
-            }),
-          ),
-          myReports: this.getAllPagedItems((page) =>
-            this.managerReportsService.getMyReports({
-              page,
-              pageSize,
-              sortBy: 'createdAt',
-              sortOrder: 'desc',
-            }),
-          ),
-        }),
-      ),
-      switchMap(({ objects, myReports }) => {
+    return forkJoin({
+      reviews: this.reviewService.getForManagerObjects(),
+      reports: this.getAllPagedItems((page) =>
+        this.managerReportsService.getMyReports({ page, pageSize, sortBy: 'createdAt', sortOrder: 'desc' }),
+      ).pipe(catchError(() => of([] as ManagerReportDto[]))),
+    }).pipe(
+      map(({ reviews, reports }) => {
         this.pendingReportCreatorIds.clear();
-        for (const report of myReports) {
+        for (const report of reports) {
           if (report.status?.toLowerCase() === 'pending') {
             this.pendingReportCreatorIds.add(report.reportedUserId);
           }
         }
 
         this.creatorObjectCounts.clear();
+        const objectsByCreator = new Map<number, Set<number>>();
         const objectContext = new Map<number, ObjectReviewContext>();
-        for (const object of objects) {
-          if (!object.createdByUserId) {
-            continue;
+
+        for (const review of reviews) {
+          const creatorId = review.createdByUserId ?? 0;
+          const knownName = review.createdByFullName?.trim();
+          if (creatorId > 0 && knownName && !this.creatorNameById.has(creatorId)) {
+            this.creatorNameById.set(creatorId, knownName);
           }
-          const knownName = object.createdByFullName?.trim();
-          if (knownName && !this.creatorNameById.has(object.createdByUserId)) {
-            this.creatorNameById.set(object.createdByUserId, knownName);
+          if (!objectContext.has(review.objectId)) {
+            objectContext.set(review.objectId, {
+              creatorId,
+              localityName: review.localityName?.trim() ?? '',
+              destinationName: review.destinationName?.trim() ?? '',
+            });
           }
-          this.creatorObjectCounts.set(
-            object.createdByUserId,
-            (this.creatorObjectCounts.get(object.createdByUserId) ?? 0) + 1,
-          );
-          objectContext.set(object.id, {
-            creatorId: object.createdByUserId,
-            localityName: object.localityName?.trim() ?? '',
-            destinationName: object.destinationName?.trim() ?? '',
-          });
+          if (creatorId > 0) {
+            if (!objectsByCreator.has(creatorId)) objectsByCreator.set(creatorId, new Set<number>());
+            objectsByCreator.get(creatorId)!.add(review.objectId);
+          }
         }
 
-        const managedObjectIds = [...objectContext.keys()];
-        if (!managedObjectIds.length) {
-          return of(this.mapReviewsToThreads([], objectContext));
+        for (const [creatorId, objectIds] of objectsByCreator) {
+          this.creatorObjectCounts.set(creatorId, objectIds.size);
         }
 
-        return this.fetchReviewsForManagedObjects(managedObjectIds).pipe(
-          map((reviews) => this.mapReviewsToThreads(reviews, objectContext)),
-        );
+        return this.mapReviewsToThreads(reviews, objectContext);
       }),
     );
   }
 
-  /** Loads reviews only for objects in the manager's scope using translated object endpoint. */
-  private fetchReviewsForManagedObjects(objectIds: number[]): Observable<ReviewDto[]> {
-    return forkJoin(
-      objectIds.map((objectId) =>
-        this.objectService.getById(objectId).pipe(catchError(() => of(null)))
-      )
-    ).pipe(
-      map((objectDetails) => {
-        const seen = new Set<number>();
-        const merged: ReviewDto[] = [];
-
-        for (const detail of objectDetails) {
-          if (!detail) {
-            continue;
-          }
-          for (const review of detail.reviews ?? []) {
-            if (seen.has(review.id)) {
-              continue;
-            }
-            seen.add(review.id);
-            merged.push({
-              ...review,
-              objectName: review.objectName?.trim() || detail.name?.trim() || '',
-            });
-          }
-        }
-
-        return merged;
-      })
-    );
+  private loadPendingReportIds(): Observable<void> {
+    return of(undefined as void);
   }
 
   private loadCreatorNameHints(): Observable<void> {
     const pageSize = 100;
     const deletionUrl = `${environment.apiUrl}/deletion-requests`;
-    const reportsUrl = `${environment.apiUrl}/manager-reports/my`;
 
     return forkJoin({
       deletionRequests: this.getAllPagedItems<DeletionRequestNameHint>((page) =>
@@ -602,27 +791,15 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
           params: { page, pageSize },
         }),
       ).pipe(catchError(() => of([] as DeletionRequestNameHint[]))),
-      managerReports: this.getAllPagedItems<ManagerReportNameHint>((page) =>
-        this.http.get<{ items?: ManagerReportNameHint[]; totalPages?: number }>(reportsUrl, {
-          params: { page, pageSize },
-        }),
-      ).pipe(catchError(() => of([] as ManagerReportNameHint[]))),
       dashboard: this.dashboardService.getOverview('1y').pipe(
         catchError(() => of(null)),
       ),
     }).pipe(
-      map(({ deletionRequests, managerReports, dashboard }) => {
+      map(({ deletionRequests, dashboard }) => {
         for (const request of deletionRequests) {
           const name = request.requestedByName?.trim();
           if (name && request.requestedByUserId > 0) {
             this.creatorNameById.set(request.requestedByUserId, name);
-          }
-        }
-
-        for (const report of managerReports) {
-          const name = report.reportedUserName?.trim();
-          if (name && report.reportedUserId > 0) {
-            this.creatorNameById.set(report.reportedUserId, name);
           }
         }
 
@@ -648,7 +825,6 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
     reviews: ReviewDto[],
     objectContext: Map<number, ObjectReviewContext>,
   ): ManagerReviewThread[] {
-    console.log(reviews);
     const threads = reviews.map((review) => {
       const context = objectContext.get(review.objectId);
       const creatorId = context?.creatorId ?? 0;
@@ -656,6 +832,7 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
 
       return {
         id: review.id,
+        touristId: review.userId,
         touristName:
           review.userFullName?.trim() ||
           this.translationService.translate('manager.creatorReviews.fallback.tourist'),
@@ -712,25 +889,21 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    forkJoin(
-      pending.map((creatorId) =>
-        this.http
-          .get<{ firstName?: string; lastName?: string; email?: string }>(
-            `${environment.apiUrl}/users/${creatorId}`,
-          )
-          .pipe(
-            map((user) => {
-              const fullName = `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim();
-              return {
-                creatorId,
-                fullName: fullName || user.email?.trim() || '',
-              };
-            }),
-            catchError(() => of({ creatorId, fullName: '' })),
-          ),
-      ),
-    )
-      .pipe(takeUntil(this.destroy$))
+    this.authService
+      .getDisplayNames(pending)
+      .pipe(
+        map((users) =>
+          users.map((user) => {
+            const fullName = `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim();
+            return {
+              creatorId: user.id,
+              fullName: fullName || user.email?.trim() || '',
+            };
+          }),
+        ),
+        catchError(() => of([] as { creatorId: number; fullName: string }[])),
+        takeUntil(this.destroy$),
+      )
       .subscribe((results) => {
         let changed = false;
 
@@ -826,7 +999,14 @@ export class ManagerCreatorReviewsComponent implements OnInit, OnDestroy {
     );
   }
 
+  private viewUpdatePending = false;
+
   private triggerViewUpdate(): void {
-    queueMicrotask(() => this.cdr.detectChanges());
+    if (this.viewUpdatePending) return;
+    this.viewUpdatePending = true;
+    queueMicrotask(() => {
+      this.viewUpdatePending = false;
+      this.cdr.detectChanges();
+    });
   }
 }

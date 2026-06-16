@@ -1,3 +1,5 @@
+@use '../../../styles/action-buttons' as action-buttons;
+
 h1 {
   font-size: 32px;
 }
@@ -1231,4 +1233,8 @@ button:hover {
 :root[data-theme='dark'] .location-image::after,
 [data-theme='dark'] .location-image::after {
   color: #ffffff !important;
+}
+// ─── Shared hover stanje (kalendar/planer) ────────────────────────────────
+.planner-btn {
+  @include action-buttons.planner-action-hover;
 }

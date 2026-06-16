@@ -498,6 +498,10 @@
   font-size: 22px;
   line-height: 1.2;
   word-break: break-word;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .detail-panel-scroll {
@@ -673,10 +677,9 @@
 }
 
 .creator-row {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: 10px;
-  align-items: center;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   padding: 10px;
   border: 1px solid #f1f5f9;
   border-radius: 12px;
@@ -688,7 +691,20 @@
   background: #fafbfc;
 }
 
+.creator-row-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.creator-row-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
 .creator-avatar {
+  flex-shrink: 0;
   width: 38px;
   height: 38px;
   border-radius: 10px;
@@ -706,6 +722,7 @@
   flex-direction: column;
   gap: 4px;
   min-width: 0;
+  flex: 1;
 }
 
 .creator-info strong {
@@ -728,6 +745,27 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.user-type-chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.user-type-chip.creator {
+  color: #1d4ed8;
+  background: #dbeafe;
+}
+
+.user-type-chip.tourist {
+  color: #6d28d9;
+  background: #ede9fe;
 }
 
 .pending-tag {
@@ -827,15 +865,10 @@
     grid-template-columns: 1fr;
   }
 
-  .creator-row {
-    grid-template-columns: auto 1fr;
-    grid-template-rows: auto auto;
-  }
-
-  .creator-row .creator-report-btn,
-  .creator-row .pending-tag {
-    grid-column: 1 / -1;
-    justify-self: start;
+  .creator-row-actions .creator-report-btn,
+  .creator-row-actions .pending-tag {
+    width: 100%;
+    justify-content: center;
   }
 }
 
@@ -863,5 +896,26 @@
   .manager-reports-page .page-head-actions .material-symbols-outlined {
     flex-shrink: 0;
     font-size: 20px;
+  }
+}
+
+@media (max-width: 640px) {
+  .manager-reports-page .filter-chips {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    gap: 8px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    padding-bottom: 4px !important;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+  }
+
+  .manager-reports-page .filter-chips .chip {
+    flex: 0 0 auto !important;
+    white-space: nowrap !important;
   }
 }

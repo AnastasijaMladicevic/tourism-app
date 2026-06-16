@@ -7,48 +7,109 @@
 
   <div class="filters-row">
     <div class="chip-group">
+      <div class="rating-scroll-row">
         <button class="chip" type="button" [class.active]="isAllRatingsSelected" (click)="selectAllRatings()">
           <span class="material-symbols-outlined" aria-hidden="true">language</span>
           {{ 'contentCreator.reviews.filters.allRatings' | translate }}
         </button>
+      
         <button class="chip chip-rating" type="button" [class.active]="isRatingSelected(5)" (click)="toggleRating(5)">5★</button>
         <button class="chip chip-rating" type="button" [class.active]="isRatingSelected(4)" (click)="toggleRating(4)">4★</button>
         <button class="chip chip-rating" type="button" [class.active]="isRatingSelected(3)" (click)="toggleRating(3)">3★</button>
         <button class="chip chip-rating" type="button" [class.active]="isRatingSelected(2)" (click)="toggleRating(2)">2★</button>
         <button class="chip chip-rating" type="button" [class.active]="isRatingSelected(1)" (click)="toggleRating(1)">1★</button>
+      </div>
         <span class="chip-divider" aria-hidden="true"></span>
-        <label class="object-filter-inline" [class.is-active]="objectFilterId != null">
-          <span class="material-symbols-outlined object-filter-icon" aria-hidden="true">location_on</span>
-          <select
-            class="object-filter-select"
-            [ngModel]="objectFilterId"
-            (ngModelChange)="onObjectFilterChange($event)"
+        <div
+          #objectFilterRoot
+          class="filter-menu object-filter-menu"
+          [class.is-open]="objectFilterMenuOpen"
+          [class.is-active]="objectFilterId != null"
+          [class.is-disabled]="isLoading"
+        >
+          <button
+            type="button"
+            class="filter-menu-trigger"
             [disabled]="isLoading"
+            [attr.aria-expanded]="objectFilterMenuOpen"
+            [attr.aria-haspopup]="'listbox'"
             [attr.aria-label]="'contentCreator.reviews.filters.filterByObject' | translate"
+            (click)="toggleObjectFilterMenu($event)"
           >
-            <option [ngValue]="null">{{ 'contentCreator.reviews.filters.allObjects' | translate }}</option>
-            @for (object of creatorObjects; track object.id) {
-              <option [ngValue]="object.id">{{ object.name }}</option>
+            <span class="material-symbols-outlined filter-menu-icon" aria-hidden="true">location_on</span>
+            <span class="filter-menu-label">{{ objectFilterLabel }}</span>
+            <span class="material-symbols-outlined filter-menu-chevron" aria-hidden="true">expand_more</span>
+          </button>
+          @if (objectFilterMenuOpen) {
+            <div class="filter-menu-panel filter-menu-panel--scroll" role="listbox">
+              <button
+                type="button"
+                class="filter-menu-option"
+                role="option"
+                [class.filter-menu-option--selected]="objectFilterId == null"
+                [attr.aria-selected]="objectFilterId == null"
+                (click)="selectObjectFilter(null, $event)"
+              >
+                {{ 'contentCreator.reviews.filters.allObjects' | translate }}
+              </button>
+              @for (object of creatorObjects; track object.id) {
+                <button
+                  type="button"
+                  class="filter-menu-option"
+                  role="option"
+                  [class.filter-menu-option--selected]="objectFilterId === object.id"
+                  [attr.aria-selected]="objectFilterId === object.id"
+                  (click)="selectObjectFilter(object.id, $event)"
+                >
+                  {{ object.name }}
+                </button>
+              }
+            </div>
+          }
+        </div>
+        <span class="chip-divider" aria-hidden="true"></span>
+
+        <div class="response-filter-row">
+          <div
+            #responseFilterRoot
+            class="filter-menu response-filter-menu"
+            [class.is-open]="responseFilterMenuOpen"
+            [class.is-active]="responseFilter !== 'all'"
+          >
+            <button
+              type="button"
+              class="filter-menu-trigger"
+              [attr.aria-expanded]="responseFilterMenuOpen"
+              [attr.aria-haspopup]="'listbox'"
+              [attr.aria-label]="'contentCreator.reviews.filters.all' | translate"
+              (click)="toggleResponseFilterMenu($event)"
+            >
+              <span class="material-symbols-outlined filter-menu-icon" aria-hidden="true">forum</span>
+              <span class="filter-menu-label">{{ responseFilterLabelKey | translate }}</span>
+              <span class="material-symbols-outlined filter-menu-chevron" aria-hidden="true">expand_more</span>
+            </button>
+            @if (responseFilterMenuOpen) {
+              <div class="filter-menu-panel" role="listbox">
+                @for (option of responseFilterOptions; track option.value) {
+                  <button
+                    type="button"
+                    class="filter-menu-option"
+                    role="option"
+                    [class.filter-menu-option--selected]="responseFilter === option.value"
+                    [attr.aria-selected]="responseFilter === option.value"
+                    (click)="selectResponseFilter(option.value, $event)"
+                  >
+                    {{ option.labelKey | translate }}
+                  </button>
+                }
+              </div>
             }
-          </select>
-          <span class="material-symbols-outlined object-filter-chevron" aria-hidden="true">expand_more</span>
-        </label>
-        <span class="chip-divider" aria-hidden="true"></span>
-        <button class="chip" type="button" [class.active]="responseFilter === 'all'" (click)="responseFilter = 'all'; onFilterChange()">
-          {{ 'contentCreator.reviews.filters.all' | translate }}
-        </button>
-        <button class="chip" type="button" [class.active]="responseFilter === 'pending'" (click)="responseFilter = 'pending'; onFilterChange()">
-          <span class="material-symbols-outlined" aria-hidden="true">mark_chat_unread</span>
-          {{ 'contentCreator.reviews.filters.pendingReply' | translate }}
-        </button>
-        <button class="chip" type="button" [class.active]="responseFilter === 'responded'" (click)="responseFilter = 'responded'; onFilterChange()">
-          <span class="material-symbols-outlined" aria-hidden="true">mark_chat_read</span>
-          {{ 'contentCreator.reviews.filters.responded' | translate }}
-        </button>
-        <span class="chip-divider" aria-hidden="true"></span>
-        <button class="chip reset" type="button" (click)="resetFilters()">
-          {{ 'contentCreator.reviews.filters.reset' | translate }}
-        </button>
+          </div>
+
+          <button class="chip reset" type="button" (click)="resetFilters()">
+            {{ 'contentCreator.reviews.filters.reset' | translate }}
+          </button>
+        </div>
     </div>
 
     <div class="search-wrap">

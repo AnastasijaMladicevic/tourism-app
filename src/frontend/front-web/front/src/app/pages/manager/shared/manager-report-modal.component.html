@@ -3,8 +3,8 @@
   <div class="report-modal card" role="dialog" aria-labelledby="manager-report-modal-title" aria-modal="true">
     <header class="modal-header">
       <div>
-        <h2 id="manager-report-modal-title">{{ 'manager.reportModal.title' | translate }}</h2>
-        <p class="modal-subtitle">{{ 'manager.reportModal.subtitle' | translate }}</p>
+        <h2 id="manager-report-modal-title">{{ titleKey | translate }}</h2>
+        <p class="modal-subtitle">{{ subtitleKey | translate }}</p>
       </div>
       <button type="button" class="icon-btn" [title]="'common.close' | translate" (click)="close()" [disabled]="isSubmitting">
         <span class="material-symbols-outlined">close</span>
@@ -19,16 +19,39 @@
     }
 
     <form class="modal-body" (ngSubmit)="submit()">
+      @if (canSwitchType) {
+        <div class="subject-type-toggle" role="group">
+          <button
+            type="button"
+            [class.active]="activeType === 'creator'"
+            (click)="setActiveType('creator')"
+            [disabled]="isSubmitting"
+          >
+            {{ 'manager.reportModal.creator' | translate }}
+          </button>
+          <button
+            type="button"
+            [class.active]="activeType === 'tourist'"
+            (click)="setActiveType('tourist')"
+            [disabled]="isSubmitting"
+          >
+            {{ 'manager.reportModal.tourist' | translate }}
+          </button>
+        </div>
+      }
+
       <label>
-        <span>{{ 'manager.reportModal.creator' | translate }}</span>
+        <span>{{ fieldLabelKey | translate }}</span>
         <select [(ngModel)]="reportForm.creatorId" name="creatorId" required [disabled]="isSubmitting">
-          <option [ngValue]="null" disabled>{{ 'manager.reportModal.selectCreator' | translate }}</option>
+          <option [ngValue]="null" disabled>{{ selectPlaceholderKey | translate }}</option>
           @for (creator of availableCreators; track creator.id) {
-            <option [ngValue]="creator.id">{{ creator.name }} — {{ creator.contentSummary }}</option>
+            <option [ngValue]="creator.id">
+              {{ creator.contentSummary ? (creator.name + ' — ' + creator.contentSummary) : creator.name }}
+            </option>
           }
         </select>
         @if (!availableCreators.length) {
-          <span class="field-hint">{{ 'manager.reportModal.noCreators' | translate }}</span>
+          <span class="field-hint">{{ noOptionsKey | translate }}</span>
         }
       </label>
 
@@ -57,7 +80,7 @@
 
       <div class="modal-warning">
         <span class="material-symbols-outlined">warning</span>
-        <p>{{ 'manager.reportModal.warning' | translate }}</p>
+        <p>{{ warningKey | translate }}</p>
       </div>
 
       <footer class="modal-footer">

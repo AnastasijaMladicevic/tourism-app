@@ -103,7 +103,7 @@
       <div class="role-api-note role-api-note--info" *ngIf="passwordChangeBlockedByActiveSession">
         {{ activeSessionBlockMessage }}
       </div>
-
+      &nbsp;
       <label class="field">
         <span class="field-label">{{ t('adminTeamMemberEdit.currentPassword') }} <span class="optional">({{ t('adminTeamMemberEdit.currentPasswordRequiredHint') }})</span></span>
         <div class="input-with-icon">
@@ -414,13 +414,4 @@
   <div class="form-shell form-shell--loading" *ngIf="isLoading">
     <p class="loading-copy">{{ t('adminTeamMemberEdit.loadingUser') }}</p>
   </div>
-
-  <footer class="page-meta-footer">
-    <span class="page-meta-version">{{ t('adminTeamMemberCreate.footerVersion') }}</span>
-    <div class="page-meta-links">
-      <a href="#" class="meta-link">{{ t('adminTeamMemberCreate.supportCenter') }}</a>
-      <a href="#" class="meta-link">{{ t('adminTeamMemberCreate.privacyPolicy') }}</a>
-      <a href="#" class="meta-link">{{ t('adminTeamMemberCreate.termsOfService') }}</a>
-    </div>
-  </footer>
 </div>

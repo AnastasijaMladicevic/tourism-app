@@ -6,6 +6,10 @@
     </div>
 
     <div class="top-actions">
+      <button type="button" class="ghost-btn" (click)="cancel()">
+        <span class="material-symbols-outlined" aria-hidden="true">close</span>
+        {{ 'common.cancel' | translate }}
+      </button>
       @if (isEditMode) {
         <button type="button" class="danger-btn" (click)="openDeleteModal()" [disabled]="isSubmitting || isDeleting || hasPendingDeletionRequest">
           <span class="material-symbols-outlined" aria-hidden="true">delete</span>
@@ -16,10 +20,6 @@
       <button type="button" class="primary-btn" [disabled]="isSubmitDisabled" (click)="submit()">
         <span class="material-symbols-outlined" aria-hidden="true">check_circle</span>
         {{ isSubmitting ? (isEditMode ? ('contentCreator.activityForm.updating' | translate) : ('contentCreator.activityForm.creating' | translate)) : (isEditMode ? ('contentCreator.activityForm.updateAction' | translate) : ('contentCreator.activityForm.createAction' | translate)) }}
-      </button>
-      <button type="button" class="ghost-btn" (click)="cancel()">
-        <span class="material-symbols-outlined" aria-hidden="true">close</span>
-        {{ 'common.cancel' | translate }}
       </button>
     </div>
   </header>
@@ -239,14 +239,14 @@
           <div>
             <span class="coord-label">{{ 'common.latitude' | translate }}</span>
             <div class="coord-input-wrap">
-              <input id="latitude-input" type="number" formControlName="latitude" min="-90" max="90" step="0.000001" placeholder="42.4240" />
+              <input id="latitude-input" type="number" formControlName="latitude" min="-90" max="90" step="0.000001" placeholder="42.4240" (change)="onCoordinateInputChanged()" />
               <span class="coord-input-suffix">{{ latitudeDirection }}</span>
             </div>
           </div>
           <div>
             <span class="coord-label">{{ 'common.longitude' | translate }}</span>
             <div class="coord-input-wrap">
-              <input id="longitude-input" type="number" formControlName="longitude" min="-180" max="180" step="0.000001" placeholder="18.7710" />
+              <input id="longitude-input" type="number" formControlName="longitude" min="-180" max="180" step="0.000001" placeholder="18.7710" (change)="onCoordinateInputChanged()" />
               <span class="coord-input-suffix">{{ longitudeDirection }}</span>
             </div>
           </div>

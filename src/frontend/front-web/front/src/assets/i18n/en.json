@@ -7,6 +7,7 @@
     "saveChanges": "Save changes",
     "cancel": "Cancel",
     "clear": "Clear",
+    "today": "Today",
     "remove": "Remove",
     "close": "Close",
     "optional": "Optional",
@@ -57,7 +58,8 @@
       "weeksAgoShort": "{{count}}w ago",
       "monthsAgoShort": "{{count}}mo ago",
       "yearsAgoShort": "{{count}}y ago"
-    }
+    },
+    "notice": "Notice"
   },
   "paginator": {
     "of": "of",
@@ -93,7 +95,7 @@
     "events": "Events",
     "reviews": "Reviews",
     "reviewsReplies": "Reviews & Replies",
-    "creatorReports": "Creator Reports",
+    "creatorReports": "Report log",
     "localities": "Localities",
     "signOut": "Sign Out",
     "profile": "Profile",
@@ -124,6 +126,8 @@
     "reportsCreatedInPeriod": "{{count}} reports created in {{period}}",
     "geocodedDestinations": "Geocoded Destinations",
     "regionsRepresentedCount": "{{count}} regions represented",
+    "totalEmployees": "Platform Employees",
+    "totalEmployeesMeta": "{{creators}} creators · {{managers}} managers · {{admins}} admins",
     "userGrowth": "User Growth",
     "groupedByWeek": "Grouped by week",
     "groupedByMonth": "Grouped by month",
@@ -482,15 +486,15 @@
     "about": "About the event",
     "descriptionFallback": "Description is not available.",
     "availableTickets": "Available tickets",
-      "standardTicket": "Standard ticket",
-      "ticketTypesHelp": "Add one or more ticket types and the total event capacity.",
-      "addTicketType": "Add ticket type",
-      "removeTicketType": "Remove",
-      "ticketTypeName": "Ticket name",
-      "ticketTypeNamePlaceholder": "VIP, Regular, Early bird...",
-      "ticketPricePlaceholder": "45.00",
-      "noTicketTypesHint": "Leave this empty if the event is free.",
-      "select": "Select"
+    "standardTicket": "Standard ticket",
+    "ticketTypesHelp": "Add one or more ticket types and the total event capacity.",
+    "addTicketType": "Add ticket type",
+    "removeTicketType": "Remove",
+    "ticketTypeName": "Ticket name",
+    "ticketTypeNamePlaceholder": "VIP, Regular, Early bird...",
+    "ticketPricePlaceholder": "45.00",
+    "noTicketTypesHint": "Leave this empty if the event is free.",
+    "select": "Select"
   },
   "object": {
     "price": {
@@ -779,638 +783,661 @@
     }
   },
   "manager": {
-      "events": {
-        "eyebrow": "Event overview",
-        "searchAria": "Search events",
-        "searchPlaceholder": "Search events, objects, or organizers...",
-        "dateRangeFilter": "Date range filter",
-        "filtersReady": "Filters ready",
-        "managedDestinationFallback": "Manager events",
-        "loading": "Loading events...",
-        "reviewEvent": "Review event",
-        "featuredEvent": "Featured event",
-        "selectedEvent": "Selected event",
-        "rejectionReason": "Rejection reason",
-        "description": "Description",
-        "noDescription": "No description provided for this event.",
-        "noCoordinates": "Coordinates are not available for this event.",
-        "openFullReview": "Open full review",
-        "totalCount": "Total: {{count}} events",
-        "capacityMax": "{{count}} max",
-        "error": {
-          "load": "Failed to load events"
-        },
-        "stats": {
-          "upcomingThisWeek": "Upcoming this week",
-          "upcomingThisWeekHint": "+2 from last month",
-          "activeStaff": "Active staff",
-          "activeStaffHint": "98% availability",
-          "totalCapacityFilled": "Total capacity filled",
-          "totalCapacityFilledHint": "Across all published events"
-        },
-        "filters": {
-          "status": "Status",
-          "allStatuses": "All statuses",
-          "category": "Category",
-          "allCategories": "All categories",
-          "sortBy": "Sort by",
-          "startDate": "Start date",
-          "name": "Name",
-          "order": "Order",
-          "ascending": "Ascending",
-          "descending": "Descending",
-          "apply": "Apply",
-          "reset": "Reset"
-        },
-        "table": {
-          "status": "Status",
-          "eventDetails": "Event details",
-          "locality": "Locality",
-          "category": "Category",
-          "capacity": "Capacity",
-          "action": "Action"
-        },
-        "categories": {
-          "festival": "Festival",
-          "workshop": "Workshop",
-          "sports": "Sports",
-          "cultural": "Cultural",
-          "exhibition": "Exhibition",
-          "concert": "Concert"
-        },
-        "status": {
-          "approved": "Approved",
-          "pending": "Pending",
-          "rejected": "Rejected",
-          "cancelled": "Cancelled",
-          "draft": "Draft"
-        },
-        "schedule": {
-          "title": "Schedule",
-          "starts": "Starts: {{date}}",
-          "ends": "Ends: {{date}}",
-          "localTime": "{{time}} local time"
-        },
-        "empty": {
-          "noEventSelected": "No event selected",
-          "pickEventTitle": "Pick an event from the table",
-          "pickEventBody": "Select a row to preview schedule, ticket price, and capacity before opening the full review."
-        }
+    "events": {
+      "eyebrow": "Event overview",
+      "searchAria": "Search events",
+      "searchPlaceholder": "Search events, objects, or organizers...",
+      "dateRangeFilter": "Date range filter",
+      "fromDate": "From date",
+      "toDate": "To date",
+      "datePlaceholder": "dd/mm/yyyy",
+      "filtersReady": "Filters ready",
+      "managedDestinationFallback": "Manager events",
+      "loading": "Loading events...",
+      "reviewEvent": "Review event",
+      "featuredEvent": "Featured event",
+      "selectedEvent": "Selected event",
+      "rejectionReason": "Rejection reason",
+      "description": "Description",
+      "noDescription": "No description provided for this event.",
+      "noCoordinates": "Coordinates are not available for this event.",
+      "openFullReview": "Open full review",
+      "totalCount": "Total: {{count}} events",
+      "capacityMax": "{{count}} max",
+      "error": {
+        "load": "Failed to load events"
       },
-      "activities": {
-        "eyebrow": "Activity overview",
-        "searchPlaceholder": "Search activities, types, or destinations...",
-        "loading": "Loading activities...",
-        "reviewActivity": "Review activity",
-        "selectedActivity": "Selected activity",
-        "featuredActivity": "Featured activity",
-        "rejectionReason": "Rejection reason",
+      "stats": {
+        "totalEvents": "Total events",
+        "totalEventsHint": "Matching the active filters",
+        "onThisPage": "On this page",
+        "onThisPageHint": "Events shown in the current page",
+        "next7Days": "In the next 7 days",
+        "next7DaysHint": "Events starting within 7 days"
+      },
+      "filters": {
+        "status": "Status",
+        "allStatuses": "All statuses",
+        "category": "Category",
+        "allCategories": "All categories",
+        "sortBy": "Sort by",
+        "startDate": "Start date",
+        "name": "Name",
+        "order": "Order",
+        "ascending": "Ascending",
+        "descending": "Descending",
+        "apply": "Apply",
+        "reset": "Reset"
+      },
+      "table": {
+        "status": "Status",
+        "eventDetails": "Event details",
+        "locality": "Locality",
+        "category": "Category",
+        "capacity": "Capacity",
+        "action": "Action"
+      },
+      "categories": {
+        "festival": "Festival",
+        "workshop": "Workshop",
+        "sports": "Sports",
+        "cultural": "Cultural",
+        "exhibition": "Exhibition",
+        "concert": "Concert"
+      },
+      "status": {
+        "approved": "Approved",
+        "pending": "Pending",
+        "rejected": "Rejected",
+        "cancelled": "Cancelled",
+        "draft": "Draft"
+      },
+      "schedule": {
+        "title": "Schedule",
+        "starts": "Starts: {{date}}",
+        "ends": "Ends: {{date}}",
+        "localTime": "{{time}} local time"
+      },
+      "empty": {
+        "noEventSelected": "No event selected",
+        "pickEventTitle": "Pick an event from the table",
+        "pickEventBody": "Select a row to preview schedule, ticket price, and capacity before opening the full review."
+      }
+    },
+    "activities": {
+      "eyebrow": "Activity overview",
+      "searchPlaceholder": "Search activities, types, or destinations...",
+      "loading": "Loading activities...",
+      "reviewActivity": "Review activity",
+      "selectedActivity": "Selected activity",
+      "featuredActivity": "Featured activity",
+      "rejectionReason": "Rejection reason",
+      "duration": "Duration",
+      "durationMinutes": "{{count}} min",
+      "oneHour": "1 hour",
+      "hours": "{{count}} hours",
+      "hoursMinutes": "{{hours}}h {{minutes}}m",
+      "activityInfo": "Activity info",
+      "destination": "Destination",
+      "object": "Object",
+      "coordinates": "Coordinates",
+      "created": "Created",
+      "updated": "Updated",
+      "description": "Description",
+      "noDescription": "A submitted activity awaiting your oversight. Review the details, location, and metadata before approving or declining.",
+      "noCoordinates": "Coordinates are not available for this activity.",
+      "openFullReview": "Open full review",
+      "totalCount": "Total: {{count}} activities",
+      "error": {
+        "load": "Failed to load activities"
+      },
+      "filters": {
+        "status": "Status",
+        "allStatuses": "All statuses",
+        "activityType": "Activity type",
+        "allTypes": "All types",
+        "sortBy": "Sort by",
+        "name": "Name",
+        "createdDate": "Created date",
+        "order": "Order",
+        "ascending": "Ascending",
+        "descending": "Descending",
+        "apply": "Apply",
+        "reset": "Reset"
+      },
+      "stats": {
+        "totalActivities": "Total activities",
+        "matchingFilters": "Matching active filters",
+        "onThisPage": "On this page",
+        "visibleRows": "Visible rows",
+        "pendingReview": "Pending review"
+      },
+      "table": {
+        "status": "Status",
+        "activityDetails": "Activity details",
+        "type": "Type",
+        "locality": "Locality",
         "duration": "Duration",
-        "durationMinutes": "{{count}} min",
-        "oneHour": "1 hour",
-        "hours": "{{count}} hours",
-        "hoursMinutes": "{{hours}}h {{minutes}}m",
-        "activityInfo": "Activity info",
-        "destination": "Destination",
-        "object": "Object",
-        "coordinates": "Coordinates",
-        "created": "Created",
-        "updated": "Updated",
-        "description": "Description",
-        "noDescription": "A submitted activity awaiting your oversight. Review the details, location, and metadata before approving or declining.",
-        "noCoordinates": "Coordinates are not available for this activity.",
-        "openFullReview": "Open full review",
-        "totalCount": "Total: {{count}} activities",
-        "error": {
-          "load": "Failed to load activities"
-        },
-        "filters": {
-          "status": "Status",
-          "allStatuses": "All statuses",
-          "activityType": "Activity type",
-          "allTypes": "All types",
-          "sortBy": "Sort by",
-          "name": "Name",
-          "createdDate": "Created date",
-          "order": "Order",
-          "ascending": "Ascending",
-          "descending": "Descending",
-          "apply": "Apply",
-          "reset": "Reset"
-        },
-        "stats": {
-          "totalActivities": "Total activities",
-          "matchingFilters": "Matching active filters",
-          "onThisPage": "On this page",
-          "visibleRows": "Visible rows",
-          "pendingReview": "Pending review"
-        },
-        "table": {
-          "status": "Status",
-          "activityDetails": "Activity details",
-          "type": "Type",
-          "locality": "Locality",
-          "duration": "Duration",
-          "action": "Action"
-        },
-        "status": {
-          "approved": "Approved",
-          "pending": "Pending",
-          "rejected": "Rejected"
-        },
-        "empty": {
-          "filtered": "No activities to review yet.",
-          "noActivitySelected": "No activity selected",
-          "pickActivityTitle": "Pick an activity from the table",
-          "pickActivityBody": "Select a row to inspect media, location, and metadata of the submission in this panel."
-        }
+        "action": "Action"
       },
-      "localities": {
-        "eyebrow": "Locality management",
-        "searchAria": "Search localities",
-        "searchPlaceholder": "Search by locality, destination or region...",
-        "createLocality": "Create locality",
-        "editLocality": "Edit locality",
-        "selectedLocality": "Selected locality",
-        "preview": "Preview",
+      "status": {
+        "approved": "Approved",
+        "pending": "Pending",
+        "rejected": "Rejected"
+      },
+      "empty": {
+        "filtered": "No activities to review yet.",
+        "noActivitySelected": "No activity selected",
+        "pickActivityTitle": "Pick an activity from the table",
+        "pickActivityBody": "Select a row to inspect media, location, and metadata of the submission in this panel."
+      }
+    },
+    "localities": {
+      "loading": "Loading localities...",
+      "eyebrow": "Locality management",
+      "searchAria": "Search localities",
+      "searchPlaceholder": "Search by locality, destination or region...",
+      "createLocality": "Create locality",
+      "editLocality": "Edit locality",
+      "selectedLocality": "Selected locality",
+      "preview": "Preview",
+      "type": "Type",
+      "destination": "Destination",
+      "region": "Region",
+      "coordinates": "Coordinates",
+      "created": "Created",
+      "createdAt": "Created at",
+      "description": "Description",
+      "noDescription": "No description provided.",
+      "noCoordinates": "Coordinates are not available for this locality.",
+      "openFullReview": "Open full review",
+      "totalCount": "Total: {{count}} localities",
+      "userFallback": "User #{{id}}",
+      "error": {
+        "load": "Failed to load localities"
+      },
+      "filters": {
+        "status": "Status",
+        "allStatuses": "All statuses",
+        "allDestinations": "All destinations",
+        "allTypes": "All types",
+        "sortBy": "Sort by",
+        "name": "Name",
+        "order": "Order",
+        "ascending": "Ascending",
+        "descending": "Descending",
+        "apply": "Apply",
+        "reset": "Reset"
+      },
+      "stats": {
+        "totalLocalities": "Total localities",
+        "matchingFilters": "Matching active filters",
+        "onThisPage": "On this page",
+        "visibleRows": "Visible rows",
+        "activeRatio": "Active ratio",
+        "currentFilteredSet": "Current filtered set"
+      },
+      "table": {
+        "status": "Status",
+        "name": "Name",
         "type": "Type",
         "destination": "Destination",
-        "region": "Region",
-        "coordinates": "Coordinates",
-        "created": "Created",
-        "createdAt": "Created at",
-        "description": "Description",
-        "noDescription": "No description provided.",
-        "noCoordinates": "Coordinates are not available for this locality.",
-        "openFullReview": "Open full review",
-        "totalCount": "Total: {{count}} localities",
-        "userFallback": "User #{{id}}",
-        "error": {
-          "load": "Failed to load localities"
-        },
-        "filters": {
-          "status": "Status",
-          "allStatuses": "All statuses",
-          "allDestinations": "All destinations",
-          "allTypes": "All types",
-          "sortBy": "Sort by",
-          "name": "Name",
-          "order": "Order",
-          "ascending": "Ascending",
-          "descending": "Descending",
-          "apply": "Apply",
-          "reset": "Reset"
-        },
-        "stats": {
-          "totalLocalities": "Total localities",
-          "matchingFilters": "Matching active filters",
-          "onThisPage": "On this page",
-          "visibleRows": "Visible rows",
-          "activeRatio": "Active ratio",
-          "currentFilteredSet": "Current filtered set"
-        },
-        "table": {
-          "status": "Status",
-          "name": "Name",
-          "type": "Type",
-          "destination": "Destination",
-          "createdBy": "Created by",
-          "actions": "Actions"
-        },
-        "status": {
-          "published": "Published",
-          "archived": "Rejected"
-        },
-        "empty": {
-          "filtered": "No localities found for the selected filters.",
-          "noLocalitySelected": "No locality selected",
-          "pickLocalityTitle": "Pick a locality from the table",
-          "pickLocalityBody": "Select a row to preview details and metadata here."
-        }
+        "createdBy": "Created by",
+        "actions": "Actions"
       },
-      "localityForm": {
-        "createTitle": "Create Locality",
-        "editTitle": "Edit Locality",
-        "createSubtitle": "Add a new locality.",
-        "editSubtitle": "Update locality details.",
-        "deleting": "Deleting...",
-        "deleteLocality": "Delete Locality",
-        "delete": "Delete",
-        "creating": "Creating...",
-        "step1": "STEP 1",
-        "step2": "STEP 2",
-        "generalInformation": "General Information",
-        "generalInformationIntro": "Essential details about the locality.",
-        "localityName": "Locality Name",
-        "localityNamePlaceholder": "e.g. Barceloneta Beach",
-        "destination": "Destination",
-        "localityType": "Locality Type",
-        "fullDescription": "Full Description",
-        "descriptionPlaceholder": "Write a detailed description including what guests can expect...",
-        "mediaGallery": "Media Gallery",
-        "mediaGalleryIntro": "Upload one or more images and choose a primary cover image.",
-        "addPhoto": "Add Photo",
-        "dropzoneCopy": "Images are attached after locality creation via the image endpoint.",
-        "selectImageFiles": "Select one or more image files...",
-        "selectedImageFiles": "Selected image files",
-        "localityImageAlt": "Locality image",
-        "localityImagePreviewAlt": "Locality image preview",
-        "primary": "Primary",
-        "saved": "Saved",
-        "setPrimary": "Set Primary",
-        "localityIntelligence": "Location information",
-        "createTips": "Create Tips",
-        "learnMore": "Learn more about localities",
-        "playbookTitle": "Locality Creator Playbook",
-        "playbookBody": "Build complete locality profiles with sharp imagery and accurate map data so guests know exactly what to expect and how to get there. Consistent destination and type metadata also boosts discovery in search and filters.",
-        "deleteSuccessTitle": "Locality successfully deleted",
-        "deleteSuccessBody": "You will be redirected to the Localities page.",
-        "confirmDeletionTitle": "Confirm deletion",
-        "confirmDeletionBody": "Are you sure you want to delete this item? This action cannot be undone.",
-        "newLocality": "New locality",
-        "locationSummary": {
-          "destination": "Destination: {{destination}}",
-          "type": "Type: {{type}}",
-          "empty": "Set destination and locality type for map context"
-        },
-        "tips": {
-          "tip1": "Use clear locality names so visitors can recognize the place quickly.",
-          "tip2": "Add precise coordinates to improve map previews and navigation.",
-          "tip3": "Upload high-quality images and choose the strongest one as primary."
-        },
-        "playbookTips": {
-          "tip1": "Pick the destination and locality type that best matches the place to keep filters clean.",
-          "tip2": "Drop the map pin on the actual entrance or center of the locality, not just the city center.",
-          "tip3": "Upload at least one high-resolution image and mark the strongest one as primary."
-        },
-        "errors": {
-          "requiredFields": "Name, destination, and type are required.",
-          "imageRequired": "At least one image is required before saving.",
-          "maxImages": "A locality can have at most {{count}} images.",
-          "updateFailed": "Failed to update locality.",
-          "createFailed": "Failed to create locality.",
-          "deleteFailed": "Failed to delete locality.",
-          "uploadLimit": "You can upload up to {{count}} images per locality.",
-          "partialUpload": "Only the first {{accepted}} image(s) were added. Each locality can have up to {{count}} images.",
-          "loadEditFailed": "Failed to load locality for editing."
-        }
+      "status": {
+        "published": "Published",
+        "archived": "Rejected"
       },
-      "eventReview": {
-        "title": "Event Review",
-        "subtitle": "Inspect event details and approve or decline submission.",
-        "approve": "Approve",
-        "decline": "Decline",
-        "alreadyApproved": "Event is already approved.",
-        "eventImages": "Event Images",
-        "eventImagesHint": "Read-only gallery shown before the review details.",
-        "imageGalleryAria": "Event image gallery",
-        "mainImagePreviewAria": "Main event image preview",
-        "eventPreviewAlt": "Event preview",
-        "noUsableImage": "No usable image preview yet",
-        "noUsableImageHint": "The event does not have a valid main image URL, or the image could not be loaded.",
-        "eventThumbnailAlt": "Event image thumbnail",
-        "noAdditionalImages": "No additional gallery images are available.",
-        "generalInformation": "General Information",
-        "generalInformationHint": "Essential details about your upcoming event.",
-        "eventTitle": "Event Title",
-        "eventTitlePlaceholder": "e.g. Summer Jazz Festival 2024",
-        "eventType": "Event Type",
-        "selectType": "Select type",
-        "organizer": "Organizer",
-        "destination": "Destination",
-        "selectDestination": "Select destination",
-        "object": "Object",
-        "selectObject": "Select object",
-        "fullDescription": "Full Description",
-        "descriptionPlaceholder": "Write a detailed description including what guests can expect...",
-        "schedule": "Schedule",
-        "scheduleHint": "When and how often this event takes place.",
-        "startDateTime": "Start Date & Time",
-        "endDateTime": "End Date & Time",
-        "timezone": "Timezone",
-        "ticketingCapacity": "Ticketing & Capacity",
-        "capacity": "Capacity",
-        "capacityPlaceholder": "500",
-        "externalLink": "External Link",
-        "externalLinkPlaceholder": "https://...",
-        "categorization": "Categorization & Restrictions",
-        "categorizationHint": "Tags and access controls for the event listing.",
-        "tagsCategories": "Tags & Categories",
-        "addTagPlaceholder": "Add tag...",
-        "ageRestriction": "Age Restriction",
-        "selectRestriction": "Select restriction",
-        "locationIntelligence": "Location information",
-        "locationIntelligenceHint": "Map preview and coordinates for the linked location.",
-        "createdBy": "Created by {{name}}",
-        "creator": "Creator",
-        "declineEventTitle": "Decline event",
-        "declineEventDescription": "Provide a clear reason so the content creator can address required changes.",
-        "declineReasonPlaceholder": "Example: Event location does not match the submitted event.",
-        "keepPending": "Keep pending",
-        "declining": "Declining...",
-        "declineEvent": "Decline event",
-        "linkedLocation": "Linked location",
-        "noAddressAvailable": "No address available",
-        "nameNotAvailable": "Name not available in this view.",
-        "success": {
-          "approved": "Event approved successfully.",
-          "declined": "Event declined successfully."
-        },
-        "errors": {
-          "missingId": "Event id is required for manager review.",
-          "loadFailed": "Failed to load event",
-          "approveFailed": "Failed to approve event",
-          "declineReasonRequired": "Please provide a reason for decline.",
-          "declineFailed": "Failed to decline event"
-        }
+      "empty": {
+        "filtered": "No localities found for the selected filters.",
+        "noLocalitySelected": "No locality selected",
+        "pickLocalityTitle": "Pick a locality from the table",
+        "pickLocalityBody": "Select a row to preview details and metadata here."
+      }
+    },
+    "localityForm": {
+      "createTitle": "Create Locality",
+      "editTitle": "Edit Locality",
+      "createSubtitle": "Add a new locality.",
+      "editSubtitle": "Update locality details.",
+      "deleting": "Deleting...",
+      "deleteLocality": "Delete Locality",
+      "delete": "Delete",
+      "creating": "Creating...",
+      "step1": "STEP 1",
+      "step2": "STEP 2",
+      "generalInformation": "General Information",
+      "generalInformationIntro": "Essential details about the locality.",
+      "localityName": "Locality Name",
+      "localityNamePlaceholder": "e.g. Barceloneta Beach",
+      "destination": "Destination",
+      "localityType": "Locality Type",
+      "fullDescription": "Full Description",
+      "descriptionPlaceholder": "Write a detailed description including what guests can expect...",
+      "mediaGallery": "Media Gallery",
+      "mediaGalleryIntro": "Upload one or more images and choose a primary cover image.",
+      "addPhoto": "Add Photo",
+      "dropzoneCopy": "Images are attached after locality creation via the image endpoint.",
+      "selectImageFiles": "Select one or more image files...",
+      "selectedImageFiles": "Selected image files",
+      "localityImageAlt": "Locality image",
+      "localityImagePreviewAlt": "Locality image preview",
+      "primary": "Primary",
+      "saved": "Saved",
+      "setPrimary": "Set Primary",
+      "localityIntelligence": "Location information",
+      "createTips": "Create Tips",
+      "learnMore": "Learn more about localities",
+      "playbookTitle": "Locality Creator Playbook",
+      "playbookBody": "Build complete locality profiles with sharp imagery and accurate map data so guests know exactly what to expect and how to get there. Consistent destination and type metadata also boosts discovery in search and filters.",
+      "deleteSuccessTitle": "Locality successfully deleted",
+      "deleteSuccessBody": "You will be redirected to the Localities page.",
+      "confirmDeletionTitle": "Confirm deletion",
+      "confirmDeletionBody": "Are you sure you want to delete this item? This action cannot be undone.",
+      "newLocality": "New locality",
+      "locationSummary": {
+        "destination": "Destination: {{destination}}",
+        "type": "Type: {{type}}",
+        "empty": "Set destination and locality type for map context"
       },
-      "reports": {
-        "title": "Content Creator Reports",
-        "subtitle": "Escalate serious or repeated violations to Admin review. Use object, event, and activity review for individual content issues first.",
-        "reportCreator": "Report Content Creator",
-        "infoTitle": "When to use a report",
-        "infoBody": "Reports are for account-level concerns such as repeated violations, abuse, or unprofessional conduct. Reject or deactivate specific content from Objects, Events, or Activities first when possible.",
-        "infoLink": "View tourist reviews & creator replies →",
-        "searchAria": "Search reports",
-        "searchPlaceholder": "Search by creator name, reason, or report ID...",
-        "managedDestinationFallback": "your destinations",
-        "creatorSummary": "{{count}} object(s) in your destinations",
-        "withdraw": "Withdraw",
-        "report": "Report",
-        "reportNumber": "Report #{{id}}",
-        "accountReport": "Account report",
-        "creatorPanelTitle": "Report a creator",
-        "creatorPanelHint": "Content creators currently available for reporting",
-        "pendingTag": "Pending report",
-        "loading": "Loading reports...",
-        "filters": {
-          "status": "Status",
-          "allStatuses": "All statuses",
-          "reset": "Reset"
-        },
-        "stats": {
-          "pendingReview": "Pending review",
-          "pendingReviewHint": "Awaiting Admin decision",
-          "totalSubmitted": "Total submitted",
-          "totalSubmittedHint": "Your submitted reports",
-          "creatorsAvailable": "Creators you can report",
-          "creatorsAvailableHint": "No pending report on file"
-        },
-        "table": {
-          "title": "Your reports",
-          "shown": "{{count}} shown",
-          "status": "Status",
-          "creator": "Content Creator",
-          "reason": "Reason",
-          "submitted": "Submitted"
-        },
-        "detail": {
-          "destination": "Destination",
-          "submitted": "Submitted",
-          "reason": "Reason",
-          "adminDecision": "Admin decision",
-          "resolvedOn": "Resolved {{date}}",
-          "approvedBody": "Report approved. Creator role removed and account blacklisted per platform policy.",
-          "pendingNotice": "Admin has not reviewed this report yet. You can withdraw while status is Pending.",
-          "empty": "Select a report to view details"
-        },
-        "empty": {
-          "filtered": "No reports match your filters.",
-          "nonePrefix": "You have not submitted any creator reports yet. Use Report on a creator below, or report from ",
-          "linkLabel": "tourist reviews & creator replies"
-        },
-        "status": {
-          "pending": "Pending",
-          "approved": "Approved",
-          "rejected": "Rejected"
-        },
-        "success": {
-          "withdrawn": "Report withdrawn."
-        },
-        "error": {
-          "load": "Failed to load reports.",
-          "withdraw": "Failed to withdraw report."
-        },
-        "fallback": {
-          "notAvailable": "—",
-          "contentCreator": "Content creator"
-        }
+      "tips": {
+        "tip1": "Use clear locality names so visitors can recognize the place quickly.",
+        "tip2": "Add precise coordinates to improve map previews and navigation.",
+        "tip3": "Upload high-quality images and choose the strongest one as primary."
       },
-      "creatorReviews": {
-        "title": "Creator review activity",
-        "subtitle": "Read-only view of tourist reviews and Content Creator replies on published objects. Use this context before escalating a creator report.",
-        "creatorReports": "Creator reports",
-        "managedDestinationFallback": "your destinations",
-        "creatorSummary": "{{count}} object(s) in your destinations",
-        "creatorSummaryFallback": "Content in your destinations",
-        "creatorActiveFallback": "Active in your destinations",
-        "queueTitle": "Review queue",
-        "queueCount": "{{count}} items",
-        "concerningReply": "Concerning reply",
-        "creatorLabel": "Creator: {{name}}",
-        "reviewNumber": "Review #{{id}} · {{objectName}}",
-        "managerView": "Manager view",
-        "touristMeta": "Tourist · {{date}}",
-        "creatorMeta": "Content Creator · {{date}}",
-        "concerningTone": "Concerning tone",
-        "noReply": "This creator has not replied to the tourist yet.",
-        "flaggedBody": "This reply was flagged as potentially inappropriate. Submit a creator report for Admin review.",
-        "pendingReportOnFile": "Pending report on file",
-        "reportCreator": "Report creator",
-        "loading": "Loading reviews...",
-        "replyStatus": {
-          "replied": "CC replied",
-          "awaiting": "Awaiting reply"
-        },
-        "filters": {
-          "allRatings": "All ratings",
-          "allResponses": "All",
-          "withReply": "With CC reply",
-          "pendingReply": "No reply yet",
-          "concerningReplies": "Concerning replies",
-          "creator": "Content Creator",
-          "allCreators": "All creators",
-          "searchPlaceholder": "Search tourist, object, review text, reply...",
-          "reset": "Reset"
-        },
-        "stats": {
-          "threads": "Threads in destination",
-          "threadsHint": "Reviews in your current scope",
-          "needsResponse": "Needs CC response",
-          "needsResponseHint": "No reply from creator yet",
-          "replied": "CC replied",
-          "repliedHint": "Reviews with a creator reply",
-          "flagged": "Flagged replies",
-          "flaggedHint": "May warrant a report"
-        },
-        "context": {
-          "object": "Object",
-          "openInObjects": "Open in Objects",
-          "creator": "Content Creator",
-          "replyStatus": "Reply status",
-          "touristRating": "Tourist rating",
-          "creatorResponded": "Creator responded",
-          "replySent": "Reply sent",
-          "yes": "Yes",
-          "no": "No"
-        },
-        "empty": {
-          "filtered": "No reviews match your filters.",
-          "none": "No reviews yet for objects in your destinations.",
-          "thread": "Select a review from the queue to read the full conversation.",
-          "context": "Object and creator details appear here."
-        },
-        "error": {
-          "load": "Failed to load reviews."
-        },
-        "fallback": {
-          "notAvailable": "—",
-          "tourist": "Tourist",
-          "object": "Object #{{id}}",
-          "contentCreator": "Content creator"
-        }
+      "playbookTips": {
+        "tip1": "Pick the destination and locality type that best matches the place to keep filters clean.",
+        "tip2": "Drop the map pin on the actual entrance or center of the locality, not just the city center.",
+        "tip3": "Upload at least one high-resolution image and mark the strongest one as primary."
       },
-      "reportModal": {
-        "title": "Report Content Creator",
-        "subtitle": "Admin will review your submission. Only one pending report per creator.",
+      "errors": {
+        "requiredFields": "Name, destination, and type are required.",
+        "imageRequired": "At least one image is required before saving.",
+        "maxImages": "A locality can have at most {{count}} images.",
+        "updateFailed": "Failed to update locality.",
+        "createFailed": "Failed to create locality.",
+        "deleteFailed": "Failed to delete locality.",
+        "uploadLimit": "You can upload up to {{count}} images per locality.",
+        "partialUpload": "Only the first {{accepted}} image(s) were added. Each locality can have up to {{count}} images.",
+        "loadEditFailed": "Failed to load locality for editing.",
+        "outsideDestination": "The selected location is outside the boundary of \"{{destination}}\"."
+      }
+    },
+    "eventReview": {
+      "title": "Event Review",
+      "subtitle": "Inspect event details and approve or decline submission.",
+      "approve": "Approve",
+      "decline": "Decline",
+      "alreadyApproved": "Event is already approved.",
+      "eventImages": "Event Images",
+      "eventImagesHint": "Read-only gallery shown before the review details.",
+      "imageGalleryAria": "Event image gallery",
+      "mainImagePreviewAria": "Main event image preview",
+      "eventPreviewAlt": "Event preview",
+      "noUsableImage": "No usable image preview yet",
+      "noUsableImageHint": "The event does not have a valid main image URL, or the image could not be loaded.",
+      "eventThumbnailAlt": "Event image thumbnail",
+      "noAdditionalImages": "No additional gallery images are available.",
+      "generalInformation": "General Information",
+      "generalInformationHint": "Essential details about your upcoming event.",
+      "eventTitle": "Event Title",
+      "eventTitlePlaceholder": "e.g. Summer Jazz Festival 2024",
+      "eventType": "Event Type",
+      "selectType": "Select type",
+      "organizer": "Organizer",
+      "destination": "Destination",
+      "selectDestination": "Select destination",
+      "object": "Object",
+      "selectObject": "Select object",
+      "fullDescription": "Full Description",
+      "descriptionPlaceholder": "Write a detailed description including what guests can expect...",
+      "schedule": "Schedule",
+      "scheduleHint": "When and how often this event takes place.",
+      "startDateTime": "Start Date & Time",
+      "endDateTime": "End Date & Time",
+      "timezone": "Timezone",
+      "ticketingCapacity": "Ticketing & Capacity",
+      "capacity": "Capacity",
+      "capacityPlaceholder": "500",
+      "externalLink": "External Link",
+      "externalLinkPlaceholder": "https://...",
+      "categorization": "Categorization & Restrictions",
+      "categorizationHint": "Tags and access controls for the event listing.",
+      "tagsCategories": "Tags & Categories",
+      "addTagPlaceholder": "Add tag...",
+      "ageRestriction": "Age Restriction",
+      "selectRestriction": "Select restriction",
+      "locationIntelligence": "Location information",
+      "locationIntelligenceHint": "Map preview and coordinates for the linked location.",
+      "createdBy": "Created by {{name}}",
+      "creator": "Creator",
+      "declineEventTitle": "Decline event",
+      "declineEventDescription": "Provide a clear reason so the content creator can address required changes.",
+      "declineReasonPlaceholder": "Example: Event location does not match the submitted event.",
+      "keepPending": "Keep pending",
+      "declining": "Declining...",
+      "declineEvent": "Decline event",
+      "linkedLocation": "Linked location",
+      "noAddressAvailable": "No address available",
+      "nameNotAvailable": "Name not available in this view.",
+      "success": {
+        "approved": "Event approved successfully.",
+        "declined": "Event declined successfully."
+      },
+      "errors": {
+        "missingId": "Event id is required for manager review.",
+        "loadFailed": "Failed to load event",
+        "approveFailed": "Failed to approve event",
+        "declineReasonRequired": "Please provide a reason for decline.",
+        "declineFailed": "Failed to decline event"
+      }
+    },
+    "reports": {
+      "title": "User Reports",
+      "subtitle": "Escalate serious or repeated violations by content creators or tourists to Admin review. Use object, event, and activity review for individual content issues first.",
+      "reportCreator": "Report a User",
+      "infoTitle": "When to use a report",
+      "infoBody": "Reports are for account-level concerns such as repeated violations, abuse, or unprofessional conduct, whether by a content creator or a tourist. Reject or deactivate specific content from Objects, Events, or Activities first when possible, or act directly from reviews.",
+      "infoLink": "View tourist reviews & creator replies →",
+      "searchAria": "Search reports",
+      "searchPlaceholder": "Search by user name, reason, or report ID...",
+      "managedDestinationFallback": "your destinations",
+      "creatorSummary": "{{count}} object(s) in your destinations",
+      "withdraw": "Withdraw",
+      "report": "Report",
+      "reportNumber": "Report #{{id}}",
+      "accountReport": "Account report",
+      "creatorPanelTitle": "Report a creator",
+      "creatorPanelHint": "Content creators currently available for reporting",
+      "pendingTag": "Pending report",
+      "loading": "Loading reports...",
+      "userType": {
+        "creator": "Content creator",
+        "tourist": "Tourist"
+      },
+      "filters": {
+        "status": "Status",
+        "allStatuses": "All statuses",
+        "reset": "Reset"
+      },
+      "stats": {
+        "pendingReview": "Pending review",
+        "pendingReviewHint": "Awaiting Admin decision",
+        "totalSubmitted": "Total submitted",
+        "totalSubmittedHint": "Your submitted reports",
+        "creatorsAvailable": "Creators you can report",
+        "creatorsAvailableHint": "No pending report on file"
+      },
+      "table": {
+        "title": "Your reports",
+        "shown": "{{count}} shown",
+        "status": "Status",
         "creator": "Content Creator",
-        "selectCreator": "Select creator...",
-        "noCreators": "No creators available to report.",
-        "category": "Category",
-        "description": "Description",
-        "descriptionHint": "(required, max 500 characters)",
-        "descriptionPlaceholder": "Describe what happened, which review reply was inappropriate, and why per-item review was not sufficient...",
-        "warning": "If approved by Admin, the creator loses Content Creator access and cannot request the role again.",
-        "submit": "Submit report",
-        "submitting": "Submitting...",
-        "successSubmitted": "Creator report submitted successfully.",
-        "successSubmittedReview": "Report submitted. Admin will review your submission.",
-        "errorSubmit": "Failed to submit report.",
-        "reason": {
-          "category": "Category",
-          "autoDetected": "Flagged automatically as a concerning reply (language / conduct rules).",
-          "managerModeration": "Reported from manager review moderation.",
-          "review": "Review",
-          "tourist": "Tourist",
-          "creator": "Content creator",
-          "reply": "Reply"
-        },
-        "categories": {
-          "placeholder": "Select a category (optional)",
-          "inappropriate_content": "Inappropriate or misleading content",
-          "repeated_violations": "Repeated policy violations",
-          "unprofessional_conduct": "Unprofessional conduct (review reply)",
-          "spam_abuse": "Spam or platform abuse",
-          "other": "Other (describe below)"
-        }
+        "reason": "Reason",
+        "submitted": "Submitted"
       },
-      "activityReview": {
-        "title": "Activity Review",
-        "subtitle": "Inspect the submitted activity and approve or decline the submission.",
-        "approve": "Approve",
-        "decline": "Decline",
-        "alreadyApproved": "Activity is already approved.",
-        "images": "Activity Images",
-        "imagesHint": "Read-only gallery shown before the review details.",
-        "imageGalleryAria": "Activity image gallery",
-        "mainImageAria": "Main activity image preview",
-        "previewAlt": "Activity preview",
-        "noImage": "No usable image preview yet",
-        "noImageHint": "The activity does not have a valid main image URL, or the image could not be loaded.",
-        "thumbnailAlt": "Activity image thumbnail",
-        "noAdditionalImages": "No additional gallery images are available.",
-        "coreDetails": "Core Details",
-        "coreDetailsHint": "Basic information from the submitted activity.",
-        "activityName": "Activity Name",
-        "activityType": "Activity Type",
-        "statusLabel": "Status",
-        "createdBy": "Created By",
-        "description": "Description",
-        "logistics": "Logistics & Classification",
-        "logisticsHint": "Commercial and destination details used by the listing.",
+      "detail": {
         "destination": "Destination",
-        "locality": "Locality",
-        "touristObject": "Tourist Object",
-        "listingState": "Listing State",
-        "duration": "Duration",
-        "locationIntelligence": "Location information",
-        "locationIntelligenceHint": "Map preview and coordinates for the linked location.",
-        "createdByName": "Created by {{name}}",
-        "creator": "Creator",
-        "reviewSummary": "Review Summary",
-        "created": "Created",
-        "updated": "Updated",
-        "approvedAt": "Approved at",
-        "approvedBy": "Approved by",
-        "rejectionReason": "Rejection reason",
-        "loadingAria": "Loading activity review skeleton",
-        "unavailableTitle": "Activity review is unavailable",
-        "unavailableBody": "No activity data was returned for this page.",
-        "declineTitle": "Decline activity",
-        "declineDescription": "Provide a clear reason so the content creator can address required changes.",
-        "declinePlaceholder": "Example: The linked object does not match the submitted activity.",
-        "keepPending": "Keep pending",
-        "declining": "Declining...",
-        "declineAction": "Decline activity",
-        "timeline": {
-          "edited": "{{created}}, edited {{updated}}"
-        },
-        "gallery": {
-          "noImages": "No gallery images",
-          "count": "{{count}} image(s)"
-        },
-        "state": {
-          "active": "Active",
-          "inactive": "Inactive"
-        },
-        "status": {
-          "approved": "Approved",
-          "rejected": "Rejected",
-          "pending": "Pending"
-        },
-        "success": {
-          "approved": "Activity approved successfully.",
-          "declined": "Activity declined successfully."
-        },
-        "errors": {
-          "missingId": "Activity id is required for manager review.",
-          "detailsUnavailable": "Activity details are unavailable.",
-          "loadFailed": "Failed to load activity",
-          "approveFailed": "Failed to approve activity",
-          "declineReasonRequired": "Please provide a reason for decline.",
-          "declineFailed": "Failed to decline activity"
-        },
-        "fallback": {
-          "notAvailable": "—",
-          "noRejectionReason": "No rejection reason recorded.",
-          "locationTbd": "Location TBD",
-          "noLinkedLocation": "No locality or object has been linked.",
-          "nameNotAvailable": "Name not available in this view."
-        }
+        "submitted": "Submitted",
+        "reason": "Reason",
+        "adminDecision": "Admin decision",
+        "resolvedOn": "Resolved {{date}}",
+        "approvedBody": "Report approved. Creator role removed and account blacklisted per platform policy.",
+        "pendingNotice": "Admin has not reviewed this report yet. You can withdraw while status is Pending.",
+        "empty": "Select a report to view details"
       },
-      "reviewMediaGallery": {
-        "title": "Media Gallery",
-        "subtitle": "Read-only gallery shown before the review details.",
-        "imageGalleryAria": "Media gallery",
-        "mainImageAria": "Main image preview",
-        "previewAlt": "Preview image",
-        "thumbnailAlt": "Gallery thumbnail",
-        "noPreview": "No usable image preview yet",
-        "noPreviewHint": "There is no valid main image URL, or the image could not be loaded.",
-        "noAdditionalImages": "No additional gallery images are available.",
-        "noImagesSubmitted": "No images were submitted.",
-        "imageCount": "{{count}} image(s) in gallery"
+      "empty": {
+        "filtered": "No reports match your filters.",
+        "nonePrefix": "You have not submitted any reports yet. Use Report below, or report from ",
+        "linkLabel": "tourist reviews & creator replies"
       },
-      "map": {
-        "searchPlaceholder": "Search objects, events, activities...",
-        "filters": {
-          "locality": "Localities",
-          "object": "Objects",
-          "event": "Events",
-          "activity": "Activities"
-        }
+      "status": {
+        "pending": "Pending",
+        "approved": "Approved",
+        "rejected": "Rejected"
       },
-      "objects": {
+      "success": {
+        "withdrawn": "Report withdrawn."
+      },
+      "error": {
+        "load": "Failed to load reports.",
+        "withdraw": "Failed to withdraw report."
+      },
+      "fallback": {
+        "notAvailable": "—",
+        "contentCreator": "Content creator",
+        "tourist": "Tourist"
+      }
+    },
+    "creatorReviews": {
+      "title": "Review activity",
+      "subtitle": "Read-only view of tourist reviews and Content Creator replies on published objects. Use this context before escalating a report.",
+      "creatorReports": "Report log",
+      "managedDestinationFallback": "your destinations",
+      "creatorSummary": "{{count}} object(s) in your destinations",
+      "creatorSummaryFallback": "Content in your destinations",
+      "creatorActiveFallback": "Active in your destinations",
+      "touristSummary": "Rating {{rating}}/5 · {{objectName}}",
+      "pendingTouristReportOnFile": "A report for this tourist is already pending",
+      "reportTourist": "Report tourist",
+      "queueTitle": "Review queue",
+      "queueCount": "{{count}} items",
+      "concerningReply": "Concerning reply",
+      "creatorLabel": "Creator: {{name}}",
+      "reviewNumber": "Review #{{id}} · {{objectName}}",
+      "managerView": "Manager view",
+      "touristMeta": "Tourist · {{date}}",
+      "creatorMeta": "Content Creator · {{date}}",
+      "concerningTone": "Concerning tone",
+      "noReply": "This creator has not replied to the tourist yet.",
+      "flaggedBody": "This content was flagged as potentially inappropriate. Submit a report for Admin review.",
+      "pendingReportOnFile": "Pending report on file",
+      "reportCreator": "Report creator",
+      "loading": "Loading reviews...",
+      "replyStatus": {
+        "replied": "CC replied",
+        "awaiting": "Awaiting reply"
+      },
+      "filters": {
+        "allRatings": "All ratings",
+        "allResponses": "All",
+        "withReply": "With CC reply",
+        "pendingReply": "No reply yet",
+        "concerningReplies": "Concerning replies",
+        "creator": "Content Creator",
+        "allCreators": "All creators",
+        "tourist": "Tourist",
+        "allTourists": "All tourists",
+        "searchPlaceholder": "Search tourist, object, review text, reply...",
+        "reset": "Reset"
+      },
+      "stats": {
+        "threads": "Threads in destination",
+        "threadsHint": "Reviews in your current scope",
+        "needsResponse": "Needs CC response",
+        "needsResponseHint": "No reply from creator yet",
+        "replied": "CC replied",
+        "repliedHint": "Reviews with a creator reply",
+        "flagged": "Flagged content",
+        "flaggedHint": "May warrant a report"
+      },
+      "context": {
+        "object": "Object",
+        "openInObjects": "Open in Objects",
+        "creator": "Content Creator",
+        "replyStatus": "Reply status",
+        "touristRating": "Tourist rating",
+        "creatorResponded": "Creator responded",
+        "replySent": "Reply sent",
+        "yes": "Yes",
+        "no": "No"
+      },
+      "empty": {
+        "filtered": "No reviews match your filters.",
+        "none": "No reviews yet for objects in your destinations.",
+        "thread": "Select a review from the queue to read the full conversation.",
+        "context": "Object and creator details appear here."
+      },
+      "error": {
+        "load": "Failed to load reviews."
+      },
+      "fallback": {
+        "notAvailable": "—",
+        "tourist": "Tourist",
+        "object": "Object #{{id}}",
+        "contentCreator": "Content creator"
+      }
+    },
+    "reportModal": {
+      "title": "Report Content Creator",
+      "subtitle": "Admin will review your submission. Only one pending report per creator.",
+      "titleTourist": "Report Tourist",
+      "subtitleTourist": "Admin will review your submission. Only one pending report per tourist.",
+      "creator": "Content Creator",
+      "tourist": "Tourist",
+      "selectCreator": "Select creator...",
+      "selectTourist": "Select tourist...",
+      "noCreators": "No creators available to report.",
+      "noTourists": "No tourists available to report.",
+      "category": "Category",
+      "description": "Description",
+      "descriptionHint": "(required, max 500 characters)",
+      "descriptionPlaceholder": "Describe what happened, which review reply was inappropriate, and why per-item review was not sufficient...",
+      "warning": "If approved by Admin, the creator loses Content Creator access and cannot request the role again.",
+      "warningTourist": "If approved by Admin, the tourist's account may be banned for a duration the admin decides.",
+      "submit": "Submit report",
+      "submitting": "Submitting...",
+      "successSubmitted": "Creator report submitted successfully.",
+      "successSubmittedReview": "Report submitted. Admin will review your submission.",
+      "errorSubmit": "Failed to submit report.",
+      "reason": {
+        "category": "Category",
+        "autoDetected": "Flagged automatically as a concerning reply (language / conduct rules).",
+        "autoDetectedReview": "Flagged automatically as a concerning review (language / conduct rules).",
+        "managerModeration": "Reported from manager review moderation.",
+        "review": "Review",
+        "tourist": "Tourist",
+        "creator": "Content creator",
+        "reply": "Reply",
+        "reviewText": "Review text"
+      },
+      "categories": {
+        "placeholder": "Select a category (optional)",
+        "inappropriate_content": "Inappropriate or misleading content",
+        "repeated_violations": "Repeated policy violations",
+        "unprofessional_conduct": "Unprofessional conduct (review reply)",
+        "spam_abuse": "Spam or platform abuse",
+        "other": "Other (describe below)"
+      }
+    },
+    "activityReview": {
+      "title": "Activity Review",
+      "subtitle": "Inspect the submitted activity and approve or decline the submission.",
+      "approve": "Approve",
+      "decline": "Decline",
+      "alreadyApproved": "Activity is already approved.",
+      "images": "Activity Images",
+      "imagesHint": "Read-only gallery shown before the review details.",
+      "imageGalleryAria": "Activity image gallery",
+      "mainImageAria": "Main activity image preview",
+      "previewAlt": "Activity preview",
+      "noImage": "No usable image preview yet",
+      "noImageHint": "The activity does not have a valid main image URL, or the image could not be loaded.",
+      "thumbnailAlt": "Activity image thumbnail",
+      "noAdditionalImages": "No additional gallery images are available.",
+      "coreDetails": "Core Details",
+      "coreDetailsHint": "Basic information from the submitted activity.",
+      "activityName": "Activity Name",
+      "activityType": "Activity Type",
+      "statusLabel": "Status",
+      "createdBy": "Created By",
+      "description": "Description",
+      "logistics": "Logistics & Classification",
+      "logisticsHint": "Commercial and destination details used by the listing.",
+      "destination": "Destination",
+      "locality": "Locality",
+      "touristObject": "Tourist Object",
+      "listingState": "Listing State",
+      "duration": "Duration",
+      "locationIntelligence": "Location information",
+      "locationIntelligenceHint": "Map preview and coordinates for the linked location.",
+      "createdByName": "Created by {{name}}",
+      "creator": "Creator",
+      "reviewSummary": "Review Summary",
+      "created": "Created",
+      "updated": "Updated",
+      "approvedAt": "Approved at",
+      "approvedBy": "Approved by",
+      "rejectionReason": "Rejection reason",
+      "loadingAria": "Loading activity review skeleton",
+      "unavailableTitle": "Activity review is unavailable",
+      "unavailableBody": "No activity data was returned for this page.",
+      "declineTitle": "Decline activity",
+      "declineDescription": "Provide a clear reason so the content creator can address required changes.",
+      "declinePlaceholder": "Example: The linked object does not match the submitted activity.",
+      "keepPending": "Keep pending",
+      "declining": "Declining...",
+      "declineAction": "Decline activity",
+      "timeline": {
+        "edited": "{{created}}, edited {{updated}}"
+      },
+      "gallery": {
+        "noImages": "No gallery images",
+        "count": "{{count}} image(s)"
+      },
+      "state": {
+        "active": "Active",
+        "inactive": "Inactive"
+      },
+      "status": {
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "pending": "Pending"
+      },
+      "success": {
+        "approved": "Activity approved successfully.",
+        "declined": "Activity declined successfully."
+      },
+      "errors": {
+        "missingId": "Activity id is required for manager review.",
+        "detailsUnavailable": "Activity details are unavailable.",
+        "loadFailed": "Failed to load activity",
+        "approveFailed": "Failed to approve activity",
+        "declineReasonRequired": "Please provide a reason for decline.",
+        "declineFailed": "Failed to decline activity"
+      },
+      "fallback": {
+        "notAvailable": "—",
+        "noRejectionReason": "No rejection reason recorded.",
+        "locationTbd": "Location TBD",
+        "noLinkedLocation": "No locality or object has been linked.",
+        "nameNotAvailable": "Name not available in this view."
+      }
+    },
+    "reviewMediaGallery": {
+      "title": "Media Gallery",
+      "subtitle": "Read-only gallery shown before the review details.",
+      "imageGalleryAria": "Media gallery",
+      "mainImageAria": "Main image preview",
+      "previewAlt": "Preview image",
+      "thumbnailAlt": "Gallery thumbnail",
+      "noPreview": "No usable image preview yet",
+      "noPreviewHint": "There is no valid main image URL, or the image could not be loaded.",
+      "noAdditionalImages": "No additional gallery images are available.",
+      "noImagesSubmitted": "No images were submitted.",
+      "imageCount": "{{count}} image(s) in gallery"
+    },
+    "map": {
+      "searchPlaceholder": "Search objects, events, activities...",
+      "filters": {
+        "locality": "Localities",
+        "object": "Objects",
+        "event": "Events",
+        "activity": "Activities"
+      }
+    },
+    "objects": {
       "eyebrow": "Object overview",
       "searchAria": "Search objects",
       "searchPlaceholder": "Search by name, category or region...",
@@ -1728,7 +1755,7 @@
       "itemsLabel": "banned users"
     },
     "report": {
-      "title": "Content creator report",
+      "title": "User report",
       "reportedUser": "Reported user",
       "submittedBy": "Submitted by",
       "destination": "Destination",
@@ -1743,11 +1770,11 @@
       "rejectionReason": "Rejection reason (required if you dismiss the report)",
       "rejectionPlaceholder": "Explain why the report is not upheld...",
       "reject": "Reject report",
-      "approveAndBan": "Approve & ban creator",
+      "approveAndBan": "Approve & ban user",
       "chooseBanEndDate": "Choose an end date for a custom ban duration.",
       "enterRejectReason": "Enter a reason when rejecting a report.",
       "approvedSuccess": "Report approved. The user has been banned ({{duration}}).",
-      "rejectedSuccess": "Report rejected. The content creator remains on the platform.",
+      "rejectedSuccess": "Report rejected. The user remains on the platform.",
       "defaultBanReason": "Banned following an upheld manager report.",
       "processError": "Could not process this report. Try again.",
       "loadPendingError": "Could not load pending creator reports."
@@ -1809,20 +1836,48 @@
       }
     },
     "countries": {
-      "Albania": "Albania", "Argentina": "Argentina", "Australia": "Australia",
-      "Austria": "Austria", "Belgium": "Belgium", "BosniaandHerzegovina": "Bosnia and Herzegovina",
-      "Brazil": "Brazil", "Bulgaria": "Bulgaria", "Canada": "Canada",
-      "China": "China", "Croatia": "Croatia", "CzechRepublic": "Czech Republic",
-      "Denmark": "Denmark", "Finland": "Finland", "France": "France",
-      "Germany": "Germany", "Greece": "Greece", "Hungary": "Hungary",
-      "India": "India", "Italy": "Italy", "Japan": "Japan",
-      "Kosovo": "Kosovo", "Mexico": "Mexico", "Montenegro": "Montenegro",
-      "CrnaGora": "Montenegro", "Netherlands": "Netherlands", "NorthMacedonia": "North Macedonia",
-      "Norway": "Norway", "Poland": "Poland", "Portugal": "Portugal",
-      "Romania": "Romania", "Russia": "Russia", "Serbia": "Serbia",
-      "Slovakia": "Slovakia", "Slovenia": "Slovenia", "Spain": "Spain",
-      "Sweden": "Sweden", "Switzerland": "Switzerland", "Turkey": "Turkey",
-      "Ukraine": "Ukraine", "UnitedKingdom": "United Kingdom", "UnitedStates": "United States"
+      "Albania": "Albania",
+      "Argentina": "Argentina",
+      "Australia": "Australia",
+      "Austria": "Austria",
+      "Belgium": "Belgium",
+      "BosniaandHerzegovina": "Bosnia and Herzegovina",
+      "Brazil": "Brazil",
+      "Bulgaria": "Bulgaria",
+      "Canada": "Canada",
+      "China": "China",
+      "Croatia": "Croatia",
+      "CzechRepublic": "Czech Republic",
+      "Denmark": "Denmark",
+      "Finland": "Finland",
+      "France": "France",
+      "Germany": "Germany",
+      "Greece": "Greece",
+      "Hungary": "Hungary",
+      "India": "India",
+      "Italy": "Italy",
+      "Japan": "Japan",
+      "Kosovo": "Kosovo",
+      "Mexico": "Mexico",
+      "Montenegro": "Montenegro",
+      "CrnaGora": "Montenegro",
+      "Netherlands": "Netherlands",
+      "NorthMacedonia": "North Macedonia",
+      "Norway": "Norway",
+      "Poland": "Poland",
+      "Portugal": "Portugal",
+      "Romania": "Romania",
+      "Russia": "Russia",
+      "Serbia": "Serbia",
+      "Slovakia": "Slovakia",
+      "Slovenia": "Slovenia",
+      "Spain": "Spain",
+      "Sweden": "Sweden",
+      "Switzerland": "Switzerland",
+      "Turkey": "Turkey",
+      "Ukraine": "Ukraine",
+      "UnitedKingdom": "United Kingdom",
+      "UnitedStates": "United States"
     },
     "languages": {
       "Serbian": "Serbian",
@@ -1936,7 +1991,14 @@
       "anotherAdminEditing": "Another admin is currently editing this user.",
       "network": "Network error. Check that the API is running.",
       "server": "Server error. Try again later.",
-      "saveFailed": "Could not save changes. Please try again."
+      "saveFailed": "Could not save changes. Please try again.",
+      "notTourist": "Only tourist accounts can be promoted to content creator.",
+      "noCreatorRequest": "This user has not requested the content creator role.",
+      "roleNotFound": "The selected role could not be found.",
+      "notContentCreator": "Only content creator accounts can be moved back to tourist.",
+      "currentPasswordIncorrect": "The current password is incorrect.",
+      "userLoggedIn": "This user is currently logged in. Ask them to log out before changing the password.",
+      "banEndDateInFuture": "The ban end date must be in the future."
     }
   },
   "adminMap": {
@@ -1977,8 +2039,7 @@
     "underline": "Underline",
     "link": "Link",
     "fullDescriptionPlaceholder": "Longer story, highlights, and practical visitor information.",
-    "categoriesTags": "Categories & tags",
-    "addCategory": "Add a category",
+    "destinationType": "Destination type",
     "mediaGallery": "Media gallery",
     "existingImages": "Existing destination images with primary cover selection.",
     "newImages": "High-quality images that represent this destination across the platform.",
@@ -2011,6 +2072,7 @@
     "managerSuggestions": "Manager suggestions",
     "searching": "Searching…",
     "noManagersMatch": "No managers match your search.",
+    "selectRegionFirst": "Select a region first to see available managers.",
     "removeManager": "Remove manager",
     "selectManagerBeforeSave": "Select a manager before you can save this destination.",
     "deleteDestinationTitle": "Delete destination?",
@@ -2025,9 +2087,11 @@
       "searching": "Searching map location...",
       "matched": "Location matched: {{label}}",
       "notFound": "Location not found automatically — set coordinates on the map below.",
-      "unavailable": "Location lookup is temporarily unavailable. You can still set coordinates manually."
+      "unavailable": "Location lookup is temporarily unavailable. You can still set coordinates manually.",
+      "outsideRegion": "The matched location is outside the boundary of \"{{region}}\". Set the coordinates manually on the map."
     },
     "errors": {
+      "outsideRegion": "The selected location is outside the boundary of \"{{region}}\".",
       "loadRegions": "Could not load regions. You can still create a destination without a region.",
       "startEditSession": "Could not start an edit session for this destination.",
       "loadDestination": "Could not load destination for editing.",
@@ -2039,6 +2103,7 @@
       "maxImagesDestination": "A destination can have at most {{count}} images.",
       "selectManager": "Please select a manager.",
       "managerAlreadyAssigned": "This manager already manages \"{{destination}}\". Each manager can manage only one destination.",
+      "managerOutsideRegion": "This manager does not belong to the selected destination's region.",
       "assignManagerFailed": "Destination was saved, but assigning the manager failed.",
       "anotherAdminEditing": "Another admin is currently editing this destination.",
       "saveFailed": "Save failed. Please check fields and try again."
@@ -2159,7 +2224,6 @@
     "setNewPasswordBtn": "Set New Password",
     "forgotPasswordHeading": "Verify Code",
     "setPasswordHeading": "Set New Password"
-
   },
   "contentCreator": {
     "objects": {
@@ -2233,6 +2297,7 @@
       "dateRangeFilter": "Date range filter",
       "fromDate": "From date",
       "toDate": "To date",
+      "datePlaceholder": "dd/mm/yyyy",
       "loading": "Loading events...",
       "selectedEvent": "Selected event",
       "featuredEvent": "Featured event",
@@ -2268,12 +2333,12 @@
         "concert": "Concert"
       },
       "stats": {
-        "upcomingThisWeek": "Upcoming this week",
-        "next7DaysHint": "Events published in the next 7 days",
-        "publishedOnPage": "Published on page",
-        "pageVisibilityHint": "Published or approved events in the current table page",
-        "capacityConfigured": "Capacity configured",
-        "capacityConfiguredHint": "Share of visible events with max visitors set"
+        "totalEvents": "Total events",
+        "totalEventsHint": "Matching the active filters",
+        "onThisPage": "On this page",
+        "onThisPageHint": "Events shown in the current page",
+        "next7Days": "In the next 7 days",
+        "next7DaysHint": "Events starting within 7 days"
       },
       "table": {
         "status": "Status",
@@ -2474,6 +2539,8 @@
       "selectObject": "Select object",
       "selectDestinationFirst": "Select destination first",
       "noObjectsForDestination": "No objects found for selected destination.",
+      "locality": "Locality",
+      "selectLocality": "Select locality",
       "fullDescription": "Full description",
       "descriptionPlaceholder": "Write a detailed description including what guests can expect...",
       "schedule": "Schedule",
@@ -2512,10 +2579,18 @@
       "creatorTips": "Creator tips",
       "learnMore": "Learn more about events",
       "activityDurationMinutes": "{{count}} mins",
-      "tips": { "tip1": "Events with high-resolution banners get more engagement.", "tip2": "Link your event to a specific object to show automated directions.", "tip3": "Clear start and end times help with exported calendars." },
+      "tips": {
+        "tip1": "Events with high-resolution banners get more engagement.",
+        "tip2": "Link your event to a specific object to show automated directions.",
+        "tip3": "Clear start and end times help with exported calendars."
+      },
       "playbookTitle": "Event Creator Playbook",
       "playbookBody": "Use object-linked events with precise map coordinates so guests can navigate directly to the event pin. Keep title, schedule, and ticketing data aligned with your related activities to improve discovery.",
-      "playbookTips": { "tip1": "Use the same destination/object pairing as related activities whenever possible.", "tip2": "Drop a map pin close to the real entrance location, not just city center.", "tip3": "Add at least one related activity to create a complete day-plan suggestion." },
+      "playbookTips": {
+        "tip1": "Use the same destination/object pairing as related activities whenever possible.",
+        "tip2": "Drop a map pin close to the real entrance location, not just city center.",
+        "tip3": "Add at least one related activity to create a complete day-plan suggestion."
+      },
       "delete": {
         "requestTitle": "Request deletion",
         "confirmTitle": "Confirm deletion",
@@ -2548,7 +2623,9 @@
         "saveFailed": "Failed to save event",
         "imageUploadAfterCreate": "Event created but image upload failed. Please add images via Edit.",
         "deletionRequestFailed": "Failed to submit deletion request",
-        "deleteFailed": "Failed to delete event"
+        "deleteFailed": "Failed to delete event",
+        "outsideDestination": "The selected location is outside the boundary of \"{{destination}}\".",
+        "outsideRegion": "The selected location is outside the boundary of \"{{region}}\"."
       }
     },
     "activityForm": {
@@ -2628,7 +2705,9 @@
         "saveFailed": "Failed to save activity.",
         "deletionRequestFailed": "Failed to submit deletion request",
         "deleteFailed": "Failed to delete activity.",
-        "loadEditFailed": "Failed to load activity for editing."
+        "loadEditFailed": "Failed to load activity for editing.",
+        "outsideDestination": "The selected location is outside the boundary of \"{{destination}}\".",
+        "outsideRegion": "The selected location is outside the boundary of \"{{region}}\"."
       }
     },
     "map": {
@@ -2696,6 +2775,7 @@
     "locality": "Locality",
     "selectLocality": "Select a locality",
     "selectDestinationFirst": "Select a destination first",
+    "destinationOrLocalityRequired": "You must select a destination or a locality before you can create the object.",
     "story": "Story",
     "fullDescription": "Full description",
     "descriptionPlaceholder": "Share the story, practical details, and standout features of this object.",
@@ -2814,6 +2894,8 @@
       "partialImages": "Some images could not be processed. Please try again.",
       "imageRequired": "Add at least one image before submitting the object.",
       "destinationRequired": "Select a destination before submitting the object.",
+      "outsideDestination": "The selected location is outside the boundary of \"{{destination}}\".",
+      "outsideRegion": "The selected location is outside the boundary of \"{{region}}\".",
       "saveFailed": "The object could not be saved.",
       "loadFailed": "The object could not be loaded.",
       "imageUploadAfterCreate": "Object was created but image upload failed. Please add images below."
@@ -2968,8 +3050,8 @@
     "Perfil actualizado": "Profile updated",
     "Profil ažuriran": "Profile updated",
     "Save Changes": "Save Changes",
-    "Guardar cambios": "Save Changes",
-    "Sačuvaj izmene": "Save Changes",
+    "Guardar cambios": "Save changes",
+    "Sačuvaj izmene": "Save changes",
     "Saving...": "Saving...",
     "Guardando...": "Saving...",
     "Čuvanje...": "Saving...",
@@ -4211,17 +4293,17 @@
     "Free": "Free",
     "Gratis": "Free",
     "Besplatno": "Free",
-    "Geolocation nije podrzana.": "Geolocation nije podrzana.",
+    "Geolocation nije podrzana.": "Geolocation is not supported.",
     "La geolocalización no es compatible.": "Geolocation nije podrzana.",
     "Geolokacija nije podržana.": "Geolocation nije podrzana.",
-    "Dozvolite pristup lokaciji.": "Dozvolite pristup lokaciji.",
+    "Dozvolite pristup lokaciji.": "Allow location access.",
     "Permite el acceso a la ubicación.": "Dozvolite pristup lokaciji.",
-    "Ovaj nalog je trenutno u read-only režimu zbog bana.": "Ovaj nalog je trenutno u read-only režimu zbog bana.",
+    "Ovaj nalog je trenutno u read-only režimu zbog bana.": "This account is currently in read-only mode due to a ban.",
     "Esta cuenta está en modo de solo lectura por el bloqueo.": "Ovaj nalog je trenutno u read-only režimu zbog bana.",
-    "Krsenje pravila platforme.": "Krsenje pravila platforme.",
+    "Krsenje pravila platforme.": "Violation of platform rules.",
     "Incumplimiento de las reglas de la plataforma.": "Krsenje pravila platforme.",
     "Kršenje pravila platforme.": "Krsenje pravila platforme.",
-    "Tvoja Content Creator uloga je uklonjena. Preusmeravamo te na turisticku aplikaciju.": "Tvoja Content Creator uloga je uklonjena. Preusmeravamo te na turisticku aplikaciju.",
+    "Tvoja Content Creator uloga je uklonjena. Preusmeravamo te na turisticku aplikaciju.": "Your Content Creator role has been removed. We are redirecting you to the tourist app.",
     "Tu rol de creador de contenido fue eliminado. Te redirigimos a la aplicación turística.": "Tvoja Content Creator uloga je uklonjena. Preusmeravamo te na turisticku aplikaciju.",
     "Tvoja Content Creator uloga je uklonjena. Preusmeravamo te na turističku aplikaciju.": "Tvoja Content Creator uloga je uklonjena. Preusmeravamo te na turisticku aplikaciju.",
     "Use the demo code shown below. It expires in": "Use the demo code shown below. It expires in",
@@ -4477,9 +4559,7 @@
     "Salva bozza": "Save draft",
     "Sačuvaj nacrt": "Save draft",
     "Save changes": "Save changes",
-    "Guardar cambios": "Save changes",
     "Salva modifiche": "Save changes",
-    "Sačuvaj izmene": "Save changes",
     "Create destination": "Create destination",
     "Crear destino": "Create destination",
     "Crea destinazione": "Create destination",
@@ -4526,7 +4606,33 @@
     "New destination": "New destination",
     "Nueva destinación": "New destination",
     "Nuova destinazione": "New destination",
-    "Nova destinacija": "New destination"
+    "Nova destinacija": "New destination",
+    "Content editing is disabled": "Content editing is disabled",
+    "Access restores automatically when the ban ends": "Access restores automatically when the ban ends",
+    "Suspended account": "Suspended account",
+    "Your access is on hold": "Your access is on hold",
+    "A platform administrator has restricted your Content Creator permissions. Review the details below — your portal access will return when the suspension ends.": "A platform administrator has restricted your Content Creator permissions. Review the details below — your portal access will return when the suspension ends.",
+    "Reason for suspension": "Reason for suspension",
+    "Suspension duration": "Suspension duration",
+    "No automatic end date is set": "No automatic end date is set",
+    "Permanent suspension": "Permanent suspension",
+    "An administrator must manually lift this suspension before you can create or edit content again.": "An administrator must manually lift this suspension before you can create or edit content again.",
+    "Time until access is restored": "Time until access is restored",
+    "Ends": "Ends",
+    "Your suspension has ended. Restoring access…": "Your suspension has ended. Restoring access…",
+    "Month": "Month",
+    "Months": "Months",
+    "Day": "Day",
+    "Days": "Days",
+    "Hour": "Hour",
+    "Hours": "Hours",
+    "Minute": "Minute",
+    "Minutes": "Minutes",
+    "Updates every minute · shown in UTC": "Updates every minute · shown in UTC",
+    "Checking access…": "Checking access…",
+    "Check access again": "Check access again",
+    "Sign out": "Sign out",
+    "Enter your current password and choose a new one.": "Enter your current password and choose a new one."
   },
   "login": {
     "title": "Log in",
@@ -4542,7 +4648,7 @@
     "hidePassword": "Hide password",
     "showPassword": "Show password",
     "invalidCredentials": "Invalid email or password.",
-    "portalComingSoon": "portal is coming soon. Please check back later."
+    "accessDenied": "Access denied. Your account does not have permission to access this application."
   },
   "signup": {
     "welcome": "Welcome",
@@ -4572,12 +4678,17 @@
     },
     "code": {
       "title": "Check your email",
-      "subtitle": "Enter the 6-digit code sent to",
+      "codeSentTo": "Verification code has been sent to",
+      "enterSixDigit": "Enter the six-digit code.",
+      "codeSentNotice": "Code has been sent to your email.",
+      "codeExpires": "Code expires in",
       "codeLabel": "Verification code",
       "codeError": "Enter a valid 6-digit code.",
       "verifying": "Verifying...",
       "verifyCode": "Verify code",
-      "changeEmail": "Change email"
+      "changeEmail": "Change email",
+      "resendIn": "Resend in",
+      "resendCode": "Resend"
     },
     "password": {
       "title": "Set new password",

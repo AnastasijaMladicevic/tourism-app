@@ -2,10 +2,12 @@ import { ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angula
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { Subject, catchError, finalize, forkJoin, map, of, switchMap } from 'rxjs';
+import { Subject, catchError, finalize, forkJoin, map, of, switchMap, type Observable } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { DestinationService } from '../../../services/destination.service';
 import { ObjectDto, ObjectService } from '../../../services/object';
+import { ReviewService } from '../../../services/review';
+import { AuthService } from '../../../services/auth.service';
 import {
   ManagerReportDto,
   ManagerReportsService,
@@ -32,6 +34,7 @@ export interface ManagerReportRow {
   resolvedAt?: string;
   rejectionReason?: string;
   reportedUserId: number;
+  reportedUserType: 'creator' | 'tourist';
 }
 
 interface DeletionRequestNameHint {
@@ -60,6 +63,8 @@ interface ManagerReportNameHint {
 export class ManagerReportsComponent implements OnInit, OnDestroy {
   private readonly managerReportsService = inject(ManagerReportsService);
   private readonly objectService = inject(ObjectService);
+  private readonly reviewService = inject(ReviewService);
+  private readonly authService = inject(AuthService);
   private readonly destinationService = inject(DestinationService);
   private readonly http = inject(HttpClient);
   private readonly route = inject(ActivatedRoute);
@@ -72,6 +77,7 @@ export class ManagerReportsComponent implements OnInit, OnDestroy {
   managedDestination = '';
   allReports: ManagerReportRow[] = [];
   reportableCreators: ReportableCreatorOption[] = [];
+  reportableTourists: ReportableCreatorOption[] = [];
 
   isLoading = true;
   errorMessage = '';
@@ -150,19 +156,25 @@ export class ManagerReportsComponent implements OnInit, OnDestroy {
             objects: this.getAllPagedObjects(),
           }),
         ),
+        switchMap(({ reports, objects }) => {
+          const pendingIds = new Set(
+            reports
+              .filter((report) => report.status?.toLowerCase() === 'pending')
+              .map((report) => report.reportedUserId),
+          );
+          const objectIds = objects.map((object) => object.id);
+
+          return this.fetchReportableTourists(objectIds, pendingIds).pipe(
+            map((tourists) => ({ reports, objects, pendingIds, tourists })),
+          );
+        }),
         finalize(() => {
           this.isLoading = false;
           this.cdr.detectChanges();
         }),
       )
       .subscribe({
-        next: ({ reports, objects }) => {
-          const pendingIds = new Set(
-            reports
-              .filter((report) => report.status?.toLowerCase() === 'pending')
-              .map((report) => report.reportedUserId),
-          );
-
+        next: ({ reports, objects, pendingIds, tourists }) => {
           for (const report of reports) {
             const name = report.reportedUserName?.trim();
             if (name && report.reportedUserId > 0) {
@@ -170,8 +182,15 @@ export class ManagerReportsComponent implements OnInit, OnDestroy {
             }
           }
 
-          this.allReports = reports.map((report) => this.mapReportRow(report));
+          const creatorOwnerIds = new Set(
+            objects
+              .map((object) => object.createdByUserId)
+              .filter((id): id is number => !!id),
+          );
+
+          this.allReports = reports.map((report) => this.mapReportRow(report, creatorOwnerIds));
           this.reportableCreators = this.buildReportableCreators(objects, pendingIds);
+          this.reportableTourists = tourists;
 
           const creatorIds = [
             ...new Set([
@@ -188,6 +207,7 @@ export class ManagerReportsComponent implements OnInit, OnDestroy {
         error: (error: { error?: { message?: string } }) => {
           this.allReports = [];
           this.reportableCreators = [];
+          this.reportableTourists = [];
           this.selectedReport = null;
           this.errorMessage =
             error?.error?.message ?? this.translationService.translate('manager.reports.error.load');
@@ -259,6 +279,10 @@ export class ManagerReportsComponent implements OnInit, OnDestroy {
     });
   }
 
+  getUserTypeLabel(type: 'creator' | 'tourist'): string {
+    return this.translationService.translate(`manager.reports.userType.${type}`);
+  }
+
   formatStatus(status: ReportStatus): string {
     return this.translationService.translate(`manager.reports.status.${status.toLowerCase()}`);
   }
@@ -317,7 +341,7 @@ export class ManagerReportsComponent implements OnInit, OnDestroy {
     });
   }
 
-  private mapReportRow(report: ManagerReportDto): ManagerReportRow {
+  private mapReportRow(report: ManagerReportDto, creatorOwnerIds: Set<number>): ManagerReportRow {
     const status = this.normalizeStatus(report.status);
     return {
       id: report.id,
@@ -333,6 +357,7 @@ export class ManagerReportsComponent implements OnInit, OnDestroy {
       createdAt: report.createdAt,
       resolvedAt: report.resolvedAt ?? undefined,
       rejectionReason: report.rejectionReason ?? undefined,
+      reportedUserType: creatorOwnerIds.has(report.reportedUserId) ? 'creator' : 'tourist',
     };
   }
 
@@ -342,6 +367,39 @@ export class ManagerReportsComponent implements OnInit, OnDestroy {
       return value;
     }
     return 'Pending';
+  }
+
+  /** Builds the list of tourists who reviewed the manager's objects, available to report. */
+  private fetchReportableTourists(
+    objectIds: number[],
+    pendingIds: Set<number>,
+  ): Observable<ReportableCreatorOption[]> {
+    if (!objectIds.length) {
+      return of([]);
+    }
+
+    return this.reviewService.getForManagerObjects(objectIds).pipe(
+      catchError(() => of([])),
+      map((reviews) => {
+        const tourists = new Map<number, ReportableCreatorOption>();
+
+        for (const review of reviews) {
+          if (!review.userId || tourists.has(review.userId)) {
+            continue;
+          }
+          tourists.set(review.userId, {
+            id: review.userId,
+            name:
+              review.userFullName?.trim() ||
+              this.translationService.translate('manager.reports.fallback.tourist'),
+            contentSummary: '',
+            hasPendingReport: pendingIds.has(review.userId),
+          });
+        }
+
+        return Array.from(tourists.values()).sort((a, b) => a.name.localeCompare(b.name));
+      }),
+    );
   }
 
   private buildReportableCreators(
@@ -481,24 +539,21 @@ export class ManagerReportsComponent implements OnInit, OnDestroy {
       return;
     }
 
-    forkJoin(
-      pending.map((creatorId) =>
-        this.http
-          .get<{ firstName?: string; lastName?: string; email?: string }>(
-            `${environment.apiUrl}/users/${creatorId}`,
-          )
-          .pipe(
-            map((user) => {
-              const fullName = `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim();
-              return {
-                creatorId,
-                fullName: fullName || user.email?.trim() || '',
-              };
-            }),
-            catchError(() => of({ creatorId, fullName: '' })),
-          ),
-      ),
-    ).subscribe((results) => {
+    this.authService
+      .getDisplayNames(pending)
+      .pipe(
+        map((users) =>
+          users.map((user) => {
+            const fullName = `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim();
+            return {
+              creatorId: user.id,
+              fullName: fullName || user.email?.trim() || '',
+            };
+          }),
+        ),
+        catchError(() => of([] as { creatorId: number; fullName: string }[])),
+      )
+      .subscribe((results) => {
       let changed = false;
       for (const result of results) {
         if (!result.fullName) {

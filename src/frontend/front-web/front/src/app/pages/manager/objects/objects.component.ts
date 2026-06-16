@@ -1,7 +1,7 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { PaginatorComponent } from '../../../shared/components/paginator/paginator';
 import { Subject, of } from 'rxjs';
 import { catchError, finalize, takeUntil } from 'rxjs/operators';
@@ -45,7 +45,8 @@ interface WorkingHoursRow {
     '../shared/manager-list-detail-layout.css',
     '../shared/manager-page-stats-scroll.css',
     '../shared/manager-stat-cards.css',
-    '../shared/manager-hero-slides.css'
+    '../shared/manager-hero-slides.css',
+    '../shared/manager-filter-menu.css'
   ]
 })
 export class ManagerObjectsComponent implements OnInit, OnDestroy {
@@ -55,6 +56,8 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
   private readonly router = inject(Router);
   private readonly cdr = inject(ChangeDetectorRef);
   readonly translationService = inject(TranslationService);
+  private readonly route = inject(ActivatedRoute);
+  private targetObjectIdFromRoute: number | null = null;
 
   private static readonly DEFAULT_BANNER_URL = '/assets/pozadina.png';
 
@@ -106,6 +109,23 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
     { value: '4.5', label: 'manager.objects.rating.4_5' }
   ];
 
+  readonly sortOrderOptions: Array<{ value: 'asc' | 'desc'; label: string }> = [
+    { value: 'asc', label: 'manager.objects.filter.ascending' },
+    { value: 'desc', label: 'manager.objects.filter.descending' }
+  ];
+
+  statusFilterMenuOpen = false;
+  typeFilterMenuOpen = false;
+  ratingFilterMenuOpen = false;
+  sortByFilterMenuOpen = false;
+  sortOrderFilterMenuOpen = false;
+
+  @ViewChild('statusFilterRoot') private statusFilterRoot?: ElementRef<HTMLElement>;
+  @ViewChild('typeFilterRoot') private typeFilterRoot?: ElementRef<HTMLElement>;
+  @ViewChild('ratingFilterRoot') private ratingFilterRoot?: ElementRef<HTMLElement>;
+  @ViewChild('sortByFilterRoot') private sortByFilterRoot?: ElementRef<HTMLElement>;
+  @ViewChild('sortOrderFilterRoot') private sortOrderFilterRoot?: ElementRef<HTMLElement>;
+
   private readonly fallbackStatusOptions: FilterOption[] = [
     { value: 'Approved', label: 'manager.objects.status.approved' },
     { value: 'Pending', label: 'manager.objects.status.pending' },
@@ -116,6 +136,12 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
   typeOptions: FilterOption[] = [];
 
   ngOnInit(): void {
+    const objectIdParam = this.route.snapshot.queryParamMap.get('objectId');
+    const parsedObjectId = Number(objectIdParam);
+  
+    this.targetObjectIdFromRoute =
+      Number.isFinite(parsedObjectId) && parsedObjectId > 0 ? parsedObjectId : null;
+
     this.loadManagedCityLabel();
     this.loadFilterOptions();
     this.loadObjects();
@@ -154,6 +180,10 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
       });
   }
 
+  private idsMatch(left: number | string | null | undefined, right: number | string | null | undefined): boolean {
+    return Number(left) === Number(right);
+  }
+
   loadObjects(): void {
     this.isLoading = true;
     this.errorMessage = '';
@@ -180,12 +210,48 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
           this.pageSize = response?.pageSize ?? this.pageSize;
           this.totalPages = response?.totalPages ?? Math.max(1, Math.ceil(this.totalCount / this.pageSize));
 
+          const objectFromRoute =
+            this.targetObjectIdFromRoute != null
+              ? sorted.find((item) => this.idsMatch(item.id, this.targetObjectIdFromRoute)) ?? null
+              : null;
+
+          if (objectFromRoute) {
+            this.setSelectedObject(objectFromRoute);
+            this.loadSelectedObjectReviews();
+            this.isLoading = false;
+            this.cdr.detectChanges();
+            return;
+          }
+
+          if (this.targetObjectIdFromRoute != null) {
+            this.objectService
+              .getById(this.targetObjectIdFromRoute)
+              .pipe(
+                takeUntil(this.destroy$),
+                catchError(() => of(null))
+              )
+              .subscribe((objectFromApi) => {
+                const nextSelected =
+                  objectFromApi ??
+                  (!this.selectedObject || !sorted.some((item) => this.idsMatch(item.id, this.selectedObject?.id))
+                    ? sorted[0] ?? null
+                    : this.selectedObject);
+
+                this.setSelectedObject(nextSelected);
+                this.loadSelectedObjectReviews();
+                this.isLoading = false;
+                this.cdr.detectChanges();
+              });
+
+            return;
+          }
+
           const nextSelected =
-            !this.selectedObject || !sorted.some((item) => item.id === this.selectedObject?.id)
+            !this.selectedObject || !sorted.some((item) => this.idsMatch(item.id, this.selectedObject?.id))
               ? sorted[0] ?? null
               : this.selectedObject;
-          this.setSelectedObject(nextSelected);
 
+          this.setSelectedObject(nextSelected);
           this.loadSelectedObjectReviews();
           this.isLoading = false;
           this.cdr.detectChanges();
@@ -262,6 +328,7 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
   }
 
   onResetFilters(): void {
+    this.closeAllFilterMenus();
     this.searchQuery = '';
     this.draftSearchQuery = '';
     this.statusFilter = 'all';
@@ -271,6 +338,194 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
     this.sortOrder = 'desc';
     this.currentPage = 1;
     this.loadObjects();
+  }
+
+  get statusFilterLabel(): string {
+    if (this.statusFilter === 'all') {
+      return this.translationService.translate('manager.objects.filter.allStatuses');
+    }
+
+    const option = this.statusOptions.find((item) => item.value === this.statusFilter);
+    return option ? this.statusOptionLabel(option) : this.translationService.translate('manager.objects.filter.allStatuses');
+  }
+
+  get typeFilterLabel(): string {
+    if (this.typeFilter === 'all') {
+      return this.translationService.translate('manager.objects.filter.allTypes');
+    }
+
+    return (
+      this.typeOptions.find((option) => option.value === this.typeFilter)?.label
+      ?? this.translationService.translate('manager.objects.filter.allTypes')
+    );
+  }
+
+  get ratingFilterLabel(): string {
+    const option = this.ratingOptions.find((item) => item.value === this.ratingFilter);
+    return this.translationService.translate(option?.label ?? 'manager.objects.rating.any');
+  }
+
+  get sortByFilterLabel(): string {
+    const option = this.sortByOptions.find((item) => item.value === this.sortBy);
+    return this.translationService.translate(option?.label ?? 'manager.objects.sort.status');
+  }
+
+  get sortOrderFilterLabel(): string {
+    const option = this.sortOrderOptions.find((item) => item.value === this.sortOrder);
+    return this.translationService.translate(option?.label ?? 'manager.objects.filter.descending');
+  }
+
+  toggleStatusFilterMenu(event: Event): void {
+    if (this.isLoading) {
+      return;
+    }
+
+    event.stopPropagation();
+    this.statusFilterMenuOpen = !this.statusFilterMenuOpen;
+    if (this.statusFilterMenuOpen) {
+      this.closeOtherFilterMenus('status');
+    }
+  }
+
+  selectStatusFilter(value: string, event: Event): void {
+    event.stopPropagation();
+    this.statusFilter = value;
+    this.statusFilterMenuOpen = false;
+    this.onApplyFilters();
+  }
+
+  toggleTypeFilterMenu(event: Event): void {
+    if (this.isLoading) {
+      return;
+    }
+
+    event.stopPropagation();
+    this.typeFilterMenuOpen = !this.typeFilterMenuOpen;
+    if (this.typeFilterMenuOpen) {
+      this.closeOtherFilterMenus('type');
+    }
+  }
+
+  selectTypeFilter(value: string, event: Event): void {
+    event.stopPropagation();
+    this.typeFilter = value;
+    this.typeFilterMenuOpen = false;
+    this.onApplyFilters();
+  }
+
+  toggleRatingFilterMenu(event: Event): void {
+    if (this.isLoading) {
+      return;
+    }
+
+    event.stopPropagation();
+    this.ratingFilterMenuOpen = !this.ratingFilterMenuOpen;
+    if (this.ratingFilterMenuOpen) {
+      this.closeOtherFilterMenus('rating');
+    }
+  }
+
+  selectRatingFilter(value: string, event: Event): void {
+    event.stopPropagation();
+    this.ratingFilter = value;
+    this.ratingFilterMenuOpen = false;
+    this.onApplyFilters();
+  }
+
+  toggleSortByFilterMenu(event: Event): void {
+    event.stopPropagation();
+    this.sortByFilterMenuOpen = !this.sortByFilterMenuOpen;
+    if (this.sortByFilterMenuOpen) {
+      this.closeOtherFilterMenus('sortBy');
+    }
+  }
+
+  selectSortByFilter(value: string, event: Event): void {
+    event.stopPropagation();
+    this.sortBy = value;
+    this.sortByFilterMenuOpen = false;
+    this.onApplyFilters();
+  }
+
+  toggleSortOrderFilterMenu(event: Event): void {
+    event.stopPropagation();
+    this.sortOrderFilterMenuOpen = !this.sortOrderFilterMenuOpen;
+    if (this.sortOrderFilterMenuOpen) {
+      this.closeOtherFilterMenus('sortOrder');
+    }
+  }
+
+  selectSortOrderFilter(value: 'asc' | 'desc', event: Event): void {
+    event.stopPropagation();
+    this.sortOrder = value;
+    this.sortOrderFilterMenuOpen = false;
+    this.onApplyFilters();
+  }
+
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    const target = event.target as Node;
+
+    if (
+      this.statusFilterMenuOpen
+      && !this.statusFilterRoot?.nativeElement.contains(target)
+    ) {
+      this.statusFilterMenuOpen = false;
+    }
+
+    if (
+      this.typeFilterMenuOpen
+      && !this.typeFilterRoot?.nativeElement.contains(target)
+    ) {
+      this.typeFilterMenuOpen = false;
+    }
+
+    if (
+      this.ratingFilterMenuOpen
+      && !this.ratingFilterRoot?.nativeElement.contains(target)
+    ) {
+      this.ratingFilterMenuOpen = false;
+    }
+
+    if (
+      this.sortByFilterMenuOpen
+      && !this.sortByFilterRoot?.nativeElement.contains(target)
+    ) {
+      this.sortByFilterMenuOpen = false;
+    }
+
+    if (
+      this.sortOrderFilterMenuOpen
+      && !this.sortOrderFilterRoot?.nativeElement.contains(target)
+    ) {
+      this.sortOrderFilterMenuOpen = false;
+    }
+  }
+
+  private closeAllFilterMenus(): void {
+    this.statusFilterMenuOpen = false;
+    this.typeFilterMenuOpen = false;
+    this.ratingFilterMenuOpen = false;
+    this.sortByFilterMenuOpen = false;
+    this.sortOrderFilterMenuOpen = false;
+  }
+
+  private closeOtherFilterMenus(except: 'status' | 'type' | 'rating' | 'sortBy' | 'sortOrder'): void {
+    if (except !== 'status') {
+      this.statusFilterMenuOpen = false;
+    }
+    if (except !== 'type') {
+      this.typeFilterMenuOpen = false;
+    }
+    if (except !== 'rating') {
+      this.ratingFilterMenuOpen = false;
+    }
+    if (except !== 'sortBy') {
+      this.sortByFilterMenuOpen = false;
+    }
+    if (except !== 'sortOrder') {
+      this.sortOrderFilterMenuOpen = false;
+    }
   }
 
   /** Pending first, then approved, then rejected - then user's secondary sort (within each status group). */
@@ -675,6 +930,7 @@ export class ManagerObjectsComponent implements OnInit, OnDestroy {
 
   private navigateToObjectReview(obj: ObjectDto): void {
     this.router.navigate(['/manager/objects/review', obj.id], {
+      queryParams: { scrollTo: 'reviews' },
       state: { objectStatus: obj.status ?? '' }
     });
   }

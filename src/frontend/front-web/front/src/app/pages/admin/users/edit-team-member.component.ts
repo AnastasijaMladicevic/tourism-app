@@ -24,6 +24,22 @@ export type DisplayRole = 'manager' | 'content-creator' | 'tourist' | 'admin';
 
 type BanDurationOption = '30-days' | 'permanent' | 'custom';
 
+/** Maps known raw backend error messages to translation keys so they are shown in the admin's language. */
+const API_ERROR_MESSAGE_KEYS: Record<string, string> = {
+  'Only tourists can be approved for content creator role.': 'adminTeamMemberEdit.errors.notTourist',
+  'User has not requested creator role.': 'adminTeamMemberEdit.errors.noCreatorRequest',
+  'Content creator role not found.': 'adminTeamMemberEdit.errors.roleNotFound',
+  'Tourist role not found.': 'adminTeamMemberEdit.errors.roleNotFound',
+  'Only content creators can be moved back to tourist role.': 'adminTeamMemberEdit.errors.notContentCreator',
+  'Current password is incorrect': 'adminTeamMemberEdit.errors.currentPasswordIncorrect',
+  'This user is currently logged in. Ask them to log out before changing the password.':
+    'adminTeamMemberEdit.errors.userLoggedIn',
+  'User not found.': 'adminTeamMemberEdit.errors.notFound',
+  'Only tourist and content creator accounts can be banned.': 'adminTeamMemberEdit.errors.banNotAllowed',
+  'Ban reason is required.': 'adminTeamMemberEdit.errors.banReasonRequired',
+  'Ban end date must be in the future.': 'adminTeamMemberEdit.errors.banEndDateInFuture'
+};
+
 @Component({
   selector: 'app-edit-team-member',
   standalone: true,
@@ -106,6 +122,48 @@ export class EditTeamMemberComponent {
 
 
 
+  /** Maps localized/alternate country names (e.g. stored as "Srbija") to the canonical English names used in `countries` and the i18n country keys. */
+  private readonly countryNameAliases: Record<string, string> = {
+    'srbija': 'Serbia',
+    'crna gora': 'Montenegro',
+    'crnagora': 'Montenegro',
+    'bosna i hercegovina': 'Bosnia and Herzegovina',
+    'hrvatska': 'Croatia',
+    'slovenija': 'Slovenia',
+    'slovačka': 'Slovakia',
+    'češka': 'Czech Republic',
+    'mađarska': 'Hungary',
+    'rumunija': 'Romania',
+    'bugarska': 'Bulgaria',
+    'grčka': 'Greece',
+    'italija': 'Italy',
+    'španija': 'Spain',
+    'francuska': 'France',
+    'nemačka': 'Germany',
+    'austrija': 'Austria',
+    'švajcarska': 'Switzerland',
+    'švedska': 'Sweden',
+    'norveška': 'Norway',
+    'danska': 'Denmark',
+    'finska': 'Finland',
+    'holandija': 'Netherlands',
+    'poljska': 'Poland',
+    'portugalija': 'Portugal',
+    'rusija': 'Russia',
+    'turska': 'Turkey',
+    'ukrajina': 'Ukraine',
+    'ujedinjeno kraljevstvo': 'United Kingdom',
+    'sjedinjene države': 'United States',
+    'albanija': 'Albania',
+    'belgija': 'Belgium',
+    'kanada': 'Canada',
+    'kina': 'China',
+    'indija': 'India',
+    'meksiko': 'Mexico',
+    'severna makedonija': 'North Macedonia',
+    'australija': 'Australia'
+  };
+
   /** Maps UI labels to API `language` codes (max 5 chars per backend). */
   private readonly languageCodes: Record<string, string> = {
     Serbian: 'sr',
@@ -183,7 +241,7 @@ export class EditTeamMemberComponent {
     this.phoneNumber = user.phoneNumber ?? '';
 
     const c = (user.country ?? '').trim();
-    this.country = c || 'United States';
+    this.country = this.normalizeCountryName(c) || 'United States';
 
     const langCode = (user.language ?? 'en').trim();
     this.preferredLanguage = this.languageLabelFromCode(langCode);
@@ -587,6 +645,14 @@ export class EditTeamMemberComponent {
     return `${y}-${m}-${day}`;
   }
 
+  private normalizeCountryName(raw: string): string {
+    if (!raw) {
+      return raw;
+    }
+    const alias = this.countryNameAliases[raw.toLowerCase().trim()];
+    return alias ?? raw;
+  }
+
   private languageLabelFromCode(code: string): string {
     const normalized = code.trim().toLowerCase();
     const hit = Object.entries(this.languageCodes).find(([, v]) => v.toLowerCase() === normalized);
@@ -759,15 +825,15 @@ export class EditTeamMemberComponent {
     if (err instanceof HttpErrorResponse) {
       const body = err.error as { message?: string; errors?: Record<string, string[] | string> } | null;
       if (body && typeof body.message === 'string' && body.message.trim()) {
-        return body.message;
+        return this.translateApiMessage(body.message.trim());
       }
       if (body?.errors && typeof body.errors === 'object') {
         for (const val of Object.values(body.errors)) {
           if (Array.isArray(val) && val[0]) {
-            return String(val[0]);
+            return this.translateApiMessage(String(val[0]));
           }
           if (typeof val === 'string') {
-            return val;
+            return this.translateApiMessage(val);
           }
         }
       }
@@ -779,6 +845,12 @@ export class EditTeamMemberComponent {
       }
     }
     return this.t('adminTeamMemberEdit.errors.saveFailed');
+  }
+
+  /** Translates a known raw backend error message; falls back to a generic translated message otherwise. */
+  private translateApiMessage(message: string): string {
+    const key = API_ERROR_MESSAGE_KEYS[message];
+    return key ? this.t(key) : this.t('adminTeamMemberEdit.errors.saveFailed');
   }
 
   t(key: string, params?: Record<string, string | number>): string {

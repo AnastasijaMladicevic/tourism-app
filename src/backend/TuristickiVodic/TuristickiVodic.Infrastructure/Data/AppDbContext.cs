@@ -126,6 +126,10 @@ public class AppDbContext : DbContext
             .HasFilter("\"IsDefault\" = TRUE")
             .IsUnique();
 
+        mb.Entity<Region>()
+            .HasIndex(r => r.Boundary)
+            .HasMethod("GIST");
+
         // ==================== DESTINATION ====================
         mb.Entity<Destination>()
             .Property(d => d.Status)
@@ -141,6 +145,10 @@ public class AppDbContext : DbContext
 
         mb.Entity<Destination>()
             .HasIndex(d => d.Geolocation)
+            .HasMethod("GIST");
+
+        mb.Entity<Destination>()
+            .HasIndex(d => d.Boundary)
             .HasMethod("GIST");
 
         mb.Entity<Destination>()
@@ -173,6 +181,10 @@ public class AppDbContext : DbContext
         // ==================== LOCATION ====================
         mb.Entity<Locality>()
             .HasIndex(l => l.Geolocation)
+            .HasMethod("GIST");
+
+        mb.Entity<Locality>()
+            .HasIndex(l => l.Boundary)
             .HasMethod("GIST");
 
         mb.Entity<Locality>()

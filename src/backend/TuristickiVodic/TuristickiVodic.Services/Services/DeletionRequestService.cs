@@ -101,7 +101,7 @@ namespace TuristickiVodic.Services.Services
             await CreateManagerDeletionRequestNotificationAsync(
                 ev.Destination ?? ev.Locality?.Destination ?? ev.Object?.Destination ?? ev.Object?.Locality?.Destination,
                 "Novi zahtev za brisanje",
-                $"Stigao je zahtev za brisanje dogadjaja \"{ev.Name}\".",
+                $"Stigao je zahtev za brisanje događaja \"{ev.Name}\".",
                 $"/deletion-requests/{request.Id}");
 
             return await LoadDtoAsync(request.Id);
@@ -265,8 +265,8 @@ namespace TuristickiVodic.Services.Services
                     await CreatePlannerEventNotificationsAsync(
                         request.EventId.Value,
                         NotificationType.PlannerEventUnavailable,
-                        "Dogadjaj iz tvog planera je otkazan",
-                        $"Dogadjaj \"{request.Event?.Name ?? "Dogadjaj"}\" iz tvog planera vise nije dostupan.",
+                        "Događaj iz tvog planera je otkazan",
+                        $"Događaj \"{request.Event?.Name ?? "Događaj"}\" iz tvog planera više nije dostupan.",
                         "/planner");
                     _context.Events.Remove(request.Event!);
                 }
@@ -645,7 +645,7 @@ namespace TuristickiVodic.Services.Services
             string message,
             string actionUrl)
         {
-            var plannerUsers = await _context.EventPlannerItems
+            var userIds = await _context.EventPlannerItems
                 .AsNoTracking()
                 .Where(item => item.EventId == eventId)
                 .Join(
@@ -656,22 +656,21 @@ namespace TuristickiVodic.Services.Services
                 .Distinct()
                 .ToListAsync();
 
-            if (plannerUsers.Count == 0)
+            if (userIds.Count == 0)
                 return;
 
             var createdAt = DateTime.UtcNow;
-            var notifications = plannerUsers
-                .Select(userId => new Notification
-                {
-                    UserId = userId,
-                    Type = type,
-                    Title = title,
-                    Message = message,
-                    ActionUrl = actionUrl,
-                    EventId = eventId,
-                    CreatedAt = createdAt
-                })
-                .ToList();
+
+            var notifications = userIds.Select(userId => new Notification
+            {
+                UserId = userId,
+                Type = type,
+                Title = title,
+                Message = message,
+                ActionUrl = actionUrl,
+                EventId = eventId,
+                CreatedAt = createdAt
+            });
 
             _context.Notifications.AddRange(notifications);
             await _context.SaveChangesAsync();
@@ -687,11 +686,11 @@ namespace TuristickiVodic.Services.Services
                 return;
 
             var managerId = destination.ManagedByUserId.Value;
-            var managerCanReceive = await _context.Users
+            var manager = await _context.Users
                 .AsNoTracking()
-                .AnyAsync(u => u.Id == managerId && u.IsActive && !u.IsBlacklisted);
+                .FirstOrDefaultAsync(u => u.Id == managerId && u.IsActive && !u.IsBlacklisted);
 
-            if (!managerCanReceive)
+            if (manager == null)
                 return;
 
             _context.Notifications.Add(new Notification
@@ -709,11 +708,11 @@ namespace TuristickiVodic.Services.Services
 
         private async Task CreateCreatorDeletionRequestReviewedNotificationAsync(DeletionRequest request)
         {
-            var creatorCanReceive = await _context.Users
+            var creator = await _context.Users
                 .AsNoTracking()
-                .AnyAsync(u => u.Id == request.RequestedByUserId && u.IsActive && !u.IsBlacklisted);
+                .FirstOrDefaultAsync(u => u.Id == request.RequestedByUserId && u.IsActive && !u.IsBlacklisted);
 
-            if (!creatorCanReceive)
+            if (creator == null)
                 return;
 
             var approved = request.Status == ContentStatus.Approved;
@@ -721,14 +720,17 @@ namespace TuristickiVodic.Services.Services
             var contentName = request.Object?.Name
                 ?? request.Event?.Name
                 ?? request.Activity?.Name
-                ?? "sadrzaj";
+                ?? "sadržaj";
+
+            var title = $"Zahtev za brisanje je {statusText}";
+            var message = $"Tvoj zahtev za brisanje sadržaja \"{contentName}\" je {statusText}.";
 
             _context.Notifications.Add(new Notification
             {
                 UserId = request.RequestedByUserId,
                 Type = NotificationType.CreatorDeletionRequestReviewed,
-                Title = $"Zahtev za brisanje je {statusText}",
-                Message = $"Tvoj zahtev za brisanje sadrzaja \"{contentName}\" je {statusText}.",
+                Title = title,
+                Message = message,
                 ActionUrl = $"/deletion-requests/{request.Id}",
                 CreatedAt = DateTime.UtcNow
             });

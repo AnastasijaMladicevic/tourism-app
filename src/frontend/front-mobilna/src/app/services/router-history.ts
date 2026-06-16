@@ -38,6 +38,10 @@ export class RouterHistoryService {
     return this.history[this.history.length - 2];
   }
 
+  getLastUrl(): string | null {
+    return this.history[this.history.length - 1] ?? null;
+  }
+
   goBack(fallback: string = '/home'): void {
     if (this.history.length < 2) {
       this.router.navigateByUrl(fallback);

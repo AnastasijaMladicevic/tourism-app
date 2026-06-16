@@ -91,11 +91,14 @@ namespace TuristickiVodic.Services
                 throw new InvalidOperationException("Admins cannot manage localities directly. The responsible manager handles localities.");
             }
 
+            var geolocation = CreatePoint(dto.Longitude, dto.Latitude);
+            EnsurePointWithinDestination(geolocation, destination);
+
             var locality = new Core.Models.Locality
             {
                 Name = dto.Name,
                 Description = dto.Description,
-                Geolocation = CreatePoint(dto.Longitude, dto.Latitude),
+                Geolocation = geolocation,
                 DestinationId = dto.DestinationId,
                 LocalityTypeId = dto.LocalityTypeId,
                 CreatedByUserId = userId,
@@ -194,7 +197,11 @@ namespace TuristickiVodic.Services
                 locality.Description = dto.Description;
 
             if (dto.Longitude.HasValue && dto.Latitude.HasValue)
-                locality.Geolocation = CreatePoint(dto.Longitude.Value, dto.Latitude.Value);
+            {
+                var geolocation = CreatePoint(dto.Longitude.Value, dto.Latitude.Value);
+                EnsurePointWithinDestination(geolocation, destination);
+                locality.Geolocation = geolocation;
+            }
 
             locality.UpdatedAt = DateTime.UtcNow;
 
@@ -248,6 +255,15 @@ namespace TuristickiVodic.Services
                 return null;
 
             return new Point(longitude.Value, latitude.Value) { SRID = 4326 };
+        }
+
+        private static void EnsurePointWithinDestination(Point? point, Destination destination)
+        {
+            if (point == null || destination.Boundary == null)
+                return;
+
+            if (!destination.Boundary.Contains(point))
+                throw new InvalidOperationException($"The selected location is outside the geographic boundary of '{destination.Name}'.");
         }
 
         public async Task<LocalityDto?> ToggleActiveAsync(int id, bool isActive, int userId, string roleName)

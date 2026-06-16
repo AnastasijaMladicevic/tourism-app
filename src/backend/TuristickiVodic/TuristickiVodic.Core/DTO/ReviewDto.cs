@@ -43,6 +43,10 @@ namespace TuristickiVodic.Core.DTO
 
         public string? ReviewedByFullName { get; set; }
 
+        public int? CreatedByUserId { get; set; }
+
+        public string? CreatedByFullName { get; set; }
+
         public DateTime CreatedAt { get; set; }
 
         public List<ReviewImageDto> Images { get; set; } = new();

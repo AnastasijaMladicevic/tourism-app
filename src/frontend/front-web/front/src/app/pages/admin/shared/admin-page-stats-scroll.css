@@ -1,24 +1,13 @@
-/* Horizontal scroll for admin statistics until the host column fits all cards in one row. */
+/* Horizontal scroll for destinations statistics until the host column fits all cards in one row. */
 
-.destinations-page .main-column,
-.users-page .dashboard-overview-main,
-.users-page {
+.destinations-page .main-column {
   container-type: inline-size;
   container-name: admin-stats-host-3;
   min-width: 0;
 }
 
-.admin-dashboard {
-  container-type: inline-size;
-  container-name: admin-stats-host-4;
-  min-width: 0;
-}
-
-/* Three stat cards (destinations, users KPI grids). */
 @container admin-stats-host-3 (max-width: 699px) {
-  .destinations-page .kpi-grid,
-  .users-page .dashboard-overview-main .kpi-grid,
-  .users-page .small-kpis {
+  .destinations-page .kpi-grid {
     display: flex;
     flex-wrap: nowrap;
     gap: 10px;
@@ -35,28 +24,20 @@
     grid-template-columns: none;
   }
 
-  .destinations-page .kpi-grid::after,
-  .users-page .dashboard-overview-main .kpi-grid::after,
-  .users-page .small-kpis::after {
+  .destinations-page .kpi-grid::after {
     content: '';
     flex: 0 0 4px;
   }
 
-  .destinations-page .kpi-grid::-webkit-scrollbar,
-  .users-page .dashboard-overview-main .kpi-grid::-webkit-scrollbar,
-  .users-page .small-kpis::-webkit-scrollbar {
+  .destinations-page .kpi-grid::-webkit-scrollbar {
     display: none;
   }
 
-  .destinations-page .kpi-grid .kpi-card:last-child,
-  .users-page .dashboard-overview-main .kpi-grid .kpi-card:last-child,
-  .users-page .small-kpis .mini-kpi-card:last-child {
+  .destinations-page .kpi-grid .kpi-card:last-child {
     grid-column: auto;
   }
 
-  .destinations-page .kpi-grid .kpi-card,
-  .users-page .dashboard-overview-main .kpi-card,
-  .users-page .small-kpis .mini-kpi-card {
+  .destinations-page .kpi-grid .kpi-card {
     flex: 0 0 min(260px, 78%);
     scroll-snap-align: start;
     min-width: 0;
@@ -64,9 +45,7 @@
 }
 
 @container admin-stats-host-3 (min-width: 700px) {
-  .destinations-page .kpi-grid,
-  .users-page .dashboard-overview-main .kpi-grid,
-  .users-page .small-kpis {
+  .destinations-page .kpi-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     overflow-x: visible;
@@ -74,59 +53,7 @@
     scroll-snap-type: none;
   }
 
-  .destinations-page .kpi-grid .kpi-card,
-  .users-page .dashboard-overview-main .kpi-card,
-  .users-page .small-kpis .mini-kpi-card {
-    flex: unset;
-    min-width: 0;
-  }
-}
-
-/* Five KPI cards (admin dashboard). */
-@container admin-stats-host-4 (max-width: 1099px) {
-  .admin-dashboard .kpi-row {
-    display: flex;
-    flex-wrap: nowrap;
-    gap: 8px;
-    width: 100%;
-    max-width: 100%;
-    margin-inline: 0;
-    padding: 0 0 6px;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scroll-snap-type: x mandatory;
-    scroll-padding-inline: 0;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    grid-template-columns: none;
-  }
-
-  .admin-dashboard .kpi-row::after {
-    content: '';
-    flex: 0 0 4px;
-  }
-
-  .admin-dashboard .kpi-row::-webkit-scrollbar {
-    display: none;
-  }
-
-  .admin-dashboard .kpi-row .kpi-card {
-    flex: 0 0 min(208px, 34%);
-    scroll-snap-align: start;
-    min-width: 0;
-  }
-}
-
-@container admin-stats-host-4 (min-width: 1100px) {
-  .admin-dashboard .kpi-row {
-    display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    overflow-x: visible;
-    overflow-y: visible;
-    scroll-snap-type: none;
-  }
-
-  .admin-dashboard .kpi-row .kpi-card {
+  .destinations-page .kpi-grid .kpi-card {
     flex: unset;
     min-width: 0;
   }
@@ -140,10 +67,6 @@
     }
 
     .destinations-page .kpi-value {
-      font-size: 28px;
-    }
-
-    .users-page .dashboard-overview-main .kpi-value {
       font-size: 28px;
     }
   }

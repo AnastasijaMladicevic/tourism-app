@@ -13,6 +13,7 @@ export interface RegionDto {
   defaultMapZoom?: number | null;
   isDefault: boolean;
   isActive: boolean;
+  boundaryGeoJson?: string;
 }
 
 @Injectable({ providedIn: 'root' })

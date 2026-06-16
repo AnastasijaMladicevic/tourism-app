@@ -18,6 +18,7 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
   @Input() interactive: boolean = false;
   @Input() zoomable: boolean = false;
   @Input() showMarker: boolean = true;
+  @Input() boundaryGeoJson?: string | null;
   @Input() mapId: string = 'map-' + Math.random().toString(36).substr(2, 9); // dinamički ID
   @Output() locationSelected = new EventEmitter<{ lat: number; lng: number }>();
 
@@ -39,6 +40,10 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
     const latOrLngChanged = (changes['lat'] || changes['lng']) && !changes['lat']?.firstChange;
     const showMarkerBecomingTrue =
       changes['showMarker']?.previousValue === false && changes['showMarker']?.currentValue === true;
+
+    if (changes['boundaryGeoJson'] && !changes['boundaryGeoJson'].firstChange) {
+      this.mapService.setBoundary(this.boundaryGeoJson);
+    }
 
     if (latOrLngChanged) {
       if (showMarkerBecomingTrue) {
@@ -96,6 +101,7 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
     }
 
     this.renderMarker();
+    this.mapService.setBoundary(this.boundaryGeoJson);
 
     // When map is mounted inside dynamic/sticky containers, force a re-measure
     // so tile layers render reliably instead of staying gray.
@@ -165,6 +171,15 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
     if (this.marker && this.popupText) {
       this.marker.openPopup();
     }
+  }
+
+  // Vraca marker na zadatu lokaciju bez emitovanja locationSelected (npr. nakon odbijenog klika van granice).
+  resetMarker(lat: number, lng: number): void {
+    this.lat = lat;
+    this.lng = lng;
+    this.renderMarker();
+    const map = this.mapService.getMap();
+    map?.panTo([lat, lng]);
   }
 
   ngOnDestroy(): void {

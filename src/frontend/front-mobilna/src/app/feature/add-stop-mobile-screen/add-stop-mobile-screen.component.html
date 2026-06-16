@@ -406,7 +406,7 @@
                   class="add-stop-screen__recent-item"
                   type="button"
                   [class.add-stop-screen__recent-item--selected]="isSelected(item)"
-                  (click)="selectResult(item)"
+                  (click)="isDesktopLayout ? selectResult(item) : selectAndAdd(item)"
                 >
                   <span class="add-stop-screen__recent-icon">
                     <mat-icon>place</mat-icon>

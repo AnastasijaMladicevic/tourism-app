@@ -51,6 +51,27 @@ namespace TuristickiVodic.API.Controllers
             return Ok(NormalizeUser(user));
         }
 
+        // Manager/Admin može da vidi osnovna imena/prezimena vise korisnika odjednom (npr. za prijavu kreatora)
+        [HttpGet("display-names")]
+        [Authorize(Roles = "Manager,Admin")]
+        public async Task<IActionResult> GetDisplayNames([FromQuery] int[] ids)
+        {
+            var users = await _userService.GetDisplayNamesAsync(ids);
+            return Ok(users);
+        }
+
+        // Manager može da vidi osnovno ime/prezime kreatora sadržaja (npr. za prijavu kreatora)
+        [HttpGet("{id}/display-name")]
+        [Authorize(Roles = "Manager,Admin")]
+        public async Task<IActionResult> GetDisplayName(int id)
+        {
+            var user = await _userService.GetByIdAsync(id);
+            if (user == null)
+                return NotFound();
+
+            return Ok(new { firstName = user.FirstName, lastName = user.LastName, email = user.Email });
+        }
+
         [HttpGet("me/location")]
         public async Task<IActionResult> GetMyLocation()
         {
@@ -246,6 +267,42 @@ namespace TuristickiVodic.API.Controllers
             catch (InvalidOperationException ex)
             {
                 return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPost("verify-email")]
+        [AllowAnonymous]
+        public async Task<IActionResult> VerifyEmail([FromBody] VerifyEmailDto verifyEmailDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                var user = await _userService.VerifyEmailAsync(verifyEmailDto);
+                return Ok(NormalizeUser(user));
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPost("resend-verification")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ResendVerificationEmail([FromBody] ResendVerificationEmailDto resendVerificationEmailDto)
+        {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
+            try
+            {
+                await _userService.ResendVerificationEmailAsync(resendVerificationEmailDto);
+                return Ok(new { message = "Verification email has been sent." });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message + " | " + ex.InnerException?.Message });
             }
         }
 

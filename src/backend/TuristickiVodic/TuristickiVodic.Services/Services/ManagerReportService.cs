@@ -43,38 +43,56 @@ namespace TuristickiVodic.Services.Services
             if (reportedUser == null)
                 throw new InvalidOperationException("Reported user not found.");
 
-            if (reportedUser.Role.Name != RoleType.ContentCreator)
-                throw new InvalidOperationException("Only content creators can be reported.");
+            var isContentCreator = reportedUser.Role.Name == RoleType.ContentCreator;
+            var isTourist = reportedUser.Role.Name == RoleType.Tourist;
+
+            if (!isContentCreator && !isTourist)
+                throw new InvalidOperationException("Only content creators or tourists can be reported.");
 
             if (reportedUser.IsBlacklisted)
-                throw new InvalidOperationException("This content creator is already blacklisted.");
+                throw new InvalidOperationException("This user is already blacklisted.");
 
             var destinationId = manager.ManagedDestinationId.Value;
 
-            var hasObjectInDestination = await _context.Objects
-                .Include(o => o.Locality)
-                .AnyAsync(o => o.CreatedByUserId == dto.ReportedUserId &&
-                    ((o.Locality != null && o.Locality.DestinationId == destinationId) ||
-                     o.DestinationId == destinationId));
+            if (isContentCreator)
+            {
+                var hasObjectInDestination = await _context.Objects
+                    .Include(o => o.Locality)
+                    .AnyAsync(o => o.CreatedByUserId == dto.ReportedUserId &&
+                        ((o.Locality != null && o.Locality.DestinationId == destinationId) ||
+                         o.DestinationId == destinationId));
 
-            var hasEventInDestination = await _context.Events
-                .Include(e => e.Locality)
-                .Include(e => e.Object)
-                    .ThenInclude(o => o.Locality)
-                .AnyAsync(e => e.CreatedByUserId == dto.ReportedUserId &&
-                    ((e.DestinationId == destinationId) ||
-                     (e.Locality != null && e.Locality.DestinationId == destinationId) ||
-                     (e.Object != null && ((e.Object.Locality != null && e.Object.Locality.DestinationId == destinationId) ||
-                                           e.Object.DestinationId == destinationId))));
+                var hasEventInDestination = await _context.Events
+                    .Include(e => e.Locality)
+                    .Include(e => e.Object)
+                        .ThenInclude(o => o.Locality)
+                    .AnyAsync(e => e.CreatedByUserId == dto.ReportedUserId &&
+                        ((e.DestinationId == destinationId) ||
+                         (e.Locality != null && e.Locality.DestinationId == destinationId) ||
+                         (e.Object != null && ((e.Object.Locality != null && e.Object.Locality.DestinationId == destinationId) ||
+                                               e.Object.DestinationId == destinationId))));
 
-            var hasActivityInDestination = await _context.Activities
-                .Include(a => a.Locality)
-                .AnyAsync(a => a.CreatedByUserId == dto.ReportedUserId &&
-                    ((a.DestinationId == destinationId) ||
-                     (a.Locality != null && a.Locality.DestinationId == destinationId)));
+                var hasActivityInDestination = await _context.Activities
+                    .Include(a => a.Locality)
+                    .AnyAsync(a => a.CreatedByUserId == dto.ReportedUserId &&
+                        ((a.DestinationId == destinationId) ||
+                         (a.Locality != null && a.Locality.DestinationId == destinationId)));
 
-            if (!hasObjectInDestination && !hasEventInDestination && !hasActivityInDestination)
-                throw new InvalidOperationException("The content creator must have content in your destination.");
+                if (!hasObjectInDestination && !hasEventInDestination && !hasActivityInDestination)
+                    throw new InvalidOperationException("The content creator must have content in your destination.");
+            }
+            else
+            {
+                var hasReviewInDestination = await _context.Reviews
+                    .Include(r => r.Object)
+                        .ThenInclude(o => o.Locality)
+                    .AnyAsync(r => r.UserId == dto.ReportedUserId &&
+                        (r.Object.DestinationId == destinationId ||
+                         (r.Object.Locality != null && r.Object.Locality.DestinationId == destinationId)));
+
+                if (!hasReviewInDestination)
+                    throw new InvalidOperationException("The tourist must have a review in your destination.");
+            }
 
             var existingPending = await _context.ManagerReports
                 .AnyAsync(r => r.ReportedUserId == dto.ReportedUserId && r.Status == ContentStatus.Pending);
@@ -121,15 +139,25 @@ namespace TuristickiVodic.Services.Services
             if (string.IsNullOrWhiteSpace(reportedUserName))
                 reportedUserName = reportedUser.Email;
 
-            var notifications = adminIds.Select(adminId => new Notification
+            var reportedRoleLabel = reportedUser.Role.Name == RoleType.ContentCreator ? "ContentCreator-a" : "turistu";
+
+            var newReportTitle = "Nova prijava menadžera";
+            var newReportMessage = $"Menadžer {managerName} je prijavio {reportedRoleLabel} {reportedUserName}.";
+            var createdAt = DateTime.UtcNow;
+            var notifications = new List<Notification>();
+
+            foreach (var adminId in adminIds)
             {
-                UserId = adminId,
-                Type = NotificationType.AdminNewManagerReport,
-                Title = "Nova prijava managera",
-                Message = $"Manager {managerName} je prijavio ContentCreator-a {reportedUserName}.",
-                ActionUrl = $"/manager-reports/{report.Id}",
-                CreatedAt = DateTime.UtcNow
-            }).ToList();
+                notifications.Add(new Notification
+                {
+                    UserId = adminId,
+                    Type = NotificationType.AdminNewManagerReport,
+                    Title = newReportTitle,
+                    Message = newReportMessage,
+                    ActionUrl = $"/manager-reports/{report.Id}",
+                    CreatedAt = createdAt
+                });
+            }
 
             var reportCountForCreator = await _context.ManagerReports
                 .AsNoTracking()
@@ -137,15 +165,21 @@ namespace TuristickiVodic.Services.Services
 
             if (reportCountForCreator > 1)
             {
-                notifications.AddRange(adminIds.Select(adminId => new Notification
+                var repeatedTitle = "Korisnik ima više prijava";
+                var repeatedMessage = $"Korisnik {reportedUserName} sada ima {reportCountForCreator} prijava u sistemu.";
+
+                foreach (var adminId in adminIds)
                 {
-                    UserId = adminId,
-                    Type = NotificationType.AdminRepeatedManagerReports,
-                    Title = "ContentCreator ima vise prijava",
-                    Message = $"ContentCreator {reportedUserName} sada ima {reportCountForCreator} prijava u sistemu.",
-                    ActionUrl = $"/manager-reports/{report.Id}",
-                    CreatedAt = DateTime.UtcNow
-                }));
+                    notifications.Add(new Notification
+                    {
+                        UserId = adminId,
+                        Type = NotificationType.AdminRepeatedManagerReports,
+                        Title = repeatedTitle,
+                        Message = repeatedMessage,
+                        ActionUrl = $"/manager-reports/{report.Id}",
+                        CreatedAt = createdAt
+                    });
+                }
             }
 
             _context.Notifications.AddRange(notifications);
@@ -252,12 +286,16 @@ namespace TuristickiVodic.Services.Services
 
             if (dto.Approve)
             {
-                var touristRole = await _context.Roles.FirstOrDefaultAsync(r => r.Name == RoleType.Tourist);
-                if (touristRole == null)
-                    throw new InvalidOperationException("Tourist role not found.");
+                if (report.ReportedUser.Role.Name == RoleType.ContentCreator)
+                {
+                    var touristRole = await _context.Roles.FirstOrDefaultAsync(r => r.Name == RoleType.Tourist);
+                    if (touristRole == null)
+                        throw new InvalidOperationException("Tourist role not found.");
 
-                report.ReportedUser.RoleId = touristRole.Id;
-                report.ReportedUser.Role = touristRole;
+                    report.ReportedUser.RoleId = touristRole.Id;
+                    report.ReportedUser.Role = touristRole;
+                }
+
                 report.ReportedUser.IsBlacklisted = true;
                 report.ReportedUser.UpdatedAt = DateTime.UtcNow;
 
@@ -278,11 +316,11 @@ namespace TuristickiVodic.Services.Services
 
         private async Task CreateManagerReportReviewedNotificationAsync(ManagerReport report, bool approved)
         {
-            var managerCanReceive = await _context.Users
+            var manager = await _context.Users
                 .AsNoTracking()
-                .AnyAsync(u => u.Id == report.ManagerId && u.IsActive && !u.IsBlacklisted);
+                .FirstOrDefaultAsync(u => u.Id == report.ManagerId && u.IsActive && !u.IsBlacklisted);
 
-            if (!managerCanReceive)
+            if (manager == null)
                 return;
 
             var statusText = approved ? "odobrena" : "odbijena";
@@ -290,12 +328,15 @@ namespace TuristickiVodic.Services.Services
             if (string.IsNullOrWhiteSpace(reportedUserName))
                 reportedUserName = report.ReportedUser.Email;
 
+            var title = $"Tvoja prijava je {statusText}";
+            var message = $"Prijava za korisnika {reportedUserName} je {statusText}.";
+
             _context.Notifications.Add(new Notification
             {
                 UserId = report.ManagerId,
                 Type = NotificationType.ManagerReportReviewed,
-                Title = $"Tvoja prijava je {statusText}",
-                Message = $"Prijava za korisnika {reportedUserName} je {statusText}.",
+                Title = title,
+                Message = message,
                 ActionUrl = $"/manager-reports/{report.Id}",
                 CreatedAt = DateTime.UtcNow
             });

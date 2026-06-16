@@ -14,5 +14,7 @@ namespace TuristickiVodic.Core.DTO
         public string? TwoFactorChallengeToken { get; set; }
         public DateTime? TwoFactorExpiresAt { get; set; }
         public string? TwoFactorDeliveryTarget { get; set; }
+        public bool RequiresEmailVerification { get; set; }
+        public string? EmailVerificationDeliveryTarget { get; set; }
     }
 }

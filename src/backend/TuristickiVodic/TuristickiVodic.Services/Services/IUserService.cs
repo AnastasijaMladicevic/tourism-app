@@ -7,6 +7,7 @@ namespace TuristickiVodic.Services
     {
         Task<PagedResultDto<UserDto>> GetAllAsync(UserQueryDto query, int? requestingUserId = null);
         Task<UserDto?> GetByIdAsync(int id, int? requestingUserId = null);
+        Task<List<UserDisplayNameDto>> GetDisplayNamesAsync(int[] ids);
         Task<UserDto?> GetByEmailAsync(string email);
         Task<UserDto> CreateAsync(CreateUserDto createUserDto);
         Task<UserDto> CreateManagerAsync(CreateUserDto createUserDto);
@@ -17,6 +18,8 @@ namespace TuristickiVodic.Services
         Task<UserEditLockDto?> AcquireEditLockAsync(int userId, int requestingUserId);
         Task<UserEditLockDto?> RefreshEditLockAsync(int userId, int requestingUserId);
         Task<bool> ReleaseEditLockAsync(int userId, int requestingUserId);
+        Task<UserDto?> VerifyEmailAsync(VerifyEmailDto dto);
+        Task ResendVerificationEmailAsync(ResendVerificationEmailDto dto);
         Task ForgotPasswordAsync(ForgotPasswordDto dto);
         Task<ResetPasswordVerificationDto> VerifyResetCodeAsync(VerifyResetCodeDto dto);
         Task ResetPasswordAsync(ResetPasswordDto dto);

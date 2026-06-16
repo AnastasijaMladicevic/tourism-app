@@ -10,5 +10,5 @@ const apiHost =
 
 export const environment = {
   production: true,
-  apiUrl: `https://${apiHost}:10203/api`,
+  apiUrl: `https://${apiHost}:10201/api`,
 };

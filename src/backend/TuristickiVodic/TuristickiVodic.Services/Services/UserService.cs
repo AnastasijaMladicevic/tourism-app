@@ -24,6 +24,7 @@ namespace TuristickiVodic.Services
         private const int ResetCodeLifetimeMinutes = 5;
         private const int ResetSessionLifetimeMinutes = 5;
         private const int TwoFactorCodeLifetimeMinutes = 5;
+        private const int EmailVerificationCodeLifetimeMinutes = 10;
         private const int ShareLocationStaleMinutes = 30;
         private const int MaxVisitedHistoryPoints = 3000;
         private const double MaxVisitedPointAccuracyMeters = 250d;
@@ -148,6 +149,24 @@ namespace TuristickiVodic.Services
                 .FirstOrDefaultAsync(u => u.Id == id);
 
             return await MapUserDtoWithMetricsAsync(user, requestingUserId);
+        }
+
+        public async Task<List<UserDisplayNameDto>> GetDisplayNamesAsync(int[] ids)
+        {
+            if (ids == null || ids.Length == 0)
+                return new List<UserDisplayNameDto>();
+
+            return await _context.Users
+                .AsNoTracking()
+                .Where(u => ids.Contains(u.Id))
+                .Select(u => new UserDisplayNameDto
+                {
+                    Id = u.Id,
+                    FirstName = u.FirstName,
+                    LastName = u.LastName,
+                    Email = u.Email
+                })
+                .ToListAsync();
         }
 
         public async Task<UserDto?> GetByEmailAsync(string email)
@@ -646,15 +665,33 @@ namespace TuristickiVodic.Services
             user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(createUserDto.Password);
             user.RoleId = role.Id;
             user.Role = role;
-            user.IsVerified = false;
             user.IsActive = true;
             user.IsBlacklisted = false;
             user.ProfileImageUrl = "/images/profiles/default_icon.png";
             user.CreatedAt = DateTime.UtcNow;
             user.UpdatedAt = DateTime.UtcNow;
 
+            string? verificationToken = null;
+
+            if (roleType == RoleType.Tourist)
+            {
+                verificationToken = GenerateTwoFactorCode();
+                user.IsVerified = false;
+                user.VerificationToken = HashOpaqueToken(verificationToken);
+                user.VerificationTokenExpiry = DateTime.UtcNow.AddMinutes(EmailVerificationCodeLifetimeMinutes);
+            }
+            else
+            {
+                user.IsVerified = true;
+            }
+
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
+
+            if (verificationToken != null)
+            {
+                await SendVerificationEmailAsync(user, verificationToken);
+            }
 
             return await MapExistingUserDtoWithMetricsAsync(user);
         }
@@ -778,6 +815,105 @@ namespace TuristickiVodic.Services
             await _context.SaveChangesAsync();
         }
 
+        public async Task<UserDto?> VerifyEmailAsync(VerifyEmailDto dto)
+        {
+            var normalizedEmail = dto.Email.Trim().ToLowerInvariant();
+            var codeHash = HashOpaqueToken(dto.Code.Trim());
+
+            var user = await _context.Users
+                .Include(u => u.Role)
+                .Include(u => u.PreferredRegion)
+                .FirstOrDefaultAsync(u => u.Email.Trim().ToLower() == normalizedEmail);
+
+            if (user == null ||
+                user.IsVerified ||
+                string.IsNullOrEmpty(user.VerificationToken) ||
+                !string.Equals(user.VerificationToken, codeHash, StringComparison.Ordinal) ||
+                !user.VerificationTokenExpiry.HasValue ||
+                user.VerificationTokenExpiry.Value <= DateTime.UtcNow)
+            {
+                throw new InvalidOperationException("Kod za potvrdu nije ispravan ili je istekao.");
+            }
+
+            user.IsVerified = true;
+            user.VerificationToken = null;
+            user.VerificationTokenExpiry = null;
+            user.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            return await MapExistingUserDtoWithMetricsAsync(user);
+        }
+
+        public async Task ResendVerificationEmailAsync(ResendVerificationEmailDto dto)
+        {
+            var normalizedEmail = dto.Email.Trim().ToLowerInvariant();
+
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Email.Trim().ToLower() == normalizedEmail);
+
+            if (user == null || !user.IsActive)
+                throw new InvalidOperationException("Korisnik sa ovom email adresom jos uvek nije registrovan.");
+
+            if (user.IsVerified)
+                throw new InvalidOperationException("Email adresa je vec potvrdjena.");
+
+            await EnsureUserNotBannedAsync(user);
+
+            var verificationCode = GenerateTwoFactorCode();
+            user.VerificationToken = HashOpaqueToken(verificationCode);
+            user.VerificationTokenExpiry = DateTime.UtcNow.AddMinutes(EmailVerificationCodeLifetimeMinutes);
+            user.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            await SendVerificationEmailAsync(user, verificationCode);
+        }
+
+        private async Task SendVerificationEmailAsync(User user, string verificationCode)
+        {
+            var subject = ResolveVerificationEmailSubject(user.Language);
+            var htmlBody = BuildVerificationEmailBody(user.FirstName, verificationCode, user.Language);
+
+            await _emailService.SendAsync(user.Email, subject, htmlBody);
+        }
+
+        private static string ResolveVerificationEmailSubject(string? language)
+        {
+            return language?.Trim().ToLowerInvariant() switch
+            {
+                "sr" or "me" or "cnr" => "Potvrdi svoju SpireGO email adresu",
+                _ => "Confirm your SpireGO email address"
+            };
+        }
+
+        private static string BuildVerificationEmailBody(string? firstName, string verificationCode, string? language)
+        {
+            var safeName = string.IsNullOrWhiteSpace(firstName) ? "there" : System.Net.WebUtility.HtmlEncode(firstName);
+
+            return language?.Trim().ToLowerInvariant() switch
+            {
+                "sr" or "me" or "cnr" => $"""
+                    <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+                        <h2>Potvrda email adrese</h2>
+                        <p>Zdravo {safeName},</p>
+                        <p>Hvala na registraciji na SpireGO. Tvoj kod za potvrdu email adrese je:</p>
+                        <p style="font-size: 24px; font-weight: 700; letter-spacing: 4px;">{verificationCode}</p>
+                        <p>Kod važi {EmailVerificationCodeLifetimeMinutes} minuta. Ako nisi ti kreirao/la ovaj nalog, slobodno ignorisi ovu poruku.</p>
+                    </div>
+                    """,
+                _ => $"""
+                    <div style="font-family: Arial, sans-serif; line-height: 1.6;">
+                        <h2>Confirm your email address</h2>
+                        <p>Hello {safeName},</p>
+                        <p>Thanks for signing up for SpireGO. Your email verification code is:</p>
+                        <p style="font-size: 24px; font-weight: 700; letter-spacing: 4px;">{verificationCode}</p>
+                        <p>This code is valid for {EmailVerificationCodeLifetimeMinutes} minutes. If you did not create this account, you can safely ignore this email.</p>
+                    </div>
+                    """
+            };
+        }
+
         public async Task ForgotPasswordAsync(ForgotPasswordDto dto)
         {
             await ReleaseExpiredBansAsync();
@@ -891,6 +1027,23 @@ namespace TuristickiVodic.Services
 
             if (!user.IsActive)
                 throw new InvalidOperationException("Account is deactivated");
+
+            if (RequiresEmailVerification(user))
+            {
+                var verificationCode = GenerateTwoFactorCode();
+                user.VerificationToken = HashOpaqueToken(verificationCode);
+                user.VerificationTokenExpiry = DateTime.UtcNow.AddMinutes(EmailVerificationCodeLifetimeMinutes);
+                user.UpdatedAt = DateTime.UtcNow;
+                await _context.SaveChangesAsync();
+
+                await SendVerificationEmailAsync(user, verificationCode);
+
+                return new AuthResponseDto
+                {
+                    RequiresEmailVerification = true,
+                    EmailVerificationDeliveryTarget = MaskEmailAddress(user.Email)
+                };
+            }
 
             if (ShouldRequireTwoFactor(user))
                 return await CreateTwoFactorChallengeAsync(user, loginDto.RememberMe);
@@ -1169,14 +1322,18 @@ namespace TuristickiVodic.Services
             if (string.IsNullOrWhiteSpace(requesterName))
                 requesterName = requester.Email;
 
+            var title = "Novi zahtev za ContentCreator ulogu";
+            var message = $"Korisnik {requesterName} je poslao zahtev za ContentCreator ulogu.";
+            var createdAt = DateTime.UtcNow;
+
             var notifications = adminIds.Select(adminId => new Notification
             {
                 UserId = adminId,
                 Type = NotificationType.AdminNewCreatorRoleRequest,
-                Title = "Novi zahtev za ContentCreator ulogu",
-                Message = $"Korisnik {requesterName} je poslao zahtev za ContentCreator ulogu.",
+                Title = title,
+                Message = message,
                 ActionUrl = "/users/creator-requests",
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = createdAt
             });
 
             _context.Notifications.AddRange(notifications);
@@ -1199,8 +1356,7 @@ namespace TuristickiVodic.Services
             if (user.Role.Name != RoleType.Tourist)
                 throw new InvalidOperationException("Only tourists can be approved for content creator role.");
 
-            if (!HasPendingCreatorRoleRequest(user))
-                throw new InvalidOperationException("User has not requested creator role.");
+            var hadPendingRequest = HasPendingCreatorRoleRequest(user);
 
             var contentCreatorRole = await _context.Roles
                 .FirstOrDefaultAsync(r => r.Name == RoleType.ContentCreator);
@@ -1213,7 +1369,9 @@ namespace TuristickiVodic.Services
             user.HasRequestedCreatorRole = false;
             user.CreatorRoleRequestStatus = CreatorRoleRequestStatus.Approved;
             user.UpdatedAt = DateTime.UtcNow;
-            _context.Notifications.Add(CreateCreatorRoleDecisionNotification(user, approved: true));
+            _context.Notifications.Add(hadPendingRequest
+                ? CreateCreatorRoleDecisionNotificationAsync(user, approved: true)
+                : CreateCreatorRolePromotedByAdminNotificationAsync(user));
 
             await _context.SaveChangesAsync();
             return true;
@@ -1239,7 +1397,7 @@ namespace TuristickiVodic.Services
             user.HasRequestedCreatorRole = false;
             user.CreatorRoleRequestStatus = CreatorRoleRequestStatus.Rejected;
             user.UpdatedAt = DateTime.UtcNow;
-            _context.Notifications.Add(CreateCreatorRoleDecisionNotification(user, approved: false));
+            _context.Notifications.Add(CreateCreatorRoleDecisionNotificationAsync(user, approved: false));
 
             await _context.SaveChangesAsync();
             return true;
@@ -1270,7 +1428,7 @@ namespace TuristickiVodic.Services
             user.HasRequestedCreatorRole = false;
             user.CreatorRoleRequestStatus = CreatorRoleRequestStatus.None;
             user.UpdatedAt = DateTime.UtcNow;
-            _context.Notifications.Add(CreateCreatorRoleRevokedNotification(user));
+            _context.Notifications.Add(CreateCreatorRoleRevokedNotificationAsync(user));
 
             await _context.SaveChangesAsync();
             return true;
@@ -1475,6 +1633,9 @@ namespace TuristickiVodic.Services
 
         private static bool ShouldRequireTwoFactor(User user)
             => user.IsTwoFactorEnabled && user.Role?.Name == RoleType.Tourist;
+
+        private static bool RequiresEmailVerification(User user)
+            => !user.IsVerified && user.Role?.Name == RoleType.Tourist;
 
         private async Task<AuthResponseDto> CreateTwoFactorChallengeAsync(User user, bool rememberMe)
         {
@@ -1873,15 +2034,15 @@ namespace TuristickiVodic.Services
             return CreatorRoleRequestStatus.None;
         }
 
-        private Notification CreateCreatorRoleDecisionNotification(User user, bool approved)
+        private Notification CreateCreatorRoleDecisionNotificationAsync(User user, bool approved)
         {
             var targetLoginUrl = ResolveAdminAppLoginUrl();
             var title = approved
                 ? "Zahtev za ContentCreator ulogu je odobren"
                 : "Zahtev za ContentCreator ulogu je odbijen";
             var message = approved
-                ? "Tvoj zahtev za ContentCreator ulogu je odobren. Prijavi se u admin aplikaciju da nastavis."
-                : "Tvoj zahtev za ContentCreator ulogu je odbijen. Mozes poslati novi zahtev kasnije.";
+                ? "Tvoj zahtev za ContentCreator ulogu je odobren. Prijavi se u admin aplikaciju da nastaviš."
+                : "Tvoj zahtev za ContentCreator ulogu je odbijen. Možeš poslati novi zahtev kasnije.";
 
             return new Notification
             {
@@ -1896,14 +2057,34 @@ namespace TuristickiVodic.Services
             };
         }
 
-        private Notification CreateCreatorRoleRevokedNotification(User user)
+        private Notification CreateCreatorRolePromotedByAdminNotificationAsync(User user)
         {
+            var targetLoginUrl = ResolveAdminAppLoginUrl();
+            var title = "Dodeljena je ContentCreator uloga";
+            var message = "Administrator ti je dodelio ContentCreator ulogu. Prijavi se u admin aplikaciju da nastaviš.";
+
+            return new Notification
+            {
+                UserId = user.Id,
+                Type = NotificationType.CreatorRoleRequestApproved,
+                Title = title,
+                Message = message,
+                ActionUrl = targetLoginUrl,
+                CreatedAt = DateTime.UtcNow
+            };
+        }
+
+        private Notification CreateCreatorRoleRevokedNotificationAsync(User user)
+        {
+            var title = "ContentCreator uloga je uklonjena";
+            var message = "Tvoja ContentCreator uloga je uklonjena. Vraćamo te na turističku aplikaciju.";
+
             return new Notification
             {
                 UserId = user.Id,
                 Type = NotificationType.CreatorRoleAccessRevoked,
-                Title = "ContentCreator uloga je uklonjena",
-                Message = "Tvoja ContentCreator uloga je uklonjena. Vracamo te na turisticku aplikaciju.",
+                Title = title,
+                Message = message,
                 ActionUrl = ResolvePublicAppHomeUrl(),
                 CreatedAt = DateTime.UtcNow
             };

@@ -19,7 +19,7 @@
                   }
                 </div>
 
-                <button class="avatar-edit-btn" type="button" title="Change photo" (click)="triggerFileInput()">
+                <button class="avatar-edit-btn" type="button" [title]="'adminProfile.changePhoto' | translate" (click)="triggerFileInput()">
                   <mat-icon fontSet="material-icons-outlined">edit</mat-icon>
                 </button>
 
@@ -202,8 +202,8 @@
   <div class="crop-modal-backdrop" (click)="cancelCrop()">
     <div class="crop-modal" (click)="$event.stopPropagation()">
       <div class="crop-modal__header">
-        <span>Crop photo</span>
-        <button class="crop-modal__close" type="button" (click)="cancelCrop()" aria-label="Close">
+        <span>{{ 'managerProfile.actions.cropPhoto' | translate }}</span>
+        <button class="crop-modal__close" type="button" (click)="cancelCrop()" [attr.aria-label]="'common.close' | translate">
           <mat-icon fontSet="material-icons-outlined">close</mat-icon>
         </button>
       </div>
@@ -219,8 +219,8 @@
       </div>
 
       <div class="crop-modal__footer">
-        <button class="crop-confirm-button" type="button" (click)="confirmCrop()">Set photo</button>
-        <button class="crop-cancel-button" type="button" (click)="cancelCrop()">Cancel</button>
+        <button class="crop-confirm-button" type="button" (click)="confirmCrop()">{{ 'managerProfile.actions.setPhoto' | translate }}</button>
+        <button class="crop-cancel-button" type="button" (click)="cancelCrop()">{{ 'common.cancel' | translate }}</button>
       </div>
     </div>
   </div>
@@ -243,7 +243,7 @@
           <p>Enter your current password and choose a new one.</p>
         </div>
 
-        <button class="password-modal__close" type="button" (click)="closePasswordModal()" aria-label="Close">
+        <button class="password-modal__close" type="button" (click)="closePasswordModal()" [attr.aria-label]="'common.close' | translate">
           <mat-icon fontSet="material-icons-outlined">close</mat-icon>
         </button>
       </div>

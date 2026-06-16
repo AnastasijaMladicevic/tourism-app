@@ -1,4 +1,4 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { filter, Subscription } from 'rxjs';
@@ -14,6 +14,7 @@ import { TranslatePipe } from '../../shared/pipes/translate.pipe';
   styleUrls: ['./adminlayout.component.css']
 })
 export class AdminLayoutComponent implements OnInit, OnDestroy {
+  @ViewChild('pageOutlet') pageOutlet!: ElementRef<HTMLElement>;
   sidebarOpen = false;
   isMapRoute = false;
   private navSubscription?: Subscription;
@@ -39,6 +40,7 @@ export class AdminLayoutComponent implements OnInit, OnDestroy {
       .subscribe(() => {
         //this.closeSidebar();
         this.syncMapRoute();
+        this.pageOutlet?.nativeElement.scrollTo({ top: 0 });
       });
   }
 

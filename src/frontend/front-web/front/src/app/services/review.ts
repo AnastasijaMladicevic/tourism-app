@@ -22,6 +22,8 @@ export interface ReviewDto {
   status: string;
   reviewedByUserId?: number | null;
   reviewedByFullName?: string | null;
+  createdByUserId?: number | null;
+  createdByFullName?: string | null;
   regionId?: number;
   regionName?: string;
   regionCode?: string;
@@ -122,6 +124,14 @@ export class ReviewService {
 
     params = this.addLanguageCode(params, options);
     return this.http.get<PagedResultDto<ReviewDto>>(`${this.baseUrl}/creator`, { params });
+  }
+
+  getForManagerObjects(objectIds?: number[]): Observable<ReviewDto[]> {
+    let params = this.addLanguageCode(new HttpParams());
+    for (const id of objectIds ?? []) {
+      params = params.append('objectIds', String(id));
+    }
+    return this.http.get<ReviewDto[]>(`${this.baseUrl}/for-manager`, { params });
   }
 
   getById(id: number): Observable<ReviewDto> {

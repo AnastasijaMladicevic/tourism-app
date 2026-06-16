@@ -261,7 +261,7 @@ export class ContentCreatorDashboardComponent implements OnInit {
       case 'object':
         return ['/content-creator/objects/edit', contentId];
       case 'event':
-        return ['/content-creator/events/view', contentId];
+        return ['/content-creator/events/edit', contentId];
       case 'activity':
         return ['/content-creator/activities/edit', contentId];
       default:
@@ -284,7 +284,7 @@ export class ContentCreatorDashboardComponent implements OnInit {
       return null;
     }
 
-    return ['/content-creator/events/view', eventId];
+    return ['/content-creator/events/edit', eventId];
   }
 
   getPublishedPercent(row: StatusRow): number {

@@ -1,5 +1,5 @@
 import { CommonModule, Location } from '@angular/common';
-import { ChangeDetectorRef, Component, NgZone, OnDestroy, OnInit, inject } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, NgZone, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
@@ -33,6 +33,7 @@ import {
   isConcerningCreatorReply,
   ManagerObjectReviewThread,
 } from '../../../manager/shared/manager-object-review.mock';
+import { isPointInGeoJson } from '../../../../shared/utils/geo-utils';
 
 type WorkingDayKey = 'pon' | 'uto' | 'sre' | 'cet' | 'pet' | 'sub' | 'ned';
 
@@ -57,7 +58,7 @@ type WorkingDayKey = 'pon' | 'uto' | 'sre' | 'cet' | 'pet' | 'sub' | 'ned';
     '../../../shared/location-sidebar.css'
   ]
 })
-export class ObjectCreateComponent implements OnInit, OnDestroy {
+export class ObjectCreateComponent implements OnInit, AfterViewInit, OnDestroy {
   private readonly fb = inject(FormBuilder);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
@@ -72,11 +73,16 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
   private readonly translationService = inject(TranslationService);
   private readonly ngZone = inject(NgZone);
 
+  @ViewChild(SharedMapComponent) mapComponent?: SharedMapComponent;
+  @ViewChild('reviewsSectionRef') reviewsSectionRef?: ElementRef<HTMLElement>;
+  private scrollToReviews = false;
+
   /** Manager opens this page read-only via `/manager/objects/review/:id` (route data). */
   isManagerReview = false;
 
   isAddressSearching = false;
   private forwardGeocodeRequestId = 0;
+  private reverseGeocodeRequestId = 0;
 
   /** Latest content status from API (for approve/decline availability). */
   reviewObjectStatus = '';
@@ -183,7 +189,44 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
     this.releasePendingImagePreviews();
   }
 
+  ngAfterViewInit(): void {
+    if (this.scrollToReviews && this.reviewsSectionRef?.nativeElement) {
+      setTimeout(() => {
+        this.reviewsSectionRef?.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 0);
+    }
+  }
+
+  private scrollPageToTop(): void {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+
+    const scrollableContainers = Array.from(
+      document.querySelectorAll<HTMLElement>(
+        '.page-outlet, .main-content, .content, .page-content, .workspace'
+      )
+    );
+    for (const container of scrollableContainers) {
+      container.scrollTop = 0;
+    }
+
+    setTimeout(() => {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
+      for (const container of scrollableContainers) {
+        container.scrollTop = 0;
+      }
+    }, 0);
+  }
+
   ngOnInit(): void {
+    this.scrollToReviews = this.route.snapshot.queryParamMap.get('scrollTo') === 'reviews';
+    if (!this.scrollToReviews) {
+      this.scrollPageToTop();
+    }
+
     this.isManagerReview = this.route.snapshot.data['managerReview'] === true;
 
     const idFromRoute = Number(this.route.snapshot.paramMap.get('id'));
@@ -206,10 +249,13 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
     }
 
     this.form.controls.destinationId.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
+      this.syncRegionFromDestination();
+      this.syncLocalitySelectionWithDestination();
       this.applyLocationFromSelection();
     });
 
     this.form.controls.localityId.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
+      this.syncDestinationFromLocality();
       this.applyLocationFromSelection();
     });
 
@@ -233,6 +279,10 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
 
   get showCcReviewsPreview(): boolean {
     return this.isEditMode && this.objectId != null && !this.isManagerReview;
+  }
+
+  translateTypeName(name: string): string {
+    return this.translationService.translateLiteral(name);
   }
 
   get selectedObjectTypeName(): string {
@@ -301,17 +351,20 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
       return true;
     }
 
-    return this.isSubmitting || this.isLoadingOptions || !this.hasRequiredCreateFields;
+    return this.isSubmitting || this.isLoadingOptions || this.form.invalid || !this.hasRequiredCreateFields;
   }
 
   get hasRequiredCreateFields(): boolean {
     const name = this.form.controls.name.value?.trim();
     const objectTypeId = this.form.controls.objectTypeId.value;
+    const destinationId = this.form.controls.destinationId.value;
+    const localityId = this.form.controls.localityId.value;
 
     return Boolean(
       name &&
       objectTypeId != null &&
       objectTypeId >= 1 &&
+      (destinationId != null || localityId != null) &&
       this.editableImageUrls.length > 0
     );
   }
@@ -574,6 +627,50 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
     return this.localities;
   }
 
+  /** When the destination changes, auto-fill the region from that destination's region. */
+  private syncRegionFromDestination(): void {
+    const destinationId = this.form.controls.destinationId.value;
+    if (destinationId == null) {
+      return;
+    }
+
+    const destination = this.destinations.find((d) => d.id === destinationId);
+    if (destination?.regionId != null) {
+      this.selectedRegionId = destination.regionId;
+    }
+  }
+
+  /** Reset the locality if it no longer belongs to the selected destination. */
+  private syncLocalitySelectionWithDestination(): void {
+    const localityId = this.form.controls.localityId.value;
+    if (localityId == null) {
+      return;
+    }
+
+    if (!this.filteredLocalities.some((locality) => locality.id === localityId)) {
+      this.form.patchValue({ localityId: null }, { emitEvent: false });
+    }
+  }
+
+  /** When the locality changes, auto-fill the destination (and through it, the region). */
+  private syncDestinationFromLocality(): void {
+    const localityId = this.form.controls.localityId.value;
+    if (localityId == null) {
+      return;
+    }
+
+    const locality = this.localities.find((l) => l.id === localityId);
+    if (!locality) {
+      return;
+    }
+
+    if (this.form.controls.destinationId.value !== locality.destinationId) {
+      this.form.patchValue({ destinationId: locality.destinationId }, { emitEvent: false });
+    }
+
+    this.syncRegionFromDestination();
+  }
+
   onRegionChange(regionId: number | null): void {
     this.selectedRegionId = regionId;
     this.form.patchValue({ destinationId: null, localityId: null }, { emitEvent: false });
@@ -614,6 +711,133 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
     return this.form.controls.latitude.value != null && this.form.controls.longitude.value != null;
   }
 
+  get selectedDestination(): DestinationDto | null {
+    const destinationId = this.form.controls.destinationId.value;
+    if (!destinationId) {
+      return null;
+    }
+    return this.destinations.find((destination) => destination.id === destinationId) ?? null;
+  }
+
+  get selectedDestinationBoundary(): string | undefined {
+    return this.selectedDestination?.boundaryGeoJson;
+  }
+
+  private isWithinSelectedDestination(lat: number, lng: number): boolean {
+    const boundary = this.selectedDestinationBoundary;
+    if (!boundary) {
+      return true;
+    }
+    return isPointInGeoJson(lng, lat, boundary);
+  }
+
+  private findDestinationContainingPoint(lat: number, lng: number): DestinationDto | null {
+    return this.destinations.find((d) => d.boundaryGeoJson && isPointInGeoJson(lng, lat, d.boundaryGeoJson)) ?? null;
+  }
+
+  get selectedRegion(): RegionDto | undefined {
+    if (this.selectedRegionId == null) {
+      return undefined;
+    }
+    return this.regions.find((r) => r.id === this.selectedRegionId);
+  }
+
+  get selectedRegionBoundary(): string | undefined {
+    return this.selectedRegion?.boundaryGeoJson;
+  }
+
+  private isWithinSelectedRegion(lat: number, lng: number): boolean {
+    const boundary = this.selectedRegionBoundary;
+    if (!boundary) {
+      return true;
+    }
+    return isPointInGeoJson(lng, lat, boundary);
+  }
+
+  private findRegionContainingPoint(lat: number, lng: number): RegionDto | null {
+    return this.regions.find((r) => r.boundaryGeoJson && isPointInGeoJson(lng, lat, r.boundaryGeoJson)) ?? null;
+  }
+
+  /** Fallback for destinations without boundary data: pick the closest one by its center point. */
+  private findNearestDestination(lat: number, lng: number, maxDistanceKm = 25): DestinationDto | null {
+    let nearest: DestinationDto | null = null;
+    let nearestDistanceKm = Infinity;
+
+    for (const destination of this.destinations) {
+      if (destination.latitude == null || destination.longitude == null) {
+        continue;
+      }
+      const distanceKm = this.haversineDistanceKm(lat, lng, destination.latitude, destination.longitude);
+      if (distanceKm < nearestDistanceKm) {
+        nearestDistanceKm = distanceKm;
+        nearest = destination;
+      }
+    }
+
+    return nearest && nearestDistanceKm <= maxDistanceKm ? nearest : null;
+  }
+
+  private haversineDistanceKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
+    const toRad = (value: number) => (value * Math.PI) / 180;
+    const earthRadiusKm = 6371;
+    const dLat = toRad(lat2 - lat1);
+    const dLng = toRad(lng2 - lng1);
+    const a =
+      Math.sin(dLat / 2) ** 2 +
+      Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+    return earthRadiusKm * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  }
+
+  /** Auto-selects the closest locality to the clicked point, within the selected destination. */
+  private tryAutoSelectLocality(lat: number, lng: number): void {
+    const destinationId = this.form.controls.destinationId.value;
+    if (destinationId == null) {
+      return;
+    }
+
+    const maxLocalityDistanceKm = 5;
+    let nearest: LocalityOption | null = null;
+    let nearestDistanceKm = Infinity;
+
+    for (const candidate of this.localities) {
+      if (candidate.destinationId !== destinationId || candidate.latitude == null || candidate.longitude == null) {
+        continue;
+      }
+      const distanceKm = this.haversineDistanceKm(lat, lng, candidate.latitude, candidate.longitude);
+      if (distanceKm < nearestDistanceKm) {
+        nearestDistanceKm = distanceKm;
+        nearest = candidate;
+      }
+    }
+
+    if (nearest && nearestDistanceKm <= maxLocalityDistanceKm) {
+      this.form.patchValue({ localityId: nearest.id }, { emitEvent: false });
+    }
+  }
+
+  /** Fills the address field from the clicked map coordinates via reverse geocoding. */
+  private reverseGeocodeAddress(lat: number, lng: number): void {
+    const requestId = ++this.reverseGeocodeRequestId;
+    const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`;
+
+    fetch(url, { headers: { Accept: 'application/json' } })
+      .then(r => r.ok ? r.json() : Promise.reject(new Error('Reverse geocoding failed')))
+      .then((result: { display_name?: string }) => {
+        this.ngZone.run(() => {
+          if (requestId !== this.reverseGeocodeRequestId || !result?.display_name) {
+            return;
+          }
+          this.form.patchValue({ address: result.display_name }, { emitEvent: false });
+          this.cdr.detectChanges();
+        });
+      })
+      .catch(() => undefined);
+  }
+
+  get activeBoundaryGeoJson(): string | undefined {
+    return this.selectedDestinationBoundary ?? this.selectedRegionBoundary;
+  }
+
   get latitudeDirection(): 'N' | 'S' {
     const lat = Number(this.form.controls.latitude.value);
     return Number.isFinite(lat) && lat < 0 ? 'S' : 'N';
@@ -626,9 +850,85 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
 
   onMapLocationSelected(event: { lat: number; lng: number }): void {
     if (this.isManagerReview) return;
-    this.form.patchValue({ latitude: event.lat, longitude: event.lng }, { emitEvent: false });
+
+    const { lat, lng } = event;
+
+    // Always reflect the clicked point on the form, then re-detect region/destination/locality/address.
+    this.form.patchValue({ latitude: lat, longitude: lng }, { emitEvent: false });
     this.form.controls.latitude.markAsDirty();
     this.form.controls.longitude.markAsDirty();
+
+    const matched = this.findDestinationContainingPoint(lat, lng) ?? this.findNearestDestination(lat, lng);
+    if (matched) {
+      this.locationErrorMessage = '';
+      this.selectedRegionId = matched.regionId ?? this.selectedRegionId;
+      if (this.form.controls.destinationId.value !== matched.id) {
+        this.loadDestinationsForRegion(this.selectedRegionId);
+        this.form.patchValue({ destinationId: matched.id }, { emitEvent: false });
+        this.syncLocalitySelectionWithDestination();
+      }
+    } else {
+      const matchedRegion = this.findRegionContainingPoint(lat, lng);
+      if (matchedRegion && this.selectedRegionId !== matchedRegion.id) {
+        this.selectedRegionId = matchedRegion.id;
+        this.loadDestinationsForRegion(this.selectedRegionId);
+      }
+      this.locationErrorMessage = '';
+    }
+
+    this.tryAutoSelectLocality(lat, lng);
+    this.reverseGeocodeAddress(lat, lng);
+    this.cdr.detectChanges();
+  }
+
+  onCoordinateInputChanged(): void {
+    if (this.isManagerReview) return;
+
+    const lat = this.toNumber(this.form.controls.latitude.value);
+    const lng = this.toNumber(this.form.controls.longitude.value);
+    if (lat == null || lng == null) {
+      return;
+    }
+
+    const matched = this.findDestinationContainingPoint(lat, lng) ?? this.findNearestDestination(lat, lng);
+    if (matched) {
+      this.locationErrorMessage = '';
+      this.selectedRegionId = matched.regionId ?? this.selectedRegionId;
+      if (this.form.controls.destinationId.value !== matched.id) {
+        this.loadDestinationsForRegion(this.selectedRegionId);
+        this.form.patchValue({ destinationId: matched.id }, { emitEvent: false });
+        this.syncLocalitySelectionWithDestination();
+      }
+      this.tryAutoSelectLocality(lat, lng);
+      this.reverseGeocodeAddress(lat, lng);
+      this.cdr.detectChanges();
+      return;
+    }
+
+    const matchedRegion = this.findRegionContainingPoint(lat, lng);
+    if (matchedRegion && this.selectedRegionId !== matchedRegion.id) {
+      this.selectedRegionId = matchedRegion.id;
+      this.loadDestinationsForRegion(this.selectedRegionId);
+    }
+
+    this.reverseGeocodeAddress(lat, lng);
+
+    if (this.selectedRegionId != null) {
+      const outsideRegionMessage = this.translationService.translate('contentCreatorObjectForm.errors.outsideRegion', {
+        region: this.selectedRegion?.name ?? ''
+      });
+
+      if (!this.isWithinSelectedRegion(lat, lng)) {
+        this.locationErrorMessage = outsideRegionMessage;
+        this.cdr.detectChanges();
+        return;
+      }
+
+      if (this.locationErrorMessage === outsideRegionMessage) {
+        this.locationErrorMessage = '';
+        this.cdr.detectChanges();
+      }
+    }
   }
 
   onAddressSearch(): void {
@@ -935,6 +1235,15 @@ export class ObjectCreateComponent implements OnInit, OnDestroy {
       this.locationErrorMessage = this.translationService.translate(
         'contentCreatorObjectForm.errors.destinationRequired',
       );
+      return;
+    }
+
+    const lat = this.toNumber(this.form.controls.latitude.value);
+    const lng = this.toNumber(this.form.controls.longitude.value);
+    if (lat != null && lng != null && !this.isWithinSelectedDestination(lat, lng)) {
+      this.locationErrorMessage = this.translationService.translate('contentCreatorObjectForm.errors.outsideDestination', {
+        destination: this.selectedDestination?.name ?? ''
+      });
       return;
     }
 

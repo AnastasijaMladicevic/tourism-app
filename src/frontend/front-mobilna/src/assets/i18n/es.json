@@ -63,7 +63,19 @@
     "enable": "Activar",
     "locationModalTitle": "Activa la ubicación para usar el orden",
     "locationModalBody": "El seguimiento de ubicación está desactivado. Toca abajo para abrir ajustes y activar el permiso de ubicación.",
-    "notification": "Notificación"
+    "notification": "Notificación",
+    "weekdayShort": {
+      "sun": "Do",
+      "mon": "Lu",
+      "tue": "Ma",
+      "wed": "Mi",
+      "thu": "Ju",
+      "fri": "Vi",
+      "sat": "Sá"
+    },
+    "violationOfRules": "Incumplimiento de las reglas de la plataforma.",
+    "bannedUntil": "Esta cuenta está suspendida hasta {{date}}. Motivo: {{reason}}",
+    "bannedPermanent": "Esta cuenta está suspendida permanentemente. Motivo: {{reason}}"
   },
   "reviewImages": {
     "maxImages": "Puedes añadir hasta 5 imágenes.",
@@ -104,7 +116,8 @@
       "requestSent": "Solicitud enviada",
       "approved": "Acceso aprobado",
       "specialRoleActive": "Rol especial activo",
-      "notRequested": "No solicitado"
+      "notRequested": "No solicitado",
+      "rejected": "Solicitud rechazada"
     },
     "feedback": {
       "sendFailed": "La solicitud no se puede enviar en este momento.",
@@ -190,6 +203,8 @@
     "chooseRegion": "Elegir región",
     "categories": "Categorías",
     "featuredDestination": "Destino destacado",
+    "previousFeatured": "Destino destacado anterior",
+    "nextFeatured": "Siguiente destino destacado",
     "explore": "Explorar",
     "recommendedForYou": "Recomendado para ti",
     "popularPlaces": "Lugares populares",
@@ -221,7 +236,8 @@
     "onlyTourists": "Solo los turistas pueden iniciar sesión aquí.",
     "invalidCredentials": "Email o contraseña incorrectos.",
     "googleFailed": "El acceso con Google no está disponible en este momento.",
-    "loginButton": "Iniciar sesión"
+    "loginButton": "Iniciar sesión",
+    "emailVerifiedSuccess": "¡Correo verificado con éxito! Ahora puedes iniciar sesión."
   },
   "forgotPassword": {
     "title": "Olvidé mi contraseña",
@@ -803,7 +819,8 @@
       "nightlife": "Vida nocturna",
       "culture": "Cultura",
       "parks": "Parques nacionales"
-    }
+    },
+    "cropPhoto": "Recortar foto"
   },
   "appearance": {
     "title": "Apariencia",
@@ -981,7 +998,10 @@
       "notSelected": "No seleccionado",
       "recenter": "Recentrar",
       "exit": "Salir",
-      "reorderStop": "Reordenar parada"
+      "reorderStop": "Reordenar parada",
+      "useMyLocation": "Usar mi ubicación",
+      "locationAlreadyInRoute": "La ubicación ya está en la ruta",
+      "resizePanel": "Cambiar tamaño del panel"
     },
     "addStop": {
       "title": "Agregar parada",
@@ -1039,14 +1059,14 @@
     "addToPlanner": "Añadir al Planificador",
     "about": "Sobre el evento",
     "descriptionFallback": "Descripción no disponible.",
-      "availableTickets": "Entradas disponibles",
-      "ticketTypesHelp": "Agrega uno o varios tipos de entrada y la capacidad total del evento.",
-      "addTicketType": "Agregar tipo de entrada",
-      "removeTicketType": "Eliminar",
-      "ticketTypeName": "Nombre de la entrada",
-      "ticketTypeNamePlaceholder": "VIP, General, Early bird...",
-      "ticketPricePlaceholder": "45.00",
-      "noTicketTypesHint": "Dejalo vacio si el evento es gratuito.",
+    "availableTickets": "Entradas disponibles",
+    "ticketTypesHelp": "Agrega uno o varios tipos de entrada y la capacidad total del evento.",
+    "addTicketType": "Agregar tipo de entrada",
+    "removeTicketType": "Eliminar",
+    "ticketTypeName": "Nombre de la entrada",
+    "ticketTypeNamePlaceholder": "VIP, General, Early bird...",
+    "ticketPricePlaceholder": "45.00",
+    "noTicketTypesHint": "Dejalo vacio si el evento es gratuito.",
     "standardTicket": "Entrada estándar",
     "select": "Seleccionar",
     "nearbyEmpty": "No hay eventos cercanos.",
@@ -1263,7 +1283,11 @@
     "togglePriority": "Cambiar prioridad",
     "save": "Guardar en el planificador",
     "saveChanges": "Guardar cambios",
-    "lockedHint": "Este evento solo puede planificarse dentro de su fecha y duracion originales."
+    "lockedHint": "Este evento solo puede planificarse dentro de su fecha y duracion originales.",
+    "selectedDaysCount": "{{count}} días seleccionados",
+    "selectAtLeastOneDay": "Selecciona al menos un día.",
+    "conflictMessageWithDay": "Este horario se superpone con \"{{title}}\" el {{day}} a las {{time}}.",
+    "selectDateHint": "Elige cuándo quieres asistir al evento"
   },
   "destination": {
     "title": "Destino",
@@ -1301,5 +1325,36 @@
     "searchPlaceholder": "Buscar localidades...",
     "foundCount": "{{count}} localidades encontradas",
     "empty": "No se encontraron localidades."
+  },
+  "auth": {
+    "codeVerification": {
+      "title": "Verificación de código",
+      "subtitle": "Ingresa el OTP (contraseña de un solo uso) enviado a",
+      "verifyButton": "Verificar código",
+      "resendButton": "Reenviar código"
+    },
+    "passwordUpdated": {
+      "title": "Contraseña actualizada",
+      "body": "Tu contraseña se ha actualizado correctamente.",
+      "loginButton": "Iniciar sesión"
+    },
+    "verifyEmail": {
+      "title": "Verifica tu email",
+      "subtitle": "Introduce el código de 6 dígitos enviado a",
+      "verifyButton": "Verificar email",
+      "resendButton": "Reenviar código",
+      "codeRequired": "Introduce los 6 dígitos.",
+      "codeExpired": "El código ha expirado. Solicita uno nuevo.",
+      "invalidCode": "Código inválido o expirado.",
+      "resendSuccess": "Se envió un nuevo código.",
+      "resendFailed": "No se pudo reenviar el código en este momento."
+    }
+  },
+  "search": {
+    "placeholder": "Busca por frase, tipo o servicio...",
+    "inProgress": "Buscando...",
+    "typeToSearch": "Escribe lo que buscas",
+    "resultsCount": "{{count}} resultados",
+    "noResultsHint": "Intenta otra búsqueda o palabras clave como hotel, piscina, restaurante, parking o cena."
   }
 }

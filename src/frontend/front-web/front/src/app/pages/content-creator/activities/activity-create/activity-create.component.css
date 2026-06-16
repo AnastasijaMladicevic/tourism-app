@@ -723,3 +723,83 @@ select:focus {
     justify-content: center;
   }
 }
+
+@media (max-width: 640px) {
+  .create-activity-page .top-actions {
+    width: 100% !important;
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+  }
+
+  .create-activity-page .top-actions .danger-btn,
+  .create-activity-page .top-actions .primary-btn,
+  .create-activity-page .top-actions .ghost-btn {
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    padding: 0 8px !important;
+    font-size: 12px !important;
+    line-height: 1.1 !important;
+    white-space: nowrap !important;
+    text-align: center !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 6px !important;
+  }
+
+  .create-activity-page .top-actions .material-symbols-outlined {
+    font-size: 16px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .create-activity-page .top-actions .ghost-btn {
+    flex: 0 0 94px !important;
+    width: 94px !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .create-activity-page .top-actions {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+  }
+
+  .create-activity-page .top-actions .danger-btn,
+  .create-activity-page .top-actions .primary-btn,
+  .create-activity-page .top-actions .ghost-btn {
+    min-width: 0 !important;
+    height: 42px !important;
+    min-height: 42px !important;
+    padding: 0 7px !important;
+    font-size: 12px !important;
+    line-height: 1.12 !important;
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center !important;
+    gap: 5px !important;
+  }
+
+  .create-activity-page .top-actions .danger-btn,
+  .create-activity-page .top-actions .primary-btn {
+    flex: 1 1 0 !important;
+    white-space: normal !important;
+  }
+
+  .create-activity-page .top-actions .ghost-btn {
+    flex: 0 0 82px !important;
+    width: 82px !important;
+    white-space: nowrap !important;
+  }
+
+  .create-activity-page .top-actions .material-symbols-outlined {
+    font-size: 15px !important;
+    flex-shrink: 0 !important;
+  }
+}

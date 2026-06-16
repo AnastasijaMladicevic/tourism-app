@@ -306,8 +306,8 @@
   align-items: center;
   gap: 8px;
   padding: 10px 13px;
-  border-radius: 9px;
-  background: #1d4ed8;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
   color: #ffffff;
   font-weight: 600;
 }
@@ -336,14 +336,25 @@
   gap: 8px;
   padding: 10px 13px;
   border: 1px solid #fecaca;
-  border-radius: 9px;
+  border-radius: 12px;
   color: #b91c1c;
   background: #fff5f5;
+  font-weight: 600;
 }
 
 .danger-btn:hover:not(:disabled) {
   background: #fee2e2;
   border-color: #fca5a5;
+}
+
+.danger-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.header-actions .primary-btn .material-symbols-outlined,
+.header-actions .danger-btn .material-symbols-outlined {
+  font-size: 18px;
 }
 
 .form-layout {
@@ -925,5 +936,41 @@
   .section-card,
   .side-card {
     padding: 14px;
+  }
+}
+
+@media (max-width: 640px) {
+  .event-form-page .header-actions {
+    width: 100% !important;
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    gap: 8px !important;
+    align-items: stretch !important;
+  }
+
+  .event-form-page .header-actions .danger-btn,
+  .event-form-page .header-actions .primary-btn {
+    flex: 1 1 0 !important;
+    height: 46px !important;
+    min-height: 46px !important;
+    padding: 0 10px !important;
+
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    text-align: center !important;
+    line-height: 1 !important;
+    gap: 8px !important;
+  }
+
+  .event-form-page .header-actions .danger-btn .material-symbols-outlined,
+  .event-form-page .header-actions .primary-btn .material-symbols-outlined {
+    font-size: 20px !important;
+    line-height: 1 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
   }
 }

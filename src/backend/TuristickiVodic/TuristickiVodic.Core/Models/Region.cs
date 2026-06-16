@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using NetTopologySuite.Geometries;
 
 namespace TuristickiVodic.Core.Models
 {
@@ -18,6 +19,8 @@ namespace TuristickiVodic.Core.Models
         public double? CenterLongitude { get; set; }
         public double? CenterLatitude { get; set; }
         public double? DefaultMapZoom { get; set; }
+
+        public Geometry? Boundary { get; set; }
 
         public bool IsDefault { get; set; }
         public bool IsActive { get; set; } = true;

@@ -115,6 +115,11 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'verify-email',
+    loadComponent: () =>
+      import('./feature/auth/verify-email/verify-email').then((m) => m.VerifyEmailComponent),
+  },
+  {
     path: 'forgot-password',
     loadComponent: () =>
       import('./feature/auth/forgot-password/forgot-password').then(

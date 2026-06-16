@@ -78,6 +78,10 @@
         </div>
       }
 
+      @if (infoMessage) {
+        <div class="info">{{ infoMessage }}</div>
+      }
+
       @if (errorMessage) {
         <div class="error">{{ errorMessage }}</div>
       }

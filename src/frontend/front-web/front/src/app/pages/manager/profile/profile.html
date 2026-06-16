@@ -19,7 +19,7 @@
                   }
                 </div>
 
-                <button class="avatar-edit-btn" type="button" title="Change photo" (click)="triggerFileInput()">
+                <button class="avatar-edit-btn" type="button" [title]="'adminProfile.changePhoto' | translate" (click)="triggerFileInput()">
                   <mat-icon fontSet="material-icons-outlined">edit</mat-icon>
                 </button>
 
@@ -237,7 +237,7 @@
           </p>
         </div>
 
-        <button class="password-modal__close" type="button" (click)="closePasswordModal()" aria-label="Close">
+        <button class="password-modal__close" type="button" (click)="closePasswordModal()" [attr.aria-label]="'common.close' | translate">
           <mat-icon fontSet="material-icons-outlined">close</mat-icon>
         </button>
       </div>

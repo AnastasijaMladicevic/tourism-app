@@ -11,10 +11,7 @@
         <h1 class="page-title">{{ form.name.trim() || t('adminDestinationForm.newDestination') }}</h1>
       </div>
       <div class="title-actions">
-        <button type="button" class="btn btn-primary btn-with-icon" (click)="onSubmit()" [disabled]="isSubmitting || isDeleting || isLoadingDestination || isEditBlocked || !selectedManager">
-          <span class="material-symbols-outlined">check_circle</span>
-          {{ isSubmitting ? t('common.saving') : isEditMode ? t('common.saveChanges') : t('adminDestinationForm.createDestination') }}
-        </button>
+        <button type="button" class="btn btn-ghost" (click)="onCancel()">{{ t('common.cancel') }}</button>
         @if (isEditMode) {
           <button
             type="button"
@@ -26,7 +23,10 @@
             {{ isDeleting ? t('adminDestinationForm.deleting') : t('adminDestinationForm.deleteDestination') }}
           </button>
         }
-        <button type="button" class="btn btn-ghost" (click)="onCancel()">{{ t('common.cancel') }}</button>
+        <button type="button" class="btn btn-primary btn-with-icon" (click)="onSubmit()" [disabled]="isSubmitDisabled">
+          <span class="material-symbols-outlined">check_circle</span>
+          {{ isSubmitting ? t('common.saving') : isEditMode ? t('common.saveChanges') : t('adminDestinationForm.createDestination') }}
+        </button>
       </div>
     </div>
   </header>
@@ -95,24 +95,12 @@
             ></textarea>
           </div>
 
-          <div class="form-field full categories-block">
-            <span class="label">{{ t('adminDestinationForm.categoriesTags') }}</span>
-            <div class="category-chips">
-              @for (c of categories; track $index) {
-                <span class="chip">
-                  {{ c }}
-                  <button type="button" class="chip-remove" (click)="removeCategory($index)" [attr.aria-label]="t('common.remove')">×</button>
-                </span>
-              }
-            </div>
-            <div class="category-add-row">
-              <input type="text" [(ngModel)]="categoryInput" (keydown.enter)="addCategory(); $event.preventDefault()" [placeholder]="t('adminDestinationForm.addCategory')" />
-              <button type="button" class="btn btn-ghost btn-sm" (click)="addCategory()">
-                <span class="material-symbols-outlined">add</span>
-                {{ t('adminDestinationForm.addCategory') }}
-              </button>
-            </div>
-          </div>
+          <label class="form-field full">
+            <span class="label">{{ t('adminDestinationForm.destinationType') }} <span class="required-star" aria-hidden="true">*</span></span>
+            <select [(ngModel)]="form.destinationTypeId" [disabled]="isLoadingDestinationTypes">
+              <option *ngFor="let type of destinationTypes" [ngValue]="type.id">{{ type.name }}</option>
+            </select>
+          </label>
         </div>
       </article>
 
@@ -244,21 +232,23 @@
         <div class="alert alert-error inline-field-error">{{ galleryErrorMessage }}</div>
       }
 
-      <article class="panel panel--muted">
-        <span class="step-tag">{{ t('adminDestinationForm.step3') }}</span>
-        <div class="panel-head">
-          <span class="panel-icon material-symbols-outlined">history</span>
-          <div>
-            <h2 class="panel-title">{{ t('adminDestinationForm.changeHistory') }}</h2>
-            <p class="panel-sub">{{ t('adminDestinationForm.changeHistoryDesc') }}</p>
+      @if (isEditMode) {
+        <article class="panel panel--muted">
+          <span class="step-tag">{{ t('adminDestinationForm.step3') }}</span>
+          <div class="panel-head">
+            <span class="panel-icon material-symbols-outlined">history</span>
+            <div>
+              <h2 class="panel-title">{{ t('adminDestinationForm.changeHistory') }}</h2>
+              <p class="panel-sub">{{ t('adminDestinationForm.changeHistoryDesc') }}</p>
+            </div>
           </div>
-        </div>
-      </article>
+        </article>
+      }
     </div>
 
     <aside class="workspace-side">
       <article class="panel">
-        <span class="step-tag">{{ t('adminDestinationForm.step4') }}</span>
+        <span class="step-tag">{{ isEditMode ? t('adminDestinationForm.step4') : t('adminDestinationForm.step3') }}</span>
         <div class="panel-head">
           <span class="panel-icon material-symbols-outlined">location_on</span>
           <div>
@@ -274,6 +264,7 @@
             [zoom]="9"
             [popupText]="mapPopupText"
             [interactive]="true"
+            [boundaryGeoJson]="selectedRegionBoundary"
             (locationSelected)="onMapLocationSelected($event)"
             mapId="admin-destination-create-map"
           ></app-map>
@@ -283,14 +274,14 @@
           <div>
             <span class="coord-label">{{ 'common.latitude' | translate }}</span>
             <div class="coord-input-wrap">
-              <input type="number" step="0.000001" min="-90" max="90" [(ngModel)]="form.latitude" placeholder="42.4240" />
+              <input type="number" step="0.000001" min="-90" max="90" [(ngModel)]="form.latitude" (change)="onCoordinateInputChanged()" placeholder="42.4240" />
               <span class="coord-input-suffix">{{ latitudeDirection }}</span>
             </div>
           </div>
           <div>
             <span class="coord-label">{{ 'common.longitude' | translate }}</span>
             <div class="coord-input-wrap">
-              <input type="number" step="0.000001" min="-180" max="180" [(ngModel)]="form.longitude" placeholder="18.7710" />
+              <input type="number" step="0.000001" min="-180" max="180" [(ngModel)]="form.longitude" (change)="onCoordinateInputChanged()" placeholder="18.7710" />
               <span class="coord-input-suffix">{{ longitudeDirection }}</span>
             </div>
           </div>
@@ -303,53 +294,55 @@
 
       </article>
 
-      <article class="panel">
-        <span class="step-tag">{{ t('adminDestinationForm.step5') }}</span>
-        <div class="panel-head panel-head--split">
-          <div class="panel-head-left">
-            <span class="panel-icon material-symbols-outlined">hub</span>
-            <h2 class="panel-title">{{ t('adminDestinationForm.linkedEntities') }}</h2>
+      @if (isEditMode) {
+        <article class="panel">
+          <span class="step-tag">{{ t('adminDestinationForm.step5') }}</span>
+          <div class="panel-head panel-head--split">
+            <div class="panel-head-left">
+              <span class="panel-icon material-symbols-outlined">hub</span>
+              <h2 class="panel-title">{{ t('adminDestinationForm.linkedEntities') }}</h2>
+            </div>
+            <button type="button" class="link-quiet" disabled>{{ t('adminDestinationForm.linkMore') }}</button>
           </div>
-          <button type="button" class="link-quiet" disabled>{{ t('adminDestinationForm.linkMore') }}</button>
-        </div>
-        <ul class="entity-list">
-          <li>
-            <span class="material-symbols-outlined entity-ico">apartment</span>
-            <div>
-              <span class="entity-name">{{ t('common.objects') }}</span>
-              <span class="entity-meta">{{ t('adminDestinationForm.hotelsShops') }}</span>
-            </div>
-            <span class="entity-count">{{ linkedEntityCounts.objects }}</span>
-          </li>
-          <li>
-            <span class="material-symbols-outlined entity-ico">event</span>
-            <div>
-              <span class="entity-name">{{ t('adminDestinationForm.relatedEvents') }}</span>
-            </div>
-            <span class="entity-count">{{ linkedEntityCounts.events }}</span>
-          </li>
-          <li>
-            <span class="material-symbols-outlined entity-ico">hiking</span>
-            <div>
-              <span class="entity-name">{{ t('adminDestinationForm.featuredActivities') }}</span>
-            </div>
-            <span class="entity-count">{{ linkedEntityCounts.activities }}</span>
-          </li>
-          <li>
-            <span class="material-symbols-outlined entity-ico">map</span>
-            <div>
-              <span class="entity-name">{{ t('adminDestinationForm.localities') }}</span>
-            </div>
-            <span class="entity-count">{{ linkedEntityCounts.localities }}</span>
-          </li>
-        </ul>
-        <p class="fine-print">
-          {{ isLoadingLinkedEntities ? t('adminDestinationForm.loadingLinkedEntityCounts') : t('adminDestinationForm.linkedEntityCountsLoaded') }}
-        </p>
-      </article>
+          <ul class="entity-list">
+            <li>
+              <span class="material-symbols-outlined entity-ico">apartment</span>
+              <div>
+                <span class="entity-name">{{ t('common.objects') }}</span>
+                <span class="entity-meta">{{ t('adminDestinationForm.hotelsShops') }}</span>
+              </div>
+              <span class="entity-count">{{ linkedEntityCounts.objects }}</span>
+            </li>
+            <li>
+              <span class="material-symbols-outlined entity-ico">event</span>
+              <div>
+                <span class="entity-name">{{ t('adminDestinationForm.relatedEvents') }}</span>
+              </div>
+              <span class="entity-count">{{ linkedEntityCounts.events }}</span>
+            </li>
+            <li>
+              <span class="material-symbols-outlined entity-ico">hiking</span>
+              <div>
+                <span class="entity-name">{{ t('adminDestinationForm.featuredActivities') }}</span>
+              </div>
+              <span class="entity-count">{{ linkedEntityCounts.activities }}</span>
+            </li>
+            <li>
+              <span class="material-symbols-outlined entity-ico">map</span>
+              <div>
+                <span class="entity-name">{{ t('adminDestinationForm.localities') }}</span>
+              </div>
+              <span class="entity-count">{{ linkedEntityCounts.localities }}</span>
+            </li>
+          </ul>
+          <p class="fine-print">
+            {{ isLoadingLinkedEntities ? t('adminDestinationForm.loadingLinkedEntityCounts') : t('adminDestinationForm.linkedEntityCountsLoaded') }}
+          </p>
+        </article>
+      }
 
       <article class="panel">
-        <span class="step-tag">{{ t('adminDestinationForm.step6') }}</span>
+        <span class="step-tag">{{ isEditMode ? t('adminDestinationForm.step6') : t('adminDestinationForm.step4') }}</span>
         <div class="panel-head">
           <span class="panel-icon material-symbols-outlined">group</span>
           <div>
@@ -381,6 +374,10 @@
             >
               @if (managerSuggestionsLoading) {
                 <li class="manager-suggestion manager-suggestion--muted" role="presentation">{{ t('adminDestinationForm.searching') }}</li>
+              } @else if (!form.regionId) {
+                <li class="manager-suggestion manager-suggestion--muted" role="presentation">
+                  {{ t('adminDestinationForm.selectRegionFirst') }}
+                </li>
               } @else if (!managerSuggestions.length) {
                 <li class="manager-suggestion manager-suggestion--muted" role="presentation">
                   {{ t('adminDestinationForm.noManagersMatch') }}

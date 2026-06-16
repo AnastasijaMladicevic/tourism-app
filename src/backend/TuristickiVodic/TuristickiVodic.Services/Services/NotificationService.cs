@@ -10,11 +10,13 @@ namespace TuristickiVodic.Services.Services
     {
         private readonly AppDbContext _context;
         private readonly IConfiguration _configuration;
+        private readonly ITranslationService _translationService;
 
-        public NotificationService(AppDbContext context, IConfiguration configuration)
+        public NotificationService(AppDbContext context, IConfiguration configuration, ITranslationService? translationService = null)
         {
             _context = context;
             _configuration = configuration;
+            _translationService = translationService ?? NullTranslationService.Instance;
         }
 
         public async Task<PagedResultDto<NotificationDto>> GetMyAsync(int userId, NotificationQueryDto query)
@@ -35,9 +37,21 @@ namespace TuristickiVodic.Services.Services
                 .Take(query.PageSize)
                 .ToListAsync();
 
+            var language = await _context.Users
+                .AsNoTracking()
+                .Where(u => u.Id == userId)
+                .Select(u => u.Language)
+                .FirstOrDefaultAsync() ?? "sr";
+
+            var dtos = new List<NotificationDto>(items.Count);
+            foreach (var item in items)
+            {
+                dtos.Add(await MapToDtoAsync(item, language));
+            }
+
             return new PagedResultDto<NotificationDto>
             {
-                Items = items.Select(MapToDto).ToList(),
+                Items = dtos,
                 Page = query.Page,
                 PageSize = query.PageSize,
                 TotalCount = totalCount,
@@ -283,24 +297,33 @@ namespace TuristickiVodic.Services.Services
                 .Select(x => $"{x.EventPlannerItemId!.Value}:{x.TriggerAtUtc!.Value.Ticks}")
                 .ToHashSet();
 
-            var newNotifications = duePlannerItems
+            var itemsToNotify = duePlannerItems
                 .Where(item => !existingKeySet.Contains($"{item.PlannerItemId}:{item.StartDate.AddHours(-2).Ticks}"))
-                .Select(item => new Notification
+                .ToList();
+
+            if (itemsToNotify.Count == 0)
+                return;
+
+            var newNotifications = new List<Notification>();
+
+            foreach (var item in itemsToNotify)
+            {
+                var title = "Događaj počinje uskoro";
+                var message = $"Događaj \"{item.EventName}\" počinje za manje od 2 sata.";
+
+                newNotifications.Add(new Notification
                 {
                     UserId = userId,
                     Type = NotificationType.PlannerEventReminder2Hours,
-                    Title = "Dogadjaj pocinje uskoro",
-                    Message = $"Dogadjaj \"{item.EventName}\" pocinje za manje od 2 sata.",
+                    Title = title,
+                    Message = message,
                     ActionUrl = $"/event/{item.EventId}",
                     EventId = item.EventId,
                     EventPlannerItemId = item.PlannerItemId,
                     TriggerAtUtc = item.StartDate.AddHours(-2),
                     CreatedAt = now
-                })
-                .ToList();
-
-            if (newNotifications.Count == 0)
-                return;
+                });
+            }
 
             _context.Notifications.AddRange(newNotifications);
             try
@@ -344,14 +367,19 @@ namespace TuristickiVodic.Services.Services
                 query.PageSize = 100;
         }
 
-        private static NotificationDto MapToDto(Notification notification)
+        private async Task<NotificationDto> MapToDtoAsync(Notification notification, string languageCode)
         {
+            var title = await _translationService.GetOrCreateTextAsync(
+                "Notification", notification.Id, "Title", notification.Title, languageCode);
+            var message = await _translationService.GetOrCreateTextAsync(
+                "Notification", notification.Id, "Message", notification.Message, languageCode);
+
             return new NotificationDto
             {
                 Id = notification.Id,
                 Type = notification.Type.ToString(),
-                Title = notification.Title,
-                Message = notification.Message,
+                Title = title,
+                Message = message,
                 ActionUrl = notification.ActionUrl,
                 IsRead = notification.IsRead,
                 ReadAt = notification.ReadAt,

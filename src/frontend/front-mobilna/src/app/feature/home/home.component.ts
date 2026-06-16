@@ -539,7 +539,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     );
     this.loadUserName();
     this.loadPlaceCards();
-    this.loadSearchIndex();
     this.loadRecommendedCards();
     this.loadEventCards();
     this.loadFavorites();

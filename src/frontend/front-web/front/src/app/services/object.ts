@@ -279,8 +279,11 @@ export class ObjectService {
     }
 
     params = this.addLang(params, options);
-    return this.http.get<ObjectDto[]>(this.url, { params }).pipe(
-      map((items) => (items ?? []).map((item) => this.normalizeObject(item)))
+    return this.http.get<ObjectDto[] | { items?: ObjectDto[] }>(this.url, { params }).pipe(
+      map((response) => {
+        const items = Array.isArray(response) ? response : (response?.items ?? []);
+        return items.map((item) => this.normalizeObject(item));
+      })
     );
   }
 

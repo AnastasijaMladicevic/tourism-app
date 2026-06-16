@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using TuristickiVodic.Core.DTO;
 using TuristickiVodic.Core.Models;
+using TuristickiVodic.Services.Services;
 
 using System;
 
@@ -24,7 +25,9 @@ namespace TuristickiVodic.Services.Mappings
                 .ForMember(dest => dest.CreatorRoleRequestStatus,
                     opt => opt.MapFrom(src => src.CreatorRoleRequestStatus.ToString()));
 
-            CreateMap<Region, RegionDto>();
+            CreateMap<Region, RegionDto>()
+                .ForMember(dest => dest.BoundaryGeoJson,
+                    opt => opt.MapFrom(src => GeoJsonHelper.ToGeoJson(src.Boundary)));
 
             CreateMap<CreateUserDto, User>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore())
@@ -144,7 +147,9 @@ namespace TuristickiVodic.Services.Mappings
                 .ForMember(dest => dest.Longitude,
                     opt => opt.MapFrom(src => src.Geolocation != null ? src.Geolocation.X : (double?)null))
                 .ForMember(dest => dest.Latitude,
-                    opt => opt.MapFrom(src => src.Geolocation != null ? src.Geolocation.Y : (double?)null));
+                    opt => opt.MapFrom(src => src.Geolocation != null ? src.Geolocation.Y : (double?)null))
+                .ForMember(dest => dest.BoundaryGeoJson,
+                    opt => opt.MapFrom(src => GeoJsonHelper.ToGeoJson(src.Boundary)));
 
             CreateMap<Destination, DestinationDto>()
                 .ForMember(dest => dest.DestinationTypeName,
@@ -162,7 +167,9 @@ namespace TuristickiVodic.Services.Mappings
                 .ForMember(dest => dest.Latitude,
                     opt => opt.MapFrom(src => src.Geolocation != null ? src.Geolocation.Y : (double?)null))
                 .ForMember(dest => dest.Status,
-                    opt => opt.MapFrom(src => src.Status.ToString()));
+                    opt => opt.MapFrom(src => src.Status.ToString()))
+                .ForMember(dest => dest.BoundaryGeoJson,
+                    opt => opt.MapFrom(src => GeoJsonHelper.ToGeoJson(src.Boundary)));
 
             CreateMap<Activity, ActivityDto>()
                 .ForMember(dest => dest.ActivityTypeName,
@@ -317,6 +324,13 @@ namespace TuristickiVodic.Services.Mappings
                 .ForMember(dest => dest.ReviewedByFullName,
                     opt => opt.MapFrom(src =>
                         src.ReviewedBy != null ? (src.ReviewedBy.FirstName + " " + src.ReviewedBy.LastName) : null))
+                .ForMember(dest => dest.CreatedByUserId,
+                    opt => opt.MapFrom(src => src.Object != null ? (int?)src.Object.CreatedByUserId : null))
+                .ForMember(dest => dest.CreatedByFullName,
+                    opt => opt.MapFrom(src =>
+                        src.Object != null && src.Object.CreatedBy != null
+                            ? (src.Object.CreatedBy.FirstName + " " + src.Object.CreatedBy.LastName).Trim()
+                            : null))
                 .ForMember(dest => dest.Status,
                     opt => opt.MapFrom(src => src.Status.ToString()));
 

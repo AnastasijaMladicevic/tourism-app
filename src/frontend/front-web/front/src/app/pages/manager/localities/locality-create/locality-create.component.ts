@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -8,6 +8,7 @@ import { CreateLocalityDto, LocalityImageDto, LocalityService, UpdateLocalityDto
 import { MapComponent as SharedMapComponent } from '../../../../shared/components/map/map';
 import { TranslatePipe } from '../../../../shared/pipes/translate.pipe';
 import { TranslationService } from '../../../../services/translation.service';
+import { isPointInGeoJson } from '../../../../shared/utils/geo-utils';
 
 interface LocalityTypeOption {
   id: number;
@@ -19,6 +20,7 @@ interface DestinationOption {
   name: string;
   latitude?: number;
   longitude?: number;
+  boundaryGeoJson?: string;
 }
 
 @Component({
@@ -41,6 +43,8 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
   private readonly route = inject(ActivatedRoute);
   private readonly cdr = inject(ChangeDetectorRef);
   readonly translationService = inject(TranslationService);
+
+  @ViewChild(SharedMapComponent) mapComponent?: SharedMapComponent;
 
   isSubmitting = false;
   isLoadingOptions = true;
@@ -106,10 +110,59 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
     return Number.isFinite(lng) && lng < 0 ? 'W' : 'E';
   }
 
+  get selectedDestination(): DestinationOption | undefined {
+    return this.destinationOptions.find((option) => option.id === Number(this.form.destinationId));
+  }
+
+  get selectedDestinationBoundary(): string | undefined {
+    return this.selectedDestination?.boundaryGeoJson;
+  }
+
+  // Vraca true ako je tacka unutar granice izabrane destinacije, ili ako granica nije definisana (preskace proveru).
+  private isWithinSelectedDestination(lat: number, lng: number): boolean {
+    const boundary = this.selectedDestinationBoundary;
+    if (!boundary) {
+      return true;
+    }
+    return isPointInGeoJson(lng, lat, boundary);
+  }
+
   onMapLocationSelected(event: { lat: number; lng: number }): void {
+    if (!this.isWithinSelectedDestination(event.lat, event.lng)) {
+      this.errorMessage = this.translationService.translate('manager.localityForm.errors.outsideDestination', {
+        destination: this.selectedDestination?.name ?? ''
+      });
+      this.mapComponent?.resetMarker(this.mapLat, this.mapLng);
+      this.cdr.detectChanges();
+      return;
+    }
+
+    this.errorMessage = '';
     this.form.latitude = event.lat;
     this.form.longitude = event.lng;
     this.cdr.detectChanges();
+  }
+
+  onCoordinateInputChanged(): void {
+    const lat = Number(this.form.latitude);
+    const lng = Number(this.form.longitude);
+
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+      return;
+    }
+
+    if (!this.isWithinSelectedDestination(lat, lng)) {
+      this.errorMessage = this.translationService.translate('manager.localityForm.errors.outsideDestination', {
+        destination: this.selectedDestination?.name ?? ''
+      });
+      return;
+    }
+
+    if (this.errorMessage === this.translationService.translate('manager.localityForm.errors.outsideDestination', {
+      destination: this.selectedDestination?.name ?? ''
+    })) {
+      this.errorMessage = '';
+    }
   }
 
   get hasMapCoordinates(): boolean {
@@ -171,6 +224,19 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
     return this.existingImages.length > 0 || this.imagePreviews.length > 0;
   }
 
+  get hasRequiredCreateFields(): boolean {
+    return Boolean(
+      this.form.name.trim() &&
+      this.form.destinationId &&
+      this.form.localityTypeId &&
+      this.hasAnyGalleryImages
+    );
+  }
+
+  get isSubmitDisabled(): boolean {
+    return this.isSubmitting || this.isLoadingOptions || !this.hasRequiredCreateFields;
+  }
+
   onSubmit(): void {
     if (this.isSubmitting || this.isLoadingOptions) {
       return;
@@ -186,6 +252,16 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
     }
     if (this.existingImages.length + this.imageFiles.length > this.maxImageCount) {
       this.errorMessage = this.translationService.translate('manager.localityForm.errors.maxImages', { count: this.maxImageCount });
+      return;
+    }
+    if (
+      this.form.latitude != null &&
+      this.form.longitude != null &&
+      !this.isWithinSelectedDestination(Number(this.form.latitude), Number(this.form.longitude))
+    ) {
+      this.errorMessage = this.translationService.translate('manager.localityForm.errors.outsideDestination', {
+        destination: this.selectedDestination?.name ?? ''
+      });
       return;
     }
 
@@ -315,6 +391,8 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
       this.form.latitude = selectedDestination.latitude;
       this.form.longitude = selectedDestination.longitude;
     }
+
+    this.onCoordinateInputChanged();
   }
 
   onFilesSelected(event: Event): void {
@@ -382,15 +460,16 @@ export class ManagerLocalityCreateComponent implements OnInit, OnDestroy {
           const destinationsRaw = Array.isArray(destResponse)
             ? destResponse
             : (destResponse as { items?: unknown[] })?.items ?? [];
-          const destinations = destinationsRaw as Array<{ id?: number; name?: string; latitude?: number; longitude?: number }>;
+          const destinations = destinationsRaw as Array<{ id?: number; name?: string; latitude?: number; longitude?: number; boundaryGeoJson?: string }>;
 
           this.destinationOptions = destinations
-            .filter((d): d is { id: number; name: string; latitude?: number; longitude?: number } => typeof d.id === 'number' && !!d.name)
+            .filter((d): d is { id: number; name: string; latitude?: number; longitude?: number; boundaryGeoJson?: string } => typeof d.id === 'number' && !!d.name)
             .map((d) => ({
               id: d.id,
               name: d.name,
               latitude: typeof d.latitude === 'number' ? d.latitude : undefined,
-              longitude: typeof d.longitude === 'number' ? d.longitude : undefined
+              longitude: typeof d.longitude === 'number' ? d.longitude : undefined,
+              boundaryGeoJson: d.boundaryGeoJson
             }))
             .sort((a, b) => a.name.localeCompare(b.name));
 

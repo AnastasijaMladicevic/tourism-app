@@ -163,7 +163,7 @@ export class ModeratorAccessPreviewComponent {
         this.syncUserState(updatedUser);
         this.requestStatus.set('pending');
         this.feedbackTone.set('success');
-        this.feedback.set(result.message || this.translationService.translate('moderatorAccess.feedback.sendSuccess'));
+        this.feedback.set(this.translationService.translate('moderatorAccess.feedback.sendSuccess'));
       });
   }
 
